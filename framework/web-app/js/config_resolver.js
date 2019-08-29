@@ -57,6 +57,8 @@ $(document).ready(function() {
 	});
 	$("#deviceid").addClass("changecolor");
 	var decider_id = $("#decider").val();
+	$.selectedVDevices = new Array();
+	$.selectedBDevices = new Array();
 });
 
 
@@ -74,16 +76,15 @@ function uploadRDKBDevice(){
 	$("#up_load_rdkb").show();
 }
 
+/**
+ * Function used to delete the selected devices based on type
+ */
 function deleteDevices(type) {
 	var devicesToDelete = [];
 	if (type == 'V') {
-		 $.each($("input[name='vDevice']:checked"), function(){            
-	        devicesToDelete.push($(this).val());
-	     })
+		devicesToDelete = $.selectedVDevices;
 	} else {
-		 $.each($("input[name='bDevice']:checked"), function(){            
-	        devicesToDelete.push($(this).val());
-	     })
+		devicesToDelete = $.selectedBDevices;
 	}
 	
 	if (devicesToDelete.length > 0) {
@@ -92,6 +93,34 @@ function deleteDevices(type) {
        	});
 	} else {
         alert('Please select any device to delete');
+    }
+}
+
+/**
+ * Function used to update the list of selected RDK V devices
+ */
+function onDeviceVSelectionChange(deviceId, id) {
+    if($('#'+ id).prop("checked") == true){
+    	$.selectedVDevices.push(deviceId);
+    } else {
+    	var index =  $.selectedVDevices.indexOf(deviceId);
+    	if(index >= 0) {
+    		$.selectedVDevices.splice(index, 1);
+    	}
+    }
+}
+
+/**
+ * Function used to update the list of selected RDK B devices
+ */
+function onDeviceBSelectionChange(deviceId, id) {
+    if($('#'+ id).prop("checked") == true){
+    	$.selectedBDevices.push(deviceId);
+    } else {
+    	var index =  $.selectedBDevices.indexOf(deviceId);
+    	if(index >= 0) {
+    		$.selectedBDevices.splice(index, 1);
+    	}
     }
 }
 
