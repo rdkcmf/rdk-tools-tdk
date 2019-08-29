@@ -279,7 +279,7 @@
 									<g:each in="${deviceInstanceListSTB}" var="parentDevice">
 								<g:if test="${parentDevice.isChild == 0}">
 										<tr>
-										    <td><input type="checkbox" name="vDevice"  value="${parentDevice.id}" onClick="onDeviceVselectionChange('${parentDevice.id}')"/> </td> 
+										    <td><input type="checkbox" name="vDevice"  id = "${parentDevice.id}_CB" value="${parentDevice.id}" onClick="onDeviceVSelectionChange('${parentDevice.id}', '${parentDevice.id}_CB')"/> </td> 
 											<td>
 												<a href="#" onclick="showDevice('${parentDevice.id}');  highlightTreeElement('deviceList_', '${deviceCount1}', '${deviceInstanceTotal}'); highlightTreeElement('deviceGroupList_', '0', '${totalDevices1}'); return false;">${parentDevice.stbName}</a>
 											</td>
@@ -295,7 +295,7 @@
 										
 										
 										<tr>
-										<td><input type="checkbox" name="vDevice"  value="${childDevice.id}" onClick="onDeviceVselectionChange('${childDevice.id}')"/> </td>
+										<td><input type="checkbox" name="vDevice" id = "${childDevice.id}_CB"  value="${childDevice.id}" onClick="onDeviceVSelectionChange('${childDevice.id}', '${childDevice.id}_CB')"/> </td>
 											<td>
 												<a href="#" onclick="showDevice('${childDevice.id}');  highlightTreeElement('deviceList_', '${deviceCount1}', '${deviceInstanceTotal}'); highlightTreeElement('deviceGroupList_', '0', '${totalDevices1}'); return false;">${childDevice.stbName}</a>
 											</td>
@@ -347,7 +347,7 @@
 									<g:each in="${deviceInstanceListModem}" var="parentDevice">
 								<g:if test="${parentDevice.isChild == 0}">
 										<tr>
-										    <td ><input type="checkbox" name="bDevice" value="${parentDevice.id}"/> </td> 
+										    <td ><input type="checkbox" name="bDevice"  value="${parentDevice.id}" id = "${parentDevice.id}_CB"  onClick="onDeviceBSelectionChange('${parentDevice.id}', '${parentDevice.id}_CB')"/> </td> 
 											<td>
 												<a href="#" onclick="showDevice('${parentDevice.id}');  highlightTreeElement('deviceList_', '${deviceCount1}', '${deviceInstanceTotal}'); highlightTreeElement('deviceGroupList_', '0', '${totalDevices2}'); return false;">${parentDevice.stbName}</a>
 											</td>
@@ -361,7 +361,7 @@
 										
 										<g:each in="${ parentDevice.childDevices}" var="childDevice">
 										<tr>
-											<td ><input type="checkbox" name="bDevice" value="${childDevice.id}"/> </td> 
+											<td ><input type="checkbox" name="bDevice" value="${childDevice.id}" id = "${childDevice.id}_CB"  onClick="onDeviceBSelectionChange('${childDevice.id}', '${childDevice.id}_CB')" /> </td> 
 											<td>
 												<a href="#" onclick="showDevice('${childDevice.id}');  highlightTreeElement('deviceList_', '${deviceCount1}', '${deviceInstanceTotal}'); highlightTreeElement('deviceGroupList_', '0', '${totalDevices2}'); return false;">${childDevice.stbName}</a>
 											</td>
