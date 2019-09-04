@@ -891,6 +891,9 @@ class ScriptService {
 		try {
 
 			def moduleObj = Module.findByName(dirName)
+			if(moduleObj == null) {
+				return script
+			}
 			def scriptDirName = Constants.COMPONENT
 			if(moduleObj){
 				if(moduleObj?.testGroup?.groupValue.equals(TestGroup.E2E.groupValue)){
@@ -1292,6 +1295,9 @@ class ScriptService {
 								files.each { file ->
 									String name = ""+file?.name?.trim()?.replace(".py", "")
 									def sFile
+									if(!sLst.contains(name)){
+										sLst.add(name)
+									}
 									ScriptFile.withTransaction {
 										sFile = ScriptFile.findByScriptNameAndModuleName(name,module.getName())
 										if(sFile == null){
@@ -1311,9 +1317,7 @@ class ScriptService {
 										scriptsListMap.put(category, scriptsListmap)
 									}
 									if(!scriptsListmap.contains(sFile)){
-
 										scriptsListmap.add(sFile)
-										sLst.add(name)
 										scriptMapping.put(name, module?.getName())
 									}
 
@@ -1327,7 +1331,6 @@ class ScriptService {
 									}
 									if(!scriptsList.contains(sFile)){
 										scriptsList.add(sFile)
-										sLst.add(name)
 										scriptMapping.put(name, module?.getName())
 									}
 									scriptsListAdvanced.put(sFile?.id, path)
