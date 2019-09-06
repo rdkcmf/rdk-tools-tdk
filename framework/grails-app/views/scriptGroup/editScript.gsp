@@ -82,7 +82,7 @@ function clearLocks(scriptName){
 				</select>&emsp;&emsp;&emsp;&emsp;&emsp; <g:if
 						test="${script?.primitiveTest?.module?.testGroup?.toString() != "OpenSource"  }">
 						<a
-							href="JavaScript:newPopup('../htmls/${script?.primitiveTest?.module?.name?.trim()}.html#${script.name}');">View&nbsp;${script?.primitiveTest?.module?.name}&nbsp;Testcase
+                                                       href="JavaScript:newPopup('viewTestCase?module=${script?.primitiveTest?.module?.name?.trim()}&category=${category}');">View&nbsp;${script?.primitiveTest?.module?.name}&nbsp;Testcase
 						</a>
 						&emsp;	
 						<g:link  params="[category:category]"  onclick="editTestCase('${script.name}','${script?.primitiveTest?.name.trim()}','${category}');return false;" >Edit Test Case</g:link><%--
