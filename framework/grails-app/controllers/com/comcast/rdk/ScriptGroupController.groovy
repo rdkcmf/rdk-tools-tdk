@@ -845,6 +845,27 @@ class ScriptGroupController {
 			}
 		}
 	}
+
+	/**
+	 * Displays the testcase details for the given module
+	 * 
+	 */
+
+	def viewTestCase(String module, String category) {
+		params?.moduleName = module
+		params?.category = category
+		def totalTestCaseMap = testCaseService?.downloadModuleTestCaseInExcel(params,getRealPath())
+		def testCaseList = totalTestCaseMap[module]
+		// For handling special characters in the test cases
+		testCaseList.each{testCaseMap ->
+			testCaseMap.each{k,v ->
+				v = v.replace("&", "&#38;");
+				testCaseMap.put(k, v)
+			}
+		}
+		[testCaseList:testCaseList]
+	}
+
 	/**
 	 * Only display tcl script content
 	 *  
