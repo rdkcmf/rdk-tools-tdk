@@ -130,14 +130,27 @@ class ScriptGroupController {
 		testGroup.each { moduleName  ->
 			moduleMap.put(moduleName,moduleName.testGroup)
 		}
-		//[scriptGroupInstanceList: lists, scriptGroupInstanceTotal: lists.size(),error: params.error, scriptId: //params.scriptId, scriptGroupId:params.scriptGroupId, scriptInstanceTotal: scriptNameList.size(), //scriptGroupMap:scriptGroupMap, testGroup : moduleMap]
+		def scriptGroupListV = ScriptGroup.findAllByCategory('RDKV')
+
+		def testSuiteMapV =[:]
+		scriptGroupListV.each { scriptgrouplistv  ->
+			testSuiteMapV.put(scriptgrouplistv.name,scriptgrouplistv.scriptList?.size())
+		}
+		
+		def scriptGroupListB = ScriptGroup.findAllByCategory('RDKB')
+
+		def testSuiteMapB =[:]
+		scriptGroupListB.each { scriptgrouplistb  ->
+			testSuiteMapB.put(scriptgrouplistb.name,scriptgrouplistb.scriptList?.size())
+		}
+
 		listsTCL = listsTCL?listsTCL?.sort():[]
-		//[scriptGroupInstanceList: lists, scriptGroupInstanceTotal: lists.size(),
+
 		[error: params.error, scriptId: params.scriptId, scriptGroupId:params.scriptGroupId,
 			scriptInstanceTotalV: scriptNameListV?.size(),scriptInstanceTotalB: scriptNameListB?.size(),
 			scriptGroupMapV:scriptGroupMapV, scriptGroupMapB:scriptGroupMapB, scriptGroupInstanceListV:listsV, scriptGroupInstanceListB:listsB,
 			scriptGroupInstanceTotalV: listsV?.size(), scriptGroupInstanceTotalB: listsB?.size(),
-			tclScripts:scriptNameListTCL, tclScriptInstanceTotal:scriptNameListTCL?.size(),  scriptGrpTcl :listsTCL, tclScriptSize : listsTCL?.size(), testGroup : moduleMap ]
+			tclScripts:scriptNameListTCL, tclScriptInstanceTotal:scriptNameListTCL?.size(),  scriptGrpTcl :listsTCL, tclScriptSize : listsTCL?.size(), testGroup : moduleMap, testSuiteMapV : testSuiteMapV, testSuiteMapB : testSuiteMapB ]
 	}
 
 
