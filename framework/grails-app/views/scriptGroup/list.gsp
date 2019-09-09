@@ -43,26 +43,29 @@
 	<script type="text/javascript">
 
 	$(document).ready(function() {
-		$("#list-scriptDetails").show();
-			$("#scriptTable").dataTable( {
+		var ele = document.getElementsByName("chooseSummary");
+		//ele[0].checked = true;
+		//ele[1].checked = false;
+		$("#scriptDetailsSummary").show();
+		$("#list-scriptDetailsV").show();
+		$("#scriptTableV").dataTable( {
+		"sPaginationType": "full_numbers"
+		});
+		$("#list-scriptDetailsB").show();
+		$("#scriptTableB").dataTable( {
 			"sPaginationType": "full_numbers"
 		});
-		$("#list-scriptDetails1").show();
-				$("#scriptTable1").dataTable( {
-				"sPaginationType": "full_numbers"
-			});
 		var scriptId = $("#currentScriptId").val();
 		if(scriptId!=null && scriptId!=""){
 			editScript(scriptId);
 		}
-
 		var scriptGroupId = $("#currentScriptGroupId").val();
 		if(scriptGroupId){
-			editScriptGroup(scriptGroupId);			
+			editScriptGroup(scriptGroupId);
 		}
-		
+		$("#suiteDetailsSummary").hide();
 	});
-		
+
 	//Popup window code
 	function newPopup(url) {
 		popupWindow = window.open(
@@ -249,13 +252,17 @@
 						    	 <img src="../images/more.png" title="Advanced Search" onclick="displayAdvancedSearch();" style="display:none;"></img>						    	
 						    	</g:form>						
 							</div>
+							<div style="width: 100%;overflow: auto;text-align: center;" id="radioDiv">
+								<input type="radio" onclick="display('scriptSummary')" name="chooseSummary" checked="checked">Script Details Summary</input> &nbsp;&nbsp;
+								<input type="radio" onclick="display('suiteSummary')" name="chooseSummary">TestSuite Summary</input>
+							</div>
 							
 								<!-- The script details table UI changes -->
-							
+					<div id="scriptDetailsSummary">		
 					<div style="width: 95%; max-height: 600px; display: none ;"
-						id="list-scriptDetails" class="content scaffold-list"
-						id="scriptDetails">
-						<table id="scriptTable" class="display">
+						id="list-scriptDetailsV" class="content scaffold-list"
+						id="scriptDetailsV">
+						<table id="scriptTableV" class="display">
 							<thead>
 								<tr>
 									<th colspan="5" align="center" style="width: 50%;"><h1> RDKV Script
@@ -310,9 +317,9 @@
 					</div>
 					
 					<div style="width: 95%; max-height: 600px; display: none ;"
-						id="list-scriptDetails1" class="content scaffold-list"
-						id="scriptDetails1">
-						<table id="scriptTable1" class="display">
+						id="list-scriptDetailsB" class="content scaffold-list"
+						id="scriptDetailsB">
+						<table id="scriptTableB" class="display">
 							<thead>
 								<tr>
 									<th colspan="5" align="center" style="width: 50%;"><h1> RDKB Script
@@ -362,7 +369,89 @@
 								</g:each>								
 							</tbody>
 						</table>
-					</div>	
+					</div>
+				</div>
+				<div id="suiteDetailsSummary">
+					<div style="width: 95%; max-height: 600px; display: none ;"
+						id="list-suiteDetailsV" class="content scaffold-list"
+						id="suiteDetailsV">
+						<table id="suitetTableV" class="display">
+							<thead>
+								<tr>
+									<th colspan="3" align="center" style="width: 50%;"><h1> RDKV TestSuite
+											Details Summary</h1></th>
+								</tr>
+								<tr align="left">
+									<th width="20%">Sl No</th>
+									<th width ="60%">TestSuite Name</th>
+									<th width ="20%">Script Count</th>
+								</tr>
+							</thead>
+							<br>
+							<br>
+							<tbody align="left">
+								<%int testSuiteCount =0  %>
+								<%--<g:each in="${scriptGroupMap}" var=" name">					
+									--%>									
+									
+								<g:each in="${testSuiteMapV}" var=" name">	
+									
+									<tr class="odd">									
+										<% 	testSuiteCount++ %>
+										<td>
+											${testSuiteCount}
+										</td>
+										<td>
+											${name.key}
+										</td>
+										<td>
+											${name.value}
+										</td>
+									</tr>
+									</g:each>								
+							</tbody>
+						</table>
+					</div>
+					
+					<div style="width: 95%; max-height: 600px; display: none ;"
+						id="list-suiteDetailsB" class="content scaffold-list"
+						id="suiteDetailsB">
+						<table id="suiteTableB" class="display">
+							<thead>
+								<tr>
+									<th colspan="3" align="center" style="width: 50%;"><h1> RDKB TestSuite
+											Details Summary</h1></th>
+								</tr>
+								<tr align="left">
+									<th width="20%">Sl No</th>
+									<th width ="60%">TestSuite Name</th>
+									<th width ="20%">Script Count</th>
+								</tr>
+							</thead>
+							<br>
+							<br>
+							<tbody align="left">
+								<%int testSuiteCount1 =0  %>									
+													
+								<g:each in="${testSuiteMapB}" var=" name">	
+									
+									<tr class="odd">									
+										<% 	testSuiteCount1++ %>
+										<td>
+											${testSuiteCount1}
+										</td>
+										<td>
+											${name.key}
+										</td>
+										<td>
+											${name.value}
+										</td>
+										</tr>
+									</g:each>								
+							</tbody>
+						</table>
+					</div>					
+				</div>
 							<div id="advancedSearch" style="display:none;width: 100%; overflow: auto;">
 								<g:form controller="scriptGroup" >
 								<table>
