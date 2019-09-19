@@ -792,6 +792,7 @@ class ExecutionController {
 												executionDevice.execution = execution
 												executionDevice.dateOfExecution = new Date()
 												executionDevice.device = deviceInstance?.stbName
+												executionDevice.boxType = deviceInstance?.boxType?.name
 												executionDevice.deviceIp = deviceInstance?.stbIp
 												executionDevice.buildName = executionService.getBuildName( deviceInstance?.stbName )
 												executionDevice.status = UNDEFINED_STATUS
@@ -1018,6 +1019,7 @@ class ExecutionController {
 		def scriptType = params?.myGroup
 		def deviceList = []
 		def deviceName
+		String boxType
 		boolean allocated = false
 		boolean singleScript = false
 		String rerunOnFailure =FALSE
@@ -1292,6 +1294,7 @@ class ExecutionController {
 												executionDevice.execution = Execution.findByName(execName)
 												executionDevice.dateOfExecution = new Date()
 												executionDevice.device = deviceInstance?.stbName
+												executionDevice.boxType = deviceInstance?.boxType?.name
 												executionDevice.deviceIp = deviceInstance?.stbIp
 												executionDevice.status = UNDEFINED_STATUS
 												executionDevice.category = Utility.getCategory(params?.category)
@@ -2241,12 +2244,7 @@ class ExecutionController {
 				sameType = "overFlow"
 			}
 			else{
-				for(int i=0;i<selectedRows.size();i++){
-					if(selectedRows[i] != UNDEFINED){
-						selectedRowsDefined.add(selectedRows[i])
-					}
-				}
-				sameType = executedbService.checkValidExecutions(selectedRowsDefined)
+				sameType = "true"
 			}
 		}
 		render sameType
@@ -2897,6 +2895,7 @@ class ExecutionController {
 							executionDevice.execution = execution
 							executionDevice.dateOfExecution = new Date()
 							executionDevice.device = deviceInstance?.stbName
+							executionDevice.boxType = deviceInstance?.boxType?.name
 							executionDevice.deviceIp = deviceInstance?.stbIp
 							executionDevice.buildName = executionService.getBuildName( deviceInstance?.stbName )
 							executionDevice.status = UNDEFINED_STATUS
@@ -3309,6 +3308,7 @@ class ExecutionController {
 							executionDevice.execution = Execution.findByName(execName)
 							executionDevice.dateOfExecution = new Date()
 							executionDevice.device = deviceInstance?.stbName
+							executionDevice.boxType = deviceInstance?.boxType?.name
 							executionDevice.deviceIp = deviceInstance?.stbIp
 							executionDevice.status = UNDEFINED_STATUS
 							executionDevice.category = Utility.getCategory(deviceInstance?.category?.toString())
@@ -3736,6 +3736,7 @@ class ExecutionController {
 										executionDevice.execution = execution
 										executionDevice.dateOfExecution = new Date()
 										executionDevice.device = deviceInstance?.stbName
+										executionDevice.boxType = deviceInstance?.boxType?.name
 										executionDevice.deviceIp = deviceInstance?.stbIp
 										executionDevice.status = UNDEFINED_STATUS
 										executionDevice.buildName = executionService.getBuildName( deviceInstance?.stbName )
