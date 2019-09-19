@@ -1015,16 +1015,9 @@ class ExecutionService {
 			if(!executionList.isEmpty()){
 				for (Iterator<Execution> iterator = executionList.iterator(); iterator.hasNext();) {
 					Execution executionInstance = iterator.next();
-					String deviceName = executionInstance.device
-					Device device = Device.findByStbName(deviceName)
-					if(device){
-						String boxTypeOfDevice = device.boxType.name
-						if(!boxTypeOfDevice.equals(boxType)){
-							def executionInstanceIndex = executionList.indexOf(executionInstance)
-							iterator.remove();
-						}
-					}
-					else{
+					def executionDeviceInstance = ExecutionDevice.findByExecution(executionInstance)
+					String boxTypeOfExecutionDevice = executionDeviceInstance?.boxType
+					if(!boxTypeOfExecutionDevice.equals(boxType)){
 						def executionInstanceIndex = executionList.indexOf(executionInstance)
 						iterator.remove();
 					}
