@@ -1738,13 +1738,41 @@ class ScriptService {
 	 * Method to update the script groups both RDKv & RDKB from script group page ui
 	 */
 	def updateScriptGroups(def moduleName , def realPath , def category){
-		File module = getModuleDirectory(moduleName, realPath, category)
-
 		if(category?.equals(Category.RDKB_TCL.toString()) || moduleName == 'tcl'){
-
 			updateTCLScriptGroup("${realPath}//fileStore//"+FileStorePath.RDKTCL.value())
 		}else{
-			updateScriptGroup(module, realPath, category)
+			def dirList = []
+			def dirNameList = []
+			String dirNameAdvanced = ""
+			def path = null
+			def pathAdvanced = null
+			def scriptDirName = ""
+			File moduleFile = null
+			def moduleObj = Module.findByName(moduleName)
+			scriptDirName = Constants.COMPONENT
+			if(moduleObj){
+				if(moduleObj?.testGroup?.groupValue.equals(TestGroup.E2E.groupValue)){
+					scriptDirName = Constants.INTEGRATION
+				}
+			}
+			if(category?.equals(Category.RDKV.toString())){
+				dirNameList.addAll(FileStorePath.RDKV.value(),FileStorePath.RDKVADVANCED.value())
+
+			}else if(category?.equals(Category.RDKB.toString())){
+				dirNameList.addAll(FileStorePath.RDKB.value(),FileStorePath.RDKBADVANCED.value())
+			}
+			dirNameList.each{ dirName->
+				path = "${realPath}//fileStore//"+dirName+"//"+scriptDirName+"//"+moduleName
+				if(path){
+					moduleFile = new File (path)
+					if(moduleFile.exists()){
+						dirList.add(moduleFile)
+					}
+				}
+			}
+			dirList.each{ module ->
+				updateScriptGroup(module, realPath, category)
+			}
 		}
 	}
 
