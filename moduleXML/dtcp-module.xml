@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2018 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<xml>
+  <module>
+  <!-- Module Name  -->
+    <moduleName>dtcp</moduleName>
+  <!-- Category of the module  -->
+    <category>RDKV</category>
+  <!-- Excecution time out of module -->
+    <executionTimeOut>5</executionTimeOut>
+  <!-- Excecution time out of module -->
+    <testGroup>Component</testGroup>
+  <!-- Logs File Names of module -->
+    <logFileNames>[]</logFileNames>
+  <!-- Crash File Names of the module -->
+    <crashFileNames>[]</crashFileNames>
+  <!-- Total functions corresponding module  -->
+    <functions>
+      <function name='TestMgr_DTCPAgent_Init' />
+      <function name='TestMgr_DTCP_Test_Execute' />
+    </functions>
+  <!-- Total parameters corresponding module  -->
+    <parameters>
+      <parameter funName='TestMgr_DTCPAgent_Init' parameterName='funcName' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DTCPAgent_Init' parameterName='param1' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DTCPAgent_Init' parameterName='param4' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_DTCPAgent_Init' parameterName='param2' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_DTCPAgent_Init' parameterName='param3' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_DTCP_Test_Execute' parameterName='funcName' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DTCP_Test_Execute' parameterName='strParam1' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DTCP_Test_Execute' parameterName='intParam2' parameterType='INTEGER' range='0-65535' />
+      <parameter funName='TestMgr_DTCP_Test_Execute' parameterName='intParam3' parameterType='INTEGER' range='0-65535' />
+      <parameter funName='TestMgr_DTCP_Test_Execute' parameterName='intParam4' parameterType='INTEGER' range='0-65535' />
+    </parameters>
+  </module>
+</xml>

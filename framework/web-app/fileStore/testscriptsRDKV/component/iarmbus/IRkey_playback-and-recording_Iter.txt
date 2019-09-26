@@ -1,0 +1,39 @@
+##########################################################################
+# If not stated otherwise in this file or this component's Licenses.txt
+# file the following copyright and licenses apply:
+#
+# Copyright 2016 RDK Management
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+##########################################################################
+KD_PLAY:32768:280
+KD_STOP:32768:281
+KD_PAUSE:32768:282
+KD_FASTFORWARD:32768:283
+KD_REWIND:32768:284
+KD_RECORD:32768:285
+KD_REPLAY:32768:286
+KU_PLAY:33024:280
+KU_STOP:33024:281
+KU_PAUSE:33024:282
+KU_FASTFORWARD:33024:283
+KU_REWIND:33024:284
+KU_RECORD:33024:285
+KU_REPLAY:33024:286
+RPT_PLAY:33280:280
+RPT_STOP:33280:281
+RPT_PAUSE:33280:282
+RPT_FASTFORWARD:33280:283
+RPT_REWIND:33280:284
+RPT_RECORD:33280:285
+RPT_REPLAY:33280:286

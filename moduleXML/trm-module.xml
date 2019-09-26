@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2018 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<xml>
+  <module>
+  <!-- Module Name  -->
+    <moduleName>trm</moduleName>
+  <!-- Category of the module  -->
+    <category>RDKV</category>
+  <!-- Excecution time out of module -->
+    <executionTimeOut>10</executionTimeOut>
+  <!-- Excecution time out of module -->
+    <testGroup>Component</testGroup>
+  <!-- Logs File Names of module -->
+    <logFileNames>[]</logFileNames>
+  <!-- Crash File Names of the module -->
+    <crashFileNames>[]</crashFileNames>
+  <!-- Total functions corresponding module  -->
+    <functions>
+      <function name='TestMgr_TRM_GetAllTunerStates' />
+      <function name='TestMgr_TRM_GetAllTunerIds' />
+      <function name='TestMgr_TRM_GetAllReservations' />
+      <function name='TestMgr_TRM_GetVersion' />
+      <function name='TestMgr_TRM_TunerReserveForRecord' />
+      <function name='TestMgr_TRM_TunerReserveForLive' />
+      <function name='TestMgr_TRM_TunerReserveForHyBrid' />
+      <function name='TestMgr_TRM_ReleaseTunerReservation' />
+      <function name='TestMgr_TRM_ValidateTunerReservation' />
+      <function name='TestMgr_TRM_CancelRecording' />
+      <function name='TestMgr_TRM_CancelLive' />
+      <function name='TestMgr_TRM_TunerReserveAllForRecord' />
+      <function name='TestMgr_TRM_TunerReserveAllForLive' />
+      <function name='TestMgr_TRM_GetMaxTuners' />
+    </functions>
+  <!-- Total parameters corresponding module  -->
+    <parameters>
+      <parameter funName='TestMgr_TRM_GetAllReservations' parameterName='deviceNo' parameterType='INTEGER' range='0-5' />
+      <parameter funName='TestMgr_TRM_TunerReserveForRecord' parameterName='recordingId' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_TunerReserveForRecord' parameterName='duration' parameterType='DOUBLE' range='0-1000000' />
+      <parameter funName='TestMgr_TRM_TunerReserveForRecord' parameterName='locator' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_TunerReserveForRecord' parameterName='startTime' parameterType='DOUBLE' range='0-1000000' />
+      <parameter funName='TestMgr_TRM_TunerReserveForRecord' parameterName='deviceNo' parameterType='INTEGER' range='0-5' />
+      <parameter funName='TestMgr_TRM_TunerReserveForRecord' parameterName='hot' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_TRM_TunerReserveForRecord' parameterName='selectOnConflict' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_TRM_TunerReserveForRecord' parameterName='token' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_TunerReserveForLive' parameterName='duration' parameterType='DOUBLE' range='0-1000000' />
+      <parameter funName='TestMgr_TRM_TunerReserveForLive' parameterName='locator' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_TunerReserveForLive' parameterName='startTime' parameterType='DOUBLE' range='0-1000000' />
+      <parameter funName='TestMgr_TRM_TunerReserveForLive' parameterName='deviceNo' parameterType='INTEGER' range='0-5' />
+      <parameter funName='TestMgr_TRM_TunerReserveForLive' parameterName='selectOnConflict' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_TRM_TunerReserveForLive' parameterName='token' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_TunerReserveForHyBrid' parameterName='recordingId' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_TunerReserveForHyBrid' parameterName='duration' parameterType='DOUBLE' range='0-1000000' />
+      <parameter funName='TestMgr_TRM_TunerReserveForHyBrid' parameterName='locator' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_ReleaseTunerReservation' parameterName='duration' parameterType='DOUBLE' range='0-1000000' />
+      <parameter funName='TestMgr_TRM_ReleaseTunerReservation' parameterName='locator' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_ReleaseTunerReservation' parameterName='deviceNo' parameterType='INTEGER' range='0-5' />
+      <parameter funName='TestMgr_TRM_ReleaseTunerReservation' parameterName='activity' parameterType='INTEGER' range='1-2' />
+      <parameter funName='TestMgr_TRM_ValidateTunerReservation' parameterName='duration' parameterType='DOUBLE' range='0-1000000' />
+      <parameter funName='TestMgr_TRM_ValidateTunerReservation' parameterName='locator' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_ValidateTunerReservation' parameterName='deviceNo' parameterType='INTEGER' range='0-5' />
+      <parameter funName='TestMgr_TRM_ValidateTunerReservation' parameterName='activity' parameterType='INTEGER' range='1-2' />
+      <parameter funName='TestMgr_TRM_CancelRecording' parameterName='recordingId' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_CancelRecording' parameterName='duration' parameterType='DOUBLE' range='0-1000000' />
+      <parameter funName='TestMgr_TRM_CancelRecording' parameterName='locator' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_CancelLive' parameterName='duration' parameterType='DOUBLE' range='0-1000000' />
+      <parameter funName='TestMgr_TRM_CancelLive' parameterName='locator' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_TunerReserveAllForRecord' parameterName='recordingId' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_TunerReserveAllForRecord' parameterName='duration' parameterType='DOUBLE' range='0-1000000' />
+      <parameter funName='TestMgr_TRM_TunerReserveAllForRecord' parameterName='locator' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_TRM_TunerReserveAllForLive' parameterName='duration' parameterType='DOUBLE' range='0-1000000' />
+      <parameter funName='TestMgr_TRM_TunerReserveAllForLive' parameterName='locator' parameterType='STRING' range='A-Z' />
+    </parameters>
+  </module>
+</xml>

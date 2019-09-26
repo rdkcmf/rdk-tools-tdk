@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2018 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<xml>
+  <module>
+  <!-- Module Name  -->
+    <moduleName>iarmbus</moduleName>
+  <!-- Category of the module  -->
+    <category>RDKV</category>
+  <!-- Excecution time out of module -->
+    <executionTimeOut>3</executionTimeOut>
+  <!-- Excecution time out of module -->
+    <testGroup>Component</testGroup>
+  <!-- Logs File Names of module -->
+    <logFileNames>[]</logFileNames>
+  <!-- Crash File Names of the module -->
+    <crashFileNames>[/opt/logs/uimgr_log.txt]</crashFileNames>
+  <!-- Total functions corresponding module  -->
+    <functions>
+      <function name='TestMgr_IARMBUS_Init' />
+      <function name='TestMgr_IARMBUS_Connect' />
+      <function name='TestMgr_IARMBUS_Disconnect' />
+      <function name='TestMgr_IARMBUS_Term' />
+      <function name='TestMgr_IARMBUS_BusCall' />
+      <function name='TestMgr_IARMBUS_RegisterCall' />
+      <function name='TestMgr_IARMBUS_RequestResource' />
+      <function name='TestMgr_IARMBUS_ReleaseResource' />
+      <function name='TestMgr_IARMBUS_BroadcastEvent' />
+      <function name='TestMgr_IARMBUS_InvokeSecondApplication' />
+      <function name='TestMgr_IARMBUS_RegisterEventHandler' />
+      <function name='TestMgr_IARMBUS_UnRegisterEventHandler' />
+      <function name='TestMgr_IARMBUS_IsConnected' />
+      <function name='TestMgr_IARMBUS_RegisterEvent' />
+      <function name='TestMgr_IARMBUS_GetContext' />
+      <function name='TestMgr_IARMBUS_GetLastReceivedEventDetails' />
+      <function name='TestMgr_IARMBUSPERF_Disconnect' />
+      <function name='TestMgr_IARMBUSPERF_Init' />
+      <function name='TestMgr_IARMBUSPERF_InvokeEventTransmitterApp' />
+      <function name='TestMgr_IARMBUSPERF_RegisterEventHandler' />
+      <function name='TestMgr_IARMBUSPERF_RegisterMultipleEventHandlers' />
+      <function name='TestMgr_IARMBUSPERF_RegisterTwoEvtHandlersTwoEvents' />
+      <function name='TestMgr_IARMBUSPERF_Term' />
+      <function name='TestMgr_IARMBUSPERF_UnRegisterEventHandler' />
+      <function name='TestMgr_IARMBUSPERF_Connect' />
+      <function name='TestMgr_IARMBUSPERF_GetLastReceivedEventDetails' />
+      <function name='TestMgr_IARMBUS_SyncSecondApplication' />
+      <function name='TestMgr_IARMBUS_InvokeEventTransmitterApp' />
+      <function name='TestMgr_IARMBUS_GetLastReceivedEventPerformanceDetails' />
+      <function name='TestMgr_IARMBUS_RegisterMultipleEventHandlers' />
+      <function name='anooptestfn' />
+      <function name='TestMgr_IARMBUS_RemoveEventHandler' />
+    </functions>
+  <!-- Total parameters corresponding module  -->
+    <parameters>
+      <parameter funName='TestMgr_IARMBUS_Init' parameterName='Process_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_BusCall' parameterName='owner_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_BusCall' parameterName='method_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_BusCall' parameterName='set_timeout' parameterType='INTEGER' range='1-65535' />
+      <parameter funName='TestMgr_IARMBUS_BusCall' parameterName='newState' parameterType='INTEGER' range='0-2' />
+      <parameter funName='TestMgr_IARMBUS_BusCall' parameterName='resource_type' parameterType='INTEGER' range='0-7' />
+      <parameter funName='TestMgr_IARMBUS_BusCall' parameterName='mfr_param_type' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_IARMBUS_BusCall' parameterName='testapp_API1_data' parameterType='INTEGER' range='1-1000' />
+      <parameter funName='TestMgr_IARMBUS_BusCall' parameterName='testapp_API0_data' parameterType='INTEGER' range='1-1000' />
+      <parameter funName='TestMgr_IARMBUS_BusCall' parameterName='imagename' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_BusCall' parameterName='imagepath' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_RegisterCall' parameterName='owner_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_RequestResource' parameterName='resource_type' parameterType='INTEGER' range='0-7' />
+      <parameter funName='TestMgr_IARMBUS_ReleaseResource' parameterName='resource_type' parameterType='INTEGER' range='0-7' />
+      <parameter funName='TestMgr_IARMBUS_BroadcastEvent' parameterName='event_id' parameterType='INTEGER' range='0-2' />
+      <parameter funName='TestMgr_IARMBUS_BroadcastEvent' parameterName='owner_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_BroadcastEvent' parameterName='keyType' parameterType='INTEGER' range='1-65535' />
+      <parameter funName='TestMgr_IARMBUS_BroadcastEvent' parameterName='keyCode' parameterType='INTEGER' range='1-65535' />
+      <parameter funName='TestMgr_IARMBUS_BroadcastEvent' parameterName='newState' parameterType='INTEGER' range='0-2' />
+      <parameter funName='TestMgr_IARMBUS_BroadcastEvent' parameterName='resource_type' parameterType='INTEGER' range='0-7' />
+      <parameter funName='TestMgr_IARMBUS_BroadcastEvent' parameterName='state' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_IARMBUS_BroadcastEvent' parameterName='error' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_IARMBUS_BroadcastEvent' parameterName='payload' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_InvokeSecondApplication' parameterName='appname' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_InvokeSecondApplication' parameterName='argv1' parameterType='STRING' range='ON,OFF,PAIR' />
+      <parameter funName='TestMgr_IARMBUS_InvokeSecondApplication' parameterName='apptype' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_InvokeSecondApplication' parameterName='iterationcount' parameterType='INTEGER' range='0-100000' />
+      <parameter funName='TestMgr_IARMBUS_RegisterEventHandler' parameterName='event_id' parameterType='INTEGER' range='0-2' />
+      <parameter funName='TestMgr_IARMBUS_RegisterEventHandler' parameterName='owner_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_RegisterEventHandler' parameterName='evt_handler' parameterType='STRING' range='Event Handler' />
+      <parameter funName='TestMgr_IARMBUS_UnRegisterEventHandler' parameterName='event_id' parameterType='INTEGER' range='0-2' />
+      <parameter funName='TestMgr_IARMBUS_UnRegisterEventHandler' parameterName='owner_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_IsConnected' parameterName='member_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_RegisterEvent' parameterName='max_event' parameterType='INTEGER' range='0-2' />
+      <parameter funName='TestMgr_IARMBUSPERF_Init' parameterName='Process_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUSPERF_InvokeEventTransmitterApp' parameterName='event_id' parameterType='INTEGER' range='0-10' />
+      <parameter funName='TestMgr_IARMBUSPERF_InvokeEventTransmitterApp' parameterName='evttxappname' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUSPERF_InvokeEventTransmitterApp' parameterName='keyCode' parameterType='INTEGER' range='0-10000' />
+      <parameter funName='TestMgr_IARMBUSPERF_InvokeEventTransmitterApp' parameterName='keyType' parameterType='INTEGER' range='0-10000' />
+      <parameter funName='TestMgr_IARMBUSPERF_InvokeEventTransmitterApp' parameterName='newState' parameterType='INTEGER' range='0-10000' />
+      <parameter funName='TestMgr_IARMBUSPERF_InvokeEventTransmitterApp' parameterName='owner_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUSPERF_InvokeEventTransmitterApp' parameterName='resource_type' parameterType='INTEGER' range='0-10000' />
+      <parameter funName='TestMgr_IARMBUSPERF_RegisterEventHandler' parameterName='event_id' parameterType='INTEGER' range='0-10' />
+      <parameter funName='TestMgr_IARMBUSPERF_RegisterEventHandler' parameterName='owner_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUSPERF_RegisterMultipleEventHandlers' parameterName='event_id' parameterType='INTEGER' range='0-10' />
+      <parameter funName='TestMgr_IARMBUSPERF_RegisterMultipleEventHandlers' parameterName='owner_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUSPERF_RegisterTwoEvtHandlersTwoEvents' parameterName='event_id' parameterType='INTEGER' range='0-10' />
+      <parameter funName='TestMgr_IARMBUSPERF_RegisterTwoEvtHandlersTwoEvents' parameterName='owner_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUSPERF_UnRegisterEventHandler' parameterName='event_id' parameterType='INTEGER' range='0-10' />
+      <parameter funName='TestMgr_IARMBUSPERF_UnRegisterEventHandler' parameterName='owner_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_SyncSecondApplication' parameterName='lockenabled' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_InvokeEventTransmitterApp' parameterName='event_id' parameterType='INTEGER' range='0-10' />
+      <parameter funName='TestMgr_IARMBUS_InvokeEventTransmitterApp' parameterName='evttxappname' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_InvokeEventTransmitterApp' parameterName='keyCode' parameterType='INTEGER' range='0-10000' />
+      <parameter funName='TestMgr_IARMBUS_InvokeEventTransmitterApp' parameterName='keyType' parameterType='INTEGER' range='0-10000' />
+      <parameter funName='TestMgr_IARMBUS_InvokeEventTransmitterApp' parameterName='newState' parameterType='INTEGER' range='0-10000' />
+      <parameter funName='TestMgr_IARMBUS_InvokeEventTransmitterApp' parameterName='owner_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_InvokeEventTransmitterApp' parameterName='resource_type' parameterType='INTEGER' range='0-10000' />
+      <parameter funName='TestMgr_IARMBUS_RegisterMultipleEventHandlers' parameterName='event_id' parameterType='INTEGER' range='0-10' />
+      <parameter funName='TestMgr_IARMBUS_RegisterMultipleEventHandlers' parameterName='owner_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_IARMBUS_RemoveEventHandler' parameterName='event_id' parameterType='INTEGER' range='0-10' />
+      <parameter funName='TestMgr_IARMBUS_RemoveEventHandler' parameterName='owner_name' parameterType='STRING' range='owner name' />
+      <parameter funName='TestMgr_IARMBUS_RemoveEventHandler' parameterName='evt_handler' parameterType='STRING' range='Event Handler' />
+    </parameters>
+  </module>
+</xml>

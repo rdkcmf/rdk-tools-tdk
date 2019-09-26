@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+
+ Copyright 2016 RDK Management
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<xml>
+  <module name='rdk_logger' testGroup='Component'>
+    <primitiveTests>
+      <primitiveTest name='RDKLogger_Dbg_Enabled_Status' id='401' version='1'>
+        <function>TestMgr_RDKLogger_Dbg_Enabled_Status</function>
+        <parameters>
+          <parameter name='module' value='' />
+          <parameter name='level' value='' />
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_Init' id='405' version='0'>
+        <function>TestMgr_RDKLogger_Init</function>
+        <parameters />
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_Log' id='407' version='1'>
+        <function>TestMgr_RDKLogger_Log</function>
+        <parameters>
+          <parameter name='module' value='' />
+          <parameter name='level' value='' />
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_EnvGet' id='408' version='1'>
+        <function>TestMgr_RDKLogger_EnvGet</function>
+        <parameters>
+          <parameter name='module' value='' />
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_EnvGetNum' id='409' version='1'>
+        <function>TestMgr_RDKLogger_EnvGetNum</function>
+        <parameters>
+          <parameter name='module' value='' />
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_EnvGetValueFromNum' id='416' version='1'>
+        <function>TestMgr_RDKLogger_EnvGetValueFromNum</function>
+        <parameters>
+          <parameter name='number' value='0' />
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_EnvGetModFromNum' id='418' version='1'>
+        <function>TestMgr_RDKLogger_EnvGetModFromNum</function>
+        <parameters>
+          <parameter name='number' value='0' />
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_Log_All' id='586' version='1'>
+        <function>TestMgr_RDKLogger_Log_All</function>
+        <parameters>
+          <parameter name='module' value='' />
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_Log_Trace' id='587' version='1'>
+        <function>TestMgr_RDKLogger_Log_Trace</function>
+        <parameters>
+          <parameter name='module' value='' />
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_Log_InverseTrace' id='588' version='1'>
+        <function>TestMgr_RDKLogger_Log_InverseTrace</function>
+        <parameters>
+          <parameter name='module' value='' />
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_Log_None' id='589' version='1'>
+        <function>TestMgr_RDKLogger_Log_None</function>
+        <parameters>
+          <parameter name='module' value='' />
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_CheckMPELogEnabled' id='590' version='0'>
+        <function>TestMgr_RDKLogger_CheckMPELogEnabled</function>
+        <parameters />
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_Log_Msg' id='591' version='1'>
+        <function>TestMgr_RDKLogger_Log_Msg</function>
+        <parameters>
+          <parameter name='level' value='' />
+          <parameter name='module' value='' />
+          <parameter name='msg' value='' />
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_SetLogLevel' id='594' version='1'>
+        <function>TestMgr_RDKLogger_SetLogLevel</function>
+        <parameters>
+          <parameter name='module' value='' />
+          <parameter name='level' value='' />
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name='RDKLogger_GetLogLevel' id='595' version='1'>
+        <function>TestMgr_RDKLogger_GetLogLevel</function>
+        <parameters>
+          <parameter name='module' value='' />
+        </parameters>
+      </primitiveTest>
+    </primitiveTests>
+  </module>
+</xml>

@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2018 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<xml>
+  <module>
+  <!-- Module Name  -->
+    <moduleName>netsrvmgr</moduleName>
+  <!-- Category of the module  -->
+    <category>RDKV</category>
+  <!-- Excecution time out of module -->
+    <executionTimeOut>2</executionTimeOut>
+  <!-- Excecution time out of module -->
+    <testGroup>Component</testGroup>
+  <!-- Logs File Names of module -->
+    <logFileNames>[]</logFileNames>
+  <!-- Crash File Names of the module -->
+    <crashFileNames>[]</crashFileNames>
+  <!-- Total functions corresponding module  -->
+    <functions>
+      <function name='TestMgr_NetSrvMgr_WifiMgrGetAvailableSSIDs' />
+      <function name='TestMgr_NetSrvMgr_WifiMgrGetCurrentState' />
+      <function name='TestMgr_NetSrvMgr_WifiMgrGetLAFState' />
+      <function name='TestMgr_NetSrvMgr_WifiMgrGetPairedSSID' />
+      <function name='TestMgr_NetSrvMgr_WifiMgrSetEnabled' />
+      <function name='TestMgr_NetSrvMgrAgent_WifiMgr_BroadcastEvent' />
+      <function name='TestMgr_NetSrvMgr_WifiMgrSetGetParameters' />
+    </functions>
+  <!-- Total parameters corresponding module  -->
+    <parameters>
+      <parameter funName='TestMgr_NetSrvMgr_WifiMgrSetEnabled' parameterName='enable' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_NetSrvMgrAgent_WifiMgr_BroadcastEvent' parameterName='owner' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_NetSrvMgrAgent_WifiMgr_BroadcastEvent' parameterName='event_log' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_NetSrvMgrAgent_WifiMgr_BroadcastEvent' parameterName='event_id' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_NetSrvMgrAgent_WifiMgr_BroadcastEvent' parameterName='value' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_NetSrvMgrAgent_WifiMgr_BroadcastEvent' parameterName='key_code' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_NetSrvMgrAgent_WifiMgr_BroadcastEvent' parameterName='key_type' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_NetSrvMgrAgent_WifiMgr_BroadcastEvent' parameterName='isFP' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_NetSrvMgr_WifiMgrSetGetParameters' parameterName='method_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_NetSrvMgr_WifiMgrSetGetParameters' parameterName='enable' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_NetSrvMgr_WifiMgrSetGetParameters' parameterName='ssid' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_NetSrvMgr_WifiMgrSetGetParameters' parameterName='passphrase' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_NetSrvMgr_WifiMgrSetGetParameters' parameterName='security_mode' parameterType='INTEGER' range='0-15' />
+      <parameter funName='TestMgr_NetSrvMgr_WifiMgrSetGetParameters' parameterName='new_mode' parameterType='INTEGER' range='0-2' />
+    </parameters>
+  </module>
+</xml>

@@ -1,0 +1,161 @@
+#!/usr/bin/expect -f
+
+##########################################################################
+# If not stated otherwise in this file or this component's Licenses.txt
+# file the following copyright and licenses apply:
+#
+# Copyright 2016 RDK Management
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+##########################################################################
+source mySQLConfig.exp
+set timeout -1
+
+set boxtype [lindex $argv 0]
+set boxip [lindex $argv 1]
+
+set systemip [lindex $argv 2]
+set systemusername [lindex $argv 3]
+set systempassword [lindex $argv 4]
+
+set path [lindex $argv 5]
+set boxpath [lindex $argv 6]
+
+if {[llength $argv] != 7} {
+    send_user "Usage: expect uploadbinary.exp 'boxtype' 'boxip' 'systemip' 'systemusername' 'systempassword' 'systempath' 'boxpath'\n"
+    exit
+}
+
+spawn "/bin/bash"
+
+send "telnet $boxip\r"
+
+expect {
+    -re ".*nable to connect.*" {
+        send_user "\nUnable to connect $boxip\n"
+        exit
+    }
+    -re ".*login.*" {
+        exp_send "$boxusername\r"
+        exp_continue
+    }
+    -re ".*sword.*" {
+        exp_send "$boxpassword\r"
+        exp_continue
+    }
+    -re "#"
+}
+
+sleep 2
+send "scp -r $systemusername@$systemip:$path/bin/* $boxpath/.\r"
+
+expect {
+    -re ".*onnecting.*" {
+        exp_send "y\r"
+        exp_continue
+    }
+    -re ".*es.*o.*" {
+        exp_send "yes\r"
+        exp_continue
+    }
+    -re ".*sword.*" {
+        exp_send "$systempassword\r"
+    }
+}
+
+expect {
+    -re ".*sword.*" {
+        send_user "\nIncorrect Password\n"
+        exit
+    }
+    -re ".*o.*such.*file.*" {
+        send_user "\nIncorrect Path. No such file or directory\n"
+        exit
+    }
+    -re "#"
+}
+
+sleep 2
+
+send "mkdir $boxpath/libs\r"
+expect "#"
+
+sleep 2
+
+send "scp -r $systemusername@$systemip:$path/libs/ $boxpath/\r"
+
+expect {
+    -re ".*es.*o.*" {
+        exp_send "yes\r"
+        exp_continue
+    }
+    -re ".*sword.*" {
+        exp_send "$systempassword\r"
+    }
+}
+
+expect {
+    -re ".*sword.*" {
+        send_user "\nIncorrect Password\n"
+        exit
+    }
+    -re ".*o.*such.*file.*" {
+        send_user "\nIncorrect Path. No such file or directory\n"
+        exit
+    }
+    -re "#"
+}
+
+sleep 2
+
+send "chmod -R 777 $boxpath/*\r"
+expect "#"
+
+sleep 2
+
+if {$boxtype == "Xi3"} {
+
+    send "ln -s $boxpath/libs/libiconv.so.2.5.0 $boxpath/libs/libiconv.so.2\r"
+    expect "#"
+
+    sleep 2
+
+}
+
+if {$boxtype == "XG1"} {
+
+    send "ln -s $boxpath/libs/libgstcheck-0.10.so.0.29.0 $boxpath/libs/libgstcheck-0.10.so.0\r"
+    expect "#"
+
+    sleep 2
+
+    send "ln -s $boxpath/libs/libQtTest.so.4.8.5 $boxpath/libs/libQtTest.so.4.8\r"
+    expect "#"
+
+    sleep 2
+
+    send "ln -s $boxpath/libs/libQtTest.so.4.8.5 $boxpath/libs/libQtTest.so.4\r"
+    expect "#"
+
+    sleep 2
+
+    send "ln -s $boxpath/libs/libQtTest.so.4.8.5 $boxpath/libs/libQtTest.so\r"
+    expect "#"
+
+    sleep 2
+
+}
+
+send_user "\nBinaries Transferred\n"
+
+exit

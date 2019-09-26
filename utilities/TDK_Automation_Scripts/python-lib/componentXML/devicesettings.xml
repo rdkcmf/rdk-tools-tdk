@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?><xml>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+
+ Copyright 2016 RDK Management
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+  <module name="devicesettings" testGroup="Component">
+    <primitiveTests>
+      <primitiveTest id="54" name="DS_AddPowerModeListener" version="0">
+        <function>TestMgr_DS_HOST_addPowerModeListener</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="55" name="DS_DisplayDetails" version="1">
+        <function>TestMgr_DS_VOP_getDisplayDetails</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="56" name="DS_DTCPSupport" version="1">
+        <function>TestMgr_DS_VOPTYPE_DTCPSupport</function>
+        <parameters>
+          <parameter name="port_id" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="57" name="DS_GetAspectRatio" version="2">
+        <function>TestMgr_DS_VOP_getAspectRatio</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="58" name="DS_GetIndicators" version="0">
+        <function>TestMgr_DS_FP_getIndicators</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="59" name="DS_GetSupportedColors" version="1">
+        <function>TestMgr_DS_FP_FP_getSupportedColors</function>
+        <parameters>
+          <parameter name="indicator_name" value="Power"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="60" name="DS_GetSupportedCompressions" version="1">
+        <function>TestMgr_DS_AOP_getSupportedCompressions</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="62" name="DS_GetSupportedEncodings" version="1">
+        <function>TestMgr_DS_AOP_getSupportedEncodings</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="63" name="DS_GetSupportedStereoModes" version="1">
+        <function>TestMgr_DS_AOP_getSupportedStereoModes</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="64" name="DS_GetTextDisplays" version="0">
+        <function>TestMgr_DS_FP_getTextDisplays</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="65" name="DS_HDCPSupport" version="1">
+        <function>TestMgr_DS_VOPTYPE_HDCPSupport</function>
+        <parameters>
+          <parameter name="port_id" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="66" name="DS_IsDynamicResolutionSupport" version="1">
+        <function>TestMgr_DS_VOPTYPE_isDynamicResolutionSupported</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="67" name="DS_LoopThru" version="1">
+        <function>TestMgr_DS_AOP_loopThru</function>
+        <parameters>
+          <parameter name="loop_thru" value="1"/>
+          <parameter name="port_name" value="HDMI0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="68" name="DS_ManagerDeInitialize" version="1">
+        <function>TestMgr_DS_managerDeinitialize</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="69" name="DS_ManagerInitialize" version="0">
+        <function>TestMgr_DS_managerInitialize</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="71" name="DS_RemovePowerModeListener" version="0">
+        <function>TestMgr_DS_HOST_removePowerModeListener</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="72" name="DS_Resolution" version="1">
+        <function>TestMgr_DS_HOST_Resolutions</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="75" name="DS_SetBlink" version="2">
+        <function>TestMgr_DS_FP_setBlink</function>
+        <parameters>
+          <parameter name="blink_iteration" value="2"/>
+          <parameter name="blink_interval" value="1"/>
+          <parameter name="indicator_name" value="Power"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="76" name="DS_SetBrightness" version="3">
+        <function>TestMgr_DS_FP_setBrightness</function>
+        <parameters>
+          <parameter name="indicator_name" value=""/>
+          <parameter name="get_only" value="0"/>
+          <parameter name="brightness" value="100"/>
+          <parameter name="text" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="77" name="DS_setColor" version="6">
+        <function>TestMgr_DS_FP_setColor</function>
+        <parameters>
+          <parameter name="indicator_name" value="Power"/>
+          <parameter name="color" value="1"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="78" name="DS_SetCompression" version="1">
+        <function>TestMgr_DS_AOP_setCompression</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+          <parameter name="compression_format" value="LIGHT"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="79" name="DS_SetDFC" version="1">
+        <function>TestMgr_DS_VD_setDFC</function>
+        <parameters>
+          <parameter name="zoom_setting" value="Full"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="80" name="DS_SetTime" version="3">
+        <function>TestMgr_DS_FP_setTime</function>
+        <parameters>
+          <parameter name="time_hrs" value="1"/>
+          <parameter name="text" value="Text"/>
+          <parameter name="time_mins" value="2"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="81" name="DS_SetEncoding" version="2">
+        <function>TestMgr_DS_AOP_setEncoding</function>
+        <parameters>
+          <parameter name="encoding_format" value="AC3"/>
+          <parameter name="port_name" value="HDMI0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="82" name="DS_SetPowerMode" version="1">
+        <function>TestMgr_DS_HOST_setPowerMode</function>
+        <parameters>
+          <parameter name="new_power_state" value="1"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="83" name="DS_SetResolution" version="1">
+        <function>TestMgr_DS_VOP_setResolution</function>
+        <parameters>
+          <parameter name="resolution" value="1080i"/>
+          <parameter name="get_only" value="0"/>
+          <parameter name="port_name" value="HDMI0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="84" name="DS_SetScroll" version="1">
+        <function>TestMgr_DS_FP_setScroll</function>
+        <parameters>
+          <parameter name="viteration" value="3"/>
+          <parameter name="hold_duration" value="2"/>
+          <parameter name="hiteration" value="1"/>
+          <parameter name="text" value="Text"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="85" name="DS_SetStereoMode" version="1">
+        <function>TestMgr_DS_AOP_setStereoMode</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+          <parameter name="stereo_mode" value="SURROUND"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="86" name="DS_SetText" version="1">
+        <function>TestMgr_DS_FP_setText</function>
+        <parameters>
+          <parameter name="text_display" value="hello"/>
+          <parameter name="text" value="Text"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="87" name="DS_SetTimeFormat" version="1">
+        <function>TestMgr_DS_FP_setTimeForamt</function>
+        <parameters>
+          <parameter name="time_format" value="1"/>
+          <parameter name="text" value="Text"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="100" name="DS_MuteStatus" version="1">
+        <function>TestMgr_DS_AOP_mutedStatus</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+          <parameter name="mute_status" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="101" name="DS_IsContentProtected" version="1">
+        <function>TestMgr_DS_VOP_isContentProtected</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="102" name="DS_IsDisplayConnectedStatus" version="1">
+        <function>TestMgr_DS_VOP_isDisplayConnected</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="104" name="DS_AddDisplayConnectionListener" version="1">
+        <function>TestMgr_DS_HOST_addDisplayConnectionListener</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="105" name="DS_RemoveDisplayConnectionListener" version="0">
+        <function>TestMgr_DS_HOST_removeDisplayConnectionListener</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DS_SetAudioDB" id=" " version="2">
+        <function>TestMgr_DS_AOP_setDB</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+          <parameter name="db_level" value="180"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="110" name="DS_SetAudioLevel" version="1">
+        <function>TestMgr_DS_AOP_setLevel</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+          <parameter name="audio_level" value="2.12"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="656" name="DS_SetState" version="1">
+        <function>TestMgr_DS_FP_setState</function>
+        <parameters>
+          <parameter name="indicator_name" value="Power"/>
+          <parameter name="state" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="657" name="DS_SetEnable" version="1">
+        <function>TestMgr_DS_VOP_setEnable</function>
+        <parameters>
+          <parameter name="port_name" value="HDMI0"/>
+          <parameter name="enable" value="0"/>
+        </parameters>
+      </primitiveTest>
+    </primitiveTests>
+  </module>
+</xml>

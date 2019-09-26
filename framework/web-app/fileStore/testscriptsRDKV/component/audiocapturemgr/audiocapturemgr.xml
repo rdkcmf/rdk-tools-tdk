@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2016 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<xml>
+  <module name="audiocapturemgr" testGroup="Component">
+    <primitiveTests>
+      <primitiveTest id="" name="AudioCaptureMgr_Session_Close" version="1">
+        <function>TestMgr_AudioCaptureMgr_Session_Close</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="AudioCaptureMgr_Session_Open" version="1">
+        <function>TestMgr_AudioCaptureMgr_Session_Open</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="AudioCaptureMgr_GetSessionDetails" version="1">
+        <function>TestMgr_AudioCaptureMgr_GetSessionDetails</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="AudioCaptureMgr_GetDefaultAudioProperties" version="4">
+        <function>TestMgr_AudioCaptureMgr_GetDefaultAudioProperties</function>
+        <parameters>
+          <parameter name="session" value="VALID"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="AudioCaptureMgr_GetAudioProperties" version="3">
+        <function>TestMgr_AudioCaptureMgr_GetAudioProperties</function>
+        <parameters>
+          <parameter name="session" value="VALID"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="AudioCaptureMgr_SetAudioProperties" version="5">
+        <function>TestMgr_AudioCaptureMgr_SetAudioProperties</function>
+        <parameters>
+          <parameter name="delay" value="-1"/>
+          <parameter name="fifoSize" value="-1"/>
+          <parameter name="threshold" value="-1"/>
+          <parameter name="session" value="VALID"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="AudioCaptureMgr_GetOutputProperties" version="1">
+        <function>TestMgr_AudioCaptureMgr_GetOutputProperties</function>
+        <parameters>
+          <parameter name="session" value="VALID"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="AudioCaptureMgr_Stop" version="1">
+        <function>TestMgr_AudioCaptureMgr_Stop</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="AudioCaptureMgr_Start" version="1">
+        <function>TestMgr_AudioCaptureMgr_Start</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="AudioCaptureMgr_ExecuteCmd" id=" " version="2">
+        <function>TestMgr_AudioCaptureMgr_ExecuteCmd</function>
+        <parameters>
+          <parameter name="command" value="NULL"/>
+        </parameters>
+      </primitiveTest>
+    </primitiveTests>
+  </module>
+</xml>

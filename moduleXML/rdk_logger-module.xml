@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2018 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<xml>
+  <module>
+  <!-- Module Name  -->
+    <moduleName>rdk_logger</moduleName>
+  <!-- Category of the module  -->
+    <category>RDKV</category>
+  <!-- Excecution time out of module -->
+    <executionTimeOut>5</executionTimeOut>
+  <!-- Excecution time out of module -->
+    <testGroup>Component</testGroup>
+  <!-- Logs File Names of module -->
+    <logFileNames>[]</logFileNames>
+  <!-- Crash File Names of the module -->
+    <crashFileNames>[]</crashFileNames>
+  <!-- Total functions corresponding module  -->
+    <functions>
+      <function name='TestMgr_RDKLogger_Dbg_Enabled_Status' />
+      <function name='TestMgr_RDKLogger_EnvGet' />
+      <function name='TestMgr_RDKLogger_EnvGetNum' />
+      <function name='TestMgr_RDKLogger_EnvGetValueFromNum' />
+      <function name='TestMgr_RDKLogger_EnvGetModFromNum' />
+      <function name='TestMgr_RDKLogger_Init' />
+      <function name='TestMgr_RDKLogger_Log' />
+      <function name='TestMgr_RDKLogger_Log_All' />
+      <function name='TestMgr_RDKLogger_Log_InverseTrace' />
+      <function name='TestMgr_RDKLogger_Log_Msg' />
+      <function name='TestMgr_RDKLogger_Log_None' />
+      <function name='TestMgr_RDKLogger_Log_Trace' />
+      <function name='TestMgr_RDKLogger_CheckMPELogEnabled' />
+      <function name='TestMgr_RDKLogger_SetLogLevel' />
+      <function name='TestMgr_RDKLogger_GetLogLevel' />
+      <function name='TestMgr_RDKLogger_Log_MPEOSDisabled' />
+    </functions>
+  <!-- Total parameters corresponding module  -->
+    <parameters>
+      <parameter funName='TestMgr_RDKLogger_Dbg_Enabled_Status' parameterName='module' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_Dbg_Enabled_Status' parameterName='level' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_EnvGet' parameterName='module' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_EnvGetNum' parameterName='module' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_EnvGetValueFromNum' parameterName='number' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_RDKLogger_EnvGetModFromNum' parameterName='number' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_RDKLogger_Log' parameterName='module' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_Log' parameterName='level' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_Log_All' parameterName='module' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_Log_InverseTrace' parameterName='module' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_Log_Msg' parameterName='module' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_Log_Msg' parameterName='level' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_Log_Msg' parameterName='msg' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_Log_None' parameterName='module' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_Log_Trace' parameterName='module' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_SetLogLevel' parameterName='module' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_SetLogLevel' parameterName='level' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_GetLogLevel' parameterName='module' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_Log_MPEOSDisabled' parameterName='level' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_RDKLogger_Log_MPEOSDisabled' parameterName='module' parameterType='STRING' range='A-Z' />
+    </parameters>
+  </module>
+</xml>

@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2018 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<xml>
+  <module>
+  <!-- Module Name  -->
+    <moduleName>xupnp</moduleName>
+  <!-- Category of the module  -->
+    <category>RDKV</category>
+  <!-- Excecution time out of module -->
+    <executionTimeOut>7</executionTimeOut>
+  <!-- Excecution time out of module -->
+    <testGroup>Component</testGroup>
+  <!-- Logs File Names of module -->
+    <logFileNames>[]</logFileNames>
+  <!-- Crash File Names of the module -->
+    <crashFileNames>[]</crashFileNames>
+  <!-- Total functions corresponding module  -->
+    <functions>
+      <function name='TestMgr_XUPNPAgent_checkjson' />
+      <function name='TestMgr_XUPNPAgent_checkSTRurl' />
+      <function name='TestMgr_XUPNPAgent_checkSerialNo' />
+      <function name='TestMgr_XUPNPAgent_checkPBurl' />
+      <function name='TestMgr_XUPNPAgent_recordId' />
+      <function name='TestMgr_XUPNPAgent_ModBasicDevice' />
+      <function name='TestMgr_XUPNPAgent_removeXmls' />
+      <function name='TestMgr_XUPNPAgent_evtCheck' />
+      <function name='TestMgr_XUPNP_ReadXDiscOutputFile' />
+      <function name='TestMgr_XUPNP_GetUpnpResult' />
+      <function name='TestMgr_XUPNP_ModifyBasicDeviceXml' />
+      <function name='TestMgr_XUPNP_CheckXMLRestoration' />
+      <function name='TestMgr_XUPNP_ReadXcalDeviceLogFile' />
+      <function name='TestMgr_XUPNP_BroadcastEvent' />
+      <function name='TestMgr_XUPNP_CheckXDiscOutputFile' />
+      <function name='TestMgr_XUPNPAgent_CheckXDiscOutputFile' />
+      <function name='TestMgr_XUPNP_GetBaseStreamingUrl' />
+      <function name='TestMgr_XUPNP_GetSerialNo' />
+      <function name='TestMgr_XUPNP_GetPlaybackUrl' />
+      <function name='TestMgr_XUPNP_GetReceiverId' />
+      <function name='TestMgr_XUPNP_GetIsGateway' />
+      <function name='TestMgr_XUPNP_GetGatewayIP' />
+      <function name='TestMgr_XUPNP_GetHostMacAddress' />
+      <function name='TestMgr_XUPNP_GetTimeZone' />
+      <function name='TestMgr_XUPNP_GetRequiresTRM' />
+      <function name='TestMgr_XUPNP_GetBaseTrmUrl' />
+      <function name='TestMgr_XUPNP_GetDnsConfig' />
+      <function name='TestMgr_XUPNP_GetHosts' />
+      <function name='TestMgr_XUPNP_GetSystemIds' />
+      <function name='TestMgr_XUPNP_GetRecvDevType' />
+      <function name='TestMgr_XUPNP_GetBuildVersion' />
+    </functions>
+  <!-- Total parameters corresponding module  -->
+    <parameters>
+      <parameter funName='TestMgr_XUPNPAgent_evtCheck' parameterName='evtName' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_XUPNPAgent_evtCheck' parameterName='evtValue' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_XUPNP_ReadXDiscOutputFile' parameterName='paramName' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_XUPNP_GetUpnpResult' parameterName='paramName' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_XUPNP_BroadcastEvent' parameterName='stateId' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_XUPNP_BroadcastEvent' parameterName='state' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_XUPNP_BroadcastEvent' parameterName='error' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_XUPNP_BroadcastEvent' parameterName='payload' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_XUPNP_BroadcastEvent' parameterName='eventLog' parameterType='STRING' range='A-Z' />
+    </parameters>
+  </module>
+</xml>

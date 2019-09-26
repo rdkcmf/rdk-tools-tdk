@@ -1,0 +1,48 @@
+##########################################################################
+# If not stated otherwise in this file or this component's Licenses.txt
+# file the following copyright and licenses apply:
+#
+# Copyright 2016 RDK Management
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+##########################################################################
+KD_DIGIT0:32768:250
+KD_DIGIT1:32768:251
+KD_DIGIT2:32768:252
+KD_DIGIT3:32768:253
+KD_DIGIT4:32768:254
+KD_DIGIT5:32768:255
+KD_DIGIT6:32768:256
+KD_DIGIT7:32768:257
+KD_DIGIT8:32768:258
+KD_DIGIT9:32768:259
+KU_DIGIT0:33024:250
+KU_DIGIT1:33024:251
+KU_DIGIT2:33024:252
+KU_DIGIT3:33024:253
+KU_DIGIT4:33024:254
+KU_DIGIT5:33024:255
+KU_DIGIT6:33024:256
+KU_DIGIT7:33024:257
+KU_DIGIT8:33024:258
+KU_DIGIT9:33024:259
+RPT_DIGIT0:33280:250
+RPT_DIGIT1:33280:251
+RPT_DIGIT2:33280:252
+RPT_DIGIT3:33280:253
+RPT_DIGIT4:33280:254
+RPT_DIGIT5:33280:255
+RPT_DIGIT6:33280:256
+RPT_DIGIT7:33280:257
+RPT_DIGIT8:33280:258
+RPT_DIGIT9:33280:259

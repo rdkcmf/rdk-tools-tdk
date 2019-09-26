@@ -1,0 +1,242 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2018 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<xml>
+  <module>
+  <!-- Module Name  -->
+    <moduleName>devicesettings</moduleName>
+  <!-- Category of the module  -->
+    <category>RDKV</category>
+  <!-- Excecution time out of module -->
+    <executionTimeOut>3</executionTimeOut>
+  <!-- Excecution time out of module -->
+    <testGroup>Component</testGroup>
+  <!-- Logs File Names of module -->
+    <logFileNames>[/opt/logs/ocapri_log.txt]</logFileNames>
+  <!-- Crash File Names of the module -->
+    <crashFileNames>[/opt/logs/uimgr_log.txt]</crashFileNames>
+  <!-- Total functions corresponding module  -->
+    <functions>
+      <function name='TestMgr_DS_FP_setColor' />
+      <function name='TestMgr_DS_managerInitialize' />
+      <function name='TestMgr_DS_managerDeinitialize' />
+      <function name='TestMgr_DS_FP_setBrightness' />
+      <function name='TestMgr_DS_FP_setBlink' />
+      <function name='TestMgr_DS_FP_setScroll' />
+      <function name='TestMgr_DS_AOP_setLevel' />
+      <function name='TestMgr_DS_AOP_setDB' />
+      <function name='TestMgr_DS_VD_setDFC' />
+      <function name='TestMgr_DS_AOP_setEncoding' />
+      <function name='TestMgr_DS_AOP_setCompression' />
+      <function name='TestMgr_DS_AOP_setStereoMode' />
+      <function name='TestMgr_DS_HOST_setPowerMode' />
+      <function name='TestMgr_DS_VOP_setResolution' />
+      <function name='TestMgr_DS_FP_getIndicators' />
+      <function name='TestMgr_DS_FP_FP_getSupportedColors' />
+      <function name='TestMgr_DS_FP_getTextDisplays' />
+      <function name='TestMgr_DS_FP_setText' />
+      <function name='TestMgr_DS_FP_setTimeForamt' />
+      <function name='TestMgr_DS_FP_setTime' />
+      <function name='TestMgr_DS_AOP_loopThru' />
+      <function name='TestMgr_DS_AOP_mutedStatus' />
+      <function name='TestMgr_DS_AOP_getSupportedEncodings' />
+      <function name='TestMgr_DS_AOP_getSupportedCompressions' />
+      <function name='TestMgr_DS_AOP_getSupportedStereoModes' />
+      <function name='TestMgr_DS_HOST_addPowerModeListener' />
+      <function name='TestMgr_DS_HOST_removePowerModeListener' />
+      <function name='TestMgr_DS_HOST_Resolutions' />
+      <function name='TestMgr_DS_VOPTYPE_HDCPSupport' />
+      <function name='TestMgr_DS_VOPTYPE_DTCPSupport' />
+      <function name='TestMgr_DS_VOP_getAspectRatio' />
+      <function name='TestMgr_DS_VOP_getDisplayDetails' />
+      <function name='TestMgr_DS_VOPTYPE_isDynamicResolutionSupported' />
+      <function name='TestMgr_DS_VOP_isContentProtected' />
+      <function name='TestMgr_DS_VOP_isDisplayConnected' />
+      <function name='TestMgr_DS_HOST_addDisplayConnectionListener' />
+      <function name='TestMgr_DS_HOST_removeDisplayConnectionListener' />
+      <function name='TestMgr_DS_FP_setState' />
+      <function name='TestMgr_DS_VOP_setEnable' />
+      <function name='TestMgr_DS_HOST_getCPUTemperature' />
+      <function name='TestMgr_DS_VOP_getHDCPStatus' />
+      <function name='TestMgr_DS_VOPTYPE_isHDCPSupported' />
+      <function name='TestMgr_DS_VOPTYPE_enableHDCP' />
+      <function name='TestMgr_DS_FP_getIndicatorFromName' />
+      <function name='TestMgr_DS_FP_getColors' />
+      <function name='TestMgr_DS_VR_isInterlaced' />
+      <function name='TestMgr_DS_VDCONFIG_getDefaultDFC' />
+      <function name='TestMgr_DS_VDCONFIG_getDFCs' />
+      <function name='TestMgr_DS_VDCONFIG_getDevices' />
+      <function name='TestMgr_DS_VD_getSupportedDFCs' />
+      <function name='TestMgr_DS_VD_setPlatformDFC' />
+      <function name='TestMgr_DS_HOST_setVersion' />
+      <function name='TestMgr_DS_VOPCONFIG_getSupportedTypes' />
+      <function name='TestMgr_DS_FP_getIndicatorFromId' />
+      <function name='TestMgr_DS_HOST_setPreferredSleepMode' />
+      <function name='TestMgr_DS_FP_getTextDisplayFromName' />
+      <function name='TestMgr_DS_HOST_getPreferredSleepMode' />
+      <function name='TestMgr_DS_HOST_getVideoOutputPorts' />
+      <function name='TestMgr_DS_HOST_getAudioOutputPorts' />
+      <function name='TestMgr_DS_HOST_getVideoDevices' />
+      <function name='TestMgr_DS_HOST_getHostEDID' />
+      <function name='TestMgr_DS_VOPCONFIG_getPortFromId' />
+      <function name='TestMgr_DS_VOPCONFIG_getPortFromName' />
+      <function name='TestMgr_DS_VOPCONFIG_getPortType' />
+      <function name='TestMgr_DS_FP_getTextDisplayFromId' />
+      <function name='TestMgr_DS_HOST_getVideoOutputPortFromName' />
+      <function name='TestMgr_DS_HOST_getVideoOutputPortFromId' />
+      <function name='TestMgr_DS_HOST_getAudioOutputPortFromName' />
+      <function name='TestMgr_DS_HOST_getAudioOutputPortFromId' />
+      <function name='TestMgr_DS_FP_getBrightnessLevels' />
+      <function name='TestMgr_DS_FP_getColorMode' />
+      <function name='TestMgr_DS_FP_getTextColorMode' />
+      <function name='TestMgr_DS_FP_getTextBrightnessLevels' />
+      <function name='TestMgr_DS_FP_setTextBrightness' />
+      <function name='TestMgr_DS_FP_getTextBrightness' />
+      <function name='TestMgr_DS_FP_enableDisplay' />
+      <function name='TestMgr_DS_AOPCONFIG_getPortType' />
+      <function name='TestMgr_DS_HOST_getAvailableSleepModes' />
+      <function name='TestMgr_DS_AOPCONFIG_getPortFromName' />
+      <function name='TestMgr_DS_VOPCONFIG_getFrameRate' />
+      <function name='TestMgr_DS_VOPCONFIG_getVideoResolution' />
+      <function name='TestMgr_DS_VOPCONFIG_getSSMode' />
+      <function name='TestMgr_DS_VOPCONFIG_getPixelResolution' />
+      <function name='TestMgr_DS_AOPCONFIG_getSupportedTypes' />
+      <function name='TestMgr_DS_AOPCONFIG_getPortFromId' />
+      <function name='TestMgr_DS_AOPCONFIG_getPorts' />
+      <function name='TestMgr_DS_AOPCONFIG_release' />
+      <function name='TestMgr_DS_AOPCONFIG_load' />
+      <function name='TestMgr_DS_AOP_setStereoAuto' />
+      <function name='TestMgr_DS_AOP_getStereoAuto' />
+      <function name='TestMgr_DS_VOPTYPE_getRestrictedResolution' />
+      <function name='TestMgr_DS_VOPTYPE_setRestrictedResolution' />
+      <function name='TestMgr_DS_AOP_getGain' />
+      <function name='TestMgr_DS_AOP_getOptimalLevel' />
+      <function name='TestMgr_DS_VOP_isActive' />
+      <function name='TestMgr_DS_VOP_setDisplayConnected' />
+      <function name='TestMgr_DS_VOPTYPE_getPorts' />
+      <function name='TestMgr_DS_VOP_hasSurround' />
+      <function name='TestMgr_DS_VOP_getEDIDBytes' />
+      <function name='TestMgr_DS_VOP_getDefaultResolution' />
+      <function name='TestMgr_DS_VD_getHDRCapabilities' />
+    </functions>
+  <!-- Total parameters corresponding module  -->
+    <parameters>
+      <parameter funName='TestMgr_DS_FP_setColor' parameterName='indicator_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_setColor' parameterName='color' parameterType='INTEGER' range='0-4' />
+      <parameter funName='TestMgr_DS_FP_setBrightness' parameterName='indicator_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_setBrightness' parameterName='brightness' parameterType='INTEGER' range='1-100' />
+      <parameter funName='TestMgr_DS_FP_setBrightness' parameterName='get_only' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_FP_setBrightness' parameterName='text' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_setBlink' parameterName='indicator_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_setBlink' parameterName='blink_interval' parameterType='INTEGER' range='1-10' />
+      <parameter funName='TestMgr_DS_FP_setBlink' parameterName='blink_iteration' parameterType='STRING' range='1-10' />
+      <parameter funName='TestMgr_DS_FP_setScroll' parameterName='viteration' parameterType='INTEGER' range='1-10' />
+      <parameter funName='TestMgr_DS_FP_setScroll' parameterName='hiteration' parameterType='INTEGER' range='1-10' />
+      <parameter funName='TestMgr_DS_FP_setScroll' parameterName='hold_duration' parameterType='INTEGER' range='1-10' />
+      <parameter funName='TestMgr_DS_FP_setScroll' parameterName='text' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_setLevel' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_setLevel' parameterName='audio_level' parameterType='FLOAT' range='1-10' />
+      <parameter funName='TestMgr_DS_AOP_setDB' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_setDB' parameterName='db_level' parameterType='FLOAT' range='1-100' />
+      <parameter funName='TestMgr_DS_VD_setDFC' parameterName='zoom_setting' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_setEncoding' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_setEncoding' parameterName='encoding_format' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_setCompression' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_setCompression' parameterName='compression_format' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_setStereoMode' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_setStereoMode' parameterName='stereo_mode' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_setStereoMode' parameterName='get_only' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_HOST_setPowerMode' parameterName='new_power_state' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_VOP_setResolution' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOP_setResolution' parameterName='resolution' parameterType='STRING' range='A-Z &amp; 0-9' />
+      <parameter funName='TestMgr_DS_VOP_setResolution' parameterName='get_only' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_FP_FP_getSupportedColors' parameterName='indicator_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_setText' parameterName='text_display' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_setText' parameterName='text' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_setTimeForamt' parameterName='time_format' parameterType='INTEGER' range='0-2' />
+      <parameter funName='TestMgr_DS_FP_setTimeForamt' parameterName='text' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_setTime' parameterName='time_hrs' parameterType='INTEGER' range='1-24' />
+      <parameter funName='TestMgr_DS_FP_setTime' parameterName='time_mins' parameterType='INTEGER' range='1-60' />
+      <parameter funName='TestMgr_DS_FP_setTime' parameterName='text' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_loopThru' parameterName='loop_thru' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_AOP_loopThru' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_mutedStatus' parameterName='mute_status' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_AOP_mutedStatus' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_getSupportedEncodings' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_getSupportedCompressions' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_getSupportedStereoModes' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_HOST_Resolutions' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPTYPE_HDCPSupport' parameterName='port_id' parameterType='INTEGER' range='0' />
+      <parameter funName='TestMgr_DS_VOPTYPE_DTCPSupport' parameterName='port_id' parameterType='INTEGER' range='0' />
+      <parameter funName='TestMgr_DS_VOP_getAspectRatio' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOP_getDisplayDetails' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPTYPE_isDynamicResolutionSupported' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOP_isContentProtected' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOP_isDisplayConnected' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_setState' parameterName='state' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_FP_setState' parameterName='indicator_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOP_setEnable' parameterName='enable' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_VOP_setEnable' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOP_getHDCPStatus' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPTYPE_isHDCPSupported' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPTYPE_enableHDCP' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPTYPE_enableHDCP' parameterName='protectContent' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_VOPTYPE_enableHDCP' parameterName='hdcpKey' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPTYPE_enableHDCP' parameterName='keySize' parameterType='INTEGER' range='0-10000' />
+      <parameter funName='TestMgr_DS_VOPTYPE_enableHDCP' parameterName='useMfrKey' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_FP_getIndicatorFromName' parameterName='fp_indicator' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_getIndicatorFromName' parameterName='indicator_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VR_isInterlaced' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_HOST_setVersion' parameterName='versionNo' parameterType='INTEGER' range='0-255' />
+      <parameter funName='TestMgr_DS_FP_getIndicatorFromId' parameterName='indicator_id' parameterType='INTEGER' range='0-255' />
+      <parameter funName='TestMgr_DS_HOST_setPreferredSleepMode' parameterName='sleepMode' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_getTextDisplayFromName' parameterName='text_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPCONFIG_getPortFromId' parameterName='port_id' parameterType='INTEGER' range='0-1000' />
+      <parameter funName='TestMgr_DS_VOPCONFIG_getPortFromName' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPCONFIG_getPortType' parameterName='port_id' parameterType='INTEGER' range='0-1000' />
+      <parameter funName='TestMgr_DS_FP_getTextDisplayFromId' parameterName='text_id' parameterType='INTEGER' range='0-255' />
+      <parameter funName='TestMgr_DS_HOST_getVideoOutputPortFromName' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_HOST_getVideoOutputPortFromId' parameterName='port_id' parameterType='INTEGER' range='0-255' />
+      <parameter funName='TestMgr_DS_HOST_getAudioOutputPortFromName' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_HOST_getAudioOutputPortFromId' parameterName='port_id' parameterType='INTEGER' range='0-255' />
+      <parameter funName='TestMgr_DS_FP_getBrightnessLevels' parameterName='indicator_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_getColorMode' parameterName='indicator_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_setTextBrightness' parameterName='brightness' parameterType='INTEGER' range='0-255' />
+      <parameter funName='TestMgr_DS_FP_enableDisplay' parameterName='enable' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_AOPCONFIG_getPortType' parameterName='port_id' parameterType='INTEGER' range='0-255' />
+      <parameter funName='TestMgr_DS_AOPCONFIG_getPortFromName' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPCONFIG_getFrameRate' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPCONFIG_getVideoResolution' parameterName='port_id' parameterType='INTEGER' range='0-1000' />
+      <parameter funName='TestMgr_DS_VOPCONFIG_getSSMode' parameterName='ss_id' parameterType='INTEGER' range='0-1000' />
+      <parameter funName='TestMgr_DS_VOPCONFIG_getPixelResolution' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOPCONFIG_getPortFromId' parameterName='port_id' parameterType='INTEGER' range='0-255' />
+      <parameter funName='TestMgr_DS_AOP_setStereoAuto' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_setStereoAuto' parameterName='autoMode' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_AOP_getStereoAuto' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPTYPE_getRestrictedResolution' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPTYPE_setRestrictedResolution' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOPTYPE_setRestrictedResolution' parameterName='resolution' parameterType='INTEGER' range='0-1000' />
+      <parameter funName='TestMgr_DS_AOP_getGain' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_getOptimalLevel' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOP_isActive' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOP_setDisplayConnected' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOP_setDisplayConnected' parameterName='connected' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_VOPTYPE_getPorts' parameterName='port_id' parameterType='INTEGER' range='0-1000' />
+      <parameter funName='TestMgr_DS_VOP_hasSurround' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOP_getEDIDBytes' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_VOP_getDefaultResolution' parameterName='port_name' parameterType='STRING' range='A-Z' />
+    </parameters>
+  </module>
+</xml>
