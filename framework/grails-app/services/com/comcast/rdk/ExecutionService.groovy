@@ -1040,7 +1040,7 @@ class ExecutionService {
         if( toDate && fromDate ){
            
             if((!deviceName) && (!resultStatus) && (!scriptType)){
-                executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' ")
+                executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' ")
             }
             else{
              if((scriptType)){
@@ -1048,46 +1048,46 @@ class ExecutionService {
                 if((scriptType).equals( TEST_SUITE )){
                     if(scriptVal){
                         if((!deviceName) && (!resultStatus)){
-                            executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.scriptGroup like '%${scriptVal}%' ")
+                            executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.scriptGroup like '%${scriptVal}%' ")
                         }
                         else if((deviceName) && (resultStatus)){
-                            executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.scriptGroup like '%${scriptVal}%' and b.device like '%${deviceName}%' and b.result='${resultStatus}'")
+                            executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.scriptGroup like '%${scriptVal}%' and b.device like '%${deviceName}%' and b.result='${resultStatus}'")
                         }
                         else if((!deviceName) && (resultStatus)){
-                            executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.scriptGroup like '%${scriptVal}%' and b.result='${resultStatus}'")
+                            executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.scriptGroup like '%${scriptVal}%' and b.result='${resultStatus}'")
                         }
                         else if((deviceName) && (!resultStatus)){
-                            executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.scriptGroup like '%${scriptVal}%' and b.device like '%${deviceName}%'")
+                            executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.scriptGroup like '%${scriptVal}%' and b.device like '%${deviceName}%'")
                         }
                     }
                     else{
                         if((!deviceName) && (!resultStatus)){
-                            executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.scriptGroup is not null ")
+                            executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.scriptGroup is not null ")
                         }
                         else if((deviceName) && (resultStatus)){
-                            executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.scriptGroup is not null and b.device like '%${deviceName}%' and b.result='${resultStatus}'")
+                            executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.scriptGroup is not null and b.device like '%${deviceName}%' and b.result='${resultStatus}'")
                         }
                         else if((!deviceName) && (resultStatus)){
-                            executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.scriptGroup is not null and b.result='${resultStatus}'")
+                            executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.scriptGroup is not null and b.result='${resultStatus}'")
                         }
                         else if((deviceName) && (!resultStatus)){
-                            executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.scriptGroup is not null and b.device like '%${deviceName}%'")
+                            executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.scriptGroup is not null and b.device like '%${deviceName}%'")
                         }
                     }
                 }
                 else{
                     if(scriptVal){
                         if((!deviceName) && (!resultStatus)){
-                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and (b.script like '%Multiple%' or b.script like '%${scriptVal}%' ) ")
+                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and b.dateOfExecution between '${fromDate}' and '${toDate}'")
                         }
                         else if((deviceName) && (resultStatus)){
-                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and (b.script like '%Multiple%' or b.script like '%${scriptVal}%' ) and b.device like '%${deviceName}%' and b.result='${resultStatus}'")
+                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and b.dateOfExecution between '${fromDate}' and '${toDate}' and b.device like '%${deviceName}%' and b.result='${resultStatus}'")
                         }
                         else if((!deviceName) && (resultStatus)){
-                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and (b.script like '%Multiple%' or b.script like '%${scriptVal}%' ) and b.result='${resultStatus}'")
+                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and b.dateOfExecution between '${fromDate}' and '${toDate}' and b.result='${resultStatus}'")
                         }
                         else if((deviceName) && (!resultStatus)){
-                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and (b.script like '%Multiple%' or b.script like '%${scriptVal}%' ) and b.device like '%${deviceName}%'")
+                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and b.dateOfExecution between '${fromDate}' and '${toDate}' and b.device like '%${deviceName}%'")
                         }
                         executionResult.each{
                             executionList.add(it[INDEX_ZERO])
@@ -1095,29 +1095,29 @@ class ExecutionService {
                     }
                     else{
                         if((!deviceName) && (!resultStatus)){
-                            executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.script is not null ")
+                            executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.script is not null ")
                         }
                         else if((deviceName) && (resultStatus)){
-                            executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.script is not null and b.device like '%${deviceName}%' and b.result='${resultStatus}'")
+                            executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.script is not null and b.device like '%${deviceName}%' and b.result='${resultStatus}'")
                         }
                         else if((!deviceName) && (resultStatus)){
-                            executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.script is not null and b.result='${resultStatus}'")
+                            executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.script is not null and b.result='${resultStatus}'")
                         }
                         else if((!deviceName) && (!resultStatus)){
-                            executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.script is not null and b.device like '%${deviceName}%'")
+                            executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.script is not null and b.device like '%${deviceName}%'")
                         }
                     }
                 }
             }
             else{
                 if((deviceName) && (resultStatus)){
-                    executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.device like '%${deviceName}%' and b.result='${resultStatus}'")
+                    executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.device like '%${deviceName}%' and b.result='${resultStatus}'")
                 }
                 else if((deviceName) && (!resultStatus)){
-                    executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.device like '%${deviceName}%'")
+                    executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and '${toDate}' and b.device like '%${deviceName}%'")
                 }
                 else if((!deviceName) && (resultStatus)){
-                    executionList = Execution.findAll("from Execution as b where DATE_FORMAT(b.dateOfExecution,'%m/%d/%Y') between '${fromDate}' and '${toDate}' and b.result='${resultStatus}'")
+                    executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.result='${resultStatus}'")
                 }
             }
             
@@ -1159,16 +1159,16 @@ class ExecutionService {
                 else{
                     if(scriptVal){
                         if((!deviceName) && (!resultStatus)){
-                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and (b.script like '%Multiple%' or b.script like '%${scriptVal}%' ) ")
+                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%'")
                         }
                         else if((deviceName) && (resultStatus)){
-                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and (b.script like '%Multiple%' or b.script like '%${scriptVal}%' ) and b.device like '%${deviceName}%' and b.result='${resultStatus}'")
+                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and b.device like '%${deviceName}%' and b.result='${resultStatus}'")
                         }
                         else if((!deviceName) && (resultStatus)){
-                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and (b.script like '%Multiple%' or b.script like '%${scriptVal}%' ) and b.result='${resultStatus}'")
+                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and b.result='${resultStatus}'")
                         }
                         else if((deviceName) && (!resultStatus)){
-                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and (b.script like '%Multiple%' or b.script like '%${scriptVal}%' ) and b.device like '%${deviceName}%' ")
+                            executionResult = Execution.findAll("from Execution b, ExecutionResult c where b.id=c.execution and c.script like '%${scriptVal}%' and b.device like '%${deviceName}%' ")
                         }
                         executionResult.each{
                             executionList.add(it[INDEX_ZERO])

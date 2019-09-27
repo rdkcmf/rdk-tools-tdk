@@ -118,3 +118,7 @@
 	</table>
 </div>			
 </g:if>
+<g:else>
+	<div class="message" role="status">No Records Found
+	</div>
+</g:else>
