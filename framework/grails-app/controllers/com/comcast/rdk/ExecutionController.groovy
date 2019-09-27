@@ -1768,6 +1768,7 @@ class ExecutionController {
 	 */
 	def searchExecutionList(){
 		def executionList = []
+		def executionResultList = []
 		def executions = Execution.findAllByNameLike("%${params?.searchName.trim()}%")
 		if(executions?.size() > 0){
 			executions.each{ execution ->
@@ -1780,7 +1781,12 @@ class ExecutionController {
 					executionList.add(execution)
 				}
 			}
-			executions = Execution.findAllByScriptLike("%${params?.searchName.trim()}%")
+			executionResultList = ExecutionResult.findAllByScriptLike("%${params?.searchName.trim()}%")
+			if(executionResultList?.size() >0){
+				executionResultList.each{ executionResultInstance ->
+						executionList.add(executionResultInstance.execution)
+				}
+			}
 			if(executions?.size() >0){
 				executions.each{ execution ->
 					executionList.add(execution)
@@ -1816,7 +1822,23 @@ class ExecutionController {
 	 * @return
 	 */
 	def multisearch(){
-		def executionList = executionService.multisearch( params?.toDate?.trim(), params?.fromDate?.trim(), params?.deviceName?.trim(), params?.resultStatus?.trim(),
+		String fromDate = ""
+		String toDate = ""
+		if(params?.fromDate && params?.toDate){
+			String fromDateString = params?.fromDate?.trim()
+			def fromDateList = fromDateString.split("/")
+			def year = fromDateList[2]
+			def month = fromDateList[0]
+			def day = fromDateList[1]
+			fromDate = year + "-" + month + "-" +day + " 00:00:00"
+			String toDateString = params?.toDate?.trim()
+			def toDateList = toDateString.split("/")
+			year = toDateList[2]
+			month = toDateList[0]
+			day = toDateList[1]
+			toDate = year + "-" + month + "-" +day + " 23:59:59"
+		}
+		def executionList = executionService.multisearch( toDate, fromDate, params?.deviceName?.trim(), params?.resultStatus?.trim(),
 				params?.scriptType?.trim(), params?.scriptVal?.trim() )
 		render(template: "searchList", model: [executionInstanceList : executionList])
 	}
