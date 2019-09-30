@@ -142,7 +142,7 @@ function hideParameters(k){
 <g:each in="${executionDeviceInstanceList}" status="k"  var="executionDeviceInstance">
 <table id="logtable" >
 	<tr>
-		<th colspan="2">Execution Details</th>	
+		<th colspan="2">Execution Details : ${executionInstance?.name}</th>
 	</tr>
 	<tr class="trborder even">
 		<td colspan="2" align="right">
