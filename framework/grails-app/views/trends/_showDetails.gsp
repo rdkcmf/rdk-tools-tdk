@@ -106,6 +106,18 @@ function hideParameters(k){
 	$('#showDevParam'+k).show();
 }
 
+function showFulltextDeviceDetails(k){
+	$("#fulltext"+k).show();
+	$("#firstfourlines"+k).hide();
+	$("#showlessdd"+k).show();	
+}
+
+function showMintextDeviceDetails(k){
+	$("#fulltext"+k).hide();
+	$("#firstfourlines"+k).show();
+	$("#showlessdd"+k).hide();	
+}
+
 </script>
 
 
