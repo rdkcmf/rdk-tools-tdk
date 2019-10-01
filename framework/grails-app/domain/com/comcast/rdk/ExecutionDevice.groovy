@@ -37,6 +37,11 @@ class ExecutionDevice {
     String device
 	
 	/**
+	 * Device type of the device in which the script is executed
+	 */
+	String boxType
+	
+	/**
 	 * DeviceIP in which the script is executed
 	 */
 	String deviceIp
@@ -75,6 +80,7 @@ class ExecutionDevice {
     
     static constraints = {             
         device(nullable:false, blank:false)
+		boxType(nullable:true, blank:true)
 		execution(nullable:false, blank:false)
 		dateOfExecution(nullable:true, blank:true)
 		buildName(nullable:true, blank:true)

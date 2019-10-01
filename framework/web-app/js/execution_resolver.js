@@ -819,21 +819,12 @@ function combinedExcelReportGeneration(executionIdList) {
 			window.focus();
 			return false
 		}
-		else if(status == "nullDevice"){
-			alert("Couldn't find device type as the device does not exist")
-			return false
-		}
 		else if(status == "overFlow"){
 			alert("Maximum number of executions that can be combined is 10 and minimum number is 2")
 			return false
 		}
-		else{
-			alert("Please select the executions with the same device type")
-			return false
-		}
 	}
-	else 
-	{
+	else {
 		alert("Please select the execution entries for report generation")
 		return false
 	}	

@@ -71,7 +71,7 @@ $(document).ready(function() {
 					${scriptName}
 				</td>
 				<td>
-                     <g:select id="defectType" name="defectType"  noSelection="['' : 'Please Select']" from="${['RDK Issue', 'Script Issue', 'Environment Issue']}" required="" value="${defectType}" 
+                     <g:select id="defectType" name="defectType"  noSelection="['' : 'Please Select']" from="${['RDK Issue', 'Script Issue', 'Environment Issue','Interface Change']}" required="" value="${defectType}" 
                      	class="many-to-one selectCombo"/>										
 				</td>
 				<td><input type="text" id="ticketNo"  name="ticketNo" value="${ticketNo}" required="" />
@@ -79,7 +79,6 @@ $(document).ready(function() {
 				<td>
 					<input list ="remarksList" name="remarks" id="remarks" value = "${remarks}"/>
 					<datalist id="remarksList">
-                		<option value="Interface Change"/>
         				<option value="New Issue"/>
    					</datalist>										
 				</td>
@@ -108,7 +107,7 @@ $(document).ready(function() {
 		<g:select id="searchBoxType" name="searchBoxType"  noSelection="['' : 'All']" from="${boxTypes}" value="${selectedBoxType}" 
                      	class="many-to-one selectCombo" style = "width:100px"/>	
         <span>No:of entries</span>
-		<g:select id="noOfEntries" name="noOfEntries"  noSelection="['' : '5']" from="${['5','6','7','8','9','10']}" value="${noOfEntries}" 
+		<g:select id="noOfEntries" name="noOfEntries"  noSelection="['' : '5']" from="${['6','7','8','9','10','15','20','25']}" value="${noOfEntries}" 
                      	class="many-to-one selectCombo" style = "width:100px"/>	
          <input type="button" value="Search" class="buttons"
             onclick="searchData('${executionId}', '${execDeviceId}', '${execResultId}', '${scriptName}', '${selectedboxType}')" style="width: 50px; height: 20px;

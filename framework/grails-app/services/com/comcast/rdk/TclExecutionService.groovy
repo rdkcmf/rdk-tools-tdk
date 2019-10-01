@@ -342,6 +342,7 @@ class TclExecutionService {
 										executionDevice.execution = Execution.findByName(execName)
 										executionDevice.dateOfExecution = new Date()
 										executionDevice.device = deviceInstance?.stbName
+										executionDevice.boxType = deviceInstance?.boxType?.name
 										executionDevice.deviceIp = deviceInstance?.stbIp
 										executionDevice.status = UNDEFINED_STATUS
 										executionDevice.category = Category.RDKB_TCL
@@ -1427,6 +1428,7 @@ class TclExecutionService {
 								executionDevice = new ExecutionDevice()
 								executionDevice.execution = rerunExecutionInstance
 								executionDevice.device = deviceInstance?.stbName
+								executionDevice.boxType = deviceInstance?.boxType?.name
 								executionDevice.deviceIp = deviceInstance?.stbIp
 								executionDevice.dateOfExecution = new Date()
 								executionDevice.status = UNDEFINED_STATUS

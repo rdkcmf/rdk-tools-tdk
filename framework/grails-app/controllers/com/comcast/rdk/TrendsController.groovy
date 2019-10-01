@@ -1365,15 +1365,17 @@ class TrendsController {
 		BoxType boxType = BoxType.findByName(selectedBoxType)
 		def allowedDevices = selectedBoxType.equalsIgnoreCase("All") ? Device.list()?.stbName : Device.findAllByBoxType(boxType)?.stbName
 		def execResults = []
-		if(allowedDevices != null) {
+		if(selectedBoxType.equalsIgnoreCase("All")){
 			def execCriteria = ExecutionResult.createCriteria()
 			execResults = execCriteria {
 				like ("script", scriptName)
-				'in' ("device", allowedDevices)
 				maxResults(maxResultCount)
 				order("id", "desc")
 				lt("execution.id", execId.toLong())
 			}
+		}
+		else{
+			execResults = ExecutionResult.findAll("from ExecutionResult as executionResult WHERE executionResult.executionDevice.boxType='${selectedBoxType}' and executionResult.script like '${scriptName}' and executionResult.execution.id<'${execId}' order by id desc" , [max: maxResultCount])
 		}
 		def analysisDetails = []
 		def data = [:]
@@ -1402,7 +1404,12 @@ class TrendsController {
 			data.execName = result?.execution?.name
 			data.execId = result?.execution?.id
 			Device device = Device.findByStbName(result?.device)
-			data.boxType = device?.boxType?.name
+			if(result?.executionDevice?.boxType){
+				data.boxType = result?.executionDevice?.boxType
+			}
+			else{
+				data.boxType = device?.boxType?.name
+			}
 			data.status = result?.status
 			data.executionResultId = result?.id
 			data.executionDeviceId = result?.executionDevice?.id 

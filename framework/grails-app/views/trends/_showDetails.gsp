@@ -576,18 +576,21 @@ function showMintextDeviceDetails(k){
 					<td style="width:50%"><g:link controller="scriptGroup" action="exportScriptData" id="${executionResultInstance?.script}" target="_blank" >${executionResultInstance?.script} </g:link> </td>					
 					<td style="width:10%;font-weight: bold;">Status</td>
 					<td style="width:10%;">${executionResultInstance?.status}</td>
-					
-					<td><g:link onclick="showResultAnalysis('${executionInstance.id}', '${executionResultInstance?.script}', '${boxType?.id}', '${executionDeviceInstance?.id}','${executionResultInstance?.id}'); return false;" id="${executionInstance.id}_analyze">${defectData[executionResultInstance?.script]? defectData[executionResultInstance?.script]: "Analyze"}</g:link></td>		
-					<td style="width:10%;"><g:remoteLink id="expander${k}_${i}" action="getExecutionDetails" update="allmessages${k}_${i}" onSuccess="this.innerHTML='Hide';viewOnClick(this,${k},${i}); return false;" params="[execResId : "${executionResultInstance?.id}"]" >Details</g:remoteLink>	</td>		
+					<g:if test="${defectData[executionResultInstance?.script]}">
+						<td><g:link onclick="showResultAnalysis('${executionInstance.id}', '${executionResultInstance?.script}', '${boxType?.id}', '${executionDeviceInstance?.id}','${executionResultInstance?.id}'); return false;" id="${executionInstance.id}_analyze" style="color:green">${defectData[executionResultInstance?.script]}</g:link></td>		
+						<td style="width:10%;"><g:remoteLink id="expander${k}_${i}" action="getExecutionDetails" update="allmessages${k}_${i}" onSuccess="this.innerHTML='Hide';viewOnClick(this,${k},${i}); return false;" params="[execResId : "${executionResultInstance?.id}"]" >Details</g:remoteLink>	</td>	
+					</g:if>
+					<g:else>
+						<td><g:link onclick="showResultAnalysis('${executionInstance.id}', '${executionResultInstance?.script}', '${boxType?.id}', '${executionDeviceInstance?.id}','${executionResultInstance?.id}'); return false;" id="${executionInstance.id}_analyze">${"Analyze"}</g:link></td>		
+						<td style="width:10%;"><g:remoteLink id="expander${k}_${i}" action="getExecutionDetails" update="allmessages${k}_${i}" onSuccess="this.innerHTML='Hide';viewOnClick(this,${k},${i}); return false;" params="[execResId : "${executionResultInstance?.id}"]" >Details</g:remoteLink>	</td>		
+					</g:else>
 				</tr>
 			</g:if>
 			<tbody id="allmessages${k}_${i}"  style="display: none;">
 			</tbody>
 			<tbody id="alllogs${k}_${i}"  style="display: none;">
-			<tr>
-			<td>Agent Console Log		
-					
-					</td>	
+				<tr>
+					<td>Agent Console Log</td>	
 					<td colspan="4">
 						&emsp;<span id="showconsolelink${k}_${i}" >
 						<g:remoteLink controller="execution" action="showAgentLogFiles" update="consoleLog${k}_${i}" onSuccess="showConsoleHideLink(${k},${i});" params="[execResId : "${executionResultInstance?.id}", execDeviceId:"${executionDeviceInstance?.id}", execId:"${executionInstance?.id}"]">Show</g:remoteLink>

@@ -463,36 +463,6 @@ class ExecutedbService {
 		}
 		return dataList
 	}
-	
-	/**
-	 * Method to check whether the selected executions have the same device type. 
-	 */
-	def checkValidExecutions(List selectedRowsDefined) {
-		def executionInstance
-		def boxTypeList = []
-		String sameType
-		for(int i=0;i<selectedRowsDefined.size();i++){
-			executionInstance = Execution.findById(selectedRowsDefined[i])
-			String deviceName = executionInstance.device
-			Device device = Device.findByStbName(deviceName)
-			if(device){
-				String boxTypeOfDevice = device.boxType.name
-				boxTypeList.add(boxTypeOfDevice)
-			}
-			else{
-				return "nullDevice"
-			}
-		}
-		for (String s : boxTypeList) {
-			if (!s.equals(boxTypeList.get(0))){
-				sameType = "false"
-			}
-			else{
-				sameType = "true"
-			}
-		}
-		return sameType
-	}
 
 	/**
 	 * Method to generate the data for creating the combined report in excel format.
@@ -720,7 +690,6 @@ class ExecutedbService {
 					String ticketNo = ""
 					String remarks = ""
 					String issueType = ""
-					/*
 					DefectDetails defectDetails = DefectDetails.findByExecutionIdAndScriptName(executionForResultAnalysisId, scriptName)
 					if(defectDetails != null)  {
 						ticketNo = defectDetails.ticketNumber
@@ -742,12 +711,11 @@ class ExecutedbService {
 							envIssueCount++
 							totalEnvIssueCount++
 						}
-						if(defectDetails.remarks.contains(INTERFACE_CHANGE)){
+						else if(defectDetails.defectType.equals(INTERFACE_CHANGE)){
 							interfaceChangeCount++
 							totalInterfaceChangeCount++
 						}
-					}*/
-					
+					}
 					Map dataMap =["C1":c1Counter,"C2":scriptName,"C3":executed,"C4":status,"C5":parseTime(executionResult?.dateOfExecution),"C6":executionLogData,"C7":ticketNo,"C8":issueType,"C9":remarks,"C10":appUrl+"/execution/getAgentConsoleLog?execResId="+executionResult?.id,"C11":repeatRerunFlag]
 					dataList.add(dataMap)
 					c1Counter ++
@@ -758,7 +726,6 @@ class ExecutedbService {
 				moduleMap.put(Constants.SCRIPT_TIME_OUT, timeoutCount)
 				moduleMap.put(Constants.NOT_APPLICABLE_STATUS, naCount)
 				moduleMap.put(Constants.SKIPPED_STATUS, skippedCount)
-				/*
 				if(!newIssueCount) {newIssueCount = 0}
 				if(!rdkIssueCount) {rdkIssueCount = 0}
 				def existingIssueCount = rdkIssueCount - newIssueCount
@@ -769,7 +736,6 @@ class ExecutedbService {
 				moduleMap.put(NEW_ISSUE, newIssueCount?newIssueCount : 0)
 				moduleMap.put(INTERFACE_CHANGE, interfaceChangeCount? interfaceChangeCount : 0)
 				moduleMap.put("Remarks","")
-				*/
 				coverPageMap.put(modName,moduleMap)
 				counter++
 				dataMapList.put("dataList",dataList)
@@ -786,7 +752,6 @@ class ExecutedbService {
 			resultMap.put(Constants.SCRIPT_TIME_OUT, totalTimeoutCount)
 			resultMap.put(Constants.NOT_APPLICABLE_STATUS, totalNaCount)
 			resultMap.put(Constants.SKIPPED_STATUS, totalSkippedCount)
-			/*
 			totalAnalysedCount  = totalNewIssueCount + totalInterfaceChangeCount + totalEnvIssueCount + totalScriptIssueCount + totalRdkIssueCount
 			if(totalAnalysedCount > 0){
 				resultMap.put("Number of failed scripts linked with open defects", totalRdkIssueCount)
@@ -798,7 +763,6 @@ class ExecutedbService {
 				resultMap.put(INTERFACE_CHANGE,totalInterfaceChangeCount)
 				resultMap.put("Remarks","")
 			}
-			*/
 			coverPageMap.put("Total", resultMap)
 			detailDataMap.each{ page, data ->
 				if(!page.equals("CoverPage")){
@@ -808,7 +772,7 @@ class ExecutedbService {
 					dataMapList.put("counter",counterValue)
 				}
 				else{
-					/*
+					
 					if(totalAnalysedCount < 1){
 						def dataMapList = detailDataMap.get(page)
 						moduleNameScriptListMap.each{ modName, scriptList ->
@@ -821,7 +785,7 @@ class ExecutedbService {
 							moduleList.remove("Interface Change")
 							moduleList.remove("Remarks")
 						}
-					}*/
+					}
 				}
 			}
 			return detailDataMap
@@ -1097,17 +1061,16 @@ class ExecutedbService {
 					def rdkIssueCount = defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(RDK_ISSUE)
 					def newIssueCount = defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(NEW_ISSUE)
 					def scriptIssueCount =  defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(SCRIPT_ISSUE)
-					def envIssueCount = defectDetailsMap?.get(MODULE_DATA)?.get(ENVIRONMENT_ISSUE)
+					def envIssueCount = defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(ENVIRONMENT_ISSUE)
 					def interfaceChangeCount = defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(INTERFACE_CHANGE)
 					if(!newIssueCount) {newIssueCount = 0}
 					if(!rdkIssueCount) {rdkIssueCount = 0}
 					def existingIssueCount = rdkIssueCount - newIssueCount
-
 					resultMap.put("Number of failed scripts linked with open defects", rdkIssueCount)
 					resultMap.put(SCRIPT_ISSUE, scriptIssueCount?scriptIssueCount:0)
 					resultMap.put("Existing Issue", existingIssueCount)
-					resultMap.put(ENVIRONMENT_ISSUE, envIssueCount? envIssueCount: 0)
 					resultMap.put(NEW_ISSUE, newIssueCount)
+					resultMap.put(ENVIRONMENT_ISSUE, envIssueCount? envIssueCount: 0)
 					resultMap.put(INTERFACE_CHANGE, interfaceChangeCount? interfaceChangeCount : 0)
 					resultMap.put("Remarks","")
 				}
@@ -1266,10 +1229,7 @@ class ExecutedbService {
 					existingCount = existingCount != null ? existingCount : 0
 					moduleData[moduleName].put(ENVIRONMENT_ISSUE, (existingCount +1))
 					totalAnalyzedData[ENVIRONMENT_ISSUE] = totalAnalyzedData[ENVIRONMENT_ISSUE] + 1
-				}
-				
-
-				else if(defectDetail.remarks.contains(INTERFACE_CHANGE)) {
+				} else if(defectDetail.defectType.equals(INTERFACE_CHANGE)) {
 					def existingCount =  moduleData[moduleName].get(INTERFACE_CHANGE)
 					existingCount = existingCount != null ? existingCount : 0
 					moduleData[moduleName].put(INTERFACE_CHANGE, (existingCount +1))
