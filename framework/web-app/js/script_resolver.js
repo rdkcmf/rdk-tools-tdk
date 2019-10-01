@@ -169,8 +169,11 @@ function uploadRDKVScript(){
 	$("#up_load").hide();
 	$("#up_load_rdkv_script").show();	
 	$("#up_load_rdkb_script").hide();
-	$("#list-scriptDetails").hide();
-	$("#list-scriptDetails1").hide();
+	$("#list-scriptDetailsV").hide();
+	$("#list-scriptDetailsB").hide();
+	$("#list-suiteDetailsV").hide();
+	$("#list-suiteDetailsB").hide();
+	$("#radioDiv").hide();
 	$("#update_scriptgroup").hide();
 }
 function uploadRDKBScript(){
@@ -178,8 +181,11 @@ function uploadRDKBScript(){
 	$("#up_load").hide();
 	$("#up_load_rdkv_script").hide();
 	$("#up_load_rdkb_script").show();
-	$("#list-scriptDetails").hide();
-	$("#list-scriptDetails1").hide();
+	$("#list-scriptDetailsV").hide();
+	$("#list-scriptDetailsB").hide();
+	$("#list-suiteDetailsV").hide();
+	$("#list-suiteDetailsB").hide();
+	$("#radioDiv").hide();
 	$("#update_scriptgroup").hide();
 	
 }
@@ -214,8 +220,11 @@ function showUploadOption(){
 	$("#up_load").show();
 	$("#up_load_rdkv_script").hide();
 	$("#up_load_rdkb_script").hide();
-	$("#list-scriptDetails").hide();
-	$("#list-scriptDetails1").hide();
+	$("#list-scriptDetailsV").hide();
+	$("#list-scriptDetailsB").hide();
+	$("#list-suiteDetailsV").hide();
+	$("#list-suiteDetailsB").hide();
+	$("#radioDiv").hide();
 	$("#update_scriptgroup").hide();
 }
 
@@ -227,8 +236,11 @@ function updateScriptGroup(){
 	$("#up_load").hide();
 	$("#up_load_rdkv_script").hide();
 	$("#up_load_rdkb_script").hide();
-	$("#list-scriptDetails").hide();
-	$("#list-scriptDetails1").hide();
+	$("#list-scriptDetailsV").hide();
+	$("#list-scriptDetailsB").hide();
+	$("#list-suiteDetailsV").hide();
+	$("#list-suiteDetailsB").hide();
+	$("#radioDiv").hide();
 	$("#update_scriptgroup").show();
 }
 /**
@@ -240,9 +252,12 @@ function hideUploadOption(){
 	$("#up_load").hide();
 	$("#up_load_rdkv_script").hide();	
 	$("#up_load_rdkb_script").hide();
-	$("#list-scriptDetails").hide();
-	$("#list-scriptDetails1").hide();
 	$("#update_scriptgroup").hide();
+	$("#list-scriptDetailsV").hide();
+	$("#list-scriptDetailsB").hide();
+	$("#list-suiteDetailsV").hide();
+	$("#list-suiteDetailsB").hide();
+	$("#radioDiv").hide();
 }
 
 var displayedGroups = [];
@@ -303,6 +318,58 @@ function addScripts() {
 	}
 
 }
+
+/**
+ * 
+ * Display Script Detail Summary or TestSuite Summary depending on the radio button clicked by user
+ */
+
+function display(val) {
+	if (val.trim() === 'scriptSummary') {
+		$("#suiteDetailsSummary").hide();
+		$("#scriptDetailsSummary").show();
+		$("#list-scriptDetailsV").show();
+		$("#scriptTableV").dataTable( {
+		    "sPaginationType": "full_numbers",
+		    "bRetrieve": true
+		});
+		$("#list-scriptDetailsB").show();
+		$("#scriptTableB").dataTable( {
+			"sPaginationType": "full_numbers",
+			"bRetrieve": true
+		});
+		var scriptId = $("#currentScriptId").val();
+		if(scriptId!=null && scriptId!=""){
+			editScript(scriptId);
+		}
+		var scriptGroupId = $("#currentScriptGroupId").val();
+		if(scriptGroupId){
+			editScriptGroup(scriptGroupId);
+		}
+	} else if (val.trim() === 'suiteSummary') {
+		$("#scriptDetailsSummary").hide();
+		$("#suiteDetailsSummary").show();
+		$("#list-suiteDetailsV").show();
+		$("#suitetTableV").dataTable( {
+			"sPaginationType": "full_numbers",
+			"bRetrieve": true
+		});
+		$("#list-suiteDetailsB").show();
+		$("#suiteTableB").dataTable( {
+			"sPaginationType": "full_numbers",
+			"bRetrieve": true
+		});
+		var scriptId = $("#currentScriptId").val();
+		if(scriptId!=null && scriptId!=""){
+			editScript(scriptId);
+		}
+		var scriptGroupId = $("#currentScriptGroupId").val();
+		if(scriptGroupId){
+			editScriptGroup(scriptGroupId);
+		}
+	} else {}
+}
+
 /**
  * Remove scripts from the script group 
  */
@@ -491,8 +558,11 @@ function createScriptForm(category) {
 	$("#update_scriptgroup").hide();
 	$("#up_load_rdkv_script").hide();	
 	$("#up_load_rdkb_script").hide();
-	$("#list-scriptDetails").hide();
-	$("#list-scriptDetails1").hide();
+	$("#list-scriptDetailsV").hide();
+	$("#list-scriptDetailsB").hide();
+	$("#list-suiteDetailsV").hide();
+	$("#list-suiteDetailsB").hide();
+	$("#radioDiv").hide();
 	$("#responseDiv123").show();
 	$.get('createScript', {category:category}, function(data) { $("#responseDiv").html(data); });
 }
@@ -508,8 +578,11 @@ function createTCLScriptForm(category) {
 	$("#update_scriptgroup").hide();
 	$("#up_load_rdkv_script").hide();	
 	$("#up_load_rdkb_script").hide();
-	$("#list-scriptDetails").hide();
-	$("#list-scriptDetails1").hide();
+	$("#list-scriptDetailsV").hide();
+	$("#list-scriptDetailsB").hide();
+	$("#list-suiteDetailsV").hide();
+	$("#list-suiteDetailsB").hide();
+	$("#radioDiv").hide();
 	$("#responseDiv123").show();
 	$.get('createScript', {category:category}, function(data) { 
 		$("#responseDiv").html(data);		
@@ -529,8 +602,11 @@ function editScript(id , category ) {
 
 function editTclScript(scriptName) {
 	// Issue fix
-	$('#list-scriptDetails').hide();
-	$('#list-scriptDetails1').hide();
+	$("#list-scriptDetailsV").hide();
+	$("#list-scriptDetailsB").hide();
+	$("#list-suiteDetailsV").hide();
+	$("#list-suiteDetailsB").hide();
+	$("#radioDiv").hide();
 	hideSearchoptions();
 	checkAnyEditingScript();
 	$.get('tclScriptDisplay', {scriptName: scriptName}, function(data) { 
@@ -589,16 +665,22 @@ function removeScript(id, category){
 
 
 function createScriptGrpForm(category) {	
-	$("#list-scriptDetails").hide();
-	$("#list-scriptDetails1").hide();
+	$("#list-scriptDetailsV").hide();
+	$("#list-scriptDetailsB").hide();
+	$("#list-suiteDetailsV").hide();
+	$("#list-suiteDetailsB").hide();
+	$("#radioDiv").hide();
 	$("#responseDiv123").show()
 	checkAnyEditingScript();
 	$.get('create', {category:category},function(data) { $("#responseDiv").html(data); });
 }
 
 function getSuiteDetails() {	
-	$("#list-scriptDetails").hide();
-	$("#list-scriptDetails1").hide();
+	$("#list-scriptDetailsV").hide();
+	$("#list-scriptDetailsB").hide();
+	$("#list-suiteDetailsV").hide();
+	$("#list-suiteDetailsB").hide();
+	$("#radioDiv").hide();
 	$("#responseDiv123").show()
 	
 	$.get('getSuiteDetails',function(data) { $("#responseDiv").html(data); });
@@ -705,8 +787,11 @@ function hideAllSearchoptions(){
 }
 
 function displayAdvancedSearch(){	
-	$("#list-scriptDetails").show();
-	$("#list-scriptDetails1").show();
+	$("#list-scriptDetailsV").show();
+	$("#list-scriptDetailsB").show();
+	$("#list-suiteDetailsV").show();
+	$("#list-suiteDetailsB").show();
+	$("#radioDiv").show();
 	$("#advancedSearch").show();
 	$("#minSearch").hide();
 	$('.veruthe').empty();
@@ -716,8 +801,11 @@ function displayAdvancedSearch(){
 
 function showMinSearch(){	
 	$("#advancedSearch").hide();
-	$("#list-scriptDetails").hide();
-	$("#list-scriptDetails1").hide();
+	$("#list-scriptDetailsV").hide();
+	$("#list-scriptDetailsB").hide();
+	$("#list-suiteDetailsV").hide();
+	$("#list-suiteDetailsB").hide();
+	$("#radioDiv").hide();
 	$("#minSearch").show();
 	$('.veruthe').empty();
 }

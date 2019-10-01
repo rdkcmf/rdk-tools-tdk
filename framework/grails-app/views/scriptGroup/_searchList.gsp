@@ -19,8 +19,11 @@
 <%@ page import="com.comcast.rdk.ScriptGroup"%>
 <script type="text/javascript">
 	$(document).ready(function() {
-		$("#list-scriptDetails").hide();
-		$("#list-scriptDetails1").hide();		
+		$("#list-scriptDetailsV").hide();
+		$("#list-scriptDetailsB").hide();
+		$("#list-suiteDetailsV").hide();
+		$("#list-suiteDetailsB").hide();
+		$("#radioDiv").hide();		
 		$("#scriptlisttable").dataTable({
 			"sPaginationType" : "full_numbers"
 		});
