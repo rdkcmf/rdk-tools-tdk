@@ -42,8 +42,7 @@ Testcase ID: CT_XUPNP_55</synopsis>
   </rdk_versions>
   <test_cases>
     <test_case_id>CT_XUPNP_55</test_case_id>
-    <test_objective>To get the broadcast mac address value from xdiscovery output file.
-</test_objective>
+    <test_objective>To get the broadcast mac address value from xdiscovery output file.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>XG1</test_setup>
     <pre_requisite>1.start_upnp.sh should be started.
@@ -53,8 +52,12 @@ Testcase ID: CT_XUPNP_55</synopsis>
     <automation_approch>1.TM loads xupnp_agent via the test agent. 
 2.The stub will invokes the RPC method for checking the parameter name in output.json file and send the results.
 3. The stub function will verify the presence of parameter name and  sends the results as Json response 
-4. TM will receive and display the result.</automation_approch>
-    <except_output>Checkpoint 1 stub will parse for parameter name in output.json file</except_output>
+4. TM will receive and display the result.
+5. TM will convert the details as a list.
+6. Using systemutil ExecuteCommand command get the parameter from cat /.tmp/deviceDtails.cache
+7 If the bcastMacAddress obtained from the /.tmp/deviceDetails.cache is present in the list created in step 5 the result is success else failure.</automation_approch>
+    <except_output>Checkpoint 1 stub will parse for parameter name in output.json file
+Checkpoint 2 the parameter from the ExecuteCommand  should be present in the parameter list obtained from output.json</except_output>
     <priority>High</priority>
     <test_stub_interface>TestMgr_XUPNP_ReadXDiscOutputFile</test_stub_interface>
     <test_script>XUPNP_GetBcastMacAddressFromOutFile</test_script>
@@ -77,14 +80,20 @@ port = <port>
 #Test component to be tested
 xUpnpObj = tdklib.TDKScriptingLibrary("xupnp","2.0");
 xUpnpObj.configureTestCase(ip,port,'XUPNP_GetBcastMacAddressFromOutFile');
-
 #Get the result of connection with test component and STB
 xupnpLoadStatus = xUpnpObj.getLoadModuleResult();
 print "XUPNP module loading status : %s" %xupnpLoadStatus;
 #Set the module loading status
 xUpnpObj.setLoadModuleStatus(xupnpLoadStatus);
 
-if "SUCCESS" in xupnpLoadStatus.upper():
+sysUtilObj = tdklib.TDKScriptingLibrary("systemutil","1");
+sysUtilObj.configureTestCase(ip,port,'XUPNP_GetBcastMacAddressFromOutFile');
+sysUtilLoadStatus = sysUtilObj.getLoadModuleResult();
+print "System module loading status : %s" %sysUtilLoadStatus;
+#Set the module loading status
+sysUtilObj.setLoadModuleStatus(sysUtilLoadStatus);
+
+if ("SUCCESS" in xupnpLoadStatus.upper()) and ("SUCCESS" in sysUtilLoadStatus.upper()):
         tdkTestObj = xUpnpObj.createTestStep('XUPNP_ReadXDiscOutputFile');
         expectedresult="SUCCESS";
         #Configuring the test object for starting test execution
@@ -92,17 +101,40 @@ if "SUCCESS" in xupnpLoadStatus.upper():
         tdkTestObj.executeTestCase(expectedresult);
         actualresult = tdkTestObj.getResult();
         details = tdkTestObj.getResultDetails();
-	details = details.replace('\\t','')
-	details = details.replace('\\','')
-	details = details.replace('\"','')
         print "GetBcastMacAddress Result : %s"%actualresult;
-        print "GetBcastMacAddress Details : %s"%details;
         #Check for SUCCESS return value of XUPNP_ReadXDiscOutputFile
         if "SUCCESS" in actualresult.upper():
-                tdkTestObj.setResultStatus("SUCCESS");
-        else:
-                tdkTestObj.setResultStatus("FAILURE");
+		tdkTestObj.setResultStatus("SUCCESS");
+		details = details.replace('\\t','').replace('\\','').replace('\"','')
+		details_list = details.split(',')
+        	print "GetBcastMacAddress Details : %s"%details_list;
+		bcast_mac_list = [ detail.split(':',1)[1] for detail in details_list]
+		print "bcastlist: %s"%bcast_mac_list
+		
+		#Get the BcasMacAddress value from /tmp/.deviceDetails.cache and compare
+		tdkTestObj = sysUtilObj.createTestStep('ExecuteCommand');
+		cmd = "cat /tmp/.deviceDetails.cache | grep moca_mac | cut -d '=' -f2 | tr -d '\n'"
+		print cmd;
+                tdkTestObj.addParameter("command", cmd);
+                tdkTestObj.executeTestCase("SUCCESS");
+                actualresult = tdkTestObj.getResult();
+                details = tdkTestObj.getResultDetails().strip();
+                bcast_mac = details.lower()
+                print "BcastMacAddress from /tmp/.deviceDetails.cache: %s" %bcast_mac
+                if expectedresult in actualresult and bcast_mac in bcast_mac_list:
+                        tdkTestObj.setResultStatus("SUCCESS");
+                        print "Actual Result: BcastMacAddress retrieved from  /tmp/.deviceDetails.cache and output.json are same"
+                        print "[TEST EXECUTION RESULT] : SUCCESS"
+                else:
+                        tdkTestObj.setResultStatus("FAILURE");
+                        print "Actual Result :BcastMacAddress retrieved from /tmp/.deviceDetails.cache and output.json are not same"
+                        print "[TEST EXECUTION RESULT] : FAILURE"
+	else:
+		tdkTestObj.setResultStatus("FAILURE");
+                print "BcastMacAddress not retrieved from output.json"
 
         #Unload xupnp module
         xUpnpObj.unloadModule("xupnp");
+        sysUtilObj.unloadModule("systemutil");
+
                                           
