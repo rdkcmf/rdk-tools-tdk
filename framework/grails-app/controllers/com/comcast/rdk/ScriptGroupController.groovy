@@ -834,10 +834,13 @@ class ScriptGroupController {
 				fileName = st.nextToken()
 			}
 			def script = scriptService.getScript(getRealPath(),dirName,fileName, params.category?.trim())
-
-			if(script){
-				[script : script , category : params?.category]
-			}else{
+			if(script != null){
+				if (script.size() > 0){
+					[script : script , category : params?.category]
+				} else {
+				    render "Error : Module information is not available for module : "+dirName
+				}
+			}else {
 				render "Error : No script available with this name : "+fileName +"in module :"+dirName
 			}
 		}
