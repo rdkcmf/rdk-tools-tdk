@@ -17,6 +17,33 @@
  limitations under the License.
 -->
 <tr>
+	<td class="tdhead" title="Shows the result of 5 previous executions having the same box type">Script Trend</td>
+	<td colspan="4">
+		<g:if test="${dataMap}">
+			<g:each in="${dataMap}" status="i"  var="map">
+				<g:if test="${map.value =="SUCCESS" }">
+					<g:link controller = "trends" action ="analyze" params="[name:"${map.key}"]" target="_blank" style="text-decoration:none">
+						<div style="padding: 2px; margin-left: 5px;display: inline-block;width: 5px;height: 5px;background: green;border-radius: 50%" title = "Success">
+						</div>
+					</g:link>
+				</g:if>
+				<g:if test="${map.value =="SCRIPT TIME OUT" }">
+					<g:link controller = "trends" action ="analyze" params="[name:"${map.key}"]" target="_blank" style="text-decoration:none">
+						<div style="padding: 2px; margin-left: 5px; display: inline-block;width: 5px;height: 5px;background: #0aa1cf;border-radius: 50%" title = "Script Time Out"></div>
+					</g:link>
+				</g:if>
+				<g:if test="${map.value =="FAILURE" }">
+					<g:link controller = "trends" action ="analyze" params="[name:"${map.key}"]" target="_blank" style="text-decoration:none">
+						<div style="padding: 2px; margin-left: 5px; display: inline-block;width: 5px;height: 5px;background: red;border-radius: 50%" title = "Failure"></div>
+					</g:link>
+				</g:if>
+			</g:each>
+		</g:if>
+		<g:else>No previous executions found
+		</g:else>
+	</td>
+</tr>
+<tr>
 	<td class="tdhead">TimeTaken(min)</td>
 	<td colspan="4">
 		${executionResultInstance?.executionTime}
