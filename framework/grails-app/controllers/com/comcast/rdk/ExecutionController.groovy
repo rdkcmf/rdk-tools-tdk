@@ -1480,8 +1480,10 @@ class ExecutionController {
 	 * @return
 	 */
 	def getExecutionDetails(){
+		Map dataMap = [:]
 		def exRes = ExecutionResult.get(params?.execResId)
-		render(template: "executionDetails", model: [executionResultInstance : exRes])
+		dataMap = showScriptTrend(params?.execResId)
+		render(template: "executionDetails", model: [executionResultInstance : exRes,dataMap:dataMap])
 	}
 
 	def showLogFiles(){
@@ -1495,6 +1497,46 @@ class ExecutionController {
 		render(template: "crashLogFileList", model: [execId : params?.execId, execDeviceId : params?.execDeviceId, execResId : params?.execResId, logFileNames : crashlogFileNames])
 	}
 
+	/**
+	 * Method to fetch the result of 5 previous executions having the same box type
+	 * @param execResId
+	 * @return
+	 */
+	def showScriptTrend(def execResId){
+		Map dataMap = [:]
+		def execResults = []
+		ExecutionResult executionResult = ExecutionResult.findById(execResId)
+		if(executionResult){
+			def scriptName = executionResult?.script
+			def execId = executionResult?.execution?.id
+			def boxType = executionResult.executionDevice.boxType
+			if(boxType){
+				execResults = ExecutionResult.findAll("from ExecutionResult as executionResult WHERE executionResult.executionDevice.boxType='${boxType}' and executionResult.script like '${scriptName}' and executionResult.execution.id<'${execId}' and (executionResult.status = 'SUCCESS' or executionResult.status = 'FAILURE' or executionResult.status = 'SCRIPT TIME OUT')" , [max: 5])
+			}
+			else{
+				BoxType boxTypeObject = null
+				Device device = Device.findByStbName(executionResult?.device)
+				if(device){
+					boxTypeObject = device?.boxType
+					def deviceList = Device.findAllByBoxType(boxTypeObject)?.stbName
+					def execCriteria = ExecutionResult.createCriteria()
+					execResults = execCriteria {
+						like ("script", scriptName)
+						'in' ("device", deviceList)
+						'in' ("status",['SUCCESS','FAILURE','SCRIPT TIME OUT'])
+						maxResults(5)
+						lt("execution.id", execId.toLong())
+					}
+				}
+			}
+			execResults?.each { def result->
+				Execution execution = result?.execution
+				dataMap.put(execution.name, result?.status)
+			}
+		}
+		return dataMap
+	}
+	
 	/**
 	 * Method to display the script execution details in the popup.
 	 * @return
