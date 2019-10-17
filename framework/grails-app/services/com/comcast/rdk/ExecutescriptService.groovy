@@ -1016,6 +1016,7 @@ class ExecutescriptService {
 							}
 							if(aborted && executionService.abortList.contains(executionName?.id?.toString())){
 								executionService.abortList.remove(executionName?.id?.toString())
+								executionService.saveExecutionStatus(aborted, executionName?.id)
 							}
 							Execution executionInstance1 = Execution.findByName(newExecName)
 							if(!aborted && pause && pendingScripts.size() > 0 ){			
