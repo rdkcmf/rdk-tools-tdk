@@ -449,6 +449,530 @@ void MocaHalAgent::MocaHal_GetMode(IN const Json::Value& req, OUT Json::Value& r
         return;
     }
 }
+/***************************************************************************
+ *Function name : MocaHal_GetSoftwareVersion
+ *Description    : This function is to get the software version of moca driver
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetSoftwareVersion(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetSoftwareVersion --->Entry\n");
+    char swVersion[16] = {'\0'};
+    int returnStatus = SoC_IMPL__RMH_Self_GetSoftwareVersion(rmh,swVersion,sizeof(swVersion));
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = swVersion;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetSoftwareVersion call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetSoftwareVersion -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetSoftwareVersion call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetSoftwareVersion -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetSupportedBand
+ *Description    : This function is to get the supported band
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetSupportedBand(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetSupportedBand --->Entry\n");
+    char supportedBand[8]= {'\0'};
+    RMH_Band band ;
+    int returnStatus = SoC_IMPL__RMH_Self_GetSupportedBand(rmh,&band);
+    if(!returnStatus)
+    {
+        sprintf(supportedBand,"%x",band);
+        response["result"] = "SUCCESS";
+        response["details"] = supportedBand;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetSupportedBand call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetSupportedBand -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GettSupportedBand call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetSupportedBand -->Exit\n");
+        return ;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetMaxBitrate
+ *Description    : This function is to get the mocahal max bit rate
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetMaxBitRate(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetMaxBitRate --->Entry\n");
+   unsigned int bitRate;
+   int returnStatus = SoC_IMPL__RMH_Self_GetMaxBitrate(rmh,&bitRate);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = bitRate;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetMaxBitRate call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetMaxBitRate -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetMaxBitRate call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetMaxBitRate -->Exit\n");
+        return;
+    } 
+}
+/***************************************************************************
+ *Function name : MocaHal_GetNodeId
+ *Description    : This function is to get the node Id of the device
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetNodeId(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetNodeId --->Entry\n");
+   unsigned int nodeId;
+   int returnStatus = SoC_IMPL__RMH_Network_GetNodeId(rmh,&nodeId);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = nodeId;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetNodeId call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetNodeId -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetNodeId call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetNodeId -->Exit\n");
+        return;
+    } 
+}
+/***************************************************************************
+ *Function name : MocaHal_GetLinkUptime
+ *Description    : This function is to get the amount of time the node has been part of the MoCA network 
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetLinkUptime(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetLinkUptime --->Entry\n");
+   unsigned int upTime;
+   int returnStatus = SoC_IMPL__RMH_Network_GetLinkUptime(rmh,&upTime);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = upTime;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetLinkUptime call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetLinkUptime -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetLinkUptime call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetLinkUptime -->Exit\n");
+        return;
+    } 
+}
+/***************************************************************************
+ *Function name : MocaHal_GetTxBroadcastPhyRate
+ *Description    : This function is to get the PHY rate at which broadcast packets are transmitted from the node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetTxBroadcastPhyRate(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxBroadcastPhyRate --->Entry\n");
+   unsigned int phyRate;
+   int returnStatus = SoC_IMPL__RMH_Network_GetTxBroadcastPhyRate(rmh,&phyRate);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = phyRate;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetTxBroadcastPhyRate call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxBroadcastPhyRate -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetTxBroadcastPhyRate call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxBroadcastPhyRate -->Exit\n");
+        return;
+    } 
+}
+/***************************************************************************
+ *Function name : MocaHal_GetTxPowerLimit
+ *Description    : This function is to get the maximum transmitter power level for the device 
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetTxPowerLimit(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxPowerLimit --->Entry\n");
+   int powerLevel;
+   int returnStatus = SoC_IMPL__RMH_Self_GetTxPowerLimit(rmh,&powerLevel);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = powerLevel;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetTxPowerLimit call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxPowerLimit -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetTxPowerLimit call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxPowerLimit -->Exit\n");
+        return;
+    } 
+}
+/***************************************************************************
+ *Function name : MocaHal_SetLOF
+ *Description    : This function is to set the last operating frequency of the device.
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_SetLOF(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_SetLOF --->Entry\n");
+    unsigned int freq = req["freq"].asInt();
+    int returnStatus = SoC_IMPL__RMH_Self_SetLOF(rmh,freq);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_SetLOF call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_SetLOF -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_SetLOF call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_SetLOF -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_SetPreferredNCEnabled
+ *Description    : This function is to set the device preferred NC enabled/disabled
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_SetPreferredNCEnabled(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_SetPreferredNCEnabled --->Entry\n");
+    bool val = req["enable"].asInt();
+    int returnStatus = SoC_IMPL__RMH_Self_SetPreferredNCEnabled(rmh,val);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_SetPreferredNCEnabled call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_SetPreferredNCEnabled -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_SetPreferredNCEnabled call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_SetPreferredNCEnabled -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetPreferredNCEnabled
+ *Description    : This function is to check if the device is preferred NC enabled
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetPreferredNCEnabled(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetPreferredNCEnabled --->Entry\n");
+    bool status;
+    int returnStatus = SoC_IMPL__RMH_Self_GetPreferredNCEnabled(rmh,&status);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = status;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetPreferredNCEnabled call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetPreferredNCEnabled -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetPreferredNCEnabled call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetPreferredNCEnabled -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetMaxPacketAggregation
+ *Description    : This function is to get the maximum number of packets the device will aggregate.
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetMaxPacketAggregation(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetMaxPacketAggregation --->Entry\n");
+   unsigned int val;
+   int returnStatus = SoC_IMPL__RMH_Self_GetMaxPacketAggregation(rmh,&val);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = val;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetMaxPacketAggregation call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetMaxPacketAggregation -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetMaxPacketAggregation call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetMaxPacketAggregation -->Exit\n");
+        return;
+    } 
+}
+/***************************************************************************
+ *Function name : MocaHal_GetMaxFrameSize
+ *Description    : This function is to get the maximum number of bytes the node can receive.
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetMaxFrameSize(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetMaxFrameSize --->Entry\n");
+   unsigned int val;
+   int returnStatus = SoC_IMPL__RMH_Self_GetMaxFrameSize(rmh,&val);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = val;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetMaxFrameSize call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetMaxFrameSize -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetMaxFrameSize call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetMaxFrameSize -->Exit\n");
+        return;
+    } 
+}
+/***************************************************************************
+ *Function name : MocaHal_GetLowBandwidthLimit
+ *Description    : This function is to get the lower threshold for the PHY link bandwidth
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetLowBandwidthLimit(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetLowBandwidthLimit --->Entry\n");
+   unsigned int val;
+   int returnStatus = SoC_IMPL__RMH_Self_GetLowBandwidthLimit(rmh,&val);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = val;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetLowBandwidthLimit call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetLowBandwidthLimit -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetLowBandwidthLimit call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetLowBandwidthLimit -->Exit\n");
+        return;
+    } 
+}
+/***************************************************************************
+ *Function name : MocaHal_SetTurboEnabled
+ *Description    : This function is used to Enable or disable turbo mode on the device
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_SetTurboEnabled(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_SetTurboEnabled --->Entry\n");
+    bool val = req["enable"].asInt();
+    int returnStatus = SoC_IMPL__RMH_Self_SetTurboEnabled(rmh,val);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_SetTurboEnabled call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_SetTurboEnabled -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_SetTurboEnabled call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_SetTurboEnabled -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetTurboEnabled
+ *Description    : This function is to check if turbo mode is enabled/disabled
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetTurboEnabled(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTurboEnabled --->Entry\n");
+    bool status;
+    int returnStatus = SoC_IMPL__RMH_Self_GetTurboEnabled(rmh,&status);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = status;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetTurboEnabled call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTurboEnabled -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetTurboEnabled call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTurboEnabled -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetPrivacyEnabled
+ *Description    : This function is to check if privacy is enabled/disabled for the device
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetPrivacyEnabled(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetPrivacyEnabled --->Entry\n");
+    bool status;
+    int returnStatus = SoC_IMPL__RMH_Self_GetPrivacyEnabled(rmh,&status);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = status;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetPrivacyEnabled call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetPrivacyEnabled -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetPrivacyEnabled call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetPrivacyEnabled -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetTxPowerControlEnabled
+ *Description    : This function is to check if transmit power control is enabled or disabled for the device.
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetTxPowerControlEnabled(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxPowerControlEnabled --->Entry\n");
+    bool status;
+    int returnStatus = SoC_IMPL__RMH_Power_GetTxPowerControlEnabled(rmh,&status);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = status;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetTxPowerControlEnabled call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxPowerControlEnabled -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetTxPowerControlEnabled call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxPowerControlEnabled -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetTxBeaconPowerReductionEnabled
+ *Description    : This function is to check if beacon power reduction is enabled on the device..
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetTxBeaconPowerReductionEnabled(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxBeaconPowerReductionEnabled --->Entry\n");
+    bool status;
+    int returnStatus = SoC_IMPL__RMH_Power_GetTxBeaconPowerReductionEnabled(rmh,&status);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = status;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetTxBeaconPowerReductionEnabled call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxBeaconPowerReductionEnabled -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetTxBeaconPowerReductionEnabled call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxBeaconPowerReductionEnabled -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetNCNodeId
+ *Description    : This function is to get the node Id of the network coordinator
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetNCNodeId(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetNCNodeId --->Entry\n");
+   unsigned int nodeId;
+   int returnStatus = SoC_IMPL__RMH_Network_GetNCNodeId(rmh,&nodeId);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = nodeId;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetNCNodeId call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetNCNodeId -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetNCNodeId call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetNCNodeId -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetBackupNCNodeId
+ *Description    : This function is to get the node Id of the backup network coordinator
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetBackupNCNodeId(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetBackupNCNodeId--->Entry\n");
+   unsigned int nodeId;
+   int returnStatus = SoC_IMPL__RMH_Network_GetBackupNCNodeId(rmh,&nodeId);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = nodeId;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetBackupNCNodeId call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetBackupNCNodeId -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetBackupNCNodeId call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetBackupNCNodeId -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetMixedMode
+ *Description    : This function is to check if the MoCA network contains both 1.1 and 2.0 nodes.
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetMixedMode(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetMixedMode --->Entry\n");
+    bool status;
+    int returnStatus = SoC_IMPL__RMH_Network_GetMixedMode(rmh,&status);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = status;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetMixedMode call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetMixedMode -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetMixedMode call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetMixedMode -->Exit\n");
+        return;
+    }
+}
 /**************************************************************************
 Function Name   : cleanup
 
