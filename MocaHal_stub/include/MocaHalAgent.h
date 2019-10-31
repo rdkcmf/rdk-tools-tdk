@@ -59,10 +59,31 @@ class MocaHalAgent : public RDKTestStubInterface , public AbstractServer<MocaHal
                     this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetHighestSupportedMoCAVersion", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetHighestSupportedMoCAVersion);
                     this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetMac", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetMac);
                     this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetName", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetName);
-                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetMoCAVersion", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetName);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetMoCAVersion", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetMoCAVersion);
                     this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetNumNodes", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetNumNodes);
                     this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetSupportedModes", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetSupportedModes);
                     this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetMode", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetMode); 
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetSoftwareVersion", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetSoftwareVersion);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetSupportedBand", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetSupportedBand);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetMaxBitRate", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetMaxBitRate);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetNodeId", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetNodeId);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetLinkUptime", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetLinkUptime);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetTxBroadcastPhyRate", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetTxBroadcastPhyRate);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetTxPowerLimit", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetTxPowerLimit);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_SetLOF", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_SetLOF);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetPreferredNCEnabled", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetPreferredNCEnabled);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_SetPreferredNCEnabled", PARAMS_BY_NAME, JSON_STRING,"enable",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_SetPreferredNCEnabled);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetMaxPacketAggregation", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetMaxPacketAggregation);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetMaxFrameSize", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetMaxFrameSize);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetLowBandwidthLimit", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetLowBandwidthLimit);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetTurboEnabled", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetTurboEnabled);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_SetTurboEnabled", PARAMS_BY_NAME, JSON_STRING,"enable",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_SetTurboEnabled);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetPrivacyEnabled", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetPrivacyEnabled);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetTxPowerControlEnabled", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetTxPowerControlEnabled);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetTxBeaconPowerReductionEnabled", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetTxBeaconPowerReductionEnabled);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetNCNodeId", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetNCNodeId);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetBackupNCNodeId", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetBackupNCNodeId);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetMixedMode", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetMixedMode);
                 }
 
                 //Inherited functions
@@ -87,5 +108,26 @@ class MocaHalAgent : public RDKTestStubInterface , public AbstractServer<MocaHal
                 void MocaHal_GetNumNodes(IN const Json::Value& req, OUT Json::Value& response);
                 void MocaHal_GetSupportedModes(IN const Json::Value& req, OUT Json::Value& response);
                 void MocaHal_GetMode(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetSoftwareVersion(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetSupportedBand(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetMaxBitRate(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetNodeId(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetLinkUptime(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetTxBroadcastPhyRate(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetTxPowerLimit(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_SetLOF(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_SetPreferredNCEnabled(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetPreferredNCEnabled(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetMaxPacketAggregation(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetMaxFrameSize(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetLowBandwidthLimit(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetTurboEnabled(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_SetTurboEnabled(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetPrivacyEnabled(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetTxPowerControlEnabled(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetTxBeaconPowerReductionEnabled(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetNCNodeId(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetBackupNCNodeId(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetMixedMode(IN const Json::Value& req, OUT Json::Value& response);
 };
 #endif //__MOCAHAL_STUB_H__
