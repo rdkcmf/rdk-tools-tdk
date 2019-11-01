@@ -70,6 +70,90 @@
         <function>TestMgr_MocaHal_GetMode</function>
         <parameters/>
       </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetSoftwareVersion" version="1">
+        <function>TestMgr_MocaHal_GetSoftwareVersion</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetSupportedBand" version="1">
+        <function>TestMgr_MocaHal_GetSupportedBand</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetMaxBitRate" version="1">
+        <function>TestMgr_MocaHal_GetMaxBitRate</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetNodeId" version="1">
+        <function>TestMgr_MocaHal_GetNodeId</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetLinkUptime" version="1">
+        <function>TestMgr_MocaHal_GetLinkUptime</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetTxBroadcastPhyRate" version="1">
+        <function>TestMgr_MocaHal_GetTxBroadcastPhyRate</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetTxPowerLimit" version="1">
+        <function>TestMgr_MocaHal_GetTxPowerLimit</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetPreferredNCEnabled" version="1">
+        <function>TestMgr_MocaHal_GetPreferredNCEnabled</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_SetPreferredNCEnabled" version="1">
+        <function>TestMgr_MocaHal_SetPreferredNCEnabled</function>
+        <parameters>
+          <parameter name="enable" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetMaxPacketAggregation" version="1">
+        <function>TestMgr_MocaHal_GetMaxPacketAggregation</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetLowBandwidthLimit" version="1">
+        <function>TestMgr_MocaHal_GetLowBandwidthLimit</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetMaxFrameSize" version="1">
+        <function>TestMgr_MocaHal_GetMaxFrameSize</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetTurboEnabled" version="1">
+        <function>TestMgr_MocaHal_GetTurboEnabled</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetPrivacyEnabled" version="1">
+        <function>TestMgr_MocaHal_GetPrivacyEnabled</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetTxPowerControlEnabled" version="1">
+        <function>TestMgr_MocaHal_GetTxPowerControlEnabled</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetTxBeaconPowerReductionEnabled" version="1">
+        <function>TestMgr_MocaHal_GetTxBeaconPowerReductionEnabled</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetNCNodeId" version="1">
+        <function>TestMgr_MocaHal_GetNCNodeId</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_SetTurboEnabled" version="1">
+        <function>TestMgr_MocaHal_SetTurboEnabled</function>
+        <parameters>
+          <parameter name="enable" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetMixedMode" version="1">
+        <function>TestMgr_MocaHal_GetMixedMode</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="MocaHal_GetBackupNCNodeId" id="" version="1">
+        <function>TestMgr_MocaHal_GetBackupNCNodeId</function>
+        <parameters/>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
