@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2016 RDK Management
+# Copyright 2019 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,8 +57,15 @@ Testcase ID: CT_XUPNP_11</synopsis>
     <automation_approch>1.TM loads xupnp_agent via the test agent. 
 2.The stub will invokes the RPC method for checking the parameter name in output.json file and send the results.
 3. The stub function will verify the presence of parameter name and  sends the results as Json response 
-4. TM will receive and display the result.</automation_approch>
-    <except_output>Checkpoint 1 stub will parse for parameter name in output.json file</except_output>
+4. TM will receive and display the result.
+5. TM will create a list of Isgateway values.
+6. Again invoke the stub with parameter DevType
+7. After getting the values for DevType, TM will create a list of DevType values .
+8. TM will create a dictionary with the 2 lists and compare the key and values with the predefined dictionary.
+9. If values are same for the corresponding keys of each dictionary then test is success else failure. 
+</automation_approch>
+    <except_output>Checkpoint 1 stub will parse for parameter name in output.json file
+checkpoint 2 Each key will have same value in the corresponding key in the predefined dictionary.</except_output>
     <priority>High</priority>
     <test_stub_interface>TestMgr_XUPNP_ReadXDiscOutputFile</test_stub_interface>
     <test_script>XUPNP_GetIsGatewayFromOutFile</test_script>
@@ -95,12 +102,44 @@ if "SUCCESS" in xupnpLoadStatus.upper():
         actualresult = tdkTestObj.getResult();
         details = tdkTestObj.getResultDetails();
         print "GetIsGateway Result : %s"%actualresult;
-        print "GetIsGateway Details : %s"%details;
-        #Check for SUCCESS return value of XUPNP_ReadXDiscOutputFile
-        if "SUCCESS" in actualresult.upper():
+	if "SUCCESS" in actualresult.upper():
                 tdkTestObj.setResultStatus("SUCCESS");
-        else:
-                tdkTestObj.setResultStatus("FAILURE");
-
+                details = details.replace('\\t','').replace('\\','').replace('\"','')
+                details_list = details.split(',')
+                isgateway_list = [ detail.split(':',1)[1] for detail in details_list]
+                #Get the devtype values
+		tdkTestObj = xUpnpObj.createTestStep('XUPNP_ReadXDiscOutputFile');
+                expectedresult="SUCCESS";
+                #Configuring the test object for starting test execution
+                tdkTestObj.addParameter("paramName","DevType");
+                tdkTestObj.executeTestCase(expectedresult);
+                actualresult = tdkTestObj.getResult();
+                print "GetDevType Result : %s"%actualresult;
+		details = tdkTestObj.getResultDetails();
+                if "SUCCESS" in actualresult.upper():
+                        tdkTestObj.setResultStatus("SUCCESS");
+                        details = details.replace('\\t','').replace('\\','').replace('\"','')
+                        details_list = details.split(',')
+                        #removing the recvdevtype values from the list
+			for detail in details_list:
+                                if detail.split(':')[0]!= 'DevType':
+                                        details_list.remove(detail)
+                        devType_list = [ detail.split(':')[1] for detail in details_list]
+                        #creating dictionary with key as devtype and isgateway value as the corresponding value
+			dictionary = dict(zip(devType_list, isgateway_list));
+                        dict_valid = {'XI3':'no','XI5':'no','XI6':'no','XG1':'yes'};
+			for key in dictionary :
+                        	if dictionary.get(key) == dict_valid.get(key):
+                                	tdkTestObj.setResultStatus("SUCCESS");
+                                	print "ACTUAL RESULT : isgateway value is %s for the corresponding DevType %s"%(dictionary.get(key),key);
+                        	else:
+					tdkTestObj.setResultStatus("FAILURE");
+                                	print "[TEST EXECUTION RESULT] : FAILURE";
+                else:
+			tdkTestObj.setResultStatus("FAILURE");
+			print "devtype not found"
+	else:
+		 tdkTestObj.setResultStatus("FAILURE");
+                 print "isgateway parameter not found"
         #Unload xupnp module
         xUpnpObj.unloadModule("xupnp");
