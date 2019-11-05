@@ -114,7 +114,7 @@ if "SUCCESS" in mocaLoadStatus.upper():
         print "DETAILS: GetTxPowerLimit : " , powerLimit
 
         #As mentioned in the "MoCA HAL SoC APIs" doc, power limit is checked with the range    
-        if powerLimit in range(-31,3):
+        if int(powerLimit) in range(-31,4):
             tdkTestObj.setResultStatus("SUCCESS")
             print "Transmit power limit in range" 
         else:
