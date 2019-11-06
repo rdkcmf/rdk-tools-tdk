@@ -1607,7 +1607,12 @@ class ExecutionService {
 			execution.result = UNDEFINED_STATUS
 			execution.executionStatus = INPROGRESS_STATUS
 			execution.dateOfExecution = new Date()
-			execution.groups = getGroup()
+			if(map.containsKey("groups")){
+				execution.groups = map.groups
+			}
+			else{
+				execution.groups = getGroup()
+			}
 			execution.applicationUrl = map.appUrl
 			execution.isRerunRequired = map.rerun?.equals("true")
 			execution.isBenchMarkEnabled = map.isBenchMark?.equals("true")
