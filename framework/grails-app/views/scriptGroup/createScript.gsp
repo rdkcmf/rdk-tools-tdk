@@ -133,7 +133,7 @@
 		</tr>
 		<tr>
 			<td>Synopsis</td>
-			<td><g:textArea name="synopsis" style="width:465px;height:40px;">
+			<td><g:textArea name="synopsis" id="synopsis" style="width:465px;height:40px;">
 				</g:textArea></td>
 		</tr>
 		<tr>
