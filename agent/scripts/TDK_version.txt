@@ -19,4 +19,4 @@
 
 RDK Test Development Kit
 
-Version : M-69
+Version : M-70
