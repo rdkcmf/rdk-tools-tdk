@@ -17,33 +17,54 @@
 # limitations under the License.
 ##########################################################################
 '''
-<?xml version="1.0" encoding="UTF-8"?><xml>
-  <id/>
-  <version>3</version>
+<?xml version='1.0' encoding='utf-8'?>
+<xml>
+  <id></id>
+  <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
+  <version>4</version>
+  <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>XUPNP_GetSerialNumFromOutFile</name>
-  <primitive_test_id/>
+  <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
+  <primitive_test_id> </primitive_test_id>
+  <!-- Do not change primitive_test_id if you are editing an existing script. -->
   <primitive_test_name>XUPNP_ReadXDiscOutputFile</primitive_test_name>
+  <!--  -->
   <primitive_test_version>1</primitive_test_version>
+  <!--  -->
   <status>FREE</status>
+  <!--  -->
   <synopsis>To get Serial Number value from xdiscovery output file.
 Testcase ID: CT_XUPNP_16</synopsis>
-  <groups_id/>
+  <!--  -->
+  <groups_id />
+  <!--  -->
   <execution_time>3</execution_time>
+  <!--  -->
   <long_duration>false</long_duration>
-  <remarks/>
+  <!--  -->
+  <advanced_script>false</advanced_script>
+  <!-- execution_time is the time out time for test execution -->
+  <remarks></remarks>
+  <!-- Reason for skipping the tests if marked to skip -->
   <skip>false</skip>
+  <!--  -->
   <box_types>
     <box_type>IPClient-3</box_type>
-    <box_type>IPClient-4</box_type>
-    <box_type>Emulator-Client</box_type>
+    <!--  -->
     <box_type>Hybrid-1</box_type>
-    <box_type>Emulator-HYB</box_type>
+    <!--  -->
     <box_type>Terminal-RNG</box_type>
+    <!--  -->
+    <box_type>IPClient-4</box_type>
+    <!--  -->
     <box_type>RPI-HYB</box_type>
+    <!--  -->
     <box_type>RPI-Client</box_type>
+    <!--  -->
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>
+    <!--  -->
   </rdk_versions>
   <test_cases>
     <test_case_id>CT_XUPNP_16</test_case_id>
@@ -59,19 +80,19 @@ Testcase ID: CT_XUPNP_16</synopsis>
 3. The stub function will verify the presence of parameter name and  sends the results as Json response 
 4. TM will receive and display the result.
 5. TM will convert the details as a list.
-6. Using systemutil ExecuteCommand command get the parameter from cat /proc/cmdline 
-7 If the serial number obtained from the /proc/cmdline is present in the list created in step 5 the result is success else failure.</automation_approch>
-    <except_output>Checkpoint 1 stub will parse for parameter name in output.json file
-Checkpoint 2 the parameter from the ExecuteCommand  should be present in the parameter list obtained from output.json</except_output>
+6. Using systemutil ExecuteCommand command get the parameter from tr181Set -g Device.DeviceInfo.SerialNumber. 
+7 If the serial number obtained from the tr181Set -g Device.DeviceInfo.SerialNumber is present in the list created in step 5 the result is success else failure.</automation_approch>
+    <expected_output>Checkpoint 1 stub will parse for parameter name in output.json file
+Checkpoint 2 the parameter from the ExecuteCommand  should be present in the parameter list obtained from output.json</expected_output>
     <priority>Medium</priority>
     <test_stub_interface>TestMgr_XUPNP_ReadXDiscOutputFile</test_stub_interface>
     <test_script>XUPNP_GetSerialNumFromOutFile</test_script>
     <skipped>No</skipped>
     <release_version>M21</release_version>
-    <remarks/>
+    <remarks></remarks>
   </test_cases>
+  <script_tags />
 </xml>
-
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
@@ -114,9 +135,9 @@ if ("SUCCESS" in xupnpLoadStatus.upper()) and ("SUCCESS" in sysUtilLoadStatus.up
         	print "GetSerialNum Details : %s"%str(details_list);
 		serial_num_list = [ detail.split(':')[1] for detail in details_list]
                 
-		#get the serialnumber from /proc/cmdline and compare
+		#get the serialnumber from tr181Set -g Device.DeviceInfo.SerialNumber and compare
 		tdkTestObj = sysUtilObj.createTestStep('ExecuteCommand');
-		cmd = "cat /proc/cmdline | tr -s '[[:space:]]' '\n' | grep serial_number | cut -d '=' -f2 | tr -d '\n'"
+		cmd = "tr181Set -g Device.DeviceInfo.SerialNumber &> /opt/TDK/serial.txt;cat /opt/TDK/serial.txt | tr -d '\n';rm /opt/TDK/serial.txt";
 		print cmd;
     		tdkTestObj.addParameter("command", cmd);
     		tdkTestObj.executeTestCase("SUCCESS");
@@ -124,14 +145,14 @@ if ("SUCCESS" in xupnpLoadStatus.upper()) and ("SUCCESS" in sysUtilLoadStatus.up
     		details = tdkTestObj.getResultDetails().strip();
 
 		serial_num = details
-		print "Serial number from cat /proc/cmdline: %s" %serial_num
+		print "Serial number from Device.DeviceInfo.SerialNumber: %s" %serial_num
 		if expectedresult in actualresult and serial_num in serial_num_list:
 			tdkTestObj.setResultStatus("SUCCESS");
-        		print "Actual Result: Serial Number retrieved from cat /proc/cmdline and output.json are same"
+        		print "Actual Result: Serial Number retrieved from tr181Set -g Device.DeviceInfo.SerialNumber and output.json are same"
         		print "[TEST EXECUTION RESULT] : SUCCESS"
 		else:
 			tdkTestObj.setResultStatus("FAILURE");
-        		print "Actual Result: Serial Number retrieved from cat /proc/cmdline and output.json are not same"
+        		print "Actual Result: Serial Number retrieved from tr181Set -g Device.DeviceInfo.SerialNumber and output.json are not same"
         		print "[TEST EXECUTION RESULT] : FAILURE"
 	else:
 		tdkTestObj.setResultStatus("FAILURE");
