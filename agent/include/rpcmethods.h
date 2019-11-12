@@ -79,6 +79,7 @@ class RpcMethods : public AbstractServer<RpcMethods>
          this->bindAndAddMethod(Procedure("loadModule", PARAMS_BY_NAME, JSON_STRING,"execID",JSON_STRING,"deviceID",JSON_STRING,"testcaseID",JSON_STRING,"execDevID",JSON_STRING,"resultID",JSON_STRING,"param1",JSON_STRING,"performanceBenchMarkingEnabled",JSON_STRING,"performanceSystemDiagnosisEnabled",JSON_STRING,NULL), &RpcMethods::RPCLoadModule);
          this->bindAndAddMethod(Procedure("unloadModule", PARAMS_BY_NAME, JSON_STRING,"param1",JSON_STRING,"ScriptSuiteEnabled",JSON_STRING,NULL), &RpcMethods::RPCUnloadModule);
          this->bindAndAddMethod(Procedure("enableReboot", PARAMS_BY_NAME, JSON_STRING,NULL), &RpcMethods::RPCEnableReboot);
+         this->bindAndAddMethod(Procedure("saveCurrentState", PARAMS_BY_NAME, JSON_STRING,NULL), &RpcMethods::RPCSaveCurrentState);
          this->bindAndAddMethod(Procedure("restorePreviousState", PARAMS_BY_NAME, JSON_STRING,"execID",JSON_STRING,"deviceID",JSON_STRING,"testcaseID",JSON_STRING,"execDevID",JSON_STRING,"resultID",JSON_STRING,NULL), &RpcMethods::RPCRestorePreviousState);
          this->bindAndAddMethod(Procedure("getHostStatus", PARAMS_BY_NAME, JSON_STRING,"managerIP",JSON_STRING,"boxName",JSON_STRING,NULL), &RpcMethods::RPCGetHostStatus);
          this->bindAndAddMethod(Procedure("callEnableTDK", PARAMS_BY_NAME, JSON_STRING,NULL), &RpcMethods::RPCCallEnableTDK);
@@ -118,6 +119,7 @@ class RpcMethods : public AbstractServer<RpcMethods>
         void RPCLoadModule (const Json::Value& request, Json::Value& response);
         void RPCUnloadModule (const Json::Value& request, Json::Value& response);
         void RPCEnableReboot (const Json::Value& request, Json::Value& response);
+        void RPCSaveCurrentState(const Json::Value& request, Json::Value& response);
         void RPCRestorePreviousState (const Json::Value& request, Json::Value& response);
         void RPCGetHostStatus (const Json::Value& request, Json::Value& response);
         void RPCCallEnableTDK(const Json::Value& request, Json::Value& response);
