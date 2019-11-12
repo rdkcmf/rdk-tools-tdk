@@ -1449,7 +1449,7 @@ class TDKScriptingLibrary:
                 else:
                         result = self.tcpClient.recv(1048)
                         if "SUCCESS" in result.upper():
-                                print "\"" + self.IP + "\"" + " Previous state restored successfully.."
+                                print "\"" + self.IP + "\"" + " Current state saved successfully.."
                                 sys.stdout.flush()
                         else:
                                  print "#TDK_@error-ERROR : Unable to save device's current state"

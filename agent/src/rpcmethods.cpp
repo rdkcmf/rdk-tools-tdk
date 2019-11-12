@@ -1210,6 +1210,80 @@ void RpcMethods::RPCEnableReboot (const Json::Value& request, Json::Value& respo
 	
 } /* End of RPCEnableReboot */
 
+/********************************************************************************************************************
+ Purpose:               Save the device's current state in configuration file
+ Parameters:
+                             request [IN]       - Json request to save devoce's current state
+                             response [OUT]  - Json response with result "SUCCESS/FAILURE"
+ Return:                 bool  -      Always returning true from this function, with details in response[result]
+ Methods of same class used :
+*********************************************************************************************************************/
+void RpcMethods::RPCSaveCurrentState (const Json::Value& request, Json::Value& response)
+{
+    DEBUG_PRINT (DEBUG_TRACE, "\nRPC SaveCurrentState ---> Entry\n");
+    cout << "Received query: \n" << request << endl;
+    DEBUG_PRINT (DEBUG_LOG, "\nGoing to SaveCurrentState \n");
+    bool bRet = true;
+    std::string strFilePath;
+    char szLibName [LIB_NAME_SIZE];
+    std::string strUnloadModuleDetails;
+    std::fstream o_RebootConfigFile;         // File to list the loaded modules before reboot
+    std::fstream o_PerfConfigFile;           // File to store performance data collection status
+    /* Prepare JSON response */
+    response["jsonrpc"] = "2.0";
+    response["id"] = request["id"];
+    response["result"] = "SUCCESS";
+    response["details"] = "Preconditions  set. Saved CurrentState";
+    /* Extracting path to file */
+    strFilePath = RpcMethods::sm_strTDKPath;
+    strFilePath.append(REBOOT_CONFIG_FILE);
+    o_RebootConfigFile.open (strFilePath.c_str(), ios::out);
+   /* Iterate over the map to find out currently loaded modules and unload the same */
+    sModuleDetails o_ModuleDetails;
+    /* Parse through module map to find the module */
+    for (o_gModuleMapIter = o_gModuleMap.begin(); o_gModuleMapIter != o_gModuleMap.end(); o_gModuleMapIter ++ )
+    {
+        o_ModuleDetails = o_gModuleMapIter -> second;
+        sprintf (szLibName, "%s", o_ModuleDetails.strModuleName.c_str());
+        /* Adding the module names into file */
+        if (o_RebootConfigFile.is_open())
+        {
+            o_RebootConfigFile << szLibName << std::endl;
+        }
+        else
+        {
+            DEBUG_PRINT (DEBUG_ERROR, "Unable to open reboot configuration file \n");
+            response ["result"] = "FAILURE";
+            response ["details"] = "Unable to open reboot configuration file";
+        }
+    }
+    o_RebootConfigFile.close();
+    /* Resetting crash status before reboot */
+    ResetCrashStatus();
+    /* Keep performance status in a file so as to start performance data collection after reboot */
+    if(bKeepPerformanceAlive)
+    {
+        /* Extracting path to file */
+        strFilePath = RpcMethods::sm_strTDKPath;
+        strFilePath.append(PERFORMANCE_CONFIG_FILE);
+        o_PerfConfigFile.open (strFilePath.c_str(), ios::out);
+        /* Adding performance status into file */
+        if (o_PerfConfigFile.is_open())
+        {
+            o_PerfConfigFile << "TRUE" << std::endl;
+            o_PerfConfigFile.close();
+        }
+        else
+        {
+            DEBUG_PRINT (DEBUG_ERROR, "Unable to open performance configuration file \n");
+            response ["result"] = "FAILURE";
+            response ["details"] = "Unable to open performance configuration file";
+        }
+    }
+    DEBUG_PRINT (DEBUG_LOG, "\nRPCSaveCurrentState exiting \n");
+    return;
+} /* End of RPCSaveCurrentState*/
+
 
 /********************************************************************************************************************
  Purpose:               Get the list of loaded modules from configuration file, load them and delete the configuration file.
