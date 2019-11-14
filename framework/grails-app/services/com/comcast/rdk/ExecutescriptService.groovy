@@ -1976,8 +1976,12 @@ class ExecutescriptService {
 		String filePath = rootPath + "//fileStore"
 		String realPath = rootPath
 		def deviceInstance 
+		def deviceBoxType 
+		String deviceBoxTypeName =  ""
 		Device.withTransaction {
 			deviceInstance = Device.findByStbName(deviceName)
+			deviceBoxType = deviceInstance?.boxType 
+			deviceBoxTypeName = deviceBoxType.name  
 		}
 		
 		boolean paused = false
@@ -1994,7 +1998,7 @@ class ExecutescriptService {
 					executionDevice.execution = Execution.findByName(execName)
 					executionDevice.dateOfExecution = new Date()
 					executionDevice.device = deviceInstance?.stbName
-					executionDevice.boxType = deviceInstance?.boxType?.name
+					executionDevice.boxType = deviceBoxTypeName
 					executionDevice.deviceIp = deviceInstance?.stbIp
 					executionDevice.status = UNDEFINED_STATUS
 					executionDevice.buildName = executionService.getBuildName( deviceInstance?.stbName )
@@ -2093,8 +2097,7 @@ class ExecutescriptService {
 			ScriptGroup.withTransaction { trans ->
 				scriptGroupInstance = ScriptGroup.findById(scriptGrp)
 				scriptGroupInstance.scriptList.each { script ->
-					
-					scriptInstance = scriptService.getScript(realPath, script?.moduleName, script?.scriptName)
+					scriptInstance = scriptService.getScript(realPath, script?.moduleName, script?.scriptName,script?.category?.toString())
 					if(scriptInstance){
 					if(executionService.validateScriptBoxTypes(scriptInstance,deviceInstance)){
 						if(executionService.validateScriptRDKVersions(scriptInstance,rdkVersion)){
@@ -2187,7 +2190,7 @@ class ExecutescriptService {
 				if(!aborted && !devStatus.equals(Status.NOT_FOUND.toString()) && !pause){
 					def startExecutionTime = new Date()
 					executionStarted = true
-					htmlData = executeScript(execName, executionDevice, scriptObj, deviceInstance, url, filePath, realPath, isBenchMark, isSystemDiagnostics, executionName, isMultiple,null,isLogReqd)
+					htmlData = executeScript(execName, executionDevice, scriptObj, deviceInstance, url, filePath, realPath, isBenchMark, isSystemDiagnostics, executionName, isMultiple,null,isLogReqd,scriptObj?.category)
 					output.append(htmlData)
 					Thread.sleep(6000)
 					def endExecutionTime = new Date()
