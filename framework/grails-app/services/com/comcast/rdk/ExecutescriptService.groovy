@@ -845,8 +845,14 @@ class ExecutescriptService {
 				int cnt = 0
 				executionDeviceList.each{ execDeviceInstance ->
 					if(execDeviceInstance.status != SUCCESS_STATUS){
-						Device deviceInstance = Device.findByStbName(execDeviceInstance?.device)
-
+						Device deviceInstance =  null;
+						def deviceBoxType
+						String deviceBoxTypeName =  ""
+						Device.withTransaction{
+							deviceInstance = Device.findByStbName(execDeviceInstance?.device)
+							deviceBoxType = deviceInstance?.boxType
+							deviceBoxTypeName = deviceBoxType.name
+						}
 						String status1 = ""
 						boolean allocated = false
 						try {
@@ -885,19 +891,19 @@ class ExecutescriptService {
 								deviceName = MULTIPLE
 							}
 							//executionSaveStatus = executionService.saveExecutionDetails(newExecName, scriptName, deviceName, scriptGroupInstance,appUrl,"false","false","false","false",category])
-							executionSaveStatus = executionService.saveExecutionDetails(newExecName,[scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:scriptGroupInstance,appUrl:appUrl, isBenchMark:"false", isSystemDiagnostics:"false", rerun:"false", isLogReqd:"false",category:category, rerunOnFailure:FALSE])
+							executionSaveStatus = executionService.saveExecutionDetails(newExecName,[scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:scriptGroupInstance,appUrl:appUrl, isBenchMark:"false", isSystemDiagnostics:"false", rerun:"false", isLogReqd:"false",category:category, rerunOnFailure:FALSE,groups:executionInstance.groups])
 							cnt++
 							Execution.withTransaction{
 								rerunExecutionInstance = Execution.findByName(newExecName)
 							}
 						}
 						if(executionSaveStatus){
-							ExecutionDevice executionDevice
+							ExecutionDevice executionDevice = null;
 							ExecutionDevice.withTransaction {
 								executionDevice = new ExecutionDevice()
 								executionDevice.execution = rerunExecutionInstance
 								executionDevice.device = deviceInstance?.stbName
-								executionDevice.boxType = deviceInstance?.boxType?.name
+								executionDevice.boxType = deviceBoxTypeName
 								executionDevice.deviceIp = deviceInstance?.stbIp
 								executionDevice.dateOfExecution = new Date()
 								executionDevice.status = UNDEFINED_STATUS
@@ -1907,7 +1913,14 @@ class ExecutescriptService {
 				Execution executionInstance1 = Execution.findByName(exName)
 				executionService.saveExecutionStatus(aborted, executionInstance1?.id)
 			}
-
+			if(!aborted && !pause){
+				def executionObj = Execution?.findByName(exName)
+				def executionDeviceObj = ExecutionDevice.findAllByExecutionAndStatusNotEqual(executionObj, SUCCESS_STATUS)
+				if(((executionDeviceObj.size() > 0)) && executionObj?.isRerunRequired ){
+					htmlData = reRunOnFailure(realPath,filePath,exName,exName,url,executionObj?.category?.toString())
+					//output.append(htmlData)
+				}
+			}
 			//		if(!aborted && !pause){
 			//
 			//			def executionDeviceObj1
