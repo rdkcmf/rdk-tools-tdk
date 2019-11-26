@@ -2117,17 +2117,17 @@ class ExecutionService {
 						def executionResultList
 						def notExecutedScripts = []
 						def actualExecutedScript = []
-						if(execInstance?.rerunOnFailure?.toString()?.equals("true")){
+						if(exName.contains("_RERUN_")){ 
 							ExecutionResult.withTransaction {
 								executionResultList = ExecutionResult.findAllByExecutionAndExecutionDeviceAndStatusNotEqual(execInstance,excutionDev,SUCCESS_STATUS)
 							}
 							executionResultList.each{ executionResultInstance ->
-								if(executionResultInstance?.status.equals("FAILURE")){
+								if((executionResultInstance?.status.equals("FAILURE")) || (executionResultInstance?.status.equals("SCRIPT TIME OUT"))){
 									notExecutedScripts.add(executionResultInstance?.script)
 								}
 							}
 							int execCount
-							def exNameSplitList =  exName?.tokenize("_RERUN_")
+							def exNameSplitList =  exName?.split("_RERUN_")
 							def previousExecName
 							execCount = Integer?.parseInt(exNameSplitList[1])
 							if(execCount?.toString()?.equals("1")){
@@ -2139,7 +2139,7 @@ class ExecutionService {
 							def  executionInstance =  Execution?.findByName(previousExecName?.toString())
 							def exResultList = ExecutionResult?.findAllByExecutionAndStatusNotEqual(executionInstance,SUCCESS_STATUS)
 							exResultList?.each{obj->
-								if(obj?.status.equals("FAILURE")){
+								if((obj?.status.equals("FAILURE")) || (obj?.status.equals("SCRIPT TIME OUT"))){
 									if(!(notExecutedScripts?.toString()?.contains(obj?.script))){
 										validScriptsList.add(obj?.script)
 									}
