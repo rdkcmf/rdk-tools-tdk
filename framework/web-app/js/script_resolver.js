@@ -857,12 +857,27 @@ function updateScriptListWithScriptName(scriptName){
  */
 function isScriptExist(scriptName){
 	var category = document.getElementById("category").value;
-	$.get('fetchScript', {scriptName: scriptName, category:category}, function(data) {
-		if(data!=""){
-			$("#isScriptExist").val(data);
-		}
-		$("#scriptMessageDiv").show();
-	});
+	var ptest = document.getElementById("ptest").value;
+	var synopsis = document.getElementById("synopsis").value;
+	synopsis = synopsis.trim()
+	if(scriptName){
+		$.get('fetchScriptFromDb', {scriptName: scriptName, category:category}, function(data) {
+			if(data!=""){
+				$("#isScriptExist").val(data);
+				alert("Duplicate Script Name not allowed. Try Again.")
+			}else if (ptest == "null" || ptest == ""){
+				alert("Please select a valid primitive test !!!")
+			}else if(synopsis == "" || !synopsis){
+				alert("Please fill the synopsis field !!!")
+			}else{
+				$("#isScriptExist").val("");
+				$("#scriptMessageDiv").show();
+			}
+		});
+	}
+	else{
+		alert("Please fill the name field ")
+	}
 }
 
 

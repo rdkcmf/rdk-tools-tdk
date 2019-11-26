@@ -1126,12 +1126,13 @@ class ScriptGroupController {
 		def scriptListRDKB  = scriptService.getScriptNameList(request.getRealPath("/"),RDKB)
 		String dirname
 		boolean isAdvanced = false
-		if(scriptListRDKV?.toString()?.contains(params?.name?.trim()?.toString()) || scriptListRDKB?.toString()?.contains(params?.name?.trim()?.toString())){
-			render("Duplicate Script Name not allowed. Try Again.")
-		}else if((!params?.ptest) || params?.ptest == "default" ){
-			render("Please select a valid primitive test !!!")
+		def scriptObject = null
+		String scriptObjectName = ""
+		scriptObject = ScriptFile.findByScriptNameAndCategory(params?.name.trim()?.toString(), params?.category?.toString())
+		if(scriptObject){
+			scriptObjectName = scriptObject.scriptName
 		}
-		else{
+		if((params?.name?.trim()?.toString()) && (!scriptObjectName.equals(params?.name?.trim()?.toString())) && (!(params?.ptest.equals("null"))) && (params.synopsis?.trim())){
 			boolean saveScript = false
 			def moduleMap = primitiveService.getPrimitiveModuleMap(getRealPath())
 			def moduleName = moduleMap.get(params?.ptest)
@@ -1450,6 +1451,10 @@ class ScriptGroupController {
 		String newScriptName = params?.name?.trim()
 		if (prevScriptName != newScriptName && scriptFileList?.scriptName?.contains(newScriptName)) {
 			flash.message = "Duplicate Script Name not allowed. Try Again."
+			redirect(action: "list")
+			return
+		}else if(params.synopsis?.isEmpty() ){
+			flash.message = "Please fill the synopsis field !!!. Try Again."
 			redirect(action: "list")
 			return
 		}
@@ -2010,7 +2015,6 @@ class ScriptGroupController {
 	 * @return
 	 */
 	def fetchScript(){
-
 		List scriptInstanceList = []
 		def scriptMap = scriptService.getScriptNameModuleNameMapping(getRealPath())
 		def mName = scriptMap.get(params.scriptName)
@@ -2021,7 +2025,23 @@ class ScriptGroupController {
 		}
 		render scriptInstanceList as JSON
 	}
-
+	
+	/**
+	 * Function to fetch the script file from database
+	 * @return
+	 */
+	def fetchScriptFromDb(){
+		List scriptInstanceList = []
+		def scriptInstance = null
+		if(params.scriptName){
+			scriptInstance = ScriptFile.findByScriptNameAndCategory(params?.scriptName.trim()?.toString(),params?.category?.trim())
+			if(scriptInstance){
+				scriptInstanceList.add(scriptInstance.scriptName)
+			}
+		}
+		render scriptInstanceList as JSON
+	}
+	
 	def fetchScriptWithScriptName(){
 
 		List scriptInstanceList = []
