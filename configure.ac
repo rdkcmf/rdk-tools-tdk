@@ -76,6 +76,7 @@ HEADLESS=" "
 SUBDIR_HYBRID=" "
 SUBDIR_CLIENT=" "
 SM_STUB_CFLAG_HYBRID=" "
+BLUETOOTH_LIBS=" "
 
 AC_ARG_ENABLE([hybrid],
         AS_HELP_STRING([--enable-hybrid],[enable hybrid build]),
@@ -173,6 +174,23 @@ AC_ARG_ENABLE([wifihal],
            [echo "wifihal component is not enabled"])
 AM_CONDITIONAL([WIFIHAL], [test x$WIFIHAL = xtrue])
 
+AC_ARG_ENABLE([bluetooth],
+         AS_HELP_STRING([--enable-bluetooth],[enable bluetooth (default is no)]),
+         [
+           case "${enableval}" in
+              yes) BLUETOOTH=true
+                   BLUETOOTH_LIBS+=" -lBTMgr"
+                   AS_IF([test x$HYBRID = xtrue], [SUBDIR_HYBRID+=" Bluetooth_stub "],
+                          [echo Bluetooth enabled in Hybrid])        
+                   AS_IF([test x$CLIENT = xtrue], [SUBDIR_CLIENT+=" Bluetooth_stub "],
+                          [echo Bluetooth enabled in Client]) ;;
+             no) BLUETOOTH=false ;;
+            *) AC_MSG_ERROR([bad value ${enableval} for --enable-bluetooth ]) ;;
+             esac
+            ],
+           [echo "bluetooth component is not enabled"])
+AM_CONDITIONAL([BLUETOOTH], [test x$BLUETOOTH = xtrue])
+
 AC_ARG_ENABLE([trace],
               AS_HELP_STRING([--enable-trace],[enable trace (default is no)]),
               [
@@ -223,6 +241,7 @@ AC_SUBST(TDK_GST_LIBS)
 AC_SUBST(SUBDIR_HYBRID)
 AC_SUBST(SUBDIR_CLIENT)
 AC_SUBST(SM_STUB_CFLAG_HYBRID)
+AC_SUBST(BLUETOOTH_LIBS)
 AC_CONFIG_FILES([Makefile
          cfg/Makefile
          agent/Makefile
