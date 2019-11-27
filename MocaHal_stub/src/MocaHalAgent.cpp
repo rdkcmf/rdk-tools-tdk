@@ -973,6 +973,355 @@ void MocaHalAgent::MocaHal_GetMixedMode(IN const Json::Value& req, OUT Json::Val
         return;
     }
 }
+/***************************************************************************
+ *Function name : MocaHal_GetNetworkNodeIds
+ *Description    : This function is to return the list of node ids in the network
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetNetworkNodeIds(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetNetworkNodeIds --->Entry\n");
+    std::string nodeIdList;
+    RMH_NodeList_Uint32_t nodeList ;
+    uint32_t nodeId;
+    int returnStatus = SoC_IMPL__RMH_Network_GetNodeIds(rmh,&nodeList);
+    if(!returnStatus)
+    {
+        for (nodeId = 0; nodeId < RMH_MAX_MOCA_NODES; nodeId++) {
+            if (nodeList.nodePresent[nodeId]) {
+                nodeIdList = nodeIdList + to_string(nodeList.nodeValue[nodeId]) + ",";
+            }
+        }
+        response["result"] = "SUCCESS";
+        response["details"] = nodeIdList;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetNetworkNodeIds call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetNetworkNodeIds -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetNetworkNodeIds call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetNetworkNodeIds -->Exit\n");
+        return ;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetRemoteNodeIds
+ *Description    : This function is to return the list of node ids in the network except self node id
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetRemoteNodeIds(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRemoteNodeIds --->Entry\n");
+    std::string rmNodeIdList;
+    RMH_NodeList_Uint32_t remoteNodeList;
+    uint32_t nodeId;
+    int returnStatus = SoC_IMPL__RMH_Network_GetRemoteNodeIds(rmh,&remoteNodeList);
+    if(!returnStatus)
+    {
+        for (nodeId = 0; nodeId < RMH_MAX_MOCA_NODES; nodeId++) {
+            if (remoteNodeList.nodePresent[nodeId]) {
+                rmNodeIdList = rmNodeIdList + to_string(remoteNodeList.nodeValue[nodeId]) + ",";
+            }
+        }
+
+        response["result"] = "SUCCESS";
+        response["details"] = rmNodeIdList;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetRemoteNodeIds call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRemoteNodeIds -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetRemoteNodeIds call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRemoteNodeIds -->Exit\n");
+        return ;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetNCMac
+ *Description    : This function is to get the Mac address of the network coordinator.
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetNCMac(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetNCMac --->Entry\n");
+    char ncMacAddress[24]= {'\0'};
+    RMH_MacAddress_t ncmac ;
+    int returnStatus = SoC_IMPL__RMH_Network_GetNCMac(rmh,&ncmac);
+    if(!returnStatus)
+    {
+        sprintf(ncMacAddress,"%s",RMH_MacToString(ncmac,ncMacAddress, sizeof(ncMacAddress)));
+        response["result"] = "SUCCESS";
+        response["details"] = ncMacAddress;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetNCMac call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetNCMac -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetNCMac call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetNCMac -->Exit\n");
+        return ;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetTxMapPhyRate
+ *Description    : This function is to get the PHY rate at which MAP packets are transmitted from the node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetTxMapPhyRate(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxMapPhyRate --->Entry\n");
+   unsigned int mapPhyRate;
+   int returnStatus = SoC_IMPL__RMH_Network_GetTxMapPhyRate(rmh,&mapPhyRate);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = mapPhyRate;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetTxMapPhyRate call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxMapPhyRate -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetTxMapPhyRate call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxMapPhyRate -->Exit\n");
+        return;
+    } 
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetMac
+ *Description    : This function is to get the mac address of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetMac(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetMac --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    char macAddress[24]= {'\0'};
+    RMH_MacAddress_t macAddr;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetMac(rmh,nodeId,&macAddr);
+    if(!returnStatus)
+    {
+        sprintf(macAddress,"%s",RMH_MacToString(macAddr, macAddress, sizeof(macAddress)));
+        response["result"] = "SUCCESS";
+        response["details"] = macAddress;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetMac call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetMac -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetMac call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetMac -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetPreferredNC
+ *Description    : This function is to check if the node indicated by nodeId is a preferred NC or not.
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetPreferredNC(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetPreferredNC --->Entry\n");
+    bool status;
+    unsigned int nodeId = req["nodeId"].asInt();
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetPreferredNC(rmh,nodeId,&status);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = status;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetPreferredNC call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetPreferredNC -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_RemoteNode_GetPreferredNC call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetPreferredNC -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetLinkDownCount
+ *Description    : This function is to get the number of times the MoCA link has gone down since the last boot
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetLinkDownCount(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetLinkDownCount --->Entry\n");
+   unsigned int linkDownCount;
+   int returnStatus = SoC_IMPL__RMH_Network_GetLinkDownCount(rmh,&linkDownCount);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = linkDownCount;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetLinkDownCount call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetLinkDownCount -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetLinkDownCount call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetLinkDownCount -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetResetCount
+ *Description    : This function is to get the number of times the MoCA link got reset
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetResetCount(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetResetCount --->Entry\n");
+   unsigned int resetCount;
+   int returnStatus = SoC_IMPL__RMH_Network_GetResetCount(rmh,&resetCount);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = resetCount;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetResetCount call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetResetCount -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetResetCount call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetResetCount -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetTxGCDPhyRate
+ *Description    : This function is to get the GCD PHY rate at packets are transmitted from the node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetTxGCDPhyRate(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxGCDPhyRate --->Entry\n");
+   unsigned int gcdPhyRate;
+   int returnStatus = SoC_IMPL__RMH_Network_GetTxGCDPhyRate(rmh,&gcdPhyRate);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = gcdPhyRate;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetTxGCDPhyRate call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxGCDPhyRate -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetTxGCDPhyRate call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxGCDPhyRate -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetRFChannelFreq
+ *Description    : This function is to get the frequency which the MoCA network is operating on 
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetRFChannelFreq(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRFChannelFreq --->Entry\n");
+   unsigned int rfChannelFreq;
+   int returnStatus = SoC_IMPL__RMH_Network_GetRFChannelFreq(rmh,&rfChannelFreq);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = rfChannelFreq;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetRFChannelFreq call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRFChannelFreq -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetRFChannelFreq call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRFChannelFreq -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetPrimaryChannelFreq
+ *Description    : This function is to get the primary channel frequency
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetPrimaryChannelFreq(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetPrimaryChannelFreq --->Entry\n");
+   unsigned int primaryChannelFreq;
+   int returnStatus = SoC_IMPL__RMH_Network_GetPrimaryChannelFreq(rmh,&primaryChannelFreq);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = primaryChannelFreq;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetPrimaryChannelFreq call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetPrimaryChannelFreq -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetPrimaryChannelFreq call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetPrimaryChannelFreq -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetSecondaryChannelFreq
+ *Description    : This function is to get the secondary channel frequency
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetSecondaryChannelFreq(IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetSecondaryChannelFreq --->Entry\n");
+   unsigned int secondaryChannelFreq;
+   int returnStatus = SoC_IMPL__RMH_Network_GetSecondaryChannelFreq(rmh,&secondaryChannelFreq);
+   if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = secondaryChannelFreq;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetSecondaryChannelFreq call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetSecondaryChannelFreq -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetSecondaryChannelFreq call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetSecondaryChannelFreq -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetActiveMoCAVersion
+ *Description    : This function is to get active supported version of MoCA by the remote node specificed by nodeId
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetActiveMoCAVersion(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetActiveMoCAVersion --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    char activeVersion[8]= {'\0'};
+    RMH_MoCAVersion version;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetActiveMoCAVersion(rmh,nodeId,&version);
+    if(!returnStatus)
+    {
+        sprintf(activeVersion,"%x",version);
+        response["result"] = "SUCCESS";
+        response["details"] = activeVersion;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetActiveMoCAVersion call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetActiveMoCAVersion -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetActiveMoCAVersion call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetActiveMoCAVersion -->Exit\n");
+        return;
+    }
+}
 /**************************************************************************
 Function Name   : cleanup
 

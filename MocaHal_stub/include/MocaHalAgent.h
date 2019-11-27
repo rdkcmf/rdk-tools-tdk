@@ -84,6 +84,19 @@ class MocaHalAgent : public RDKTestStubInterface , public AbstractServer<MocaHal
                     this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetNCNodeId", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetNCNodeId);
                     this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetBackupNCNodeId", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetBackupNCNodeId);
                     this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetMixedMode", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetMixedMode);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetNetworkNodeIds", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetNetworkNodeIds);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetRemoteNodeIds", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetRemoteNodeIds);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetNCMac", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetNCMac);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetTxMapPhyRate", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetTxMapPhyRate);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetMac", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetMac);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetPreferredNC", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetPreferredNC);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetLinkDownCount", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetLinkDownCount);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetResetCount", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetResetCount);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetTxGCDPhyRate", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetTxGCDPhyRate);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetRFChannelFreq", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetRFChannelFreq);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetPrimaryChannelFreq", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetPrimaryChannelFreq);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetSecondaryChannelFreq", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetSecondaryChannelFreq);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetActiveMoCAVersion", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetActiveMoCAVersion);
                 }
 
                 //Inherited functions
@@ -129,5 +142,18 @@ class MocaHalAgent : public RDKTestStubInterface , public AbstractServer<MocaHal
                 void MocaHal_GetNCNodeId(IN const Json::Value& req, OUT Json::Value& response);
                 void MocaHal_GetBackupNCNodeId(IN const Json::Value& req, OUT Json::Value& response);
                 void MocaHal_GetMixedMode(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetNetworkNodeIds(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetRemoteNodeIds(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetNCMac(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetTxMapPhyRate(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetMac(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetPreferredNC(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetLinkDownCount(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetResetCount(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetTxGCDPhyRate(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetRFChannelFreq(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetPrimaryChannelFreq(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetSecondaryChannelFreq(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetActiveMoCAVersion(IN const Json::Value& req, OUT Json::Value& response);
 };
 #endif //__MOCAHAL_STUB_H__
