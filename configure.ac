@@ -174,6 +174,21 @@ AC_ARG_ENABLE([wifihal],
            [echo "wifihal component is not enabled"])
 AM_CONDITIONAL([WIFIHAL], [test x$WIFIHAL = xtrue])
 
+
+AC_ARG_ENABLE([dtcp],
+         AS_HELP_STRING([--enable-dtcp],[enable dtcp (default is no)]),
+         [
+           case "${enableval}" in
+              yes) DTCP=true
+                   AS_IF([test x$CLIENT = xtrue], [SUBDIR_CLIENT+=" DTCP_stub"],
+                          [echo box type not specified]) ;;
+             no) DTCP=false ;;
+            *) AC_MSG_ERROR([bad value ${enableval} for --enable-dtcp ]) ;;
+             esac
+            ],
+           [echo "dtcp component is not enabled"])
+AM_CONDITIONAL([DTCP], [test x$DTCP = xtrue])
+
 AC_ARG_ENABLE([bluetooth],
          AS_HELP_STRING([--enable-bluetooth],[enable bluetooth (default is no)]),
          [
