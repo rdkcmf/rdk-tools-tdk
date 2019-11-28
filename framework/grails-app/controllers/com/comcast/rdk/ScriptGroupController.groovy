@@ -91,6 +91,39 @@ class ScriptGroupController {
 	def index() {
 		redirect(action: "list", params: params)
 	}
+	
+    /**
+    * Show TestSuite Details Summary	
+    * @return
+    */
+	
+	def showSuiteSummary() {
+		redirect(action: "suiteSummary")
+	}
+	
+	/**
+	 * Show TestSuite Summary
+	 * @return
+	 */
+	def suiteSummary() {
+		def scriptGroupListB = ScriptGroup.findAllByCategory('RDKB')
+		
+		def testSuiteMapB =[:]
+		scriptGroupListB.each { scriptgrouplistb  ->
+			testSuiteMapB.put(scriptgrouplistb.name,scriptgrouplistb.scriptList?.size())
+		}
+
+		def scriptGroupListV = ScriptGroup.findAllByCategory('RDKV')
+		
+		def testSuiteMapV =[:]
+		scriptGroupListV.each { scriptgrouplistv  ->
+			testSuiteMapV.put(scriptgrouplistv.name,scriptgrouplistv.scriptList?.size())
+		}
+
+		def data = [testSuiteMapB:testSuiteMapB,testSuiteMapV:testSuiteMapV]
+		render(template:"suiteSummary", model:data)
+		return data
+	}
 
 	/**
 	 * Lists Script and Script Groups in a tree in list.gsp
