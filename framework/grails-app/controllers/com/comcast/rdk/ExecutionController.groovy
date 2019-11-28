@@ -1826,14 +1826,12 @@ class ExecutionController {
 			executionResultList = ExecutionResult.findAllByScriptLike("%${params?.searchName.trim()}%")
 			if(executionResultList?.size() >0){
 				executionResultList.each{ executionResultInstance ->
+					if(!executionList.contains(executionResultInstance.execution)){
 						executionList.add(executionResultInstance.execution)
+					}
 				}
 			}
-			if(executions?.size() >0){
-				executions.each{ execution ->
-					executionList.add(execution)
-				}
-			}else{
+			else{
 				String searchString = params?.searchName.trim()
 				if(searchString?.equalsIgnoreCase("SUCCESS")){
 					searchString = "COMPLETED"
