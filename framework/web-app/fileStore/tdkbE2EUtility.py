@@ -420,6 +420,9 @@ def parseDeviceConfig(obj):
                 global connected_lan_hostname
                 connected_lan_hostname = config.get(deviceConfig, "CONNECTED_LAN_HOSTNAME")
 
+                global blocked_site
+                blocked_site = config.get(deviceConfig, "BLOCKED_SITE")
+
                 global webui_logfile
                 webui_logfile = config.get(deviceConfig, "WEBUI_LOGFILE")
 
@@ -2425,11 +2428,14 @@ def bringupLanNetwork(lanInterface):
 # Return Value: status - status of interface
 
         try:
-                if lan_os_type == "UBUNTU":
-                        command="sudo sh %s bringup_lan_network %s" %(lan_script,lanInterface)
-                        status = executeCommand(command)
-                else:
-                        status = "Only UBUNTU platform supported!!!"
+                status = clientConnect("LAN")
+                if status == "SUCCESS":
+
+                        if lan_os_type == "UBUNTU":
+                                command="sudo sh %s bringup_lan_network %s" %(lan_script,lanInterface)
+                                status = executeCommand(command)
+                        else:
+                                status = "Only UBUNTU platform supported!!!"
 
         except Exception, e:
                 print e;
@@ -2437,6 +2443,7 @@ def bringupLanNetwork(lanInterface):
 
         print "LAN Interface bringup status:%s" %status;
         return status;
+
 
 ########## End of Function ##########
 
@@ -2451,11 +2458,14 @@ def bringdownLanNetwork(lanInterface):
 # Return Value: status - status of interface
 
         try:
-                if lan_os_type == "UBUNTU":
-                        command="sudo sh %s bringdown_lan_network %s" %(lan_script,lanInterface)
-                        status = executeCommand(command)
-                else:
-                        status = "Only UBUNTU platform supported!!!"
+                status = clientConnect("LAN")
+                if status == "SUCCESS":
+
+                        if lan_os_type == "UBUNTU":
+                                command="sudo sh %s bringdown_lan_network %s" %(lan_script,lanInterface)
+                                status = executeCommand(command)
+                        else:
+                                status = "Only UBUNTU platform supported!!!"
 
         except Exception, e:
                 print e;
@@ -2463,6 +2473,7 @@ def bringdownLanNetwork(lanInterface):
 
         print "LAN Interface bringdown status:%s" %status;
         return status;
+
 
 ########## End of Function ##########
 
