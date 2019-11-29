@@ -154,6 +154,64 @@
         <function>TestMgr_MocaHal_GetBackupNCNodeId</function>
         <parameters/>
       </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetNetworkNodeIds" version="1">
+        <function>TestMgr_MocaHal_GetNetworkNodeIds</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetRemoteNodeIds" version="1">
+        <function>TestMgr_MocaHal_GetRemoteNodeIds</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetNCMac" version="1">
+        <function>TestMgr_MocaHal_GetNCMac</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetTxMapPhyRate" version="1">
+        <function>TestMgr_MocaHal_GetTxMapPhyRate</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetMac" version="2">
+        <function>TestMgr_MocaHal_RemoteNode_GetMac</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="MocaHal_RemoteNode_GetPreferredNC" id=" " version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetPreferredNC</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetTxGCDPhyRate" version="1">
+        <function>TestMgr_MocaHal_GetTxGCDPhyRate</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetResetCount" version="1">
+        <function>TestMgr_MocaHal_GetResetCount</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetLinkDownCount" version="1">
+        <function>TestMgr_MocaHal_GetLinkDownCount</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetRFChannelFreq" version="1">
+        <function>TestMgr_MocaHal_GetRFChannelFreq</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetPrimaryChannelFreq" version="1">
+        <function>TestMgr_MocaHal_GetPrimaryChannelFreq</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetSecondaryChannelFreq" version="1">
+        <function>TestMgr_MocaHal_GetSecondaryChannelFreq</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="MocaHal_RemoteNode_GetActiveMoCAVersion" id=" " version="2">
+        <function>TestMgr_MocaHal_RemoteNode_GetActiveMoCAVersion</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
