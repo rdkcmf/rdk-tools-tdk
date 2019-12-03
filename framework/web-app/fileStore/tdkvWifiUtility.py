@@ -184,7 +184,7 @@ def parseDeviceConfig(obj):
 
 
 def GetSSID(sysObj):
-    tdkTestObj = sysObj.createTestStep('ExecuteCmd');
+    tdkTestObj = sysObj.createTestStep('ExecuteCommand');
     tdkTestObj.addParameter("command","curl -d '{\"paramList\":[{\"name\":\"Device.WiFi.SSID.1.SSID\"}]}' http://127.0.0.1:10999");
 
     #Execute the test case in STB

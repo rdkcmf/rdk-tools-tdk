@@ -73,7 +73,7 @@ from tdkvWifiUtility import *;
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("wifihal","1");
-sysObj = tdklib.TDKScriptingLibrary("sysutil","RDKB");
+sysObj = tdklib.TDKScriptingLibrary("systemutil","1.0");
 
 #IP and Port of box, No need to change,
 #This will be replaced with correspoing Box Ip and port while executing script
@@ -122,7 +122,7 @@ if "SUCCESS" in loadmodulestatus1.upper() and loadmodulestatus2.upper():
         print "Connecting to SSID operation failed"
 
     obj.unloadModule("wifihal");
-    sysObj.unloadModule("sysutil");
+    sysObj.unloadModule("systemutil");
 else:
     print "Failed to load the module";
     sysObj.setLoadModuleStatus("FAILURE");
