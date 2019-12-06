@@ -349,25 +349,8 @@ function display(val) {
 	} else if (val.trim() === 'suiteSummary') {
 		$("#scriptDetailsSummary").hide();
 		$("#suiteDetailsSummary").show();
-		$("#list-suiteDetailsV").show();
-		$("#suitetTableV").dataTable( {
-			"sPaginationType": "full_numbers",
-			"bRetrieve": true
-		});
-		$("#list-suiteDetailsB").show();
-		$("#suiteTableB").dataTable( {
-			"sPaginationType": "full_numbers",
-			"bRetrieve": true
-		});
-		var scriptId = $("#currentScriptId").val();
-		if(scriptId!=null && scriptId!=""){
-			editScript(scriptId);
-		}
-		var scriptGroupId = $("#currentScriptGroupId").val();
-		if(scriptGroupId){
-			editScriptGroup(scriptGroupId);
-		}
-	} else {}
+		$.get('showSuiteSummary', function(data) {$("#suiteDetailsSummary").html(data); });
+	}
 }
 
 /**
