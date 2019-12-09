@@ -45,29 +45,28 @@ refresh_lan_network()
                 echo "OUTPUT:FAILURE"
         fi
 }
-#Bring up Lan Network
-bringup_lan_network()
+#Bring up interface
+bringup_interface()
 {
-        lan_up="$(ifconfig $var2 up > /dev/null && echo "SUCCESS" || echo "FAILURE")"
+        up="$(ifconfig $var2 up > /dev/null && echo "SUCCESS" || echo "FAILURE")"
         sleep 5
-        if [ $lan_up = "SUCCESS" ]; then
+        if [ $up = "SUCCESS" ]; then
                 echo "OUTPUT:SUCCESS"
         else
                 echo "OUTPUT:FAILURE"
         fi
 
 }
-#Bring down Lan Network
-bringdown_lan_network()
+#Bring down interface
+bringdown_interface()
 {
-        lan_down="$(ifconfig $var2 down > /dev/null && echo "SUCCESS" || echo "FAILURE")"
+        down="$(ifconfig $var2 down > /dev/null && echo "SUCCESS" || echo "FAILURE")"
         sleep 5
-        if [ $lan_down = "SUCCESS" ]; then
+        if [ $down = "SUCCESS" ]; then
                 echo "OUTPUT:SUCCESS"
         else
                 echo "OUTPUT:FAILURE"
         fi
-
 }
 #Verify ping to a network
 ping_to_network()
@@ -356,10 +355,10 @@ case $event in
         get_lan_ipv6_address;;
    "refresh_lan_network")
         refresh_lan_network;;
-   "bringdown_lan_network")
-        bringdown_lan_network;;
-   "bringup_lan_network")
-        bringup_lan_network;;
+   "bringdown_interface")
+        bringdown_interface;;
+   "bringup_interface")
+        bringup_interface;;
    "ping_to_network")
         ping_to_network;;
    "ping_to_host")

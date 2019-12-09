@@ -101,6 +101,30 @@ refresh_wifi_network()
         fi
 }
 
+#Bring up interface
+bringup_interface()
+{
+        up="$(ifconfig $var2 up > /dev/null && echo "SUCCESS" || echo "FAILURE")"
+        sleep 5
+        if [ $up = "SUCCESS" ]; then
+                echo "OUTPUT:SUCCESS"
+        else
+                echo "OUTPUT:FAILURE"
+        fi
+
+}
+#Bring down interface
+bringdown_interface()
+{
+        down="$(ifconfig $var2 down > /dev/null && echo "SUCCESS" || echo "FAILURE")"
+        sleep 5
+        if [ $down = "SUCCESS" ]; then
+                echo "OUTPUT:SUCCESS"
+        else
+                echo "OUTPUT:FAILURE"
+        fi
+}
+
 #Verify ping to a network
 ping_to_network()
 {
@@ -441,6 +465,10 @@ case $event in
         get_security_mode;;
    "refresh_wifi_network")
         refresh_wifi_network;;
+   "bringdown_interface")
+        bringdown_interface;;
+   "bringup_interface")
+        bringup_interface;;
    "ping_to_network")
         ping_to_network;;
    "ping_to_host")
