@@ -2390,6 +2390,7 @@ def setLanModeAndVerify(obj, setVal):
                 print "EXPECTED RESULT : Should set lanMode";
                 print "ACTUAL RESULT : %s" %details;
                 print "[TEST EXECUTION RESULT] : SUCCESS";
+                sleep(90);
 
                 #Retrieve the values after set and compare
                 tdkTestObj,status,newValue = getParameterValue(obj,lanMode)
