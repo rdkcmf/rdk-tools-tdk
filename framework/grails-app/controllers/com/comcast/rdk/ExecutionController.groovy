@@ -2337,7 +2337,7 @@ class ExecutionController {
 					selectedRowsDefined.add(selectedRows[i])
 				}
 			}
-			dataMap = executedbService.getDataForCombinedExcelReportGeneration(selectedRowsDefined ,getApplicationUrl())
+			dataMap = executedbService.getDataForCombinedExcelReportGeneration(selectedRowsDefined ,getApplicationUrl(), getRealPath())
 			//For excel generation
 			fieldMap = ["C1":" Sl.No ", "C2":" Script Name ","C3":"Executed","C4":" Status ", "C5":"Executed On ","C6":"Log Data","C7":"Jira #","C8":"Issue Type","C9":"Remarks","C10":" Agent Console Log","C11":"Rerun/Repeat"]
 			parameters = [ title: EXPORT_SHEET_NAME, "column.widths": columnWidthList]
