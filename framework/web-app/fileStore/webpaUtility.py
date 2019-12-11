@@ -121,7 +121,6 @@ def parseWebpaResponse(response, count, method="get"):
         print "GET/SET operation failed. Response msg for failure: ",msg
         return ["FAILURE", msg]
 ########## End of Function ##########
-
 def webpaPreRequisite(obj):
 # webpaPreRequisite
 
@@ -133,6 +132,8 @@ def webpaPreRequisite(obj):
     tdkTestObj = obj.createTestStep('ExecuteCmd');
     expectedresult = "SUCCESS"
     returnStatus = "FAILURE"
+    parodusStatus = "FAILURE"
+    webpaStatus = "FAILURE"
 
     cmd= "sh %s/tdk_utility.sh parseConfigFile WEBPA_CHECK_CMD" %TDK_PATH;
     tdkTestObj.addParameter("command",cmd);
@@ -159,7 +160,23 @@ def webpaPreRequisite(obj):
 
         if expectedresult in actualresult and "SUCCESS" in details:
             print "parodus process is up and running"
-
+            parodusStatus = "SUCCESS"
+        else:
+            #Check for every 2 mins whether the process is up
+            retryCount = 0;
+            MAX_RETRY = 8;
+            while retryCount < MAX_RETRY:
+                sleep(120);
+                tdkTestObj.executeTestCase(expectedresult);
+                actualresult = tdkTestObj.getResult();
+                details = tdkTestObj.getResultDetails().strip();
+                if expectedresult in actualresult and "SUCCESS" in details:
+                    print "Parodus process is up and running in device"
+                    parodusStatus = "SUCCESS"
+                    break;
+                else:
+                    retryCount = retryCount + 1;
+        if parodusStatus == "SUCCESS":
             #Check for webpa process
             tdkTestObj.addParameter("command",cmd_webpa)
             tdkTestObj.executeTestCase(expectedresult);
@@ -167,7 +184,7 @@ def webpaPreRequisite(obj):
             details = tdkTestObj.getResultDetails().strip();
             if expectedresult in actualresult and "SUCCESS" in details:
                 print "Webpa process is up and running in device"
-                returnStatus = "SUCCESS"
+                webpaStatus = "SUCCESS"
             else:
                 print "Webpa process is not running in device"
                 #Check for every 2 mins whether the process is up
@@ -180,14 +197,19 @@ def webpaPreRequisite(obj):
                     details = tdkTestObj.getResultDetails().strip();
                     if expectedresult in actualresult and "SUCCESS" in details:
                         print "Webpa process is up and running in device"
-                        returnStatus = "SUCCESS"
+                        webpaStatus = "SUCCESS"
                         break;
                     else:
                         retryCount = retryCount + 1;
+            if parodusStatus =="SUCCESS" and webpaStatus == "SUCCESS":
+                returnStatus = "SUCCESS"
         else:
             print "Parodus process is not running in device"
     else:
         print "Failed to get the commands for webpa and parodus"
     return tdkTestObj,returnStatus;
 ########## End of Function ##########
+
+
+
 
