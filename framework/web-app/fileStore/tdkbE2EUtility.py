@@ -2419,21 +2419,25 @@ def setLanModeAndVerify(obj, setVal):
 
 ########## End of Function ##########
 
-def bringupLanNetwork(lanInterface):
+def bringupInterface(interface,source):
 
-# bringupLanNetwork
+# bringupInterface
 
-# Syntax      : bringupLanNetwork()
-# Description : Function to bring up the the lan client on the given interface
-# Parameters  : lanInterface - lan interface name
+# Syntax      : bringupInterface
+# Description : Function to bring up the the client on the given interface
+# Parameters  : interface - interface name, source - clienttype
 # Return Value: status - status of interface
 
         try:
-                status = clientConnect("LAN")
+                status = clientConnect(source)
                 if status == "SUCCESS":
 
-                        if lan_os_type == "UBUNTU":
-                                command="sudo sh %s bringup_lan_network %s" %(lan_script,lanInterface)
+                        if wlan_os_type == "UBUNTU":
+                                if source == "LAN":
+                                    script_name = lan_script;
+                                else:
+                                    script_name = wlan_script;
+                                command="sudo sh %s bringup_interface %s" %(script_name,interface)
                                 status = executeCommand(command)
                         else:
                                 status = "Only UBUNTU platform supported!!!"
@@ -2442,28 +2446,30 @@ def bringupLanNetwork(lanInterface):
                 print e;
                 status = e;
 
-        print "LAN Interface bringup status:%s" %status;
+        print "Interface bringup status:%s" %status;
         return status;
-
 
 ########## End of Function ##########
 
+def bringdownInterface(interface,source):
 
-def bringdownLanNetwork(lanInterface):
+# bringdownInterface
 
-# bringdownLanNetwork
-
-# Syntax      : bringdownLanNetwork()
-# Description : Function to bring down the the lan client on the given interface
-# Parameters  : lanInterface - lan interface name
+# Syntax      : bringdownInterface
+# Description : Function to bring down the the client on the given interface
+# Parameters  : interface - interface name, source - clienttype
 # Return Value: status - status of interface
 
         try:
-                status = clientConnect("LAN")
+                status = clientConnect(source)
                 if status == "SUCCESS":
 
-                        if lan_os_type == "UBUNTU":
-                                command="sudo sh %s bringdown_lan_network %s" %(lan_script,lanInterface)
+                        if wlan_os_type == "UBUNTU":
+                                if source == "LAN":
+                                    script_name = lan_script;
+                                else:
+                                    script_name = wlan_script;
+                                command="sudo sh %s bringdown_interface %s" %(script_name,interface)
                                 status = executeCommand(command)
                         else:
                                 status = "Only UBUNTU platform supported!!!"
@@ -2472,9 +2478,8 @@ def bringdownLanNetwork(lanInterface):
                 print e;
                 status = e;
 
-        print "LAN Interface bringdown status:%s" %status;
+        print "Interface bringdown status:%s" %status;
         return status;
-
 
 ########## End of Function ##########
 
