@@ -1511,7 +1511,7 @@ class ExecutionController {
 			def execId = executionResult?.execution?.id
 			def boxType = executionResult.executionDevice.boxType
 			if(boxType){
-				execResults = ExecutionResult.findAll("from ExecutionResult as executionResult WHERE executionResult.executionDevice.boxType='${boxType}' and executionResult.script like '${scriptName}' and executionResult.execution.id<'${execId}' and (executionResult.status = 'SUCCESS' or executionResult.status = 'FAILURE' or executionResult.status = 'SCRIPT TIME OUT')" , [max: 5])
+				execResults = ExecutionResult.findAll("from ExecutionResult as executionResult WHERE executionResult.executionDevice.boxType='${boxType}' and executionResult.script like '${scriptName}' and executionResult.execution.id<'${execId}' and (executionResult.status = 'SUCCESS' or executionResult.status = 'FAILURE' or executionResult.status = 'SCRIPT TIME OUT') order by id desc" , [max: 5])
 			}
 			else{
 				BoxType boxTypeObject = null
@@ -1525,10 +1525,12 @@ class ExecutionController {
 						'in' ("device", deviceList)
 						'in' ("status",['SUCCESS','FAILURE','SCRIPT TIME OUT'])
 						maxResults(5)
+						order("id", "desc")
 						lt("execution.id", execId.toLong())
 					}
 				}
 			}
+			execResults = execResults.reverse();
 			execResults?.each { def result->
 				Execution execution = result?.execution
 				dataMap.put(execution.name, result?.status)
