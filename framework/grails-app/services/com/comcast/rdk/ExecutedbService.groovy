@@ -85,7 +85,8 @@ class ExecutedbService {
 					def summaryMap = getStatusList(executionInstance,executionDeviceInstance,executionDeviceInstance.executionresults?.size()?.toString())
 
 					Summary(){
-						TotalScriptsExecuted(summaryMap.get("Total Scripts in ScriptGroup"))
+						TotalScripts(summaryMap.get("Total Scripts"))
+						Executed(summaryMap.get("Executed"))
 						Success(summaryMap?.get("SUCCESS"))
 						Failure(summaryMap?.get("FAILURE"))
 						NotApplicable(summaryMap?.get("N/A"))
@@ -1168,7 +1169,9 @@ class ExecutedbService {
 				else{
 					scriptCount = Integer.parseInt(scriptCnt)
 				}
-
+				if(executionInstance?.name.toString().contains("_RERUN_")){
+					scriptCount = Integer.parseInt(scriptCnt)
+				}
 				def executedCount = ExecutionResult.countByExecutionDevice(executionDevice)
 				executedCount = executedCount - pendingCount 
 				
