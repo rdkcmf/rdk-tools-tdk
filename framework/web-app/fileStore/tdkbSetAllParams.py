@@ -68,11 +68,15 @@ def setAllParams(module, setup_type, tr181Obj, sysObj):
         paramType = param.find('type').text
         writable = param.find('writable').text
         persistentSet = param.find('persistentSet').text
-        defaultValue = param.find('defaultValue').text
 	#some parameters will have expected set of values and some may not
         if param.find('expectedValues') is not None:
             expectedValues = param.find('expectedValues').text
-            expectedValues = expectedValues.split(",")
+            #if expectedValues in xml is non-empty
+            if expectedValues is not None:
+                expectedValues = expectedValues.split(",")
+            else:
+                expectedValues = ""
+        #if expectedValues is not known and that tag itself is not available in xml
 	else:
 	    expectedValues = ""
 	    #the value used for set is chosen from expectedValues. If that tag is not available, look for setValue tag
@@ -84,13 +88,18 @@ def setAllParams(module, setup_type, tr181Obj, sysObj):
                 moduleStatus = "FAILURE";
 		failedParams.append(paramName);
                 return moduleStatus,failedParams;
-	        
+	            
         if setup_type == "TDK":
             paramName = param.find('name').text
         elif setup_type == "WEBPA":
             paramName = param.find('webpaName').text
         elif setup_type == "SNMP":
-            paramName = param.find('oid').text
+            if param.find('oid')is not None:
+                paramName = param.find('oid').text
+            #if snmp details of one param is not available, skip that param
+            else:
+                print "OID not available for %s, skipping this parameter" %paramName
+                continue;
 	    #get the snmp specific param details
     	    if param.find('snmpExpectedValues')is not None:
     	        expectedValues = param.find('snmpExpectedValues').text
@@ -101,7 +110,7 @@ def setAllParams(module, setup_type, tr181Obj, sysObj):
             moduleStatus = "FAILURE";
 	    print "Invalid setup_type passed, setupType should be one fom TDK, WEBPA or SNMP"
             return moduleStatus,failedParams;
-    
+
         expectedresult="SUCCESS";
 
 	#get and save the original value before doing set
@@ -114,7 +123,7 @@ def setAllParams(module, setup_type, tr181Obj, sysObj):
 		#if no expected values are there for the parameter, use the setValue field in xml directly, otherwise chose one setvalue from expectedValues list
 		if expectedValues != "":
                     for newValue in expectedValues:
-                        if orgValue != newValue:
+                       if orgValue != newValue:
                             setValue = newValue
     		            break
                 #set a new value from expected value list
@@ -221,13 +230,25 @@ def getAllParams(module, setup_type, factoryReset, tr181Obj, sysObj):
     print "PARAMS TO BE GET ARE: ",paramList
 
     for param in paramsRoot:
+	#for some params default value is not applicable, skip 
+	if factoryReset == "true" and param.find('defaultValue') is None:
+	    continue;
         #Get the value of each param
+        if param.find('defaultValue') is not None:
+            defaultValue = param.find('defaultValue').text
+	    #if default value given xml is empty
+	    if defaultValue is None:
+		defaultValue = ""
         paramType = param.find('type').text
-        defaultValue = param.find('defaultValue').text
 	#some parameters will have expected set of values and some may not
         if param.find('expectedValues')is not None:
             expectedValues = param.find('expectedValues').text
-            expectedValues = expectedValues.split(",")
+	    #if expectedValues in xml is non-empty
+	    if expectedValues is not None:
+                expectedValues = expectedValues.split(",")
+	    else:
+		expectedValues = ""
+	#if expectedValues is not known and that tag itself is not available in xml
         else:
             expectedValues = ""
 
@@ -235,8 +256,19 @@ def getAllParams(module, setup_type, factoryReset, tr181Obj, sysObj):
             paramName = param.find('name').text
         elif setup_type == "WEBPA":
             paramName = param.find('webpaName').text
+	    #for some params expected value or default value may differ for webpa
+	    if param.find('webpaExpectedValues')is not None:
+                expectedValues = param.find('webpaExpectedValues').text
+                expectedValues = expectedValues.split(",")
+            if param.find('webpaDefaultValue')is not None:
+                defaultValue = param.find('webpaDefaultValue').text
         elif setup_type == "SNMP":
-            paramName = param.find('oid').text
+            if param.find('oid')is not None:
+                paramName = param.find('oid').text
+            #if snmp details of one param is not available, skip that param
+            else:
+                print "OID not available for %s, skipping this parameter" %paramName
+                continue;
             if param.find('snmpExpectedValues')is not None:
                 expectedValues = param.find('snmpExpectedValues').text
                 expectedValues = expectedValues.split(",")
@@ -248,7 +280,6 @@ def getAllParams(module, setup_type, factoryReset, tr181Obj, sysObj):
             moduleStatus = "FAILURE";
 	    print "Invalid setup_type passed, setupType should be one fom TDK, WEBPA or SNMP"
             return moduleStatus,failedParams;
-
         expectedresult="SUCCESS";
 
 	#if get operation is to be done with factory reset, cross check parameter's get value with default value list other wise with expectedvalues list
@@ -326,14 +357,28 @@ def getParameterValue(tr181Obj, sysObj, setup_type, paramName, paramType, expect
 	#delimiter for response parsing, based on param type strings like STRING:,INTEGER:
 	delimiter = typeDict.get(paramType)+":"
 	if delimiter in actResponse:
-	    value = actResponse.split(delimiter)[1].strip()
+	    value = actResponse.split(delimiter)[1].strip().replace('"', '')
 	    actualresult = "SUCCESS"
 	else:
             value = actResponse
             actualresult = "FAILURE"	       
 
-    #if there are no expected values, then check if getvalue is non-empty, otherwise getvalue should be in exepectedValues list	
-    if (expectedresult in actualresult) and (expectedValues == "" and value!="") or (value in expectedValues and value!=""):
+    #if there are is no expected value tag, then check if getvalue is non-empty, otherwise getvalue should be in exepectedValues list
+    if (expectedresult in actualresult) and (expectedValues == "" and value!="") or (value in expectedValues and value!="") or (value!="" and ',' in value) or (expectedValues == "" and value ==""):
+	#if the get value has comma, split the value at commas and check each value against expected values
+        if expectedValues != "" and ',' in value:
+            value = value.split(',')
+            for val in value:
+                if val not in expectedValues:
+                    #Set the result status of execution
+                    tdkTestObj.setResultStatus("FAILURE");
+                    actualresult = "FAILURE"
+                    print "TEST STEP : Get the value of param", paramName;
+                    print "EXPECTED RESULT: Should get the value of param as one from ", expectedValues;
+                    print "ACTUAL RESULT : %s" %value;
+                    print "TEST EXECUTION RESULT: FAILURE"
+                    print "--------------------------------------------------------------------------------------\n"
+    		    return (value,actualresult);
         #Set the result status of execution
         tdkTestObj.setResultStatus("SUCCESS");
         print "TEST STEP: Get the value of param", paramName;
@@ -341,6 +386,7 @@ def getParameterValue(tr181Obj, sysObj, setup_type, paramName, paramType, expect
         print "ACTUAL RESULT  : %s" %value;
         print "TEST EXECUTION RESULT: SUCCESS"
         print "--------------------------------------------------------------------------------------\n"
+
     else:
         #Set the result status of execution
         tdkTestObj.setResultStatus("FAILURE");
