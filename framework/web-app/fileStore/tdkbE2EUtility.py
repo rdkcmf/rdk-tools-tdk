@@ -507,6 +507,9 @@ def parseDeviceConfig(obj):
 		global public_ipv6_address
                 public_ipv6_address = config.get(deviceConfig, "PUBLIC_IPV6_ADDRESS")
 
+                global public_ipv4_address
+                public_ipv4_address = config.get(deviceConfig, "PUBLIC_IPV4_ADDRESS")
+
 		global webui_node_lan_logfile
                 webui_node_lan_logfile = config.get(deviceConfig, "WEBUI_NODE_LAN_LOGFILE")
 
