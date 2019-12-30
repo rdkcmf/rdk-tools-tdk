@@ -1322,6 +1322,523 @@ void MocaHalAgent::MocaHal_RemoteNode_GetActiveMoCAVersion(IN const Json::Value&
         return;
     }
 }
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetRxUnicastPhyRate
+ *Description    : This function is to get the RxUnicastPhyRate of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetRxUnicastPhyRate(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxUnicastPhyRate --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    unsigned int phyRate;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetRxUnicastPhyRate(rmh,nodeId,&phyRate);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = phyRate;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxUnicastPhyRate call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxUnicastPhyRate -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxUnicastPhyRate call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxUnicastPhyRate -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetRxBroadcastPhyRate
+ *Description    : This function is to get the RxBroadcastPhyRate of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetRxBroadcastPhyRate(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxBroadcastPhyRate --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    unsigned int phyRate;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetRxBroadcastPhyRate(rmh,nodeId,&phyRate);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = phyRate;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxBroadcastPhyRate call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxBroadcastPhyRate -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxBroadcastPhyRate call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxBroadcastPhyRate -->Exit\n");
+        return;
+    }
+}
+
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetMaxFrameSize
+ *Description    : This function is to get the max frame size of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetMaxFrameSize(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetMaxFrameSize --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    unsigned int maxFrameSize;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetMaxFrameSize(rmh,nodeId,&maxFrameSize);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = maxFrameSize;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetMaxFrameSize call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetMaxFrameSize -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetMaxFrameSize call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetMaxFrameSize -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetRxUnicastPower
+ *Description    : This function is to get the RxUnicastPower of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetRxUnicastPower(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxUnicastPower --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    float power;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetRxUnicastPower(rmh,nodeId,&power);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = power;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxUnicastPower call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxUnicastPower -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxUnicastPower call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxUnicastPower -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetRxBroadcastPower
+ *Description    : This function is to get the RxBroadcastPower of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetRxBroadcastPower(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxBroadcastPower --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    float power;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetRxBroadcastPower(rmh,nodeId,&power);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = power;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxBroadcastPower call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxBroadcastPower -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxBroadcastPower call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxBroadcastPower -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetRxMapPower
+ *Description    : This function is to get the RxMapPower of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetRxMapPower(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxMapPower --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    float power;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetRxMapPower(rmh,nodeId,&power);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = power;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxMapPower call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxMapPower -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxMapPower call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxMapPower -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetRxPackets
+ *Description    : This function is to get the RxPackets of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetRxPackets(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxPackets --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    unsigned int rxPackets;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetRxPackets(rmh,nodeId,&rxPackets);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = rxPackets;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxPackets call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxPackets -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxPackets call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxPackets -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetRxSNR
+ *Description    : This function is to get the signal to noise ratio of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetRxSNR(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxSNR --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    float snr;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetRxSNR(rmh,nodeId,&snr);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = snr;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxSNR call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxSNR -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxSNR call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxSNR -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetRxCorrectedErrors
+ *Description    : This function is to get the RxCorrectedErrors of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetRxCorrectedErrors(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxCorrectedErrors --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    unsigned int errors;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetRxCorrectedErrors(rmh,nodeId,&errors);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = errors;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxCorrectedErrors call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxCorrectedErrors -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxCorrectedErrors call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxCorrectedErrors -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetRxUnCorrectedErrors
+ *Description    : This function is to get the RxUnCorrectedErrors of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetRxUnCorrectedErrors(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxUnCorrectedErrors --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    unsigned int errors;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetRxUnCorrectedErrors(rmh,nodeId,&errors);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = errors;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxUnCorrectedErrors call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxUnCorrectedErrors -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxUnCorrectedErrors call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxUnCorrectedErrors -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetRxTotalErrors
+ *Description    : This function is to get the RxTotalErrors of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetRxTotalErrors(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxTotalErrors --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    unsigned int errors;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetRxTotalErrors(rmh,nodeId,&errors);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = errors;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxTotalErrors call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxTotalErrors -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetRxTotalErrors call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetRxTotalErrors -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetTxUnicastPhyRate
+ *Description    : This function is to get the TxUnicastPhyRate of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetTxUnicastPhyRate(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetTxUnicastPhyRate --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    unsigned int phyRate;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetTxUnicastPhyRate(rmh,nodeId,&phyRate);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = phyRate;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetTxUnicastPhyRate call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetTxUnicastPhyRate -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetTxUnicastPhyRate call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetTxUnicastPhyRate -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetTxUnicastPower
+ *Description    : This function is to get the TxUnicastPower of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetTxUnicastPower(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetTxUnicastPower --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    float power;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetTxUnicastPower(rmh,nodeId,&power);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = power;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetTxUnicastPower call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetTxUnicastPower -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetTxUnicastPower call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetTxUnicastPower -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_RemoteNode_GetTxPackets
+ *Description    : This function is to get the TxPackets of the remote node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_RemoteNode_GetTxPackets(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetTxPackets --->Entry\n");
+    unsigned int nodeId = req["nodeId"].asInt();
+    unsigned int txPackets;
+    int returnStatus = SoC_IMPL__RMH_RemoteNode_GetTxPackets(rmh,nodeId,&txPackets);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = txPackets;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetTxPackets call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetTxPackets -->Exit\n");
+        return ;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_RemoteNode_GetTxPackets call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_RemoteNode_GetTxPackets -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetTxTotalPackets
+ *Description    : This function is to get the total number of packets transmitted by the node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetTxTotalPackets(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxTotalPackets --->Entry\n");
+    unsigned int txPackets;
+    int returnStatus = SoC_IMPL__RMH_Stats_GetTxTotalPackets(rmh,&txPackets);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = txPackets;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetTxTotalPackets call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxTotalPackets -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetTxTotalPackets call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxTotalPackets -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetRxTotalPackets
+ *Description    : This function is to get the total number of packets received by the node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetRxTotalPackets(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRxTotalPackets --->Entry\n");
+    unsigned int rxPackets;
+    int returnStatus = SoC_IMPL__RMH_Stats_GetRxTotalPackets(rmh,&rxPackets);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = rxPackets;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetRxTotalPackets call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRxTotalPackets -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetRxTotalPackets call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRxTotalPackets -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetTxTotalBytes
+ *Description    : This function is to get the total number of bytes transmitted by the node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetTxTotalBytes(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxTotalBytes --->Entry\n");
+    unsigned int txBytes;
+    int returnStatus = SoC_IMPL__RMH_Stats_GetTxTotalBytes(rmh,&txBytes);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = txBytes;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetTxTotalBytes call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxTotalBytes -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetTxTotalBytes call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxTotalBytes -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetRxTotalBytes
+ *Description    : This function is to get the total number of bytes received by the node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetRxTotalBytes(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRxTotalBytes --->Entry\n");
+    unsigned int rxBytes;
+    int returnStatus = SoC_IMPL__RMH_Stats_GetRxTotalBytes(rmh,&rxBytes);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = rxBytes;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetRxTotalBytes call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRxTotalBytes -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetRxTotalBytes call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRxTotalBytes -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetTxDroppedPackets
+ *Description    : This function is to get the total number of packets dropped during transmission by the node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetTxDroppedPackets(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxDroppedPackets --->Entry\n");
+    unsigned int txPackets;
+    int returnStatus = SoC_IMPL__RMH_Stats_GetTxDroppedPackets(rmh,&txPackets);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = txPackets;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetTxDroppedPackets call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxDroppedPackets -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetTxDroppedPackets call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetTxDroppedPackets -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : MocaHal_GetRxDroppedPackets
+ *Description    : This function is to get the total number of packets dropped during reception by the node
+ *****************************************************************************/
+void MocaHalAgent::MocaHal_GetRxDroppedPackets(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRxDroppedPackets --->Entry\n");
+    unsigned int rxPackets;
+    int returnStatus = SoC_IMPL__RMH_Stats_GetRxDroppedPackets(rmh,&rxPackets);
+    if(!returnStatus)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = rxPackets;
+        DEBUG_PRINT(DEBUG_LOG, "MocaHal_GetRxDroppedPackets call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRxDroppedPackets -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "MocaHal_GetRxDroppedPackets call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "MocaHal_GetRxDroppedPackets -->Exit\n");
+        return;
+    }
+}
+
+
 /**************************************************************************
 Function Name   : cleanup
 
