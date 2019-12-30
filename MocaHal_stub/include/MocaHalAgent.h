@@ -97,6 +97,26 @@ class MocaHalAgent : public RDKTestStubInterface , public AbstractServer<MocaHal
                     this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetPrimaryChannelFreq", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetPrimaryChannelFreq);
                     this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetSecondaryChannelFreq", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetSecondaryChannelFreq);
                     this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetActiveMoCAVersion", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetActiveMoCAVersion);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetMaxFrameSize", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetMaxFrameSize);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetRxUnicastPhyRate", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetRxUnicastPhyRate);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetRxBroadcastPhyRate", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetRxBroadcastPhyRate);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetRxUnicastPower", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetRxUnicastPower);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetRxBroadcastPower", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetRxBroadcastPower);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetRxMapPower", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetRxMapPower);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetRxPackets", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetRxPackets);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetRxSNR", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetRxSNR);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetRxCorrectedErrors", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetRxCorrectedErrors);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetRxUnCorrectedErrors", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetRxUnCorrectedErrors);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetRxTotalErrors", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetRxTotalErrors);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetTxUnicastPhyRate", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetTxUnicastPhyRate);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetTxUnicastPower", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetTxUnicastPower);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_RemoteNode_GetTxPackets", PARAMS_BY_NAME, JSON_STRING, "nodeId",JSON_INTEGER,NULL), &MocaHalAgent::MocaHal_RemoteNode_GetTxPackets);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetTxTotalPackets", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetTxTotalPackets);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetTxTotalBytes", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetTxTotalBytes);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetTxDroppedPackets", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetTxDroppedPackets);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetRxTotalPackets", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetRxTotalPackets);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetRxTotalBytes", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetRxTotalBytes);
+                    this->bindAndAddMethod(Procedure("TestMgr_MocaHal_GetRxDroppedPackets", PARAMS_BY_NAME, JSON_STRING,NULL), &MocaHalAgent::MocaHal_GetRxDroppedPackets);
                 }
 
                 //Inherited functions
@@ -155,5 +175,25 @@ class MocaHalAgent : public RDKTestStubInterface , public AbstractServer<MocaHal
                 void MocaHal_GetPrimaryChannelFreq(IN const Json::Value& req, OUT Json::Value& response);
                 void MocaHal_GetSecondaryChannelFreq(IN const Json::Value& req, OUT Json::Value& response);
                 void MocaHal_RemoteNode_GetActiveMoCAVersion(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetMaxFrameSize(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetRxUnicastPhyRate(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetRxBroadcastPhyRate(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetRxUnicastPower(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetRxBroadcastPower(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetRxMapPower(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetRxPackets(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetRxSNR(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetRxCorrectedErrors(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetRxUnCorrectedErrors(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetRxTotalErrors(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetTxUnicastPhyRate(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetTxUnicastPower(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_RemoteNode_GetTxPackets(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetTxTotalPackets(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetTxTotalBytes(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetTxDroppedPackets(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetRxTotalPackets(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetRxTotalBytes(IN const Json::Value& req, OUT Json::Value& response);
+                void MocaHal_GetRxDroppedPackets(IN const Json::Value& req, OUT Json::Value& response);
 };
 #endif //__MOCAHAL_STUB_H__
