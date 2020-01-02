@@ -467,7 +467,7 @@ class ExecutedbService {
 	/**
 	 * Method to generate the data for creating the combined report in excel format.
 	 */
-	def getDataForCombinedExcelReportGeneration(List selectedRowsDefined ,String appUrl) {
+	def getDataForCombinedExcelReportGeneration(List selectedRowsDefined ,String appUrl, String realPath) {
 		Map moduleNameScriptListMap = [:]
 		Map scriptNameExecutionResultIdMap = [:]
 		Map executionResultIdScriptNameMap = [:]
@@ -507,7 +507,8 @@ class ExecutedbService {
 				def scriptNameListForMap = []
 				def scriptFile =  ScriptFile.findByScriptName(scriptName)
 				if(scriptFile){
-					moduleName = scriptFile.moduleName
+					def sMap = scriptService.getScriptNameModuleNameMapping(realPath)
+					moduleName = sMap.get(scriptName)
 					def moduleNameFromMap = moduleNameScriptListMap.get(moduleName)
 					if(moduleNameScriptListMap.containsKey(moduleName)){
 						def scriptPresentList = []
