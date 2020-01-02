@@ -212,6 +212,114 @@
           <parameter name="nodeId" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetMaxFrameSize" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetMaxFrameSize</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetRxUnicastPhyRate" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetRxUnicastPhyRate</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetRxBroadcastPhyRate" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetRxBroadcastPhyRate</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetRxUnicastPower" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetRxUnicastPower</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetRxBroadcastPower" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetRxBroadcastPower</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetRxMapPower" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetRxMapPower</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetRxPackets" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetRxPackets</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetRxSNR" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetRxSNR</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetRxCorrectedErrors" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetRxCorrectedErrors</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetRxTotalErrors" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetRxTotalErrors</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetTxUnicastPhyRate" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetTxUnicastPhyRate</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetTxUnicastPower" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetTxUnicastPower</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetTxPackets" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetTxPackets</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="MocaHal_RemoteNode_GetRxUnCorrectedErrors" version="1">
+        <function>TestMgr_MocaHal_RemoteNode_GetRxUnCorrectedErrors</function>
+        <parameters>
+          <parameter name="nodeId" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetTxTotalPackets" version="1">
+        <function>TestMgr_MocaHal_GetTxTotalPackets</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetRxTotalPackets" version="1">
+        <function>TestMgr_MocaHal_GetRxTotalPackets</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetTxTotalBytes" version="1">
+        <function>TestMgr_MocaHal_GetTxTotalBytes</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetTxDroppedPackets" version="1">
+        <function>TestMgr_MocaHal_GetTxDroppedPackets</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="MocaHal_GetRxTotalBytes" version="1">
+        <function>TestMgr_MocaHal_GetRxTotalBytes</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="MocaHal_GetRxDroppedPackets" id="" version="1">
+        <function>TestMgr_MocaHal_GetRxDroppedPackets</function>
+        <parameters/>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
