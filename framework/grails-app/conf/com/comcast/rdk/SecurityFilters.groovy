@@ -29,7 +29,8 @@ class SecurityFilters {
 		execution : ['saveLoadModuleStatus','saveResultDetails','getDeviceStatusList','getDeviceStatus','thirdPartyJsonResult','thirdPartyTest','showResult','getDetailedTestResult','getClientPort','stopThirdPartyTestExecution','getAgentConsoleLog','getRealtimeDeviceStatus','getExecutionOutput','thirdPartySingleTestExecution','thirdPartyJsonPerformanceResult','getExecutionId','getImageName','getExecutionList', 'getDeviceImageName','thirdPartyMultipleScriptExecution','uploadLogs','getExecutionStatus','exportConsolidatedToExcel','getTMIPAddress','securedUploadLogs', 'resultSummary'],
 		deviceGroup : ['uploadAgentBinaries','getDeviceList','deleteDeviceMethod','createNewDevice','uploadTclConfig','getDeviceBoxType','getDeviceDetails','uploadE2EConfig'],
 		scriptGroup : ['getScriptsByScriptGroup','getScriptsByModule','getAllScriptGroups','deleteScriptGroup','createNewScriptGroup','verifyScriptGroup','getScriptTimeout','getTestJavaScript'],
-		module : ['getModuleScriptTimeOut']
+		module : ['getModuleScriptTimeOut'],
+		thunder : ['thirdPartySingleTestExecutionThunder','thirdPartySuiteExecutionThunder', 'thirdPartyMultipleTestExecutionThunder']
     ];
 
     private boolean findAction(actionMap, controllerName, actionName) {

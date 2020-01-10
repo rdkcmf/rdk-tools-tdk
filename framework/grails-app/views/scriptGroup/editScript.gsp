@@ -44,7 +44,7 @@ function clearLocks(scriptName){
 	});
 }
 </script>
-<g:if test="${script && category != 'RDKB_TCL' }">
+<g:if test="${script && category != 'RDKB_TCL' && category != 'RDKV_THUNDER' }">
 	<g:form name="editScriptForm" action="updateScript"
 		controller="scriptGroup" method="post">
 		<input type="hidden" name="id" id="id"
@@ -276,4 +276,63 @@ function clearLocks(scriptName){
 		</g:form>
 	</div>
 </g:if>
-
+<g:if test="${script && category == 'RDKV_THUNDER' }">
+	<g:form action="saveThunder" method="post">
+		<g:hiddenField name="scriptName" value="${script.scriptName}" />
+			<table>
+				<tr>
+					<th colspan="4" align="center">Display thunder Script</th>
+				</tr>
+				<tr>
+					<td>Script Name</td>
+					<td>
+						${script.scriptName }
+					</td>
+				</tr>
+				<tr>
+					<td>Title</td>
+					<td>
+						${script.title }
+					</td>
+				</tr>
+				<tr>
+					<td>Description</td>
+					<td>
+						${script.description }
+					</td>
+				</tr>
+				<tr>
+					<td>Path</td>
+					<td>
+						${script.path }
+					</td>
+				</tr>
+				<tr>
+					<td>Content</td>
+					<td><g:textArea id="thunderText" name="thunderText" value="${script.scriptContent}"
+							disabled="true"
+							style="color:RGB(130,15,15);font-size:12px;height:350px;width:700px;"></g:textArea></td>
+				</tr>
+			</table>
+	</g:form>
+	<g:if test="${SecurityUtils.getSubject().hasRole('ADMIN')}">
+		<g:hiddenField name="category" value="${script?.category}" />
+		<input type="hidden" name="id" id="id" value="${script?.name}">
+		<table>
+			<tr></tr>
+			<tr>
+				<td style="width: 35%;"></td>
+				<td style="width: 65%;">
+				    <g:form name="downloadScriptFormThunder" action="exportThunderScriptContent"
+						controller="scriptGroup" method="post">
+						<g:hiddenField name="category" value="${script?.category}" />
+						<input type="hidden" name="id" id="id" value="${script.scriptName}">
+						<span class="buttons"> <input
+							class="download" type="submit" value="Download Script"
+							id="download"> </span>
+			 		</g:form> 
+                </td>
+			</tr>
+		</table>
+	</g:if>
+</g:if>

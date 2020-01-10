@@ -21,6 +21,7 @@ import groovy.sql.Sql;
 
 import java.io.IOException
 import com.comcast.rdk.Category;
+import com.comcast.rdk.Constants;
 import com.comcast.rdk.Device;
 import com.comcast.rdk.DeviceGroup;
 import com.comcast.rdk.ExecuteMethodResult;
@@ -51,13 +52,12 @@ import org.apache.shiro.crypto.hash.Sha256Hash
 class BootStrap {
 	
 	def grailsApplication
-
     def primitivetestService
 	def migrationService
 	def scriptService
 	def primitiveService
 	def executionService
-         def utilityService
+    def utilityService
 	def mailService
 	
     def init = { servletContext ->
@@ -137,7 +137,8 @@ class BootStrap {
 		executionService.tftpServerStartUp(rootFile.file.getAbsolutePath())
 		// creates tcl module if it doesn't exist
 		createTclModule()
-		
+		//create thunder module if it doesn't exist
+		createThunderModule()
 		/*List<Script> scriptList = Script.list()
 		
 		scriptList.each{ scriptInstance ->
@@ -297,32 +298,55 @@ class BootStrap {
 	 * Method to migrate the existing tables to unified TM.
 	 */
 	def migratetoUnifiedTM(){
-		println " migrate to UnifiedTM Start " 
-		
-		BoxType.executeUpdate("update BoxType m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		Function.executeUpdate("update Function m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		Module.executeUpdate("update Module m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		RDKVersions.executeUpdate("update RDKVersions m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		ScriptFile.executeUpdate("update ScriptFile m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		ScriptTag.executeUpdate("update ScriptTag m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		SoCVendor.executeUpdate("update SoCVendor m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		BoxManufacturer.executeUpdate("update BoxManufacturer m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		
-		ScriptGroup.executeUpdate("update ScriptGroup m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		
-        Device.executeUpdate("update Device m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		DeviceGroup.executeUpdate("update DeviceGroup m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		ExecuteMethodResult.executeUpdate("update ExecuteMethodResult m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		Execution.executeUpdate("update Execution m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		ExecutionDevice.executeUpdate("update ExecutionDevice m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		ExecutionResult.executeUpdate("update ExecutionResult m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		
-		JobDetails.executeUpdate("update JobDetails m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		Performance.executeUpdate("update Performance m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		RepeatPendingExecution.executeUpdate("update RepeatPendingExecution m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		ThirdPartyExecutionDetails.executeUpdate("update ThirdPartyExecutionDetails m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL]);
-		
-		println " migrate to UnifiedTM End "
+        println " migrate to UnifiedTM Start "
+       
+        BoxType.executeUpdate("update BoxType m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        Function.executeUpdate("update Function m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        Module.executeUpdate("update Module m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        RDKVersions.executeUpdate("update RDKVersions m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        ScriptFile.executeUpdate("update ScriptFile m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        ScriptTag.executeUpdate("update ScriptTag m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        SoCVendor.executeUpdate("update SoCVendor m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        BoxManufacturer.executeUpdate("update BoxManufacturer m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+       
+        ScriptGroup.executeUpdate("update ScriptGroup m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+       
+        Device.executeUpdate("update Device m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        DeviceGroup.executeUpdate("update DeviceGroup m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        ExecuteMethodResult.executeUpdate("update ExecuteMethodResult m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        Execution.executeUpdate("update Execution m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        ExecutionDevice.executeUpdate("update ExecutionDevice m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        ExecutionResult.executeUpdate("update ExecutionResult m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+       
+        JobDetails.executeUpdate("update JobDetails m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        Performance.executeUpdate("update Performance m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        RepeatPendingExecution.executeUpdate("update RepeatPendingExecution m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+        ThirdPartyExecutionDetails.executeUpdate("update ThirdPartyExecutionDetails m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER]);
+       
+        println " migrate to UnifiedTM End "
+    }
+	
+	/**
+	 * Method to create thunder module if it is not already present
+	 * @return
+	 */
+	def createThunderModule() {
+		def thunderModule = Module.findByName(Constants.THUNDER)
+		if(thunderModule == null){
+			Module?.withTransaction{
+				def moduleInstance = new Module()
+				moduleInstance.name = Constants.THUNDER
+				moduleInstance.testGroup = TestGroup.Component
+				moduleInstance.groups= null
+			   
+				moduleInstance.category= Category.RDKV_THUNDER
+				if(!moduleInstance.save(flush:true)){
+					moduleInstance.errors.each{
+						println it
+					}
+				}
+			}
+		}
 	}
 }
 

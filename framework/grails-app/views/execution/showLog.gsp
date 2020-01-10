@@ -169,7 +169,8 @@ function hideParameters(k){
 		<td >${executionInstance?.dateOfExecution}</td>				
 	</tr>
 	<tr class="odd">
-		<td class="tdhead">Time taken for Complete execution(min)</td>
+    	<td class="tdhead">Time taken for Complete execution(min)</td>
+
 		<%
 			String time = executionInstance?.realExecutionTime
 			try{
@@ -239,9 +240,14 @@ function hideParameters(k){
        	 	}
 		 %>	
 		<g:if test="${!(fileContents.isEmpty())}">
-			<span id="showlessdd${k}" style="display:none;"><g:link onclick="showMintextDeviceDetails(${k}); return false;"><b><i>Show Less</i></b></g:link></span><br>
-			<span id="firstfourlines${k}">${firstfourLine} &emsp; <g:link  onclick="showFulltextDeviceDetails(${k}); return false;"><b><i>Show More</i></b></g:link></span>
-			<span id="fulltext${k}" style="display:none;">${fileContents}&emsp; </span>
+		    <g:if test="${executionDeviceInstance?.category != 'RDKV_THUNDER'}">
+			    <span id="showlessdd${k}" style="display:none;"><g:link onclick="showMintextDeviceDetails(${k}); return false;"><b><i>Show Less</i></b></g:link></span><br>
+			    <span id="firstfourlines${k}">${firstfourLine} &emsp; <g:link  onclick="showFulltextDeviceDetails(${k}); return false;"><b><i>Show More</i></b></g:link></span>
+			    <span id="fulltext${k}" style="display:none;">${fileContents}&emsp; </span>
+			</g:if>
+			<g:else>
+			    ${fileContents}
+			</g:else>
 		</g:if>		
 		<g:else>
 			<g:if test="${executionDeviceInstance.buildName && executionDeviceInstance.buildName != "Image name not available" }">
@@ -392,13 +398,21 @@ function hideParameters(k){
 			</tbody>
 			<tbody id="alllogs${k}_${i}"  style="display: none;">
 			<tr>
-			<td>Agent Console Log		
-					
+			<td>
+			<g:if test="${executionDeviceInstance?.category != 'RDKV_THUNDER'}">
+			Agent Console Log
+			</g:if>
+			<g:else>
+			    <div title="Console logs from json-rpc server">
+			        Server Console Log
+			    </div>
+			</g:else>	
+				
 					</td>	
 					<td colspan="4">
 						&emsp;<span id="showconsolelink${k}_${i}" >
 						<g:remoteLink action="showAgentLogFiles" update="consoleLog${k}_${i}" onSuccess="showConsoleHideLink(${k},${i});" params="[execResId : "${executionResultInstance?.id}", execDeviceId:"${executionDeviceInstance?.id}", execId:"${executionInstance?.id}"]">Show</g:remoteLink>						&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-						<g:link action="showAgentLogFiles" update="consoleLog${k}_${i}" onSuccess="showConsoleHideLink(${k},${i});" params="[execResId : "${executionResultInstance?.id}", execDeviceId:"${executionDeviceInstance?.id}", execId:"${executionInstance?.id}"]"  target="_blank"> Agent Console Log Link</g:link>						
+						<g:link action="showAgentLogFiles" update="consoleLog${k}_${i}" title="Console logs from json-rpc server" onSuccess="showConsoleHideLink(${k},${i});" params="[execResId : "${executionResultInstance?.id}", execDeviceId:"${executionDeviceInstance?.id}", execId:"${executionInstance?.id}"]"  target="_blank"> Log Link</g:link>						
 						</span>
 						<span id="hideconsolelink${k}_${i}" style="display:none;"><a style="color:#7E2217;" href="#" onclick="hideConsoleLogs(${k},${i})">Hide</a></span>
 						<br>

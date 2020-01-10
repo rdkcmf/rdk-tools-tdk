@@ -113,6 +113,11 @@ class Device
 	 * List of child devices of a Gateway box.
 	 */
 	List childDevices
+	
+	/**
+	 * Flag to identify whether a box is thunder enabled or not.
+	 */
+	Integer isThunderEnabled = 0
 
 	/**
 	 * Flag to identify whether a box is a child one or not.
@@ -141,6 +146,7 @@ class Device
 		groups(nullable:true, blank:true)
 		category(nullable:false, blank:false)
 		serialNo(nullable:true, blank:true)
+		isThunderEnabled(nullable:true, blank:true)
     }
 	
 	static hasMany = [childDevices:Device]

@@ -80,6 +80,16 @@ class ScriptGroupController {
 	def testCaseService
 	
 	/**
+	 * Injecting thunderService
+	 */
+	def thunderService
+	
+	/**
+	 * Injects the grailsApplication.
+	 */
+	def grailsApplication
+	
+	/**
 	 * To keep the status of any system test suite update operation
 	 */
 	public static transient scriptUpdateProgress = false
@@ -146,10 +156,11 @@ class ScriptGroupController {
 		scriptNameListB = scriptNameListB?scriptNameListB:[]
 		def scriptNameListTCL = scriptService.getTCLNameList(requestGetRealPath)
 		scriptNameListTCL = scriptNameListTCL?scriptNameListTCL?.sort():[]
+		def scriptNameListThunder = thunderService.getScriptNameFileListStorm()
+		scriptNameListThunder = scriptNameListThunder?scriptNameListThunder?.sort():[]
 		def scriptGroupMapB = scriptService.getScriptsMap(requestGetRealPath, RDKB)
 		scriptGroupMapB = scriptGroupMapB?scriptGroupMapB:[:]
 		def scriptGroupMapV = scriptService.getScriptsMap(requestGetRealPath, RDKV)
-		
 		scriptGroupMapV = scriptGroupMapV?scriptGroupMapV:[:]
 		//def lists = ScriptGroup.executeQuery('select name from ScriptGroup')
 		def listsV = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKV])
@@ -157,6 +168,8 @@ class ScriptGroupController {
 		def listsB = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKB])
 		listsB = listsB?listsB : []
 		def listsTCL = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKB_TCL])
+		def listsThunder = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKV_THUNDER])
+		listsThunder = listsThunder?listsThunder?.sort():[]
 		def lists = ScriptGroup.executeQuery('select name from ScriptGroup')
 		def testGroup = Module.findAll()
 		def moduleMap =[:]
@@ -164,7 +177,6 @@ class ScriptGroupController {
 			moduleMap.put(moduleName,moduleName.testGroup)
 		}
 		def scriptGroupListV = ScriptGroup.findAllByCategory('RDKV')
-
 		def testSuiteMapV =[:]
 		scriptGroupListV.each { scriptgrouplistv  ->
 			testSuiteMapV.put(scriptgrouplistv.name,scriptgrouplistv.scriptList?.size())
@@ -178,12 +190,18 @@ class ScriptGroupController {
 		}
 
 		listsTCL = listsTCL?listsTCL?.sort():[]
+		def totalScriptsThunder = 0
+		totalScriptsThunder = scriptNameListThunder?.size() * listsThunder?.size()
 
 		[error: params.error, scriptId: params.scriptId, scriptGroupId:params.scriptGroupId,
 			scriptInstanceTotalV: scriptNameListV?.size(),scriptInstanceTotalB: scriptNameListB?.size(),
 			scriptGroupMapV:scriptGroupMapV, scriptGroupMapB:scriptGroupMapB, scriptGroupInstanceListV:listsV, scriptGroupInstanceListB:listsB,
 			scriptGroupInstanceTotalV: listsV?.size(), scriptGroupInstanceTotalB: listsB?.size(),
-			tclScripts:scriptNameListTCL, tclScriptInstanceTotal:scriptNameListTCL?.size(),  scriptGrpTcl :listsTCL, tclScriptSize : listsTCL?.size(), testGroup : moduleMap, testSuiteMapV : testSuiteMapV, testSuiteMapB : testSuiteMapB ]
+			tclScripts:scriptNameListTCL, tclScriptInstanceTotal:scriptNameListTCL?.size(),  scriptGrpTcl :listsTCL, tclScriptSize : listsTCL?.size(), 
+			testGroup : moduleMap, testSuiteMapV : testSuiteMapV, testSuiteMapB : testSuiteMapB,
+			scriptNameListThunder:scriptNameListThunder,  scriptGrpThunder :listsThunder,
+			thunderScriptInstanceTotal:scriptNameListThunder?.size(),  thunderScriptSize :listsThunder?.size(),
+			totalScriptsThunder:totalScriptsThunder]
 	}
 
 
@@ -318,8 +336,10 @@ class ScriptGroupController {
 		def category = params?.category?.trim()
 		def scriptNameList = []
 		def sList = null
-		if(!(Category.RDKB_TCL.toString().equals(category))){
+		if(!(Category.RDKB_TCL.toString().equals(category)) && !(Category.RDKV_THUNDER.toString().equals(category))){
 			scriptNameList = scriptService.getScriptNameFileList(getRealPath(), category)
+		}else if(Category.RDKV_THUNDER.toString().equals(category)){
+			scriptNameList = scriptService.getScriptFileListStorm()
 		}else{
 			//issue fix
 			scriptService.totalTclScriptList.each{
@@ -563,7 +583,6 @@ class ScriptGroupController {
 
 	def edit(String name) {
 		def scriptGroupInstance = ScriptGroup.findByName(name)
-
 		if (!scriptGroupInstance) {
 			flash.message = message(code: 'default.not.found.message', args: [
 				message(code: 'scriptGroup.label', default: 'Test Suite'),
@@ -574,8 +593,11 @@ class ScriptGroupController {
 		}
 		//def scripts = scriptService.getScriptNameFileList(getRealPath());
 		def scripts = null
-		if(scriptGroupInstance.category != Category.RDKB_TCL){
+		if(scriptGroupInstance.category != Category.RDKB_TCL && scriptGroupInstance.category != Category.RDKV_THUNDER){
 			scripts = scriptService.getScriptNameFileList(getRealPath(), scriptGroupInstance?.category?.toString());
+		}
+		else if(scriptGroupInstance.category == Category.RDKV_THUNDER){
+			scripts = scriptService.getScriptFileListStorm()
 		}
 		else{
 			scripts = scriptService.totalTclScriptList
@@ -2112,6 +2134,49 @@ class ScriptGroupController {
 				redirect(action: "list")
 			}
 		}else{
+			flash.message = "Download failed. No valid script is available for download."
+			redirect(action: "list")
+		}
+	}
+	
+	/**
+	 * Method to trigger downloading the script content as a Javascript file in script page.
+	 * @return
+	 */
+	def exportThunderScriptContent(){
+		def opFail = false
+		if(params?.id){
+			if(!exportScriptThunder(params)){
+				opFail = true
+			}
+			if(opFail){
+				flash.message = "Download failed. No valid script is available for download."
+				redirect(action: "list")
+			}
+		}else{
+			flash.message = "Download failed. No valid script is available for download."
+			redirect(action: "list")
+		}
+	}
+	/**
+	 * Method to get the script content from script file for storm scripts.
+	 * @param params
+	 * @return
+	 */
+	def exportScriptThunder(def params){
+		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
+		String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION)
+		String STORM_FRAMEWORK_TESTCASES_LOCATION = STORM_FRAMEWORK_LOCATION + TESTCASES
+		def path = STORM_FRAMEWORK_TESTCASES_LOCATION + FILE_SEPARATOR + params?.id + JAVASCRIPT_EXTENSION
+		File sFile = new File(path)
+		if(sFile.exists()){
+			params.format = TEXT
+			params.extension = JAVASCRIPT
+			String data = new String(sFile.getBytes())
+			response.setHeader("Content-Type", "application/octet-stream;")
+			response.setHeader("Content-Disposition", "attachment; filename=\""+ params?.id+JAVASCRIPT_EXTENSION+"\"")
+			response.outputStream << data.getBytes()
+		}else {
 			flash.message = "Download failed. No valid script is available for download."
 			redirect(action: "list")
 		}
@@ -4382,5 +4447,25 @@ class ScriptGroupController {
 			redirect(action: "list")
 		}
 
+	}
+	/**
+	 * Only display thunder script content
+	 *
+	 */
+	def thunderScriptDisplay(){
+		def scriptName = params?.scriptName
+		if(scriptName?.toString()?.contains('@')){
+			def name  = scriptName?.tokenize('@')
+			scriptName = name[1]
+		}else{
+			scriptName = params?.scriptName
+		}
+		def scriptMap = scriptService.getThundertScript(scriptName)
+		def scriptText = scriptMap.scriptContent
+		if(scriptText){
+			render (view:"editScript", model:[script : scriptMap , category : Category.RDKV_THUNDER.toString()])
+		}else{
+			render "Error : No script available with this name : "+scriptName
+		}
 	}
 }

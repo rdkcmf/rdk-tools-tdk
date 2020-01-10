@@ -57,7 +57,12 @@ public final class Constants
     public static final String TEMP_VERSIONFILE_NAME= "Version_File.py";
     public static final String RESULT_TOKEN         = "[SCRIPTSTATUSRESULT]";
     public static final String PYTHON_EXTENSION     = ".py";
-    public static final String TCL_EXTENSION     = ".tcl";
+    public static final String JAVASCRIPT_EXTENSION = ".js";
+    public static final String JAVASCRIPT           = "js";
+    public static final String TEXT                 = "text";
+    public static final String EXECUTION_LOG        = "Execution.log";
+    public static final String FULLLOG_LOG          = "fullLog.log";
+    public static final String TCL_EXTENSION        = ".tcl";
     public static final String FILE_STARTS_WITH     = "/script_";
     public static final String FAILURE_STATUS       = "FAILURE";
     public static final String SUCCESS_STATUS       = "SUCCESS";
@@ -104,6 +109,7 @@ public final class Constants
 	public static final String NEW_LINE             = "\n";
 	public static final String TAB					= "\t";
 	public static final String LINE_STRING          = "======";
+	public static final String LOG_SEPARATION_LINE_STRING = "========================";
 	public static final int INDEX_ZERO              = 0;
 	public static final int INDEX_ONE               = 1;
 	public static final int INDEX_TWO               = 2;
@@ -230,6 +236,10 @@ public final class Constants
     
     public static final String TCL_FAILED = "FAILED";
     
+    public static final String STORM_FRAMEWORK_LOCATION = "storm.framework.location";
+    
+    public static final String STORM_TIME_OUT = "storm.time.out";
+    
     public static final String TCL_FAILED_RESPONSE = "FailureReason";
     
     public static final String REQUEST_FAILED = "HTTP request failed";
@@ -242,6 +252,7 @@ public final class Constants
     private static final String RDKV="RDKV";
     private static final String RDKB="RDKB";
     private static final String RDKB_TCL = "RDKB_TCL";
+    private static final String RDKV_THUNDER = "RDKV_THUNDER";
     
     private static final String  TESTSCRIPTS_RDKV="testscriptsRDKV";
     private static final String  TESTSCRIPTS_RDKB="testscriptsRDKB";    
@@ -253,10 +264,20 @@ public final class Constants
 	private static final String REMARKS ="Remarks";
     private static final String STATUS ="Status";
 	//for test case doc details 
-	 private static final String TESTCASE ="TestCase_";
+	private static final String TESTCASE ="TestCase_";
+	private static final String TESTCASES ="testcases";
+	private static final String STORM_JSONRPC_URL = "storm.jsonrpc.url";
+	private static final String STORM_TESTCASES ="Storm-Testcases";
+	private static final String TESTS ="tests";
+	private static final String THUNDER ="thunder";
     private static final String FILESTORE ="fileStore";
+    private static final String SRC = "src";
+    private static final String LOGS = "logs";
     private static final String TEST_SCRIPTS="testscripts";
     private static final String XML =".xml";
+    private static final String SUITE ="suite";
+    private static final String MULTIPLE_STORM ="multiple";
+    private static final String EXECUTING_SCRIPT="Executing script : ";
     
     private static final String TC_ID ="Test Case ID";
     private static final String TC_OBJ ="Test Objective";
@@ -319,6 +340,7 @@ public final class Constants
    	public static final String LOG_UPLOAD_IPV4= "log.upload.ipv4"; 
    	public static final String LOG_UPLOAD_IPV6= "log.upload.ipv6"; 
    	public static final String TM_CONFIG_FILE= "/fileStore/tm.config";
+   	public static final String STORM_CONFIG_FILE= "/fileStore/storm.config";
 	public static final String TFTP_MECHANISM= "tftp";
 	public static final String REST_MECHANISM= "REST";
 	public static final String FILE_NOT_FOUND= "File not found.";

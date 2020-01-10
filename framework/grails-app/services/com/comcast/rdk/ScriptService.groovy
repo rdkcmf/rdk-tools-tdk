@@ -25,6 +25,8 @@ import java.util.List;
 import com.comcast.rdk.Category
 import org.springframework.util.CollectionUtils
 import org.springframework.util.StringUtils
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -41,20 +43,13 @@ class ScriptService {
 
 	public static volatile Map scriptGroupMap = [:]
 
-	//public static volatile Set scriptSet = []
-
 	public static volatile List scriptLockList = []
-
 
 	public static volatile Map scriptsListMap = [:]
 
 	public static volatile Map scriptNameListMap = [:]
 
 	public static volatile Map scriptsListAdvanced = [:]
-
-	//public static volatile Map scriptGroupMapB = [:]
-
-	//public static volatile List scriptLockListB = []
 
 	public static volatile List tclScriptsList = []
 
@@ -67,11 +62,16 @@ class ScriptService {
 	public static volatile List totalTclScriptList = []
 
 	public static volatile Map newTestCaseMap  = [:]
+	
+	public static volatile List totalThunderScriptList = []
+	
 	def primitiveService
 
 	def scriptgroupService
 
 	def grailsApplication
+	
+	def thunderScriptService
 
 	def updateScript(def script){
 		scriptsList.add(script)
@@ -232,6 +232,7 @@ class ScriptService {
 			}
 			//removeOrphanScriptFile(realPath,scriptFileList, scriptsList)
 			initializeTCLScripts("${realPath}//fileStore//"+FileStorePath.RDKTCL.value())
+			initializeThunderScripts("${realPath}")
 			//removeOrphanScriptFile(realPath,scriptFileList, scriptsListMap) // debug needed
 		} catch (Exception e) {
 			e.printStackTrace()
@@ -239,6 +240,204 @@ class ScriptService {
 
 		return scriptsList
 	}
+
+	/**
+	 * Method to initialize thunder Scripts
+	 *
+	 */
+	def initializeThunderScripts(final String path){
+		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
+		String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION)
+		try {
+			totalThunderScriptList.clear()
+			def scriptsListStormFinal = []
+			def fileStorePath
+			String osName = System.getProperty(Constants.OS_NAME)
+			if(osName?.startsWith(Constants.OS_WINDOWS)){
+				fileStorePath = STORM_FRAMEWORK_LOCATION+Constants.TESTCASES+File.separator+Constants.STORM_TESTCASES+File.separator+Constants.SRC+File.separator+Constants.TESTS+File.separator
+			}else{
+			    fileStorePath = STORM_FRAMEWORK_LOCATION+Constants.TESTCASES+File.separator+Constants.STORM_TESTCASES+File.separator+Constants.SRC+File.separator+Constants.TESTS+File.separator
+			}
+			def fileName
+			List directories = new File("$fileStorePath").listFiles(new FileFilter() {
+				boolean accept(File file) {
+					return file.isDirectory();
+				}
+			})
+			List dirList = []
+			directories.each{directory ->
+				String directoryName = directory.toString()
+				int index = directoryName.lastIndexOf("/");
+				String directoryNameString = directoryName.substring(index+1, directoryName.length());
+				dirList.add(directoryNameString)
+			}
+			dirList.each{directory ->
+				File scriptsDir = new File("$fileStorePath"+directory+File.separator)
+				if(scriptsDir.exists()){
+					def testscriptfiles = scriptsDir.list()
+					testscriptfiles.each { testscriptfile ->
+						if(testscriptfile.contains(".js") ){
+							fileName = testscriptfile.split(".js")[0]
+							thunderScriptService.saveThunderScriptFile(fileName)
+							def scriptName =ScriptFile.findByScriptNameAndCategory(fileName, Category.RDKV_THUNDER)
+							if(!scriptMapping.containsKey(fileName)){
+								scriptMapping.put(fileName, 'thunder')
+							}
+							if(!totalThunderScriptList.contains(scriptName)){
+								totalThunderScriptList.add(scriptName)
+							}
+						    if(path){
+							    boolean updateReqd = isDefaultSGUpdateRequired(path)
+							    updateThunderScriptSuite(scriptName , RDKV_THUNDER)
+						    }
+						}
+					}
+				}
+			}
+		}catch (Exception e) {
+			e.printStackTrace()
+		}
+	}
+	
+	/**
+	 * Updating Firebolt script suite
+	 * @param scriptFileInstance
+	 * @param category
+	 * @return
+	 */
+	def updateThunderScriptSuite(def ScriptFile scriptFileInstance , def String category){
+		try{
+			def moduleName =  "THUNDER"
+			def cmdFireboltScriptListFinal
+			def scriptGrpInstance = ScriptGroup.findByName(moduleName)
+			if(!scriptGrpInstance){
+				scriptGrpInstance = new ScriptGroup()
+				scriptGrpInstance.name = moduleName
+				scriptGrpInstance.scriptList = []
+				scriptGrpInstance.category = Utility.getCategory(category)
+				scriptGrpInstance.save()
+			}
+			if(scriptFileInstance.scriptName?.toString()?.endsWith(".js")){
+				def firstScriptNameSplit =  scriptFileInstance.scriptName.toString().replace(".js", "")
+				def script
+				def scriptFile1 = ScriptFile.findByScriptNameAndCategory(script, Category.RDKV_THUNDER)
+				if(!scriptFile1){
+					scriptFile1 = new ScriptFile()
+					scriptFile1?.scriptName =firstScriptNameSplit
+					scriptFile1?.category = Category.RDKV_THUNDER
+					scriptFile1?.moduleName = Constants.THUNDER
+					if(!(scriptFile1?.save(flush:true))){
+						log.error "Not able to save"
+					}
+				}
+				if(!scriptGrpInstance?.scriptList?.contains(scriptFile1 )){
+					scriptGrpInstance.addToScriptList(scriptFile1 )
+				}
+
+			}
+			else{
+				if(!scriptGrpInstance?.scriptList?.contains(scriptFileInstance)){
+					scriptGrpInstance.addToScriptList(scriptFileInstance)
+				}
+			}
+		}catch(Exception e){
+			log.error " Error "+ e.printStackTrace()
+		}
+	}
+	
+	/***
+	 *  Retrieves thunder script from the fileStore
+	 */
+	 def getThundertScript(final String name){
+		 boolean scriptFound = false
+		 File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
+		 String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION)
+		 String osName = System.getProperty(Constants.OS_NAME)
+		 def thunderPath
+		 def fileStorePath
+		 if(osName?.startsWith(OS_WINDOWS)){
+			 fileStorePath = STORM_FRAMEWORK_LOCATION+Constants.TESTCASES+File.separator+Constants.STORM_TESTCASES+File.separator+Constants.SRC+File.separator+Constants.TESTS+File.separator
+		 }else{
+		     fileStorePath = STORM_FRAMEWORK_LOCATION+Constants.TESTCASES+File.separator+Constants.STORM_TESTCASES+File.separator+Constants.SRC+File.separator+Constants.TESTS+File.separator
+		 }
+		List directories = new File("$fileStorePath").listFiles(new FileFilter() {
+			boolean accept(File file) {
+				return file.isDirectory();
+			}
+		})
+		List dirList = []
+		directories.each{directory ->
+			String directoryName = directory.toString()
+			int index = directoryName.lastIndexOf("/");
+			String directoryNameString = directoryName.substring(index+1, directoryName.length());
+			dirList.add(directoryNameString)
+		}
+		 def fileName
+		 dirList.each{directory ->
+			 File scriptsDir = new File("$fileStorePath"+directory+File.separator)
+			 if(scriptsDir.exists()){
+				 def testscriptfiles = scriptsDir.list()
+				 for(String testscriptfile : testscriptfiles){
+					 if(testscriptfile.contains(".js") ){
+						 fileName = testscriptfile.split(".js")[0]
+					     if(fileName.equals(name)){
+							 thunderPath = fileStorePath + directory + File.separator + fileName
+							 scriptFound = true
+							 break
+						 }
+					 }
+				 }
+			 }
+		 }
+		 if(scriptFound) {
+			 thunderPath = thunderPath + ".js"
+		 }
+		 def content = new StringBuilder()
+		 Map script = [:]
+		 def file = new File(thunderPath)
+		 if(file.exists()){
+			 String s = ""
+			 String scriptContent = ""
+			 List line = file.readLines()
+			 int indx = 0
+			 while(indx < line.size()){
+				 scriptContent = scriptContent + line.get(indx)+"\n"
+				 indx++
+			 }
+			 def title = ""
+			 def description = ""
+			 Pattern pattern = Pattern.compile("title:(.*?),");
+			 Matcher matcher = pattern.matcher(scriptContent);
+			 if (matcher.find()) {
+				 title = matcher.group(1)
+			 }
+			 
+			 Pattern pattern1 = Pattern.compile("description:(.*?),");
+			 Matcher matcher1 = pattern1.matcher(scriptContent);
+			 if (matcher1.find()) {
+				 description = matcher1.group(1)
+			 }
+			 title = title.replace("'","")
+			 description = description.replace("'","")			 
+			 script.put("scriptName", name)
+			 script.put("title", title)
+			 script.put("description", description)
+			 script.put("path", thunderPath)
+			 script.put("scriptContent", scriptContent)
+		}
+		return script
+	 }
+	 
+	 /**
+	  * Method which returns total Thunder Scripts as a List
+	  * @return
+	  */
+	 def getScriptFileListStorm(){
+		 if(totalThunderScriptList == null || totalThunderScriptList.size() == 0){
+			 initializeThunderScripts()
+		 }
+		 return totalThunderScriptList
+	 }
 
 	private void initialize(def module, def updateReqd, def realPath, def category,def fileStorePath){
 
@@ -308,11 +507,11 @@ class ScriptService {
 
 			scriptGroupMap.put(module?.getName(), sLst)
 		} catch (Exception e) {
-			println " Error "+e.getMessage()
 			e.printStackTrace()
 		}
 
 	}
+
 
 	def removeOrphanScriptFile(String realPath,List oldList , Map newListMap){
 		def rdkBlist = newListMap.get('RDKB')
@@ -368,7 +567,6 @@ class ScriptService {
 					if(sGroup){
 						List sList = sgMap.get(sname)
 						//						if(sList?.size() <= 7){
-						//							println " SG<<>><<> "+sname
 						//						sList?.each{ scriptInstance ->
 						//							sGroup.removeFromScriptList(scriptInstance)
 						//							sGroup?.scriptList?.removeAll(sList);

@@ -282,6 +282,16 @@
 		</g:if>
 	</g:if>
 </g:if>
+<g:if test="${ deviceInstance?.category != com.comcast.rdk.Category.RDKB }">
+	<div id="isThunderEnabled"
+		class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'isThunderEnabled', 'error')}">
+		<label for="isThunderEnabled"> <g:message
+				code="device.isThunderEnabled.label" default="Is Thunder Enabled" />
+		</label>
+		<g:checkBox id="isThunderEnabled" name="thunderEnabled"
+			checked="${deviceInstance?.isThunderEnabled == 1}" />
+	</div>
+</g:if>
 <div style="display: none;" id="gatewayIdedit"
 	class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'gatewayIp', 'error')}">
 	<label for="gatewayIp"> <g:message
