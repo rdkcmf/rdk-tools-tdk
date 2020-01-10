@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.IP.Diagnostics.X_CISCO_COM_ARP.ARPTableNumberOfEntries</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.IP.Diagnostics.X_CISCO_COM_ARP.ARPTableNumberOfEntries</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.IP.Diagnostics.X_CISCO_COM_ARP.ARPTable.1.IPAddress</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.IP.Diagnostics.X_CISCO_COM_ARP.ARPTable.1.IPAddress</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.IP.Diagnostics.X_CISCO_COM_ARP.ARPTable.1.Static</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.IP.Diagnostics.X_CISCO_COM_ARP.ARPTable.1.Static</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.IP.Diagnostics.X_CISCO_COM_ARP.ARPTable.1.MACAddress</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.IP.Diagnostics.X_CISCO_COM_ARP.ARPTable.1.MACAddress</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.IP.Diagnostics.X_RDKCENTRAL-COM_PingTest.Run</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.IP.Diagnostics.X_RDKCENTRAL-COM_PingTest.Run</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.IP.Diagnostics.X_RDKCENTRAL-COM_PingTest.ecmMAC</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.IP.Diagnostics.X_RDKCENTRAL-COM_PingTest.ecmMAC</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.IP.Diagnostics.X_RDKCENTRAL-COM_PingTest.DeviceID</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.IP.Diagnostics.X_RDKCENTRAL-COM_PingTest.DeviceID</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.IP.Diagnostics.X_RDKCENTRAL-COM_PingTest.DeviceModel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.IP.Diagnostics.X_RDKCENTRAL-COM_PingTest.DeviceModel</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>ARMv7 Processor rev 4 (v7l)</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.SelfHeal.X_RDKCENTRAL-COM_Enable</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.44.1.1.1.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.SelfHeal.X_RDKCENTRAL-COM_Enable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!--default value of the param after factory reset -->
+               <snmpDefaultValue>1</snmpDefaultValue>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>1,2</snmpExpectedValues>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.SelfHeal.X_RDKCENTRAL-COM_MaxRebootCount</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.44.1.1.10.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.SelfHeal.X_RDKCENTRAL-COM_MaxRebootCount</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>Gauge32</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!-- the range of values acceptable -->
+               <setValue>5</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.SelfHeal.X_RDKCENTRAL-COM_MaxResetCount</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.44.1.1.11.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.SelfHeal.X_RDKCENTRAL-COM_MaxResetCount</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!-- the range of values acceptable -->
+               <setValue>5</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.SelfHeal.X_RDKCENTRAL-COM_LogBackupThreshold</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.SelfHeal.X_RDKCENTRAL-COM_LogBackupThreshold</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>Gauge32</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!-- the range of values acceptable -->
+               <setValue>5</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.SelfHeal.ResourceMonitor.X_RDKCENTRAL-COM_UsageComputeWindow</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.44.1.1.7.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.SelfHeal.ResourceMonitor.X_RDKCENTRAL-COM_UsageComputeWindow</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>15</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>10</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.SelfHeal.ResourceMonitor.X_RDKCENTRAL-COM_AvgCPUThreshold</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.44.1.1.8.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.SelfHeal.ResourceMonitor.X_RDKCENTRAL-COM_AvgCPUThreshold</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>Gauge32</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>100</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>95</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.SelfHeal.ResourceMonitor.X_RDKCENTRAL-COM_AvgMemoryThreshold</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.44.1.1.9.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.SelfHeal.ResourceMonitor.X_RDKCENTRAL-COM_AvgMemoryThreshold</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>Gauge32</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>100</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>95</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogBackup.X_RDKCENTRAL-COM_Enable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogBackup.X_RDKCENTRAL-COM_Enable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogBackup.X_RDKCENTRAL-COM_Interval</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogBackup.X_RDKCENTRAL-COM_Interval</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>30</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>40</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogBackup.X_RDKCENTRAL-COM_SyncandUploadLogs</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogBackup.X_RDKCENTRAL-COM_SyncandUploadLogs</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+</parameters>
+
+
+
