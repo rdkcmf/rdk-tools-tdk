@@ -50,7 +50,7 @@ public class DeviceStatusUpdater {
 		def deviceStatus
 		def deviceId
 		String filePath = absolutePath//"${RequestContextHolder.currentRequestAttributes().currentRequest.getRealPath("/")}//fileStore//calldevicestatus_cmndline.py"
-		def deviceList 
+		def deviceList
 		
 		try {
 			if(!flag){
@@ -113,7 +113,15 @@ public class DeviceStatusUpdater {
 			def device
 			String devIp = ""
 			String devName = ""
-
+			if(dev?.isThunderEnabled == 1){
+				File nontdkstatus = grailsApplication.parentContext.getResource("//fileStore//callthunderdevicestatus_cmndline.py").file
+				def scriptPath = nontdkstatus.absolutePath
+				devIp = dev?.stbIp
+				device = Device.findById(dev?.id)
+				String[] cmd = [PYTHON_COMMAND, scriptPath, devIp]
+				Runnable statusUpdator = new ThunderDeviceStatusUpdaterTask(cmd, device, deviceStatusService,executescriptService,grailsApplication);
+				executorService.execute(statusUpdator);
+			}else{
 			try {
 				def resultArray = Device.executeQuery("select a.stbIp, a.stbName,a.statusPort from Device a where a.id = :devId",[devId: dev?.id])
 				if(resultArray && resultArray?.size() == 1){
@@ -143,13 +151,23 @@ public class DeviceStatusUpdater {
 						executorService.execute(statusUpdator);
 					}
 				}
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				e.printStackTrace()
 			}
+			}
 		}
+
 	}
 
-	public static String fetchDeviceStatus(def grailsApplication,Device device){		
+	public static String fetchDeviceStatus(def grailsApplication,Device device){
+		String[] cmd
+		if(device?.isThunderEnabled == 1){
+			File nontdkstatus = grailsApplication.parentContext.getResource("//fileStore//callthunderdevicestatus_cmndline.py").file
+			def scriptPath = nontdkstatus.absolutePath
+			def devIp = device?.stbIp
+			cmd = [PYTHON_COMMAND, scriptPath, devIp]
+		}else{
 		File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//calldevicestatus_cmndline.py").file
 
 		def absolutePath = layoutFolder.absolutePath
@@ -182,7 +200,7 @@ public class DeviceStatusUpdater {
 			}
 		}
 		
-		if(ipAddress == null ){		
+		if(ipAddress == null ){
 			
 			Enumeration ne = NetworkInterface.getNetworkInterfaces();
 	
@@ -221,7 +239,7 @@ public class DeviceStatusUpdater {
 			tmIP = ipV6Address
 		}
 		
-		String[] cmd = [
+		cmd = [
 			PYTHON_COMMAND,
 			filePath,
 			device?.stbIp,
@@ -229,7 +247,9 @@ public class DeviceStatusUpdater {
 			tmIP,
 			device?.stbName
 		]
+		
 
+		}
 		String outData = ""
 		
 		try {

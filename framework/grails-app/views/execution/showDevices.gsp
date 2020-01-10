@@ -23,7 +23,8 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	$("#scripts").select2();	
-	$("#devices").select2();	
+	$("#devices").select2();
+	$("#scriptsThunder").select2();
 });
 
 </script>
@@ -70,11 +71,17 @@ $(document).ready(function() {
 		<tr>
 			<td>Select Type</td>
 			<td>
-				<input onclick="showSuite();" id="testSuiteRadio" type="radio" name="myGroup" value="TestSuite" />TestSuite 
-				&emsp;<input onclick="showSingle();" id="singleTestRadio" type="radio" name="myGroup" checked="checked" value="SingleScript" />SingleScript	
+			    <g:if test="${device?.isThunderEnabled != 1}">
+				    <input onclick="showSuite();" id="testSuiteRadio" type="radio" name="myGroup" value="TestSuite" />TestSuite 
+				    &emsp;<input onclick="showSingle();" id="singleTestRadio" type="radio" name="myGroup" checked="checked" value="SingleScript" />SingleScript
+				</g:if>
+				<g:else>
+		            <input onclick="showSuiteThunder();" id="testSuiteRadioThunder" type="radio" name="myGroupThunder" value="TestSuiteThunder" />TestSuite 
+				    &emsp;<input onclick="showSingleThunder();" id="singleTestRadioThunder" type="radio" name="myGroupThunder" checked="checked" value="SingleScriptThunder" />SingleScript				    
+				</g:else>	
 			</td>		
 		</tr>	
-		<g:if test="${category != 'RDKV'}">
+		<g:if test="${category != 'RDKV' && device?.isThunderEnabled != 1}">
 		<tr>
 			<td>Select Script Type</td>
 			<%--<td>${deviceInstance.id}
@@ -90,13 +97,23 @@ $(document).ready(function() {
 		</g:if>
 		<tr>
 			<td>Select Script</td>
-			<td>				
-				<div id="testSuite" style="display: none;">
-				<g:select id="scriptGrp" onchange="showDateTime();" name="scriptGrp" noSelection="['' : 'Please Select']" from="${scriptGrpList}" optionKey="id" required="" value="" class="many-to-one selectCombo"/>
-				</div>
-				<div id="singletest" >
-				<g:select id="scripts" multiple="true" style="height:200px;width:400px" onchange="showDateTime();" name="scripts"  from="${scriptList}" value="" class="many-to-one selectCombo"/>
-				</div>							
+			<td>
+			    <g:if test="${device?.isThunderEnabled != 1}">	
+				    <div id="testSuite" style="display: none;">
+				        <g:select id="scriptGrp" onchange="showDateTime();" name="scriptGrp" noSelection="['' : 'Please Select']" from="${scriptGrpList}" optionKey="id" required="" value="" class="many-to-one selectCombo"/>
+				    </div>
+				    <div id="singletest" >
+				        <g:select id="scripts" multiple="true" style="height:200px;width:400px" onchange="showDateTime();" name="scripts"  from="${scriptList}" value="" class="many-to-one selectCombo"/>
+				    </div>
+				</g:if>
+				<g:else>
+					<div id="testSuiteThunder" style="display: none;">
+				        <g:select id="scriptGrpThunder" onchange="showDateTime();" name="scriptGrpThunder" noSelection="['' : 'Please Select']" from="${scriptGrpList}" optionKey="id" required="" value="" class="many-to-one selectCombo"/>
+				    </div>
+				    <div id="singletestThunder" >
+				        <g:select id="scriptsThunder" name="scriptsThunder" multiple="true" style="height:200px;width:400px" onchange="showDateTime();" name="scriptsThunder"  from="${scriptListStorm}" value="" class="many-to-one selectCombo"/>
+				    </div>
+				</g:else>						
 			</td>						
 		</tr>	
 		<tr>
@@ -116,17 +133,29 @@ $(document).ready(function() {
 			</td>
 		</tr>	
 		<tr>
-			<td colspan="2" align="center">				
-				<g:hiddenField name="pageFlag" value="execute"/>
-				<span id="executeBtn" class="buttons"><g:submitToRemote class="save" before="showWaitSpinner();" 
-				action="executeScriptMethod" controller="execution" update="resultDiv${device?.id}" value="Execute" 
-				onComplete="completed(${device?.id})" onFailure="changeStyles()"  onSuccess="changeStyles()" >
-				</g:submitToRemote>&emsp;	
-				</span>
-				<span id="scheduleBtn" class="buttons">
+			<td colspan="2" align="center">
+			    <g:if test="${device?.isThunderEnabled != 1 }">				
+					<g:hiddenField name="pageFlag" value="execute"/>
+					<span id="executeBtn" class="buttons"><g:submitToRemote class="save" before="showWaitSpinner();" 
+					action="executeScriptMethod" controller="execution" update="resultDiv${device?.id}" value="Execute" 
+					onComplete="completed(${device?.id})" onFailure="changeStyles()"  onSuccess="changeStyles()" >
+					</g:submitToRemote>&emsp;	
+					</span>
+					<span id="scheduleBtn" class="buttons">
+						<input type=button class="save"  onclick="showScheduler(${device?.id}, '${category}');return false;"
+						value="Schedule" />	
+					</span>
+				</g:if>
+				<g:else>
+				    <span id="executeBtnThunder" class="buttons"><g:submitToRemote class="save" before="showWaitSpinnerThunder();" 
+                    action="executeThunderScript" controller="thunder" update="resultDiv${device?.id}" value="Execute" 
+                    onComplete="completedThunder(${device?.id})" onFailure="changeStylesThunder()"  onSuccess="changeStylesThunder()">
+                    </g:submitToRemote></span>&emsp;
+				    <span id="scheduleBtnThunder" class="buttons">
 					<input type=button class="save"  onclick="showScheduler(${device?.id}, '${category}');return false;"
-					value="Schedule" />	
-				</span>
+					value="Schedule" />
+					</span>
+				</g:else>
 				<div id="popup" style="display: none;">
 			              Please wait.....<img id="s" src="${resource(dir:'images',file:'spinner.gif')}" />
 			    </div>				
@@ -143,6 +172,7 @@ $(document).ready(function() {
 					border-width: 1px;width: 550px;height:215px;overflow:auto;" >
 					
 				</div>
+				<g:hiddenField id="grailsUrl" name="grailsUrl" value="${grailsUrl}"/>
 		 	</td>
 		</tr>						
 	</table>

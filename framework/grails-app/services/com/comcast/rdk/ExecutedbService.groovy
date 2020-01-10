@@ -797,7 +797,6 @@ class ExecutedbService {
 	 * Method to get the data for creating the consolidated report in excel format.
 	 */
 	def getDataForConsolidatedListExcelExport(Execution executionInstance, String realPath,String appUrl) {
-
 		List executionDeviceList = []
 		List executionResultInstanceList = []
 		List columnWidthList = []
@@ -843,14 +842,7 @@ class ExecutedbService {
 					}
 					deviceDetails = fileContents.replace(HTML_BR, NEW_LINE)
 				}
-				else{
-					//println "No version file found"
-				}
 			}
-			else{
-				//println "Invalid file path"
-			}
-
 			Map coverPageMap = [:]
 			detailDataMap.put("CoverPage", coverPageMap)
 			Map detailsMap = [:]
@@ -906,19 +898,21 @@ class ExecutedbService {
 				
 //				}
 				
-				if(executionResultInstance?.category != Category.RDKB_TCL){
+				if(executionResultInstance?.category != Category.RDKB_TCL && executionResultInstance?.category != Category.RDKV_THUNDER){
 					def sMap = scriptService.getScriptNameModuleNameMapping(realPath)
 					moduleName = sMap.get(scriptName)
 				}
-				else{
+				else if(executionResultInstance?.category == Category.RDKB_TCL){
 					moduleName = 'tcl'
+				}
+				else{
+					moduleName = 'thunder'
 				}
 				
 				int i = 0
 				
 				if(!moduleName.equals("")){	
 		//			def scriptObj1 = ScriptFile.findByModuleName(moduleName)
-		
 	
 					def scriptObj = ScriptFile.findByScriptNameAndModuleName(scriptName,moduleName)
 					if(scriptObj){
@@ -941,7 +935,6 @@ class ExecutedbService {
 							counter =  dataMapList.get("counter")
 						}
 						if(dataList != null){
-							
 							if(output){
 								executionOutput = output.replace(HTML_BR, NEW_LINE)
 								if(executionOutput && executionOutput.length() > 10000){
@@ -1306,7 +1299,23 @@ class ExecutedbService {
 				String scriptName = executionResultInstance?.script
 				String status = executionResultInstance?.status
 				Category category = executionResultInstance?.category 
-				if(category != Category.RDKB_TCL){
+				if(category == Category.RDKV_THUNDER){
+					def moduleName = Constants.THUNDER
+					if(moduleName && !moduleName.equals("null") && !moduleName.equals("")){
+						def moduleMap = detailDataMap.get(moduleName)
+						if(!moduleMap){
+							moduleMap = [:]
+							detailDataMap.put(moduleName,moduleMap)
+						}
+						def statusCounter = moduleMap.get(status)
+						if(!statusCounter){
+							statusCounter = 0
+						}
+						statusCounter ++
+						moduleMap.put(status, statusCounter)
+					}
+				}
+				else if(category != Category.RDKB_TCL){
 					def moduleName = sMap.get(scriptName)
 					
 					if(moduleName && !moduleName.equals("null") && !moduleName.equals("")){

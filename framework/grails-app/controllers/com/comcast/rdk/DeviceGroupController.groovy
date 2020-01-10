@@ -356,6 +356,9 @@ class DeviceGroupController {
         }
 		}
 		def deviceInstance = new Device(params)
+		int enabled = 1;
+		int notEnabled = 0;
+		deviceInstance.isThunderEnabled = params?.thunderEnabled == "on"? enabled : notEnabled
 		deviceInstance.groups = utilityService.getGroup()
 		deviceInstance.category = Utility.getCategory(params?.category)
         if (deviceInstance.save(flush: true)) {
@@ -411,7 +414,6 @@ class DeviceGroupController {
      * @return
      */
     def updateDevice(Long id, Long version) {
-		
         def deviceInstance = Device.get(id)
 
         if (!deviceInstance) {
@@ -468,7 +470,9 @@ class DeviceGroupController {
 			
 
             deviceInstance.properties = params
-
+			int enabled = 1;
+			int notEnabled = 0;
+			deviceInstance.isThunderEnabled = params?.thunderEnabled == "on"? enabled : notEnabled
 			if(deviceInstance?.category == Category.RDKV){
 				if(currentBoxType.equals( BOXTYPE_CLIENT )){
 					if(newBoxType.equals( BOXTYPE_CLIENT )){
@@ -1367,6 +1371,11 @@ class DeviceGroupController {
 									def boxManufacture = node?.device.box_manufacture?.text()?.trim()
 									def gateway = node?.device?.gateway_name?.text()?.trim()
 									def category = node?.device?.category?.text()?.trim()
+									def isThunderEnabled = 0
+									if(node?.device?.isThunderEnabled?.text()?.trim() == "1"){
+										isThunderEnabled = node?.device?.isThunderEnabled?.text()?.trim()
+									}
+									isThunderEnabled = isThunderEnabled.toInteger()
 									if(node?.device?.streams){
 										node?.device?.streams?.stream?.each{
 											streams.add(it?.@id)
@@ -1467,6 +1476,7 @@ class DeviceGroupController {
 												deviceInstance.boxType=boxTypeObj
 												deviceInstance.boxManufacturer =boxManufactureObj
 												deviceInstance.category= Utility.getCategory(category) 
+												deviceInstance.isThunderEnabled = isThunderEnabled
 												//deviceInstance.groups=utilityService.getGroup()
 												if(boxTypeInastnce?.type?.toString()?.toLowerCase()?.equals(BOXTYPE_CLIENT)){
 													if(category?.equals(RDKV )){
@@ -1661,6 +1671,11 @@ class DeviceGroupController {
 							def boxManufacture = node?.device.box_manufacture?.text()?.trim()
 							def gateway = node?.device?.gateway_name?.text()?.trim()
 							def category = node?.device?.category?.text()?.trim()
+							def isThunderEnabled = 0
+							if(node?.device?.isThunderEnabled?.text()?.trim() == "1"){
+								isThunderEnabled = node?.device?.isThunderEnabled?.text()?.trim()
+							}
+							isThunderEnabled = isThunderEnabled.toInteger()
 							def boxTypeObj = BoxType.findByNameAndCategory(boxType,Utility.getCategory(category))
 							def boxManufactureObj = BoxManufacturer.findByNameAndCategory(boxManufacture,Utility.getCategory(category))
 							def socVendorObj = SoCVendor.findByNameAndCategory(socVendor,Utility.getCategory(category))
@@ -1729,6 +1744,7 @@ class DeviceGroupController {
 										deviceInstance.boxType=boxTypeObj
 										deviceInstance.boxManufacturer =boxManufactureObj
 										deviceInstance.category= Utility.getCategory(category)
+										deviceInstance.isThunderEnabled = isThunderEnabled
 										//deviceInstance.groups=utilityService.getGroup()
 										if(boxTypeInastnce?.type?.toString()?.toLowerCase()?.equals(BOXTYPE_CLIENT) && category?.equals(RDKV )){
 											status = 1
@@ -2217,6 +2233,15 @@ class DeviceGroupController {
 							xml.mac_addr("")
 							mkp.yield "\r\n  "
 						}
+						if(deviceInstance?.isThunderEnabled){
+							mkp.comment " Is Thunder enabled for STB"
+							xml.isThunderEnabled(deviceInstance?.isThunderEnabled)
+							mkp.yield "\r\n  "
+						}else{
+							mkp.comment "Is Thunder enabled for STB "
+							xml.isThunderEnabled("")
+							mkp.yield "\r\n  "
+						}
 						mkp.comment " BoxType for STB  "
 						xml.box_type(deviceInstance?.boxType)
 						mkp.yield "\r\n  "
@@ -2350,7 +2375,6 @@ class DeviceGroupController {
 				redirect(action:"list")
 			}
 		} catch (Exception e) {
-			println" Error "+e.getMessage()
 			e.printStackTrace()
 		}
 	}

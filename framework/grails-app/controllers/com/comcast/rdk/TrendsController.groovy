@@ -1490,13 +1490,17 @@ class TrendsController {
 	 * Displays the executions for analysis based on the input category
 	 */
 	def executionsForAnalysis(String category) {
-		def selectedCategory =  category==RDKV ? Category.RDKV : Category.RDKB
 		def completedStatus = COMPLETED_STATUS
 		def result = FAILURE_STATUS
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.DATE, -14);
 		String formated = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(Calendar.DATE) + " 00:00:00"
-		def executionTotalList = Execution.findAll("from Execution as b where b.category='${selectedCategory}' and b.executionStatus='${completedStatus}' and b.result='${result}' and b.dateOfExecution>'${formated}' and (b.script like '%Multiple%' or b.scriptGroup is not null ) order by id desc")
+		def executionTotalList
+		if(category==RDKV){
+			executionTotalList = Execution.findAll("from Execution as b where (b.category='${Category.RDKV}' or b.category='${Category.RDKV_THUNDER}') and b.executionStatus='${completedStatus}' and b.result='${result}' and b.dateOfExecution>'${formated}' and (b.script like '%Multiple%' or b.scriptGroup is not null ) ")
+		}else{
+			executionTotalList = Execution.findAll("from Execution as b where b.category='${Category.RDKB}' and b.executionStatus='${completedStatus}' and b.result='${result}' and b.dateOfExecution>'${formated}' and (b.script like '%Multiple%' or b.scriptGroup is not null ) ")
+		}
 		render executionTotalList
 	}
 	

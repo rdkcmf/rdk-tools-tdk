@@ -143,6 +143,10 @@ class ExecutionService {
 							lineData = lineData?.replaceAll(">","&gt;")
 							fileContents = fileContents + "<br>"+ lineData
 						}						
+					}else if(fileName.startsWith( "ServerConsole" )){//ServerConsole logs
+					    file.eachLine { line ->
+							fileContents = fileContents + line + HTML_BR
+					    }
 					}
 				}
 			}

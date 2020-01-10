@@ -135,6 +135,7 @@ function showSchedule(){
 }
 
 function showSuite(){
+	
 	$('#testSuite').show();
 	$('#singletest').hide();
 }
@@ -144,6 +145,21 @@ function showSingle(){
 	$('#testSuite').hide();
 }
 
+/**
+ * Function to display thunder test suites in execution page when the user clicks on a device
+ */
+function showSuiteThunder(){
+	$('#testSuiteThunder').show();
+	$('#singletestThunder').hide();
+}
+
+/**
+ * Function to display thunder scripts in execution page when the user clicks on a device
+ */
+function showSingleThunder(){
+	$('#singletestThunder').show();
+	$('#testSuiteThunder').hide();
+}
 function pageLoadOnScriptType(category, id){
 	var isTestSuiteRadio = document.getElementById('testSuiteRadio').checked;
 	var isSingleTestRadio = document.getElementById('singleTestRadio').checked;
@@ -253,7 +269,7 @@ function changeStyle(){
 	$('#resultDiv').css('display','table');
 }
 
-function showExecutionLog(id){	
+function showExecutionLog(id){
 	$.get('showLog', {id: id}, function(data) { $("#executionLogPopup").html(data); });		
 	$("#executionLogPopup").modal({ opacity : 40, overlayCss : {
 		  backgroundColor : "#c4c4c4" }, containerCss: {
@@ -414,6 +430,8 @@ function hideSpinner(){
 
 var repeatTask;
 
+var repeatTaskThunder;
+
 function showWaitSpinner(){	
 	$("#popup").show();
 	$("#executeBtn").hide();
@@ -433,6 +451,78 @@ function showWaitSpinner(){
 	$('#dynamicResultDiv').html('Starting the script execution...');
 	repeatTask = setInterval("updateLog()",5000);
 	}
+}
+
+/**
+ * Function to display the spinner gif for thunder executions
+ */
+function showWaitSpinnerThunder(){
+	$("#popup").show();
+	$("#executeBtnThunder").hide();
+	
+	var execId = $('#exId').val();
+	var deviceList= $('#devices').val();
+	if(deviceList  && deviceList.length > 1 )
+	{
+		$('#resultDiv'+execId).show();	
+		$('#resultDiv'+execId).html('Multiple Device Execution ');
+	}
+	else
+	{
+		$('#resultDiv'+execId).hide();
+		$('#dynamicResultDiv').show();
+		$('#dynamicResultDiv').html('Starting the script execution...');
+		repeatTaskThunder = setInterval("updateLogThunder()",1000);
+	}
+}
+
+/**
+ * Function to update thunder logs in UI
+ */
+function updateLogThunder(){
+	var execName = "";
+	execName = $('#defexecName').val();
+	var suite = "single"
+	var scriptNameArray
+	var scriptname = ""
+	if ($('input[name=myGroupThunder]:checked').val()=='TestSuiteThunder'){
+		suite = "suite"
+	}else{
+		scriptNameArray = $('#scriptsThunder').val();
+		if(scriptNameArray.length > 1){
+			suite = "multiple"
+		}else{
+			scriptname = scriptNameArray[0]
+		}
+	}
+	$.get('readOutputFileDataThunder', {executionName: execName, scriptName: scriptname, suiteName: suite}, function(data) {
+		$("#dynamicResultDiv").html(data); 
+	});
+}
+
+/**
+ * Function to show the static result div once execution gets completed
+ * @param id
+ */
+function completedThunder(id) {
+	if (repeatTaskThunder) {
+		clearInterval(repeatTaskThunder);
+	}
+	showDateTime();
+	var execId = $('#exId').val();
+	if (id == execId) {
+		$('#resultDiv' + execId).show();
+		$('#dynamicResultDiv').hide();
+	}
+}
+
+/**
+ * Function to hide wait spinner and show Execute button once execution is completed
+ */
+function changeStylesThunder(){
+	showDateTime();
+	$("#popup").hide();
+	$("#executeBtnThunder").show();
 }
 
 function showSpinner(){

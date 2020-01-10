@@ -109,6 +109,10 @@ $(document).ready(function() {
 			'add_scriptgrpB' : function(node) {
 				hideAllSearchoptions();
 				createScriptGrpForm('RDKB');
+			},			
+			'add_scriptgrpThunder' : function(node) {
+				hideAllSearchoptions();
+				createScriptGrpForm('RDKV_THUNDER');
 			},
 			'add_scriptgrpTCL' : function(node) {
 				hideUpload();
@@ -279,9 +283,9 @@ function getScriptsList(val, scriptGroup, scriptInstanceTotal, totalScripts){
 					displayHtml= displayHtml+				
 						'<li><span  id="' + elem["moduleName"] + '@' + elem["scriptName"] + '"><a href="#" onclick="editScript(' + "'" + elem["moduleName"] + '@' + 
 						elem["scriptName"]+ "','"+elem["category"]+ "'); " +
-							"highlightTreeElement(" + "'scriptList_', '0', '" + scriptInstanceTotal + "');" +
-							"highlightTreeElement('scriptGroupList_', '" + scriptGroupCount + "', '" + totalScripts + "' );"+
-							'return false;">'+elem["scriptName"]+'</a></span></li>';
+						"highlightTreeElement(" + "'scriptList_', '0', '" + scriptInstanceTotal + "');" +
+						"highlightTreeElement('scriptGroupList_', '" + scriptGroupCount + "', '" + totalScripts + "' );"+
+						'return false;">'+elem["scriptName"]+'</a></span></li>';
 						++scriptGroupCount;
 				}
 				var displayClass = ".scripts_"+ group;
@@ -573,11 +577,15 @@ function createTCLScriptForm(category) {
 }
 
 function editScript(id , category ) {
-	if(category.trim() !== 'RDKB_TCL'){
+	if(category.trim() !== 'RDKB_TCL' && category.trim() !== 'RDKV_THUNDER'){
 		hideUploadOption();
 		hideSearchoptions();
 		checkAnyEditingScript();
 		$.get('editScript', {id: id , category : category}, function(data) { $("#responseDiv").html(data); });
+	}else if (category.trim() === 'RDKV_THUNDER'){
+		var nameList = id.split("@");
+		var name = nameList[1]
+		showThunderScript(name);
 	}else{
 		editTclScript(id);
 	}
@@ -595,6 +603,22 @@ function editTclScript(scriptName) {
 	$.get('tclScriptDisplay', {scriptName: scriptName}, function(data) { 
 		$("#responseDiv").html(data); });
 
+}
+
+/**
+ * Function to display the content of thunder scripts
+ * @param scriptName
+ */
+function showThunderScript(scriptName) {
+	$('#list-scriptDetailsV').hide();
+	$('#list-scriptDetailsB').hide();
+	$("#list-suiteDetailsV").hide();
+	$("#list-suiteDetailsB").hide();
+	$("#radioDiv").hide();
+	hideSearchoptions();
+	checkAnyEditingScript();
+	$.get('thunderScriptDisplay', {scriptName: scriptName}, function(data) { 
+		$("#responseDiv").html(data); });
 }
 
 function checkAnyEditingScript(){
