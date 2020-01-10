@@ -1,0 +1,2728 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.Enable</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.6.1.1.1.10000</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.Enable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>1,3</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>1,3</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.Enable</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.6.1.1.1.10100</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.Enable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>3</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>1,3</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.Status</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.Status</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Up</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>Up,Down</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.Status</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.Status</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Up</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>Up,Down</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.Alias</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.Alias</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Radio0</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>Radio</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.Alias</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.Alias</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Radio1</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>Radio</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.Name</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.Name</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>wifi0</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.Name</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.Name</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>wifi1</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.LastChange</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.LastChange</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.LastChange</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.LastChange</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.LowerLayers</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.LowerLayers</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Not Applicable</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>Not Applicable</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.LowerLayers</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.LowerLayers</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Not Applicable</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>Not Applicable</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.Upstream</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.Upstream</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.Upstream</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.Upstream</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.MaxBitRate</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.MaxBitRate</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>144</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.MaxBitRate</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.MaxBitRate</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>300</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.SupportedFrequencyBands</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.SupportedFrequencyBands</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>2.4GHz</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>2.4GHz</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.SupportedFrequencyBands</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.SupportedFrequencyBands</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>5GHz</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>5GHz</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.OperatingFrequencyBand</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.7.1.1.3.10000</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.OperatingFrequencyBand</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>2.4GHz</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>1</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>2.4GHz</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>1</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.OperatingFrequencyBand</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.7.1.1.3.10100</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.OperatingFrequencyBand</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>5GHz</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>2</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>5GHz</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>2</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.SupportedStandards</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.SupportedStandards</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>b,g,n</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>b,g,n</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.SupportedStandards</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.SupportedStandards</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>a,n,ac</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>a,n,ac</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.OperatingStandards</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.7.1.1.1.10000</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.OperatingStandards</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>g,n</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>160</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>g,n</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>160,32,128</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.OperatingStandards</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.7.1.1.1.10100</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.OperatingStandards</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>a,n,ac</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>448</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>a,n,ac</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>448,64,192,320,384</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.PossibleChannels</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.PossibleChannels</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.PossibleChannels</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.PossibleChannels</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.ChannelsInUse</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.ChannelsInUse</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.ChannelsInUse</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.ChannelsInUse</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.Channel</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.6.1.1.18.10000</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.Channel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.Channel</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.6.1.1.18.10100</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.Channel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.AutoChannelSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.AutoChannelSupported</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.AutoChannelSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.AutoChannelSupported</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.AutoChannelEnable</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.6.1.1.3.10000</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.AutoChannelEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>Gauge32</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>0</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.AutoChannelEnable</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.6.1.1.3.10100</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.AutoChannelEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--type of the parameter expected by snmp-->
+               <snmpType>Gauge32</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>0</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.AutoChannelRefreshPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.AutoChannelRefreshPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>3600</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>3000</setValue>
+                <!-- the range of values acceptable for snmp-->
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.AutoChannelRefreshPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.AutoChannelRefreshPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>3600</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>3000</setValue>
+                <!-- the range of values acceptable for snmp-->
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.OperatingChannelBandwidth</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.7.1.1.4.10000</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.OperatingChannelBandwidth</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>20MHz</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>1</snmpDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.OperatingChannelBandwidth</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.7.1.1.4.10100</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.OperatingChannelBandwidth</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>20MHz</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>3</snmpDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.ExtensionChannel</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.7.1.1.5.10000</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.ExtensionChannel</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Auto</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>0</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>AboveControlChannel,BelowControlChannel,Auto</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>0,1,2</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.ExtensionChannel</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.7.1.1.5.10100</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.ExtensionChannel</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Auto</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>0</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>AboveControlChannel,BelowControlChannel,Auto</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>0,1,2</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.GuardInterval</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.7.1.1.8.10000</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.GuardInterval</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Auto</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>0</snmpDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.GuardInterval</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.7.1.1.8.10100</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.GuardInterval</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Auto</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>0</snmpDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.MCS</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.7.1.1.2.10000</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.MCS</webpaName>
+               <!--type of the parameter -->
+               <type>int</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>-1</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>0</snmpDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.MCS</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.7.1.1.2.10100</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.MCS</webpaName>
+               <!--type of the parameter -->
+               <type>int</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>3</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>0</snmpDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.TransmitPowerSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.TransmitPowerSupported</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0,25,50,75,100</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.TransmitPowerSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.TransmitPowerSupported</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0,25,50,75,100</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.TransmitPower</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.6.1.1.12.10000</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.TransmitPower</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>100</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>0,25,50,75,100</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.TransmitPower</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.6.1.1.12.10100</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.TransmitPower</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>100</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>0,25,50,75,100</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.IEEE80211hSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.IEEE80211hSupported</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.IEEE80211hSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.IEEE80211hSupported</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.IEEE80211hEnabled</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.IEEE80211hEnabled</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.IEEE80211hEnabled</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.IEEE80211hEnabled</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.RegulatoryDomain</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.6.1.1.13.10000</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.RegulatoryDomain</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>841</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>6</snmpDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.RegulatoryDomain</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.6.1.1.13.10100</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.RegulatoryDomain</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>841</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>6</snmpDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.X_RDKCENTRAL-COM_AutoChannelRefreshPeriodSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.X_RDKCENTRAL-COM_AutoChannelRefreshPeriodSupported</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.X_RDKCENTRAL-COM_AutoChannelRefreshPeriodSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.X_RDKCENTRAL-COM_AutoChannelRefreshPeriodSupported</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.X_CISCO_COM_11nGreenfieldEnabled</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.X_CISCO_COM_11nGreenfieldEnabled</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.X_CISCO_COM_11nGreenfieldEnabled</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.X_CISCO_COM_11nGreenfieldEnabled</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.X_COMCAST_COM_DFSSupport</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.X_COMCAST_COM_DFSSupport</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.X_COMCAST_COM_DFSSupport</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.X_COMCAST_COM_DFSSupport</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.X_COMCAST_COM_DFSEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.X_COMCAST_COM_DFSEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.X_COMCAST_COM_DFSEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.X_COMCAST_COM_DFSEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.X_COMCAST-COM_DCSSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.X_COMCAST-COM_DCSSupported</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.X_COMCAST-COM_DCSSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.X_COMCAST-COM_DCSSupported</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.X_COMCAST-COM_DCSEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.X_COMCAST-COM_DCSEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.X_COMCAST-COM_DCSEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.X_COMCAST-COM_DCSEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.X_COMCAST_COM_RadioUpTime</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.X_COMCAST_COM_RadioUpTime</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.X_COMCAST_COM_RadioUpTime</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.X_COMCAST_COM_RadioUpTime</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.X_COMCAST_COM_IGMPSnoopingEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.X_COMCAST_COM_IGMPSnoopingEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.X_COMCAST_COM_IGMPSnoopingEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.X_COMCAST_COM_IGMPSnoopingEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.X_COMCAST-COM_AutoChannelRefreshPeriodSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.X_COMCAST-COM_AutoChannelRefreshPeriodSupported</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.X_COMCAST-COM_AutoChannelRefreshPeriodSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.X_COMCAST-COM_AutoChannelRefreshPeriodSupported</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.BeaconPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.BeaconPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>100</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.BeaconPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.BeaconPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>100</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.BasicDataTransmitRates</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.BasicDataTransmitRates</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>1,2</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>10</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.BasicDataTransmitRates</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.BasicDataTransmitRates</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <setValue>10</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.SupportedDataTransmitRates</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.SupportedDataTransmitRates</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>1,2,5.5,6,9,11,12,18,24,36,48,54</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.SupportedDataTransmitRates</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.SupportedDataTransmitRates</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>6,9,12,18,24,36,48,54,6.5,7,13.5,15,13,14,27,30,19.5,21,40.5,45,26,28,60,39,43,81,90,52,57,108,120,58.5,65,121.5,135,72,150,78,86,162,180,104,115,216,240,117,130,243,270,144,300,156,173,324,360,175.5,195,364.5,405,450,208,231,432,480,234,260,486,540,288,600,97.5,202.5,225,91,101,189,210,136.5,151,283.5,315,143,158,297,330,214.5,238,445.5,495,29.5,32.5,88,263.5,292.5,325,351,390,0,433.5,59,42,176,56,114,468,520,527,585,650,172,702,780,867,88.5,63,264,84,129,526.5,171,790.5,877.5,975,258,1053,1170,1300.5,118,352,112,228,936,1040,1054,1300,648,720,312,344,1404,1560,1734</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.OperationalDataTransmitRates</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.OperationalDataTransmitRates</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>1,2,5.5,11,6,9,12,18,24,36,48,54</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.OperationalDataTransmitRates</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.OperationalDataTransmitRates</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>6,9,12,18,24,36,48,54,6.5,7,13.5,15,13,14,27,30,19.5,21,40.5,45,26,28,60,39,43,81,90,52,57,108,120,58.5,65,121.5,135,72,150,78,86,162,180,104,115,216,240,117,130,243,270,144,300,156,173,324,360,175.5,195,364.5,405,450,208,231,432,480,234,260,486,540,288,600,97.5,202.5,225,91,101,189,210,136.5,151,283.5,315,143,158,297,330,214.5,238,445.5,495,29.5,32.5,88,263.5,292.5,325,351,390,0,433.5,59,42,176,56,114,468,520,527,585,650,172,702,780,867,88.5,63,264,84,129,526.5,171,790.5,877.5,975,258,1053,1170,1300.5,118,352,112,228,936,1040,1054,1300,648,720,312,344,1404,1560,1734</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.1.RadioResetCount</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10000.RadioResetCount</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>1</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.Radio.2.RadioResetCount</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.Radio.10100.RadioResetCount</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>3</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.Enable</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.2.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10001.Enable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>1</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+		<!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>1,2</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.2.Enable</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.2.10101</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10101.Enable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>1,2</snmpExpectedValues>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>1</snmpDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.Status</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10001.Status</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Up</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>Up,Down</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.2.Status</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10002.Status</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Up</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>Up,Down</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.Alias</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10001.Alias</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>ath0</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>ath</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.2.Alias</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10002.Alias</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>ath1,ath2</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>ath</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.Name</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10001.Name</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>ath0</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.2.Name</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10002.Name</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>ath1,ath2</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.LastChange</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10001.LastChange</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.2.LastChange</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10002.LastChange</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.LowerLayers</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10001.LowerLayers</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Device.WiFi.Radio.1.</defaultValue>
+               <!--default webpa value of the param after factory reset -->
+               <webpaDefaultValue>Device.WiFi.Radio.10000.</webpaDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.2.LowerLayers</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10002.LowerLayers</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Device.WiFi.Radio.2.</defaultValue>
+               <!--default webpa value of the param after factory reset -->
+               <webpaDefaultValue>Device.WiFi.Radio.10000.</webpaDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.BSSID</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.1.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10001.BSSID</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.2.BSSID</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.1.10002</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10002.BSSID</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.MACAddress</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10001.MACAddress</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.2.MACAddress</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10002.MACAddress</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.SSID</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.3.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10001.SSID</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>RPi3_RDKB-AP0</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>SSIID-C940</setValue>
+                <!-- the range of values acceptable for snmp-->
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.2.SSID</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.3.10002</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10002.SSID</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>RPi3_RDKB-AP1</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>SSIID-C940</setValue>
+                <!-- the range of values acceptable for snmp-->
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.X_COMCAST-COM_DefaultSSID</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.16.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10001.X_COMCAST-COM_DefaultSSID</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>RPI3_RDKB-AP0</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.2.X_COMCAST-COM_DefaultSSID</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.16.10002</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10002.X_COMCAST-COM_DefaultSSID</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>RPI3_RDKB-AP1</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.X_CISCO_COM_EnableOnline</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10001.X_CISCO_COM_EnableOnline</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.2.X_CISCO_COM_EnableOnline</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10002.X_CISCO_COM_EnableOnline</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.X_CISCO_COM_RouterEnabled</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10001.X_CISCO_COM_RouterEnabled</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.SSID.1.X_CISCO_COM_RouterEnabled</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.SSID.10002.X_CISCO_COM_RouterEnabled</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.SSIDAdvertisementEnabled</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.5.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.SSIDAdvertisementEnabled</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>2</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>1,2</snmpExpectedValues>
+        </parameter>
+        <parameter>
+               <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.SSIDAdvertisementEnabled</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.5.10002</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.SSIDAdvertisementEnabled</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>1</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>1,2</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Enable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Enable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Enable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Enable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Status</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Status</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Enabled</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>Enabled,Disabled</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Status</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Status</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Enabled</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>Enabled,Disabled</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Alias</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Alias</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>AccessPoint1</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>AccessPoint</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Alias</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Alias</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>AccessPoint2,AccessPoint3</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>AccessPoint</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.SSIDReference</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.SSIDReference</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Device.WiFi.SSID.1.</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>Device.WiFi.SSID.1.</expectedValues>
+               <!-- the range of values acceptable for WEBPA-->
+               <webpaExpectedValues>Device.WiFi.SSID.10001.</webpaExpectedValues>
+               <!-- default value of the param after factory reset/ for WEBPA-->
+               <webpaDefaultValue>Device.WiFi.SSID.10001.</webpaDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.SSIDReference</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.SSIDReference</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>fale</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Device.WiFi.SSID.2.</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>Device.WiFi.SSID.2.</expectedValues>
+               <!-- the range of values acceptable for WEBPA-->
+               <webpaExpectedValues>Device.WiFi.SSID.10002.</webpaExpectedValues>
+               <!-- default value of the param after factory reset/ for WEBPA-->
+               <webpaDefaultValue>Device.WiFi.SSID.10002.</webpaDefaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.RetryLimit</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.RetryLimit</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>16</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>1</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.RetryLimit</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.RetryLimit</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>16</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>1</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.X_CISCO_COM_LongRetryLimit</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.X_CISCO_COM_LongRetryLimit</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>16</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.X_CISCO_COM_LongRetryLimit</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.X_CISCO_COM_LongRetryLimit</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>16</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.WMMCapability</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.WMMCapability</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.WMMCapability</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.WMMCapability</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.UAPSDCapability</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.UAPSDCapability</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.UAPSDCapability</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.UAPSDCapability</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.WMMEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.WMMEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.WMMEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.WMMEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.AssociatedDeviceNumberOfEntries</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.AssociatedDeviceNumberOfEntries</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.AssociatedDeviceNumberOfEntries</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.AssociatedDeviceNumberOfEntries</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.MaxAssociatedDevices</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.MaxAssociatedDevices</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.MaxAssociatedDevices</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.MaxAssociatedDevices</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.X_COMCAST-COM_MAC_FilteringMode</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.X_COMCAST-COM_MAC_FilteringMode</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Allow-ALL</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.X_COMCAST-COM_MAC_FilteringMode</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.X_COMCAST-COM_MAC_FilteringMode</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Allow-ALL</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.ModesSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.ModesSupported</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>None,WEP-64,WEP-128,WPA2-Personal,WPA-WPA2-Personal,WPA2-Enterprise,WPA-WPA2-Enterprise</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>None,WEP-64,WEP-128,WPA2-Personal,WPA-WPA2-Personal,WPA2-Enterprise,WPA-WPA2-Enterprise</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.ModesSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.ModesSupported</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>None,WEP-64,WEP-128,WPA2-Personal,WPA-WPA2-Personal,WPA2-Enterprise,WPA-WPA2-Enterprise</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>None,WEP-64,WEP-128,WPA2-Personal,WPA-WPA2-Personal,WPA2-Enterprise,WPA-WPA2-Enterprise</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.ModeEnabled</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.ModeEnabled</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>WPA2-Personal</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>None,WEP-64,WEP-128,WPA-Personal,WPA2-Personal,WPA-WPA2-Personal,WPA-Enterprise,WPA2-Enterprise,WPA-WPA2-Enterprise,WPA3-Personal,WPA3-Enterprise</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.ModeEnabled</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.ModeEnabled</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>WPA2-Personal</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>None,WEP-64,WEP-128,WPA-Personal,WPA2-Personal,WPA-WPA2-Personal,WPA-Enterprise,WPA2-Enterprise,WPA-WPA2-Enterprise,WPA3-Personal,WPA3-Enterprise</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.WEPKey</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.WEPKey</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.WEPKey</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.WEPKey</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.PreSharedKey</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.1.1.2.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.PreSharedKey</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.PreSharedKey</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.1.1.2.10002</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.PreSharedKey</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+		<!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>""</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.KeyPassphrase</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.KeyPassphrase</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>rdk@1234</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>rdk@1234</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.KeyPassphrase</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.KeyPassphrase</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>rdk@1234</defaultValue>
+               <!-- the range of values acceptable -->
+               <setValue>autumn1234</setValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.X_COMCAST-COM_DefaultKeyPassphrase</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.X_COMCAST-COM_DefaultKeyPassphrase</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>rdk@1234</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.X_COMCAST-COM_DefaultKeyPassphrase</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.X_COMCAST-COM_DefaultKeyPassphrase</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>rdk@1234</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.X_CISCO_COM_EncryptionMethod</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.1.1.1.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.X_CISCO_COM_EncryptionMethod</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>AES+TKIP</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>1</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>TKIP,AES,AES+TKIP</expectedValues>
+               <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>0,1,2</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.X_CISCO_COM_EncryptionMethod</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.1.1.1.10002</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.X_CISCO_COM_EncryptionMethod</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>AES+TKIP</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>1</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>TKIP,AES,AES+TKIP</expectedValues>
+               <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>0,1,2</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.RadiusServerIPAddr</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.2.1.2.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.RadiusServerIPAddr</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>75.56.77.78</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.RadiusServerIPAddr</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.2.1.2.10002</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.RadiusServerIPAddr</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>75.56.77.78</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.RadiusServerPort</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.2.1.3.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.RadiusServerPort</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>Gauge32</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>123</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.RadiusServerPort</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.2.1.3.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.RadiusServerPort</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>Gauge32</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>123</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.RadiusSecret</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.2.1.4.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.RadiusSecret</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+		<!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>""</snmpExpectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.RadiusSecret</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.2.1.4.10002</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.RadiusSecret</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.SecondaryRadiusServerIPAddr</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.2.1.6.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.SecondaryRadiusServerIPAddr</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>75.56.77.78</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.SecondaryRadiusServerIPAddr</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.2.1.6.10002</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.SecondaryRadiusServerIPAddr</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>75.56.77.78</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.SecondaryRadiusServerPort</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.2.1.7.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.SecondaryRadiusServerPort</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>Gauge32</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>123</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.SecondaryRadiusServerPort</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.2.1.7.10002</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.SecondaryRadiusServerPort</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--type of the parameter epected by snmp-->
+               <snmpType>Gauge32</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>123</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.SecondaryRadiusSecret</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.2.1.8.10001</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.SecondaryRadiusSecret</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.SecondaryRadiusSecret</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.2.3.2.1.8.10002</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.SecondaryRadiusSecret</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.Security.MFPConfig</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.Security.MFPConfig</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+               <!-- the range of values acceptable -->
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.Security.MFPConfig</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.Security.MFPConfig</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.WPS.Enable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.WPS.Enable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.WPS.Enable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.WPS.Enable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.WPS.ConfigMethodsSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.WPS.ConfigMethodsSupported</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>PushButton,PIN</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>PushButton,PIN,USBFlashDrive,Ethernet,Label,Display,ExternalNFCToken,IntegratedNFCToken,NFCInterface,PhysicalPushButton,PhysicalDisplay,VirtualPushButton,VirtualDisplay</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.WPS.ConfigMethodsSupported</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.WPS.ConfigMethodsSupported</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>PushButton,PIN</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>PushButton,PIN,USBFlashDrive,Ethernet,Label,Display,ExternalNFCToken,IntegratedNFCToken,NFCInterface,PhysicalPushButton,PhysicalDisplay,VirtualPushButton,VirtualDisplay</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.1.WPS.ConfigMethodsEnabled</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10001.WPS.ConfigMethodsEnabled</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>PushButton,PIN</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>PushButton,PIN,USBFlashDrive,Ethernet,Label,Display,ExternalNFCToken,IntegratedNFCToken,NFCInterface,PhysicalPushButton,PhysicalDisplay,VirtualPushButton,VirtualDisplay</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.WiFi.AccessPoint.2.WPS.ConfigMethodsEnabled</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.WiFi.AccessPoint.10002.WPS.ConfigMethodsEnabled</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>PushButton,PIN</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>PushButton,PIN,USBFlashDrive,Ethernet,Label,Display,ExternalNFCToken,IntegratedNFCToken,NFCInterface,PhysicalPushButton,PhysicalDisplay,VirtualPushButton,VirtualDisplay</expectedValues>
+        </parameter>
+</parameters>
+
+
+
+
+
+
