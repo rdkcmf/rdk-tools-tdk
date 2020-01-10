@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.WifiLogMsg</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.WifiLogMsg</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>WiFiLogMsg</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.HarvesterLogMsg</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.HarvesterLogMsg</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>HarvesterLogMsg</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_TR69_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_TR69_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_TR69_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_TR69_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default vaue of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_PAM_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_PAM_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_PAM_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_PAM_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_NotifyComp_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_NotifyComp_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_NotifyComp_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_NotifyComp_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_PSM_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_PSM_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_PSM_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_PSM_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_MTA_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_MTA_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_MTA_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_MTA_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_CM_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_CM_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_CM_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_CM_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_WiFi_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_WiFi_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_WiFi_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_WiFi_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_CR_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_CR_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_CR_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_CR_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_EthAgent_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_EthAgent_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_EthAgent_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_EthAgent_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_Harvester_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_Harvester_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_Harvester_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_Harvester_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_PowerMgr_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_PowerMgr_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_PowerMgr_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_PowerMgr_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_FSC_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_FSC_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_FSC_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_FSC_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_Mesh_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_Mesh_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_Mesh_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_Mesh_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.WifiEventLogMsg</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.WifiEventLogMsg</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>WifiEventLogMsg</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.HarvesterEventLogMsg</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.HarvesterEventLogMsg</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>HarvesterEventLogMsg</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_TelcoVOIPAgent_LogLevel</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_TelcoVOIPAgent_LogLevel</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>4</defaultValue>
+               <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.LogAgent.X_RDKCENTRAL-COM_TelcoVOIPAgent_LoggerEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.LogAgent.X_RDKCENTRAL-COM_TelcoVOIPAgent_LoggerEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+
+</parameters>
