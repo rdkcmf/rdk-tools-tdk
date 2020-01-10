@@ -24,19 +24,25 @@
                <webpaName></webpaName>
                <!--type of the parameter -->
                <type></type>
+               <!--type of the parameter expected by snmp. This tag is required only if snmp is expecting a different datatype name-->
+               <snmpType></snmpType>
                <!--whether set is applicable or not -->
                <writable></writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet></persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
-               <!--default value exepcted by snmp after factory reset -->
+               <!--default value exepcted by snmp after factory reset . This tag is required only if the default value expected by snmp is different-->
                <snmpDefaultValue></snmpDefaultValue>
+               <!-- default value of the param after factory reset for WEBPA. This tag is required only if the default value expected by webpa is different-->
+               <webpaDefaultValue></webpaDefaultValue>
                <!-- the range of values acceptable -->
                <expectedValues></expectedValues>
-               <!-- the range of values expected by snmp -->
+               <!-- the range of values expected by snmp. This tag is required only if the values expected by snmp is different -->
                <snmpExpectedValues></snmpExpectedValues>
-	       <!--to be specified only if expectedValues is not available -->
+               <!-- the range of values acceptable for WEBPA. This tag is required only if the values expected by webpa is different-->
+               <webpaExpectedValues></webpaExpectedValues>
+	       <!--to be specified only if expectedValues is not available. -->
 	       <setValue></setValue>
         </parameter>
 
