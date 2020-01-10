@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.InterfaceStackNumberOfEntries</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.InterfaceStackNumberOfEntries</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_CISCO_COM_BootloaderVersion</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_CISCO_COM_BootloaderVersion</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_CISCO_COM_FirmwareName</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_CISCO_COM_FirmwareName</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_CISCO_COM_FirmwareBuildTime</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_CISCO_COM_FirmwareBuildTime</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_RDKCENTRAL-COM_CaptivePortalEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_RDKCENTRAL-COM_CaptivePortalEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_RDKCENTRAL-COM_CloudUIEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_RDKCENTRAL-COM_CloudUIEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_RDKCENTRAL-COM_CloudPersonalizationURL</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_RDKCENTRAL-COM_CloudPersonalizationURL</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+               <name>Device.DeviceInfo.X_RDKCENTRAL-COM_UI_ACCESS</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_RDKCENTRAL-COM_UI_ACCESS</webpaName>
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_COMCAST-COM_CM_MAC</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_COMCAST-COM_CM_MAC</webpaName>
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_COMCAST-COM_CM_IP</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_COMCAST-COM_CM_IP</webpaName>
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_COMCAST-COM_WAN_MAC</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_COMCAST-COM_WAN_MAC</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_COMCAST-COM_WAN_IP</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_COMCAST-COM_WAN_IP</webpaName>
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_CISCO_COM_BaseMacAddress</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_CISCO_COM_BaseMacAddress</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.Manufacturer</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.Manufacturer</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Cisco</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.ManufacturerOUI</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.ManufacturerOUI</webpaName>
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>088039</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_CISCO_COM_ProcessorSpeed</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_CISCO_COM_ProcessorSpeed</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.Hardware</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.Hardware</webpaName>
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.ModelName</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.ModelName</webpaName>
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>PcSim</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.Description</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.Description</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Emulates the Functionality of XB3 Router</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.ProductClass</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.ProductClass</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>XB3</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.SerialNumber</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.SerialNumber</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.HardwareVersion</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.HardwareVersion</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.SoftwareVersion</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.SoftwareVersion</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.AdditionalHardwareVersion</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.AdditionalHardwareVersion</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.AdditionalSoftwareVersion</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.AdditionalSoftwareVersion</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.ProvisioningCode</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.ProvisioningCode</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.UpTime</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.UpTime</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_RDKCENTRAL-COM_BootTime</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_RDKCENTRAL-COM_BootTime</webpaName>
+               <type>unsignedint</type>
+                <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_RDKCENTRAL-COM_LastRebootReason</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>factory-reset</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.FirstUseDate</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.FirstUseDate</webpaName>
+               <type>dateTime</type>
+                <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.VendorConfigFileNumberOfEntries</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.VendorConfigFileNumberOfEntries</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_COMCAST-COM_xfinitywifiCapableCPE</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_COMCAST-COM_xfinitywifiCapableCPE</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_COMCAST_COM_xfinitywifiEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_COMCAST_COM_xfinitywifiEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.PartnerId</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>comcast</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.TR69CertLocation</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>/etc/cacert.pem</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.RDKB_UIBranding.DefaultLocalIPv4SubnetRange</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.RDKB_UIBranding.DefaultLocalIPv4SubnetRange</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.RDKB_UIBranding.LocalUI.DefaultLoginUsername</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.RDKB_UIBranding.LocalUI.DefaultLoginUsername</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.RDKB_UIBranding.LocalUI.DefaultLoginPassword</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.RDKB_UIBranding.LocalUI.DefaultLoginPassword</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.RDKB_UIBranding.HelpTip.NetworkName</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_RDKCENTRAL-COM_Syndication.RDKB_UIBranding.HelpTip.NetworkName</webpaName>
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+</parameters>
+
+
