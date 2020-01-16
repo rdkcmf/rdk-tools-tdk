@@ -685,8 +685,6 @@
                <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
-               <!--default value of the param after factory reset -->
-               <defaultValue>Auto</defaultValue>
                <!--default value exepcted by snmp after factory reset -->
                <snmpDefaultValue>0</snmpDefaultValue>
                <!-- the range of values acceptable -->
@@ -2635,7 +2633,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>true</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
@@ -2651,7 +2649,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>true</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
@@ -2720,6 +2718,8 @@
                <expectedValues>PushButton,PIN,USBFlashDrive,Ethernet,Label,Display,ExternalNFCToken,IntegratedNFCToken,NFCInterface,PhysicalPushButton,PhysicalDisplay,VirtualPushButton,VirtualDisplay</expectedValues>
         </parameter>
 </parameters>
+
+
 
 
 
