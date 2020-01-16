@@ -19,6 +19,6 @@
 
 URL=$1
 rdkbrowser2.sh $URL &
-sleep 10
+sleep 30
 pkill rdkbrowser.sh
 pkill rdkbrowser2
