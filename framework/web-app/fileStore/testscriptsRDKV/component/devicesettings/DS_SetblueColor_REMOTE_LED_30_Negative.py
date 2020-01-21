@@ -20,12 +20,12 @@
 <?xml version="1.0" encoding="UTF-8"?><xml>
   <id>593</id>
   <version>3</version>
-  <name>DS_SetblueColor_REMOTE_LED_30</name>
+  <name>DS_SetblueColor_REMOTE_LED_30_Negative</name>
   <primitive_test_id>77</primitive_test_id>
   <primitive_test_name>DS_SetColor</primitive_test_name>
   <primitive_test_version>6</primitive_test_version>
   <status>FREE</status>
-  <synopsis>This test script Sets and gets the Blue Color for the Remote Front panel Indicator
+  <synopsis>Negative test: This test script tries to set and get the Blue Color for the Remote Front panel Indicator which is not available on the IPClient device. Test steps expected to fail.
 Test Case ID : CT_DS_30</synopsis>
   <groups_id/>
   <execution_time>3</execution_time>
@@ -42,9 +42,9 @@ Test Case ID : CT_DS_30</synopsis>
   </rdk_versions>
   <test_cases>
     <test_case_id>CT_DS_30</test_case_id>
-    <test_objective>Device Setting – Get and Set the color of the REMOTE LED to BLUE color.</test_objective>
-    <test_type>Positive(Boundary condition)</test_type>
-    <test_setup>XI3-1/XG1-1</test_setup>
+    <test_objective>Device Setting – Get and Set the color of the REMOTE LED to BLUE color. REMOTE LED is not present in the platform so test step is expected to fail </test_objective>
+    <test_type>Negative(Boundary condition)</test_type>
+    <test_setup>XI3-1</test_setup>
     <pre_requisite>1. dsMgrMain should be up and running.
 2. IARMDaemonMain should be up and running.</pre_requisite>
     <api_or_interface_used>device::Manager::Initialize()                                  FrontPanelConfig::getInstance()
@@ -61,9 +61,8 @@ E.g.: 0</input_parameters>
 2.Device_Settings_Agent will get the list of colors.
 3.Device_Settings_Agent will get a indicator by passing”name:REMOTE”.
 4.Device_Settings_Agent will get the color for REMOTE Indicator.
-5.Device_Settings_Agent will set the new color to “color” for the REMOTE Indicator.
-6. TM makes RPC calls for getting the color of REMOTE Indicator from Device Settings_stub and verify whether the color has changed.
-7.Device_Settings_Agent will return SUCCESS or FAILURE based on the result from the above step(6th)</automation_approch>
+5.Device_Settings_Agent will set the new color to “color” for the REMOTE Indicator which is invalid indicator.
+6.Device_Settings_Agent will return SUCCESS or FAILURE based on the result from the above step(6th)</automation_approch>
     <except_output>
 
 Checkpoint 1.Check for the color of POWER Indicator after and before setting the color.</except_output>
@@ -105,24 +104,20 @@ if "SUCCESS" in loadmodulestatus.upper():
                 tdkTestObj.setResultStatus("SUCCESS");
                 tdkTestObj = obj.createTestStep('DS_GetSupportedColors');
                 tdkTestObj.addParameter("indicator_name","Remote");
-                expectedresult="SUCCESS"
+                expectedresult="FAILURE"
                 tdkTestObj.executeTestCase(expectedresult);
                 actualresult = tdkTestObj.getResult();
                 colordetails = tdkTestObj.getResultDetails();
                 #Check for SUCCESS/FAILURE return value of DS_GetSupportedColors
                 if expectedresult in actualresult:
                         tdkTestObj.setResultStatus("SUCCESS");
-                        print "SUCCESS :Application successfully gets the list of supported colors";
-                        print "%s" %colordetails
+                        print "SUCCESS :Application fails to get the list of supported colors for invalid indicator REMOTE";
+                        print "details %s" %colordetails
                 else:
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "FAILURE :Failed to get the color list";
-                print "SUCCESS :Application successfully initialized with Device Settings library";
-                print "0-Blue";
-                print "1-Green";
-                print "2-Red";
-                print "3-Yellow";
-                print "4-Orange";
+                        print "details %s" %colordetails
+                        print "FAILURE :Application successfully get the color list for invalid indicator";
+                        
                 tdkTestObj = obj.createTestStep('DS_SetColor');
                 #setting color parameter value
                 color = 0;
@@ -131,26 +126,18 @@ if "SUCCESS" in loadmodulestatus.upper():
                 print "Indicator value set to:%s" %indicator;
                 tdkTestObj.addParameter("color",color);
                 tdkTestObj.addParameter("indicator_name",indicator);
-                expectedresult="SUCCESS"
+                expectedresult="FAILURE"
                 tdkTestObj.executeTestCase(expectedresult);
                 actualresult = tdkTestObj.getResult();
-                colordetails = tdkTestObj.getResultDetails();
-                setColor = "%s" %color;
-                list = ['255','65280','16711680','16777184','16747520']
+                details = tdkTestObj.getResultDetails();
                 if expectedresult in actualresult:
-                        print "SUCCESS :Application successfully gets and sets the color";
-                        print "getColor %s" %colordetails;
-                        print "Color to be verified: %s"%list[int(setColor)];
-                        #comparing the color before and after setting
-                        if list[int(setColor)] in colordetails :
-                                tdkTestObj.setResultStatus("SUCCESS");
-                                print "SUCCESS: Both the colors are same";
-                        else:
-                                tdkTestObj.setResultStatus("FAILURE");
-                                print "FAILURE: Both the colors are not same";
+                        print "SUCCESS : As expected application fails to gets and sets the color of invalid indicator";
+                        print details;
+                        tdkTestObj.setResultStatus("SUCCESS");
                 else:
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "Failure: Failed to get and set color for LED";
+                        print details;
+                        print "Failure: Application is able to get and set color for invalid LED";
                 time.sleep(10);
                 #calling DS_ManagerDeInitialize to DeInitialize API 
                 tdkTestObj = obj.createTestStep('DS_ManagerDeInitialize');

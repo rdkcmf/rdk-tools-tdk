@@ -146,6 +146,26 @@ void DeviceSettingsAgent::DSmanagerDeinitialize(IN const Json::Value& req, OUT J
 	return;
 }
 
+bool Is_valid_indicator(std::string indicator_name)
+{
+	//get list of colors supported in the FrontPanel LEDs
+	const device::List<device::FrontPanelIndicator> indicatorList = device::FrontPanelConfig::getInstance().getIndicators();
+	size_t listSize = indicatorList.size();
+	size_t i = 0;
+	DEBUG_PRINT(DEBUG_LOG,"List of available indicators in the platform: \n");
+	for (i = 0; i < listSize; i++)
+	{
+		DEBUG_PRINT(DEBUG_LOG,"Indicator id [%d]= name [%s] \n", i,indicatorList.at(i).getName().c_str());
+		if ( indicator_name == indicatorList.at(i).getName().c_str())
+		{
+			return true;
+		}
+	}
+	if (i == listSize)
+	{
+		return false;
+	}
+}
 /***************************************************************************
  *Function name	: FPI_setBrightness
  *Descrption	: This function is to check the functionality of setBrightness and getBrightness APIs
@@ -272,7 +292,14 @@ void DeviceSettingsAgent::FPI_setColor(IN const Json::Value& req, OUT Json::Valu
 	int colorid;
         int colorSetId;
         int colorMatchId;
-
+        int colorMode = 0;
+        string colorName;
+	bool valid_indicator=true;
+	if(!Is_valid_indicator(indicator_name))
+	{
+		DEBUG_PRINT(DEBUG_ERROR,"\n Given indicator :%s is not supported\n", indicator_name.c_str());
+		valid_indicator=false;
+	}
 
 	try
 	{
@@ -280,40 +307,60 @@ void DeviceSettingsAgent::FPI_setColor(IN const Json::Value& req, OUT Json::Valu
                 switch(color)
                 {
                     case 0: //blue
+                      colorName = "Blue";
                       colorSetId = device::FrontPanelIndicator::Color::kBlue;
                       colorMatchId=255;
                       break;
                     case 1: //green
+                      colorName = "Green";
                       colorSetId = device::FrontPanelIndicator::Color::kGreen;
                       colorMatchId=65280;
                       break;
                     case 2: //red
+                      colorName = "Red";
                       colorSetId = device::FrontPanelIndicator::Color::kRed;
                       colorMatchId=16711680;
                       break;
                     case 3: //yellow
+                      colorName = "Yellow";
                       colorSetId = device::FrontPanelIndicator::Color::kYellow;
                       colorMatchId=16777184;
                       break;
                     case 4: //orange
+                      colorName = "Orange";
                       colorSetId = device::FrontPanelIndicator::Color::kOrange;
                       colorMatchId=16747520;
                       break;
                     case 5: //white
+                      colorName = "White";
                       colorSetId = device::FrontPanelIndicator::Color::kWhite;
                       colorMatchId=16777215;
                       break;
                     default:
+                      DEBUG_PRINT(DEBUG_LOG,"\n Not a supported color \n");
                       colorSetId = color;
                       colorMatchId = color;
                       break;
                }
                 DEBUG_PRINT(DEBUG_LOG,"\nColorSetId retrieved is:%d\n",colorSetId);
-                device::FrontPanelIndicator::Color c(colorSetId);
-		/*calling setcolor*/
-		DEBUG_PRINT(DEBUG_LOG,"\nCalling setColor\n");
-		DEBUG_PRINT(DEBUG_LOG,"\ncolor to set:%d\n",color);
-		device::FrontPanelIndicator::getInstance(indicator_name).setColor(c);
+                /*calling setcolor*/
+                colorMode = device::FrontPanelIndicator::getInstance(indicator_name).getColorMode();
+                DEBUG_PRINT(DEBUG_LOG,"\ncolor to set: %d color mode retrived: %d\n",color,colorMode);
+                switch(colorMode)
+                {
+                    case 0: //always throws an exception
+                      DEBUG_PRINT(DEBUG_LOG,"\ncolorMode is 0\n");
+                      throw "Exception";
+                    case 1: // passing the RGB value corresponding to the color to be set
+                      device::FrontPanelIndicator::getInstance(indicator_name).setColor(colorSetId);
+                      break;
+                    case 2: // passing color object
+                      device::FrontPanelIndicator::getInstance(indicator_name).setColor(device::FrontPanelIndicator::Color::getInstance(colorName));
+                      break;
+                    default:
+                      DEBUG_PRINT(DEBUG_LOG,"\nUndefined colorMode\n");
+                      throw "Exception";
+                }
 		/*calling getcolor*/
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling getColor\n");
 		colorid = device::FrontPanelIndicator::getInstance(indicator_name).getColor();
@@ -329,8 +376,16 @@ void DeviceSettingsAgent::FPI_setColor(IN const Json::Value& req, OUT Json::Valu
 	}
 	catch(...)
 	{
-		DEBUG_PRINT(DEBUG_ERROR,"\n Exception Caught in FPI_setColor\n");
-		response["details"]= "Exception Caught in FPI_setColor";
+		if(valid_indicator == false)
+		{
+			DEBUG_PRINT(DEBUG_ERROR,"\n Exception Caught in FPI_setColor due to invalid indicator provided\n");
+			response["details"]= "Exception Caught in FPI_setColor due to invalid indicator provided";
+		}
+		else
+		{
+			DEBUG_PRINT(DEBUG_ERROR,"\n Exception Caught in FPI_setColor\n");
+			response["details"]= "Exception Caught in FPI_setColor";
+		}
 		response["result"]= "FAILURE";
 	}
 	DEBUG_PRINT(DEBUG_TRACE,"\n FPI_setColor ---->Exit\n");
@@ -1517,11 +1572,18 @@ void DeviceSettingsAgent::FPCONFIG_getTextDisplayFromId(IN const Json::Value& re
 void DeviceSettingsAgent::FPI_getSupportedColors(IN const Json::Value& req, OUT Json::Value& response)
 {
 	DEBUG_PRINT(DEBUG_TRACE,"\nFPI_getSupportedColors ---->Entry\n");
+	bool valid_indicator=true;  
 
 	try
 	{
 		char colors[512] = {'\0'};
-		std::string indicator_name=req["indicator_name"].asCString();
+		std::string indicator_name=req["indicator_name"].asCString();	
+        	if(!Is_valid_indicator(indicator_name))
+		{
+			DEBUG_PRINT(DEBUG_ERROR,"\n Given indicator :%s is not supported\n", indicator_name.c_str());
+			valid_indicator=false;
+		}
+                
 		//get list of colors supported in the FrontPanel LEDs
 		const device::List<device::FrontPanelIndicator::Color> colorList = device::FrontPanelIndicator::getInstance(indicator_name).getSupportedColors();
                 size_t listSize = colorList.size();
@@ -1550,8 +1612,16 @@ void DeviceSettingsAgent::FPI_getSupportedColors(IN const Json::Value& req, OUT 
 	}
 	catch(...)
 	{
-		DEBUG_PRINT(DEBUG_ERROR,"\n Exception Caught in FPI_getSupportedColors\n");
-		response["details"]= "Exception Caught in FPI_getSupportedColors";
+		if(valid_indicator == false)
+		{
+			DEBUG_PRINT(DEBUG_ERROR,"\n Exception Caught in FPI_setColor due to invalid indicator provided\n");
+			response["details"]= "Exception Caught in FPI_setColor due to invalid indicator provided";
+		}
+		else
+		{
+			DEBUG_PRINT(DEBUG_ERROR,"\n Exception Caught in FPI_getSupportedColors\n");
+			response["details"]= "Exception Caught in FPI_getSupportedColors";
+		}
 		response["result"]= "FAILURE";
 	}
 	DEBUG_PRINT(DEBUG_TRACE,"\nFPI_getSupportedColors ---->Exit\n");

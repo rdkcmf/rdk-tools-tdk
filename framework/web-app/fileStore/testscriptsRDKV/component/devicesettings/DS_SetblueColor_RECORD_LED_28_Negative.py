@@ -18,15 +18,14 @@
 ##########################################################################
 '''
 <?xml version="1.0" encoding="UTF-8"?><xml>
-  <id>592</id>
+  <id>591</id>
   <version>3</version>
-  <name>DS_SetblueColor_RFBYPASS_LED_29</name>
+  <name>DS_SetblueColor_RECORD_LED_28_Negative</name>
   <primitive_test_id>77</primitive_test_id>
   <primitive_test_name>DS_SetColor</primitive_test_name>
   <primitive_test_version>6</primitive_test_version>
   <status>FREE</status>
-  <synopsis>This test script Sets and gets the Blue Color for the RfByPass Front panel Indicator
-Test Case ID : CT_DS_29</synopsis>
+  <synopsis>Negative: This test script tries Set and get the Blue Color for the Record Front panel Indicator which is not available in IPClient Test Case ID : CT_DS_28</synopsis>
   <groups_id/>
   <execution_time>3</execution_time>
   <long_duration>false</long_duration>
@@ -41,10 +40,10 @@ Test Case ID : CT_DS_29</synopsis>
     <rdk_version>RDK2.0</rdk_version>
   </rdk_versions>
   <test_cases>
-    <test_case_id>CT_DS_29</test_case_id>
-    <test_objective>Device Setting – Get and Set the color of the RFBYPASS LED to BLUE color.</test_objective>
-    <test_type>Positive(Boundary condition)</test_type>
-    <test_setup>XI3-1/XG1-1</test_setup>
+    <test_case_id>CT_DS_28</test_case_id>
+    <test_objective>Device Setting – Get and Set the color of the RECORD LED to BLUE color. Test case expected to fail since the indicator is not available on the device</test_objective>
+    <test_type>Negative(Boundary condition)</test_type>
+    <test_setup>XI3-1</test_setup>
     <pre_requisite>1. dsMgrMain should be up and running.
 2. IARMDaemonMain should be up and running.</pre_requisite>
     <api_or_interface_used>device::Manager::Initialize()                                  FrontPanelConfig::getInstance()
@@ -54,16 +53,15 @@ FrontPanelConfig::getColor()
 FrontPanelConfig::setColor(int)      
 device::Manager::DeInitialize()</api_or_interface_used>
     <input_parameters>getIndicator : string – name
-E.g.: name : “RFBYPASS”
+E.g.: name : “RECORD”
 SetColor : int – color
 E.g.: 0</input_parameters>
     <automation_approch>1.TM loads the Device_Settings_Agent via the test agent
 2.Device_Settings_Agent will get the list of colors.
-3.Device_Settings_Agent will get a indicator by passing”name:”RFBYPASS”.
-4.Device_Settings_Agent will get the color for RFBYPASS Indicator.
-5.Device_Settings_Agent will set the new color to “color” for the RFBYPASS Indicator.
-6. TM makes RPC calls for getting the color of RFBYPASS Indicator from Device Settings_stub and verify whether the color has changed.
-7.Device_Settings_Agent will return SUCCESS or FAILURE based on the result from the above step(6th)</automation_approch>
+3.Device_Settings_Agent will get a indicator by passing”name:RECORD”.
+4.Device_Settings_Agent will get the color for RECORD Indicator.
+5.Device_Settings_Agent will set the new color to “color” for the RECORD Indicator.
+6.Device_Settings_Agent will return SUCCESS or FAILURE based on the result from the above step(5th)</automation_approch>
     <except_output>
 
 Checkpoint 1.Check for the color of POWER Indicator after and before setting the color.</except_output>
@@ -72,7 +70,7 @@ Checkpoint 1.Check for the color of POWER Indicator after and before setting the
 TestMgr_DS_FP_FP_getSupportedColors
 TestMgr_DS_FP_setColor
 TestMgr_DS_managerDeinitialize</test_stub_interface>
-    <test_script>DS_SetblueColor_RFBYPASS_LED_29</test_script>
+    <test_script>DS_SetblueColor_RECORD_LED_28</test_script>
     <skipped>No</skipped>
     <release_version>M21</release_version>
     <remarks/>
@@ -87,7 +85,7 @@ obj = tdklib.TDKScriptingLibrary("devicesettings","1.2");
 #Ip address of the selected STB for testing
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'CT_DS_29');
+obj.configureTestCase(ip,port,'CT_DS_28');
 loadmodulestatus =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %loadmodulestatus ;
 if "SUCCESS" in loadmodulestatus.upper():
@@ -103,53 +101,42 @@ if "SUCCESS" in loadmodulestatus.upper():
         if expectedresult in actualresult:
                 tdkTestObj.setResultStatus("SUCCESS");
                 tdkTestObj = obj.createTestStep('DS_GetSupportedColors');
-                tdkTestObj.addParameter("indicator_name","RfByPass");
-                expectedresult="SUCCESS"
+                tdkTestObj.addParameter("indicator_name","Record");
+                expectedresult="FAILURE"
                 tdkTestObj.executeTestCase(expectedresult);
                 actualresult = tdkTestObj.getResult();
                 colordetails = tdkTestObj.getResultDetails();
                 #Check for SUCCESS/FAILURE return value of DS_GetSupportedColors
                 if expectedresult in actualresult:
                         tdkTestObj.setResultStatus("SUCCESS");
-                        print "SUCCESS :Application successfully gets the list of supported colors";
-                        print "%s" %colordetails
+                        print "SUCCESS :Application fails to get the list of supported colors for invalid indicator RECORD";
+                        print "details %s" %colordetails
                 else:
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "FAILURE :Failed to get the color list";
-                print "SUCCESS :Application successfully initialized with Device Settings library";
-                print "0-Blue";
-                print "1-Green";
-                print "2-Red";
-                print "3-Yellow";
-                print "4-Orange";
+                        print "details %s" %colordetails
+                        print "FAILURE :Application successfully get the color list for invalid indicator";
+
                 tdkTestObj = obj.createTestStep('DS_SetColor');
                 #setting color parameter value
                 color = 0;
                 print "Color value set to:%d" %color;
-                indicator = "RfByPass";
+                indicator = "Record"
                 print "Indicator value set to:%s" %indicator;
-                tdkTestObj.addParameter("indicator_name", indicator);
                 tdkTestObj.addParameter("color",color);
-                expectedresult="SUCCESS"
+                tdkTestObj.addParameter("indicator_name",indicator);
+                expectedresult="FAILURE"
                 tdkTestObj.executeTestCase(expectedresult);
                 actualresult = tdkTestObj.getResult();
-                colordetails = tdkTestObj.getResultDetails();
-                setColor = "%s" %color;
-                list = ['255','65280','16711680','16777184','16747520'];
+                details = tdkTestObj.getResultDetails();
+                
                 if expectedresult in actualresult:
-                        print "SUCCESS :Application successfully gets and sets the color for RFBYPASS LED";
-                        print "getColor %s" %colordetails;
-                        print "Color to be verified: %s"%list[int(setColor)];                        
-                        #comparing the color before and after setting
-                        if list[int(setColor)] in colordetails :
-                                tdkTestObj.setResultStatus("SUCCESS");
-                                print "SUCCESS: Both the colors are same";
-                        else:
-                                tdkTestObj.setResultStatus("FAILURE");
-                                print "FAILURE: Both the colors are not same";
+                        print "SUCCESS :As expected application fails to get and set the color of RECORD LED which is invalid";
+                        print "details %s" %details;
+                        tdkTestObj.setResultStatus("SUCCESS");
                 else:
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "Failure: Failed to get and set color for RFBYPASS LED";
+                        print "details %s" %details;
+                        print "Failure: Able to get and set color for REMOTE LED which is not expected";
                 #calling DS_ManagerDeInitialize to DeInitialize API 
                 tdkTestObj = obj.createTestStep('DS_ManagerDeInitialize');
                 expectedresult="SUCCESS"
