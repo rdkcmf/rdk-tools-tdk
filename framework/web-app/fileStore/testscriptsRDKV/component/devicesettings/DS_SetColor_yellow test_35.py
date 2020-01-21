@@ -103,7 +103,7 @@ if "SUCCESS" in loadmodulestatus.upper():
         if expectedresult in actualresult:
                 tdkTestObj.setResultStatus("SUCCESS");
                 tdkTestObj = obj.createTestStep('DS_GetSupportedColors');
-                tdkTestObj.addParameter("indicator_name","Message");
+                tdkTestObj.addParameter("indicator_name","Power");
                 expectedresult="SUCCESS"
                 tdkTestObj.executeTestCase(expectedresult);
                 actualresult = tdkTestObj.getResult();
