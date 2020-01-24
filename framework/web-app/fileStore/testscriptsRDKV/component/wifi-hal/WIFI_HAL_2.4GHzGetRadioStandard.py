@@ -94,7 +94,7 @@ loadmodulestatus2 =sysObj.getLoadModuleResult();
 if "SUCCESS" in loadmodulestatus1.upper() and loadmodulestatus2.upper():
     obj.setLoadModuleStatus("SUCCESS");
     sysObj.setLoadModuleStatus("SUCCESS");
-    radioIndex = 1
+    radioIndex = 0
     connectresult = isConnectedtoSSID(obj,sysObj,radioIndex);
     if "TRUE" in connectresult:
         #Prmitive test case which associated to this Script
