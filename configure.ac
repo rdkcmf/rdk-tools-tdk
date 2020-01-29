@@ -259,5 +259,6 @@ AC_CONFIG_FILES([Makefile
 	 AudioCaptureMgr_stub/Makefile
 	 USBCtrl_stub/Makefile
 	 SystemUtil_stub/Makefile
+	 DSHal_stub/Makefile
 	 WIFIHAL_stub/Makefile])
 AC_OUTPUT
