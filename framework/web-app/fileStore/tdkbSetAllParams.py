@@ -155,7 +155,6 @@ def setAllParams(module, setup_type, tr181Obj, sysObj):
 			#revert the value after set
                 	detail, actualresult = setParameterValue(tr181Obj, sysObj, setup_type, paramName, orgValue, paramType);
                 	if expectedresult in actualresult:
-			    moduleStatus = "SUCCESS";
                 	    print "Successfully reverted the value"
                             print "*************Set validation of %s is SUCCESS**************\n" %paramName
                 	else:
@@ -178,6 +177,8 @@ def setAllParams(module, setup_type, tr181Obj, sysObj):
             if setup_type == "WEBPA":
     	        print "Sleeping for 90sec"
                 sleep(90)
+                if deviceType == "RPI":
+                    sleep(30)
 
     return moduleStatus,failedParams;
 
