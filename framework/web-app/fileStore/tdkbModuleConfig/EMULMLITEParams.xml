@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.Hosts.X_CISCO_COM_ConnectedDeviceNumber</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.Hosts.X_CISCO_COM_ConnectedDeviceNumber</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.Hosts.X_CISCO_COM_ConnectedWiFiNumber</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.Hosts.X_CISCO_COM_ConnectedWiFiNumber</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.Hosts.X_RDKCENTRAL-COM_HostVersionId</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.Hosts.X_RDKCENTRAL-COM_HostVersionId</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.Hosts.X_RDKCENTRAL-COM_HostCountPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.Hosts.X_RDKCENTRAL-COM_HostCountPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.Hosts.X_RDKCENTRAL-COM_LMHost_Sync</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.Hosts.X_RDKCENTRAL-COM_LMHost_Sync</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.Hosts.X_RDKCENTRAL-COM_LMHost_Sync_From_MoCA</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.Hosts.X_RDKCENTRAL-COM_LMHost_Sync_From_MoCA</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.Hosts.X_RDKCENTRAL-COM_LMHost_Sync_From_WiFi</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.Hosts.X_RDKCENTRAL-COM_LMHost_Sync_From_WiFi</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.Hosts.HostNumberOfEntries</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.Hosts.HostNumberOfEntries</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.XHosts.X_CISCO_COM_ConnectedDeviceNumber</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.XHosts.X_CISCO_COM_ConnectedDeviceNumber</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.XHosts.XHostNumberOfEntries</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.XHosts.XHostNumberOfEntries</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.Enabled</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.Enabled</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.ReportingPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.ReportingPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>900</defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.PollingPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.PollingPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>900</defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.Schema</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.Schema</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue> Schema Buffer is empty</defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.SchemaID</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.SchemaID</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.Default.ReportingPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.Default.ReportingPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>900</defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.Default.PollingPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.Default.PollingPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>900</defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.Default.OverrideTTL</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesStatus.Default.OverrideTTL</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>300</defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.Enabled</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.Enabled</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <expectedValues>true,false</expectedValues>
+        </parameter><parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.ReportingPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.ReportingPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>fals</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>900</defaultValue>
+        </parameter>
+
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.PollingPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.PollingPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>300</defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.Schema</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.Schema</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Schema Buffer is empty</defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.SchemaID</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.SchemaID</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.Default.ReportingPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.Default.ReportingPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>900</defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.Default.PollingPeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.Default.PollingPeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>300</defaultValue>
+        </parameter>
+                <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.Default.OverrideTTL</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.Default.OverrideTTL</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>300</defaultValue>
+        </parameter>
+</parameters>
