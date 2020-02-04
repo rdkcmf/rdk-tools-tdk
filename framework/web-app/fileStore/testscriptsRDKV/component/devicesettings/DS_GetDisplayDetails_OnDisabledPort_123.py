@@ -122,7 +122,9 @@ if "SUCCESS" in loadmodulestatus.upper():
                     # Get DisplayDetails after port disable
                     tdkTestObj = obj.createTestStep('DS_DisplayDetails');
                     tdkTestObj.addParameter("port_name","HDMI0");
-                    expectedresult="SUCCESS"
+                    # Cannot get Display details after disabling the port
+                    # Getting the display details of disabled port raises exception from SDK 17.3 version
+                    expectedresult="FAILURE"
                     tdkTestObj.executeTestCase(expectedresult);
                     actualresult = tdkTestObj.getResult();
                     print "[GetPortDisplayDetails RESULT] : %s" %actualresult;
