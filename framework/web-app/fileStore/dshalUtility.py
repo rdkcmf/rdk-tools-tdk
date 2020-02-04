@@ -20,7 +20,7 @@
 import tdklib;
 from time import sleep; 
 audioPortType = {"LR":0, "HDMI":1, "SPDIF":2, "INVALID":9};
-videoPortType = {"RF":0, "BB":1, "SVIDEO":2, "1394":3, "DVI":4, "COMPONENT":5, "HDMI":6, "HDMI_INPUT":7, "INTERNAL":8, "SCART":9};
+videoPortType = {"RF":0, "BB":1, "SVIDEO":2, "1394":3, "DVI":4, "COMPONENT":5, "HDMI":6, "HDMI_INPUT":7, "INTERNAL":8, "SCART":9, "INVALID":15};
 stereoModeType = {"UNKNOWN":0, "MONO":1, "STEREO":2, "SURROUND":3, "PASSTHRU":4, "INVALID":9};
 audioEncodingType = {"NONE":0, "DISPLAY":1, "PCM":2, "AC3":3, "EAC3":4, "INVALID":9}
 hdcpProtocolVersion = {"VERSION_1X":0, "VERSION_2X":1};
