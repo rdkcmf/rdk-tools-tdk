@@ -41,6 +41,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Properties;
+
 /*import com.sun.corba.se.impl.orbutil.graph.Node
 import groovy.xml.StreamingMarkupBuilder
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -2164,21 +2170,56 @@ class ScriptGroupController {
 	 * @return
 	 */
 	def exportScriptThunder(def params){
+		try{
 		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION)
-		String STORM_FRAMEWORK_TESTCASES_LOCATION = STORM_FRAMEWORK_LOCATION + TESTCASES
-		def path = STORM_FRAMEWORK_TESTCASES_LOCATION + FILE_SEPARATOR + params?.id + JAVASCRIPT_EXTENSION
-		File sFile = new File(path)
-		if(sFile.exists()){
-			params.format = TEXT
-			params.extension = JAVASCRIPT
-			String data = new String(sFile.getBytes())
-			response.setHeader("Content-Type", "application/octet-stream;")
-			response.setHeader("Content-Disposition", "attachment; filename=\""+ params?.id+JAVASCRIPT_EXTENSION+"\"")
-			response.outputStream << data.getBytes()
-		}else {
-			flash.message = "Download failed. No valid script is available for download."
-			redirect(action: "list")
+		String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION)
+		def fileStorePath = STORM_FRAMEWORK_LOCATION+Constants.TESTCASES+File.separator+Constants.STORM_TESTCASES+File.separator+Constants.SRC+File.separator+Constants.TESTS+File.separator
+		List directories = new File(fileStorePath).listFiles()
+		List dirList = []
+		directories.each{directory ->
+			String directoryName = directory.toString()
+			int index = directoryName.lastIndexOf("/");
+			String directoryNameString = directoryName.substring(index+1, directoryName.length());
+			dirList.add(directoryNameString)
+		}
+		String fileName
+		boolean fileFound = false
+		def path
+		for(String directory : dirList){
+			File scriptsDir = new File("$fileStorePath"+directory+File.separator)
+			if(scriptsDir.exists()){
+				def testscriptfiles = scriptsDir.list()
+				for(String testscriptfile : testscriptfiles){
+					if(testscriptfile.contains(".js") ){
+						fileName = testscriptfile.split(".js")[0]
+						if(fileName.equals(params?.id)){
+							path = fileStorePath + directory + File.separator + params?.id + JAVASCRIPT_EXTENSION
+							fileFound = true
+							break
+						}
+					}
+				}
+				if(fileFound){
+					break
+				}
+			}
+		}
+		if(fileFound){
+			File sFile = new File(path)
+			if(sFile.exists()){
+				params.format = TEXT
+				params.extension = JAVASCRIPT
+				String data = new String(sFile.getBytes())
+				response.setHeader("Content-Type", "application/octet-stream;")
+				response.setHeader("Content-Disposition", "attachment; filename=\""+ params?.id+JAVASCRIPT_EXTENSION+"\"")
+				response.outputStream << data.getBytes()
+			}else{
+				flash.message = "Download failed. No valid script is available for download."
+				redirect(action: "list")
+			}
+		}
+		}catch(Exception e){
+			e.printStackTrace
 		}
 	}
 	
