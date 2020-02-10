@@ -219,8 +219,6 @@ void WIFIHAL::WIFI_HAL_GetOrSetParamStringValue(IN const Json::Value& req, OUT J
 	returnValue = wifi_getRadioPossibleChannels(radioIndex,output);
     else if(!strcmp(methodName, "getRadioChannelsInUse"))
 	returnValue = wifi_getRadioChannelsInUse(radioIndex,output);
-    else if(!strcmp(methodName, "getRadioPossibleChannels"))
-	returnValue = wifi_getRadioPossibleChannels(radioIndex,output);
     else if(!strcmp(methodName, "getRadioOperatingChannelBandwidth"))
 	returnValue = wifi_getRadioOperatingChannelBandwidth(radioIndex,output);
     else if(!strcmp(methodName, "getRegulatoryDomain"))
