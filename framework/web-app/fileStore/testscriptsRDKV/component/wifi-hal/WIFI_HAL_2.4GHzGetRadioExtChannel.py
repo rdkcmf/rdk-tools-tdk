@@ -44,17 +44,14 @@
     <test_objective>To get the secondary extension channel position for radio 2.4GHz using wifi_getRadioExtChannel HAL API and validate the same.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>IPClient-Wifi</test_setup>
-    <pre_requisite>1.Ccsp Components  should be in a running state else invoke cosa_start.sh manually that includes all the ccsp components and TDK Component
-2.TDK Agent should be in running state or invoke it through StartTdk.sh script</pre_requisite>
-    <api_or_interface_used>wifi_getRadioExtChannel()
-wifi_connectEndpoint()</api_or_interface_used>
+    <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script</pre_requisite>
+    <api_or_interface_used>wifi_getRadioExtChannel()</api_or_interface_used>
     <input_parameters>methodName : getRadioExtChannel
 radioIndex : 0</input_parameters>
     <automation_approch>1.Load the module.
-2.Check if the DUT is connected to the required SSID, if not do the connection using wifi_connectEndpoint().
-3.Invoke the api wifi_getRadioExtChannel() to get the secondary extension channel position for radio 2.4GHz.
-4.If the position is from the list of expected positions return SUCCESS,else FAILURE.
-5.Unload the module.</automation_approch>
+2.Invoke the api wifi_getRadioExtChannel() to get the secondary extension channel position for radio 2.4GHz.
+3.If the position is from the list of expected positions return SUCCESS,else FAILURE.
+4.Unload the module.</automation_approch>
     <except_output>To get the secondary extension channel position for radio 2.4GHz using wifi_getRadioExtChannel HAL API.</except_output>
     <priority>High</priority>
     <test_stub_interface>WIFI_HAL</test_stub_interface>
@@ -74,65 +71,55 @@ from tdkvWifiUtility import *;
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("wifihal","1");
-sysObj = tdklib.TDKScriptingLibrary("systemutil","1.0");
 
 #IP and Port of box, No need to change,
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'WIFI_HAL_2.4GHzGetRadioExtChannel');
-sysObj.configureTestCase(ip,port,'WIFI_HAL_2.4GHzGetRadioExtChannel');
 
 #Get the result of connection with test component and DUT
-loadmodulestatus1 =obj.getLoadModuleResult();
-loadmodulestatus2 =sysObj.getLoadModuleResult();
+loadmodulestatus =obj.getLoadModuleResult();
 
-if "SUCCESS" in loadmodulestatus1.upper() and loadmodulestatus2.upper():
+if "SUCCESS" in loadmodulestatus.upper():
     obj.setLoadModuleStatus("SUCCESS");
-    sysObj.setLoadModuleStatus("SUCCESS");
     radioIndex = 0
-    connectresult = isConnectedtoSSID(obj,sysObj,radioIndex);
-    if "TRUE" in connectresult:
-        #Script to load the configuration file of the component
-        tdkTestObj = obj.createTestStep("WIFI_HAL_GetOrSetParamStringValue");
-        #Giving the method name to invoke the api for getting Radio Extension channel ie,wifi_getRadioExtChannel()
-        tdkTestObj.addParameter("methodName","getRadioExtChannel");
-        #Radio index is 0 for 2.4GHz and 1 for 5GHz
-        tdkTestObj.addParameter("radioIndex",0);
-        expectedresult="SUCCESS";
-        tdkTestObj.executeTestCase(expectedresult);
-        actualresult = tdkTestObj.getResult();
-        details = tdkTestObj.getResultDetails();
-        ChannelList = ['AboveControlChannel', 'BelowControlChannel', 'Auto'];
-        if expectedresult in actualresult:
-            Channel = details.split(":")[1].strip(" ");
-            if Channel in ChannelList:
-                #Set the result status of execution
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "TEST STEP 1: Get the Radio Extension Channel for 2.4GHz";
-                print "EXPECTED RESULT 1: Should get the Radio Extension Channel either as 'AboveControlChannel' or 'BelowControlChannel' or 'Auto'for 2.4GHz";
-                print "ACTUAL RESULT 1:Radio Extension Channel = ",Channel;
-                #Get the result of execution
-                print "[TEST EXECUTION RESULT] : SUCCESS";
-            else:
-                #Set the result status of execution
-                tdkTestObj.setResultStatus("FAILURE");
-                print "TEST STEP 1: Get the Radio Extension Channel for 2.4GHz";
-                print "EXPECTED RESULT 1: Should get the Radio Extension Channel either as 'AboveControlChannel' or 'BelowControlChannel' or 'Auto' for 2.4GHz";
-                print "ACTUAL RESULT 1:Radio Extension Channel = ",Channel;
-                #Get the result of execution
-                print "[TEST EXECUTION RESULT] : FAILURE";
+    #Script to load the configuration file of the component
+    tdkTestObj = obj.createTestStep("WIFI_HAL_GetOrSetParamStringValue");
+    #Giving the method name to invoke the api for getting Radio Extension channel ie,wifi_getRadioExtChannel()
+    tdkTestObj.addParameter("methodName","getRadioExtChannel");
+    #Radio index is 0 for 2.4GHz and 1 for 5GHz
+    tdkTestObj.addParameter("radioIndex",0);
+    expectedresult="SUCCESS";
+    tdkTestObj.executeTestCase(expectedresult);
+    actualresult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    ChannelList = ['AboveControlChannel', 'BelowControlChannel', 'Auto'];
+    if expectedresult in actualresult:
+        Channel = details.split(":")[1].strip(" ");
+        if Channel in ChannelList:
+            #Set the result status of execution
+            tdkTestObj.setResultStatus("SUCCESS");
+            print "TEST STEP 1: Get the Radio Extension Channel for 2.4GHz";
+            print "EXPECTED RESULT 1: Should get the Radio Extension Channel either as 'AboveControlChannel' or 'BelowControlChannel' or 'Auto'for 2.4GHz";
+            print "ACTUAL RESULT 1:Radio Extension Channel = ",Channel;
+            #Get the result of execution
+            print "[TEST EXECUTION RESULT] : SUCCESS";
         else:
+            #Set the result status of execution
             tdkTestObj.setResultStatus("FAILURE");
-            print "wifi_getRadioExtChannel() operation failed";
+            print "TEST STEP 1: Get the Radio Extension Channel for 2.4GHz";
+            print "EXPECTED RESULT 1: Should get the Radio Extension Channel either as 'AboveControlChannel' or 'BelowControlChannel' or 'Auto' for 2.4GHz";
+            print "ACTUAL RESULT 1:Radio Extension Channel = ",Channel;
+            #Get the result of execution
+            print "[TEST EXECUTION RESULT] : FAILURE";
     else:
-        print "Connecting to SSID operation failed"
+        tdkTestObj.setResultStatus("FAILURE");
+        print "wifi_getRadioExtChannel() operation failed";
 
     obj.unloadModule("wifihal");
-    sysObj.unloadModule("systemutil");
 else:
     print "Failed to load the module";
-    sysObj.setLoadModuleStatus("FAILURE");
     obj.setLoadModuleStatus("FAILURE");
     print "Module loading failed";
 

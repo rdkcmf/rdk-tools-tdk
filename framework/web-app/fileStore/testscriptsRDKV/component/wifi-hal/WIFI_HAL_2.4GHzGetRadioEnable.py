@@ -44,17 +44,18 @@
     <test_objective>To invoke wifi_getRadioEnable() api and get the Radio Enable value for 2.4GHz.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>IPClient-Wifi</test_setup>
-    <pre_requisite>1.Ccsp Components  should be in a running state else invoke cosa_start.sh manually that includes all the ccsp components and TDK Component
-2.TDK Agent should be in running state or invoke it through StartTdk.sh script.</pre_requisite>
+    <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script.</pre_requisite>
     <api_or_interface_used>wifi_getRadioEnable()
-wifi_connectEndpoint()</api_or_interface_used>
+wifi_getRadioStatus()</api_or_interface_used>
     <input_parameters>methodName : getRadioEnable
 radioIndex : 0</input_parameters>
     <automation_approch>1.Load the module.
-2.Check if the DUT is connected to the required SSID, if not do the connection using wifi_connectEndpoint().
-3.Invoke wifi_getRadioEnable() api and get the radio Enable value.
-4.Return the status of the api and print the Enable value.
-5.Unload the module.</automation_approch>
+2.Invoke wifi_getRadioEnable() api and get the radio Enable value.
+3.Invoke wifi_getRadioStatus() api to get the radio enable status
+4.Validate Radio Enable value by checking Radio status
+5.Radio Status should be UP if RADIO ENABLED or DOWN if RADIO NOT ENABLED
+6.Update test results based on validation
+7.Unload the module.</automation_approch>
     <except_output>To get the Radio Enable value for 2.4GHz.</except_output>
     <priority>High</priority>
     <test_stub_interface>WIFI_HAL</test_stub_interface>
@@ -74,65 +75,85 @@ from tdkvWifiUtility import *;
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("wifihal","1");
-sysObj = tdklib.TDKScriptingLibrary("systemutil","1.0");
 
 #IP and Port of box, No need to change,
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'WIFI_HAL_2.4GHzGetRadioEnable');
-sysObj.configureTestCase(ip,port,'WIFI_HAL_2.4GHzGetRadioEnable');
 
 #Get the result of connection with test component and DUT
-loadmodulestatus1 =obj.getLoadModuleResult();
-loadmodulestatus2 =sysObj.getLoadModuleResult();
+loadmodulestatus =obj.getLoadModuleResult();
 
-if "SUCCESS" in loadmodulestatus1.upper() and loadmodulestatus2.upper():
+if "SUCCESS" in loadmodulestatus.upper():
+    expectedresult="SUCCESS";
     obj.setLoadModuleStatus("SUCCESS");
-    sysObj.setLoadModuleStatus("SUCCESS");
     radioIndex = 0
-    connectresult = isConnectedtoSSID(obj,sysObj,radioIndex);
-    if "TRUE" in connectresult:
+    #Script to load the configuration file of the component
+    tdkTestObj = obj.createTestStep("WIFI_HAL_GetOrSetParamBoolValue");
+    #Giving the method name to invoke the api for getting radio Enable value ie,wifi_getRadioEnable()
+    print "\nTEST STEP 1: To invoke the api wifi_getRadioEnable() for radio 0";
+    print "EXPECTED RESULT : Should get the radio enable value";
+    tdkTestObj.addParameter("methodName","getRadioEnable");
+    tdkTestObj.addParameter("radioIndex",0);
+    expectedresult="SUCCESS";
+    tdkTestObj.executeTestCase(expectedresult);
+    actualresult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    if expectedresult in actualresult:
+        tdkTestObj.setResultStatus("SUCCESS");
+        enable_value = details.split(":")[1].strip(" ");
+        if int(enable_value) == 1:
+            print "ACTUAL RESULT  : RADIO ENABLED";
+            print "Value returned : ",enable_value;
+        else:
+            print "ACTUAL RESULT  : RADIO NOT ENABLED";
+            print "Value returned : ",enable_value;
+
         #Script to load the configuration file of the component
-        tdkTestObj = obj.createTestStep("WIFI_HAL_GetOrSetParamBoolValue");
-        #Giving the method name to invoke the api for getting radio Enable value ie,wifi_getRadioEnable()
-        tdkTestObj.addParameter("methodName","getRadioEnable");
+        tdkTestObj = obj.createTestStep("WIFI_HAL_GetOrSetParamStringValue");
+        #Giving the method name to invoke the api for getting radio status  value ie,wifi_getRadioStatus()
+        print "\nTEST STEP 2: To invoke the api wifi_getRadioStatus() for radio 0";
+        print "EXPECTED RESULT : Should get the radio status value";
+        tdkTestObj.addParameter("methodName","getRadioStatus");
         tdkTestObj.addParameter("radioIndex",0);
         expectedresult="SUCCESS";
         tdkTestObj.executeTestCase(expectedresult);
         actualresult = tdkTestObj.getResult();
         details = tdkTestObj.getResultDetails();
         if expectedresult in actualresult:
-            enable_value = details.split(":")[1].strip(" ");
-            if int(enable_value) == 1:
-                #Set the result status of execution
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "TEST STEP 1: To invoke the api wifi_getRadioEnable() for radio 0";
-                print "EXPECTED RESULT 1: Should get the radio enable value";
-                print "ACTUAL RESULT 1: RADIO ENABLED";
-                print "Value returned : ",enable_value;
-                #Get the result of execution
-                print "[TEST EXECUTION RESULT] : SUCCESS";
+            tdkTestObj.setResultStatus("SUCCESS");
+            enable_status = details.split(":")[1].strip(" ");
+            if enable_status == "UP":
+                print "ACTUAL RESULT  : UP";
+                print "Value returned : ",enable_status;
             else:
-                #Set the result status of execution
+                print "ACTUAL RESULT  : DOWN";
+                print "Value returned : ",enable_status;
+
+            #Validating Radio Enable Value by checking Radio status
+            print "\nTEST STEP 3: Validate Radio Enable value by checking Radio status"
+            print "EXPECTED RESULT : Radio Status should be UP if RADIO ENABLED or DOWN if RADIO NOT ENABLED"
+            if int(enable_value) == 1 and enable_status == "UP":
+                print "ACTUAL RESULT  : RADIO ENABLED : RADIO STATUS UP"
+                print "[TEST EXECUTION RESULT] : SUCCESS\n"
                 tdkTestObj.setResultStatus("SUCCESS");
-                print "TEST STEP 1: To invoke the api wifi_getRadioEnable() for radio 0";
-                print "EXPECTED RESULT 1: Should get the radio enable value";
-                print "ACTUAL RESULT 1: RADIO NOT ENABLED";
-                print "Value returned : ",enable_value;
-                #Get the result of execution
-                print "[TEST EXECUTION RESULT] : SUCCESS";
+            elif int(enable_value) == 0 and enable_status == "DOWN":
+                print "ACTUAL RESULT  : RADIO NOT ENABLED : RADIO STATUS DOWN"
+                print "[TEST EXECUTION RESULT] : SUCCESS\n"
+                tdkTestObj.setResultStatus("SUCCESS");
+            else:
+                print "[TEST EXECUTION RESULT] : FAILURE\n"
+                tdkTestObj.setResultStatus("FAILURE");
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "wifi_getRadioEnable() operation failed for radio 0";
+            print "wifi_getRadioStatus() operation failed for radio 0";
     else:
-        print "Connecting to SSID operation failed"
-
+        tdkTestObj.setResultStatus("FAILURE");
+        print "wifi_getRadioEnable() operation failed for radio 0";
     obj.unloadModule("wifihal");
-    sysObj.unloadModule("systemutil");
 else:
     print "Failed to load the module";
-    sysObj.setLoadModuleStatus("FAILURE");
     obj.setLoadModuleStatus("FAILURE");
     print "Module loading failed";
 

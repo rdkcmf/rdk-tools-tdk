@@ -44,17 +44,14 @@
     <test_objective>To get the radio number of entries and check whether the value is greater than 0.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>IPClient-Wifi</test_setup>
-    <pre_requisite>1.Ccsp Components  should be in a running state else invoke cosa_start.sh manually that includes all the ccsp components and TDK Component
-2.TDK Agent should be in running state or invoke it through StartTdk.sh script</pre_requisite>
+    <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script</pre_requisite>
     <api_or_interface_used>wifi_getRadioNumberOfEntries()
-wifi_connectEndpoint()
 </api_or_interface_used>
     <input_parameters>methodName : getRadioNumberOfEntries</input_parameters>
     <automation_approch>1.Load the module.
-2.Check if the DUT is connected to the required SSID, if not do the connection using wifi_connectEndpoint().
-3.Invoke wifi_getRadioNumberOfEntries() api to get the radio number of entries.
-4.If the value returned is greater than 0,return SUCCESS,else FAILURE.
-5.Unload the module.</automation_approch>
+2.Invoke wifi_getRadioNumberOfEntries() api to get the radio number of entries.
+3.If the value returned is greater than 0,return SUCCESS,else FAILURE.
+4.Unload the module.</automation_approch>
     <except_output>The radio number of entries should be greater than 0.</except_output>
     <priority>High</priority>
     <test_stub_interface>WIFI_HAL</test_stub_interface>
@@ -73,61 +70,51 @@ from tdkvWifiUtility import *;
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("wifihal","1");
-sysObj = tdklib.TDKScriptingLibrary("systemutil","1.0");
 
 #IP and Port of box, No need to change,
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'WIFI_HAL_GetRadioNumberOfEntries');
-sysObj.configureTestCase(ip,port,'WIFI_HAL_GetRadioNumberOfEntries');
 
 #Get the result of connection with test component and DUT
-loadmodulestatus1 =obj.getLoadModuleResult();
-loadmodulestatus2 =sysObj.getLoadModuleResult();
+loadmodulestatus =obj.getLoadModuleResult();
 
-if "SUCCESS" in loadmodulestatus1.upper() and loadmodulestatus2.upper():
+if "SUCCESS" in loadmodulestatus.upper():
     obj.setLoadModuleStatus("SUCCESS");
-    sysObj.setLoadModuleStatus("SUCCESS");
     radioIndex = 1
-    connectresult = isConnectedtoSSID(obj,sysObj,radioIndex);
-    if "TRUE" in connectresult:
-        #Script to load the configuration file of the component
-        tdkTestObj = obj.createTestStep("WIFI_HAL_GetOrSetParamULongValue");
-        #Giving the method name to invoke the api for getting radio number of entries. ie,wifi_getRadioNumberOfEntries()
-        tdkTestObj.addParameter("methodName","getRadioNumberOfEntries");
-        expectedresult="SUCCESS";
-        tdkTestObj.executeTestCase(expectedresult);
-        actualresult = tdkTestObj.getResult();
-        details = tdkTestObj.getResultDetails();
-        if expectedresult in actualresult :
-            Num_Entries = details.split(":")[1].strip(" ");
-            if int(Num_Entries) > 0:
-                #Set the result status of execution
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "TEST STEP 1: Get the Radio number of entries";
-                print "EXPECTED RESULT 1: Should get the Radio number of entries greater than 0";
-                print "ACTUAL RESULT 1: Radio Number Of Entries = ",Num_Entries;
-                #Get the result of execution
-                print "[TEST EXECUTION RESULT] : SUCCESS";
-            else:
-    	        #Set the result status of execution
-                tdkTestObj.setResultStatus("FAILURE");
-                print "TEST STEP 1: Get the Radio number of entries";
-                print "EXPECTED RESULT 1: Should get the Radio number of entries greater than 0";
-                print "ACTUAL RESULT 1: Radio Number of Entries = ",Num_Entries;
-                #Get the result of execution
-                print "[TEST EXECUTION RESULT] : FAILURE";
+    #Script to load the configuration file of the component
+    tdkTestObj = obj.createTestStep("WIFI_HAL_GetOrSetParamULongValue");
+    #Giving the method name to invoke the api for getting radio number of entries. ie,wifi_getRadioNumberOfEntries()
+    tdkTestObj.addParameter("methodName","getRadioNumberOfEntries");
+    expectedresult="SUCCESS";
+    tdkTestObj.executeTestCase(expectedresult);
+    actualresult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    if expectedresult in actualresult :
+        Num_Entries = details.split(":")[1].strip(" ");
+        if int(Num_Entries) > 0:
+            #Set the result status of execution
+            tdkTestObj.setResultStatus("SUCCESS");
+            print "TEST STEP 1: Get the Radio number of entries";
+            print "EXPECTED RESULT 1: Should get the Radio number of entries greater than 0";
+            print "ACTUAL RESULT 1: Radio Number Of Entries = ",Num_Entries;
+            #Get the result of execution
+            print "[TEST EXECUTION RESULT] : SUCCESS";
         else:
+            #Set the result status of execution
             tdkTestObj.setResultStatus("FAILURE");
-            print "wifi_getRadioNumberOfEntries() operation failed";
+            print "TEST STEP 1: Get the Radio number of entries";
+            print "EXPECTED RESULT 1: Should get the Radio number of entries greater than 0";
+            print "ACTUAL RESULT 1: Radio Number of Entries = ",Num_Entries;
+            #Get the result of execution
+            print "[TEST EXECUTION RESULT] : FAILURE";
     else:
-        print "Connecting to SSID operation failed"
+        tdkTestObj.setResultStatus("FAILURE");
+        print "wifi_getRadioNumberOfEntries() operation failed";
 
     obj.unloadModule("wifihal");
-    sysObj.unloadModule("systemutil");
 else:
     print "Failed to load the module";
-    sysObj.setLoadModuleStatus("FAILURE");
     obj.setLoadModuleStatus("FAILURE");
     print "Module loading failed";
