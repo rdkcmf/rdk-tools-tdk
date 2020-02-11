@@ -44,17 +44,15 @@
     <test_objective>Invoke wifi_getRadioSupportedStandards() api for 5GHz and check whether it returns the radio supported standards list as ['n','ac'].</test_objective>
     <test_type>Positive</test_type>
     <test_setup>IPClient-Wifi</test_setup>
-    <pre_requisite>1.Ccsp Components  should be in a running state else invoke cosa_start.sh manually that includes all the ccsp components and TDK Component
-2.TDK Agent should be in running state or invoke it through StartTdk.sh script</pre_requisite>
+    <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script</pre_requisite>
     <api_or_interface_used>wifi_getRadioSupportedStandards()
-wifi_connectEndpoint()</api_or_interface_used>
+</api_or_interface_used>
     <input_parameters>methodName : getRadioSupportedStandards
 radioIndex : 1</input_parameters>
     <automation_approch>1.Load the module.
-2.Check if the DUT is connected to the required SSID, if not do the connection using wifi_connectEndpoint().
-3.Invoke wifi_getRadioSupportedStandards() api for radio 1 and get the list of radio supported standards.
-4.If api returns the list as ['n','ac'] return SUCCESS,else FAILURE.
-5.Unload the module.</automation_approch>
+2.Invoke wifi_getRadioSupportedStandards() api for radio 1 and get the list of radio supported standards.
+3.If api returns the list as ['n','ac'] return SUCCESS,else FAILURE.
+4.Unload the module.</automation_approch>
     <except_output>wifi_getRadioSupportedStandards() api should the list as ['n','ac'] for 5GHz.</except_output>
     <priority>High</priority>
     <test_stub_interface>WIFI_HAL</test_stub_interface>
@@ -74,64 +72,54 @@ from tdkvWifiUtility import *;
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("wifihal","1");
-sysObj = tdklib.TDKScriptingLibrary("systemutil","1.0");
 
 #IP and Port of box, No need to change,
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'WIFI_HAL_5GHzGetRadioSupportedStandards');
-sysObj.configureTestCase(ip,port,'WIFI_HAL_5GHzGetRadioSupportedStandards');
 
 #Get the result of connection with test component and DUT
-loadmodulestatus1 =obj.getLoadModuleResult();
-loadmodulestatus2 =sysObj.getLoadModuleResult();
+loadmodulestatus =obj.getLoadModuleResult();
 
-if "SUCCESS" in loadmodulestatus1.upper() and loadmodulestatus2.upper():
+if "SUCCESS" in loadmodulestatus.upper():
     obj.setLoadModuleStatus("SUCCESS");
-    sysObj.setLoadModuleStatus("SUCCESS");
     radioIndex = 1
-    connectresult = isConnectedtoSSID(obj,sysObj,radioIndex);
-    if "TRUE" in connectresult:
-        #Script to load the configuration file of the component
-        tdkTestObj = obj.createTestStep("WIFI_HAL_GetOrSetParamStringValue");
-        #Giving the method name to invoke the api for getting radio supported standards ie,wifi_getRadioSupportedStandards()
-        tdkTestObj.addParameter("methodName","getRadioSupportedStandards");
-        #Radio index is 0 for 2.4GHz and 1 for 5GHz
-        tdkTestObj.addParameter("radioIndex",1);
-        expectedresult="SUCCESS";
-        tdkTestObj.executeTestCase(expectedresult);
-        actualresult = tdkTestObj.getResult();
-        details = tdkTestObj.getResultDetails();
-        if expectedresult in actualresult:
-            List = details.split(":")[1].split(",");
-            SupportedStandards = [s.strip() for s in List];
-            if 'n' and 'ac' in SupportedStandards:
-                #Set the result status of execution
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "TEST STEP 1: Get the Radio Supported Standards for 5GHz";
-                print "EXPECTED RESULT 1: Should get the Radio Supported Standards as 'n,ac' for 5GHz";
-                print "ACTUAL RESULT 1: %s" %SupportedStandards;
-                #Get the result of execution
-                print "[TEST EXECUTION RESULT] : SUCCESS";
-            else:
-                #Set the result status of execution
-                tdkTestObj.setResultStatus("FAILURE");
-                print "TEST STEP 1: Get the Radio Supported Standards for 5GHz";
-                print "EXPECTED RESULT 1: Should get the Radio Supported Standards as 'n,ac' for 5GHz";
-                print "ACTUAL RESULT 1: %s" %SupportedStandards;
-                #Get the result of execution
-                print "[TEST EXECUTION RESULT] : FAILURE";
+    #Script to load the configuration file of the component
+    tdkTestObj = obj.createTestStep("WIFI_HAL_GetOrSetParamStringValue");
+    #Giving the method name to invoke the api for getting radio supported standards ie,wifi_getRadioSupportedStandards()
+    tdkTestObj.addParameter("methodName","getRadioSupportedStandards");
+    #Radio index is 0 for 2.4GHz and 1 for 5GHz
+    tdkTestObj.addParameter("radioIndex",1);
+    expectedresult="SUCCESS";
+    tdkTestObj.executeTestCase(expectedresult);
+    actualresult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    if expectedresult in actualresult:
+        List = details.split(":")[1].split(",");
+        SupportedStandards = [s.strip() for s in List];
+        if 'n' and 'ac' in SupportedStandards:
+            #Set the result status of execution
+            tdkTestObj.setResultStatus("SUCCESS");
+            print "TEST STEP 1: Get the Radio Supported Standards for 5GHz";
+            print "EXPECTED RESULT 1: Should get the Radio Supported Standards as 'n,ac' for 5GHz";
+            print "ACTUAL RESULT 1: %s" %SupportedStandards;
+            #Get the result of execution
+            print "[TEST EXECUTION RESULT] : SUCCESS";
         else:
+            #Set the result status of execution
             tdkTestObj.setResultStatus("FAILURE");
-            print "wifi_getRadioSupportedStandards() operation failed";
+            print "TEST STEP 1: Get the Radio Supported Standards for 5GHz";
+            print "EXPECTED RESULT 1: Should get the Radio Supported Standards as 'n,ac' for 5GHz";
+            print "ACTUAL RESULT 1: %s" %SupportedStandards;
+            #Get the result of execution
+            print "[TEST EXECUTION RESULT] : FAILURE";
     else:
-        print "Connecting to SSID operation failed"
+        tdkTestObj.setResultStatus("FAILURE");
+        print "wifi_getRadioSupportedStandards() operation failed";
 
     obj.unloadModule("wifihal");
-    sysObj.unloadModule("systemutil");
 else:
     print "Failed to load the module";
-    sysObj.setLoadModuleStatus("FAILURE");
     obj.setLoadModuleStatus("FAILURE");
     print "Module loading failed";

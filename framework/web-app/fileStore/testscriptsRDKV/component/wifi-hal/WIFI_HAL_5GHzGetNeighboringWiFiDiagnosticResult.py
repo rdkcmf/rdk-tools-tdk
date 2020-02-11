@@ -44,18 +44,15 @@
     <test_objective>To get neighboring wifi diagnostic result for 5GHz</test_objective>
     <test_type>Positive</test_type>
     <test_setup>IPClient-Wifi</test_setup>
-    <pre_requisite>1.Ccsp Components  should be in a running state else invoke cosa_start.sh manually that includes all the ccsp components and TDK Component
-2.TDK Agent should be in running state or invoke it through StartTdk.sh script</pre_requisite>
+    <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script</pre_requisite>
     <api_or_interface_used>wifi_getNeighboringWiFiDiagnosticResult()
-wifi_connectEndpoint()
 </api_or_interface_used>
     <input_parameters>methodName : getNeighboringWiFiDiagnosticResult
 radioIndex : 1</input_parameters>
     <automation_approch>1.Load the module.
-2.Check if the DUT is connected to the required SSID, if not do the connection using wifi_connectEndpoint().
-3.Invoke wifi_getNeighboringWiFiDiagnosticResult() api to get the neighboring WiFi Diagostic result.
-4.If the api return SUCCESS,print the values,else FAILURE.
-5.Unload the module.</automation_approch>
+2.Invoke wifi_getNeighboringWiFiDiagnosticResult() api to get the neighboring WiFi Diagostic result.
+3.If the api return SUCCESS,print the values,else FAILURE.
+4.Unload the module.</automation_approch>
     <except_output>Get the neighboring wifi diagnostic result for 5GHz.</except_output>
     <priority>High</priority>
     <test_stub_interface>WIFI_HAL</test_stub_interface>
@@ -74,58 +71,54 @@ from tdkvWifiUtility import *;
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("wifihal","1");
-sysObj = tdklib.TDKScriptingLibrary("systemutil","1.0");
 
 #IP and Port of box, No need to change,
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'WIFI_HAL_5GHzGetNeighboringWiFiDiagnosticResult');
-sysObj.configureTestCase(ip,port,'WIFI_HAL_5GHzGetNeighboringWiFiDiagnosticResult');
 
 #Get the result of connection with test component and DUT
-loadmodulestatus1 =obj.getLoadModuleResult();
-loadmodulestatus2 =sysObj.getLoadModuleResult();
+loadmodulestatus =obj.getLoadModuleResult();
 
-if "SUCCESS" in loadmodulestatus1.upper() and loadmodulestatus2.upper():
+if "SUCCESS" in loadmodulestatus.upper():
     obj.setLoadModuleStatus("SUCCESS");
-    sysObj.setLoadModuleStatus("SUCCESS");
     radioIndex = 1
-    connectresult = isConnectedtoSSID(obj,sysObj,radioIndex);
-    if "TRUE" in connectresult:
-        #Prmitive test case which associated to this Script
-        tdkTestObj = obj.createTestStep('WIFI_HAL_GetNeighboringWiFiDiagnosticResult');
-        #Radio index is 0 for 2.4GHz and 1 for 5GHz
-        tdkTestObj.addParameter("radioIndex",1);
-        expectedresult="SUCCESS";
-        tdkTestObj.executeTestCase(expectedresult);
-        actualresult = tdkTestObj.getResult();
-        details = tdkTestObj.getResultDetails();
-        if expectedresult in actualresult:
-            #Set the result status of execution
-            tdkTestObj.setResultStatus("SUCCESS");
-            print "TEST STEP 1: Get the neighbor wifi diagnostic"
-            print "EXPECTED RESULT 1: Should get the neighbor wifi diagnostic"
-            print "ACTUAL RESULT 1: Gets the neighbor wifi diagnostic successfully"
-            print "Details : %s"%details;
-            #Get the result of execution
-            print "[TEST EXECUTION RESULT] : SUCCESS";
+    #Prmitive test case which associated to this Script
+    tdkTestObj = obj.createTestStep('WIFI_HAL_GetNeighboringWiFiDiagnosticResult');
+    #Radio index is 0 for 2.4GHz and 1 for 5GHz
+    tdkTestObj.addParameter("radioIndex",1);
+    expectedresult="SUCCESS";
+    tdkTestObj.executeTestCase(expectedresult);
+    actualresult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    if expectedresult in actualresult:
+        #Set the result status of execution
+        tdkTestObj.setResultStatus("SUCCESS");
+        print "TEST STEP 1: Get the neighbor wifi diagnostic"
+        print "EXPECTED RESULT 1: Should get the neighbor wifi diagnostic"
+        print "ACTUAL RESULT 1: Gets the neighbor wifi diagnostic successfully"
+        if "SSID" in details and "Band" in details:
+            neighborAPInfo = details.split("|")
+            print "Neighboring AP Info:"
+            for AP in neighborAPInfo:
+                print AP
         else:
-            #Set the result status of execution
-            tdkTestObj.setResultStatus("FAILURE");
-            print "TEST STEP 1: Get the neighbor wifi diagnostic"
-            print "EXPECTED RESULT 1: Should get the neighbor wifi diagnostic"
-            print "ACTUAL RESULT 1: Failed to get the neighbor wifi diagnostic"
             print "Details : %s"%details;
-            #Get the result of execution
-            print "[TEST EXECUTION RESULT] : FAILURE";
+        #Get the result of execution
+        print "[TEST EXECUTION RESULT] : SUCCESS";
     else:
-        print "Connecting to SSID operation failed"
+        #Set the result status of execution
+        tdkTestObj.setResultStatus("FAILURE");
+        print "TEST STEP 1: Get the neighbor wifi diagnostic"
+        print "EXPECTED RESULT 1: Should get the neighbor wifi diagnostic"
+        print "ACTUAL RESULT 1: Failed to get the neighbor wifi diagnostic"
+        print "Details : %s"%details;
+        #Get the result of execution
+        print "[TEST EXECUTION RESULT] : FAILURE";
 
     obj.unloadModule("wifihal");
-    sysObj.unloadModule("systemutil");
 else:
     print "Failed to load the module";
-    sysObj.setLoadModuleStatus("FAILURE");
     obj.setLoadModuleStatus("FAILURE");
     print "Module loading failed";

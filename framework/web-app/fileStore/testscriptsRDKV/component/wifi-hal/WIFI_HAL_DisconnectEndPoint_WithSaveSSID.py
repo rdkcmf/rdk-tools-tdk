@@ -44,8 +44,7 @@
     <test_objective>To connect the end point with saveSSID flag as true, disconnect the endpoint and verify that the details about the end point are saved in the lastConnected endpoint details</test_objective>
     <test_type>Positive</test_type>
     <test_setup>IPClient-Wifi</test_setup>
-    <pre_requisite>"1.Ccsp Components  should be in a running state else invoke cosa_start.sh manually that includes all the ccsp components and TDK Component
-2.TDK Agent should be in running state or invoke it through StartTdk.sh script"</pre_requisite>
+    <pre_requisite>"1.TDK Agent should be in running state or invoke it through StartTdk.sh script"</pre_requisite>
     <api_or_interface_used>wifi_connectEndpoint
 wifi_disconnectEndpoint
 wifi_lastConnected_Endpoint</api_or_interface_used>
@@ -93,6 +92,8 @@ if "SUCCESS" in loadmodulestatus.upper():
 
     #Script to load the configuration file of the component
     #Connect ans save the SSID details
+    print "TEST STEP 1 : Initiate connection to Access Point A using wifi_connectEndpoint()"
+    print "EXPECTED RESULT : Connection initiation should be success"
     tdkTestObj = obj.createTestStep("WIFI_HAL_ConnectEndpoint");
     tdkTestObj.addParameter("radioIndex",1);
     tdkTestObj.addParameter("ssid",tdkvWifiUtility.ssid_5ghz_name);
@@ -106,78 +107,140 @@ if "SUCCESS" in loadmodulestatus.upper():
     actualresult = tdkTestObj.getResult();
     details = tdkTestObj.getResultDetails();
     print "Connecting to an AP by saving the SSID details"
-    print "Details 1 :",details;
     if expectedresult in actualresult:
         tdkTestObj.setResultStatus("SUCCESS");
-        tdkTestObj = obj.createTestStep("WIFI_HAL_ConnectEndpoint");
+        print "ACTUAL RESULT  : Connection to %s initiated successfully" %(tdkvWifiUtility.ssid_5ghz_name)
+        print "Value Returned : %s\n" %(details)
+
+        # Getting current station connection status after 15 seconds
+        sleep(15);
+        print "TEST STEP 2 : Invoke wifi_getStats to get the connection status"
+        print "EXPECTED RESULT : Should get the details of connected station"
+        tdkTestObj = obj.createTestStep("WIFI_HAL_GetStats");
         tdkTestObj.addParameter("radioIndex",1);
-        tdkTestObj.addParameter("ssid",tdkvWifiUtility.ssid_5ghz_name_new);
-        tdkTestObj.addParameter("security_mode",int(tdkvWifiUtility.ap_5ghz_security_mode_new));
-        tdkTestObj.addParameter("WEPKey",tdkvWifiUtility.ap_5ghz_wep_key_new);
-        tdkTestObj.addParameter("PreSharedKey",tdkvWifiUtility.ap_5ghz_preshared_key_new);
-        tdkTestObj.addParameter("KeyPassphrase",tdkvWifiUtility.ap_5ghz_key_passphrase_new);
-        tdkTestObj.addParameter("saveSSID",1);
-        expectedresult = "SUCCESS";
         tdkTestObj.executeTestCase(expectedresult);
         actualresult = tdkTestObj.getResult();
         details = tdkTestObj.getResultDetails();
-        print "Connecting to an AP without saving the SSID details"
-        print "SSID Name:",tdkvWifiUtility.ssid_5ghz_name_new
-        print "KeyPassphrase:",tdkvWifiUtility.ap_5ghz_key_passphrase_new
-        print "Details 2 :",details;
         if expectedresult in actualresult:
-            tdkTestObj.setResultStatus("SUCCESS");
-            tdkTestObj = obj.createTestStep("WIFI_HAL_DisconnectEndpoint")
-            tdkTestObj.addParameter("radioIndex",1);
-            tdkTestObj.addParameter("ssid",tdkvWifiUtility.ssid_5ghz_name);
-            expectedresult = "SUCCESS";
-            tdkTestObj.executeTestCase(expectedresult);
-            actualresult = tdkTestObj.getResult();
-            details = tdkTestObj.getResultDetails();
-            print "Details 3 :",details
-            if expectedresult in actualresult:
+            SSID_GET = details.split(":")[1].split(",")[0].split("=")[1];
+            if SSID_GET == tdkvWifiUtility.ssid_5ghz_name:
                 tdkTestObj.setResultStatus("SUCCESS");
-                
-                obj.initiateReboot();
-                
-                tdkTestObj = obj.createTestStep("WIFI_HAL_LastConnected_Endpoint");
+                print "ACTUAL RESULT  : Connected to %s successfully" %(tdkvWifiUtility.ssid_5ghz_name)
+                print "Value Returned : %s\n" %(details)
+
+                print "TEST STEP 3 : Initiate connection to Access Point B using wifi_connectEndpoint()"
+                print "EXPECTED RESULT : Connection initiation should be success"
+                tdkTestObj = obj.createTestStep("WIFI_HAL_ConnectEndpoint");
+                tdkTestObj.addParameter("radioIndex",1);
+                tdkTestObj.addParameter("ssid",tdkvWifiUtility.ssid_5ghz_name_new);
+                tdkTestObj.addParameter("security_mode",int(tdkvWifiUtility.ap_5ghz_security_mode_new));
+                tdkTestObj.addParameter("WEPKey",tdkvWifiUtility.ap_5ghz_wep_key_new);
+                tdkTestObj.addParameter("PreSharedKey",tdkvWifiUtility.ap_5ghz_preshared_key_new);
+                tdkTestObj.addParameter("KeyPassphrase",tdkvWifiUtility.ap_5ghz_key_passphrase_new);
+                tdkTestObj.addParameter("saveSSID",1);
                 expectedresult = "SUCCESS";
                 tdkTestObj.executeTestCase(expectedresult);
                 actualresult = tdkTestObj.getResult();
                 details = tdkTestObj.getResultDetails();
-		print details
+                print "Connecting to an AP by saving the SSID details"
                 if expectedresult in actualresult:
                     tdkTestObj.setResultStatus("SUCCESS");
-                    details = details.split(":",1)[1].strip().split(",");
-                    detailsList = [i.split('=', 1)[1] for i in details]
-		    print "Last connected details: ", details
-                    if tdkvWifiUtility.ssid_5ghz_name_new in detailsList and tdkvWifiUtility.ap_5ghz_key_passphrase_new in detailsList:
-                        print "TEST STEP : Compare the ssid details in the lastConnected endpoint details and connected ssid"
-                        print "EXPECTED RESULT : The SSID details should be the same"
-                        print "ACTUAL RESULT : The SSID details are the same"
-                        print "TEST EXECUTION RESULT : SUCCESS"
-                        tdkTestObj.setResultStatus("SUCCESS");
+                    print "ACTUAL RESULT  : Connection to %s initiated successfully" %(tdkvWifiUtility.ssid_5ghz_name_new)
+                    print "Value Returned : %s\n" %(details)
+
+                    # Getting current station connection status after 15 seconds
+                    sleep(15);
+                    print "TEST STEP 4 : Invoke wifi_getStats to get the connection status"
+                    print "EXPECTED RESULT : Should get the details of connected station"
+                    tdkTestObj = obj.createTestStep("WIFI_HAL_GetStats");
+                    tdkTestObj.addParameter("radioIndex",1);
+                    tdkTestObj.executeTestCase(expectedresult);
+                    actualresult = tdkTestObj.getResult();
+                    details = tdkTestObj.getResultDetails();
+                    if expectedresult in actualresult:
+                        SSID_GET = details.split(":")[1].split(",")[0].split("=")[1];
+                        if SSID_GET == tdkvWifiUtility.ssid_5ghz_name_new:
+                            tdkTestObj.setResultStatus("SUCCESS");
+                            print "ACTUAL RESULT  : Connected to %s successfully" %(tdkvWifiUtility.ssid_5ghz_name_new)
+                            print "Value Returned : %s\n" %(details)
+
+                            print "TEST STEP 5 : Invoke wifi_disconnectEndpoint to diconnect Access Point A"
+                            print "EXPECTED RESULT : Should get disconnected from the end-point"
+                            tdkTestObj = obj.createTestStep("WIFI_HAL_DisconnectEndpoint")
+                            tdkTestObj.addParameter("radioIndex",1);
+                            tdkTestObj.addParameter("ssid",tdkvWifiUtility.ssid_5ghz_name);
+                            expectedresult = "SUCCESS";
+                            tdkTestObj.executeTestCase(expectedresult);
+                            actualresult = tdkTestObj.getResult();
+                            details = tdkTestObj.getResultDetails();
+                            if expectedresult in actualresult:
+                                tdkTestObj.setResultStatus("SUCCESS");
+                                print "ACTUAL RESULT  : Disconnected from End Point: SSID: %s" %(tdkvWifiUtility.tdkvWifiUtility.ssid_5ghz_name)
+                                print "Value Returned : %s\n" %(details)
+
+                                obj.initiateReboot();
+
+                                print "TEST STEP 6 : Check wifi_lastConnected_Endpoint results"
+                                print "EXPECTED RESULT : wifi_lastConnected_Endpoint results should have details of Access Point B"
+                                tdkTestObj = obj.createTestStep("WIFI_HAL_LastConnected_Endpoint");
+                                expectedresult = "SUCCESS";
+                                tdkTestObj.executeTestCase(expectedresult);
+                                actualresult = tdkTestObj.getResult();
+                                details = tdkTestObj.getResultDetails();
+                                if expectedresult in actualresult:
+                                    tdkTestObj.setResultStatus("SUCCESS");
+                                    details = details.split(":",1)[1].strip().split(",");
+                                    detailsList = [i.split('=', 1)[1] for i in details]
+                                    print "Last connected details: ", details
+                                    if tdkvWifiUtility.ssid_5ghz_name_new in detailsList and tdkvWifiUtility.ap_5ghz_key_passphrase_new in detailsList:
+                                        print "ACTUAL RESULT : The SSID details are the same"
+                                        print "Value Returned : %s" %(details)
+                                        print "[TEST EXECUTION RESULT] : SUCCESS\n"
+                                        tdkTestObj.setResultStatus("SUCCESS");
+                                    else:
+                                        print "ACTUAL RESULT : The SSID details are not the same"
+                                        print "Value Returned : %s" %(details)
+                                        print "[TEST EXECUTION RESULT] : FAILURE\n"
+                                        tdkTestObj.setResultStatus("FAILURE");
+                                else:
+                                    tdkTestObj.setResultStatus("FAILURE");
+                                    print "ACTUAL RESULT : ",details
+                                    print "[TEST EXECUTION RESULT] : FAILURE"
+                            else:
+                                tdkTestObj.setResultStatus("FAILURE");
+                                print "ACTUAL RESULT : ",details
+                                print "[TEST EXECUTION RESULT] : FAILURE"
+                        else:
+                            tdkTestObj.setResultStatus("FAILURE");
+                            print "ACTUAL RESULT  : Connection to %s Failed" %(tdkvWifiUtility.ssid_5ghz_name_new)
+                            print "Value Returned : %s\n" %(details)
+                            print "[TEST EXECUTION RESULT] : FAILURE"
                     else:
-                        print "TEST STEP : Compare the ssid details in the lastConnected endpoint details and connected ssid"
-                        print "EXPECTED RESULT : The SSID details should be the same"
-                        print "ACTUAL RESULT : The SSID details are not the same"
-                        print "TEST EXECUTION RESULT : FAILURE"
-                        tdkTestObj.setResultStatus("FAILURE");
+                       tdkTestObj.setResultStatus("FAILURE");
+                       print "ACTUAL RESULT : wifi_getStats operation failed"
+                       print "[TEST EXECUTION RESULT] : FAILURE"
                 else:
-                    print "wifi_lastConnected_Endpoint call failed"
                     tdkTestObj.setResultStatus("FAILURE");
+                    print "ACTUAL RESULT : ",details
+                    print "[TEST EXECUTION RESULT] : FAILURE"
             else:
                 tdkTestObj.setResultStatus("FAILURE");
-                print "wifi_disconnectEndpoint call failed"
+                print "ACTUAL RESULT  : Connection to %s Failed" %(tdkvWifiUtility.ssid_5ghz_name)
+                print "Value Returned : %s\n" %(details)
+                print "[TEST EXECUTION RESULT] : FAILURE"
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "wifi_connectEndpoint failed"
+            print "ACTUAL RESULT : wifi_getStats operation failed"
+            print "[TEST EXECUTION RESULT] : FAILURE"
     else:
         tdkTestObj.setResultStatus("FAILURE");
-        print "wifi_connectEndpoint failed"
+        print "ACTUAL RESULT : ",details
+        print "[TEST EXECUTION RESULT] : FAILURE"
 
     obj.unloadModule("wifihal");
 else:
     print "Failed to load the module";
     obj.setLoadModuleStatus("FAILURE");
     print "Module loading failed";
+
+
