@@ -44,7 +44,7 @@ def executeBluetoothCtl(bluetoothObj,commands):
         session = pxssh.pxssh(options={
                             "StrictHostKeyChecking": "no",
                             "UserKnownHostsFile": "/dev/null"})
-        session.login(ip,username,password)
+        session.login(ip,username,password,sync_multiplier=3)
         print "Executing the bluetoothctl commands"
         for parameters in range(0,len(commands)):
             if 'scan on' in commands[parameters]:
