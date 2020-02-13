@@ -518,7 +518,7 @@ class ExecutionController {
 		}
 		else{
 			scripts = scriptService.getScriptNameFileList(getRealPath(), category)
-			scriptListStorm = thunderService.getScriptNameFileListStorm()
+			scriptListStorm = scriptService.getScriptNameFileListStorm()
 		}
 		def sList = scripts?.clone()
 		sList?.sort{a,b -> a?.scriptName <=> b?.scriptName}
@@ -4153,13 +4153,17 @@ class ExecutionController {
 	def readOutputFileDataThunder(){
         File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
         String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION)
-        String STORM_FRAMEWORK_LOG_LOCATION = STORM_FRAMEWORK_LOCATION+Constants.SRC+File.separator+Constants.LOGS+File.separator
+        String folderName = Constants.SCRIPT_OUTPUT_FILE_PATH_STORM
+		String fullLogFilePath = folderName+params?.executionName+Constants.UNDERSCORE+Constants.FULLLOG_LOG
+		File fullLogFile = grailsApplication.parentContext.getResource(fullLogFilePath).file
+		String fullLogFileAbsolutePath = fullLogFile.getAbsolutePath()
+		String STORM_FRAMEWORK_LOG_LOCATION_SINGLE = STORM_FRAMEWORK_LOCATION+Constants.SRC+File.separator+Constants.LOGS+File.separator
 		String LOG_FILE_LOCATION
 		BufferedReader reader
 		if(params?.suiteName == SUITE || params?.suiteName == MULTIPLE_STORM){
-			LOG_FILE_LOCATION = STORM_FRAMEWORK_LOG_LOCATION+params?.executionName+Constants.UNDERSCORE+Constants.FULLLOG_LOG
+			LOG_FILE_LOCATION = fullLogFileAbsolutePath
 		}else{
-		    LOG_FILE_LOCATION = STORM_FRAMEWORK_LOG_LOCATION+params?.scriptName+Constants.JAVASCRIPT_EXTENSION+Constants.UNDERSCORE+params?.executionName+Constants.UNDERSCORE+Constants.EXECUTION_LOG
+		    LOG_FILE_LOCATION = STORM_FRAMEWORK_LOG_LOCATION_SINGLE+params?.scriptName+Constants.JAVASCRIPT_EXTENSION+Constants.UNDERSCORE+params?.executionName+Constants.UNDERSCORE+Constants.EXECUTION_LOG
 		}
         File log_file = new File(LOG_FILE_LOCATION)
         String output= ""

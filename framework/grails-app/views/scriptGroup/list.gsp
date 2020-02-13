@@ -141,10 +141,18 @@
 									<ul>
 										<div class="" style="max-height: 150px;overflow: auto;vertical-align: top;">
 											<li class="closed"><span class="folder" id="firebolt">THUNDER</span>
-												<ul id ="module_">
-													<g:each in="${scriptNameListThunder}" var="script">
-	    												<li id=""><span class="file" id="${script}-RDKV_THUNDER"><a href="#"  onclick="showThunderScript('${script}');  return false;">${script}</a></span></li>
-													</g:each>
+												<ul>
+													<div class="" style="max-height: 150px;overflow: scroll;vertical-align: top;">
+														<g:each in="${scriptGroupMapThunder}" var="mapEntry">
+															<li class="closed"><span class="folder" id="addScriptId">${mapEntry.key}</span>
+																<ul id ="module_">
+																	<g:each in="${mapEntry.value}" var="script">
+	    																<li id=""><span class="file" id="${script}-RDKV_THUNDER"><a href="#"  onclick="showThunderScript('${script}');  return false;">${script}</a></span></li>
+																	</g:each>
+																</ul>
+															</li>
+														</g:each>	
+													</div>
 												</ul>
 											</li>
 										</div>
