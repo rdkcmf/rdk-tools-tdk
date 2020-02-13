@@ -145,11 +145,21 @@ class ThunderController {
 			catch(Exception eX){
 				eX.printStackTrace()
 			}
+			long timeDifference
+			def executionId
+			def executionDeviceId
+			def executionResultId
+			def statusExecution
 			if((status.equals( Status.FREE.toString() ))){
+				(executionId, executionDeviceId) = saveMultipleScriptExecutionDetailsThunder(deviceInstance?.stbName, executionName, scriptName, UNDEFINED_STATUS, startExecutionTime, timeDifference, htmlData, 0)
+				Execution execution = Execution.findById(executionId)
+				ExecutionDevice executionDevice = ExecutionDevice.findById(executionDeviceId)
 				boolean executionResult = false
 				boolean executionFinished = false
 				def waitCounter = 0
+				startExecutionTime = new Date()
 				StormExecuter.executeThunderScript(grailsApplication,scriptName,deviceInstance?.stbIp,executionName)
+				def endExecutionTime = new Date()
 				sleep(10000)
 				waitCounter++
 				executionFinished = StormExecuter.checkThunderExecution(grailsApplication, scriptName, executionName)
@@ -166,13 +176,16 @@ class ThunderController {
 				}else if(executionFinished){
 					executionResult = StormExecuter.parseThunderResult(grailsApplication,scriptName,executionName)
 				}
-				def endExecutionTime = new Date()
-				long timeDifference = endExecutionTime.getTime() - startExecutionTime.getTime()
+				if(executionResult){
+					statusExecution = SUCCESS_STATUS
+				}else{
+					statusExecution = FAILURE_STATUS
+				}
+				timeDifference = endExecutionTime.getTime() - startExecutionTime.getTime()
 				long timeDifferenceInSeconds = (long)(timeDifference/(1000))
 				float timeDifferenceInMinutes = (float)(timeDifferenceInSeconds/(60.0))
 				String timeDifferenceInMinutesString = timeDifferenceInMinutes.toString()
 				htmlData = StormExecuter.returnThunderLogFile(grailsApplication, scriptName, executionName)
-				boolean executionSaveStatus = saveExecutionDetailsThunder(stbName, executionName, scriptName, executionResult, startExecutionTime, timeDifferenceInMinutesString, htmlData)
 				String url = getApplicationUrl()
 				url = url + "/thunder/thirdPartyJsonResultThunder?execName=${executionName}"
 				jsonOutData.addProperty("status", "RUNNING")
@@ -189,9 +202,35 @@ class ThunderController {
 				}catch(Exception e){
                     e.printStackTrace()
 				}
+				ExecutionResult.withTransaction{
+					def executionResultObject = new ExecutionResult()
+					executionResultObject.execution = execution
+					executionResultObject.executionDevice = executionDevice
+					executionResultObject.script = scriptName
+					executionResultObject.device = executionDevice.device
+					executionResultObject.execDevice = null
+					executionResultObject.deviceIdString = null
+					executionResultObject.status = statusExecution
+					executionResultObject.executionTime = timeDifferenceInMinutesString
+					executionResultObject.totalExecutionTime = timeDifferenceInMinutesString
+					executionResultObject.dateOfExecution = execution.dateOfExecution
+					executionResultObject.category = execution.category
+					executionResultObject.executionOutput = htmlData
+					if(!executionResultObject.save(flush:true)) {
+						println "error : "+executionResultObject?.errors
+					}else {
+						executionResultId = executionResultObject.id
+					}
+				}
+				boolean serverConsoleLogFilecreated =StormExecuter.writeServerConsoleLogFileData(grailsApplication, realPath,  executionId, executionDeviceId, executionResultId, scriptName, executionName)
+				boolean versionFilecreated = StormExecuter.createThunderVersionFile(realPath, executionId, executionDeviceId, executionDevice?.deviceIp)
+				Execution.executeUpdate("update Execution e set e.executionStatus = :completedStatus , e.result = :newStatus, e.realExecutionTime = :timeDifference, e.executionTime = :timeDifference, e.outputData = :outputData where e.id = :execId",
+					[newStatus: statusExecution, execId: executionId, completedStatus: COMPLETED_STATUS, timeDifference: timeDifferenceInMinutesString, outputData: htmlData])
+				ExecutionDevice.executeUpdate("update ExecutionDevice e set e.executionTime = :timeDifference where e.id = :execDeviceId",
+					[execDeviceId: executionDeviceId, timeDifference: timeDifferenceInMinutesString])
 			}
 			else{
-				log.error "Device status noT FREE"
+				log.error "Device status is not FREE"
 				jsonOutData.addProperty("status", "Device is not free to execute scripts")
 				jsonOutData.addProperty("result", "None")
 			}
@@ -204,13 +243,73 @@ class ThunderController {
 	}
 	
 	/**
+	 * Method to execute test suites using REST-API
+	 * @param stbName
+	 * @param suiteName
+	 * @return
+	 */
+	def thirdPartySuiteExecutionThunder(final String stbName, final String suiteName){
+		boolean suiteNotPresent = false
+		JsonObject jsonOutData = new JsonObject()
+		if((ScriptGroup.findByName(suiteName) == null) || (ScriptGroup.findByName(suiteName) == "")){
+			suiteNotPresent = true
+		}
+		ScriptGroup scriptGroup = ScriptGroup.findByName(suiteName)
+		def scriptsList
+		if(scriptGroup){
+			scriptsList  = scriptGroup?.scriptList
+		}
+		String scriptName = scriptGroup?.name
+		if ( (scriptsList?.size() > 0) && !suiteNotPresent){
+			thirdPartyScriptListExecutionThunder(stbName, scriptsList, scriptName)
+		}
+		else{
+			log.error "script list empty or script not found..."
+			jsonOutData.addProperty("status", "TESTS NOT FOUND")
+			jsonOutData.addProperty("result", "None")
+			render jsonOutData
+		}
+
+	}
+
+	/**
 	 * Method to execute multiple thunder scripts using REST-API
 	 * @param stbName
 	 * @param scripts
 	 * @return
 	 */
 	def thirdPartyMultipleTestExecutionThunder(final String stbName, final String scripts){
+		JsonObject jsonOutData = new JsonObject()
+		String scriptName = MULTIPLESCRIPT
 		def scriptList  = scripts?.tokenize(",")
+		def scriptInstanceList = []
+		ScriptFile.withTransaction {
+			scriptList.each { script->
+				def scriptFile = ScriptFile.findByScriptName(script)
+				if(scriptFile != null) {
+					scriptInstanceList.add(scriptFile)
+				}
+			}
+		}
+		if ((scriptInstanceList?.size() > 0)  ){
+			thirdPartyScriptListExecutionThunder(stbName, scriptInstanceList, scriptName)
+		}else{
+			log.error "script list empty or script not found..."
+			jsonOutData.addProperty("status", "TESTS NOT FOUND")
+			jsonOutData.addProperty("result", "None")
+			render jsonOutData
+		}
+
+	}
+
+	/**
+	 * Method to execute list of thunder scripts
+	 * @param stbName
+	 * @param scriptList
+	 * @param scriptName
+	 * @return
+	 */
+	 def thirdPartyScriptListExecutionThunder(String stbName, def scriptList, String scriptName){
 		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
 		String STORM_TIME_OUT = thunderService.getConfigProperty(configFile, Constants.STORM_TIME_OUT)
 		def STORM_TIME_OUT_INTEGER = Integer.parseInt(STORM_TIME_OUT)
@@ -230,14 +329,20 @@ class ThunderController {
 		deviceName = deviceInstance?.stbName
 		executionName = CI_EXECUTION+deviceName+"-"+dateFormat.format(cal.getTime()).toString()
 		String STORM_FRAMEWORK_LOCATION = thunderService.getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION)
-		String STORM_FRAMEWORK_LOCATION_LOG_LOCATION_LINUX = STORM_FRAMEWORK_LOCATION+"src/logs/"
-		String fullLogFileAbsolutePath = STORM_FRAMEWORK_LOCATION_LOG_LOCATION_LINUX+executionName+"_fullLog.log"
+		def folderName = Constants.SCRIPT_OUTPUT_FILE_PATH_STORM
+		File folder = grailsApplication.parentContext.getResource(folderName).file
+		folder.mkdirs();
+		String fullLogFilePath = folderName+executionName+Constants.UNDERSCORE+Constants.FULLLOG_LOG
+		File fullLogFile = grailsApplication.parentContext.getResource(fullLogFilePath).file
+		String fullLogFileAbsolutePath = fullLogFile.getAbsolutePath()
 		File fullLog = new File(fullLogFileAbsolutePath)
 		boolean fullLogFileCreated = false
+		try{
 		if(fullLog.createNewFile()){
 			fullLogFileCreated = true
+		}}catch(Exception e){
+			e.printStackTrace()
 		}
-		String scriptName = MULTIPLESCRIPT
 		def executionResult = UNDEFINED_STATUS
 		long timeDifferenceInSeconds
 		float timeDifferenceInMinutes
@@ -260,7 +365,6 @@ class ThunderController {
 						}
 					}
 				}
-				
 			}
 			catch(Exception eX){
 				eX.printStackTrace()
@@ -278,7 +382,6 @@ class ThunderController {
 					aborted = executionService.abortList.contains(executionId?.toString())
 					if(!aborted && !(status.equals(Status.NOT_FOUND.toString()) || status.equals(Status.HANG.toString()))){
 						try{
-							def scriptObject = ScriptFile.findByScriptNameAndCategory(scriptList[i],Category.RDKV_THUNDER)
 							def fileStorePath = STORM_FRAMEWORK_LOCATION+Constants.TESTCASES+File.separator+Constants.STORM_TESTCASES+File.separator+Constants.SRC+File.separator+Constants.TESTS+File.separator
 							List directories = new File(fileStorePath).listFiles()
 							List dirList = []
@@ -298,8 +401,8 @@ class ThunderController {
 									for(String testscriptfile : testscriptfiles){
 										if(testscriptfile.contains(".js") ){
 											fileName = testscriptfile.split(".js")[0]
-											if(fileName.equals(scriptList[i])){
-												path = fileStorePath + directory + File.separator + scriptList[i] + JAVASCRIPT_EXTENSION
+											if(fileName.equals(scriptList[i]?.scriptName)){
+												path = fileStorePath + directory + File.separator + scriptList[i]?.scriptName + JAVASCRIPT_EXTENSION
 												fileFound = true
 												break
 											}
@@ -320,13 +423,19 @@ class ThunderController {
 								DateFormat dateFormat1 = new SimpleDateFormat(DATE_FORMAT)
 								Calendar cal1 = Calendar.getInstance()
 								String timeStamp = dateFormat1.format(cal1.getTime()).toString()
-								StormExecuter.executeThunderScript(grailsApplication,scriptList[i],deviceInstance?.stbIp,executionName)
+								def scriptStartTime = new Date()
+								StormExecuter.executeThunderScript(grailsApplication,scriptList[i]?.scriptName,deviceInstance?.stbIp,executionName)
+								def scriptEndTime = new Date()
+								def scripttimeDifference = scriptEndTime.getTime() - scriptStartTime.getTime()
+								def scripttimeDifferenceInSeconds = (long)(scripttimeDifference/(1000))
+								def scripttimeDifferenceInMinutes = (float)(scripttimeDifferenceInSeconds/(60.0))
+								def scripttimeDifferenceInMinutesString = scripttimeDifferenceInMinutes?.toString()
 								sleep(10000)
 								waitCounter++
-								executionFinished = StormExecuter.checkThunderExecution(grailsApplication, scriptList[i], executionName)
+								executionFinished = StormExecuter.checkThunderExecution(grailsApplication, scriptList[i]?.scriptName, executionName)
 								while(!executionFinished && waitCounter<STORM_COUNTER_MAXIMUM){
 									sleep(10000)
-									executionFinished = StormExecuter.checkThunderExecution(grailsApplication, scriptList[i], executionName)
+									executionFinished = StormExecuter.checkThunderExecution(grailsApplication, scriptList[i]?.scriptName, executionName)
 									if(executionFinished){
 										break
 									}
@@ -335,11 +444,11 @@ class ThunderController {
 								if(waitCounter==STORM_COUNTER_MAXIMUM && !executionFinished){
 									executionResultBool = false
 								}else if(executionFinished){
-									executionResultBool = StormExecuter.parseThunderResult(grailsApplication, scriptList[i], executionName)
+									executionResultBool = StormExecuter.parseThunderResult(grailsApplication, scriptList[i]?.scriptName, executionName)
 								}
-								htmlData = StormExecuter.returnThunderLogFile(grailsApplication, scriptList[i], executionName)
-								def htmlDataForAppend  = timeStamp + HTML_BR + EXECUTING_SCRIPT + scriptList[i] + HTML_BR + LOG_SEPARATION_LINE_STRING + HTML_BR + htmlData
-								executionLogData = executionLogData + timeStamp + HTML_BR + EXECUTING_SCRIPT + scriptList[i] + HTML_BR + LOG_SEPARATION_LINE_STRING + HTML_BR + htmlData + HTML_BR + HTML_BR
+								htmlData = StormExecuter.returnThunderLogFile(grailsApplication, scriptList[i]?.scriptName, executionName)
+								def htmlDataForAppend  = timeStamp + HTML_BR + EXECUTING_SCRIPT + scriptList[i]?.scriptName + HTML_BR + LOG_SEPARATION_LINE_STRING + HTML_BR + htmlData
+								executionLogData = executionLogData + timeStamp + HTML_BR + EXECUTING_SCRIPT + scriptList[i]?.scriptName + HTML_BR + LOG_SEPARATION_LINE_STRING + HTML_BR + htmlData + HTML_BR + HTML_BR
 								try{
 									if(fullLogFileCreated){
 										FileWriter fr = new FileWriter(fullLog, true)
@@ -351,274 +460,11 @@ class ThunderController {
 									e.printStackTrace()
 								}
 								ExecutionResult.withTransaction{
-								def executionResultObject = new ExecutionResult()
-								executionResultObject.execution = execution
-								executionResultObject.executionDevice = executionDevice
-								executionResultObject.script = scriptList[i]
-								executionResultObject.device = executionDevice.device
-								executionResultObject.execDevice = null
-								executionResultObject.deviceIdString = null
-								if(executionResultBool){
-									executionResultObject.status = SUCCESS_STATUS
-								}else{
-									executionResultObject.status = FAILURE_STATUS
-								}
-								executionResultObject.dateOfExecution = execution.dateOfExecution
-								executionResultObject.category = execution.category
-								executionResultObject.executionOutput = htmlData
-								if(!executionResultObject.save(flush:true)) {
-									executionSaveStatus = false
-								}else {
-										executionResultId = executionResultObject.id
-								}
-								}
-							}else{
-								String reason = "No script is available with name :"+scriptList[i]
-								ExecutionResult.withTransaction{
-									ExecutionResult executionResultObject = new ExecutionResult()
+									def executionResultObject = new ExecutionResult()
 									executionResultObject.execution = execution
 									executionResultObject.executionDevice = executionDevice
-									executionResultObject.script = scriptList[i]
-									executionResultObject.device = deviceInstance?.stbName
-									executionResultObject.status = Constants.SKIPPED_STATUS
-									executionResultObject.dateOfExecution = new Date()
-									executionResultObject.executionOutput = "Test not executed. Reason : "+reason
-									executionResultObject.category = Category.RDKV_THUNDER
-									if(! executionResultObject.save(flush:true)) {
-										log.error "Error saving executionResult instance : ${executionResult.errors}"
-									}
-								}
-							}
-						}catch(Exception e){
-							log.error"Exception occurred!!. e : "+e
-							e.printStackTrace()
-						}
-						boolean serverConsoleLogFilecreated =StormExecuter.writeServerConsoleLogFileData(grailsApplication, realPath,  executionId, executionDeviceId, executionResultId, scriptList[i], executionName)
-					}else{
-						if(aborted && executionService.abortList.contains(executionId?.toString())){
-							break
-						}
-					}
-				}
-				def endExecutionTime = new Date()
-				long timeDifference = endExecutionTime.getTime() - startExecutionTime.getTime()
-				timeDifferenceInSeconds = (long)(timeDifference/(1000))
-				timeDifferenceInMinutes = (float)(timeDifferenceInSeconds/(60.0))
-				String timeDifferenceInMinutesString = timeDifferenceInMinutes.toString()
-				def failureListCount = ExecutionResult.executeQuery("SELECT count(*) from ExecutionResult where execution_id = :execId and status like :status",
-				[execId:executionId, status:"FAILURE"])
-				def statusExecution = SUCCESS_STATUS
-				if(failureListCount[0] > 0) {
-					statusExecution = FAILURE_STATUS
-				}
-				if(aborted && executionService.abortList.contains(executionId?.toString())){
-					Execution.executeUpdate("update Execution e set e.executionStatus = :completedStatus , e.result = :newStatus, e.realExecutionTime = :timeDifference, e.executionTime = :timeDifference, e.outputData = :outputData where e.id = :execId",
-					[newStatus: statusExecution, execId: executionId, completedStatus: ABORTED_STATUS, timeDifference: timeDifferenceInMinutesString, outputData: executionLogData])
-					executionService.abortList.remove(executionId?.toString())
-				}else{
-					Execution.executeUpdate("update Execution e set e.executionStatus = :completedStatus , e.result = :newStatus, e.realExecutionTime = :timeDifference, e.executionTime = :timeDifference, e.outputData = :outputData where e.id = :execId",
-						[newStatus: statusExecution, execId: executionId, completedStatus: COMPLETED_STATUS, timeDifference: timeDifferenceInMinutesString, outputData: executionLogData])
-				}
-				ExecutionDevice.executeUpdate("update ExecutionDevice e set e.executionTime = :timeDifference where e.id = :execDeviceId",
-					[execDeviceId: executionDeviceId, timeDifference: timeDifferenceInMinutesString])
-				boolean versionFilecreated = StormExecuter.createThunderVersionFile(realPath, execution?.id, executionDevice?.id, executionDevice?.deviceIp)
-				println " multipleTestRestExecutionThunder [stbName="+stbName+"] [scripts="+scripts+"] [executionName="+executionName+"] [Triggered Execution]"
-				String url = getApplicationUrl()
-				url = url + "/thunder/thirdPartyJsonResultThunder?execName=${executionName}"
-				jsonOutData.addProperty("status", "RUNNING")
-				jsonOutData.addProperty("result",url )
-			}
-			else {
-				log.error "device not free ."
-				jsonOutData.addProperty("status", "Device is not free to execute scripts")
-				jsonOutData.addProperty("result", "None")
-			}
-			try{
-				if(allocated && executionService.deviceAllocatedList.contains(deviceInstance?.id)){
-					executionService.deviceAllocatedList.remove(deviceInstance?.id)
-					allocated = false
-				}
-				status = DeviceStatusUpdater.fetchDeviceStatus(grailsApplication, deviceInstance)
-				Thread.start{
-					deviceStatusService.updateOnlyDeviceStatus(deviceInstance, status)
-				}
-			}catch(Exception e){
-				e.printStackTrace()
-			}
-		} else {
-			log.error "script list empty or script not found..."
-			jsonOutData.addProperty("status", "TESTS NOT FOUND")
-			jsonOutData.addProperty("result", "None")
-		}
-		render jsonOutData
-	}
-	
-	/**
-	 * Method to execute test suites using REST-API
-	 * @param stbName
-	 * @param suiteName
-	 * @return
-	 */
-	def thirdPartySuiteExecutionThunder(final String stbName, final String suiteName){
-		boolean suiteNotPresent = false
-		if((ScriptGroup.findByName(suiteName) == null) || (ScriptGroup.findByName(suiteName) == "")){
-			suiteNotPresent = true
-		}
-		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		String STORM_TIME_OUT = thunderService.getConfigProperty(configFile, Constants.STORM_TIME_OUT)
-		def STORM_TIME_OUT_INTEGER = Integer.parseInt(STORM_TIME_OUT)
-		def STORM_COUNTER_MAXIMUM = (STORM_TIME_OUT_INTEGER * 60 * 1000)/(10000)
-		ScriptGroup scriptGroup = ScriptGroup.findByName(suiteName)
-		def scriptsList
-		if(scriptGroup){
-			scriptsList  = scriptGroup?.scriptList
-		}
-		def htmlData = ""
-		def deviceName
-		def executionName
-		def scriptCount
-		Long executionResultId
-		boolean executionSaveStatus
-		boolean aborted = false
-		String executionLogData = ""
-		executionLogData = executionLogData + HTML_BR + HTML_BR
-		JsonObject jsonOutData = new JsonObject()
-		DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT1)
-		Calendar cal = Calendar.getInstance()
-		def deviceInstance = Device.findByStbName(stbName)
-		deviceName = deviceInstance?.stbName
-		executionName = CI_EXECUTION+deviceName+"-"+dateFormat.format(cal.getTime()).toString()
-		String STORM_FRAMEWORK_LOCATION = thunderService.getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION)
-		String STORM_FRAMEWORK_LOCATION_LOG_LOCATION_LINUX = STORM_FRAMEWORK_LOCATION+"src/logs/"
-		String fullLogFileAbsolutePath = STORM_FRAMEWORK_LOCATION_LOG_LOCATION_LINUX+executionName+"_fullLog.log"
-		File fullLog = new File(fullLogFileAbsolutePath)
-		boolean fullLogFileCreated = false
-		if(fullLog.createNewFile()){
-			fullLogFileCreated = true
-		}
-		String scriptName = scriptGroup?.name
-		def executionResult = UNDEFINED_STATUS
-		long timeDifferenceInSeconds
-		float timeDifferenceInMinutes
-		if ( (scriptsList?.size() > 0) && !suiteNotPresent){
-			scriptCount = scriptsList?.size()
-			String status = ""
-			boolean allocated = false
-			try {
-				status = DeviceStatusUpdater.fetchDeviceStatus(grailsApplication, deviceInstance)
-				if(executionService.deviceAllocatedList.contains(deviceInstance?.id)){
-					status = "BUSY"
-				}else{
-					if((status.equals( Status.FREE.toString() ))){
-						if(!executionService.deviceAllocatedList.contains(deviceInstance?.id)){
-							allocated = true
-							executionService.deviceAllocatedList.add(deviceInstance?.id)
-							Thread.start{
-								deviceStatusService.updateOnlyDeviceStatus(deviceInstance, Status.BUSY.toString())
-							}
-						}
-					}
-				}
-				
-			}
-			catch(Exception eX){
-				eX.printStackTrace()
-			}
-			def startExecutionTime = new Date()
-			def executionId
-			def executionDeviceId
-			def executionResultObject
-			if((status.equals( Status.FREE.toString() ))){
-				(executionId, executionDeviceId) = saveMultipleScriptExecutionDetailsThunder(stbName, executionName, scriptName, executionResult, startExecutionTime, timeDifferenceInSeconds, htmlData, scriptCount)
-				Execution execution = Execution.findById(executionId)
-				ExecutionDevice executionDevice = ExecutionDevice.findById(executionDeviceId)
-				for(int i=0; i<scriptsList.size(); i++){
-					boolean scriptPresent = false
-					aborted = executionService.abortList.contains(executionId?.toString())
-					if(!aborted && !(status.equals(Status.NOT_FOUND.toString()) || status.equals(Status.HANG.toString()))){
-						try{
-							def scriptObject = ScriptFile.findByScriptNameAndCategory(scriptsList[i]?.scriptName,Category.RDKV_THUNDER)
-							def fileStorePath = STORM_FRAMEWORK_LOCATION+Constants.TESTCASES+File.separator+Constants.STORM_TESTCASES+File.separator+Constants.SRC+File.separator+Constants.TESTS+File.separator
-							List directories = new File(fileStorePath).listFiles()
-							List dirList = []
-							directories.each{directory ->
-								String directoryName = directory.toString()
-								int index = directoryName.lastIndexOf("/");
-								String directoryNameString = directoryName.substring(index+1, directoryName.length());
-								dirList.add(directoryNameString)
-							}
-							String fileName
-							boolean fileFound = false
-							def path
-							for(String directory : dirList){
-								File scriptsDir = new File("$fileStorePath"+directory+File.separator)
-								if(scriptsDir.exists()){
-									def testscriptfiles = scriptsDir.list()
-									for(String testscriptfile : testscriptfiles){
-										if(testscriptfile.contains(".js") ){
-											fileName = testscriptfile.split(".js")[0]
-											if(fileName.equals(scriptsList[i]?.scriptName)){
-												path = fileStorePath + directory + File.separator + scriptsList[i]?.scriptName + JAVASCRIPT_EXTENSION
-												fileFound = true
-												break
-											}
-										}
-									}
-									if(fileFound){
-										break
-									}
-								}
-							}
-							if(fileFound){
-								scriptPresent = true
-							}
-							if(scriptPresent){
-								boolean executionResultBool = false
-								boolean executionFinished = false
-								def waitCounter = 0
-								DateFormat dateFormat1 = new SimpleDateFormat(DATE_FORMAT)
-								Calendar cal1 = Calendar.getInstance()
-								def timeStamp = dateFormat1.format(cal1.getTime()).toString()
-								try{
-									StormExecuter.executeThunderScript(grailsApplication,scriptsList[i]?.scriptName,deviceInstance?.stbIp,executionName)
-								}catch(Exception e){
-									e.printStackTrace()
-								}
-								sleep(10000)
-								waitCounter++
-								executionFinished = StormExecuter.checkThunderExecution(grailsApplication, scriptsList[i]?.scriptName, executionName)
-								while(!executionFinished && waitCounter<STORM_COUNTER_MAXIMUM){
-									sleep(10000)
-									executionFinished = StormExecuter.checkThunderExecution(grailsApplication, scriptsList[i]?.scriptName, executionName)
-									if(executionFinished){
-										break
-									}
-									waitCounter++
-								}
-								if(waitCounter==STORM_COUNTER_MAXIMUM && !executionFinished){
-									executionResultBool = false
-								}else if(executionFinished){
-									executionResultBool = StormExecuter.parseThunderResult(grailsApplication, scriptsList[i]?.scriptName, executionName)
-								}
-								htmlData = StormExecuter.returnThunderLogFile(grailsApplication, scriptsList[i]?.scriptName, executionName)
-								def htmlDataForAppend  = timeStamp + HTML_BR + EXECUTING_SCRIPT + scriptsList[i]?.scriptName + HTML_BR + LOG_SEPARATION_LINE_STRING + HTML_BR + htmlData
-								executionLogData = executionLogData + timeStamp + HTML_BR + EXECUTING_SCRIPT + scriptsList[i]?.scriptName + HTML_BR + LOG_SEPARATION_LINE_STRING + HTML_BR + htmlData + HTML_BR + HTML_BR
-								try{
-									if(fullLogFileCreated){
-										FileWriter fr = new FileWriter(fullLog, true)
-										fr.write(htmlDataForAppend)
-										fr.write("\n\n")
-										fr.close()
-									}
-								}catch(Exception e){
-									e.printStackTrace()
-								}
-								ExecutionResult.withTransaction{
-									executionResultObject = new ExecutionResult()
-									executionResultObject.execution = execution
-									executionResultObject.executionDevice = executionDevice
-									executionResultObject.script = scriptsList[i]?.scriptName
-									executionResultObject.device = executionDevice?.device
+									executionResultObject.script = scriptList[i]?.scriptName
+									executionResultObject.device = executionDevice.device
 									executionResultObject.execDevice = null
 									executionResultObject.deviceIdString = null
 									if(executionResultBool){
@@ -626,39 +472,41 @@ class ThunderController {
 									}else{
 										executionResultObject.status = FAILURE_STATUS
 									}
+									executionResultObject.executionTime = scripttimeDifferenceInMinutesString
+									executionResultObject.totalExecutionTime = scripttimeDifferenceInMinutesString
 									executionResultObject.dateOfExecution = execution.dateOfExecution
 									executionResultObject.category = execution.category
 									executionResultObject.executionOutput = htmlData
 									if(!executionResultObject.save(flush:true)) {
-										executionSaveStatus = false
-									}else{
+										log.error "Error saving executionResult instance : ${executionResultObject.errors}"
+									}else {
 										executionResultId = executionResultObject.id
 									}
 								}
 							}else{
-								String reason = "No script is available with name :"+scriptsList[i]?.scriptName
-								ExecutionResult.withTransaction{
-									executionResultObject = new ExecutionResult()
-									executionResultObject.execution = execution
-									executionResultObject.executionDevice = executionDevice
-									executionResultObject.script = scriptsList[i]?.scriptName
-									executionResultObject.device = deviceInstance?.stbName
-									executionResultObject.status = Constants.SKIPPED_STATUS
-									executionResultObject.dateOfExecution = new Date()
-									executionResultObject.executionOutput = "Test not executed. Reason : "+reason
-									executionResultObject.category = Category.RDKV_THUNDER
-									if(! executionResultObject.save(flush:true)) {
-										log.error "Error saving executionResult instance : ${executionResult.errors}"
-									}else{
-										executionResultId = executionResultObject.id
+									String reason = "No script is available with name :"+scriptList[i]?.scriptName
+									ExecutionResult.withTransaction{
+										ExecutionResult executionResultObject = new ExecutionResult()
+										executionResultObject.execution = execution
+										executionResultObject.executionDevice = executionDevice
+										executionResultObject.script = scriptList[i]?.scriptName
+										executionResultObject.device = deviceInstance?.stbName
+										executionResultObject.status = Constants.SKIPPED_STATUS
+										executionResultObject.dateOfExecution = new Date()
+										executionResultObject.executionOutput = "Test not executed. Reason : "+reason
+										executionResultObject.category = Category.RDKV_THUNDER
+										if(! executionResultObject.save(flush:true)) {
+											log.error "Error saving executionResult instance : ${executionResultObject.errors}"
+										}else{
+											executionResultId = executionResultObject.id
+										}
 									}
 								}
-							}
 						}catch(Exception e){
 							log.error"Exception occurred!!. e : "+e
 							e.printStackTrace()
 						}
-						boolean serverConsoleLogFilecreated =StormExecuter.writeServerConsoleLogFileData(grailsApplication, realPath,  execution?.id, executionDevice?.id, executionResultId, executionResultObject?.script, executionName)
+						boolean serverConsoleLogFilecreated =StormExecuter.writeServerConsoleLogFileData(grailsApplication, getRealPath(),  executionId, executionDeviceId, executionResultId, scriptList[i]?.scriptName, executionName)
 					}else{
 						if(aborted && executionService.abortList.contains(executionId?.toString())){
 							break
@@ -686,14 +534,13 @@ class ThunderController {
 				}
 				ExecutionDevice.executeUpdate("update ExecutionDevice e set e.executionTime = :timeDifference where e.id = :execDeviceId",
 					[execDeviceId: executionDeviceId, timeDifference: timeDifferenceInMinutesString])
-				boolean versionFilecreated = StormExecuter.createThunderVersionFile(realPath, execution?.id, executionDevice?.id, executionDevice?.deviceIp)
-				println " suiteRestExecutionThunder [stbName="+stbName+"] [suitename="+suiteName+"] [executionName="+executionName+"] [Triggered Execution]"
+				boolean versionFilecreated = StormExecuter.createThunderVersionFile(getRealPath(), execution?.id, executionDevice?.id, executionDevice?.deviceIp)
+				println " RestExecutionThunder [stbName="+stbName+"] [executionName="+executionName+"] [Triggered Execution]"
 				String url = getApplicationUrl()
 				url = url + "/thunder/thirdPartyJsonResultThunder?execName=${executionName}"
 				jsonOutData.addProperty("status", "RUNNING")
 				jsonOutData.addProperty("result",url )
-			}
-			else {
+			}else {
 				log.error "device not free ."
 				jsonOutData.addProperty("status", "Device is not free to execute scripts")
 				jsonOutData.addProperty("result", "None")
@@ -710,7 +557,7 @@ class ThunderController {
 			}catch(Exception e){
 				e.printStackTrace()
 			}
-		} else {
+		}else{
 			log.error "script list empty or script not found..."
 			jsonOutData.addProperty("status", "TESTS NOT FOUND")
 			jsonOutData.addProperty("result", "None")

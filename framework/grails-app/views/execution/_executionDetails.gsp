@@ -45,9 +45,17 @@
 </tr>
 <tr>
 	<td class="tdhead">TimeTaken(min)</td>
-	<td colspan="4">
-		${executionResultInstance?.executionTime}
-	</td>
+	<%
+		String time = executionResultInstance?.executionTime
+		try{
+			if(time && time?.length() > 0 && time?.contains(".")){
+				int indx = ((time.indexOf(".") + 3) <= time?.length() )?  (time.indexOf(".") + 3) : (time?.length() )
+				time = time.substring(0, time.indexOf(".")+3);
+			}
+		}catch(Exception e){
+		}
+	%>
+	<td colspan="4">${time}</td>
 </tr>
 <g:each in="${executionResultInstance.executemethodresults}"
 	var="executionResultMthdsInstance">
