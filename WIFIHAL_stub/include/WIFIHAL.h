@@ -58,6 +58,11 @@ class WIFIHAL : public RDKTestStubInterface, public AbstractServer<WIFIHAL>
 		  this->bindAndAddMethod(Procedure("TestMgr_WIFIHAL_GetSSIDTrafficStats",PARAMS_BY_NAME, JSON_STRING, "radioIndex",JSON_INTEGER,NULL), &WIFIHAL::WIFI_HAL_GetSSIDTrafficStats);
 		  this->bindAndAddMethod(Procedure("TestMgr_WIFIHAL_GetNeighboringWiFiDiagnosticResult",PARAMS_BY_NAME, JSON_STRING, "radioIndex",JSON_INTEGER,NULL), &WIFIHAL::WIFI_HAL_GetNeighboringWiFiDiagnosticResult);
                   this->bindAndAddMethod(Procedure("TestMgr_WIFIHAL_ConnectEndpoint", PARAMS_BY_NAME, JSON_STRING,"radioIndex", JSON_INTEGER, "ssid",JSON_STRING, "security_mode",JSON_INTEGER, "WEPKey", JSON_STRING, "PreSharedKey", JSON_STRING, "KeyPassphrase", JSON_STRING, "privatekey", JSON_STRING, "eapIdentity", JSON_STRING, "saveSSID", JSON_INTEGER, NULL), &WIFIHAL::WIFI_HAL_ConnectEndpoint);
+                  this->bindAndAddMethod(Procedure("TestMgr_WIFIHAL_GetStats", PARAMS_BY_NAME, JSON_STRING,"radioIndex", JSON_INTEGER, NULL), &WIFIHAL::WIFI_HAL_GetStats);
+                  this->bindAndAddMethod(Procedure("TestMgr_WIFIHAL_GetDualBandSupport", PARAMS_BY_NAME, JSON_STRING, NULL), &WIFIHAL::WIFI_HAL_GetDualBandSupport);
+                  this->bindAndAddMethod(Procedure("TestMgr_WIFIHAL_GetSpecificSSIDInfo", PARAMS_BY_NAME, JSON_STRING, "ssid", JSON_STRING, "band", JSON_INTEGER, NULL), &WIFIHAL::WIFI_HAL_GetSpecificSSIDInfo);
+                  this->bindAndAddMethod(Procedure("TestMgr_WIFIHAL_SetRadioScanningFreqList", PARAMS_BY_NAME, JSON_STRING, "freqList", JSON_STRING, "radioIndex", JSON_INTEGER, NULL), &WIFIHAL::WIFI_HAL_SetRadioScanningFreqList);
+                  this->bindAndAddMethod(Procedure("TestMgr_WIFIHAL_ClearSSIDInfo", PARAMS_BY_NAME, JSON_STRING, "radioIndex", JSON_INTEGER,NULL), &WIFIHAL::WIFI_HAL_ClearSSIDInfo);
                   this->bindAndAddMethod(Procedure("TestMgr_WIFIHAL_LastConnected_Endpoint", PARAMS_BY_NAME, JSON_STRING,NULL), &WIFIHAL::WIFI_HAL_LastConnected_Endpoint);
                   this->bindAndAddMethod(Procedure("TestMgr_WIFIHAL_DisconnectEndpoint", PARAMS_BY_NAME, JSON_STRING,"radioIndex", JSON_INTEGER,"ssid", JSON_STRING, NULL), &WIFIHAL::WIFI_HAL_DisconnectEndpoint);
                   this->bindAndAddMethod(Procedure("TestMgr_WIFIHAL_SetCliWpsButtonPush", PARAMS_BY_NAME, JSON_STRING,"radioIndex", JSON_INTEGER, NULL), &WIFIHAL::WIFI_HAL_SetCliWpsButtonPush);
@@ -80,6 +85,11 @@ class WIFIHAL : public RDKTestStubInterface, public AbstractServer<WIFIHAL>
 	void WIFI_HAL_GetSSIDTrafficStats(IN const Json::Value& req, OUT Json::Value& response);
 	void WIFI_HAL_GetNeighboringWiFiDiagnosticResult(IN const Json::Value& req, OUT Json::Value& response);
 	void WIFI_HAL_ConnectEndpoint(IN const Json::Value& req, OUT Json::Value& response);
+        void WIFI_HAL_GetStats(IN const Json::Value& req, OUT Json::Value& response);
+        void WIFI_HAL_GetDualBandSupport(IN const Json::Value& req, OUT Json::Value& response);
+        void WIFI_HAL_GetSpecificSSIDInfo(IN const Json::Value& req, OUT Json::Value& response);
+        void WIFI_HAL_SetRadioScanningFreqList(IN const Json::Value& req, OUT Json::Value& response);
+        void WIFI_HAL_ClearSSIDInfo(IN const Json::Value& req, OUT Json::Value& response);
 	void WIFI_HAL_LastConnected_Endpoint(IN const Json::Value& req, OUT Json::Value& response);
 	void WIFI_HAL_DisconnectEndpoint(IN const Json::Value& req, OUT Json::Value& response);
 	void WIFI_HAL_SetCliWpsButtonPush(IN const Json::Value& req, OUT Json::Value& response);
