@@ -183,86 +183,94 @@ def parseDeviceConfig(obj):
 ########## End of Function ##########
 
 
-def GetSSID(sysObj):
-    tdkTestObj = sysObj.createTestStep('ExecuteCommand');
-    tdkTestObj.addParameter("command","curl -d '{\"paramList\":[{\"name\":\"Device.WiFi.SSID.1.SSID\"}]}' http://127.0.0.1:10999");
-
-    #Execute the test case in STB
-    expectedresult = "SUCCESS";
-    tdkTestObj.executeTestCase(expectedresult);
-    actualresult = tdkTestObj.getResult();
-    details = tdkTestObj.getResultDetails();
-    if expectedresult in actualresult:
-        status = "SUCCESS";
-        SSID_GET = details.split("value\:")[0].split(":")[3].split("}]}")[0].strip("\\\"");
-        return (SSID_GET,status);
-    else:
-        status = "FAILURE";
-        return (details,status);
-########## End of Function ##########
-
-def isConnectedtoSSID(obj,sysObj,radioIndex):
+def isConnectedtoSSID(obj,radioIndex):
     retValue = "FALSE"
     expectedresult="SUCCESS";
     parseStatus = parseDeviceConfig(obj);
-    (SSID_GET,result) = GetSSID(sysObj);
-    tdkTestObj = obj.createTestStep("WIFI_HAL_ConnectEndpoint");
+    # Getting current station connection status
+    tdkTestObj = obj.createTestStep("WIFI_HAL_GetStats");
     if expectedresult in parseStatus:
         print "==========PARSED THE DEVICE CONFIGURATION FILE SUCCESSFULLY==========";
-        if expectedresult in result:
+        tdkTestObj.addParameter("radioIndex",radioIndex);
+        tdkTestObj.executeTestCase(expectedresult);
+        actualresult = tdkTestObj.getResult();
+        details = tdkTestObj.getResultDetails();
+        if expectedresult in actualresult:
+            tdkTestObj.setResultStatus("SUCCESS");
+            SSID_GET = details.split(":")[1].split(",")[0].split("=")[1];
             print "==========GET SSID NAME OPERATION SUCCESS==========";
-	    if radioIndex == 0:
-		print "SSID from STB:",SSID_GET;
+            if radioIndex == 0:
+                print "SSID of Current station:",SSID_GET;
                 print "SSID to be connected:",ssid_2ghz_name;
                 if SSID_GET == ssid_2ghz_name:
                     print "==========CLIENT CONNECTED TO REQUIRED SSID==========";
-		    retValue = "TRUE"
-
-	        else:
-		    print "==========CLIENT IS NOT CONNECTED TO REQUIRED SSID==========";
-		    print "Connecting to required SSID....."
-	            tdkTestObj.addParameter("radioIndex",0);
-	            tdkTestObj.addParameter("ssid",ssid_2ghz_name);
-	            tdkTestObj.addParameter("security_mode",int(ap_2ghz_security_mode));
-	            tdkTestObj.addParameter("WEPKey",ap_2ghz_wep_key);
-	            tdkTestObj.addParameter("PreSharedKey",ap_2ghz_preshared_key);
-	            tdkTestObj.addParameter("KeyPassphrase",ap_2ghz_key_passphrase);
-	            tdkTestObj.addParameter("saveSSID",1);
-	    else:
-		print "SSID from STB:",SSID_GET;
+                    retValue = "TRUE"
+            else:
+                print "SSID of Current station:",SSID_GET;
                 print "SSID to be connected:",ssid_5ghz_name;
                 if SSID_GET == ssid_5ghz_name:
                     print "==========CLIENT CONNECTED TO REQUIRED SSID==========";
                     retValue = "TRUE"
 
-                else:
-                    print "==========CLIENT IS NOT CONNECTED TO REQUIRED SSID==========";
-                    print "Connecting to required SSID....."
-	            tdkTestObj.addParameter("radioIndex",1);
-	            tdkTestObj.addParameter("ssid",ssid_5ghz_name);
-	            tdkTestObj.addParameter("security_mode",int(ap_5ghz_security_mode));
-	            tdkTestObj.addParameter("WEPKey",ap_5ghz_wep_key);
-	            tdkTestObj.addParameter("PreSharedKey",ap_5ghz_preshared_key);
-	            tdkTestObj.addParameter("KeyPassphrase",ap_5ghz_key_passphrase);
-	            tdkTestObj.addParameter("saveSSID",1);
-
-	    if retValue == "FALSE":
-                #Execute the test case in STB
+            if retValue == "FALSE":
                 expectedresult = "SUCCESS";
+                print "==========CLIENT IS NOT CONNECTED TO REQUIRED SSID==========";
+                print "Connecting to required SSID....."
+                tdkTestObj = obj.createTestStep("WIFI_HAL_ConnectEndpoint");
+                if radioIndex == 0:
+                    tdkTestObj.addParameter("radioIndex",0);
+                    tdkTestObj.addParameter("ssid",ssid_2ghz_name);
+                    tdkTestObj.addParameter("security_mode",int(ap_2ghz_security_mode));
+                    tdkTestObj.addParameter("WEPKey",ap_2ghz_wep_key);
+                    tdkTestObj.addParameter("PreSharedKey",ap_2ghz_preshared_key);
+                    tdkTestObj.addParameter("KeyPassphrase",ap_2ghz_key_passphrase);
+                    tdkTestObj.addParameter("saveSSID",1);
+
+                else:
+                    tdkTestObj.addParameter("radioIndex",1);
+                    tdkTestObj.addParameter("ssid",ssid_5ghz_name);
+                    tdkTestObj.addParameter("security_mode",int(ap_5ghz_security_mode));
+                    tdkTestObj.addParameter("WEPKey",ap_5ghz_wep_key);
+                    tdkTestObj.addParameter("PreSharedKey",ap_5ghz_preshared_key);
+                    tdkTestObj.addParameter("KeyPassphrase",ap_5ghz_key_passphrase);
+                    tdkTestObj.addParameter("saveSSID",1);
+
                 tdkTestObj.executeTestCase(expectedresult);
                 actualresult = tdkTestObj.getResult();
                 details = tdkTestObj.getResultDetails();
                 if expectedresult in actualresult:
                     tdkTestObj.setResultStatus("SUCCESS");
-                    print "==========CONNECTION SUCCESS==========";
-       	            retValue = "TRUE"
-	        else:
-	            tdkTestObj.setResultStatus("FAILURE");
-	            print "==========CONNECTION FAILED==========";
-	            retValue = "FALSE"
+                    print "==========CONNECTION INITIATION SUCCESS==========";
+                    # Getting current station connection status after 15 seconds
+                    sleep(15);
+                    tdkTestObj = obj.createTestStep("WIFI_HAL_GetStats");
+                    tdkTestObj.addParameter("radioIndex",radioIndex);
+                    tdkTestObj.executeTestCase(expectedresult);
+                    actualresult = tdkTestObj.getResult();
+                    details = tdkTestObj.getResultDetails();
+                    if expectedresult in actualresult:
+                        SSID_GET = details.split(":")[1].split(",")[0].split("=")[1];
+                        print "SSID of Current station:",SSID_GET;
+                        if radioIndex == 0 and SSID_GET == ssid_2ghz_name:
+                            tdkTestObj.setResultStatus("SUCCESS");
+                            print "==========CONNECTION SUCCESS==========";
+                            retValue = "TRUE"
+                        elif radioIndex == 1 and SSID_GET == ssid_5ghz_name:
+                            tdkTestObj.setResultStatus("SUCCESS");
+                            print "==========CONNECTION SUCCESS==========";
+                            retValue = "TRUE"
+                        else:
+                            tdkTestObj.setResultStatus("FAILURE");
+                            print "==========CONNECTION FAILED==========";
+                    else:
+                        tdkTestObj.setResultStatus("FAILURE");
+                        print "Get Current Station status operation failed";
+                else:
+                    tdkTestObj.setResultStatus("FAILURE");
+                    print "==========CONNECTION INITIATION FAILED==========";
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Get SSID Name operation failed";
+            print "Get Current Station status operation failed";
     else:
         tdkTestObj.setResultStatus("FAILURE");
         print "Failed to parse the device configuration file";
