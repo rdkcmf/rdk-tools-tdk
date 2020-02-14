@@ -50,11 +50,7 @@ wifi_lastConnected_Endpoint()
 wifi_disconnectEndpoint()</api_or_interface_used>
     <input_parameters>radioIndex:1
 ssid : 5ghz ssid name
-security_mode
-WEPKey
-PreSharedKey
-KeyPassphrase
-saveSSID = 1</input_parameters>
+</input_parameters>
     <automation_approch>1.Load the module.
 2.Check if the DUT is connected to the required SSID, using wifi utility method isConnectedtoSSID.
 3.If connected to end point, invoke wifi_clearSSIDInfo() to clear the conf file
@@ -94,6 +90,7 @@ if "SUCCESS" in loadmodulestatus.upper():
     obj.setLoadModuleStatus("SUCCESS");
     radioIndex = 1
     connectresult = isConnectedtoSSID(obj,radioIndex);
+    ssid = tdkvWifiUtility.ssid_5ghz_name;
     if "TRUE" in connectresult:
         print "TEST STEP 1 : To invoke wifi_clearSSIDInfo api to clear configuration";
         print "EXPECTED RESULT : Should clear ssid info from wpa_supplicant.conf";

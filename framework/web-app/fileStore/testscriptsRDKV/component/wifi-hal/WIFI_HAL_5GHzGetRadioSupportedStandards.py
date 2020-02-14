@@ -51,7 +51,7 @@
 radioIndex : 1</input_parameters>
     <automation_approch>1.Load the module.
 2.Invoke wifi_getRadioSupportedStandards() api for radio 1 and get the list of radio supported standards.
-3.If api returns the list as ['n','ac'] return SUCCESS,else FAILURE.
+3.If api returns the list as ['n','ac','a'] return SUCCESS,else FAILURE.
 4.Unload the module.</automation_approch>
     <except_output>wifi_getRadioSupportedStandards() api should the list as ['n','ac'] for 5GHz.</except_output>
     <priority>High</priority>
@@ -98,11 +98,11 @@ if "SUCCESS" in loadmodulestatus.upper():
     if expectedresult in actualresult:
         List = details.split(":")[1].split(",");
         SupportedStandards = [s.strip() for s in List];
-        if 'n' and 'ac' in SupportedStandards:
+        if 'n' and 'ac' and 'a' in SupportedStandards:
             #Set the result status of execution
             tdkTestObj.setResultStatus("SUCCESS");
             print "TEST STEP 1: Get the Radio Supported Standards for 5GHz";
-            print "EXPECTED RESULT 1: Should get the Radio Supported Standards as 'n,ac' for 5GHz";
+            print "EXPECTED RESULT 1: Should get the Radio Supported Standards as 'n,ac,a' for 5GHz";
             print "ACTUAL RESULT 1: %s" %SupportedStandards;
             #Get the result of execution
             print "[TEST EXECUTION RESULT] : SUCCESS";
@@ -110,7 +110,7 @@ if "SUCCESS" in loadmodulestatus.upper():
             #Set the result status of execution
             tdkTestObj.setResultStatus("FAILURE");
             print "TEST STEP 1: Get the Radio Supported Standards for 5GHz";
-            print "EXPECTED RESULT 1: Should get the Radio Supported Standards as 'n,ac' for 5GHz";
+            print "EXPECTED RESULT 1: Should get the Radio Supported Standards as 'n,ac,a' for 5GHz";
             print "ACTUAL RESULT 1: %s" %SupportedStandards;
             #Get the result of execution
             print "[TEST EXECUTION RESULT] : FAILURE";
