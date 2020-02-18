@@ -111,6 +111,36 @@
         <function>TestMgr_WIFIHAL_Uninit</function>
         <parameters/>
       </primitiveTest>
+      <primitiveTest id=" " name="WIFI_HAL_GetStats" version="2">
+        <function>TestMgr_WIFIHAL_GetStats</function>
+        <parameters>
+          <parameter name="radioIndex" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="WIFI_HAL_GetDualBandSupport" version="1">
+        <function>TestMgr_WIFIHAL_GetDualBandSupport</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="WIFI_HAL_GetSpecificSSIDInfo" version="1">
+        <function>TestMgr_WIFIHAL_GetSpecificSSIDInfo</function>
+        <parameters>
+          <parameter name="band" value="0"/>
+          <parameter name="ssid" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="WIFI_HAL_SetRadioScanningFreqList" version="1">
+        <function>TestMgr_WIFIHAL_SetRadioScanningFreqList</function>
+        <parameters>
+          <parameter name="freqList" value="0"/>
+          <parameter name="radioIndex" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="WIFI_HAL_ClearSSIDInfo" id=" " version="1">
+        <function>TestMgr_WIFIHAL_ClearSSIDInfo</function>
+        <parameters>
+          <parameter name="radioIndex" value="0"/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
