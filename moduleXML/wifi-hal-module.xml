@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2018 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<xml>
+  <module>
+  <!-- Module Name  -->
+    <moduleName>wifi-hal</moduleName>
+  <!-- Category of the module  -->
+    <category>RDKV</category>
+  <!-- Excecution time out of module -->
+    <executionTimeOut>10</executionTimeOut>
+  <!-- Excecution time out of module -->
+    <testGroup>Component</testGroup>
+  <!-- Logs File Names of module -->
+    <logFileNames>[]</logFileNames>
+  <!-- Crash File Names of the module -->
+    <crashFileNames>[]</crashFileNames>
+  <!-- Total functions corresponding module  -->
+    <functions>
+      <function name='TestMgr_WIFIHAL_GetOrSetParamStringValue' />
+      <function name='TestMgr_WIFIHAL_GetOrSetParamULongValue' />
+      <function name='TestMgr_WIFIHAL_GetOrSetParamBoolValue' />
+      <function name='TestMgr_WIFIHAL_GetOrSetRadioStandard' />
+      <function name='TestMgr_WIFIHAL_GetRadioTrafficStats' />
+      <function name='TestMgr_WIFIHAL_GetSSIDTrafficStats' />
+      <function name='TestMgr_WIFIHAL_GetNeighboringWiFiDiagnosticResult' />
+      <function name='TestMgr_WIFIHAL_ConnectEndpoint' />
+      <function name='TestMgr_WIFIHAL_LastConnected_Endpoint' />
+      <function name='TestMgr_WIFIHAL_DisconnectEndpoint' />
+      <function name='TestMgr_WIFIHAL_Init' />
+      <function name='TestMgr_WIFIHAL_Down' />
+      <function name='TestMgr_WIFIHAL_Uninit' />
+      <function name='TestMgr_WIFIHAL_SetCliWpsButtonPush' />
+      <function name='TestMgr_WIFIHAL_GetStats' />
+      <function name='TestMgr_WIFIHAL_GetDualBandSupport' />
+      <function name='TestMgr_WIFIHAL_GetSpecificSSIDInfo' />
+      <function name='TestMgr_WIFIHAL_SetRadioScanningFreqList' />
+      <function name='TestMgr_WIFIHAL_ClearSSIDInfo' />
+    </functions>
+  <!-- Total parameters corresponding module  -->
+    <parameters>
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetParamStringValue' parameterName='methodName' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetParamStringValue' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetParamStringValue' parameterName='paramType' parameterType='STRING' range='NULL' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetParamStringValue' parameterName='param' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetParamULongValue' parameterName='methodName' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetParamULongValue' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetParamULongValue' parameterName='param' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetParamULongValue' parameterName='paramType' parameterType='STRING' range='NULL' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetParamBoolValue' parameterName='methodName' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetParamBoolValue' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetParamBoolValue' parameterName='paramType' parameterType='STRING' range='NULL' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetParamBoolValue' parameterName='param' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetRadioStandard' parameterName='methodName' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetRadioStandard' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetRadioStandard' parameterName='param' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_GetOrSetRadioStandard' parameterName='paramType' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_GetRadioTrafficStats' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_GetSSIDTrafficStats' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_GetNeighboringWiFiDiagnosticResult' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_ConnectEndpoint' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_ConnectEndpoint' parameterName='ssid' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_ConnectEndpoint' parameterName='security_mode' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_WIFIHAL_ConnectEndpoint' parameterName='WEPKey' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_ConnectEndpoint' parameterName='PreSharedKey' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_ConnectEndpoint' parameterName='KeyPassphrase' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_ConnectEndpoint' parameterName='privatekey' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_ConnectEndpoint' parameterName='eapIdentity' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_ConnectEndpoint' parameterName='saveSSID' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_DisconnectEndpoint' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_DisconnectEndpoint' parameterName='ssid' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_SetCliWpsButtonPush' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_GetStats' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_GetSpecificSSIDInfo' parameterName='ssid' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_GetSpecificSSIDInfo' parameterName='band' parameterType='STRING' range='0-2' />
+      <parameter funName='TestMgr_WIFIHAL_SetRadioScanningFreqList' parameterName='freqList' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_WIFIHAL_SetRadioScanningFreqList' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_WIFIHAL_ClearSSIDInfo' parameterName='radioIndex' parameterType='INTEGER' range='0-1' />
+    </parameters>
+  </module>
+</xml>
