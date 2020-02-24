@@ -46,6 +46,11 @@
       <function name='TestMgr_Bluetooth_DisconnectFromDevice' />
       <function name='TestMgr_Bluetooth_GetDeviceProperties' />
       <function name='TestMgr_Bluetooth_GetConnectedDevices' />
+      <function name='TestMgr_Bluetooth_StartAudioStreamingOut' />
+      <function name='TestMgr_Bluetooth_SendRequest' />
+      <function name='TestMgr_Bluetooth_ResetAdapter' />
+      <function name='TestMgr_Bluetooth_IsAudioStreamingOut' />
+      <function name='TestMgr_Bluetooth_StopAudioStreamingOut' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -53,12 +58,17 @@
       <parameter funName='TestMgr_Bluetooth_SetAdapterPowerStatus' parameterName='powerstatus' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_Bluetooth_SetAdapterDiscoverable' parameterName='discoverablestatus' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_Bluetooth_SetAdapterDiscoverable' parameterName='timeout' parameterType='INTEGER' range='1-1000' />
+      <parameter funName='TestMgr_Bluetooth_StartDeviceDiscovery' parameterName='devicetype' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_Bluetooth_StopDeviceDiscovery' parameterName='devicetype' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_Bluetooth_PairDevice' parameterName='devicehandle' parameterType='STRING' range='0-9' />
       <parameter funName='TestMgr_Bluetooth_UnpairDevice' parameterName='devicehandle' parameterType='STRING' range='0-9' />
       <parameter funName='TestMgr_Bluetooth_ConnectToDevice' parameterName='devicehandle' parameterType='STRING' range='0-9' />
       <parameter funName='TestMgr_Bluetooth_ConnectToDevice' parameterName='devicetype' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_Bluetooth_DisconnectFromDevice' parameterName='devicehandle' parameterType='STRING' range='0-9' />
       <parameter funName='TestMgr_Bluetooth_GetDeviceProperties' parameterName='devicehandle' parameterType='STRING' range='0-9' />
+      <parameter funName='TestMgr_Bluetooth_StartAudioStreamingOut' parameterName='devicetype' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_Bluetooth_StartAudioStreamingOut' parameterName='devicehandle' parameterType='STRING' range='0-9' />
+      <parameter funName='TestMgr_Bluetooth_StopAudioStreamingOut' parameterName='devicehandle' parameterType='STRING' range='0-9' />
     </parameters>
   </module>
 </xml>

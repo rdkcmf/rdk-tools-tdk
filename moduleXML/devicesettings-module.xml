@@ -139,6 +139,7 @@
       <parameter funName='TestMgr_DS_FP_setBrightness' parameterName='brightness' parameterType='INTEGER' range='1-100' />
       <parameter funName='TestMgr_DS_FP_setBrightness' parameterName='get_only' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_DS_FP_setBrightness' parameterName='text' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_FP_setBrightness' parameterName='persist' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_DS_FP_setBlink' parameterName='indicator_name' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_DS_FP_setBlink' parameterName='blink_interval' parameterType='INTEGER' range='1-10' />
       <parameter funName='TestMgr_DS_FP_setBlink' parameterName='blink_iteration' parameterType='STRING' range='1-10' />

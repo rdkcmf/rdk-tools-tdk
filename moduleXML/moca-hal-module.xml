@@ -43,10 +43,87 @@
       <function name='TestMgr_MocaHal_GetNumNodes' />
       <function name='TestMgr_MocaHal_GetSupportedModes' />
       <function name='TestMgr_MocaHal_GetMode' />
+      <function name='TestMgr_MocaHal_GetSoftwareVersion' />
+      <function name='TestMgr_MocaHal_GetSupportedBand' />
+      <function name='TestMgr_MocaHal_GetNodeId' />
+      <function name='TestMgr_MocaHal_GetMaxBitRate' />
+      <function name='TestMgr_MocaHal_GetLinkUptime' />
+      <function name='TestMgr_MocaHal_GetTxBroadcastPhyRate' />
+      <function name='TestMgr_MocaHal_GetTxPowerLimit' />
+      <function name='TestMgr_MocaHal_GetPreferredNCEnabled' />
+      <function name='TestMgr_MocaHal_SetPreferredNCEnabled' />
+      <function name='TestMgr_MocaHal_GetMaxPacketAggregation' />
+      <function name='TestMgr_MocaHal_GetMaxFrameSize' />
+      <function name='TestMgr_MocaHal_GetLowBandwidthLimit' />
+      <function name='TestMgr_MocaHal_GetTurboEnabled' />
+      <function name='TestMgr_MocaHal_SetTurboEnabled' />
+      <function name='TestMgr_MocaHal_GetPrivacyEnabled' />
+      <function name='TestMgr_MocaHal_GetTxPowerControlEnabled' />
+      <function name='TestMgr_MocaHal_GetTxBeaconPowerReductionEnabled' />
+      <function name='TestMgr_MocaHal_GetNCNodeId' />
+      <function name='TestMgr_MocaHal_GetBackupNCNodeId' />
+      <function name='TestMgr_MocaHal_GetMixedMode' />
+      <function name='TestMgr_MocaHal_GetNetworkNodeIds' />
+      <function name='TestMgr_MocaHal_GetRemoteNodeIds' />
+      <function name='TestMgr_MocaHal_GetNCMac' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetMac' />
+      <function name='TestMgr_MocaHal_GetTxMapPhyRate' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetPreferredNC' />
+      <function name='TestMgr_MocaHal_GetTxGCDPhyRate' />
+      <function name='TestMgr_MocaHal_GetLinkDownCount' />
+      <function name='TestMgr_MocaHal_GetResetCount' />
+      <function name='TestMgr_MocaHal_GetRFChannelFreq' />
+      <function name='TestMgr_MocaHal_GetPrimaryChannelFreq' />
+      <function name='TestMgr_MocaHal_GetSecondaryChannelFreq' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetActiveMoCAVersion' />
+      <function name='TestMgr_MocaHal_SetLOF' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetMaxPacketAggregation' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetMaxFrameSize' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetRxUnicastPhyRate' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetRxBroadcastPhyRate' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetRxUnicastPower' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetRxBroadcastPower' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetRxMapPower' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetRxPackets' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetRxSNR' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetRxCorrectedErrors' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetRxTotalErrors' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetTxUnicastPhyRate' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetTxUnicastPower' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetTxPackets' />
+      <function name='TestMgr_MocaHal_RemoteNode_GetRxUnCorrectedErrors' />
+      <function name='TestMgr_MocaHal_GetLastResetReason' />
+      <function name='TestMgr_MocaHal_GetTxTotalPackets' />
+      <function name='TestMgr_MocaHal_GetRxTotalPackets' />
+      <function name='TestMgr_MocaHal_GetTxTotalBytes' />
+      <function name='TestMgr_MocaHal_GetTxDroppedPackets' />
+      <function name='TestMgr_MocaHal_GetRxTotalBytes' />
+      <function name='TestMgr_MocaHal_GetRxDroppedPackets' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
       <parameter funName='TestMgr_MocaHal_SetEnabled' parameterName='enable' parameterType='STRING' range='0-1' />
+      <parameter funName='TestMgr_MocaHal_SetPreferredNCEnabled' parameterName='enable' parameterType='STRING' range='0-1' />
+      <parameter funName='TestMgr_MocaHal_SetTurboEnabled' parameterName='enable' parameterType='STRING' range='0-1' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetMac' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetPreferredNC' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetActiveMoCAVersion' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_SetLOF' parameterName='freq' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetMaxPacketAggregation' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetMaxFrameSize' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetRxUnicastPhyRate' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetRxBroadcastPhyRate' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetRxUnicastPower' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetRxBroadcastPower' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetRxMapPower' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetRxPackets' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetRxSNR' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetRxCorrectedErrors' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetRxTotalErrors' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetTxUnicastPhyRate' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetTxUnicastPower' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetTxPackets' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_MocaHal_RemoteNode_GetRxUnCorrectedErrors' parameterName='nodeId' parameterType='INTEGER' range='0-9' />
     </parameters>
   </module>
 </xml>
