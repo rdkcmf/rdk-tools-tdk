@@ -24,6 +24,9 @@ videoPortType = {"RF":0, "BB":1, "SVIDEO":2, "1394":3, "DVI":4, "COMPONENT":5, "
 stereoModeType = {"UNKNOWN":0, "MONO":1, "STEREO":2, "SURROUND":3, "PASSTHRU":4, "INVALID":9};
 audioEncodingType = {"NONE":0, "DISPLAY":1, "PCM":2, "AC3":3, "EAC3":4, "INVALID":9}
 hdcpProtocolVersion = {"VERSION_1X":0, "VERSION_2X":1};
+surroundMode = {"DD":1, "DDPLUS":2};
+aspectRatio = {"4x3":0, "16x9":1};
+colorSpace = {"RGB":1, "YCbCr422":2, "YCbCr444":3, "YCbCr420":4, "AUTO":5};
 
 def stopDsmgrService(obj):
     expectedResult="SUCCESS";
