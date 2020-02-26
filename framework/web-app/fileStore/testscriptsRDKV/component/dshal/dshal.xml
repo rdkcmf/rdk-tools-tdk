@@ -54,8 +54,61 @@
           <parameter name="enable" value=""/>
         </parameters>
       </primitiveTest>
-      <primitiveTest name="DSHal_IsAudioPortEnabled" id="" version="1">
+      <primitiveTest id="" name="DSHal_IsAudioPortEnabled" version="1">
         <function>TestMgr_DSHal_IsAudioPortEnabled</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_IsDisplayConnected" version="1">
+        <function>TestMgr_DSHal_IsDisplayConnected</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_IsDisplaySurround" version="1">
+        <function>TestMgr_DSHal_IsDisplaySurround</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetHDCPProtocol" version="1">
+        <function>TestMgr_DSHal_GetHDCPProtocol</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetHDCPReceiverProtocol" version="1">
+        <function>TestMgr_DSHal_GetHDCPReceiverProtocol</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetHDCPCurrentProtocol" version="1">
+        <function>TestMgr_DSHal_GetHDCPCurrentProtocol</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_IsVideoPortEnabled" version="1">
+        <function>TestMgr_DSHal_IsVideoPortEnabled</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_EnableVideoPort" version="1">
+        <function>TestMgr_DSHal_EnableVideoPort</function>
+        <parameters>
+          <parameter name="enable" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_GetDisplay" version="1">
+        <function>TestMgr_DSHal_GetDisplay</function>
+        <parameters>
+          <parameter name="index" value="0"/>
+          <parameter name="portType" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetDisplayAspectRatio" version="1">
+        <function>TestMgr_DSHal_GetDisplayAspectRatio</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetColorDepth" version="1">
+        <function>TestMgr_DSHal_GetColorDepth</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetColorSpace" version="1">
+        <function>TestMgr_DSHal_GetColorSpace</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_IsVideoPortActive" version="1">
+        <function>TestMgr_DSHal_IsVideoPortActive</function>
         <parameters/>
       </primitiveTest>
     </primitiveTests>
