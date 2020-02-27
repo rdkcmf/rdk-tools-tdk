@@ -1078,7 +1078,7 @@ void DeviceSettingsAgent::AOP_setCompression(IN const Json::Value& req, OUT Json
 	}
 	std::string portName=req["port_name"].asCString();
 	char compressionDetails1[60] ="Compression format:";
-	std::string compressionFormat=req["compression_format"].asCString();
+        const int compressionFormat=req["compression_format"].asInt();
 	char *compressionDetails = (char*)malloc(sizeof(char)*200);
 	memset(compressionDetails,'\0', (sizeof(char)*200));
 	try
@@ -1091,8 +1091,8 @@ void DeviceSettingsAgent::AOP_setCompression(IN const Json::Value& req, OUT Json
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling setCompression\n");
 		aPort.setCompression(compressionFormat);
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling getCompression\n");
-		DEBUG_PRINT(DEBUG_LOG,"\nGetCompression:%s\n",aPort.getCompression().getName().c_str());
-		sprintf(compressionDetails,"%s",aPort.getCompression().getName().c_str());
+		DEBUG_PRINT(DEBUG_LOG,"\nGetCompression:%s\n",aPort.getCompression());
+		sprintf(compressionDetails,"%d",aPort.getCompression());
 		printf("\ncompressionDetails1:%s\n",compressionDetails1);
 		strcat(compressionDetails1,compressionDetails);
 		response["details"]= compressionDetails1; 
@@ -3583,9 +3583,9 @@ void DeviceSettingsAgent::HOST_getAudioOutputPorts(IN const Json::Value& req, OU
                 {
 			device::AudioOutputPort &aPort = aPorts.at(i);
 
-                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Compression [%s] Encoding [%s] StereoMode [%s] Gain [%f] DB [%f]\r\n",
+                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Compression [%d] Encoding [%s] StereoMode [%s] Gain [%f] DB [%f]\r\n",
                                                 aPort.getName().c_str(),
-						aPort.getCompression().getName().c_str(),
+						aPort.getCompression(),
 						aPort.getEncoding().getName().c_str(),
 						aPort.getStereoMode().getName().c_str(),
 						aPort.getGain(),
@@ -4050,9 +4050,9 @@ void DeviceSettingsAgent::AOPCONFIG_release(IN const Json::Value& req, OUT Json:
                 for (size_t i = 0; i < aPorts.size(); i++)
                 {
                         device::AudioOutputPort &aPort = aPorts.at(i);
-                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Compression [%s] Encoding [%s] StereoMode [%s]\r\n",
+                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Compression [%d] Encoding [%s] StereoMode [%s]\r\n",
                                                 aPort.getName().c_str(),
-                                                aPort.getCompression().getName().c_str(),
+                                                aPort.getCompression(),
                                                 aPort.getEncoding().getName().c_str(),
                                                 aPort.getStereoMode().getName().c_str());
 
@@ -4121,9 +4121,9 @@ void DeviceSettingsAgent::AOPCONFIG_load(IN const Json::Value& req, OUT Json::Va
                 for (size_t i = 0; i < aPorts.size(); i++)
                 {
                         device::AudioOutputPort &aPort = aPorts.at(i);
-                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Compression [%s] Encoding [%s] StereoMode [%s]\r\n",
+                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Compression [%d] Encoding [%s] StereoMode [%s]\r\n",
                                                 aPort.getName().c_str(),
-                                                aPort.getCompression().getName().c_str(),
+                                                aPort.getCompression(),
                                                 aPort.getEncoding().getName().c_str(),
                                                 aPort.getStereoMode().getName().c_str());
 
