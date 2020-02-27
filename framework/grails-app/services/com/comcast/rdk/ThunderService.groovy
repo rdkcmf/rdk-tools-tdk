@@ -179,7 +179,6 @@ class ThunderService {
 			def waitCounter = 0
 			startExecutionTime = new Date()
 			StormExecuter.executeThunderScript(grailsApplication,params?.scriptsThunder,deviceInstance?.stbIp,executionName)
-			def endExecutionTime = new Date()
 			sleep(10000)
 			waitCounter++
 			executionFinished = StormExecuter.checkThunderExecution(grailsApplication,params?.scriptsThunder,executionName)
@@ -191,6 +190,7 @@ class ThunderService {
 				}
 				waitCounter++
 			}
+			def endExecutionTime = new Date()
 			if(waitCounter==STORM_COUNTER_MAXIMUM && !executionFinished){
 				executionResult = false
 			}else if(executionFinished){
@@ -200,6 +200,7 @@ class ThunderService {
 			long timeDifferenceInSeconds = (long)(timeDifference/(1000))
 			float timeDifferenceInMinutes = (float)(timeDifferenceInSeconds/(60.0))
 			String timeDifferenceInMinutesString = timeDifferenceInMinutes.toString()
+			timeDifferenceInMinutesString = truncateTimeTaken(timeDifferenceInMinutesString)
 			def statusExecution
 			if(executionResult){
 				statusExecution = SUCCESS_STATUS
@@ -392,11 +393,6 @@ class ThunderService {
 							def timeStamp = dateFormat1.format(cal1.getTime()).toString()
 							def scriptStartTime = new Date()
 							StormExecuter.executeThunderScript(grailsApplication,scriptList[i]?.scriptName,device?.stbIp,executionName)
-							def scriptEndTime = new Date()
-							def scripttimeDifference = scriptEndTime.getTime() - scriptStartTime.getTime()
-							def scripttimeDifferenceInSeconds = (long)(scripttimeDifference/(1000))
-							def scripttimeDifferenceInMinutes = (float)(scripttimeDifferenceInSeconds/(60.0))
-							def scripttimeDifferenceInMinutesString = scripttimeDifferenceInMinutes?.toString()
 							sleep(10000)
 							waitCounter++
 							executionFinished = StormExecuter.checkThunderExecution(grailsApplication,scriptList[i]?.scriptName,executionName)
@@ -408,6 +404,12 @@ class ThunderService {
 								}
 								waitCounter++
 							}
+							def scriptEndTime = new Date()
+							def scripttimeDifference = scriptEndTime.getTime() - scriptStartTime.getTime()
+							def scripttimeDifferenceInSeconds = (long)(scripttimeDifference/(1000))
+							def scripttimeDifferenceInMinutes = (float)(scripttimeDifferenceInSeconds/(60.0))
+							def scripttimeDifferenceInMinutesString = scripttimeDifferenceInMinutes?.toString()
+							scripttimeDifferenceInMinutesString = truncateTimeTaken(scripttimeDifferenceInMinutesString)
 							if(waitCounter==STORM_COUNTER_MAXIMUM && !executionFinished){
 								executionResult = false
 							}else if(executionFinished){
@@ -540,13 +542,15 @@ class ThunderService {
 			session.clear()
 		}
 		def execution = Execution.findByName(execName)
-		try{
-		def isRerunRequired = execution.isRerunRequired
-		if(execution.result == FAILURE && isRerunRequired){
-			runFailedScripts(params, execName, realPath)
-		}
-		}catch(Exception e){
-		    e.printStackTrace()
+		if(execution){
+			try{
+				def isRerunRequired = execution.isRerunRequired
+				if(execution.result == FAILURE && isRerunRequired){
+					runFailedScripts(params, execName, realPath)
+				}
+			}catch(Exception e){
+		    	e.printStackTrace()
+			}
 		}
 	}
 
@@ -1007,6 +1011,24 @@ class ThunderService {
 		def user = User.findByUsername(SecurityUtils.subject.principal)
 		def group = Groups.findById(user?.groupName?.id)
 		return group
+	}
+	
+	/**
+	 * Function to format execution time for thunder scripts
+	 */
+	def truncateTimeTaken ( String executionTime )
+	{
+		try {
+			if(executionTime.contains(".") ){
+					int index = executionTime.indexOf(".")
+					if((index + 3) < executionTime.length() ){
+						executionTime = executionTime?.substring(0, index+3);
+					}
+				}
+		} catch (Exception e) {
+			e.printStackTrace()
+		}
+		return 	executionTime
 	}
 	
 	/**
