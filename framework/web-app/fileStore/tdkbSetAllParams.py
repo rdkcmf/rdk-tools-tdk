@@ -87,9 +87,9 @@ def setAllParams(module, setup_type, tr181Obj, sysObj):
                 expectedValues = expectedValues.split(",")
             else:
                 expectedValues = ""
-        #if expectedValues is not known and that tag itself is not available in xml
+        #if expectedValues is not known and that tag itself is not available in xml, check if get value is non-empty
 	else:
-	    expectedValues = ""
+	    expectedValues = "non-empty"
 	    #the value used for set is chosen from expectedValues. If that tag is not available, look for setValue tag
             if param.find('setValue') is not None:
 		setValue = param.find('setValue').text
@@ -107,7 +107,11 @@ def setAllParams(module, setup_type, tr181Obj, sysObj):
             #for some params expected value or default value may differ for webpa
             if param.find('webpaExpectedValues')is not None:
                 expectedValues = param.find('webpaExpectedValues').text
-                expectedValues = expectedValues.split(",")
+                #if expectedValues in xml is non-empty
+                if expectedValues is not None:
+                    expectedValues = expectedValues.split(",")
+                else:
+                    expectedValues = ""
         elif setup_type == "SNMP":
             if param.find('oid')is not None:
                 paramName = param.find('oid').text
@@ -118,7 +122,11 @@ def setAllParams(module, setup_type, tr181Obj, sysObj):
 	    #get the snmp specific param details
     	    if param.find('snmpExpectedValues')is not None:
     	        expectedValues = param.find('snmpExpectedValues').text
-    	        expectedValues = expectedValues.split(",")
+                #if expectedValues in xml is non-empty
+                if expectedValues is not None:
+                    expectedValues = expectedValues.split(",")
+                else:
+                    expectedValues = ""
 	    if param.find('snmpType') is not None:
 		paramType = param.find('snmpType').text
         else:
@@ -137,7 +145,7 @@ def setAllParams(module, setup_type, tr181Obj, sysObj):
             if expectedresult in actualresult:
                 orgValue = value
 		#if no expected values are there for the parameter, use the setValue field in xml directly, otherwise chose one setvalue from expectedValues list
-		if expectedValues != "":
+		if expectedValues != "" and expectedValues != "non-empty":
                     for newValue in expectedValues:
                        if orgValue != newValue:
                             setValue = newValue
@@ -273,7 +281,7 @@ def getAllParams(module, setup_type, factoryReset, tr181Obj, sysObj):
 		expectedValues = ""
 	#if expectedValues is not known and that tag itself is not available in xml
         else:
-            expectedValues = ""
+            expectedValues = "non-empty"
 
         if setup_type == "TDK":
             paramName = param.find('name').text
@@ -294,9 +302,16 @@ def getAllParams(module, setup_type, factoryReset, tr181Obj, sysObj):
                 continue;
             if param.find('snmpExpectedValues')is not None:
                 expectedValues = param.find('snmpExpectedValues').text
-                expectedValues = expectedValues.split(",")
+                #if expectedValues in xml is non-empty
+                if expectedValues is not None:
+                    expectedValues = expectedValues.split(",")
+                else:
+                    expectedValues = ""
             if param.find('snmpDefaultValue')is not None:
                 defaultValue = param.find('snmpDefaultValue').text
+                #if default value given xml is empty
+                if defaultValue is None:
+                    defaultValue = ""
             if param.find('snmpType') is not None:
                 paramType = param.find('snmpType').text
         else:
@@ -344,7 +359,7 @@ def getParameterValue(tr181Obj, sysObj, setup_type, paramName, paramType, expect
         tdkTestObj.addParameter("ParamName",paramName)
         tdkTestObj.executeTestCase(expectedresult);
         actualresult = tdkTestObj.getResult();
-        value = tdkTestObj.getResultDetails();
+        value = tdkTestObj.getResultDetails().replace("\\n", "")
     elif setup_type == "WEBPA" :
         # Modify the input parameter type to the format webpa is expecting
         param = {'name':paramName}
@@ -378,6 +393,9 @@ def getParameterValue(tr181Obj, sysObj, setup_type, paramName, paramType, expect
 
 	#delimiter for response parsing, based on param type strings like STRING:,INTEGER:
 	delimiter = typeDict.get(paramType)+":"
+        #SNMP response with empty value will not have the type name as usual response, hence use = as delimiter
+        if expectedValues == "":
+            delimiter = '='
 	if delimiter in actResponse:
 	    value = actResponse.split(delimiter)[1].strip().replace('"', '')
 	    actualresult = "SUCCESS"
@@ -386,9 +404,9 @@ def getParameterValue(tr181Obj, sysObj, setup_type, paramName, paramType, expect
             actualresult = "FAILURE"
 
     #if there are is no expected value tag, then check if getvalue is non-empty, otherwise getvalue should be in exepectedValues list
-    if (expectedresult in actualresult) and (expectedValues == "" and value!="") or (value in expectedValues and value!="") or (value!="" and ',' in value) or (expectedValues == "" and value ==""):
+    if (expectedresult in actualresult) and (expectedValues == "non-empty" and value!="") or (value in expectedValues and value!="") or (value!="" and ',' in value) or (expectedValues == "" and value ==""):
 	#if the get value has comma, split the value at commas and check each value against expected values
-        if expectedValues != "" and ',' in value:
+        if expectedValues != "" and expectedValues != "non-empty" and ',' in value:
             value = value.split(',')
             for val in value:
                 if val not in expectedValues:
