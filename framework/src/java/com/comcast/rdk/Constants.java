@@ -172,6 +172,7 @@ public final class Constants
     public static final String MULTIPLE = "Multiple";
     
     public static final String SCRIPT_OUTPUT_FILE_PATH = "//fileStore//opFolder//";
+    public static final String SCRIPT_OUTPUT_FILE_PATH_STORM = "/fileStore/opFolder/";
     public static final String SCRIPT_OUTPUT_FILE_EXTN = ".txt";
     
     public static final String TDK_ERROR = "#TDK_@error-";

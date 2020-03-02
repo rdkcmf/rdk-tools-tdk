@@ -86,11 +86,6 @@ class ScriptGroupController {
 	def testCaseService
 	
 	/**
-	 * Injecting thunderService
-	 */
-	def thunderService
-	
-	/**
 	 * Injects the grailsApplication.
 	 */
 	def grailsApplication
@@ -162,13 +157,14 @@ class ScriptGroupController {
 		scriptNameListB = scriptNameListB?scriptNameListB:[]
 		def scriptNameListTCL = scriptService.getTCLNameList(requestGetRealPath)
 		scriptNameListTCL = scriptNameListTCL?scriptNameListTCL?.sort():[]
-		def scriptNameListThunder = thunderService.getScriptNameFileListStorm()
+		def scriptNameListThunder = scriptService.getScriptNameFileListStorm()
 		scriptNameListThunder = scriptNameListThunder?scriptNameListThunder?.sort():[]
 		def scriptGroupMapB = scriptService.getScriptsMap(requestGetRealPath, RDKB)
 		scriptGroupMapB = scriptGroupMapB?scriptGroupMapB:[:]
 		def scriptGroupMapV = scriptService.getScriptsMap(requestGetRealPath, RDKV)
 		scriptGroupMapV = scriptGroupMapV?scriptGroupMapV:[:]
-		//def lists = ScriptGroup.executeQuery('select name from ScriptGroup')
+		def scriptGroupMapThunder = scriptService.getScriptMapThunder(requestGetRealPath)
+		scriptGroupMapThunder = scriptGroupMapThunder?scriptGroupMapThunder:[:]
 		def listsV = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKV])
 		listsV = listsV?listsV : []
 		def listsB = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKB])
@@ -207,7 +203,7 @@ class ScriptGroupController {
 			testGroup : moduleMap, testSuiteMapV : testSuiteMapV, testSuiteMapB : testSuiteMapB,
 			scriptNameListThunder:scriptNameListThunder,  scriptGrpThunder :listsThunder,
 			thunderScriptInstanceTotal:scriptNameListThunder?.size(),  thunderScriptSize :listsThunder?.size(),
-			totalScriptsThunder:totalScriptsThunder]
+			totalScriptsThunder:totalScriptsThunder, scriptGroupMapThunder : scriptGroupMapThunder]
 	}
 
 
@@ -3023,6 +3019,7 @@ class ScriptGroupController {
 		def requestGetRealPath = request.getRealPath("/")
 		def scriptGroupMap = scriptService.getScriptsMap(requestGetRealPath)
 		def refreshStatus = scriptService.scriptListRefresh(realPath ,scriptGroupMap )
+		scriptService.initializeThunderScripts(realPath)
 		if(refreshStatus){
 			flash.message =  "Script lists are same not modified "
 		} else {
@@ -4330,8 +4327,10 @@ class ScriptGroupController {
 		def moduleList
 		if(params?.category?.equals(Constants.RDKB_TCL)){
 			moduleList = ['tcl']
+		}else if(params?.category?.equals(Constants.RDKV)){
+		 	moduleList = Module.findAll("from Module as b where (b.category='${Category.RDKV}' or b.category='${Category.RDKV_THUNDER}')")
 		}else{
-		  moduleList = Module.findAllByCategory(params?.category)
+			moduleList = Module.findAllByCategory(params?.category)
 		}
 		render(template:"modulelist", model:[ moduleList : moduleList])
 	}
@@ -4502,11 +4501,11 @@ class ScriptGroupController {
 			scriptName = params?.scriptName
 		}
 		def scriptMap = scriptService.getThundertScript(scriptName)
-		def scriptText = scriptMap.scriptContent
-		if(scriptText){
+		if(scriptMap!=null){
+			def scriptText = scriptMap.scriptContent
 			render (view:"editScript", model:[script : scriptMap , category : Category.RDKV_THUNDER.toString()])
 		}else{
-			render "Error : No script available with this name : "+scriptName
+			render "No script available with this name : "+scriptName
 		}
 	}
 }
