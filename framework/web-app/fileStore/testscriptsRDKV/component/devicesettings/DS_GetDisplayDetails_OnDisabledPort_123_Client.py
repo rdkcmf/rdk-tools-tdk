@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2016 RDK Management
+# Copyright 2020 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,37 +18,35 @@
 ##########################################################################
 '''
 <?xml version="1.0" encoding="UTF-8"?><xml>
-  <id>1599</id>
-  <version>4</version>
-  <name>DS_GetDisplayDetails_OnDisabledPort_123</name>
+  <id/>
+  <version>1</version>
+  <name>DS_GetDisplayDetails_OnDisabledPort_123_Client</name>
   <primitive_test_id>657</primitive_test_id>
   <primitive_test_name>DS_SetEnable</primitive_test_name>
   <primitive_test_version>1</primitive_test_version>
   <status>FREE</status>
-  <synopsis>Verify that EDID value is retrieved even when HDMI port is connected and disabled. In order to disable fetching of display details manual plugout of HDMI is required.
-TestcaseID: CT_DS123</synopsis>
+  <synopsis>Verify that EDID value is retrieved even when HDMI port is connected and disabled. In order to disable fetching of display details manual plugout of HDMI is required.</synopsis>
   <groups_id/>
   <execution_time>3</execution_time>
   <long_duration>false</long_duration>
+  <advanced_script>false</advanced_script>
   <remarks/>
   <skip>false</skip>
   <box_types>
-    <box_type>IPClient-4</box_type>
-    <box_type>Hybrid-1</box_type>
-    <box_type>Terminal-RNG</box_type>
+    <box_type>IPClient-3</box_type>
   </box_types>
   <rdk_versions>
     <rdk_version>RDK1.3</rdk_version>
     <rdk_version>RDK2.0</rdk_version>
   </rdk_versions>
   <test_cases>
-    <test_case_id>CT_DS123</test_case_id>
+    <test_case_id>CT_DS200</test_case_id>
     <test_objective>Verify that EDID value is not retrieved when HDMI is plugged out. Verify that EDID value is retrieved even when HDMI port is connected and disabled.</test_objective>
-    <test_type>Negative</test_type>
-    <test_setup>XG1-1/XI3-1</test_setup>
+    <test_type>Positive</test_type>
+    <test_setup>XI3-1</test_setup>
     <pre_requisite>1. dsMgrMain should be up and running.
 2. IARMDaemonMain should be up and running.</pre_requisite>
-    <api_or_interface_used>device::Manager::Initialize() 
+    <api_or_interface_used>device::Manager::Initialize()
 device::VideoOutputPort::enable
 device::VideoOutputPort::disable
 device::VideoOutputPort::getDisplay()::getManufacturerWeek()
@@ -58,20 +56,20 @@ device::VideoOutputPort::getDisplay()::getSerialNumber()
 device::Manager::DeInitialize()</api_or_interface_used>
     <input_parameters>integer enable(0,1)
 string port_name="HDMI0"</input_parameters>
-    <automation_approch>1.TM loads the Device_Settings_Agent via the test agent 
+    <automation_approch>1.TM loads the Device_Settings_Agent via the test agent
 2. Set the Videooutput port to disable and get the details about the videoOutputPort.
 3. Set the Videooutput port to enable and get the details about the videoOutputPort.
 4.Device_Settings_Agent will list the details about videoOutputPort.</automation_approch>
-    <except_output>Checkpoint 1 Check for return value of the devicedetails after port disable / enable .</except_output>
+    <expected_output>Checkpoint 1 Check for return value of the devicedetails after port disable / enable .</expected_output>
     <priority>High</priority>
     <test_stub_interface>TestMgr_DS_managerInitialize
 TestMgr_DS_VOP_setEnable
 TestMgr_DS_VOP_getDisplayDetails
 TestMgr_DS_managerDeinitialize</test_stub_interface>
-    <test_script>DS_GetDisplayDetails_OnDisabledPort_123</test_script>
+    <test_script>DS_GetDisplayDetails_OnDisabledPort_123_Client</test_script>
     <skipped>No</skipped>
-    <release_version>M21</release_version>
-    <remarks>XITHREE-721 </remarks>
+    <release_version>M74</release_version>
+    <remarks/>
   </test_cases>
 </xml>
 
@@ -86,7 +84,7 @@ port = <port>
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("devicesettings","1.2");
-obj.configureTestCase(ip,port,'DS_GetDisplayDetails_OnDisabledPort_123');
+obj.configureTestCase(ip,port,'DS_GetDisplayDetails_OnDisabledPort_123_Client');
 loadmodulestatus =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %loadmodulestatus ;
 #Set the module loading status
@@ -121,9 +119,8 @@ if "SUCCESS" in loadmodulestatus.upper():
                     # Get DisplayDetails after port disable
                     tdkTestObj = obj.createTestStep('DS_DisplayDetails');
                     tdkTestObj.addParameter("port_name","HDMI0");
-                    # Cannot get Display details after disabling the port
-                    # Getting the display details of disabled port raises exception from SDK 17.3 version
-                    expectedresult="FAILURE"
+                    # Able to get Display details after disabling the port for SDK version 14.4
+                    expectedresult="SUCCESS"
                     tdkTestObj.executeTestCase(expectedresult);
                     actualresult = tdkTestObj.getResult();
                     print "[GetPortDisplayDetails RESULT] : %s" %actualresult;
@@ -188,3 +185,4 @@ if "SUCCESS" in loadmodulestatus.upper():
 
         #Unload the deviceSettings module
         obj.unloadModule("devicesettings");
+
