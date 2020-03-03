@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.EnableCWMP</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.3.1.1.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.EnableCWMP</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <snmpDefaultValue>1</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+		<!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>0,1</snmpExpectedValues>
+        </parameter>
+
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.URL</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.3.1.2.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.URL</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <snmpType>string</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.Username</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.3.1.3.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.Username</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <snmpType>string</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.Password</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.3.1.4.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.Password</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <snmpType>string</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.PeriodicInformEnable</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.3.1.7.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.PeriodicInformEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <snmpDefaultValue>1</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>0,1</snmpExpectedValues>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.PeriodicInformInterval</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.3.1.8.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.PeriodicInformInterval</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <snmpType>int</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.PeriodicInformTime</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.PeriodicInformTime</webpaName>
+               <!--type of the parameter -->
+               <type>dateTime</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.ParameterKey</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.ParameterKey</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.ConnectionRequestURL</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.3.1.10.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.ConnectionRequestURL</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <snmpType>string</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.ConnectionRequestUsername</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.3.1.5.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.ConnectionRequestUsername</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+                <snmpType>string</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.ConnectionRequestPassword</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.3.1.6.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.ConnectionRequestPassword</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <snmpType>string</snmpType>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+		<expectedValues></expectedValues>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+               <snmpDefaultValue></snmpDefaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.ACSOverride</name>
+               <!--OID of the above parameter if available -->
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.ACSOverride</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.UpgradesManaged</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.UpgradesManaged</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.X_CISCO_COM_DiagComplete</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.X_CISCO_COM_DiagComplete</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.KickURL</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.KickURL</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.DownloadProgressURL</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.DownloadProgressURL</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+                <persistentSet>false</persistentSet>
+                <defaultValue></defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.DefaultActiveNotificationThrottle</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.DefaultActiveNotificationThrottle</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>30</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.CWMPRetryMinimumWaitInterval</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.CWMPRetryMinimumWaitInterval</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <defaultValue>5</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.CWMPRetryIntervalMultiplier</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.CWMPRetryIntervalMultiplier</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>2000</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.UDPConnectionRequestAddress</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.UDPConnectionRequestAddress</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <defaultValue></defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.UDPConnectionRequestAddressNotificationLimit</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.UDPConnectionRequestAddressNotificationLimit</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.STUNEnable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.STUNEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues></snmpExpectedValues>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.STUNServerAddress</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.STUNServerAddress</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.STUNServerPort</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.STUNServerPort</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>3478</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.STUNUsername</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.STUNUsername</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.STUNPassword</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.STUNPassword</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.STUNMaximumKeepAlivePeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.STUNMaximumKeepAlivePeriod</webpaName>
+               <!--type of the parameter -->
+               <type>int</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>30</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.STUNMinimumKeepAlivePeriod</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.STUNMinimumKeepAlivePeriod</webpaName>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>5</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.NATDetected</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.NATDetected</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.AliasBasedAddressing</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.AliasBasedAddressing</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.X_CISCO_COM_ConnectionRequestURLPort</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.X_CISCO_COM_ConnectionRequestURLPort</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>7547</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.AutonomousTransferCompletePolicy.Enable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.AutonomousTransferCompletePolicy.Enable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.AutonomousTransferCompletePolicy.TransferTypeFilter</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.AutonomousTransferCompletePolicy.TransferTypeFilter</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.AutonomousTransferCompletePolicy.ResultTypeFilter</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.AutonomousTransferCompletePolicy.ResultTypeFilter</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.AutonomousTransferCompletePolicy.FileTypeFilter</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.AutonomousTransferCompletePolicy.FileTypeFilter</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.DUStateChangeComplPolicy.Enable</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.DUStateChangeComplPolicy.Enable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.DUStateChangeComplPolicy.OperationTypeFilter</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.DUStateChangeComplPolicy.OperationTypeFilter</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.DUStateChangeComplPolicy.ResultTypeFilter</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.DUStateChangeComplPolicy.ResultTypeFilter</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.ManagementServer.DUStateChangeComplPolicy.FaultCodeFilter</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.ManagementServer.DUStateChangeComplPolicy.FaultCodeFilter</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.SupportedDataModel.1.URL</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.SupportedDataModel.1.URL</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>aa</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.SupportedDataModel.1.URN</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.SupportedDataModel.1.URN</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>bb</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.SupportedDataModel.1.Features</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.SupportedDataModel.1.Features</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>bb</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.SupportedDataModel.2.URL</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.SupportedDataModel.2.URL</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>xx</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.SupportedDataModel.2.URN</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.SupportedDataModel.2.URN</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>yy</defaultValue>
+        </parameter>
+ <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.SupportedDataModel.2.Features</name>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.SupportedDataModel.2.Features</webpaName>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>bb</defaultValue>
+        </parameter>
+</parameters>
+
+
+
