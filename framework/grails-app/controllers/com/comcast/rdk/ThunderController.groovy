@@ -159,7 +159,6 @@ class ThunderController {
 				def waitCounter = 0
 				startExecutionTime = new Date()
 				StormExecuter.executeThunderScript(grailsApplication,scriptName,deviceInstance?.stbIp,executionName)
-				def endExecutionTime = new Date()
 				sleep(10000)
 				waitCounter++
 				executionFinished = StormExecuter.checkThunderExecution(grailsApplication, scriptName, executionName)
@@ -171,6 +170,7 @@ class ThunderController {
 					}
 					waitCounter++
 				}
+				def endExecutionTime = new Date()
 				if(waitCounter==STORM_COUNTER_MAXIMUM && !executionFinished){
 					executionResult = false
 				}else if(executionFinished){
@@ -185,6 +185,7 @@ class ThunderController {
 				long timeDifferenceInSeconds = (long)(timeDifference/(1000))
 				float timeDifferenceInMinutes = (float)(timeDifferenceInSeconds/(60.0))
 				String timeDifferenceInMinutesString = timeDifferenceInMinutes.toString()
+				timeDifferenceInMinutesString = thunderService.truncateTimeTaken(timeDifferenceInMinutesString)
 				htmlData = StormExecuter.returnThunderLogFile(grailsApplication, scriptName, executionName)
 				String url = getApplicationUrl()
 				url = url + "/thunder/thirdPartyJsonResultThunder?execName=${executionName}"
@@ -425,11 +426,6 @@ class ThunderController {
 								String timeStamp = dateFormat1.format(cal1.getTime()).toString()
 								def scriptStartTime = new Date()
 								StormExecuter.executeThunderScript(grailsApplication,scriptList[i]?.scriptName,deviceInstance?.stbIp,executionName)
-								def scriptEndTime = new Date()
-								def scripttimeDifference = scriptEndTime.getTime() - scriptStartTime.getTime()
-								def scripttimeDifferenceInSeconds = (long)(scripttimeDifference/(1000))
-								def scripttimeDifferenceInMinutes = (float)(scripttimeDifferenceInSeconds/(60.0))
-								def scripttimeDifferenceInMinutesString = scripttimeDifferenceInMinutes?.toString()
 								sleep(10000)
 								waitCounter++
 								executionFinished = StormExecuter.checkThunderExecution(grailsApplication, scriptList[i]?.scriptName, executionName)
@@ -441,6 +437,12 @@ class ThunderController {
 									}
 									waitCounter++
 								}
+								def scriptEndTime = new Date()
+								def scripttimeDifference = scriptEndTime.getTime() - scriptStartTime.getTime()
+								def scripttimeDifferenceInSeconds = (long)(scripttimeDifference/(1000))
+								def scripttimeDifferenceInMinutes = (float)(scripttimeDifferenceInSeconds/(60.0))
+								def scripttimeDifferenceInMinutesString = scripttimeDifferenceInMinutes?.toString()
+								scripttimeDifferenceInMinutesString = thunderService.truncateTimeTaken(scripttimeDifferenceInMinutesString)
 								if(waitCounter==STORM_COUNTER_MAXIMUM && !executionFinished){
 									executionResultBool = false
 								}else if(executionFinished){
