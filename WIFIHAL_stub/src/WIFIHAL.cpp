@@ -533,27 +533,65 @@ void WIFIHAL::WIFI_HAL_GetNeighboringWiFiDiagnosticResult(IN const Json::Value& 
 {
     DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_GetNeighboringWiFiDiagnosticResult ----->Entry\n");
 
-    wifi_neighbor_ap_t *neighbor_ap;
-    unsigned int output_array_size;
+    wifi_neighbor_ap_t *neighbor_ap = NULL;
+    unsigned int output_array_size = 0;
+    unsigned int output_array_index;
     int radioIndex = 1;
     int returnValue;
-    char details[1000] = {'\0'};
+    int dataLength;
+    int basicInfoSize = 50;
 
     radioIndex = req["radioIndex"].asInt();
 
     returnValue = wifi_getNeighboringWiFiDiagnosticResult(radioIndex, &neighbor_ap, &output_array_size);
+    printf("return status from api call: %d",returnValue);
     if(0 == returnValue)
     {
-        sprintf(details, "Value returned is :ap_SSID=%s,ap_BSSID=%s,ap_Mode=%s,ap_Channel=%d,ap_SignalStrength=%d,ap_SecurityModeEnabled=%s,ap_EncryptionMode=%s,ap_OperatingFrequencyBand=%s,ap_SupportedStandards=%s,ap_OperatingStandards=%s,ap_OperatingChannelBandwidth=%s,ap_BeaconPeriod=%d,ap_Noise=%d,ap_BasicDataTransferRates=%s,ap_SupportedDataTransferRates=%s,ap_DTIMPeriod=%d,ap_ChannelUtilization=%d,output_array_size=%u",neighbor_ap->ap_SSID,neighbor_ap->ap_BSSID,neighbor_ap->ap_Mode,neighbor_ap->ap_Channel,neighbor_ap->ap_SignalStrength,neighbor_ap->ap_SecurityModeEnabled,neighbor_ap->ap_EncryptionMode,neighbor_ap->ap_OperatingFrequencyBand,neighbor_ap->ap_SupportedStandards,neighbor_ap->ap_OperatingStandards,neighbor_ap->ap_OperatingChannelBandwidth,neighbor_ap->ap_BeaconPeriod,neighbor_ap->ap_Noise,neighbor_ap->ap_BasicDataTransferRates,neighbor_ap->ap_SupportedDataTransferRates,neighbor_ap->ap_DTIMPeriod,neighbor_ap->ap_ChannelUtilization,output_array_size);
-        response["result"]="SUCCESS";
-        response["details"]=details;
-        return;
+        DEBUG_PRINT(DEBUG_TRACE,"\n No of SSIDs with provided channels : %u\n",output_array_size);
+        if (output_array_size > 0)
+        {
+            DEBUG_PRINT(DEBUG_TRACE,"\n Going to allocate %d bytes memory for details",basicInfoSize*output_array_size);
+            char *details = (char*)malloc(basicInfoSize*output_array_size);
+            if (details == NULL)
+            {
+                response["result"]="FAILED";
+                response["details"]="Failed to capture Neighboring WiFi Diagnostic Results";
+                DEBUG_PRINT(DEBUG_TRACE,"\n Memory Allocation failed\n");
+                return;
+            }
+            else{
+                char *details_ptr  = details;
+                memset(details_ptr,'\0',basicInfoSize*output_array_size);
+
+                for (output_array_index=0; output_array_index<output_array_size; output_array_index++)
+                {
+                    if (details[0] != '\0' )
+                    {
+                        sprintf(details_ptr,"|");
+                        details_ptr++;
+                    }
+                    DEBUG_PRINT(DEBUG_TRACE, "ap_SSID=%s,ap_BSSID=%s,ap_Mode=%s,ap_Channel=%d,ap_SignalStrength=%d,ap_SecurityModeEnabled=%s,ap_EncryptionMode=%s,ap_OperatingFrequencyBand=%s,ap_SupportedStandards=%s,ap_OperatingStandards=%s,ap_OperatingChannelBandwidth=%s,ap_BeaconPeriod=%d,ap_Noise=%d,ap_BasicDataTransferRates=%s,ap_SupportedDataTransferRates=%s,ap_DTIMPeriod=%d,ap_ChannelUtilization=%d\n",neighbor_ap->ap_SSID,neighbor_ap->ap_BSSID,neighbor_ap->ap_Mode,neighbor_ap->ap_Channel,neighbor_ap->ap_SignalStrength,neighbor_ap->ap_SecurityModeEnabled,neighbor_ap->ap_EncryptionMode,neighbor_ap->ap_OperatingFrequencyBand,neighbor_ap->ap_SupportedStandards,neighbor_ap->ap_OperatingStandards,neighbor_ap->ap_OperatingChannelBandwidth,neighbor_ap->ap_BeaconPeriod,neighbor_ap->ap_Noise,neighbor_ap->ap_BasicDataTransferRates,neighbor_ap->ap_SupportedDataTransferRates,neighbor_ap->ap_DTIMPeriod,neighbor_ap->ap_ChannelUtilization);
+                    dataLength = sprintf(details_ptr, "SSID=%s,Band=%s",neighbor_ap->ap_SSID,neighbor_ap->ap_OperatingFrequencyBand);
+
+                    details_ptr = details_ptr + dataLength;
+                    neighbor_ap++;
+                }
+                response["result"]="SUCCESS";
+                response["details"]=details;
+                free(details);
+                return;
+            }
+        }
+        else{
+                response["result"]="SUCCESS";
+                response["details"]="No Neighboring SSID found";
+                return;
+        }
     }
     else
     {
-        sprintf(details, "wifi_getNeighboringWiFiDiagnosticResult operation failed");
         response["result"]="FAILURE";
-        response["details"]=details;
+        response["details"]="wifi_getNeighboringWiFiDiagnosticResult operation failed";
         DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_GetNeighboringWiFiDiagnosticResult ---->Error in execution\n");
         return;
     }
@@ -665,6 +703,195 @@ void WIFIHAL::WIFI_HAL_ConnectEndpoint(IN const Json::Value& req, OUT Json::Valu
 }
 /*******************************************************************************************
  *
+ * Function Name        : WIFI_HAL_GetStats
+ * Description          : This function invokes WiFi hal api wifi_getStats()
+ *
+ * @param [in] req-     : radioIndex  - radio index of the wifi
+ * @param [out] response - filled with SUCCESS or FAILURE based on the output status of operation
+ *
+ ********************************************************************************************/
+void WIFIHAL::WIFI_HAL_GetStats(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_GetStats ------>Entry\n");
+    int radioIndex = 1;
+    char details[1000] = {'\0'};
+
+    radioIndex = req["radioIndex"].asInt();
+
+    wifi_sta_stats_t  currStationStat;
+    memset(&currStationStat,0,sizeof(wifi_sta_stats_t));
+
+    wifi_getStats(radioIndex,&currStationStat);
+
+    sprintf(details, "Current Station: sta_SSID=%s,sta_BSSID=%s,sta_BAND=%s,sta_PhyRate=%f,sta_Noise=%f,sta_RSSI=%f,sta_AvgRSSI=%f,sta_LastDataDownlinkRate=%u,sta_LastDataUplinkRate=%u,sta_Retransmissions=%u",currStationStat.sta_SSID,currStationStat.sta_BSSID,currStationStat.sta_BAND,currStationStat.sta_PhyRate,currStationStat.sta_Noise,currStationStat.sta_RSSI,currStationStat.sta_AvgRSSI,currStationStat.sta_LastDataDownlinkRate,currStationStat.sta_LastDataUplinkRate,currStationStat.sta_Retransmissions);
+    response["result"]="SUCCESS";
+    response["details"]=details;
+    DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_GetStats --->Exit\n");
+    return;
+
+}
+
+/*******************************************************************************************
+ *
+ * Function Name        : WIFI_HAL_GetDualBandSupport
+ * Description          : This function invokes WiFi hal api wif_getDualBandSupport()
+ *
+ * @param [in] req-     : NIL
+ * @param [out] response - filled with SUCCESS or FAILURE based on the output staus of operation
+ *
+ ********************************************************************************************/
+void WIFIHAL::WIFI_HAL_GetDualBandSupport(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_GetDualBandSupport ------>Entry\n");
+    int isDualBand;
+    char details[30] = {'\0'};
+
+    isDualBand = wif_getDualBandSupport();
+
+    sprintf(details,"Is Dual Band Supported : %d",isDualBand);
+    response["result"]="SUCCESS";
+    response["details"]=details;
+    DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_GetDualBandSupport ------>Exit\n");
+    return;
+}
+
+/*******************************************************************************************
+ *
+ * Function Name        : WIFI_HAL_GetSpecificSSIDInfo
+ * Description          : This function invokes WiFi hal api wifi_getSpecificSSIDInfo()
+ *
+ * @param [in] req-     : ssid   - ssid name of the router to which to be connected
+                          band   - frequency band
+ * @param [out] response - filled with SUCCESS or FAILURE based on the output staus of operation
+ *
+ ********************************************************************************************/
+void WIFIHAL::WIFI_HAL_GetSpecificSSIDInfo(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_GetSpecificSSIDInfo ------>Entry\n");
+    int returnValue;
+    char details[1000] = {'\0'};
+    char ssid[30];
+    int freq_Band = 0;    // WIFI_HAL_FREQ_BAN_NONE
+
+    strcpy(ssid,req["ssid"].asCString());
+    freq_Band = req["band"].asInt();
+    printf("AP_ssid: %s\n",ssid);
+    printf("Frequency_Band: %d\n",freq_Band);
+
+    unsigned int output_array_size;
+    WIFI_HAL_FREQ_BAND band;
+    wifi_neighbor_ap_t  *filtered_ap_array;
+
+    switch(freq_Band)
+    {
+        case 0: band = WIFI_HAL_FREQ_BAN_NONE;
+                break;
+        case 1: band = WIFI_HAL_FREQ_BAND_24GHZ;
+                break;
+        case 2: band = WIFI_HAL_FREQ_BAND_5GHZ;
+                break;
+    }
+
+    returnValue=wifi_getSpecificSSIDInfo(ssid,band,&filtered_ap_array,&output_array_size);
+    printf("return status from api call: %d",returnValue);
+    if(0 == returnValue)
+    {
+        sprintf(details, "ap_SSID=%s,ap_BSSID=%s,ap_Mode=%s,ap_Channel=%u,ap_SignalStrength=%d,ap_SecurityModeEnabled=%s,ap_EncryptionMode=%s,ap_OperatingFrequencyBand=%s,ap_SupportedStandards=%s,ap_OperatingStandards=%s,ap_OperatingChannelBandwidth=%s,ap_BeaconPeriod=%u,ap_Noise=%d,ap_BasicDataTransferRates=%s,ap_SupportedDataTransferRates=%s,ap_DTIMPeriod=%u,ap_ChannelUtilization=%u",filtered_ap_array->ap_SSID,filtered_ap_array->ap_BSSID,filtered_ap_array->ap_Mode,filtered_ap_array->ap_Channel,filtered_ap_array->ap_SignalStrength,filtered_ap_array->ap_SecurityModeEnabled,filtered_ap_array->ap_EncryptionMode,filtered_ap_array->ap_OperatingFrequencyBand,filtered_ap_array->ap_SupportedStandards,filtered_ap_array->ap_OperatingStandards,filtered_ap_array->ap_OperatingChannelBandwidth,filtered_ap_array->ap_BeaconPeriod,filtered_ap_array->ap_Noise,filtered_ap_array->ap_BasicDataTransferRates,filtered_ap_array->ap_SupportedDataTransferRates,filtered_ap_array->ap_DTIMPeriod,filtered_ap_array->ap_ChannelUtilization);
+        response["result"]="SUCCESS";
+        response["details"]=details;
+        return;
+    }
+    else
+    {
+        sprintf(details, "wifi_getSpecificSSIDInfo operation failed");
+        response["result"]="FAILURE";
+        response["details"]=details;
+        DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_GetSpecificSSIDInfo --->Error in execution\n");
+        return;
+    }
+}
+
+/*******************************************************************************************
+ *
+ * Function Name        : WIFI_HAL_SetRadioScanningFreqList
+ * Description          : This function invokes WiFi hal api wifi_setRadioScanningFreqList()
+ *
+ * @param [in] req-     : radioIndex - radio index value of wifi
+                          freqList   - list of frequency to be set
+ * @param [out] response - filled with SUCCESS or FAILURE based on the output staus of operation
+ *
+ ********************************************************************************************/
+void WIFIHAL::WIFI_HAL_SetRadioScanningFreqList(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_SetRadioScanningFreqList ------>Entry\n");
+    int returnValue;
+    char details[100] = {'\0'};
+    char freq_list[100];
+    int radioIndex=1;
+
+    strcpy(freq_list,req["freqList"].asCString());
+    radioIndex = req["radioIndex"].asInt();
+    printf("Radio Index: %d\n",radioIndex);
+    printf("Frequency List: %s\n",freq_list);
+
+    returnValue=wifi_setRadioScanningFreqList(radioIndex,freq_list);
+    printf("return status from api call: %d",returnValue);
+    if(0 == returnValue)
+    {
+        sprintf(details, "Radio Scanning Frequency set operation success");
+        response["result"]="SUCCESS";
+        response["details"]=details;
+        return;
+    }
+    else
+    {
+        sprintf(details, "wifi_setRadioScanningFreqList operation failed");
+        response["result"]="FAILURE";
+        response["details"]=details;
+        DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_SetRadioScanningFreqList --->Error in execution\n");
+        return;
+    }
+}
+
+/*******************************************************************************************
+ *
+ * Function Name        : WIFI_HAL_ClearSSIDInfo
+ * Description          : This function invokes WiFi hal api wifi_clearSSIDInfo()
+ *
+ * @param [in] req-     : ssid   - ssid name of the router to which to be connected
+ * @param [out] response - filled with SUCCESS or FAILURE based on the output staus of operation
+ *
+ ********************************************************************************************/
+void WIFIHAL::WIFI_HAL_ClearSSIDInfo(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_ClearSSIDInfo ------>Entry\n");
+    int returnValue;
+    int radioIndex = 1;
+    char details[100] = {'\0'};
+
+    radioIndex = req["radioIndex"].asInt();
+
+    returnValue = wifi_clearSSIDInfo(radioIndex);
+    printf("return status from api call: %d",returnValue);
+    if(0 == returnValue)
+    {
+        sprintf(details, "Clearing ssid info operation success");
+        response["result"]="SUCCESS";
+        response["details"]=details;
+        return;
+    }
+    else
+    {
+        sprintf(details, "wifi_clearSSIDInfo operation failed");
+        response["result"]="FAILURE";
+        response["details"]=details;
+        DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_ClearSSIDInfo --->Error in execution\n");
+        return;
+    }
+}
+
+/*******************************************************************************************
+ *
  * Function Name        : WIFI_HAL_LastConnected_Endpoint
  * Description          : This function invokes WiFi hal api wifi_lastConnected_Endpoint()
  *
@@ -679,6 +906,7 @@ void WIFIHAL::WIFI_HAL_LastConnected_Endpoint(IN const Json::Value& req, OUT Jso
     char details[500] = {'\0'};
 
     wifi_pairedSSIDInfo_t pairedSSIDInfo;
+    memset(&pairedSSIDInfo,0,sizeof(wifi_pairedSSIDInfo_t));
 
     returnValue=wifi_lastConnected_Endpoint(&pairedSSIDInfo);
 
