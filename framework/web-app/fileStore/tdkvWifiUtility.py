@@ -176,6 +176,12 @@ def parseDeviceConfig(obj):
 	global wifi_interface
 	wifi_interface = config.get(deviceConfig, "WIFI_INTERFACE")
 
+        global set_5ghz_freq_list
+        set_5ghz_freq_list = config.get(deviceConfig, "SET_5GHZ_FREQ_LIST")
+
+        global set_2ghz_freq_list
+        set_2ghz_freq_list = config.get(deviceConfig, "SET_2GHZ_FREQ_LIST")
+
     except Exception, e:
         print e;
         status = "Failed to parse the device specific configuration file"
