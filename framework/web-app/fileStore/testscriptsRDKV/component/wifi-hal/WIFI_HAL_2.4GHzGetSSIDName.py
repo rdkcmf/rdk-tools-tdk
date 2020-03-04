@@ -103,7 +103,7 @@ if "SUCCESS" in loadmodulestatus.upper():
         details = tdkTestObj.getResultDetails();
         if expectedresult in actualresult:
             SSIDName = details.split(":")[1].strip(" ");
-            if len(SSIDName) <= 32:
+            if len(SSIDName) <= 32 and SSIDName == tdkvWifiUtility.ssid_2ghz_name:
                 #Set the result status of execution
                 tdkTestObj.setResultStatus("SUCCESS");
                 print "TEST STEP 1 : Validate the wifi_getSSIDName Function";

@@ -41,7 +41,7 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>TC_WIFI_HAL_29</test_case_id>
-    <test_objective>Test if the list returned by wifi_getRadioChannel() api for 2.4GHz is a subset of the list returned by wifi_getRadioPossibleChannels() for 5GHz.</test_objective>
+    <test_objective>Test if the list returned by wifi_getRadioChannel() api for 5GHz is a subset of the list returned by wifi_getRadioPossibleChannels() for 5GHz.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>IPClient-Wifi</test_setup>
     <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script</pre_requisite>
