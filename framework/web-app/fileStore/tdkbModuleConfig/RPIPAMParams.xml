@@ -753,7 +753,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>comcast</defaultValue>
+               <defaultValue>RDKM</defaultValue>
         </parameter>
 
  <parameter>
@@ -873,7 +873,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>XFINITY Network</defaultValue>
+               <defaultValue>RDKM</defaultValue>
 </parameter>
 
  <parameter>
@@ -888,7 +888,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>Xfinity</defaultValue>
+               <defaultValue>RDKM</defaultValue>
         </parameter>
 
  <parameter>
@@ -903,7 +903,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>xFi</defaultValue>
+               <defaultValue>RDKM</defaultValue>
 </parameter>
  <parameter>
                 <!--the tr-181 parameter name -->
