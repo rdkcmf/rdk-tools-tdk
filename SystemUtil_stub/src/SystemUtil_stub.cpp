@@ -417,6 +417,17 @@ void SystemUtilAgent::SystemUtilAgent_ExecuteBinary(IN const Json::Value& req, O
         string toolPath = req["tool_path"].asCString();
         string ExecutionLogFile,ShellScript,testenvPath;
         int Status;
+        if (logFile.empty() or toolPath.empty())
+        {
+            response["result"]="FAILURE";
+            response["details"]="Configuration details of execution are not present in filestore";
+            DEBUG_PRINT(DEBUG_TRACE, "SystemUtilAgent_ExecuteBinary -->Exit\n");
+            return;
+        }
+        if (toolPath == "Rdkbrowser2_default_url")
+        {
+            toolPath = "";
+        }
         try
         {
                 pid_t idChild = vfork();
@@ -438,7 +449,7 @@ void SystemUtilAgent::SystemUtilAgent_ExecuteBinary(IN const Json::Value& req, O
                 {
                     DEBUG_PRINT(DEBUG_ERROR,"\nFork failed");
                     response["result"]="FAILURE";
-                    response["result"]="Binary Execution Failed";
+                    response["details"]="Binary Execution Failed";
                 }
                 else
                 {
