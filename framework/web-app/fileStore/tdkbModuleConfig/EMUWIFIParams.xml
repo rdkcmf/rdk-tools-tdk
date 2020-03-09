@@ -1000,7 +1000,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.SSID.2.Status</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.SSID.10002.Status</webpaName>
+               <webpaName>Device.WiFi.SSID.10101.Status</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1032,7 +1032,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.SSID.2.Alias</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.SSID.10002.Alias</webpaName>
+               <webpaName>Device.WiFi.SSID.10101.Alias</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1062,7 +1062,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.SSID.2.Name</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.SSID.10002.Name</webpaName>
+               <webpaName>Device.WiFi.SSID.10101.Name</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1088,7 +1088,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.SSID.2.LastChange</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.SSID.10002.LastChange</webpaName>
+               <webpaName>Device.WiFi.SSID.10101.LastChange</webpaName>
                <!--type of the parameter -->
                <type>unsignedint</type>
                <!--whether set is applicable or not -->
@@ -1116,7 +1116,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.SSID.2.LowerLayers</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.SSID.10002.LowerLayers</webpaName>
+               <webpaName>Device.WiFi.SSID.10101.LowerLayers</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1148,7 +1148,7 @@
                <!--OID of the above parameter if available -->
                <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.1.10002</oid>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.SSID.10002.BSSID</webpaName>
+               <webpaName>Device.WiFi.SSID.10101.BSSID</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1172,7 +1172,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.SSID.2.MACAddress</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.SSID.10002.MACAddress</webpaName>
+               <webpaName>Device.WiFi.SSID.10101.MACAddress</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1203,7 +1203,7 @@
                <!--OID of the above parameter if available -->
                <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.3.10002</oid>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.SSID.10002.SSID</webpaName>
+               <webpaName>Device.WiFi.SSID.10101.SSID</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1242,7 +1242,7 @@
                <!--OID of the above parameter if available -->
                <oid>1.3.6.1.4.1.17270.50.2.2.2.1.1.5.10002</oid>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.SSIDAdvertisementEnabled</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.SSIDAdvertisementEnabled</webpaName>
                <!--type of the parameter -->
                <type>bool</type>
                <!--whether set is applicable or not -->
@@ -1278,7 +1278,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.Enable</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.Enable</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.Enable</webpaName>
                <!--type of the parameter -->
                <type>bool</type>
                <!--whether set is applicable or not -->
@@ -1308,7 +1308,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.Status</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.Status</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.Status</webpaName>
                <!--type of the parameter -->
                <type>bool</type>
                <!--whether set is applicable or not -->
@@ -1338,7 +1338,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.Alias</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.Alias</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.Alias</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1374,7 +1374,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.SSIDReference</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.SSIDReference</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.SSIDReference</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1386,9 +1386,9 @@
                <!-- the range of values acceptable -->
                <expectedValues>Device.WiFi.SSID.2.</expectedValues>
                <!-- the range of values acceptable for WEBPA-->
-               <webpaExpectedValues>Device.WiFi.SSID.10002.</webpaExpectedValues>
+               <webpaExpectedValues>Device.WiFi.SSID.10101.</webpaExpectedValues>
                <!-- default value of the param after factory reset/ for WEBPA-->
-               <webpaDefaultValue>Device.WiFi.SSID.10002.</webpaDefaultValue>
+               <webpaDefaultValue>Device.WiFi.SSID.10101.</webpaDefaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -1410,7 +1410,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.RetryLimit</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.RetryLimit</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.RetryLimit</webpaName>
                <!--type of the parameter -->
                <type>unsignedint</type>
                <!--whether set is applicable or not -->
@@ -1440,7 +1440,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.X_CISCO_COM_LongRetryLimit</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.X_CISCO_COM_LongRetryLimit</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.X_CISCO_COM_LongRetryLimit</webpaName>
                <!--type of the parameter -->
                <type>unsignedint</type>
                <!--whether set is applicable or not -->
@@ -1470,7 +1470,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.WMMCapability</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.WMMCapability</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.WMMCapability</webpaName>
                <!--type of the parameter -->
                <type>bool</type>
                <!--whether set is applicable or not -->
@@ -1502,7 +1502,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.UAPSDCapability</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.UAPSDCapability</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.UAPSDCapability</webpaName>
                <!--type of the parameter -->
                <type>bool</type>
                <!--whether set is applicable or not -->
@@ -1534,7 +1534,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.WMMEnable</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.WMMEnable</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.WMMEnable</webpaName>
                <!--type of the parameter -->
                <type>bool</type>
                <!--whether set is applicable or not -->
@@ -1564,7 +1564,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.AssociatedDeviceNumberOfEntries</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.AssociatedDeviceNumberOfEntries</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.AssociatedDeviceNumberOfEntries</webpaName>
                <!--type of the parameter -->
                <type>unsignedint</type>
                <!--whether set is applicable or not -->
@@ -1594,7 +1594,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.Security.ModesSupported</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.Security.ModesSupported</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.Security.ModesSupported</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1626,7 +1626,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.Security.ModeEnabled</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.Security.ModeEnabled</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.Security.ModeEnabled</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1658,7 +1658,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.Security.WEPKey</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.Security.WEPKey</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.Security.WEPKey</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1690,7 +1690,7 @@
                <!--OID of the above parameter if available -->
                <oid>1.3.6.1.4.1.17270.50.2.2.3.1.1.2.10002</oid>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.Security.PreSharedKey</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.Security.PreSharedKey</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1720,7 +1720,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.Security.KeyPassphrase</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.Security.KeyPassphrase</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.Security.KeyPassphrase</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1764,7 +1764,7 @@
                <!--OID of the above parameter if available -->
                <oid>1.3.6.1.4.1.17270.50.2.2.3.1.1.1.10002</oid>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.Security.X_CISCO_COM_EncryptionMethod</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.Security.X_CISCO_COM_EncryptionMethod</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--type of the parameter epected by snmp-->
@@ -1802,7 +1802,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.WPS.Enable</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.WPS.Enable</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.WPS.Enable</webpaName>
                <!--type of the parameter -->
                <type>bool</type>
                <!--whether set is applicable or not -->
@@ -1810,7 +1810,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>true</defaultValue>          
+               <defaultValue>true</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
@@ -1834,7 +1834,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.WPS.ConfigMethodsSupported</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.WPS.ConfigMethodsSupported</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.WPS.ConfigMethodsSupported</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
@@ -1866,7 +1866,7 @@
                 <!--the tr-181 parameter name -->
                <name>Device.WiFi.AccessPoint.2.WPS.ConfigMethodsEnabled</name>
                <!--webpa param name of the above tr-181 parameter if available -->
-               <webpaName>Device.WiFi.AccessPoint.10002.WPS.ConfigMethodsEnabled</webpaName>
+               <webpaName>Device.WiFi.AccessPoint.10101.WPS.ConfigMethodsEnabled</webpaName>
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
