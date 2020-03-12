@@ -68,6 +68,7 @@ std::string GetSubString (std::string strLine, std::string strDelimiter);
 #define MEMORY_USED_DATA_FILE    "memused.log"                  // File to store memory used data
 #define PERFORMANCE_CONFIG_FILE  "perfConfig.ini"               // File to store performance status which persist over reboot cycle
 #define DEVICE_DIAGNOSTICS_FILE  "device_diagnostics.log"     // File to store the device diagnostics data
+#define TIMINGINFO_FILE          "timingInfo.log"             // File to capture the timing info of service & APIs
 
 #define ENABLE_TDK_SCRIPT   "$TDK_PATH/EnableTDK.sh"      // Script to enable TDK
 #define DISABLE_TDK_SCRIPT   "$TDK_PATH/DisableTDK.sh"      // Script to disable TDK
@@ -903,6 +904,15 @@ void RpcMethods::RPCLoadModule (const Json::Value& request, Json::Value& respons
         strNullLog.append(MEMORY_USED_DATA_FILE);
         system(strNullLog.c_str());
     }
+ 
+    /* Checking if it is a new execution, If it is new clear old timingInfo.log */
+    if (strcmp (pszResultId, RpcMethods::sm_strResultId.c_str()) != 0)
+    {
+        DEBUG_PRINT (DEBUG_LOG,"Clearing %s \n",std::string(TIMINGINFO_FILE));
+        strNullLog = std::string(NULL_LOG_FILE) + RpcMethods::sm_strTDKPath;
+        strNullLog.append(TIMINGINFO_FILE);
+        system(strNullLog.c_str());
+    }
 	
     /* Check whether sm_nConsoleLogFlag is set, if it is set the redirect console log to a file */
     if(RpcMethods::sm_nConsoleLogFlag == FLAG_SET)
@@ -942,6 +952,7 @@ void RpcMethods::RPCLoadModule (const Json::Value& request, Json::Value& respons
             }
         }
     }
+
 	
     fprintf(stdout,"\nStarting Execution..\n");
 	
