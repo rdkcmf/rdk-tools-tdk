@@ -190,7 +190,12 @@ class BoxTypeController {
 	 */
 	def getBoxTypeFromCategory() {
 		List boxTypeList = []
-		boxTypeList = BoxType.findAllByCategory(params.category)
+        if(params.category == Constants.RDKV_THUNDER){
+            boxTypeList = BoxType.findAllByCategory(Constants.RDKV)
+        }
+        else{
+            boxTypeList = BoxType.findAllByCategory(params.category)
+        }
 		render boxTypeList as JSON
 	}
 
