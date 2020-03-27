@@ -28,6 +28,11 @@ $(document).ready(function() {
 		"sPaginationType": "full_numbers",
 		"bRetrieve": true
 	});
+	$("#list-suiteDetailsC").show();
+	$("#suiteTableC").dataTable( {
+		"sPaginationType": "full_numbers",
+		"bRetrieve": true
+	});
 	var scriptId = $("#currentScriptId").val();
 	if(scriptId!=null && scriptId!=""){
 		editScript(scriptId);
@@ -110,6 +115,44 @@ $(document).ready(function() {
                         ${name.value}
                     </td>
                     </tr>
+                </g:each>
+        </tbody>
+    </table>
+</div>
+
+<div style="width: 95%; max-height: 600px; display: none ;"
+    id="list-suiteDetailsC" class="content scaffold-list"
+    id="suiteDetailsC">
+    <table id="suiteTableC" class="display">
+        <thead>
+            <tr>
+                <th colspan="3" align="center" style="width: 50%;"><h1> RDKC TestSuite
+                        Details Summary</h1></th>
+            </tr>
+            <tr align="left">
+                <th width="20%">Sl No</th>
+                <th width ="60%">TestSuite Name</th>
+                <th width ="20%">Script Count</th>
+            </tr>
+        </thead>
+        <br>
+        <br>
+        <tbody align="left">
+            <%int testSuiteCount2 =0  %>
+            <g:each in="${testSuiteMapC}" var=" name">
+
+                <tr class="odd">
+                    <%     testSuiteCount2++ %>
+                    <td>
+                        ${testSuiteCount2}
+                    </td>
+                    <td>
+                        ${name.key}
+                    </td>
+                    <td>
+                        ${name.value}
+                    </td>
+                </tr>
                 </g:each>
         </tbody>
     </table>

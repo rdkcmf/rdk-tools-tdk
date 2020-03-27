@@ -170,6 +170,9 @@
 			<g:if test="${deviceInstance.category == Category.RDKV}">
 				<g:message code="device.stbName.label" default="Stb Name" />
 			</g:if>
+			<g:if test="${deviceInstance.category == Category.RDKC}">
+				<g:message code="device.stbName.label" default="Camera Name" />
+			</g:if>
 			<g:if test="${deviceInstance.category == Category.RDKB}">
 				<g:message code="device.stbName.label" default="Gateway Name" />
 			</g:if>
@@ -191,7 +194,7 @@
 					<g:message code="device.gateWayIp.label" default="Gateway Ip" />
 				</g:if>
 			</g:if> <g:if test="${deviceInstance?.category}">
-				<g:if test="${deviceInstance.category == Category.RDKV}">
+				<g:if test="${deviceInstance.category == Category.RDKV || deviceInstance.category == Category.RDKC}">
 					<g:message code="device.stbName.label" default="Stb Ip" />
 				</g:if>
 				<g:if test="${deviceInstance.category == Category.RDKB}">
@@ -282,7 +285,7 @@
 		</g:if>
 	</g:if>
 </g:if>
-<g:if test="${ deviceInstance?.category != com.comcast.rdk.Category.RDKB }">
+<g:if test="${ deviceInstance?.category != com.comcast.rdk.Category.RDKB && deviceInstance?.category != com.comcast.rdk.Category.RDKC}">
 	<div id="isThunderEnabled"
 		class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'isThunderEnabled', 'error')}">
 		<label for="isThunderEnabled"> <g:message

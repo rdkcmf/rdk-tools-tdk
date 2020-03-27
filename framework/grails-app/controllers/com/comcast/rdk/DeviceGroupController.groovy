@@ -83,16 +83,22 @@ class DeviceGroupController {
 		
 		def deviceInstanceListModem = getDevicesList(groupsInstance, [category:RDKB])
 		
+		def deviceInstanceListRDKC = getDevicesList(groupsInstance, [category:RDKC])
+		
 		def deviceGrpInstanceListSTB = getDeviceGroupList(groupsInstance, [category:RDKV])
 		
 		def deviceGrpInstanceListModem = getDeviceGroupList(groupsInstance, [category:RDKB])
+		
+		def deviceGrpInstanceListRDKC = getDeviceGroupList(groupsInstance, [category:RDKC])
 		
 		[url: getApplicationUrl(), deviceGroupsInstance : params?.deviceGroupsInstance, 
 			 deviceInstanceListSTB : deviceInstanceListSTB, deviceInstanceListModem : deviceInstanceListModem,
 			 deviceInstanceSTBTotal : deviceInstanceListSTB.size(), deviceInstanceModemTotal : deviceInstanceListModem.size(),  
 			 deviceGrpInstanceListSTB : deviceGrpInstanceListSTB, deviceGrpInstanceListModem : deviceGrpInstanceListModem, 
 			 deviceGrpInstanceSTBTotal : deviceGrpInstanceListSTB.size(), deviceGrpInstanceModemTotal : deviceGrpInstanceListModem.size(),
-			 deviceId: params.deviceId, deviceGroupId: params.deviceGroupId]
+			 deviceId: params.deviceId, deviceGroupId: params.deviceGroupId,deviceInstanceListRDKC:deviceInstanceListRDKC,
+			 deviceGrpInstanceListRDKC:deviceGrpInstanceListRDKC, deviceInstanceListRDKCTotal:deviceInstanceListRDKC.size(),
+			 deviceGrpInstanceListRDKCTotal:deviceGrpInstanceListRDKC.size()]
 		
     }
 

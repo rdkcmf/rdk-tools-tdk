@@ -54,7 +54,7 @@ public class DeviceStatusUpdater {
 		
 		try {
 			if(!flag){
-				Device.executeUpdate("update Device m set m.category=:rdkvcat where m.category !=:rdkbcat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB]);
+				Device.executeUpdate("update Device m set m.category=:rdkvcat where m.category !=:rdkbcat and m.category !=:rdkccat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkccat:Category.RDKC]);
 				flag = true;
 			}
 		} catch (Exception e) {

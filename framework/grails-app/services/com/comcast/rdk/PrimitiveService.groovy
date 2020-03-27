@@ -51,11 +51,15 @@ class PrimitiveService {
 
 		List dirList = [Constants.COMPONENT, Constants.INTEGRATION]
 
-		[TESTSCRIPTS_RDKB, TESTSCRIPTS_RDKV, TESTSCRIPTS_RDKV_ADV, TESTSCRIPTS_RDKB_ADV].each{ testScriptPath ->
+		[TESTSCRIPTS_RDKB, TESTSCRIPTS_RDKV, TESTSCRIPTS_RDKC,TESTSCRIPTS_RDKV_ADV, TESTSCRIPTS_RDKB_ADV].each{ testScriptPath ->
 			def primitiveList = []
 			if(testScriptPath.equals(TESTSCRIPTS_RDKB) || testScriptPath.equals(TESTSCRIPTS_RDKB_ADV)){
 				if(primitiveListMap.get(RDKB)){
 					primitiveList = primitiveListMap.get(RDKB)
+				}
+			}else if(testScriptPath.equals(TESTSCRIPTS_RDKC)){
+				if(primitiveListMap.get(RDKC)){
+					primitiveList = primitiveListMap.get(RDKC)
 				}
 			}else{
 				if(primitiveListMap.get(RDKV)){
@@ -80,6 +84,8 @@ class PrimitiveService {
 								try {
 									if(testScriptPath.equals(TESTSCRIPTS_RDKB) || testScriptPath.equals(TESTSCRIPTS_RDKB_ADV)){
 										moduleDirMap.put(RDKB+"_"+module?.name?.toString()?.trim(), testScriptPath)
+									}else if(testScriptPath.equals(TESTSCRIPTS_RDKC)){
+										moduleDirMap.put(RDKC+"_"+module?.name?.toString()?.trim(), testScriptPath)
 									}else{
 										moduleDirMap.put(RDKV+"_"+module?.name?.toString()?.trim(), testScriptPath)
 									}
@@ -131,6 +137,8 @@ class PrimitiveService {
 			}
 			else if(testScriptPath.equals(TESTSCRIPTS_RDKV) || testScriptPath.equals(TESTSCRIPTS_RDKV_ADV)){
 				primitiveListMap.put(RDKV, primitiveList)
+			}else if(testScriptPath.equals(TESTSCRIPTS_RDKC)){
+				primitiveListMap.put(RDKC, primitiveList)
 			}
 		}
 	}
@@ -261,6 +269,12 @@ class PrimitiveService {
 			}
 			primitivePath = primitivePath + dirName + FILE_SEPARATOR
 		}
+		if(RDKC.equals(category)){
+			if(!dirName){
+				dirName = FileStorePath.RDKC.value()
+			}
+			primitivePath = primitivePath + dirName + FILE_SEPARATOR
+		}
 		primitivePath = primitivePath + scriptDirName + FILE_SEPARATOR + moduleName + FILE_SEPARATOR + moduleName+".xml"
 		File primitiveFile = new File(primitivePath)
 		// The new issue fixed
@@ -300,23 +314,22 @@ class PrimitiveService {
 		def newFilePath = null
 		def testScriptsPath = null
 		def categoryFound = false
-		if(!(filePath.contains(FileStorePath.RDKV.value()) || filePath.contains(FileStorePath.RDKB.value()))) {
-			categoryFound = primitiveListMap.get(RDKV)?.contains(primitiveTestName?.trim())
+		if(!(filePath.contains(FileStorePath.RDKV.value()) || filePath.contains(FileStorePath.RDKB.value()) || filePath.contains(FileStorePath.RDKC.value()))) {
 			def dirName = getDirectoryName(primitiveTestName)
-			if(!categoryFound) {
-				categoryFound = primitiveListMap.get(RDKB)?.contains(primitiveTestName?.trim())
-				if(!categoryFound){
-					categoryFound = primitiveListMap.get(RDKB)?.contains(primitiveTestName)
-				}
-				if(categoryFound){
-					if(!dirName){
-						dirName = FileStorePath.RDKB.value()
-					}
-					testScriptsPath = dirName
-				}
-			}else{
+			if(primitiveListMap.get(RDKV)?.contains(primitiveTestName?.trim())){
 				if(!dirName){
 					dirName = FileStorePath.RDKV.value()
+				}
+				testScriptsPath = dirName
+				
+			}else if(primitiveListMap.get(RDKB)?.contains(primitiveTestName?.trim())){
+				if(!dirName){
+					dirName = FileStorePath.RDKB.value()
+				}
+				testScriptsPath = dirName
+			}else if(primitiveListMap.get(RDKC)?.contains(primitiveTestName?.trim())){
+				if(!dirName){
+					dirName = FileStorePath.RDKC.value()
 				}
 				testScriptsPath = dirName
 			}
@@ -409,6 +422,9 @@ class PrimitiveService {
 		else if(RDKB.equals(category)){
 			dirList.add(FileStorePath.RDKB.value())
 			dirList.add(FileStorePath.RDKBADVANCED.value())
+		}
+		else if(RDKC.equals(category)){
+			dirList.add(FileStorePath.RDKC.value())
 		}
 
 		dirList.each { testScriptsFolder  ->

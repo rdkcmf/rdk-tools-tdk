@@ -34,6 +34,9 @@ $(document).ready(function() {
 			'add_deviceB' : function(node) {
 				createDevice("RDKB");
 			},
+			'add_deviceC' : function(node) {
+				createDevice("RDKC");
+			},
 			'upload_device':function(node){
 				uploadRDKVDevice();
 			},

@@ -143,12 +143,15 @@ class PrimitiveTestController {
 	def create() {
 		def primitiveTestMapB = primitiveService.getAllPrimitiveTest(getRealPath(), RDKB)
 		def primitiveTestMapA = primitiveService.getAllPrimitiveTest(getRealPath(), RDKV)
+		def primitiveTestMapC = primitiveService.getAllPrimitiveTest(getRealPath(), RDKC)
 		def primitiveTestListB = primitiveService.getPrimitiveList(getRealPath(), RDKB)?.sort()
 		def primitiveTestListA = primitiveService.getPrimitiveList(getRealPath(), RDKV)?.sort()
+		def primitiveTestListC = primitiveService.getPrimitiveList(getRealPath(), RDKC)?.sort()
 		def primitiveTestMap =  primitiveService.getAllPrimitiveTest(getRealPath())
 
 		[primitiveTestListA : primitiveTestListA, primitiveTestListB : primitiveTestListB, error: params.error, primitiveTestId: params.primitiveTestId,
-			primitiveTestCountA : PrimitiveTest.count(),primitiveTestMapA:primitiveTestMapA, primitiveTestMapB:primitiveTestMapB]
+			primitiveTestCountA : PrimitiveTest.count(),primitiveTestMapA:primitiveTestMapA, primitiveTestMapB:primitiveTestMapB,
+			primitiveTestMapC:primitiveTestMapC, primitiveTestListC:primitiveTestListC]
 
 	}
 
@@ -400,7 +403,7 @@ class PrimitiveTestController {
 	 */
 	def getCategoryFromMap(def param){
 		def category = null
-		[RDKV, RDKB].each{ cat ->
+		[RDKV, RDKB, RDKC].each{ cat ->
 			if(category == null){
 				def primList =  primitiveService.primitiveListMap?.get(cat)
 				if(primList?.contains(param)){
@@ -716,12 +719,14 @@ class PrimitiveTestController {
 				dirName = TESTSCRIPTS_RDKV
 			}else if(RDKB.equals(category)){
 				dirName = TESTSCRIPTS_RDKB
+			}else if(RDKC.equals(category)){
+				dirName = TESTSCRIPTS_RDKC
 			}
 
 		}else{
 			dirName = PrimitiveService.moduleDirMap.get(category+"_"+moduleName)
 		}
-		if(RDKV.equals(category) || RDKB.equals(category)){
+		if(RDKV.equals(category) || RDKB.equals(category) || RDKC.equals(category)){
 			path = path + dirName
 		}
 		path

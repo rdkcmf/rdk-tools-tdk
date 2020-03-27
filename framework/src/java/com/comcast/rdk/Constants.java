@@ -252,11 +252,13 @@ public final class Constants
     private static final int TCL_TIMEOUT = 12;
     private static final String RDKV="RDKV";
     private static final String RDKB="RDKB";
+    private static final String RDKC="RDKC";
     private static final String RDKB_TCL = "RDKB_TCL";
     private static final String RDKV_THUNDER = "RDKV_THUNDER";
     
     private static final String  TESTSCRIPTS_RDKV="testscriptsRDKV";
-    private static final String  TESTSCRIPTS_RDKB="testscriptsRDKB";    
+    private static final String  TESTSCRIPTS_RDKB="testscriptsRDKB"; 
+    private static final String  TESTSCRIPTS_RDKC="testscriptsRDKC";
     private static final String  TESTSCRIPTS_RDKV_ADV="testscriptsRDKVAdvanced";
     private static final String  TESTSCRIPTS_RDKB_ADV="testscriptsRDKBAdvanced"; 
     

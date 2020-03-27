@@ -130,8 +130,15 @@ class ScriptGroupController {
 		scriptGroupListV.each { scriptgrouplistv  ->
 			testSuiteMapV.put(scriptgrouplistv.name,scriptgrouplistv.scriptList?.size())
 		}
+		
+		def scriptGroupListC = ScriptGroup.findAllByCategory('RDKC')
+		
+		def testSuiteMapC =[:]
+		scriptGroupListC.each { scriptgrouplistc  ->
+			testSuiteMapC.put(scriptgrouplistc.name,scriptgrouplistc.scriptList?.size())
+		}
 
-		def data = [testSuiteMapB:testSuiteMapB,testSuiteMapV:testSuiteMapV]
+		def data = [testSuiteMapB:testSuiteMapB,testSuiteMapV:testSuiteMapV,testSuiteMapC:testSuiteMapC]
 		render(template:"suiteSummary", model:data)
 		return data
 	}
@@ -159,12 +166,17 @@ class ScriptGroupController {
 		scriptNameListTCL = scriptNameListTCL?scriptNameListTCL?.sort():[]
 		def scriptNameListThunder = scriptService.getScriptNameFileListStorm()
 		scriptNameListThunder = scriptNameListThunder?scriptNameListThunder?.sort():[]
+		def scriptNameListC = scriptService?.getScriptNameList(requestGetRealPath, RDKC)
+		scriptNameListC = scriptNameListC?scriptNameListC:[]
+		
 		def scriptGroupMapB = scriptService.getScriptsMap(requestGetRealPath, RDKB)
 		scriptGroupMapB = scriptGroupMapB?scriptGroupMapB:[:]
 		def scriptGroupMapV = scriptService.getScriptsMap(requestGetRealPath, RDKV)
 		scriptGroupMapV = scriptGroupMapV?scriptGroupMapV:[:]
 		def scriptGroupMapThunder = scriptService.getScriptMapThunder(requestGetRealPath)
 		scriptGroupMapThunder = scriptGroupMapThunder?scriptGroupMapThunder:[:]
+		def scriptGroupMapC = scriptService.getScriptsMap(requestGetRealPath, RDKC)
+		scriptGroupMapC = scriptGroupMapC?scriptGroupMapC:[:]
 		def listsV = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKV])
 		listsV = listsV?listsV : []
 		def listsB = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKB])
@@ -172,6 +184,8 @@ class ScriptGroupController {
 		def listsTCL = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKB_TCL])
 		def listsThunder = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKV_THUNDER])
 		listsThunder = listsThunder?listsThunder?.sort():[]
+		def listsC = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKC])
+		listsC = listsC?listsC : []
 		def lists = ScriptGroup.executeQuery('select name from ScriptGroup')
 		def testGroup = Module.findAll()
 		def moduleMap =[:]
@@ -190,7 +204,11 @@ class ScriptGroupController {
 		scriptGroupListB.each { scriptgrouplistb  ->
 			testSuiteMapB.put(scriptgrouplistb.name,scriptgrouplistb.scriptList?.size())
 		}
-
+		def scriptGroupListC = ScriptGroup.findAllByCategory('RDKC')
+		def testSuiteMapC =[:]
+		scriptGroupListC.each { scriptgrouplistC  ->
+			testSuiteMapC.put(scriptgrouplistC.name,scriptgrouplistC.scriptList?.size())
+		}
 		listsTCL = listsTCL?listsTCL?.sort():[]
 		def totalScriptsThunder = 0
 		totalScriptsThunder = scriptNameListThunder?.size() * listsThunder?.size()
@@ -203,7 +221,8 @@ class ScriptGroupController {
 			testGroup : moduleMap, testSuiteMapV : testSuiteMapV, testSuiteMapB : testSuiteMapB,
 			scriptNameListThunder:scriptNameListThunder,  scriptGrpThunder :listsThunder,
 			thunderScriptInstanceTotal:scriptNameListThunder?.size(),  thunderScriptSize :listsThunder?.size(),
-			totalScriptsThunder:totalScriptsThunder, scriptGroupMapThunder : scriptGroupMapThunder]
+			totalScriptsThunder:totalScriptsThunder, scriptGroupMapThunder : scriptGroupMapThunder,scriptInstanceTotalC: scriptNameListC?.size(),scriptGroupMapC:scriptGroupMapC,
+			scriptGroupInstanceListC:listsC, scriptGroupInstanceTotalC: listsC?.size(),testSuiteMapC : testSuiteMapC]
 	}
 
 
@@ -726,7 +745,7 @@ class ScriptGroupController {
 		def primitiveTestList
 		def uniqueId = "script_"+System.currentTimeMillis()
 		def lis
-		if(params?.category?.toString().equals(RDKV) || params?.category?.toString().equals(RDKB)){
+		if(params?.category?.toString().equals(RDKV) || params?.category?.toString().equals(RDKB) || params?.category?.toString().equals(RDKC)){
 			scriptService?.addNewTestCaseDetails([:],uniqueId)
 			//		def primitiveTestList = PrimitiveTest.findAllByGroupsOrGroupsIsNull(utilityService.getGroup(), [order: 'asc', sort: 'name'])//PrimitiveTest.list([order: 'asc', sort: 'name'])
 			primitiveTestList = primitiveService.getPrimitiveList(getRealPath(), params?.category)
@@ -1181,6 +1200,7 @@ class ScriptGroupController {
 		def scriptList = scriptService.getScriptNameList(params?.category?.toString())
 		def scriptListRDKV  = scriptService.getScriptNameList(request.getRealPath("/"),RDKV)
 		def scriptListRDKB  = scriptService.getScriptNameList(request.getRealPath("/"),RDKB)
+		def scriptListRDKC  = scriptService.getScriptNameList(request.getRealPath("/"),RDKC)
 		String dirname
 		boolean isAdvanced = false
 		def scriptObject = null
@@ -1210,6 +1230,14 @@ class ScriptGroupController {
 			}
 			else if(RDKB.equals(category)){
 				path = path + TESTSCRIPTS_RDKB + Constants.FILE_SEPARATOR + scriptsDirName.toString() + Constants.FILE_SEPARATOR + moduleName  +Constants.FILE_SEPARATOR+moduleName+XML
+				File xmlFile = new File(path)
+				if(!xmlFile?.exists()){
+					def dirName = primitiveService.getDirectoryName(params?.ptest)
+					path = getRealPath()+Constants.FILE_SEPARATOR+"fileStore"+Constants.FILE_SEPARATOR + dirName + Constants.FILE_SEPARATOR + scriptsDirName.toString() + Constants.FILE_SEPARATOR + moduleName  +Constants.FILE_SEPARATOR+moduleName+XML
+				}
+			}
+			else if(RDKC.equals(category)){
+				path = path + TESTSCRIPTS_RDKC + Constants.FILE_SEPARATOR + scriptsDirName.toString() + Constants.FILE_SEPARATOR + moduleName  +Constants.FILE_SEPARATOR+moduleName+XML
 				File xmlFile = new File(path)
 				if(!xmlFile?.exists()){
 					def dirName = primitiveService.getDirectoryName(params?.ptest)
@@ -1428,6 +1456,9 @@ class ScriptGroupController {
 						pathToDir = pathToDir + Constants.FILE_SEPARATOR + TESTSCRIPTS_RDKB
 					}
 				}
+				else if(RDKC.equals(category)){
+					pathToDir = pathToDir + Constants.FILE_SEPARATOR + TESTSCRIPTS_RDKC
+				}
 				//File dir = new File( "${request.getRealPath('/')}//fileStore//testscripts/"+scriptsDirName+"//"+dirname+"/")
 				File dir = new File( pathToDir + Constants.FILE_SEPARATOR + scriptsDirName +  Constants.FILE_SEPARATOR +dirname)
 				if(!dir.exists()){
@@ -1539,6 +1570,13 @@ class ScriptGroupController {
 		}
 		else if(RDKB.equals(category)){
 			filePath = getRealPath() + FILE_SEPARATOR + "fileStore"+ FILE_SEPARATOR + TESTSCRIPTS_RDKB + FILE_SEPARATOR + scriptsDirName + FILE_SEPARATOR + moduleName+ FILE_SEPARATOR + moduleName +XML
+			File xmlFile = new File(filePath)
+			if(!xmlFile?.exists()){
+				def dirName = primitiveService.getDirectoryName(params?.ptest)
+				filePath = getRealPath() + FILE_SEPARATOR + "fileStore"+ FILE_SEPARATOR + dirName + FILE_SEPARATOR + scriptsDirName + FILE_SEPARATOR + moduleName+ FILE_SEPARATOR + moduleName +XML
+			}
+		}else if(RDKC.equals(category)){
+			filePath = getRealPath() + FILE_SEPARATOR + "fileStore"+ FILE_SEPARATOR + TESTSCRIPTS_RDKC + FILE_SEPARATOR + scriptsDirName + FILE_SEPARATOR + moduleName+ FILE_SEPARATOR + moduleName +XML
 			File xmlFile = new File(filePath)
 			if(!xmlFile?.exists()){
 				def dirName = primitiveService.getDirectoryName(params?.ptest)
@@ -2806,6 +2844,9 @@ class ScriptGroupController {
 					path = getRealPath() +  FILESTORE + FILE_SEPARATOR + FileStorePath.RDKBADVANCED.value()
 				}
 				break;
+			case Category.RDKC:
+				path = getRealPath() +  FILESTORE + FILE_SEPARATOR + FileStorePath.RDKC.value()
+				break;
 			case Category.RDKB_TCL:
 				path = getRealPath()  + FILESTORE + FILE_SEPARATOR + FileStorePath.RDKTCL.value()
 				break;
@@ -3587,7 +3628,7 @@ class ScriptGroupController {
 			ScriptGroup sg = ScriptGroup?.findByName(params?.name)
 			def rPath = getRealPath()
 			List removeList = []
-			if(sg?.category?.toString()?.equals(RDKB) || sg?.category?.toString()?.equals(RDKV)){
+			if(sg?.category?.toString()?.equals(RDKB) || sg?.category?.toString()?.equals(RDKV) || sg?.category?.toString()?.equals(RDKC)){
 				sg?.scriptList.each { script ->
 					Map scriptInstance1 = scriptService.getScript(rPath,script?.moduleName, script?.scriptName, params?.category)
 					if(scriptInstance1 == null || scriptInstance1?.keySet()?.size() ==  0){
@@ -3925,6 +3966,9 @@ class ScriptGroupController {
 				}else{
 					pathToDir = pathToDir + Constants.FILE_SEPARATOR + TESTSCRIPTS_RDKB
 				}
+			}
+			else if(RDKC.equals(params?.category)){
+				pathToDir = pathToDir + Constants.FILE_SEPARATOR + TESTSCRIPTS_RDKC
 			}
 			
 			File file = new File( pathToDir + Constants.FILE_SEPARATOR + scriptsDirName + Constants.FILE_SEPARATOR+dirname+Constants.FILE_SEPARATOR+params?.script+".py");
