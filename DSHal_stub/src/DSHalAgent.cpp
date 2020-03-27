@@ -51,6 +51,8 @@ std::string DSHalAgent::testmodulepre_requisites()
         dsAudioPortInit();
         dsVideoPortInit();
         dsDisplayInit();
+        dsVideoDeviceInit();
+	dsFPInit();
 
         DEBUG_PRINT(DEBUG_TRACE, "DSHal testmodule pre_requisites --> Exit\n");
         return "SUCCESS";
@@ -77,7 +79,10 @@ bool DSHalAgent::testmodulepost_requisites()
     dsAudioPortTerm();
     dsVideoPortTerm();
     dsDisplayTerm();
+    dsVideoDeviceTerm();
+    dsFPTerm();
     vpHandle = 0;
+    vdHandle = 0;
     apHandle = 0;
     dispHandle = 0;
     
@@ -288,7 +293,7 @@ void DSHalAgent::DSHal_GetStereoMode(IN const Json::Value& req, OUT Json::Value&
         response["result"] = "SUCCESS";
         response["details"] = stereoMode;
         DEBUG_PRINT(DEBUG_LOG, "DSHal_GetStereoMode call is SUCCESS");
-        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetStereodMode -->Exit\n");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetStereoMode -->Exit\n");
         return;
     }
     else
@@ -322,7 +327,7 @@ void DSHalAgent::DSHal_SetStereoMode(IN const Json::Value& req, OUT Json::Value&
         response["result"] = "SUCCESS";
         response["details"] = "SetStereoMode call success";
         DEBUG_PRINT(DEBUG_LOG, "DSHal_SetStereoMode call is SUCCESS");
-        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetStereodMode -->Exit\n");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetStereoMode -->Exit\n");
         return;
     }
     else
@@ -760,6 +765,1160 @@ void DSHalAgent::DSHal_IsVideoPortActive(IN const Json::Value& req, OUT Json::Va
         response["details"] = "Video port active status not retrieved";
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsVideoPortActive call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsVideoPortActive -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_HdmiInGetNumberOfInputs
+ *Description    : This function is to get the  number of HDMI inputs
+ *****************************************************************************/
+void DSHalAgent::DSHal_HdmiInGetNumberOfInputs(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetNumberOfInputs --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    uint8_t noOfInputs;
+
+    ret = dsHdmiInGetNumberOfInputs(&noOfInputs);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = noOfInputs;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_HdmiInGetNumberOfInputs call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetNumberOfInputs -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "Hdmi Number Of Inputs not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_HdmiInGetNumberOfInputs call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetNumberOfInputs -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_HdmiInGetStatus
+ *Description    : This function is to get the HDMI status
+ *****************************************************************************/
+void DSHalAgent::DSHal_HdmiInGetStatus(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    dsHdmiInStatus_t pStatus;
+
+    ret = dsHdmiInGetStatus(&pStatus);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+    //    response["details"] = pStatus;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_HdmiInGetStatus call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "Hdmi status not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_HdmiInGetStatus call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_IsOutputHDR
+ *Description    : This function is to check if the video output is HDR or not
+ *****************************************************************************/
+void DSHalAgent::DSHal_IsOutputHDR(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsOutputHDR --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    bool hdr;
+
+    ret = dsIsOutputHDR(vpHandle, &hdr);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = hdr;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_IsOutputHDR call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsOutputHDR -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "Output HDR status not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsOutputHDR call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsOutputHDR -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_IsAudioMute
+ *Description    : This function is to check whether the audio is muted or not
+ *****************************************************************************/
+void DSHalAgent::DSHal_IsAudioMute(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMute --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    bool muted;
+
+    ret = dsIsAudioMute(apHandle, &muted);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = muted;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_IsAudioMute call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMute -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "Audio port enable status not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsAudioMute call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMute -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_SetAudioMute
+ *Description    : This function is to set the audio to mute
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetAudioMute(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioMute--->Entry\n");
+    if(&req["muted"] == NULL)
+    {
+        return;
+    }
+
+    bool muted = req["muted"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsSetAudioMute(apHandle, muted);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetAudioMute call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetAudioMute call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioMute -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "SetAudioMute call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetAudioMute call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioMute -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetAudioDelay
+ *Description    : This function is to get the audio delay in milliseconds
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetAudioDelay(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioDelay --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    uint32_t audioDelayMs;
+
+    ret = dsGetAudioDelay(apHandle, &audioDelayMs);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = audioDelayMs;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetAudioDelay call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioDelay -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "StereoMode not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetAudioDelay call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioDelay -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_SetAudioDelay
+ *Description    : This function is to set the audio delay in milliseconds
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetAudioDelay(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioDelay --->Entry\n");
+    if(&req["audioDelay"] == NULL)
+    {
+        return;
+    }
+
+    uint32_t audioDelayMs = req["audioDelay"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsSetAudioDelay(apHandle, audioDelayMs);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetAudioDelay call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetAudioDelay call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioDelayOffset -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "SetAudioDelay call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetAudioDelay call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioDelay -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetAudioDelayOffset
+ *Description    : This function is to get the audio delay offset in milliseconds
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetAudioDelayOffset(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioDelayOffset --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    uint32_t audioDelayOffsetMs;
+
+    ret = dsGetAudioDelayOffset(apHandle, &audioDelayOffsetMs);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = audioDelayOffsetMs;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetAudioDelayOffset call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioDelayOffset -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "StereoMode not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetAudioDelayOffset call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioDelayOffset -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_SetAudioDelayOffset
+ *Description    : This function is to set the audio delay offset in milliseconds
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetAudioDelayOffset(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioDelayOffset --->Entry\n");
+    if(&req["offset"] == NULL)
+    {
+        return;
+    }
+
+    uint32_t audioDelayOffsetMs = req["offset"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsSetAudioDelayOffset(apHandle, audioDelayOffsetMs);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetAudioDelayOffset call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetAudioDelayOffset call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioDelayOffset -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "SetAudioDelayOffset call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetAudioDelayOffset call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioDelayOffset -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_IsAudioMSDecode
+ *Description    : This function is to check whether the audio port supports Dolby MS11 Multistream Decode
+ *****************************************************************************/
+void DSHalAgent::DSHal_IsAudioMSDecode(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMSDecode --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    bool ms11Enabled;
+
+    ret = dsIsAudioMSDecode(apHandle, &ms11Enabled);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = ms11Enabled;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_IsAudioMSDecode call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMSDecode -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "Audio port enable status not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsAudioMSDecode call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMSDecode -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_IsAudioMS12Decode
+ *Description    : This function is to check whether whether the audio port supports MS12 Decode
+ *****************************************************************************/
+void DSHalAgent::DSHal_IsAudioMS12Decode(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMS12Decode --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    bool ms12Enabled;
+
+    ret = dsIsAudioMS12Decode(apHandle, &ms12Enabled);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = ms12Enabled;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_IsAudioMS12Decode call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMS12Decode -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "Audio port enable status not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsAudioMS12Decode call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMS12Decode -->Exit\n");
+        return;
+    }
+}
+
+/***************************************************************************
+ *Function name : DSHal_GetHdmiPreference
+ *Description    : This function is to get the Preferred HDMI Protocol
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetHdmiPreference(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHdmiPreference --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    dsHdcpProtocolVersion_t hdcpProtocol;
+
+    ret = dsGetHdmiPreference(vpHandle, &hdcpProtocol);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = hdcpProtocol;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetHdmiPreference call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHdmiPreference -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "StereoMode not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetHdmiPreference call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHdmiPreference -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_SetHdmiPreference
+ *Description    : This function is to set the Preferred HDMI Protocol
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetHdmiPreference(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetHdmiPreference --->Entry\n");
+    if(&req["stereoMode"] == NULL)
+    {
+        return;
+    }
+
+    dsHdcpProtocolVersion_t hdcpProtocol = (dsHdcpProtocolVersion_t) req["hdcpProtocol"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsSetHdmiPreference(vpHandle, &hdcpProtocol);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetHdmiPreference call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetHdmiPreference call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetHdmiPreference -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "SetHdmiPreference call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetHdmiPreference call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetHdmiPreference -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_SetBackgroundColor
+ *Description    : This function is to set the back ground color
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetBackgroundColor(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetBackgroundColor --->Entry\n");
+    if(&req["stereoMode"] == NULL)
+    {
+        return;
+    }
+
+    dsVideoBackgroundColor_t color = (dsVideoBackgroundColor_t) req["color"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsSetBackgroundColor(vpHandle, color);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetBackgroundColor call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetBackgroundColor call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetBackgroundColor -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "SetBackgroundColor call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetBackgroundColor call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetBackgroundColor -->Exit\n");
+        return;
+    }
+}
+/**************************************************************************
+*Function name : DSHal_SetFPBrightness
+*Description   : This function will set the brightness of the specified discrete LEDs on the Front
+ Panel Display to the specified brightness level. The Power LED brightness setting
+ will also be adjusted to this setting.
+**************************************************************************/
+void DSHalAgent::DSHal_SetFPBrightness(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPBrightness --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    dsFPDIndicator_t eIndicator = (dsFPDIndicator_t) req["indicator"].asInt();
+    dsFPDBrightness_t eBrightness = (dsFPDBrightness_t) req["brightness"].asInt();
+    ret = dsSetFPBrightness( eIndicator,eBrightness);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "Brightness set successfully to " + std::to_string(eBrightness);
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetFPBrightness call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPBrightness -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        if(ret == dsERR_INVALID_PARAM)
+        {
+            response["details"] = "Given parameters are not supported for device";
+        }
+        else
+        {
+            response["details"] = "Brightness not set successfully";
+        }
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetFPBrightness call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPBrightness -->Exit\n");
+        return;
+     }
+}
+
+/**************************************************************************
+*Function name : DSHal_GetFPBrightness
+*Description   : This function returns the brightness level of the specified discrete LEDs on the front
+ panel
+**************************************************************************/
+void DSHalAgent::DSHal_GetFPBrightness(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetFPBrightness --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    dsFPDIndicator_t eIndicator = (dsFPDIndicator_t) req["indicator"].asInt();
+    dsFPDBrightness_t eBrightness;
+    ret = dsGetFPBrightness( eIndicator,&eBrightness);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = eBrightness;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetFPBrightness call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetFPBrightness -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        if(ret == dsERR_INVALID_PARAM)
+        {
+            response["details"] = "Given parameters are not supported for device";
+        }
+        else
+        {
+            response["details"] = "Brightness value not retrieved";
+        }
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetFPBrightness call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetFPBrightness -->Exit\n");
+        return;
+     }
+}
+/***************************************************************************
+ *Function name  : DSHal_GetCPUTemperature
+ *Description    : This function is to get the CPU temperature in centigrade
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetCPUTemperature(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetCPUTemperature --->Entry\n");
+    float temp = 0.0;
+    dsError_t ret = dsERR_NONE;
+    ret = dsGetCPUTemperature(&temp);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = temp;
+        DEBUG_PRINT(DEBUG_LOG, "dsGetCPUTemperature call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetCPUTemperature -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "CPU Temperature value not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "dsGetCPUTemperature call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetCPUTemperature -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name  : DSHal_GetVersion
+ *Description    : This function is to get the 4 byte version number
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetVersion(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVersion --->Entry\n");
+    unsigned int  version = 0;
+    dsError_t ret = dsERR_NONE;
+    ret = dsGetVersion(&version);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = version;
+        DEBUG_PRINT(DEBUG_LOG, "dsGetVersion call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVersion -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "DSHAL version number not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "dsGetVersion call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVersion -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name  : DSHal_SetVersion
+ *Description    : This function is to set the 4 byte runtime dshal version
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetVersion(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetVersion --->Entry\n");
+    if(&req["version"] == NULL)
+    {
+        return;
+    }
+
+    unsigned int  version = req["version"].asUInt();
+    dsError_t ret = dsERR_NONE;
+    ret = dsSetVersion(version);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "dsSetVersion call is success";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetVersion call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetVersion -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "DSHAL version number not set";
+        DEBUG_PRINT(DEBUG_ERROR, "dsSetVersion call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetVersion -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name  : DSHal_GetHDRCapabilities
+ *Description    : This function is to get the STB HDR capabilities
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetHDRCapabilities(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHDRCapabilities --->Entry\n");
+    int capability = 0;
+    dsError_t ret = dsERR_NONE;
+    ret = dsGetHDRCapabilities(vdHandle, &capability);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = capability;
+        DEBUG_PRINT(DEBUG_LOG, "dsGetHDRCapabilities call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHDRCapabilities -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "STB HDR capabilities not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "dsGetHDRCapabilities call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHDRCapabilities -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name  : DSHal_GetSupportedVideoCodingFormats
+ *Description    : This function is to get the supported Video Coding formats
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetSupportedVideoCodingFormats(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSupportedVideoCodingFormats --->Entry\n");
+    unsigned int supportedFormat = 0;
+    dsError_t ret = dsERR_NONE;
+    ret = dsGetSupportedVideoCodingFormats(vdHandle, &supportedFormat);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = supportedFormat;
+        DEBUG_PRINT(DEBUG_LOG, "dsGetSupportedVideoCodingFormats call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSupportedVideoCodingFormats -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "Supported video coding formats not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "dsGetSupportedVideoCodingFormats call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSupportedVideoCodingFormats -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name  : DSHal_GetVideoCodecInfo
+ *Description    : This function is to get supported video codec formats
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetVideoCodecInfo(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVideoCodecInfo --->Entry\n");
+    if(&req["format"] == NULL)
+    {
+        return;
+    }
+    char format[10];
+    strcpy(format,req["format"].asCString());
+
+    dsVideoCodecInfo_t info;
+    info.num_entries = 0;
+    dsVideoCodingFormat_t codingFormat;
+    if (!strcmp(format,"MPEGH"))
+        codingFormat = dsVIDEO_CODEC_MPEGHPART2;
+    else if (!strcmp(format,"MPEG4"))
+        codingFormat = dsVIDEO_CODEC_MPEG4PART10;
+    else if (!strcmp(format,"MPEG2"))
+        codingFormat = dsVIDEO_CODEC_MPEG2;
+    else{
+        response["result"] = "FAILURE";
+        response["details"] = "Invalid Video Codec Format";
+        return;
+    }
+
+    dsError_t ret = dsERR_NONE;
+    ret = dsGetVideoCodecInfo(vdHandle,codingFormat,&info);
+    if (ret == dsERR_NONE )
+    {
+        unsigned int entries = info.num_entries;
+        if (entries > 0)
+        {
+            int basicInfoSize = 150; //size for the buffer
+            char *details = (char*)malloc(basicInfoSize*entries);
+            if (details == NULL)
+            {
+                response["result"]="FAILED";
+                response["details"]="Failed to capture Video Codec Info Results";
+                DEBUG_PRINT(DEBUG_TRACE,"\n Memory Allocation failed\n");
+                return;
+            }
+            else
+            {
+                float level;
+                int hevcProfile;
+                string hevcProfileName;
+                dsVideoCodecHevcProfiles_t profile;
+
+                int dataLength;
+                unsigned int count;
+                char *details_ptr  = details;
+                memset(details_ptr,'\0',basicInfoSize*entries);
+                for (count=0; count<entries; count++)
+                {
+                    if (details[0] != '\0' )
+                    {
+                        sprintf(details_ptr,"|");
+                        details_ptr++;
+                    }
+                    profile = info.entries[count].profile;
+                    level   = info.entries[count].level;
+                    hevcProfile = static_cast<int>(profile);
+                    if ( profile == dsVIDEO_CODEC_HEVC_PROFILE_MAIN)
+                        hevcProfileName = "dsVIDEO_CODEC_HEVC_PROFILE_MAIN";
+                    else if ( profile == dsVIDEO_CODEC_HEVC_PROFILE_MAIN10 )
+                        hevcProfileName = "dsVIDEO_CODEC_HEVC_PROFILE_MAIN10";
+                    else
+                        hevcProfileName = "dsVIDEO_CODEC_HEVC_PROFILE_MAINSTILLPICTURE";
+                    dataLength = sprintf(details_ptr,"Profile:%d[%s],level:%f",hevcProfile,hevcProfileName.c_str(),level);
+                    details_ptr = details_ptr + dataLength;
+                }
+                response["result"] = "SUCCESS";
+                response["details"] = details;
+                free(details);
+                DEBUG_PRINT(DEBUG_LOG, "dsGetVideoCodecInfo call is SUCCESS");
+                DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVideoCodecInfo -->Exit\n");
+                return;
+            }
+        }
+        else{
+            response["result"]="SUCCESS";
+            response["details"]="Codec info currently supports only HEVC[MPEGH] codec";
+            DEBUG_PRINT(DEBUG_LOG, "dsGetVideoCodecInfo call is SUCCESS");
+            DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVideoCodecInfo -->Exit\n");
+            return;
+        }
+    }
+    else if (ret == dsERR_OPERATION_NOT_SUPPORTED){
+        response["result"] = "SUCCESS";
+        response["details"] = "Operation Not Supported";
+        DEBUG_PRINT(DEBUG_ERROR, "dsGetVideoCodecInfo call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVideoCodecInfo -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "Video Codec Info not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "dsGetVideoCodecInfo call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVideoCodecInfo -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name  : DSHal_GetTVHDRCapabilities
+ *Description    : This function is to get the TV HDR capabilities
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetTVHDRCapabilities(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetTVHDRCapabilities --->Entry\n");
+    int capabilities = 0;
+    dsError_t ret = dsERR_NONE;
+    ret = dsGetTVHDRCapabilities(vpHandle, &capabilities);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = capabilities;
+        DEBUG_PRINT(DEBUG_LOG, "dsGetTVHDRCapabilities call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetTVHDRCapabilities -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "TV HDR capabilities not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "dsGetTVHDRCapabilities call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetTVHDRCapabilities -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name  : DSHal_SetFPBlink
+ *Description    : This function is to set the individual discrete LEDs to blink
+                   for a specified number of times at the specified blink interval
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetFPBlink(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPBlink --->Entry\n");
+    if(&req["indicator"] == NULL || &req["blinkDuration"] == NULL || &req["blinkIteration"] == NULL)
+    {
+        return;
+    }
+
+    dsFPDIndicator_t eIndicator = (dsFPDIndicator_t) req["indicator"].asInt();
+    if (eIndicator > dsFPD_INDICATOR_MAX)
+        DEBUG_PRINT(DEBUG_TRACE,"Invalid LED Indicator");
+
+    unsigned int uBlinkDuration  = req["blinkDuration"].asUInt();
+    unsigned int uBlinkIteration = req["blinkIteration"].asUInt();
+
+    dsError_t ret = dsERR_NONE;
+    ret = dsSetFPBlink(eIndicator,uBlinkDuration,uBlinkIteration);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "dsSetFPBlink call success";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetFPBlink call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPBlink -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "Invalid LED Indicator";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetFPBlink call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPBlink -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "dsSetFPBlink call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetFPBlink call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPBlink -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name  : DSHal_SetFPColor
+ *Description    : This function sets the color of the specified front panel
+                   indicator LED, if the indicator supports it (i.e. is multi-colored)
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetFPColor(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPColor --->Entry\n");
+    if(&req["indicator"] == NULL || &req["color"] == NULL )
+    {
+        return;
+    }
+
+    char color[10] = {'\0'};
+    strcpy(color,req["color"].asCString());
+
+    dsFPDIndicator_t eIndicator = (dsFPDIndicator_t) req["indicator"].asInt();
+    if (eIndicator > dsFPD_INDICATOR_MAX)
+        DEBUG_PRINT(DEBUG_TRACE,"Invalid LED Indicator");
+
+    dsFPDColor_t eColor;
+    if(!strcmp(color, "BLUE"))
+        eColor = (dsFPDColor_t)dsFPD_COLOR_BLUE;
+    else if(!strcmp(color,"GREEN"))
+        eColor = (dsFPDColor_t)dsFPD_COLOR_GREEN;
+    else if(!strcmp(color,"RED"))
+        eColor = (dsFPDColor_t)dsFPD_COLOR_RED;
+    else if(!strcmp(color,"YELLOW"))
+        eColor = (dsFPDColor_t)dsFPD_COLOR_YELLOW;
+    else if(!strcmp(color,"ORANGE"))
+        eColor = (dsFPDColor_t)dsFPD_COLOR_ORANGE;
+    else if(!strcmp(color,"WHITE"))
+        eColor = (dsFPDColor_t)dsFPD_COLOR_WHITE;
+    else{
+        response["result"] = "FAILURE";
+        response["details"] = "Invalid LED Indicator Color";
+        return;
+    }
+
+    dsError_t ret = dsERR_NONE;
+    ret = dsSetFPColor(eIndicator,eColor);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "dsSetFPColor call success";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetFPColor call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPColor -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_OPERATION_NOT_SUPPORTED)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "Operation not supported : LED indicator is single-colored";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetFPColor call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPColor -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "Invalid LED Indicator";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetFPColor call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPColor -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "dsSetFPColor call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "dsSetFPColor call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPColor -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name  : DSHal_SetFPTime
+ *Description    : This function sets the 7-segment display LEDs to show the time.
+                   The format  (12/24-hour) must be specified
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetFPTime(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPTime --->Entry\n");
+    if(&req["format"] == NULL || &req["hours"] == NULL || &req["minutes"] == NULL )
+    {
+        return;
+    }
+    char format[10] = {'\0'};
+    strcpy(format,req["format"].asCString());
+    unsigned int hours = req["hours"].asUInt();
+    unsigned int mins = req["minutes"].asUInt();
+
+    dsFPDTimeFormat_t timeFormat;
+    if(!strcmp(format, "12_HOUR"))
+        timeFormat = dsFPD_TIME_12_HOUR;
+    else if(!strcmp(format,"24_HOUR"))
+        timeFormat = dsFPD_TIME_24_HOUR;
+    else if(!strcmp(format,"STRING"))
+        timeFormat = dsFPD_TIME_STRING;
+    else{
+        response["result"] = "FAILURE";
+        response["details"] = "Invalid Time format";
+        return;
+    }
+
+    dsError_t ret = dsERR_NONE;
+    ret = dsSetFPTime(timeFormat,hours,mins);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "dsSetFPTime call success";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetFPTime call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPTime -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_OPERATION_NOT_SUPPORTED)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "Operation not supported : 7-Segment display LEDs not available";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetFPTime call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPTime -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "Invalid hours/minutes or Time Format and hours values do not agree";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetFPTime call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPTime -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "dsSetFPTime call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "dsSetFPTime call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPTime -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name  : DSHal_SetFPText
+ *Description    : This function sets the 7-segment display LEDs to show the given text
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetFPText(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPText --->Entry\n");
+    if(&req["text"] == NULL)
+    {
+        return;
+    }
+    char text[50] = {'\0'};
+    strcpy(text,req["text"].asCString());
+    dsError_t ret = dsERR_NONE;
+    ret = dsSetFPText(text);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "dsSetFPText call success";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetFPText call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPText -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_OPERATION_NOT_SUPPORTED)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "Operation not supported : 7-Segment display LEDs not available";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetFPText call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPText -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "dsSetFPText call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "dsSetFPText call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPText -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name  : DSHal_SetFPTextBrightness
+ *Description    : This function will set the brightness of the specified 7-Segment Display LEDs
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetFPTextBrightness(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPTextBrightness --->Entry\n");
+    if(&req["brightness"] == NULL )
+    {
+        return;
+    }
+    dsFPDBrightness_t eBrightness = (dsFPDBrightness_t) req["brightness"].asUInt();
+    dsFPDTextDisplay_t eIndicator = dsFPD_TEXTDISP_TEXT;
+    dsError_t ret = dsERR_NONE;
+    ret = dsSetFPTextBrightness(eIndicator,eBrightness);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "dsSetFPTextBrightness call success";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetFPTextBrightness call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPTextBrightness -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_OPERATION_NOT_SUPPORTED)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "Operation not supported : 7-Segment display LEDs not available";
+        DEBUG_PRINT(DEBUG_LOG, "dsSetFPTextBrightness call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPTextBrightness -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "dsSetFPTextBrightness call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "dsSetFPTextBrightness call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPTextBrightness -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetVideoEOTF
+ *Description    : This function is to get the video Electro-Optical Transfer Function
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetVideoEOTF(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVideoEOTF --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    dsHDRStandard_t eotf;
+
+    ret = dsGetVideoEOTF(vpHandle, &eotf);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = eotf;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetVideoEOTF call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVideoEOTF -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "EOTF value not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetVideoEOTF call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVideoEOTF -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_HdmiInScaleVideo
+ *Description    : This function is to scale video
+ *****************************************************************************/
+void DSHalAgent::DSHal_HdmiInScaleVideo(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInScaleVideo --->Entry\n");
+    if(&req["x"] == NULL || &req["y"] == NULL || &req["width"] == NULL || &req["height"] == NULL )
+    {
+        return;
+    }
+
+    int32_t x = req["x"].asInt();
+    int32_t y = req["y"].asInt();
+    int32_t width = req["width"].asInt();
+    int32_t height = req["height"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsHdmiInScaleVideo(x, y, width, height);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "DSHal_HdmiInScaleVideo call is SUCCESS";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_HdmiInScaleVideo call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInScaleVideo -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "DSHal_HdmiInScaleVideo call is FAILURE";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_HdmiInScaleVideo call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInScaleVideo -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_IsHDCPEnabled
+ *Description    : This function is to check if HDCP is enabled
+ *****************************************************************************/
+void DSHalAgent::DSHal_IsHDCPEnabled(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsHDCPEnabled --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    bool contentProtected;
+
+    ret = dsIsHDCPEnabled(vpHandle, &contentProtected);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = contentProtected;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_IsHDCPEnabled call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsHDCPEnabled -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "HDCP status not retrieved";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsHDCPEnabled call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsHDCPEnabled -->Exit\n");
         return;
     }
 }

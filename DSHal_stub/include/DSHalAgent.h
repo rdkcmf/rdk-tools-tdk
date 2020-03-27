@@ -33,6 +33,7 @@
 #include "dsHost.h"
 #include "dsMgr.h"
 #include "dsFPD.h"
+#include "dsHdmiIn.h"
 
 
 #include "libIBus.h"
@@ -49,6 +50,7 @@
 using namespace std;
 
 int vpHandle = 0;
+int vdHandle = 0;
 int apHandle = 0;
 int dispHandle = 0;
 
@@ -79,6 +81,37 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetColorDepth", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetColorDepth);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetColorSpace", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetColorSpace);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_IsVideoPortActive", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_IsVideoPortActive);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_HdmiInGetNumberOfInputs", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_HdmiInGetNumberOfInputs);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_IsOutputHDR", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_IsOutputHDR);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_IsAudioMute", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_IsAudioMute);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetAudioMute", PARAMS_BY_NAME, JSON_STRING, "muted", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetAudioMute);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetAudioDelay", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetAudioDelay);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetAudioDelay", PARAMS_BY_NAME, JSON_STRING, "audioDelay", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetAudioDelay);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetAudioDelayOffset", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetAudioDelayOffset);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetAudioDelayOffset", PARAMS_BY_NAME, JSON_STRING, "offset", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetAudioDelayOffset);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_IsAudioMSDecode", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_IsAudioMSDecode);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_IsAudioMS12Decode", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_IsAudioMS12Decode);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetHdmiPreference", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetHdmiPreference);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetHdmiPreference", PARAMS_BY_NAME, JSON_STRING, "hdcpProtocol", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetHdmiPreference);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetBackgroundColor", PARAMS_BY_NAME, JSON_STRING, "color", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetBackgroundColor);
+		    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetFPBrightness", PARAMS_BY_NAME, JSON_STRING,"indicator",JSON_INTEGER,"brightness",JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetFPBrightness);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetFPBrightness", PARAMS_BY_NAME, JSON_STRING,"indicator",JSON_INTEGER,NULL), &DSHalAgent::DSHal_GetFPBrightness);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetCPUTemperature", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetCPUTemperature);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetVersion", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetVersion);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetVersion", PARAMS_BY_NAME, JSON_STRING, "version", JSON_INTEGER, NULL), &DSHalAgent::DSHal_SetVersion);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetHDRCapabilities", PARAMS_BY_NAME, JSON_STRING, NULL), &DSHalAgent::DSHal_GetHDRCapabilities);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetSupportedVideoCodingFormats", PARAMS_BY_NAME, JSON_STRING, NULL),&DSHalAgent::DSHal_GetSupportedVideoCodingFormats);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetVideoCodecInfo", PARAMS_BY_NAME, JSON_STRING, "format", JSON_STRING, NULL),&DSHalAgent::DSHal_GetVideoCodecInfo);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetTVHDRCapabilities", PARAMS_BY_NAME, JSON_STRING, NULL),&DSHalAgent::DSHal_GetTVHDRCapabilities);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetFPBlink", PARAMS_BY_NAME, JSON_STRING, "indicator", JSON_INTEGER, "blinkDuration", JSON_INTEGER, "blinkIteration", JSON_INTEGER, NULL),&DSHalAgent::DSHal_SetFPBlink);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetFPColor", PARAMS_BY_NAME, JSON_STRING, "indicator", JSON_INTEGER, "color", JSON_STRING, NULL),&DSHalAgent::DSHal_SetFPColor);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetFPTime", PARAMS_BY_NAME, JSON_STRING, "format", JSON_STRING, "hours", JSON_INTEGER, "minutes", JSON_INTEGER, NULL),&DSHalAgent::DSHal_SetFPTime);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetFPText", PARAMS_BY_NAME, JSON_STRING, "text", JSON_STRING, NULL),&DSHalAgent::DSHal_SetFPText);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetFPTextBrightness", PARAMS_BY_NAME, JSON_STRING, "brightness", JSON_INTEGER, NULL),&DSHalAgent::DSHal_SetFPTextBrightness);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_HdmiInGetStatus", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_HdmiInGetStatus);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetVideoEOTF", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetVideoEOTF);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_HdmiInScaleVideo", PARAMS_BY_NAME, JSON_STRING, "x", JSON_INTEGER, "y", JSON_INTEGER, "width", JSON_INTEGER ,"height", JSON_INTEGER,NULL), &DSHalAgent::DSHal_HdmiInScaleVideo);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_IsHDCPEnabled", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_IsHDCPEnabled);
                 }
 
                 //Inherited functions
@@ -109,5 +142,37 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                 void DSHal_GetColorDepth(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_GetColorSpace(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_IsVideoPortActive(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_HdmiInGetNumberOfInputs(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_IsOutputHDR(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_IsAudioMute(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetAudioMute(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetAudioDelay(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetAudioDelayOffset(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetAudioDelayOffset(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetAudioDelay(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_IsAudioMSDecode(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_IsAudioMS12Decode(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetHdmiPreference(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetHdmiPreference(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetBackgroundColor(IN const Json::Value& req, OUT Json::Value& response);
+		void DSHal_SetFPBrightness(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetFPBrightness(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetCPUTemperature(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetVersion(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetVersion(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetHDRCapabilities(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetSupportedVideoCodingFormats(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetVideoCodecInfo(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetTVHDRCapabilities(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetFPBlink(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetFPColor(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetFPTime(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetFPText(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetFPTextBrightness(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_HdmiInGetStatus(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetVideoEOTF(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_HdmiInScaleVideo(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_IsHDCPEnabled(IN const Json::Value& req, OUT Json::Value& response);
+
 };
 #endif //__DSHAL_STUB_H__
