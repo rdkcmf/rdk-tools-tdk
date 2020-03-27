@@ -447,10 +447,12 @@ class ExecutionController {
 		def jobDetailList
 		def deviceInstanceListV
 		def deviceInstanceListB
+		def deviceInstanceListC
 		def deviceInstanceList
 
 		deviceInstanceListV = Device.findAllByGroupsAndCategory(groups, Category.RDKV,[sort:'stbName',order:'asc'])
 		deviceInstanceListB = Device.findAllByGroupsAndCategory(groups, Category.RDKB,[sort:'stbName', order:'asc'])
+		deviceInstanceListC = Device.findAllByGroupsAndCategory(groups, Category.RDKC,[sort:'stbName', order:'asc'])
 		category = params?.category
 		if(params?.devicestatustable) {
 			// This is called from execution-resolver.js loadXmlDoc. This is for automatic page refresh.
@@ -461,6 +463,8 @@ class ExecutionController {
 				}
 				else if(Category.RDKB.toString().equals(category)){
 					deviceInstanceList = deviceInstanceListB
+				}else if(Category.RDKC.toString().equals(category)){
+					deviceInstanceList = deviceInstanceListC
 				}
 
 				result1 = [url: getApplicationUrl(), deviceList : deviceInstanceList, deviceInstanceTotal: deviceInstanceList?.size()]
@@ -494,7 +498,8 @@ class ExecutionController {
 		}
 
 		[url : getApplicationUrl(), deviceListV : deviceInstanceListV, deviceListB : deviceInstanceListB,  error: params.error, executionInstanceList : executionInstanceList, executorInstanceTotal: executionInstanceListCnt,
-			jobDetailList : jobDetailList, jobInstanceTotal: jobDetailList.size(), deviceInstanceTotalV: deviceInstanceListV?.size(), deviceInstanceTotalB: deviceInstanceListB?.size(), category : params?.category ]
+			jobDetailList : jobDetailList, jobInstanceTotal: jobDetailList.size(), deviceInstanceTotalV: deviceInstanceListV?.size(), deviceInstanceTotalB: deviceInstanceListB?.size(), category : params?.category ,
+			deviceListC : deviceInstanceListC,deviceInstanceTotalC: deviceInstanceListC?.size() ]
 	}
 
 	/**
@@ -552,6 +557,9 @@ class ExecutionController {
 				break
 			case Category.RDKV:
 				devices = Device.findAllByCategory(Category.RDKV)
+				break
+			case Category.RDKC:
+				devices = Device.findAllByCategory(Category.RDKC)
 				break
 			default: break
 		}
@@ -2642,6 +2650,8 @@ class ExecutionController {
 			}
 			else if(Category.RDKB.toString().equals(category)){
 				deviceInstanceList = Device.findAllByGroupsAndCategory(utilityService.getGroup(), Category.RDKB, [order: 'asc', sort: 'stbName'])
+			}else if(Category.RDKC.toString().equals(category)){
+				deviceInstanceList = Device.findAllByGroupsAndCategory(utilityService.getGroup(), Category.RDKC, [order: 'asc', sort: 'stbName'])
 			}
 			result1 = [url: getApplicationUrl(), deviceList : deviceInstanceList, deviceInstanceTotal: deviceInstanceList?.size()]
 

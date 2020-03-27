@@ -107,6 +107,26 @@
 										
 										</ul>
 										</li>
+										<li><span class="closed">RDK-C</span>
+										<ul>
+										
+										<% int primitiveTestIndexC = 0; %>
+										<g:each in="${primitiveTestMapC}" var="mapEntry">
+										<li class="closed"><span class="folder" id="addTestId">${mapEntry.key}</span>
+											<ul id ="module_">
+												<g:each in="${mapEntry.value}" var="test">
+												<%  primitiveTestIndexC++; %>
+											<li id="primitiveTestList_${primitiveTestIndexC}">
+												<span class="file" id="${test}@RDKC">
+													<a href="#" onclick="makeTestEditable('${test}','RDKC'); highlightTreeElement('primitiveTestList_', '${primitiveTestIndexC}', '${primitiveTestCount}'); return false;">${test}</a>
+												</span>
+												</li>
+												</g:each>
+												</ul>
+											</li>
+											</g:each>
+										</ul>
+										</li>
 									</ul>
 								</li>
 							</ul>
@@ -122,6 +142,7 @@
 				<ul>
 	          		<li id="add_propertyV"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-V Primitive Test </li>
 	          		<li id="add_propertyB"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-B Primitive Test</li>
+	          		<li id="add_propertyC"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-C Primitive Test</li>
 	        	</ul>
 	      </div>
 			<div class="contextMenu" id="childs_menu">

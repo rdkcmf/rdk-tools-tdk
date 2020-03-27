@@ -30,15 +30,22 @@
 --%><script type="text/javascript">
 window.onload = function(){
 	$("#rdkB").hide();
+	$("#rdkC").hide();
 }
 
 function display(val) {
 	if (val.trim() === 'RDKV') {
 		$("#rdkB").hide();
+		$("#rdkC").hide();
 		$("#rdkV").show();
 	} else if (val.trim() === 'RDKB') {
 		$("#rdkV").hide();
+		$("#rdkC").hide();
 		$("#rdkB").show();
+	}else if (val.trim() === 'RDKC') {
+		$("#rdkV").hide();
+		$("#rdkB").hide();
+		$("#rdkC").show();
 	} else {}
 }
 
@@ -50,6 +57,7 @@ function display(val) {
 		<b style="color: #A24C15;">Choose the configuration Category</b>&nbsp;&nbsp;&nbsp;
 		<input type="radio" onclick="display('RDKV')" name="chooseCat" checked="checked" >RDK-V</input> &nbsp;&nbsp;
 		<input type="radio" onclick="display('RDKB')" name="chooseCat">RDK-B</input>
+		<input type="radio" onclick="display('RDKC')" name="chooseCat">RDK-C</input>
 	</div>
 	<br>
 	<div id="rdkV">
@@ -163,7 +171,7 @@ function display(val) {
 		</div>
 		</div>
 
-		<div id="rdkB">
+	<div id="rdkB">
 			<div style="float: left; padding-left: 10%; padding-top: 5%;">
 				<h2 style="color: #A24C15;">
 					<center>RDK-B</center>
@@ -256,7 +264,93 @@ function display(val) {
 				--%></table>
 			</div>
 		</div>
+	<div id="rdkC">
+		<div style="float: left; padding-left: 10%; padding-top: 5%;">
+			<h2 style="color: #A24C15;">
+				<center>RDK-C</center>
+			</h2>
+		</div>
+		<div style="width: 40%; margin: 0 auto; align: center;">
+			<!-- RDK_C -->
+			<table>
+				<tr>
+					<td><g:link controller="module" action="list"
+							params="[category: com.comcast.rdk.Category.RDKC]">
+							<span>Modules</span>
+						</g:link></td>
+					<td>Configure Information about Component Interface Modules</td>
+				</tr>
+				<tr>
+					<td><g:link controller="module" action="crashlog"
+							params="[category:com.comcast.rdk.Category.RDKC ]">
+							<span>Link Crash Files</span>
+						</g:link></td>
+					<td>Link Crash Files to Modules</td>
+				</tr>
 
+				<tr>
+					<td><g:link controller="module" action="logFileNames"
+							params="[category:com.comcast.rdk.Category.RDKC ]">
+							<span>Link logs files</span>
+						</g:link></td>
+					<td>Link Configure STB logs to Module</td>
+				</tr>
+				<tr>
+					<td><g:link controller="streamingDetails" action="list"
+							params="[category:com.comcast.rdk.Category.RDKC]">
+							<span>Streaming Details</span>
+						</g:link></td>
+					<td>Option to add streaming details</td>
+				</tr>
+				<tr>
+					<td><g:link controller="boxManufacturer" action="index"
+							params="[category:com.comcast.rdk.Category.RDKC]">
+							<span>Box Manufacturers</span>
+						</g:link></td>
+					<td>Option to add Box Manufacturers</td>
+				</tr>
+				<tr>
+					<td><g:link controller="boxType" action="index"
+							params="[category:com.comcast.rdk.Category.RDKC]">
+							<span>Box Type</span>
+						</g:link></td>
+					<td>Option to add Box Type</td>
+				</tr>
+				<tr>
+					<td><g:link controller="RDKVersions" action="index"
+							params="[category:com.comcast.rdk.Category.RDKC]">
+							<span>RDK Versions</span>
+						</g:link></td>
+					<td>Option to add RDK Versions</td>
+				</tr>
+				<tr>
+					<td><g:link controller="soCVendor" action="index"
+							params="[category:com.comcast.rdk.Category.RDKC ]">
+							<span>SoC Vendors</span>
+						</g:link></td>
+					<td>Option to add SoC Vendors</td>
+				</tr>
+				<tr>
+						<td><g:link controller="ScriptTag" action="index"
+								params="[category:com.comcast.rdk.Category.RDKC ]">
+								<span>Script Tags</span>
+							</g:link></td>
+						<td>Option to add Script Tags</td>
+					</tr>
+					
+				<tr>
+					<td>
+					
+						<g:link controller="TestProfile" action="index"
+								params="[category:com.comcast.rdk.Category.RDKC ]">
+								<span>Test Profile</span>
+							</g:link></td>
+						<td>Option to add Test profile</td>
+						
+				</tr>
+			</table>
+		</div>
+	</div>
 	<div style="padding-top:40px;">
 	
 		<g:if test="${SecurityUtils.subject.principal.equals("admin")}">

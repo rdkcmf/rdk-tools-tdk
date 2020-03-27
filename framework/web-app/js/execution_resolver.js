@@ -227,6 +227,7 @@ function showScript(id, category){
 	$.get('showDevices', {id: id, category: category}, function(data) { $("#responseDiv").html(data); });
 	$.get('updateDeviceStatus', {id: id,category: 'RDKV'}, function(data) {refreshDevices(data,'RDKV');});
 	$.get('updateDeviceStatus', {id: id,category: 'RDKB'}, function(data) {refreshDevices(data,  'RDKB');});
+	$.get('updateDeviceStatus', {id: id,category: 'RDKC'}, function(data) {refreshDevices(data,  'RDKC');});
 	//$.get('updateDeviceStatus', {id: id,category: 'RDKB'}, function(data) {refreshDevices(data,  'RDKB');});
 }
 
@@ -237,6 +238,9 @@ function refreshDevices(data, category){
 	}
 	else if("RDKB" === category){
 		container = document.getElementById("device_statusB");
+	}
+	else if("RDKC" === category){
+		container = document.getElementById("device_statusC");
 	}
 	//container = document.getElementById("device_statusTotal");
 	container.innerHTML= data;
@@ -733,6 +737,10 @@ function loadXMLDoc1() {
 	$.get('create',{t:Math.random(),max:10,offset:0,devicestatustable:true,category:'RDKB'},function(data,status){
 		document.getElementById("device_statusB").innerHTML = "";
 		document.getElementById("device_statusB").innerHTML = data;
+	});
+	$.get('create',{t:Math.random(),max:10,offset:0,devicestatustable:true,category:'RDKC'},function(data,status){
+		document.getElementById("device_statusC").innerHTML = "";
+		document.getElementById("device_statusC").innerHTML = data;
 	});
 	/*$.get('create',{t:Math.random(),max:10,offset:0,devicestatustable:true},function(data,status){
 		//alert(data);

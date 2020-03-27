@@ -61,7 +61,7 @@
 <div id="scriptMessageDiv" class="message" style="display: none;"></div>
 <div id="scriptTclMessageDiv" class="message" style="display: none;"></div>
 
-<g:if test="${ category == 'RDKV' || category == 'RDKB'   }">
+<g:if test="${ category == 'RDKV' || category == 'RDKB' || category == 'RDKC' }">
 <g:form action="saveScript" method="post">
 	<g:hiddenField name="category" value="${category}"/>
 	<g:hiddenField name="uniqueId" value="${uniqueId}"/>

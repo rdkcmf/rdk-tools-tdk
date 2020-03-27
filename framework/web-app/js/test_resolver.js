@@ -35,6 +35,9 @@ $(document).ready(function() {
 			},
 			'add_propertyB' : function(node) {
 				createTestForm('RDKB');
+			},
+			'add_propertyC' : function(node) {
+				createTestForm('RDKC');
 			}
 		}
 	});

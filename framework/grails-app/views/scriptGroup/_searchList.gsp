@@ -21,8 +21,10 @@
 	$(document).ready(function() {
 		$("#list-scriptDetailsV").hide();
 		$("#list-scriptDetailsB").hide();
+		$("#list-scriptDetailsC").hide();
 		$("#list-suiteDetailsV").hide();
 		$("#list-suiteDetailsB").hide();
+		$("#list-suiteDetailsC").hide();
 		$("#radioDiv").hide();		
 		$("#scriptlisttable").dataTable({
 			"sPaginationType" : "full_numbers"

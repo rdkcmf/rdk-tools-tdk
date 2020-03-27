@@ -55,6 +55,10 @@
 		$("#scriptTableB").dataTable( {
 			"sPaginationType": "full_numbers"
 		});
+		$("#list-scriptDetailsC").show();
+		$("#scriptTableC").dataTable( {
+			"sPaginationType": "full_numbers"
+		});
 		var scriptId = $("#currentScriptId").val();
 		if(scriptId!=null && scriptId!=""){
 			editScript(scriptId);
@@ -192,6 +196,26 @@
 									</div>
 									</ul> 
 								</li>
+								<li>
+									<span class="folder" id="scriptTypeC" style="overflow: auto;">RDK-C</span>
+									<ul>
+										<div class="" style="max-height: 150px;overflow: auto;vertical-align: top;">
+										<% int scriptCountC = 0;
+										   int totalScriptsC = scriptInstanceTotalC * scriptGroupInstanceTotalC;
+										 %>
+										<g:each in="${scriptGroupMapC}" var="mapEntry">
+											<li class="closed"><span class="folder" id="addScriptId">${mapEntry.key}</span>
+												<ul id ="module_">
+													<g:each in="${mapEntry.value}" var="script">
+													<% scriptCountC++; %>
+	    												<li id="scriptList_${scriptCountC}"><span class="file" id="${mapEntry.key}@${script}-RDKC"><a href="#"  onclick="editScript('${mapEntry.key}@${script}','RDKC'); highlightTreeElement('scriptList_', '${scriptCountC}', '${scriptInstanceTotalC}'); highlightTreeElement('scriptGroupList_', '0', '${totalScriptsC}'); return false;">${script}</a></span></li>
+													</g:each>
+												</ul>
+											</li>
+										</g:each>
+										</div>
+									</ul> 
+								</li>
 								</ul>
 								<!-- RDK-B changes end -->
 							</ul>
@@ -271,6 +295,27 @@
 															</div>
 															</g:each>
 															</div>
+													</ul>
+													</li>
+													<li><span class="folder" id="u">RDK-C</span>
+													<ul>
+														<div style="max-height: 170px;overflow: auto;">
+														<g:each in="${scriptGroupInstanceListC}" var="scriptGrp">
+															<% def id = scriptGrp
+																if(id.contains(".")){
+																	id = id.replace(".", "_")
+																}
+															 %>
+															<div id="${id}" class="${scriptGrp}" onmouseover="getScriptsList(this, '${scriptGrp}', ${scriptInstanceTotalC}, ${totalScriptsC} )">
+																<li class="closed"><span class="folder" id="${scriptGrp}"><a href="#" onclick="editScriptGroup('${scriptGrp}', 'RDKC'); return false;">${scriptGrp}</a></span>
+																	<ul>
+																	<div class="scripts_${id}">
+																	</div>
+																	</ul>											
+																</li>
+															</div>
+															</g:each>
+														</div>
 													</ul>
 													</li>
 										</div>
@@ -405,6 +450,62 @@
 										</td>
 									</tr>
 								</g:each>								
+							</tbody>
+						</table>
+					</div>
+					<div style="width: 95%; max-height: 600px; display: block ;"
+						id="list-scriptDetailsC" class="content scaffold-list"
+						id="scriptDetailsC">
+						<table id="scriptTableC" class="display">
+							<thead>
+								<tr>
+									<th colspan="5" align="center" style="width: 50%;"><h1> RDKC Script
+											Details Summary</h1></th>
+								</tr>
+								<tr align="left">
+									<th width="15%">Sl No</th>
+									<th width ="28%">Module Name</th>
+									<th width ="23%"> Test Group </th>
+									<th width ="13%">Script Count</th>
+									<th width ="21%">Test Cases</th>							
+								</tr>
+							</thead>
+							<br>
+							<br>
+							<tbody align="left">
+								<%int moduleCount2 =0  %>
+								<%--<g:each in="${scriptGroupMap}" var=" name">					
+									--%>									
+									
+								<g:each in="${scriptGroupMapC}" var=" name">	
+									
+									<tr class="odd">									
+										<% 	moduleCount2++ %>
+										<td>
+											${moduleCount2}
+										</td>
+										<td>
+											${name.key}
+										</td>
+										<td>
+											<g:each in="${testGroup}" var ="groupName">												
+												 <g:if test="${groupName.key?.toString() == name?.key?.toString()}" >												 
+													${groupName?.value }
+												</g:if>
+												
+											</g:each>
+										</td>
+										<td>
+										  <g:if test="${name?.value}" >		
+											 ${name?.value?.size()}
+										  </g:if>
+										  <g:else>0</g:else>
+										</td>
+										<td>
+										  <g:link controller="scriptGroup" action="downloadScriptGroupTestCase" params="[scriptGrpName:name.key,category:'RDKC']" ><img src="../images/excel.png"  title = " Download Test Cases(Excel)" style="padding-left: 3px"/></g:link>
+										</td>												
+									</tr>
+									</g:each>								
 							</tbody>
 						</table>
 					</div>
@@ -562,6 +663,7 @@
 			<ul>
 	          		<li id="add_scriptV"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-V Script</li>
 	          		<li id="add_scriptB"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-B Script</li>
+	          		<li id="add_scriptC"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-C Script</li>
 	          		<li id="add_scriptTCL"><img src="../images/add_new.png" height="15px" width="15px"/>Add New TCL Script</li>
 				
 					<li id="refresh"><img src="../images/refresh.gif" height="15px"
@@ -595,6 +697,7 @@
 				<ul>
 	          		<li id="add_scriptgrpV"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-V Test Suite</li>
 	          		<li id="add_scriptgrpB"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-B Test Suite</li>
+					<li id="add_scriptgrpC"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-C Test Suite</li>
 	          		<li id="add_scriptgrpThunder"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-V Thunder Test Suite</li>
 	          		<li id="add_scriptgrpTCL"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-B Test Suite(TCL)</li>
 	          		<li id="upload_scriptGroup"><img src="../images/reorder_up.png"

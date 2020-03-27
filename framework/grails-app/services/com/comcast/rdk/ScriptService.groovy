@@ -211,7 +211,7 @@ class ScriptService {
 
 			List dirList = [Constants.COMPONENT, Constants.INTEGRATION]
 			def start = System.currentTimeMillis()
-			[Constants.TESTSCRIPTS_RDKV, Constants.TESTSCRIPTS_RDKB, Constants.TESTSCRIPTS_RDKV_ADV, Constants.TESTSCRIPTS_RDKB_ADV].each{ fileStorePath ->
+			[Constants.TESTSCRIPTS_RDKV, Constants.TESTSCRIPTS_RDKB,Constants.TESTSCRIPTS_RDKC, Constants.TESTSCRIPTS_RDKV_ADV, Constants.TESTSCRIPTS_RDKB_ADV].each{ fileStorePath ->
 				dirList.each{ directory ->
 					File scriptsDir = new File( "${realPath}//fileStore//$fileStorePath//"+directory+"//")
 					if(scriptsDir.exists()){
@@ -226,6 +226,8 @@ class ScriptService {
 								category = Constants.RDKV
 							}else if(Constants.TESTSCRIPTS_RDKB.equals(fileStorePath) || Constants.TESTSCRIPTS_RDKB_ADV.equals(fileStorePath)){
 								category = Constants.RDKB
+							}else if(Constants.TESTSCRIPTS_RDKC.equals(fileStorePath)){
+								category = Constants.RDKC
 							}
 							initialize( module, updateReqd, realPath, category,fileStorePath)
 						}
@@ -1068,6 +1070,15 @@ class ScriptService {
 				}
 			}
 		}
+		else if("RDKC".equals(category)){
+			def directories = ["testscriptsRDKC"]
+			directories.each { dirName ->
+				def path = realPath+Constants.FILE_SEPARATOR+"fileStore"+Constants.FILE_SEPARATOR+dirName
+				["component", "integration"].each{ directory ->
+					dir.addAll(getDirectoryList(path+Constants.FILE_SEPARATOR+directory))
+				}
+			}
+		}
 		def map = [:]
 		dir.each{
 			map.put(it, scriptGroupMap.get(it))
@@ -1240,8 +1251,7 @@ class ScriptService {
 				def primitiveTest = null
 
 				def directoryName = primitiveService.getDirectoryName(nodePrimitiveTestName)
-
-				if("RDKV".equals(category) || "RDKB".equals(category)){
+				if("RDKV".equals(category) || "RDKB".equals(category) || "RDKC".equals(category)){
 					primitiveTest = primitiveService.getPrimitiveTest(realPath+"/fileStore/"+directoryName+"//"+primitiveDirName+"//"+moduleName1+"/"+moduleName1+".xml",nodePrimitiveTestName)
 				}
 
@@ -1391,6 +1401,10 @@ class ScriptService {
 				}else{
 					sDirName= "//" +FILESTORE+"//" + TESTSCRIPTS_RDKB +"//"
 				}
+				file = new File( "${realPath}"+sDirName+scriptDirName+"//"+dirName+"//"+fileName+".py");
+			}else if("RDKC".equals(category)){
+				String sDirName= ""
+				sDirName= "//" +FILESTORE+"//" + TESTSCRIPTS_RDKC +"//"
 				file = new File( "${realPath}"+sDirName+scriptDirName+"//"+dirName+"//"+fileName+".py");
 			}
 
@@ -1700,6 +1714,9 @@ class ScriptService {
 				if(isAdvanced){
 					testDirName =  FileStorePath.RDKBADVANCED.value()
 				}
+				break;
+			case Category.RDKC:
+				testDirName =  FileStorePath.RDKC.value()
 				break;
 			case Category.RDKB_TCL:
 				testDirName = FileStorePath.RDKTCL.value()

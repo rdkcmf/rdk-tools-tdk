@@ -51,6 +51,9 @@
 			$("#devicetable2").dataTable( {
 				"sPaginationType": "full_numbers"
 			});
+			$("#devicetable3").dataTable( {
+				"sPaginationType": "full_numbers"
+			});
 		}
 
 		var deviceGroupId = $("#currentDeviceGroupId").val();
@@ -151,7 +154,30 @@
 											</g:each>
 										</ul>	
 										</li>
-											</div>
+										<li><span class="folder" id="addDeviceRDKC">RDK-C</span>
+											<ul>	
+												<%  int rdkcDeviceCount = 0;
+											   		int rdkcTotalDevices = deviceInstanceListRDKCTotal * deviceGrpInstanceListRDKCTotal;
+											 	%>
+													<g:each in="${deviceInstanceListRDKC}" var="parentDevice">
+													<g:if test="${parentDevice.isChild == 0}">
+														<li class="closed"><span class="file" id="${parentDevice.id}"><a href="#" onclick="showDevice('${parentDevice.id}');  highlightTreeElement('deviceList_', '${rdkcDeviceCount}', '${deviceInstanceListRDKCTotal}'); highlightTreeElement('deviceGroupList_', '0', '${rdkcTotalDevices}'); return false;">${parentDevice.stbName}</a></span>
+															<ul>
+																<g:each in="${ parentDevice.childDevices}" var="childDevice">
+																	<% rdkcDeviceCount++; %>
+																	<li id="deviceList_${rdkcDeviceCount}">
+																		<span class="file" id="${childDevice.id}">
+																			<a href="#" onclick="showDevice('${childDevice.id}');  highlightTreeElement('deviceList_', '${rdkcDeviceCount}', '${deviceInstanceListRDKCTotal}'); highlightTreeElement('deviceGroupList_', '0', '${rdkcTotalDevices}'); return false;">${childDevice.stbName}</a>
+																		</span>
+																	</li>
+															     </g:each>
+															</ul>											
+														</li>
+														 </g:if>
+													</g:each>
+												</ul>	
+												</li>
+										</div>
 									</ul>
 								</li>
 							</ul>
@@ -188,6 +214,23 @@
 														<% modemGroupCount++; %>
 													<li id="deviceGroupList_${modemGroupCount}">
 														<span id="${device.id}"><a href="#" onclick="showDevice('${device.id}' , 'STATIC');  highlightTreeElement('deviceList_', '0', '${deviceInstanceModemTotal}'); highlightTreeElement('deviceGroupList_', '${modemGroupCount}', '${totalDevices}'); return false;">${device.stbName}</a></span>
+													</li>
+													</g:each>
+												</ul>											
+											</li>
+											</g:each>
+										</ul>
+										</li>
+										<li><span class="folder" id="">RDK-C</span>
+										<ul>
+											<% int rdkcGroupCount = 0; %>
+											<g:each in="${deviceGrpInstanceListRDKC}" var="deviceGrp">
+											<li class="closed"><span class="hasChildren" id="${deviceGrp.id}"><a href="#" onclick="showDeviceGroup('${deviceGrp.id}'); return false;">${deviceGrp.name}</a></span>
+												<ul>
+													<g:each in="${deviceGrp.devices}" var="device">
+														<% rdkcGroupCount++; %>
+													<li id="deviceGroupList_${rdkcGroupCount}">
+														<span id="${device.id}"><a href="#" onclick="showDevice('${device.id}' , 'STATIC');  highlightTreeElement('deviceList_', '0', '${deviceInstanceListRDKCTotal}'); highlightTreeElement('deviceGroupList_', '${rdkcGroupCount}', '${rdkcTotalDevices}'); return false;">${device.stbName}</a></span>
 													</li>
 													</g:each>
 												</ul>											
@@ -380,7 +423,62 @@
 							<br/>
 							<br/>
 							</div>
-							
+							<div>
+								<g:link action="downloadAllDevices"  params="[category:'RDKC']" target="_blank"> Download All the RDK-C Device Details </g:link>
+								<table id="devicetable3" class="display">
+									<thead>
+										<tr>
+											<th colspan="4" align="center" style="width: 50%;"><h1> RDK-C Device
+													Summary</h1></th>
+										</tr>
+										<tr id="deleteVRow" >
+											<td colspan="4">
+											 <span class="buttons" style="float:right;padding:0px">
+											     <input type="submit" class="delete" value="Delete" onClick="deleteDevices('V')"/> 
+											 </span> 
+											</td>
+										</tr>
+										<tr align="left">
+										    <th width="5">Select</th>
+											<th width="45%;">Device Name</th>
+											<th width="25%">Device IP</th>
+											<th width="25%">Box Type</th>
+										</tr>
+									</thead>
+									<tbody>
+										<g:each in="${deviceInstanceListRDKC}" var="parentDevice">
+											<g:if test="${parentDevice.isChild == 0}">
+												<tr>
+												    <td><input type="checkbox" name="vDevice"  id = "${parentDevice.id}_CB" value="${parentDevice.id}" onClick="onDeviceVSelectionChange('${parentDevice.id}', '${parentDevice.id}_CB')"/> </td> 
+													<td>
+														<a href="#" onclick="showDevice('${parentDevice.id}');  highlightTreeElement('deviceList_', '${deviceCountRDKC}', '${deviceInstanceTotal}'); highlightTreeElement('deviceGroupList_', '0', '${totalDevicesRDKC}'); return false;">${parentDevice.stbName}</a>
+													</td>
+													<td>
+														${parentDevice.stbIp}
+													</td>
+													<td>
+														${parentDevice.boxType}
+													</td>
+												</tr>
+												<g:each in="${ parentDevice.childDevices}" var="childDevice">
+												<tr>
+												<td><input type="checkbox" name="vDevice" id = "${childDevice.id}_CB"  value="${childDevice.id}" onClick="onDeviceVSelectionChange('${childDevice.id}', '${childDevice.id}_CB')"/> </td>
+													<td>
+														<a href="#" onclick="showDevice('${childDevice.id}');  highlightTreeElement('deviceList_', '${deviceCountRDKC}', '${deviceInstanceTotal}'); highlightTreeElement('deviceGroupList_', '0', '${totalDevicesRDKC}'); return false;">${childDevice.stbName}</a>
+													</td>
+													<td>
+														${parentDevice.stbIp} (${childDevice.macId})
+													</td>
+													<td>
+														${childDevice.boxType} 
+													</td>
+												</tr>
+												</g:each>
+											</g:if>
+										</g:each>
+									</tbody>
+								</table>
+							</div>
 							
 						</div>
 						</div>
@@ -406,6 +504,7 @@
 				<ul>
 	          		<li id="add_device"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-V Device</li>
 	          		<li id="add_deviceB"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-B Device</li>
+	          		<li id="add_deviceC"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-C Device</li>
 	          		<li id="upload_device"><img src="../images/reorder_up.png" height="15px" width="15px" /> Upload RDK-V Device</li>
 	          		<li id="upload_device_RDKB"><img src="../images/reorder_up.png" height="15px" width="15px" /> Upload RDK-B Device</li>
 	        	</ul>

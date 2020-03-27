@@ -20,5 +20,5 @@ package com.comcast.rdk;
 
 public enum Category {
 
-	RDKV, RDKB, RDKB_TCL, RDKV_THUNDER
+	RDKV, RDKB, RDKB_TCL, RDKV_THUNDER, RDKC
 }
