@@ -188,6 +188,14 @@ class ExecutescriptService {
 		String outData = executionService.executeScript( file.getPath() , execTime, uniqueExecutionName , scriptInstance.name)
 		file.delete()
 		
+		Date execEndDate = new Date()
+		def execEndTime =  execEndDate.getTime()
+		// time difference for single script in seconds
+		def timeDifference = ( execEndTime - executionStartTime  ) / 1000;
+		String timeDiff =  String.valueOf(timeDifference)
+		String singleScriptExecTime = timeDifference
+		timeDifference = timeDifference / 60;
+		
 		def logPath = "${realPath}/logs//${executionId}//${executionDevice?.id}//${executionResultId}//"
 		copyLogsIntoDir(realPath,logPath, executionId,executionDevice?.id, executionResultId)	
 		
@@ -196,12 +204,7 @@ class ExecutescriptService {
 		outData?.eachLine { line ->
 			htmlData += (line + HTML_BR )
 		}
-		Date execEndDate = new Date()
-		def execEndTime =  execEndDate.getTime()
-		// time difference for single script in seconds
-		def timeDifference = ( execEndTime - executionStartTime  ) / 1000;
-		String timeDiff =  String.valueOf(timeDifference)	
-		String singleScriptExecTime = timeDifference
+
 		try
 		{
 			def cumulativeTime
