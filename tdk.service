@@ -17,13 +17,15 @@
 # limitations under the License.
 ##########################################################################
 [Unit]
-Description=TDK Test Agent Start
+Description=TDK Test Agent Service
 After=network-online.target
 Requires=network-online.target
 
 [Service]
 ExecStartPre=/bin/sh -c 'rm -rf /opt/TDK/lib* && cp -r /var/TDK /opt/'
 ExecStart=/bin/sh -c '/opt/TDK/StartTDK.sh'
+ExecStop=/bin/sh -c '/opt/TDK/StopTDK.sh'
+
 
 [Install]
 WantedBy=multi-user.target
