@@ -601,7 +601,7 @@
 								<tr>
 									<td><label>Select Category</label> &nbsp;&nbsp; <g:select
 											id="category" name="category"
-											from="${['RDKV','RDKB']}"
+											from="${['RDKV','RDKB','RDKC']}"
 											noSelection="['' : 'Please Select']" required=""  autocomplete="off" 
 											class="many-to-one"
 											onchange="${remoteFunction(action:"getModuleList",update:"propData", params: " \'category=\' + this.value")}" />

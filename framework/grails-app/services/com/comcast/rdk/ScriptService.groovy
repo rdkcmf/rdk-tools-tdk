@@ -1540,7 +1540,7 @@ class ScriptService {
 			List scriptList = []
 			Map tempScriptGroupMap = [:]
 			boolean updateReqd = isDefaultSGUpdateRequired(realPath)
-			[FileStorePath.RDKB.value(), FileStorePath.RDKV.value(), FileStorePath.RDKBADVANCED.value(), FileStorePath.RDKVADVANCED.value()].each{  path ->
+			[FileStorePath.RDKB.value(), FileStorePath.RDKV.value(),FileStorePath.RDKC.value() ,FileStorePath.RDKBADVANCED.value(), FileStorePath.RDKVADVANCED.value()].each{  path ->
 
 				def category
 				if(path.equals(FileStorePath.RDKB.value()) || path.equals(FileStorePath.RDKBADVANCED.value())){
@@ -1548,6 +1548,9 @@ class ScriptService {
 				}
 				else if(path.equals(FileStorePath.RDKV.value()) || path.equals(FileStorePath.RDKVADVANCED.value())){
 					category = Category.RDKV.toString()
+				}
+				else if(path.equals(FileStorePath.RDKC.value())){
+					category = Category.RDKC.toString()
 				}
 
 				List dirList = [Constants.COMPONENT, Constants.INTEGRATION]
@@ -2045,6 +2048,8 @@ class ScriptService {
 
 			}else if(category?.equals(Category.RDKB.toString())){
 				dirNameList.addAll(FileStorePath.RDKB.value(),FileStorePath.RDKBADVANCED.value())
+			}else if(category?.equals(Category.RDKC.toString())){
+				dirNameList.add(FileStorePath.RDKC.value())
 			}
 			dirNameList.each{ dirName->
 				path = "${realPath}//fileStore//"+dirName+"//"+scriptDirName+"//"+moduleName

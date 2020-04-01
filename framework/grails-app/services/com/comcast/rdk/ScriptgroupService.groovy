@@ -165,8 +165,9 @@ class ScriptgroupService {
 			removeScriptFromScriptGroup(scriptInstance, module?.testGroup?.toString() + KEY_GROUP+"_LD")
 		}
 
-
-		createOrUpdateScriptGroups(scriptInstance, groupName,category)
+		if(!category?.equals(Category.RDKC.toString())){
+			createOrUpdateScriptGroups(scriptInstance, groupName,category)
+		}
 
 		boxTypeList.each { boxType ->
 
