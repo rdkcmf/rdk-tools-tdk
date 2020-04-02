@@ -1091,7 +1091,7 @@ void DeviceSettingsAgent::AOP_setCompression(IN const Json::Value& req, OUT Json
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling setCompression\n");
 		aPort.setCompression(compressionFormat);
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling getCompression\n");
-		DEBUG_PRINT(DEBUG_LOG,"\nGetCompression:%s\n",aPort.getCompression());
+		DEBUG_PRINT(DEBUG_LOG,"\nGetCompression:%d\n",aPort.getCompression());
 		sprintf(compressionDetails,"%d",aPort.getCompression());
 		printf("\ncompressionDetails1:%s\n",compressionDetails1);
 		strcat(compressionDetails1,compressionDetails);
