@@ -1878,5 +1878,27 @@
                <!--default value of the param after factory reset -->
                <defaultValue>PushButton,PIN</defaultValue>
         </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.DeviceInfo.X_COMCAST_COM_xfinitywifiEnable</name>
+               <!--OID of the above parameter if available -->
+               <oid>1.3.6.1.4.1.17270.50.2.13.1.1.0</oid>
+               <!--webpa param name of the above tr-181 parameter if available -->
+               <webpaName>Device.DeviceInfo.X_COMCAST_COM_xfinitywifiEnable</webpaName>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!--default value exepcted by snmp after factory reset -->
+               <snmpDefaultValue>2</snmpDefaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+                <!-- the range of values acceptable for snmp-->
+               <snmpExpectedValues>1,2</snmpExpectedValues>
+        </parameter>
 </parameters>
 
