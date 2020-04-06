@@ -3583,9 +3583,8 @@ void DeviceSettingsAgent::HOST_getAudioOutputPorts(IN const Json::Value& req, OU
                 {
 			device::AudioOutputPort &aPort = aPorts.at(i);
 
-                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Compression [%d] Encoding [%s] StereoMode [%s] Gain [%f] DB [%f]\r\n",
+                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Encoding [%s] StereoMode [%s] Gain [%f] DB [%f]\r\n",
                                                 aPort.getName().c_str(),
-						aPort.getCompression(),
 						aPort.getEncoding().getName().c_str(),
 						aPort.getStereoMode().getName().c_str(),
 						aPort.getGain(),
