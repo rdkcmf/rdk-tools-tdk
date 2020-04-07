@@ -4049,9 +4049,8 @@ void DeviceSettingsAgent::AOPCONFIG_release(IN const Json::Value& req, OUT Json:
                 for (size_t i = 0; i < aPorts.size(); i++)
                 {
                         device::AudioOutputPort &aPort = aPorts.at(i);
-                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Compression [%d] Encoding [%s] StereoMode [%s]\r\n",
+                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Encoding [%s] StereoMode [%s]\r\n",
                                                 aPort.getName().c_str(),
-                                                aPort.getCompression(),
                                                 aPort.getEncoding().getName().c_str(),
                                                 aPort.getStereoMode().getName().c_str());
 
@@ -4120,9 +4119,8 @@ void DeviceSettingsAgent::AOPCONFIG_load(IN const Json::Value& req, OUT Json::Va
                 for (size_t i = 0; i < aPorts.size(); i++)
                 {
                         device::AudioOutputPort &aPort = aPorts.at(i);
-                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Compression [%d] Encoding [%s] StereoMode [%s]\r\n",
+                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Encoding [%s] StereoMode [%s]\r\n",
                                                 aPort.getName().c_str(),
-                                                aPort.getCompression(),
                                                 aPort.getEncoding().getName().c_str(),
                                                 aPort.getStereoMode().getName().c_str());
 
