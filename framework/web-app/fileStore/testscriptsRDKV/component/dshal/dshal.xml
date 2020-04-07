@@ -111,6 +111,152 @@
         <function>TestMgr_DSHal_IsVideoPortActive</function>
         <parameters/>
       </primitiveTest>
+    <primitiveTest id=" " name="DSHal_SetFPBrightness" version="1">
+        <function>TestMgr_DSHal_SetFPBrightness</function>
+        <parameters>
+          <parameter name="brightness" value=""/>
+          <parameter name="indicator" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_GetFPBrightness" version="1">
+        <function>TestMgr_DSHal_GetFPBrightness</function>
+        <parameters>
+          <parameter name="indicator" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetCPUTemperature" version="1">
+        <function>TestMgr_DSHal_GetCPUTemperature</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetVersion" version="1">
+        <function>TestMgr_DSHal_GetVersion</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetVersion" version="1">
+        <function>TestMgr_DSHal_SetVersion</function>
+        <parameters>
+          <parameter name="version" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetHDRCapabilities" version="1">
+        <function>TestMgr_DSHal_GetHDRCapabilities</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetSupportedVideoCodingFormats" version="1">
+        <function>TestMgr_DSHal_GetSupportedVideoCodingFormats</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetVideoCodecInfo" id=" " version="1">
+        <function>TestMgr_DSHal_GetVideoCodecInfo</function>
+        <parameters>
+          <parameter name="format" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetTVHDRCapabilities" version="1">
+        <function>TestMgr_DSHal_GetTVHDRCapabilities</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetFPBlink" version="2">
+        <function>TestMgr_DSHal_SetFPBlink</function>
+        <parameters>
+          <parameter name="blinkDuration" value="0"/>
+          <parameter name="blinkIteration" value="0"/>
+          <parameter name="indicator" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetFPTextBrightness" version="1">
+        <function>TestMgr_DSHal_SetFPTextBrightness</function>
+        <parameters>
+          <parameter name="brightness" value="50"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetFPText" version="1">
+        <function>TestMgr_DSHal_SetFPText</function>
+        <parameters>
+          <parameter name="text" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetFPTime" version="1">
+        <function>TestMgr_DSHal_SetFPTime</function>
+        <parameters>
+          <parameter name="format" value="0"/>
+          <parameter name="hours" value="0"/>
+          <parameter name="minutes" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetFPColor" version="2">
+        <function>TestMgr_DSHal_SetFPColor</function>
+        <parameters>
+          <parameter name="color" value="0"/>
+          <parameter name="indicator" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_IsOutputHDR" version="1">
+        <function>TestMgr_DSHal_IsOutputHDR</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_HdmiInGetNumberOfInputs" version="1">
+        <function>TestMgr_DSHal_HdmiInGetNumberOfInputs</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetAudioMute" version="1">
+        <function>TestMgr_DSHal_SetAudioMute</function>
+        <parameters>
+          <parameter name="muted" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_IsAudioMute" version="1">
+        <function>TestMgr_DSHal_IsAudioMute</function>
+        <parameters/>
+      </primitiveTest>
+       <primitiveTest id=" " name="DSHal_SetAudioDelay" version="1">
+        <function>TestMgr_DSHal_SetAudioDelay</function>
+        <parameters>
+          <parameter name="audioDelay" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetAudioDelay" version="1">
+        <function>TestMgr_DSHal_GetAudioDelay</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetAudioDelayOffset" version="1">
+        <function>TestMgr_DSHal_SetAudioDelayOffset</function>
+        <parameters>
+          <parameter name="offset" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetAudioDelayOffset" version="1">
+        <function>TestMgr_DSHal_GetAudioDelayOffset</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetBackgroundColor" version="1">
+        <function>TestMgr_DSHal_SetBackgroundColor</function>
+        <parameters>
+          <parameter name="color" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="DSHal_IsAudioMS12Decode" id="" version="1">
+        <function>TestMgr_DSHal_IsAudioMS12Decode</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_IsAudioMSDecode" version="1">
+        <function>TestMgr_DSHal_IsAudioMSDecode</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetHdmiPreference" version="1">
+        <function>TestMgr_DSHal_SetHdmiPreference</function>
+        <parameters>
+          <parameter name="hdcpProtocol" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetHdmiPreference" version="1">
+        <function>TestMgr_DSHal_GetHdmiPreference</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_IsHDCPEnabled" id="" version="1">
+        <function>TestMgr_DSHal_IsHDCPEnabled</function>
+        <parameters/>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
