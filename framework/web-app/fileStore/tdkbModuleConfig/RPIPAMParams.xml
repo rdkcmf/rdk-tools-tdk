@@ -60,6 +60,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
 
          <parameter>
@@ -75,6 +76,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
 
         <parameter>
@@ -134,6 +136,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
 
         <parameter>
@@ -211,6 +214,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
          <parameter>
                <name>Device.DeviceInfo.X_RDKCENTRAL-COM_UI_ACCESS</name>
@@ -223,6 +227,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
 
 
@@ -239,6 +244,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
 
          <parameter>
@@ -252,7 +258,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>false</defaultValue> 
         </parameter>
 
          <parameter>
@@ -313,6 +319,7 @@
                <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
+               <expectedValues></expectedValues>
         </parameter>
 
          <parameter>
@@ -326,6 +333,7 @@
                <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
+                <expectedValues></expectedValues>
         </parameter>
 
         <parameter>
@@ -338,6 +346,7 @@
                <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
+                <expectedValues></expectedValues>
         </parameter>
 
         <parameter>
@@ -917,6 +926,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue>xfinity.com/myxfi</defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
 
  <parameter>
@@ -982,6 +992,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues>1</expectedValues>
         </parameter>
 
 <parameter>
@@ -1113,6 +1124,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
 
          <parameter>
@@ -1130,6 +1142,7 @@
                <defaultValue>0</defaultValue>
         </parameter>
 </parameters>
+
 
 
 
