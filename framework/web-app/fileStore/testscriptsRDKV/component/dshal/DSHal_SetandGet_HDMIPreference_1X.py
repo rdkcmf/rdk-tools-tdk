@@ -156,7 +156,8 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
                         tdkTestObj.setResultStatus("SUCCESS");
                         details = tdkTestObj.getResultDetails();
                         print "HdmiPreference retrieved", details
-                        if int(details) == hdcpProtocolVersion["VERSION_1X"]:
+                        #Value is VERSION_MAX for any HDCP protocol version set other than VERSION_2X
+                        if int(details) == hdcpProtocolVersion["VERSION_1X"] or int(details) == hdcpProtocolVersion["VERSION_MAX"]:
                             tdkTestObj.setResultStatus("SUCCESS");
                             print "HdmiPreference set successfully";
                         else:
