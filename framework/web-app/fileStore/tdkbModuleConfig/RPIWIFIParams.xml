@@ -1872,7 +1872,7 @@
                <!-- the range of values acceptable -->
                <expectedValues>Device.WiFi.SSID.2.</expectedValues>
                <!-- the range of values acceptable for WEBPA-->
-               <webpaExpectedValues>Device.WiFi.SSID.10002.</webpaExpectedValues>
+               <webpaExpectedValues>Device.WiFi.SSID.10101.</webpaExpectedValues>
                <!-- default value of the param after factory reset/ for WEBPA-->
                <webpaDefaultValue>Device.WiFi.SSID.10101.</webpaDefaultValue>
         </parameter>
@@ -2189,6 +2189,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -2203,6 +2204,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -2219,6 +2221,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -2235,6 +2238,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
 		<!-- the range of values acceptable for snmp-->
                <snmpExpectedValues>""</snmpExpectedValues>
         </parameter>
@@ -2429,6 +2433,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+                <expectedValues></expectedValues>
 		<!-- the range of values acceptable for snmp-->
                <snmpExpectedValues>""</snmpExpectedValues>
         </parameter>
@@ -2447,6 +2452,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+                <expectedValues></expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -2531,6 +2537,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -2547,6 +2554,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -2562,6 +2570,7 @@
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
                <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -2576,6 +2585,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
