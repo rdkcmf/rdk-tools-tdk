@@ -1651,6 +1651,8 @@
                <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
         </parameter>
@@ -1665,6 +1667,8 @@
                <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
         </parameter>
@@ -1900,5 +1904,6 @@
                 <!-- the range of values acceptable for snmp-->
                <snmpExpectedValues>1,2</snmpExpectedValues>
         </parameter>
+
 </parameters>
 
