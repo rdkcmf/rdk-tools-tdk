@@ -81,6 +81,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
 		<parameter>
                 <!--the tr-181 parameter name -->
@@ -95,6 +96,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
 		<parameter>
                 <!--the tr-181 parameter name -->
@@ -109,6 +111,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
 		<parameter>
                 <!--the tr-181 parameter name -->
@@ -151,6 +154,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
 		<parameter>
                 <!--the tr-181 parameter name -->
@@ -165,6 +169,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
 		<parameter>
                 <!--the tr-181 parameter name -->
@@ -504,6 +509,7 @@
                <defaultValue>300</defaultValue>
         </parameter>
 </parameters>
+
 
 
 
