@@ -119,8 +119,6 @@
                <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
-               <!--default value of the param after factory reset -->
-               <defaultValue></defaultValue>
         </parameter>
 
          <parameter>
