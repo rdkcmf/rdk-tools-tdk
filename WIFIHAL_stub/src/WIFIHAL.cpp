@@ -734,7 +734,7 @@ void WIFIHAL::WIFI_HAL_GetStats(IN const Json::Value& req, OUT Json::Value& resp
 /*******************************************************************************************
  *
  * Function Name        : WIFI_HAL_GetDualBandSupport
- * Description          : This function invokes WiFi hal api wif_getDualBandSupport()
+ * Description          : This function invokes WiFi hal api wifi_getDualBandSupport()
  *
  * @param [in] req-     : NIL
  * @param [out] response - filled with SUCCESS or FAILURE based on the output staus of operation
@@ -746,7 +746,7 @@ void WIFIHAL::WIFI_HAL_GetDualBandSupport(IN const Json::Value& req, OUT Json::V
     int isDualBand;
     char details[30] = {'\0'};
 
-    isDualBand = wif_getDualBandSupport();
+    isDualBand = wifi_getDualBandSupport();
 
     sprintf(details,"Is Dual Band Supported : %d",isDualBand);
     response["result"]="SUCCESS";
