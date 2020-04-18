@@ -94,27 +94,20 @@ from dshalUtility import *;
 
 #Test component to be tested
 dshalObj = tdklib.TDKScriptingLibrary("dshal","1");
-sysObj = tdklib.TDKScriptingLibrary("systemutil","1");
 
 #IP and Port of box, No need to change,
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
 dshalObj.configureTestCase(ip,port,'DSHal_GetAudioEncoding_HDMI');
-sysObj.configureTestCase(ip,port,'DSHal_GetAudioEncoding_HDMI');
 
 #Get the result of connection with test component and STB
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
-sysloadModuleStatus = dshalObj.getLoadModuleResult();
-print "[LIB LOAD STATUS]  :  %s" %sysloadModuleStatus;
 
 dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
-sysObj.setLoadModuleStatus(sysloadModuleStatus);
 
-if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStatus.upper():
-    stopStatus = stopDsmgrService(sysObj);
-    if stopStatus:
+if "SUCCESS" in dshalloadModuleStatus.upper():
         expectedResult="SUCCESS";
         #Prmitive test case which associated to this Script
         tdkTestObj = dshalObj.createTestStep('DSHal_GetAudioPort');
@@ -152,9 +145,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStat
             tdkTestObj.setResultStatus("FAILURE");
             print "AudioPort handle not retrieved";
 
-    startDsmgrService(sysObj);
-    dshalObj.unloadModule("dshal");
-    sysObj.unloadModule("systemutil");
+        dshalObj.unloadModule("dshal");
 
 else:
     print "Module load failed";
