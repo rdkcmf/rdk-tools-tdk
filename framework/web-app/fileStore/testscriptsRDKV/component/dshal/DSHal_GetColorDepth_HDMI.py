@@ -106,15 +106,13 @@ sysObj.configureTestCase(ip,port,'DSHal_GetColorDepth_HDMI');
 #Get the result of connection with test component and STB
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
-sysloadModuleStatus = dshalObj.getLoadModuleResult();
+sysloadModuleStatus = sysObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %sysloadModuleStatus;
 
 dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
 sysObj.setLoadModuleStatus(sysloadModuleStatus);
 
 if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStatus.upper():
-    stopStatus = stopDsmgrService(sysObj);
-    if stopStatus:
         expectedResult="SUCCESS";
         #Prmitive test case which associated to this Script
         tdkTestObj = dshalObj.createTestStep('DSHal_GetVideoPort');
@@ -181,9 +179,8 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStat
             tdkTestObj.setResultStatus("FAILURE");
             print "VideooPort handle not retrieved";
 
-    startDsmgrService(sysObj);
-    dshalObj.unloadModule("dshal");
-    sysObj.unloadModule("systemutil");
+        dshalObj.unloadModule("dshal");
+        sysObj.unloadModule("systemutil");
 
 else:
     print "Module load failed";
