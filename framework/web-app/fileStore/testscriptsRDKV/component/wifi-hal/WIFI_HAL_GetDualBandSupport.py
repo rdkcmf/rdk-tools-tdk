@@ -52,7 +52,7 @@ wifi_getRadioSupportedFrequencyBands()</api_or_interface_used>
 2.Invoke wif_getDualBandSupport() api to get dual band support status.
 3.API returns 1 if device supports dual band or 0 if the device does not dual band
 4.Invoke wifi_getRadioSupportedFrequencyBands() to get the supported bands
-5.Supported bands should be both 2.4 & 5 GHz if dual band support is true else either one frequency band
+5.Supported bands should be both 2.4 and 5 GHz if dual band support is true else either one frequency band
 6.Update test results
 7.Unload the module.</automation_approch>
     <expected_output>Dual band support status of the device</expected_output>
