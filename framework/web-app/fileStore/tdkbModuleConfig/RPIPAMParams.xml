@@ -119,6 +119,7 @@
                <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
         </parameter>
 
          <parameter>
@@ -958,6 +959,7 @@
                <defaultValue>false</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
+               <RFCEnabled>true</RFCEnabled>
         </parameter>
 
 <parameter>
@@ -975,6 +977,7 @@
                <defaultValue>false</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
+               <RFCEnabled>true</RFCEnabled>
         </parameter>
 
 <parameter>
@@ -991,6 +994,7 @@
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
                <expectedValues>1</expectedValues>
+               <RFCEnabled>true</RFCEnabled>
         </parameter>
 
 <parameter>
@@ -1008,6 +1012,7 @@
                 <defaultValue>false</defaultValue>
                 <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
+               <RFCEnabled>true</RFCEnabled>
 </parameter>
 
 <parameter>
@@ -1025,6 +1030,7 @@
                <defaultValue>false</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
+               <RFCEnabled>true</RFCEnabled>
         </parameter>
 
 <parameter>
@@ -1041,6 +1047,7 @@
                <defaultValue>true</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
+               <RFCEnabled>true</RFCEnabled>
         </parameter>
 
 <parameter>
@@ -1058,6 +1065,7 @@
                <defaultValue>false</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
+               <RFCEnabled>true</RFCEnabled>
         </parameter>
 
        <parameter>
@@ -1074,6 +1082,7 @@
                <defaultValue>false</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
+               <RFCEnabled>true</RFCEnabled>
         </parameter>
 
         <parameter>
@@ -1090,6 +1099,7 @@
                <defaultValue>false</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
+               <RFCEnabled>true</RFCEnabled>
         </parameter>
 
         <parameter>
@@ -1107,6 +1117,7 @@
                <defaultValue>false</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
+               <RFCEnabled>true</RFCEnabled>
         </parameter>
 
          <parameter>
@@ -1123,6 +1134,7 @@
                <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
                <expectedValues></expectedValues>
+               <RFCEnabled>true</RFCEnabled>
         </parameter>
 
          <parameter>
@@ -1138,6 +1150,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue>0</defaultValue>
+               <RFCEnabled>true</RFCEnabled>
         </parameter>
 </parameters>
 
