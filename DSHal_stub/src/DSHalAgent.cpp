@@ -52,7 +52,8 @@ std::string DSHalAgent::testmodulepre_requisites()
         dsVideoPortInit();
         dsDisplayInit();
         dsVideoDeviceInit();
-	dsFPInit();
+        dsFPInit();
+        dsHdmiInInit();
 
         DEBUG_PRINT(DEBUG_TRACE, "DSHal testmodule pre_requisites --> Exit\n");
         return "SUCCESS";
@@ -81,6 +82,7 @@ bool DSHalAgent::testmodulepost_requisites()
     dsDisplayTerm();
     dsVideoDeviceTerm();
     dsFPTerm();
+    dsHdmiInTerm();
     vpHandle = 0;
     vdHandle = 0;
     apHandle = 0;
@@ -1922,6 +1924,235 @@ void DSHalAgent::DSHal_IsHDCPEnabled(IN const Json::Value& req, OUT Json::Value&
         return;
     }
 }
+/***************************************************************************
+ *Function name : DSHal_EnableLEConfig
+ *Description    : This function is to enable or disable the LE config
+ *****************************************************************************/
+void DSHalAgent::DSHal_EnableLEConfig(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_EnableLEConfig--->Entry\n");
+    if(&req["enable"] == NULL)
+    {
+        return;
+    }
+
+    bool enable = req["enable"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsEnableLEConfig(apHandle, enable);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "EnableLEConfig call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_EnableLEConfig call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_EnableLEConfig -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID HANDLE";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid audio handle");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_EnableLEConfig -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "EnableLEConfig call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_EnableLEConfig call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_EnableLEConfig -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetLEConfig
+ *Description    : This function is to check if LE feature is enabled
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetLEConfig(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetLEConfig --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    bool enable;
+
+    ret = dsGetLEConfig(apHandle, &enable);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = enable;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetLEConfig call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetLEConfig -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID HANDLE";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid audio handle");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetLEConfig -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetLEConfig call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetLEConfig call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetLEConfig -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetSupportedTvResolutions
+ *Description    : This function is to get the supported TV resolutions
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetSupportedTvResolutions(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSupportedTvResolutions --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    int resolutions;
+
+    ret = dsSupportedTvResolutions(vpHandle, &resolutions);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = resolutions;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetSupportedTvResolutions call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSupportedTvResolutions -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID HANDLE";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid video handle");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSupportedTvResolutions -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetSupportedTvResolutions call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetSupportedTvResolutions call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSupportedTvResolutions -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetMatrixCoefficients
+ *Description    : This function is to matrix coefficients setting
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetMatrixCoefficients(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetMatrixCoefficients --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    dsDisplayMatrixCoefficients_t coefficients;
+
+    ret = dsGetMatrixCoefficients(vpHandle, &coefficients);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = coefficients;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetMatrixCoefficients call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetMatrixCoefficients -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetMatrixCoefficients call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetMatrixCoefficients call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetMatrixCoefficients -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_SetDolbyVolumeMode
+ *Description    : This function is to set the dolby volume mode
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetDolbyVolumeMode(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetDolbyVolumeMode--->Entry\n");
+    if(&req["mode"] == NULL)
+    {
+        return;
+    }
+
+    bool mode = req["mode"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsSetDolbyVolumeMode(apHandle, mode);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetDolbyVolumeMode call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetDolbyVolumeMode call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetDolbyVolumeMode -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID HANDLE";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid audio handle");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetDolbyVolumeMode -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "SetDolbyVolumeMode call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetDolbyVolumeMode call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetDolbyVolumeMode -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetDolbyVolumeMode
+ *Description    : This function is to get the dolby volume mode
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetDolbyVolumeMode(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDolbyVolumeMode --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    bool mode;
+
+    ret = dsGetDolbyVolumeMode(apHandle, &mode);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = mode;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetDolbyVolumeMode call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDolbyVolumeMode -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID HANDLE";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid audio handle");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDolbyVolumeMode -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetDolbyVolumeMode call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetDolbyVolumeMode call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDolbyVolumeMode -->Exit\n");
+        return;
+    }
+}
+
 /**************************************************************************
 Function Name   : cleanup
 
