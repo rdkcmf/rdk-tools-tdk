@@ -112,6 +112,12 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetVideoEOTF", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetVideoEOTF);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_HdmiInScaleVideo", PARAMS_BY_NAME, JSON_STRING, "x", JSON_INTEGER, "y", JSON_INTEGER, "width", JSON_INTEGER ,"height", JSON_INTEGER,NULL), &DSHalAgent::DSHal_HdmiInScaleVideo);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_IsHDCPEnabled", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_IsHDCPEnabled);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_EnableLEConfig", PARAMS_BY_NAME, JSON_STRING, "enable", JSON_INTEGER,NULL), &DSHalAgent::DSHal_EnableLEConfig);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetLEConfig", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetLEConfig);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetSupportedTvResolutions", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetSupportedTvResolutions);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetMatrixCoefficients", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetMatrixCoefficients);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetDolbyVolumeMode", PARAMS_BY_NAME, JSON_STRING, "mode", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetDolbyVolumeMode);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetDolbyVolumeMode", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetDolbyVolumeMode);
                 }
 
                 //Inherited functions
@@ -173,6 +179,12 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                 void DSHal_GetVideoEOTF(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_HdmiInScaleVideo(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_IsHDCPEnabled(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_EnableLEConfig(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetLEConfig(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetSupportedTvResolutions(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetMatrixCoefficients(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetDolbyVolumeMode(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetDolbyVolumeMode(IN const Json::Value& req, OUT Json::Value& response);
 
 };
 #endif //__DSHAL_STUB_H__
