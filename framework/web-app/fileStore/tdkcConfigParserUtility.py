@@ -62,6 +62,61 @@ def parseDeviceConfig(obj):
         global psk
         psk = config.get(deviceConfig, 'PSK')
 
+        #global variables for selenium framework
+        global start_selenium_script
+        start_selenium_script = config.get(deviceConfig,'START_SELENIUM_SCRIPT');
+
+        global start_selenium_script_client
+        start_selenium_script_client = config.get(deviceConfig,'START_SELENIUM_SCRIPT_CLIENT');
+
+        global hub_machine_ip
+        hub_machine_ip = config.get(deviceConfig,'HUB_MACHINE_IP');
+
+        global hub_logfile
+        hub_logfile = config.get(deviceConfig,'HUB_LOGFILE');
+
+        global hub_selenium_path
+        hub_selenium_path = config.get(deviceConfig,'HUB_SELENIUM_PATH');
+
+        global node_machine_ip
+        node_machine_ip = config.get(deviceConfig,'NODE_MACHINE_IP');
+
+        global node_username
+        node_username = config.get(deviceConfig,'NODE_USERNAME');
+
+        global node_password
+        node_password = config.get(deviceConfig,'NODE_PASSWORD');
+
+        global node_logfile
+        node_logfile = config.get(deviceConfig,'NODE_LOGFILE');
+
+        global node_selenium_path
+        node_selenium_path = config.get(deviceConfig,'NODE_SELENIUM_PATH');
+
+        global ersIP
+        ersIP  = config.get(deviceConfig,'ERS_IP');
+
+        global ersPort
+        ersPort = config.get(deviceConfig,'ERS_PORT');
+
+        global roomName
+        roomName  = config.get(deviceConfig,'ROOM_NAME');
+
+        global streamName
+        streamName = config.get(deviceConfig,'STREAM_NAME');
+
+        global webrtcDemoURL
+        webrtcDemoURL = config.get(deviceConfig,'WEBRTC_DEMO_URL');
+
+        global UICheckXpath
+        UICheckXpath = config.get(deviceConfig,'UI_CHECK_XPATH');
+
+        global UICheckData
+        UICheckData = config.get(deviceConfig,'UI_CHECK_DATA');
+
+        global debug
+        debug = config.get(deviceConfig,'UI_DEBUG_XPATH');
+
     except Exception, e:
         print e;
         status = "Failed to parse the device specific configuration file"
