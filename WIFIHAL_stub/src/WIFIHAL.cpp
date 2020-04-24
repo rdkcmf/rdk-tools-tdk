@@ -540,6 +540,7 @@ void WIFIHAL::WIFI_HAL_GetNeighboringWiFiDiagnosticResult(IN const Json::Value& 
     int returnValue;
     int dataLength;
     int basicInfoSize = 50;
+    int basicMsgSize = 500;
 
     radioIndex = req["radioIndex"].asInt();
 
@@ -550,8 +551,8 @@ void WIFIHAL::WIFI_HAL_GetNeighboringWiFiDiagnosticResult(IN const Json::Value& 
         DEBUG_PRINT(DEBUG_TRACE,"\n No of SSIDs with provided channels : %u\n",output_array_size);
         if (output_array_size > 0)
         {
-            DEBUG_PRINT(DEBUG_TRACE,"\n Going to allocate %d bytes memory for details",basicInfoSize*output_array_size);
-            char *details = (char*)malloc(basicInfoSize*output_array_size);
+            DEBUG_PRINT(DEBUG_TRACE,"\n Going to allocate %d bytes memory for details",basicMsgSize);
+            char *details = (char*)malloc(basicMsgSize);
             if (details == NULL)
             {
                 response["result"]="FAILED";
@@ -561,19 +562,21 @@ void WIFIHAL::WIFI_HAL_GetNeighboringWiFiDiagnosticResult(IN const Json::Value& 
             }
             else{
                 char *details_ptr  = details;
-                memset(details_ptr,'\0',basicInfoSize*output_array_size);
+                memset(details_ptr,'\0',basicMsgSize);
 
                 for (output_array_index=0; output_array_index<output_array_size; output_array_index++)
                 {
-                    if (details[0] != '\0' )
-                    {
-                        sprintf(details_ptr,"|");
-                        details_ptr++;
-                    }
                     DEBUG_PRINT(DEBUG_TRACE, "ap_SSID=%s,ap_BSSID=%s,ap_Mode=%s,ap_Channel=%d,ap_SignalStrength=%d,ap_SecurityModeEnabled=%s,ap_EncryptionMode=%s,ap_OperatingFrequencyBand=%s,ap_SupportedStandards=%s,ap_OperatingStandards=%s,ap_OperatingChannelBandwidth=%s,ap_BeaconPeriod=%d,ap_Noise=%d,ap_BasicDataTransferRates=%s,ap_SupportedDataTransferRates=%s,ap_DTIMPeriod=%d,ap_ChannelUtilization=%d\n",neighbor_ap->ap_SSID,neighbor_ap->ap_BSSID,neighbor_ap->ap_Mode,neighbor_ap->ap_Channel,neighbor_ap->ap_SignalStrength,neighbor_ap->ap_SecurityModeEnabled,neighbor_ap->ap_EncryptionMode,neighbor_ap->ap_OperatingFrequencyBand,neighbor_ap->ap_SupportedStandards,neighbor_ap->ap_OperatingStandards,neighbor_ap->ap_OperatingChannelBandwidth,neighbor_ap->ap_BeaconPeriod,neighbor_ap->ap_Noise,neighbor_ap->ap_BasicDataTransferRates,neighbor_ap->ap_SupportedDataTransferRates,neighbor_ap->ap_DTIMPeriod,neighbor_ap->ap_ChannelUtilization);
-                    dataLength = sprintf(details_ptr, "SSID=%s,Band=%s",neighbor_ap->ap_SSID,neighbor_ap->ap_OperatingFrequencyBand);
+                    if ((basicMsgSize - strlen(details)) >= basicInfoSize ){
+                        if (details[0] != '\0' )
+                        {
+                            sprintf(details_ptr,"|");
+                            details_ptr++;
+                        }
+                        dataLength = sprintf(details_ptr, "SSID=%s,Band=%s",neighbor_ap->ap_SSID,neighbor_ap->ap_OperatingFrequencyBand);
 
-                    details_ptr = details_ptr + dataLength;
+                        details_ptr = details_ptr + dataLength;
+                    }
                     neighbor_ap++;
                 }
                 response["result"]="SUCCESS";
