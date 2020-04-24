@@ -27,6 +27,9 @@ hdcpProtocolVersion = {"VERSION_1X":0, "VERSION_2X":1, "VERSION_MAX":2, "VERSION
 surroundMode = {"DD":1, "DDPLUS":2};
 aspectRatio = {"4x3":0, "16x9":1};
 colorSpace = {"RGB":1, "YCbCr422":2, "YCbCr444":3, "YCbCr420":4, "AUTO":5};
+matrixCoefficients = {"UNKNOWN":0, "T_709":1, "T_470_2_BG":2, "MPTE_170M":3, "vYCC_709":4, "XvYCC_601":5, "T_2020_NCL":6, "T_2020_CL":7};
+eotf = {"NONE":0, "HDR10":1, "HLG":2, "DolbyVision":4, "TechnicolorPrime":8, "Invalid":128};
+
 
 def stopDsmgrService(obj):
     expectedResult="SUCCESS";

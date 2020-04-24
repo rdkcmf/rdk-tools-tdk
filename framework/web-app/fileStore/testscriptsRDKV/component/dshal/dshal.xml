@@ -257,6 +257,127 @@
         <function>TestMgr_DSHal_IsHDCPEnabled</function>
         <parameters/>
       </primitiveTest>
+      <primitiveTest name="DSHal_EnableLEConfig" id=" " version="1">
+        <function>TestMgr_DSHal_EnableLEConfig</function>
+        <parameters>
+          <parameter name="enable" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetLEConfig" id="" version="1">
+        <function>TestMgr_DSHal_GetLEConfig</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetVideoEOTF" id="" version="1">
+        <function>TestMgr_DSHal_GetVideoEOTF</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetMatrixCoefficients" id="" version="1">
+        <function>TestMgr_DSHal_GetMatrixCoefficients</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetSupportedTvResolutions" id="" version="1">
+        <function>TestMgr_DSHal_GetSupportedTvResolutions</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_HdmiInGetStatus" id="" version="1">
+        <function>TestMgr_DSHal_HdmiInGetStatus</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_SetDolbyVolumeMode" id=" " version="2">
+        <function>TestMgr_DSHal_SetDolbyVolumeMode</function>
+        <parameters>
+          <parameter name="mode" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetDolbyVolumeMode" id="" version="1">
+        <function>TestMgr_DSHal_GetDolbyVolumeMode</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_HdmiInSelectZoomMode" id=" " version="1">
+        <function>TestMgr_DSHal_HdmiInSelectZoomMode</function>
+        <parameters>
+          <parameter name="mode" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetSocIDFromSDK" id="" version="1">
+        <function>TestMgr_DSHal_GetSocIDFromSDK</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetEDIDBytes" id="" version="1">
+        <function>TestMgr_DSHal_GetEDIDBytes</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetEDID" id="" version="1">
+        <function>TestMgr_DSHal_GetEDID</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetResolution" id="" version="1">
+        <function>TestMgr_DSHal_GetResolution</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_SetResolution" id=" " version="2">
+        <function>TestMgr_DSHal_SetResolution</function>
+        <parameters>
+          <parameter name="resolution" value=""/>
+          <parameter name="pixelResolution" value=""/>
+          <parameter name="aspectRatio" value=""/>
+          <parameter name="stereoScopicMode" value=""/>
+          <parameter name="persist" value="1"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetCurrentOutputSettings" id="" version="1">
+        <function>TestMgr_DSHal_GetCurrentOutputSettings</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_HdmiInSelectPort" id=" " version="1">
+        <function>TestMgr_DSHal_HdmiInSelectPort</function>
+        <parameters>
+          <parameter name="port" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="DSHal_HdmiInScaleVideo" id=" " version="2">
+        <function>TestMgr_DSHal_HdmiInScaleVideo</function>
+        <parameters>
+          <parameter name="x" value=""/>
+          <parameter name="y" value=""/>
+          <parameter name="width" value=""/>
+          <parameter name="height" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetSinkDeviceAtmosCapability" version="1">
+        <function>TestMgr_DSHal_GetSinkDeviceAtmosCapability</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_SetAudioAtmosOutputMode" id=" " version="1">
+        <function>TestMgr_DSHal_SetAudioAtmosOutputMode</function>
+        <parameters>
+          <parameter name="enable" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetHdmiInCurrentVideoMode" id="" version="1">
+        <function>TestMgr_DSHal_GetHdmiInCurrentVideoMode</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetIntelligentEqualizerMode" version="1">
+        <function>TestMgr_DSHal_SetIntelligentEqualizerMode</function>
+        <parameters>
+          <parameter name="mode" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetIntelligentEqualizerMode" version="1">
+        <function>TestMgr_DSHal_GetIntelligentEqualizerMode</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetDialogEnhancement" version="1">
+        <function>TestMgr_DSHal_SetDialogEnhancement</function>
+        <parameters>
+          <parameter name="level" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetDialogEnhancement" id="" version="1">
+        <function>TestMgr_DSHal_GetDialogEnhancement</function>
+        <parameters/>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
