@@ -135,7 +135,7 @@ if "SUCCESS" in loadmodulestatus.upper():
                 details = tdkTestObj.getResultDetails();
                 print details
                 if expectedresult in actualresult:
-                    radioCh = details.split(":")[1].strip;
+                    radioCh = details.split(":")[1].strip();
                     if int(radioCh) in PossibleChannels:
                         #Set the result status of execution
                         tdkTestObj.setResultStatus("SUCCESS");
