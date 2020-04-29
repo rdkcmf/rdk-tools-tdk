@@ -134,6 +134,17 @@ function hideParameters(k){
 	$('#showDevParam'+k).show();
 }
 
+function showTrendHideLink(execResId){
+        $('#hideTrendLink'+execResId).show();
+        $('#scriptTrend'+execResId).show();
+        $('#showTrendLink'+execResId).hide();
+}
+
+function hideScriptTrend(execResId){
+        $('#showTrendLink'+execResId).show();
+        $('#scriptTrend'+execResId).hide();
+        $('#hideTrendLink'+execResId).hide();
+}
 </script>
 
 

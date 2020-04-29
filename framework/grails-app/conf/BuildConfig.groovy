@@ -42,6 +42,8 @@ grails.project.source.level = 1.6
 //]
 
 //here comes the dependency resolution 
+//grails.project.dependency.resolver = "ivy"
+grails.project.dependency.resolver = "maven"
 grails.project.dependency.resolution = {
     // this will inherit default dependencies provided by Grails' 
     inherits("global") {
@@ -81,7 +83,11 @@ grails.project.dependency.resolution = {
 		//dependency for maven central
         mavenCentral()
 
-        grailsRepo "https://grails.org/plugins"
+        mavenRepo "https://mvnrepository.com"
+
+        mavenRepo "https://repo1.maven.org/maven2"
+
+//        grailsRepo "https://grails.org/plugins"
 		
         // uncomment these (or add new ones) to enable 
 		//remote dependency resolution from public Maven repositories
@@ -109,21 +115,33 @@ grails.project.dependency.resolution = {
 		  compile 'com.google.code.gson:gson:1.4'
 		  //mysql connector dependency
 		  runtime 'mysql:mysql-connector-java:5.1.10'
+                  
+                  compile "cglib:cglib:3.2.4"
+
+                  compile "net.sf.ehcache:ehcache-core:2.4.6"
+		
+                  compile "org.hibernate:hibernate-core:4.3.5.Final"
+//                  compile 'org.springframework:spring-jms:3.2.4.RELEASE'
+//2                  compile "org.springframework:spring-core:4.0.4.RELEASE"
+//2               compile "org.springframework:spring-jms:2.0"
+
+//                  compile "org.grails.plugins:atomikos:1.0"
 		   // for excel reader 
 		 // runtime ('org.apache.poi:poi:3.7', 'org.apache.poi:poi-ooxml:3.7')
     }
 
     plugins {
-        runtime ":hibernate:$grailsVersion"
+        runtime ":hibernate4:4.3.5.5"
 		//for the jquery dependency
-        runtime ":jquery:1.8.3"
+        runtime ":jquery:1.11.0.2"
         //compile ":shiro:1.1.4"
 		//user management plugin shiro dependency
-        compile (":shiro:1.1.4") {
+        compile (":shiro:1.2.1") {
             excludes([name: 'quartz', group: 'org.opensymphony.quartz'])
         }
         //quartz plugin dependency
         compile ":quartz2:2.1.6.2"
+//2        compile ":atomikos:1.0"
         
       //  compile ':jquery-date-time-picker:0.1.0'
         
@@ -137,14 +155,14 @@ grails.project.dependency.resolution = {
         //runtime ":yui-minify-resources:0.1.5"
 		
 		//this is to resolve tomcat dependency
-        build ":tomcat:$grailsVersion"
+        build ":tomcat:7.0.70"
 		// this to resolve the database migration plugin dependency
         runtime ":database-migration:1.3.2"
 		//to resolve the cache dependency
-        compile ':cache:1.0.1'
+        compile ':cache:1.1.7'
 		//export plugin dependency , plugin to export the content to different formats.
 		compile ":export:1.5"
 		//the mail plugin dependency
-		compile ":mail:1.0.1"
+		compile ":mail:1.0.6"
     }
 }

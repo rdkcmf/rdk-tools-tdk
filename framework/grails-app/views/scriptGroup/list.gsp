@@ -665,12 +665,11 @@
 	          		<li id="add_scriptB"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-B Script</li>
 	          		<li id="add_scriptC"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-C Script</li>
 	          		<li id="add_scriptTCL"><img src="../images/add_new.png" height="15px" width="15px"/>Add New TCL Script</li>
-				
-					<li id="refresh"><img src="../images/refresh.gif" height="15px"
-					width="15px" /> <g:submitToRemote class="test"
-						before="refreshListStart()" action="scriptListRefresh;"
-						value="ScriptList Refresh" onFailure="scriptRefreshFailure()"
-						onSuccess="scriptRefreshSuccess()" /></li>
+				<li id="refresh">
+					<g:form action="scriptListRefresh" controller="scriptGroup" >
+						<img src="../images/refresh.gif" height="15px" width="15px" /> <g:submitToRemote class="test" before="refreshListStart()" action="scriptListRefresh" value="ScriptList Refresh" onFailure="scriptRefreshFailure()" onSuccess="scriptRefreshSuccess()" />
+					</g:form>
+				</li>	
 			<li id="download_script"> <img src="../images/script_download.png" height="15px" width="15px"/>Download Script Details </li>
 			<li id= "upload_rdkv_script"> <img src="../images/reorder_up.png" height="15px" width="15px" > Upload RDKV Script </li>  
 			<li id= "upload_rdkb_script"> <img src="../images/reorder_up.png" height="15px" width="15px" > Upload RDKB Script </li>      

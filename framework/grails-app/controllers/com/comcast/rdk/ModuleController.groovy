@@ -466,9 +466,16 @@ class ModuleController {
 	 */
 	def deleteFunction = {
 		Function functionInstance
-		def unDeletedList = []
-		def fnList = []
-		def selectedFunctions = params.findAll { it.value == KEY_ON }
+                def unDeletedList = []
+                def fnList = []
+                def selectedFunctions = [:]
+                if((params?.delete_function) instanceof String){
+                        selectedFunctions.put(params.delete_function,KEY_ON)
+                }else{
+                        params.delete_function.each{ functionId ->
+                                selectedFunctions.put(functionId,KEY_ON)
+                        }
+                }
 		try{
 			selectedFunctions.each{
 				def key = it.key
@@ -513,10 +520,17 @@ class ModuleController {
 	 * Deletes the selected parameter/s
 	 */
 	def deleteParameterType = {
-		def parameterTypeInstance
-		def unDeletedList = []
-		def paramsList = []
-		def selectedParameters = params.findAll { it.value == KEY_ON }
+                def parameterTypeInstance
+                def unDeletedList = []
+                def paramsList = []
+                def selectedParameters = [:]
+                if((params?.delete_parameter) instanceof String){
+                        selectedParameters.put(params.delete_parameter,KEY_ON)
+                }else{
+                        params.delete_parameter.each{ parameterId ->
+                                selectedParameters.put(parameterId,KEY_ON)
+                        }
+                }
 		try{
 			selectedParameters.each{
 				def key = it.key
