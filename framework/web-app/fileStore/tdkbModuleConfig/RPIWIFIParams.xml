@@ -88,13 +88,11 @@
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
-               <writable>true</writable>
+               <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
-               <persistentSet>true</persistentSet>
+               <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue>Radio0</defaultValue>
-               <!-- the range of values acceptable -->
-               <setValue>Radio</setValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -104,13 +102,11 @@
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
-               <writable>true</writable>
+               <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
-               <persistentSet>true</persistentSet>
+               <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue>Radio1</defaultValue>
-               <!-- the range of values acceptable -->
-               <setValue>Radio</setValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -1402,13 +1398,11 @@
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
-               <writable>true</writable>
+               <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
-               <persistentSet>true</persistentSet>
+               <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue>ath0</defaultValue>
-               <!-- the range of values acceptable -->
-               <setValue>ath</setValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -1418,13 +1412,11 @@
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
-               <writable>true</writable>
+               <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
-               <persistentSet>true</persistentSet>
+               <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue>ath1,ath2</defaultValue>
-               <!-- the range of values acceptable -->
-               <setValue>ath</setValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -1812,13 +1804,11 @@
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
-               <writable>true</writable>
+               <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
-               <persistentSet>true</persistentSet>
+               <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue>AccessPoint1</defaultValue>
-               <!-- the range of values acceptable -->
-               <setValue>AccessPoint</setValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -1828,13 +1818,11 @@
                <!--type of the parameter -->
                <type>string</type>
                <!--whether set is applicable or not -->
-               <writable>true</writable>
+               <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
-               <persistentSet>true</persistentSet>
+               <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue>AccessPoint2,AccessPoint3</defaultValue>
-               <!-- the range of values acceptable -->
-               <setValue>AccessPoint</setValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
