@@ -1500,10 +1500,8 @@ class ExecutionController {
 	 * @return
 	 */
 	def getExecutionDetails(){
-		Map dataMap = [:]
 		def exRes = ExecutionResult.get(params?.execResId)
-		dataMap = showScriptTrend(params?.execResId)
-		render(template: "executionDetails", model: [executionResultInstance : exRes,dataMap:dataMap])
+		render(template: "executionDetails", model: [executionResultInstance : exRes])
 	}
 
 	def showLogFiles(){
@@ -1522,7 +1520,8 @@ class ExecutionController {
 	 * @param execResId
 	 * @return
 	 */
-	def showScriptTrend(def execResId){
+	def showScriptTrend(){
+		def execResId = params?.execResId
 		Map dataMap = [:]
 		def execResults = []
 		ExecutionResult executionResult = ExecutionResult.findById(execResId)
@@ -1556,7 +1555,7 @@ class ExecutionController {
 				dataMap.put(execution.name, result?.status)
 			}
 		}
-		return dataMap
+		render(template: "showScriptTrend", model: [dataMap : dataMap])
 	}
 	
 	/**

@@ -111,7 +111,7 @@
 					<g:each in="${functionInstanceList}" status="i" var="functionInstance">				
 						<tr>										
 							<td align="center">
-								<g:checkBox class ="funSelect" name="${functionInstance?.id}" value="${false}"  /></td>
+							<g:checkBox class ="funSelect" name="delete_function" id="${functionInstance?.id}" value="${functionInstance?.id}" checked="false"  /></td>
 							<td id="functionSelect">${fieldValue(bean: functionInstance, field: "name")}</td>    				
 						</tr>
 					</g:each>					
@@ -141,7 +141,7 @@
 				<tbody>								 	
 					<g:each in="${parameteInstanceList}" status="i" var="parameterTypeInstance">					
 						<tr>	
-							<td align="center"><g:checkBox name="${parameterTypeInstance?.id}" value="${false}"  /></td>    										
+							<td align="center"><g:checkBox name="delete_parameter" id="${parameterTypeInstance?.id}" value="${parameterTypeInstance?.id}" checked="false"  /></td>    										
 							<td align="center">${fieldValue(bean: parameterTypeInstance, field: "function")}</td>				
 							<td align="center">${fieldValue(bean: parameterTypeInstance, field: "name")}</td>							
 							<td align="center">${fieldValue(bean: parameterTypeInstance, field: "parameterTypeEnum")}</td>

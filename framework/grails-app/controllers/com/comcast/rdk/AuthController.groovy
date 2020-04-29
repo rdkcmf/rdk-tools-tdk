@@ -27,7 +27,6 @@ import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.web.util.SavedRequest
 import org.apache.shiro.web.util.WebUtils
-import org.apache.shiro.grails.ConfigUtils
 import org.apache.shiro.crypto.hash.Sha256Hash
 import org.apache.commons.lang.RandomStringUtils
 

@@ -18,30 +18,15 @@
 -->
 <tr>
 	<td class="tdhead" title="Shows the result of 5 previous executions having the same box type">Script Trend</td>
-	<td colspan="4">
-		<g:if test="${dataMap}">
-			<g:each in="${dataMap}" status="i"  var="map">
-				<g:if test="${map.value =="SUCCESS" }">
-					<g:link controller = "trends" action ="analyze" params="[name:"${map.key}"]" target="_blank" style="text-decoration:none">
-						<div style="padding: 2px; margin-left: 5px;display: inline-block;width: 5px;height: 5px;background: green;border-radius: 50%" title = "Success">
-						</div>
-					</g:link>
-				</g:if>
-				<g:if test="${map.value =="SCRIPT TIME OUT" }">
-					<g:link controller = "trends" action ="analyze" params="[name:"${map.key}"]" target="_blank" style="text-decoration:none">
-						<div style="padding: 2px; margin-left: 5px; display: inline-block;width: 5px;height: 5px;background: #0aa1cf;border-radius: 50%" title = "Script Time Out"></div>
-					</g:link>
-				</g:if>
-				<g:if test="${map.value =="FAILURE" }">
-					<g:link controller = "trends" action ="analyze" params="[name:"${map.key}"]" target="_blank" style="text-decoration:none">
-						<div style="padding: 2px; margin-left: 5px; display: inline-block;width: 5px;height: 5px;background: red;border-radius: 50%" title = "Failure"></div>
-					</g:link>
-				</g:if>
-			</g:each>
-		</g:if>
-		<g:else>No previous executions found
-		</g:else>
-	</td>
+        <td colspan="4">
+                &emsp;<span id="showTrendLink${executionResultInstance?.id}" >
+                <g:remoteLink action="showScriptTrend" update="scriptTrend${executionResultInstance?.id}" onSuccess="showTrendHideLink(${executionResultInstance?.id});" params="[execResId : "${executionResultInstance?.id}"]">Show</g:remoteLink>                                         &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                </span>
+                <span id="hideTrendLink${executionResultInstance?.id}" style="display:none;"><a style="color:#7E2217;" href="#" onclick="hideScriptTrend(${executionResultInstance?.id})">Hide</a></span>
+                <br>
+		<br>
+                <div id="scriptTrend${executionResultInstance?.id}"></div>
+        </td>
 </tr>
 <tr>
 	<td class="tdhead">TimeTaken(min)</td>

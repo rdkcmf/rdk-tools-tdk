@@ -43,7 +43,7 @@ import static com.comcast.rdk.Constants.*
 
 import java.util.regex.Pattern
 
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 
 import rdk.test.tool.DeviceStatusJob
 
@@ -355,7 +355,7 @@ class JobSchedulerService implements Job{
 										executionDevice.execution = Execution.findByName(execName)
 										executionDevice.dateOfExecution = new Date()
 										executionDevice.device = deviceInstance?.stbName
-										executionDevice.boxType = deviceInstance?.boxType?.name
+                                                                                executionDevice.boxType = deviceInstance?.boxType?.name
 										executionDevice.deviceIp = deviceInstance?.stbIp
 										executionDevice.status = UNDEFINED_STATUS
 										executionDevice.category = category
@@ -1138,7 +1138,7 @@ class JobSchedulerService implements Job{
 								executionDevice = new ExecutionDevice()
 								executionDevice.execution = rerunExecutionInstance
 								executionDevice.device = deviceInstance?.stbName
-								executionDevice.boxType = deviceInstance?.boxType?.name
+                                                                executionDevice.boxType = deviceInstance?.boxType?.name
 								executionDevice.deviceIp = deviceInstance?.stbIp
 								executionDevice.dateOfExecution = new Date()
 								executionDevice.status = UNDEFINED_STATUS
@@ -2633,7 +2633,7 @@ class JobSchedulerService implements Job{
 	 * @return
 	 */
 	public String getCommand(String command) {
-		String actualCommand = ConfigurationHolder.config.python.execution.path +" "+ command
+		String actualCommand = grailsApplication.config.python.execution.path +" "+ command
 		return actualCommand
 	}
 
@@ -3200,13 +3200,14 @@ class JobSchedulerService implements Job{
 				testCaseDeatilsMap?.put(T_C_INTERFACE,node?.test_cases?.api_or_interface_used?.text())
 				testCaseDeatilsMap?.put(T_C_IOPARAMS, node?.test_cases?.input_parameters?.text())
 				testCaseDeatilsMap?.put(T_C_AUTOAPROCH,node?.test_cases?.automation_approch?.text())
-				
+                                     
+                                				
 				if(node?.test_cases?.expected_output){
 					testCaseDeatilsMap?.put(T_C_EX_OUTPUT,node?.test_cases?.expected_output?.text())
 				}
 				else{
-					testCaseDeatilsMap?.put(T_C_EX_OUTPUT,node?.test_cases?.except_output?.text())
-				}			
+				        testCaseDeatilsMap?.put(T_C_EX_OUTPUT,node?.test_cases?.except_output?.text())
+                                }
 				testCaseDeatilsMap?.put(T_C_PRIORITY,node?.test_cases?.priority?.text())
 				testCaseDeatilsMap?.put(T_C_TSI, node?.test_cases?.test_stub_interface?.text())
 				testCaseDeatilsMap?.put(T_C_SCRIPT,node?.test_cases?.test_script?.text())
