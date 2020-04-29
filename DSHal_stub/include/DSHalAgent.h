@@ -118,6 +118,20 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetMatrixCoefficients", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetMatrixCoefficients);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetDolbyVolumeMode", PARAMS_BY_NAME, JSON_STRING, "mode", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetDolbyVolumeMode);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetDolbyVolumeMode", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetDolbyVolumeMode);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetSocIDFromSDK", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetSocIDFromSDK);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetResolution", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetResolution);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetResolution", PARAMS_BY_NAME, JSON_STRING, "resolution", JSON_STRING,NULL), &DSHalAgent::DSHal_SetResolution);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetIntelligentEqualizerMode", PARAMS_BY_NAME, JSON_STRING, "mode", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetIntelligentEqualizerMode);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetIntelligentEqualizerMode", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetIntelligentEqualizerMode);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetDialogEnhancement", PARAMS_BY_NAME, JSON_STRING, "level", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetDialogEnhancement);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetDialogEnhancement", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetDialogEnhancement);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetEDID", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetEDID);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_HdmiInSelectZoomMode", PARAMS_BY_NAME, JSON_STRING, "mode", JSON_INTEGER,NULL), &DSHalAgent::DSHal_HdmiInSelectZoomMode);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetCurrentOutputSettings", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetCurrentOutputSettings);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_HdmiInSelectPort", PARAMS_BY_NAME, JSON_STRING, "port", JSON_INTEGER,NULL), &DSHalAgent::DSHal_HdmiInSelectPort);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetHdmiInCurrentVideoMode", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetHdmiInCurrentVideoMode);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetAudioAtmosOutputMode", PARAMS_BY_NAME, JSON_STRING, "enable", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetAudioAtmosOutputMode);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetSinkDeviceAtmosCapability", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetSinkDeviceAtmosCapability);
                 }
 
                 //Inherited functions
@@ -185,6 +199,19 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                 void DSHal_GetMatrixCoefficients(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_SetDolbyVolumeMode(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_GetDolbyVolumeMode(IN const Json::Value& req, OUT Json::Value& response);
-
+                void DSHal_GetSocIDFromSDK(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetResolution(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetResolution(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetIntelligentEqualizerMode(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetIntelligentEqualizerMode(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetDialogEnhancement(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetDialogEnhancement(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_HdmiInSelectZoomMode(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetEDID(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetCurrentOutputSettings(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_HdmiInSelectPort(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetHdmiInCurrentVideoMode(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetAudioAtmosOutputMode(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetSinkDeviceAtmosCapability(IN const Json::Value& req, OUT Json::Value& response);
 };
 #endif //__DSHAL_STUB_H__
