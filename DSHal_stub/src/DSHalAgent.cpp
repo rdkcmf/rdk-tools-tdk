@@ -810,13 +810,15 @@ void DSHalAgent::DSHal_HdmiInGetStatus(IN const Json::Value& req, OUT Json::Valu
 
     dsError_t ret = dsERR_NONE;
     dsHdmiInStatus_t pStatus;
-
+    char status[200]= {'\0'};
     ret = dsHdmiInGetStatus(&pStatus);
+
+    sprintf(status, "isPresented:%d,activePort:%d,isPortConnected_Port0:%d,isPortConnected_Port1:%d", pStatus.isPresented,pStatus.activePort,pStatus.isPortConnected[0], pStatus.isPortConnected[1]);
 
     if (ret == dsERR_NONE)
     {
         response["result"] = "SUCCESS";
-    //    response["details"] = pStatus;
+        response["details"] = status;
         DEBUG_PRINT(DEBUG_LOG, "DSHal_HdmiInGetStatus call is SUCCESS");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus -->Exit\n");
         return;
@@ -2152,7 +2154,531 @@ void DSHalAgent::DSHal_GetDolbyVolumeMode(IN const Json::Value& req, OUT Json::V
         return;
     }
 }
+/***************************************************************************
+ *Function name : DSHal_SetResolution
+ *Description    : This function is to set video port's display resolution
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetResolution(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetResolution--->Entry\n");
+    if(&req["resolution"] == NULL)
+    {
+        return;
+    }
+    dsVideoPortResolution_t resolution;
+    std::string resolutionName=req["resolution"].asCString();
+    resolution.pixelResolution = (dsVideoResolution_t) req["pixelResolution"].asInt();
+    resolution.aspectRatio = (dsVideoAspectRatio_t) req["aspectRatio"].asInt();;
+    resolution.stereoScopicMode = (dsVideoStereoScopicMode_t) req["stereoScopicMode"].asInt();
+    strcpy(resolution.name,resolutionName.c_str());
+    bool persist = req["persist"].asInt();
+    dsError_t ret = dsERR_NONE;
 
+    ret = dsSetResolution(vpHandle, &resolution, persist);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetResolution call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetResolution call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetResolution -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID PARAM";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid parameter");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetResolution -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "SetResolution call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetResolution call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetResolution -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetResolution
+ *Description    : This function is to get video port's display resolution
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetResolution(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetResolution --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    char output[50];
+    dsVideoPortResolution_t resolution;
+
+    ret = dsGetResolution(vpHandle, &resolution);
+    sprintf(output, "Name: %s", resolution.name);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = output;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetResolution call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetResolution -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID HANDLE";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid display handle");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetResolution -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetResolution call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetResolution call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetResolution -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetSocIDFromSDK
+ *Description    : This function is to get the soc id
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetSocIDFromSDK(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSocIDFromSDK --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    char id[20];
+
+    ret = dsGetSocIDFromSDK(id);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = id;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetSocIDFromSDK call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSocIDFromSDK -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetSocIDFromSDK call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetSocIDFromSDK call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSocIDFromSDK -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_SetIntelligentEqualizerMode
+ *Description    : This function is to set the intelligent equalizer mode
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetIntelligentEqualizerMode(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetIntelligentEqualizerMode--->Entry\n");
+    if(&req["mode"] == NULL)
+    {
+        return;
+    }
+
+    int mode = req["mode"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsSetIntelligentEqualizerMode(apHandle, mode);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetIntelligentEqualizerMode call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetIntelligentEqualizerMode call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetIntelligentEqualizerMode -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID PARAM";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid parameter");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetIntelligentEqualizerMode -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "SetIntelligentEqualizerMode call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetIntelligentEqualizerMode call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetIntelligentEqualizerMode -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetIntelligentEqualizerMode
+ *Description    : This function is to get the intelligent equalizer mode
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetIntelligentEqualizerMode(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetIntelligentEqualizerMode --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    int mode;
+
+    ret = dsGetIntelligentEqualizerMode(apHandle, &mode);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = mode;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetIntelligentEqualizerMode call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetIntelligentEqualizerMode -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID PARAM";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid parameter");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetIntelligentEqualizerMode -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetIntelligentEqualizerMode call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetIntelligentEqualizerMode call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetIntelligentEqualizerMode -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_SetDialogEnhancement
+ *Description    : This function is to set the dialogue enhancement level
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetDialogEnhancement(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetDialogEnhancement--->Entry\n");
+    if(&req["level"] == NULL)
+    {
+        return;
+    }
+
+	//Level is within the range 1 to 15
+    int level = req["level"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsSetDialogEnhancement(apHandle, level);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetDialogEnhancement call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetDialogEnhancement call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetDialogEnhancement -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID PARAM";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid parameter");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetDialogEnhancement -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "SetDialogEnhancement call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetDialogEnhancement call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetDialogEnhancement -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetDialogEnhancement
+ *Description    : This function is to get the dialogue enhancement level
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetDialogEnhancement(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDialogEnhancement --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    int level;
+
+    ret = dsGetDialogEnhancement(apHandle, &level);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = level;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetDialogEnhancement call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDialogEnhancement -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID PARAM";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid parameter");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDialogEnhancement -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetDialogEnhancement call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetDialogEnhancement call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDialogEnhancement -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_HdmiInSelectZoomMode
+ *Description    : This function is to select the zoom mode
+ *****************************************************************************/
+void DSHalAgent::DSHal_HdmiInSelectZoomMode(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInSelectZoomMode--->Entry\n");
+    if(&req["mode"] == NULL)
+    {
+        return;
+    }
+
+    dsVideoZoom_t zoomMode = (dsVideoZoom_t) req["mode"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsHdmiInSelectZoomMode(zoomMode);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "HdmiInSelectZoomMode call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_HdmiInSelectZoomMode call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInSelectZoomMode -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "HdmiInSelectZoomMode call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_HdmiInSelectZoomMode call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInSelectZoomMode -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetEDID
+ *Description    : This function is to get the EDID information of the connected display
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetEDID(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetEDID --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    char output[300];
+    dsDisplayEDID_t edidInfo;
+
+    ret = dsGetEDID(dispHandle, &edidInfo);
+    sprintf(output, "productCode:%d,serialNumber:%d,manufactureYear:%d,manufactureWeek:%d,hdmiDeviceType:%d.isRepeater:%d,physicalAddressA:%d,physicalAddressB:%d,physicalAddressC:%d,physicalAddressD:%d,numOfSupportedResolution:%d", edidInfo.productCode, edidInfo.serialNumber,edidInfo.manufactureYear,edidInfo.manufactureWeek,edidInfo.hdmiDeviceType,edidInfo.isRepeater,edidInfo.physicalAddressA,edidInfo.physicalAddressB,edidInfo.physicalAddressC,edidInfo.physicalAddressD,edidInfo.numOfSupportedResolution);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = output;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetEDID call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetEDID -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetEDID call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetEDID call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetEDID -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetCurrentOutputSettings
+ *Description    : This function is to get the EDID information of the connected display
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetCurrentOutputSettings(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetCurrentOutputSettings --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    char output[50];
+    dsHDRStandard_t eotf;
+    dsDisplayMatrixCoefficients_t coefficients;
+    dsDisplayColorSpace_t colorSpace;
+    unsigned int colorDepth;
+
+    ret = dsGetCurrentOutputSettings(vpHandle, &eotf, &coefficients, &colorSpace, &colorDepth);
+    sprintf(output, "eotf:%d,coefficients:%d,colorSpace:%d,colorDepth:%d", eotf, coefficients, colorSpace, colorDepth);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = output;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetCurrentOutputSettings call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetCurrentOutputSettings -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetCurrentOutputSettings call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetCurrentOutputSettings call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetCurrentOutputSettings -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_HdmiInSelectPort
+ *Description    : This function is to select the hdmiin port
+ *****************************************************************************/
+void DSHalAgent::DSHal_HdmiInSelectPort(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInSelectPort--->Entry\n");
+    if(&req["port"] == NULL)
+    {
+        return;
+    }
+
+    dsHdmiInPort_t port = (dsHdmiInPort_t) req["port"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsHdmiInSelectPort(port);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "HdmiInSelectPort call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_HdmiInSelectPort call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInSelectPort -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "HdmiInSelectPort call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_HdmiInSelectPort call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInSelectPort -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetHdmiInCurrentVideoMode
+ *Description    : This function is to get the current hdmiin video mode
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetHdmiInCurrentVideoMode(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHdmiInCurrentVideoMode --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    char output[50];
+    dsVideoPortResolution_t resolution;
+
+    ret =  dsHdmiInGetCurrentVideoMode(&resolution);
+    sprintf(output, "Name:%s,pixelResolution:%d,frameRate:%d,interlaced:%d ", resolution.name,resolution.pixelResolution,resolution.frameRate,resolution.interlaced);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = output;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetHdmiInCurrentVideoMode call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHdmiInCurrentVideoMode -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetHdmiInCurrentVideoMode call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetHdmiInCurrentVideoMode call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHdmiInCurrentVideoMode -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_GetSinkDeviceAtmosCapability
+ *Description    : This function is to get the audio sink device ATMOS capability
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetSinkDeviceAtmosCapability(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSinkDeviceAtmosCapability --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    dsATMOSCapability_t capability;
+
+    ret = dsGetSinkDeviceAtmosCapability(apHandle, &capability);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = capability;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetSinkDeviceAtmosCapability call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSinkDeviceAtmosCapability -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID HANDLE";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid audio handle");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSinkDeviceAtmosCapability -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetSinkDeviceAtmosCapability call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetSinkDeviceAtmosCapability call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSinkDeviceAtmosCapability -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_SetAudioAtmosOutputMode
+ *Description    : This function is to set the Audio Atmos output mode
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetAudioAtmosOutputMode(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioAtmosOutputMode--->Entry\n");
+    if(&req["enable"] == NULL)
+    {
+        return;
+    }
+
+    bool enable = req["enable"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsSetAudioAtmosOutputMode(apHandle, enable);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetAudioAtmosOutputMode call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetAudioAtmosOutputMode call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioAtmosOutputMode -->Exit\n");
+        return;
+    }
+    else if (ret == dsERR_INVALID_PARAM)
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "INVALID HANDLE";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid audio handle");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioAtmosOutputMode -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "SetAudioAtmosOutputMode call failed";
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetAudioAtmosOutputMode call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioAtmosOutputMode -->Exit\n");
+        return;
+    }
+}
 /**************************************************************************
 Function Name   : cleanup
 
