@@ -18,10 +18,11 @@ commSetStr = ""
 #             : setup_type : Type of execution, TDK/WEBPA/SNMP
 #             : module - module to be validated
 # Return Value: SUCCESS/FAILURE
-def setAllParams(module, setup_type, tr181Obj, sysObj):
+def setAllParams(module, setup_type, tr181Obj, sysObj, rebootTest = "false"):
 
     failedParams = [];
     moduleStatus = "SUCCESS"
+    preRebootValues = {}
 
     print "\n------------------------------------------------------------------------"
     print "SET VALUES OF ALL NAMESPACES IN ", module;
@@ -153,41 +154,102 @@ def setAllParams(module, setup_type, tr181Obj, sysObj):
                 #set a new value from expected value list
                 detail, actualresult = setParameterValue(tr181Obj, sysObj, setup_type, paramName, setValue, paramType);
 
-                if expectedresult in actualresult:
-		    #For WiFi parameters wait for set operation to be reflected
-		    if module == "WIFI":
-			sleep(60)
-                    value,actualresult = getParameterValue(tr181Obj, sysObj, setup_type, paramName, paramType, setValue)
+                if rebootTest == "false":
                     if expectedresult in actualresult:
-
-			#revert the value after set
-                	detail, actualresult = setParameterValue(tr181Obj, sysObj, setup_type, paramName, orgValue, paramType);
-                	if expectedresult in actualresult:
-                	    print "Successfully reverted the value"
-                            print "*************Set validation of %s is SUCCESS**************\n" %paramName
-                	else:
-                	    print "Revert operation failed"
-    			    moduleStatus = "FAILURE";
-			    failedParams.append(paramName);
-                            print "*************Set validation with get is FAILURE for %s**************\n" %paramName
+		        #For WiFi parameters wait for set operation to be reflected
+		        if module == "WIFI":
+			    print "Sleeping for 60sec for WiFi set opearation to reflect before doing next get\n"
+		    	    sleep(60)
+                        value,actualresult = getParameterValue(tr181Obj, sysObj, setup_type, paramName, paramType, setValue)
+                        if expectedresult in actualresult:
+		    	    #revert the value after set
+                    	    detail, actualresult = setParameterValue(tr181Obj, sysObj, setup_type, paramName, orgValue, paramType);
+                    	    if expectedresult in actualresult:
+                    	        print "Successfully reverted the value"
+                                print "*************Set validation of %s is SUCCESS**************\n" %paramName
+                    	    else:
+                    	        print "Revert operation failed"
+    		    	        moduleStatus = "FAILURE";
+		    	        failedParams.append(paramName);
+                                print "*************Set validation with get is FAILURE for %s**************\n" %paramName
+                        else:
+                    	    moduleStatus = "FAILURE";
+		    	    failedParams.append(paramName);
                     else:
-                	moduleStatus = "FAILURE";
-			failedParams.append(paramName);
-                else:
-                    moduleStatus = "FAILURE";
-		    print "Set operation failed for %s" %paramName
-		    failedParams.append(paramName);
+                        moduleStatus = "FAILURE";
+		        print "Set operation failed for %s" %paramName
+		        failedParams.append(paramName);
+		#if this is a set persistence test with reboot, set validation with get and revert validation is not done immediately but only after a reboot
+		#hence saving all setvalues and orgValues
+	        else:
+                    if module == "WIFI":
+			print "Sleeping for 20sec before doing next set\n"
+                        sleep(20)
+
+		    if expectedresult not in actualresult:
+                        moduleStatus = "FAILURE";
+                        print "Set operation failed for %s" %paramName
+                        failedParams.append(paramName);
+		    #save each parameters setvalue and orgvalue in a dictionary, with key as parameter name
+	            if param.find('RFCEnabled') is not None:
+            		RFCEnabled = param.find('RFCEnabled').text
+			if RFCEnabled != "true":
+			    preRebootValues[paramName] = {'setVal': setValue, 'org':orgValue, 'paramtype':paramType}
+		    else:
+			preRebootValues[paramName] = {'setVal': setValue, 'org':orgValue, 'paramtype':paramType}
             else:
                 moduleStatus = "FAILURE";
-		print "Get operation faied for %s" %paramName
+		print "Get operation failed for %s" %paramName
                 failedParams.append(paramName);
 	    #adding sleep time in between to avoid WEBPA error
             if setup_type == "WEBPA":
-    	        print "Sleeping for 90sec"
+    	        print "Sleeping for 90sec before next webpa operation"
                 sleep(90)
                 if deviceType == "RPI":
+		    print "Sleeping for additional 30sec in rpi before next webpa operation"
                     sleep(30)
 
+    if rebootTest == "true":
+	#Reboot the device after set
+        sysObj.initiateReboot();
+        tr181Obj.resetConnectionAfterReboot();
+	#wait till all processes are up
+	print "Waiting for 5 minutes after reboot for all proccesses to come up\n"
+        sleep(300)
+        if setup_type == "WEBPA":
+            tdkTestObj,preRequisiteStatus = webpaPreRequisite(sysObj);
+            if "SUCCESS" not in preRequisiteStatus:
+		moduleStatus = "FAILURE";
+		print "Webpa Pre-requisite failed after reboot. Please check parodus and webpa processes are running in device"
+		return moduleStatus,failedParams;
+
+	for parameter in preRebootValues:
+	    setValue = preRebootValues[parameter]['setVal']
+	    orgValue = preRebootValues[parameter]['org']
+            paramType = preRebootValues[parameter]['paramtype']
+            value,actualresult = getParameterValue(tr181Obj, sysObj, setup_type, parameter, paramType, setValue)
+            if expectedresult in actualresult:
+                #revert the value after set
+                detail, actualresult = setParameterValue(tr181Obj, sysObj, setup_type, parameter, orgValue, paramType);
+                if expectedresult in actualresult:
+                    print "Successfully reverted the value"
+                    print "*************Set validation of %s is SUCCESS**************\n" %parameter
+                else:
+                    print "Revert operation failed"
+                    moduleStatus = "FAILURE";
+                    failedParams.append(parameter);
+                    print "*************Set validation with get is FAILURE for %s**************\n" %parameter
+            else:
+                moduleStatus = "FAILURE";
+                failedParams.append(parameter);
+            #adding sleep time in between set to avoid WEBPA error
+            if setup_type == "WEBPA":
+                print "Sleeping for 90sec before next webpa operation"
+                sleep(90)
+                if deviceType == "RPI":
+		    print "Sleeping for additional 30sec in rpi before next webpa operation"
+                    sleep(30)
+    
     return moduleStatus,failedParams;
 
 
