@@ -169,7 +169,8 @@ def kill_hub_node():
     if status == "SUCCESS":
         command = "source %s kill_selenium" %(tdkcConfigParserUtility.start_selenium_script_client)
         status = executeCommand(command)
-        return "SUCCESS"
+        status = clientDisconnect()
+        return status
     else:
         return "FAILURE"
 
@@ -231,7 +232,7 @@ def openLocalWebUI(tdkTestObj,GridUrl,LoginStatus,CheckUIXpath,CheckUIData):
         driver.get(GridUrl);
         time.sleep(5);
         checkUI = driver.find_element_by_xpath(CheckUIXpath).text
-        print "URL Requested : "    , GridUrl
+        print "URL Requested : "    ,driver.current_url
         print "Data from Web UI : " ,checkUI
         if checkUI == CheckUIData:
             print "SUCCESS: opened the web UI page Successfully"
@@ -243,9 +244,45 @@ def openLocalWebUI(tdkTestObj,GridUrl,LoginStatus,CheckUIXpath,CheckUIData):
     except Exception as error:
         print "Got Exception at the function openLocalWebUI()"
         print error;
-        driver.quit()
+        kill_web_driver(driver)
         Status = "FAILURE"
     return Status,driver;
+
+
+def IsWEBDriverActive(driver):
+# syntax       : IsWEBDriverActive()
+# Description  : Function to check whether driver is quit or not
+# Parameters   : driver - selenium web driver
+# Return Value : TRUE/FALSE
+    try:
+        URL = driver.current_url
+        print "Current URL :",URL
+        print "Current session ID : ",driver.session_id
+        return "TRUE"
+    except Exception as error:
+        print (str(error).split("Stacktrace:",1)[0].replace("\\n","").replace("\n",""))
+        return "FALSE"
+
+def kill_web_driver(driver):
+# syntax       : kill_web_driver()
+# Description  : Function to quit the web-driver
+# Parameters   : driver - selenium web driver
+# Return Value : SUCCESS/FAILURE
+
+    Status = "SUCCESS"
+    print "Kill web-driver"
+    if IsWEBDriverActive(driver) == "TRUE":
+        print "Killing selenium web-driver ..."
+        driver.quit();
+        time.sleep(3);
+        if IsWEBDriverActive(driver) == "FALSE":
+            print "SUCCESS: Selenium web-driver killed successfully\n"
+        else:
+            Status = "FALSE"
+            print "FAILURE: Selenium web-driver kill failed\n"
+    else:
+        print "SUCCESS: Selenium web-driver killed already\n"
+    return Status
 
 
 def setWebRTCInfoInWEBUI(driver):
@@ -274,7 +311,7 @@ def setWebRTCInfoInWEBUI(driver):
     except Exception as error:
         print "Got Exception at the function setWebRTCInfoInWEBUI()"
         print error;
-        driver.quit()
+        kill_web_driver(driver)
         Status = "FAILURE"
     return Status
 
@@ -297,7 +334,7 @@ def getWebRTCInfoInWEBUI(driver):
     except Exception as error:
         print "Got Exception at the function getWebRTCInfoFromWEBUI()"
         print error;
-        driver.quit()
+        kill_web_driver(driver)
         Info = []
         Status = "FAILURE"
     return Status,Info
@@ -320,6 +357,8 @@ def verifyWebRTCInfoInWEBUI(driver):
             setStatus = "SUCCESS"
         else:
             setStatus = "FAILURE"
+    else:
+        setStatus = "FAILURE"
     return setStatus
 
 
@@ -351,7 +390,7 @@ def playStreamInWEBUI(driver):
     except Exception as error:
         print "Got Exception at the function playStreamInWEBUI()"
         print error;
-        driver.quit()
+        kill_web_driver(driver)
         Status = "FAILURE"
     return Status
 
@@ -384,7 +423,7 @@ def pauseStreamInWEBUI(driver):
     except Exception as error:
         print "Got Exception at the function pauseStreamInWEBUI()"
         print error;
-        driver.quit()
+        kill_web_driver(driver)
         Status = "FAILURE"
     return Status
 
@@ -417,7 +456,7 @@ def stopStreamInWEBUI(driver):
     except Exception as error:
         print "Got Exception at the function stopStreamInWEBUI()"
         print error;
-        driver.quit()
+        kill_web_driver(driver)
         Status = "FAILURE"
     return Status
 
@@ -435,7 +474,7 @@ def getDebugMsgInWEBUI(driver):
     except Exception as error:
         print "Got Exception at the function getDebugMsgInWEBUI()"
         print error;
-        driver.quit()
+        kill_web_driver(driver)
         Msg = ""
         Status = "FAILURE"
     return Status,Msg
