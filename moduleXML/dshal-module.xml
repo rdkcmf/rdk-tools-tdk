@@ -49,6 +49,58 @@
       <function name='TestMgr_DSHal_GetColorDepth' />
       <function name='TestMgr_DSHal_GetColorSpace' />
       <function name='TestMgr_DSHal_IsVideoPortActive' />
+      <function name='TestMgr_DSHal_IsOutputHDR' />
+      <function name='TestMgr_DSHal_HdmiInGetNumberOfInputs' />
+      <function name='TestMgr_DSHal_SetAudioMute' />
+      <function name='TestMgr_DSHal_IsAudioMute' />
+      <function name='TestMgr_DSHal_SetAudioDelay' />
+      <function name='TestMgr_DSHal_GetAudioDelay' />
+      <function name='TestMgr_DSHal_SetAudioDelayOffset' />
+      <function name='TestMgr_DSHal_GetAudioDelayOffset' />
+      <function name='TestMgr_DSHal_GetCPUTemperature' />
+      <function name='TestMgr_DSHal_GetVersion' />
+      <function name='TestMgr_DSHal_SetVersion' />
+      <function name='TestMgr_DSHal_IsAudioMSDecode' />
+      <function name='TestMgr_DSHal_SetFPBrightness' />
+      <function name='TestMgr_DSHal_GetFPBrightness' />
+      <function name='TestMgr_DSHal_GetVideoDevice' />
+      <function name='TestMgr_DSHal_GetHdmiPreference' />
+      <function name='TestMgr_DSHal_SetHdmiPreference' />
+      <function name='TestMgr_DSHal_SetBackgroundColor' />
+      <function name='TestMgr_DSHal_GetHDRCapabilities' />
+      <function name='TestMgr_DSHal_GetSupportedVideoCodingFormats' />
+      <function name='TestMgr_DSHal_GetTVHDRCapabilities' />
+      <function name='TestMgr_DSHal_GetVideoCodecInfo' />
+      <function name='TestMgr_DSHal_SetFPBlink' />
+      <function name='TestMgr_DSHal_SetFPTime' />
+      <function name='TestMgr_DSHal_SetFPText' />
+      <function name='TestMgr_DSHal_SetFPTextBrightness' />
+      <function name='TestMgr_DSHal_SetFPColor' />
+      <function name='TestMgr_DSHal_IsAudioMS12Decode' />
+      <function name='TestMgr_DSHal_IsHDCPEnabled' />
+      <function name='TestMgr_DSHal_EnableLEConfig' />
+      <function name='TestMgr_DSHal_GetLEConfig' />
+      <function name='TestMgr_DSHal_GetVideoEOTF' />
+      <function name='TestMgr_DSHal_GetMatrixCoefficients' />
+      <function name='TestMgr_DSHal_GetSupportedTvResolutions' />
+      <function name='TestMgr_DSHal_HdmiInGetStatus' />
+      <function name='TestMgr_DSHal_SetDolbyVolumeMode' />
+      <function name='TestMgr_DSHal_GetDolbyVolumeMode' />
+      <function name='TestMgr_DSHal_HdmiInSelectZoomMode' />
+      <function name='TestMgr_DSHal_GetSocIDFromSDK' />
+      <function name='TestMgr_DSHal_GetEDIDBytes' />
+      <function name='TestMgr_DSHal_GetEDID' />
+      <function name='TestMgr_DSHal_GetResolution' />
+      <function name='TestMgr_DSHal_SetResolution' />
+      <function name='TestMgr_GetCurrentOutputSettings' />
+      <function name='TestMgr_DSHal_GetCurrentOutputSettings' />
+      <function name='TestMgr_DSHal_HdmiInSelectPort' />
+      <function name='TestMgr_DSHal_HdmiInScaleVideo' />
+      <function name='TestMgr_DSHal_GetHdmiInCurrentVideoMode' />
+      <function name='TestMgr_DSHal_GetSinkDeviceAtmosCapability' />
+      <function name='TestMgr_DSHal_SetAudioAtmosOutputMode' />
+      <function name='TestMgr_DSHal_SetIntelligentEqualizerMode' />
+      <function name='TestMgr_DSHal_GetIntelligentEqualizerMode' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -61,6 +113,42 @@
       <parameter funName='TestMgr_DSHal_EnableVideoPort' parameterName='enable' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_DSHal_GetDisplay' parameterName='portType' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_DSHal_GetDisplay' parameterName='index' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_SetAudioMute' parameterName='muted' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_SetAudioDelay' parameterName='audioDelay' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_SetAudioDelayOffset' parameterName='offset' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_SetVersion' parameterName='version' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_SetFPBrightness' parameterName='indicator' parameterType='INTEGER' range='0-5' />
+      <parameter funName='TestMgr_DSHal_SetFPBrightness' parameterName='brightness' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_DSHal_GetFPBrightness' parameterName='indicator' parameterType='INTEGER' range='0-4' />
+      <parameter funName='TestMgr_DSHal_GetVideoDevice' parameterName='index' parameterType='INTEGER' range='0' />
+      <parameter funName='TestMgr_DSHal_SetHdmiPreference' parameterName='hdcpProtocol' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_SetBackgroundColor' parameterName='color' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_GetVideoCodecInfo' parameterName='format' parameterType='STRING' range='a-z' />
+      <parameter funName='TestMgr_DSHal_SetFPBlink' parameterName='blinkDuration' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_SetFPBlink' parameterName='blinkIteration' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_SetFPBlink' parameterName='indicator' parameterType='INTEGER' range='0-4' />
+      <parameter funName='TestMgr_DSHal_SetFPTime' parameterName='format' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DSHal_SetFPTime' parameterName='hours' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_SetFPTime' parameterName='minutes' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_SetFPText' parameterName='text' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DSHal_SetFPTextBrightness' parameterName='brightness' parameterType='INTEGER' range='0-100' />
+      <parameter funName='TestMgr_DSHal_SetFPColor' parameterName='color' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DSHal_SetFPColor' parameterName='indicator' parameterType='INTEGER' range='0-4' />
+      <parameter funName='TestMgr_DSHal_EnableLEConfig' parameterName='enable' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_SetDolbyVolumeMode' parameterName='mode' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_HdmiInSelectZoomMode' parameterName='mode' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_SetResolution' parameterName='resolution' parameterType='STRING' range='a-z' />
+      <parameter funName='TestMgr_DSHal_SetResolution' parameterName='pixelResolution' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_SetResolution' parameterName='aspectRatio' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_SetResolution' parameterName='stereoScopicMode' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_SetResolution' parameterName='persist' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_HdmiInSelectPort' parameterName='port' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_HdmiInScaleVideo' parameterName='x' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_HdmiInScaleVideo' parameterName='y' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_HdmiInScaleVideo' parameterName='width' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_HdmiInScaleVideo' parameterName='height' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_SetAudioAtmosOutputMode' parameterName='enable' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_SetIntelligentEqualizerMode' parameterName='mode' parameterType='INTEGER' range='0-1' />
     </parameters>
   </module>
 </xml>
