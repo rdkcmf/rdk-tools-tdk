@@ -192,7 +192,7 @@ class ScriptGroupController {
 		testGroup.each { moduleName  ->
 			moduleMap.put(moduleName,moduleName.testGroup)
 		}
-		def scriptGroupListV = ScriptGroup.findAllByCategory('RDKV')
+		/*def scriptGroupListV = ScriptGroup.findAllByCategory('RDKV')
 		def testSuiteMapV =[:]
 		scriptGroupListV.each { scriptgrouplistv  ->
 			testSuiteMapV.put(scriptgrouplistv.name,scriptgrouplistv.scriptList?.size())
@@ -208,7 +208,7 @@ class ScriptGroupController {
 		def testSuiteMapC =[:]
 		scriptGroupListC.each { scriptgrouplistC  ->
 			testSuiteMapC.put(scriptgrouplistC.name,scriptgrouplistC.scriptList?.size())
-		}
+		}*/
 		listsTCL = listsTCL?listsTCL?.sort():[]
 		def totalScriptsThunder = 0
 		totalScriptsThunder = scriptNameListThunder?.size() * listsThunder?.size()
@@ -218,11 +218,10 @@ class ScriptGroupController {
 			scriptGroupMapV:scriptGroupMapV, scriptGroupMapB:scriptGroupMapB, scriptGroupInstanceListV:listsV, scriptGroupInstanceListB:listsB,
 			scriptGroupInstanceTotalV: listsV?.size(), scriptGroupInstanceTotalB: listsB?.size(),
 			tclScripts:scriptNameListTCL, tclScriptInstanceTotal:scriptNameListTCL?.size(),  scriptGrpTcl :listsTCL, tclScriptSize : listsTCL?.size(), 
-			testGroup : moduleMap, testSuiteMapV : testSuiteMapV, testSuiteMapB : testSuiteMapB,
-			scriptNameListThunder:scriptNameListThunder,  scriptGrpThunder :listsThunder,
+			testGroup : moduleMap, scriptNameListThunder:scriptNameListThunder,  scriptGrpThunder :listsThunder,
 			thunderScriptInstanceTotal:scriptNameListThunder?.size(),  thunderScriptSize :listsThunder?.size(),
 			totalScriptsThunder:totalScriptsThunder, scriptGroupMapThunder : scriptGroupMapThunder,scriptInstanceTotalC: scriptNameListC?.size(),scriptGroupMapC:scriptGroupMapC,
-			scriptGroupInstanceListC:listsC, scriptGroupInstanceTotalC: listsC?.size(),testSuiteMapC : testSuiteMapC]
+			scriptGroupInstanceListC:listsC, scriptGroupInstanceTotalC: listsC?.size()]
 	}
 
 
@@ -888,7 +887,6 @@ class ScriptGroupController {
 				}
 				 else{
 					 flash.message = "Test Suite Created Successfully "
-					 render("Test Suite Created Successfully ")
 				 }
 			}
 		}
@@ -2982,7 +2980,8 @@ class ScriptGroupController {
 		ScriptFile scriptFile
 		scriptFile = ScriptFile?.findByScriptName(scriptName)
 		try {
-			if(scriptFile && getScriptFileObj(getRealPath(), scriptFile?.moduleName,scriptFile?.scriptName) == null){
+                        def requestGetRealPath = request.getRealPath("/")
+			if(scriptFile && scriptService.getScriptFileObj(requestGetRealPath, scriptFile?.moduleName,scriptFile?.scriptName) == null){
 				def sgList = []
 				def scriptGroups = ScriptGroup.where {
 					scriptList { id == scriptFile?.id }
@@ -2997,12 +2996,9 @@ class ScriptGroupController {
 					sGroup?.save()
 				}
 				scriptFile?.delete()
-				render "Success fully updated"
 			}else{
-				render "Error"
 			}
 		} catch (Exception e) {
-			render "Error"+e.getMessage()
 			e.printStackTrace()
 		}
 	}

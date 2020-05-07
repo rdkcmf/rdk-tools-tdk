@@ -50,6 +50,7 @@ environments {
     }
     production {
         dataSource {
+            driverClassName = "com.mysql.jdbc.Driver"
             dbCreate = "update"
            // url = "jdbc:mysql://127.0.0.1/rdktesttoolproddbm4?autoReconnect=true" // Test DB for Testers - rdk-tdk-test.war
             url = "jdbc:mysql://127.0.0.1/rdktesttoolproddb?autoReconnect=true"
@@ -70,6 +71,7 @@ environments {
         }
 		
 		dataSource_temp {
+                        driverClassName = "com.mysql.jdbc.Driver"
 			dbCreate = "update"
 		   // url = "jdbc:mysql://127.0.0.1/rdktesttoolproddbm4?autoReconnect=true" // Test DB for Testers - rdk-tdk-test.war
 			url = "jdbc:mysql://127.0.0.1/rdktesttoolproddb_temp?autoReconnect=true"
