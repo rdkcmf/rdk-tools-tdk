@@ -48,10 +48,10 @@ Test Case ID : CT_DS_02</synopsis>
     <pre_requisite>1. dsMgrMain should be up and running.
 2. IARMDaemonMain should be up and running.</pre_requisite>
     <api_or_interface_used>device::Manager::Initialize()                                  FrontPanelConfig::getInstance()
-FrontPanelConfig::getColors() 
+FrontPanelConfig::getColors()
 FrontPanelConfig::getIndicator(string)
 FrontPanelConfig::getColor()
-FrontPanelConfig::setColor(int)      
+FrontPanelConfig::setColor(int)
 device::Manager::DeInitialize()</api_or_interface_used>
     <input_parameters>getIndicator : string – name
 E.g.: name : “POWER”
@@ -101,9 +101,9 @@ if "SUCCESS" in loadmodulestatus.upper():
         #Check for SUCCESS/FAILURE return value of DS_ManagerInitialize
         if expectedresult in actualresult:
                 tdkTestObj.setResultStatus("SUCCESS");
+                print "SUCCESS :Application successfully initialized with Device Settings library";
                 tdkTestObj = obj.createTestStep('DS_GetSupportedColors');
                 tdkTestObj.addParameter("indicator_name","Power");
-                expectedresult="SUCCESS"
                 tdkTestObj.executeTestCase(expectedresult);
                 actualresult = tdkTestObj.getResult();
                 colordetails = tdkTestObj.getResultDetails();
@@ -112,46 +112,46 @@ if "SUCCESS" in loadmodulestatus.upper():
                         tdkTestObj.setResultStatus("SUCCESS");
                         print "SUCCESS :Application successfully gets the list of supported colors";
                         print "%s" %colordetails
-                else:
+			setColor = "Blue";
+			if setColor in colordetails:
+				print "Device supports %s color"%setColor;
+		                tdkTestObj = obj.createTestStep('DS_SetColor');
+				colorlist = colordetails.split(",");
+                                for i in range(0,len(colorlist)):
+                                        print "%s-%s"%(i,colorlist[i]);
+				color = colorlist.index(setColor);
+                                print "Color value set to %d to set %s color"%(color,colorlist[color]);
+		                indicator = "Power";
+		                print "Indicator value set to:%s" %indicator;
+		                tdkTestObj.addParameter("indicator_name",indicator);
+		                tdkTestObj.addParameter("color",color);
+		                tdkTestObj.executeTestCase(expectedresult);
+		                actualresult = tdkTestObj.getResult();
+		                colordetails = tdkTestObj.getResultDetails();
+		                setColor = "%s" %color;
+		                list = ['255','65280','16711680','16777184','16747520','16777215']
+		                if expectedresult in actualresult:
+		                        print "SUCCESS :Application successfully gets and sets the color";
+		                        print "getColor %s" %colordetails;
+		                        print "Color to be verified: %s"%list[int(setColor)];
+		                        #comparing the color before and after setting
+		                        if list[int(setColor)] in colordetails :
+		                                tdkTestObj.setResultStatus("SUCCESS");
+		                                print "SUCCESS: Both the colors are same";
+		                        else:
+		                                tdkTestObj.setResultStatus("FAILURE");
+		                                print "FAILURE: Both the colors are not same";
+		                else:
+		                        tdkTestObj.setResultStatus("FAILURE");
+		                        print "Failure: Failed to get and set color for LED";
+			else:
+				tdkTestObj.setResultStatus("FAILURE");
+				print "Failure: Device does not support %s color"%setColor;
+		else:
                         tdkTestObj.setResultStatus("FAILURE");
                         print "FAILURE :Failed to get the color list";
-                print "SUCCESS :Application successfully initialized with Device Settings library";
-                print "0-Blue";
-                print "1-Green";
-                print "2-Red";
-                print "3-Yellow";
-                print "4-Orange";
-                tdkTestObj = obj.createTestStep('DS_SetColor');
-                #setting color parameter value
-                color = 0;
-                print "Color value set to:%d" %color;
-                indicator = "Power";
-                print "Indicator value set to:%s" %indicator;
-                tdkTestObj.addParameter("indicator_name",indicator);
-                tdkTestObj.addParameter("color",color);
-                expectedresult="SUCCESS"
-                tdkTestObj.executeTestCase(expectedresult);
-                actualresult = tdkTestObj.getResult();
-                colordetails = tdkTestObj.getResultDetails();
-                setColor = "%s" %color;
-                list = ['255','65280','16711680','16777184','16747520']
-                if expectedresult in actualresult:
-                        print "SUCCESS :Application successfully gets and sets the color";
-                        print "getColor %s" %colordetails;
-                        print "Color to be verified: %s"%list[int(setColor)];
-                        #comparing the color before and after setting
-                        if list[int(setColor)] in colordetails :
-                                tdkTestObj.setResultStatus("SUCCESS");
-                                print "SUCCESS: Both the colors are same";
-                        else:
-                                tdkTestObj.setResultStatus("FAILURE");
-                                print "FAILURE: Both the colors are not same";
-                else:
-                        tdkTestObj.setResultStatus("FAILURE");
-                        print "Failure: Failed to get and set color for LED";
                 #calling DS_ManagerDeInitialize to DeInitialize API 
                 tdkTestObj = obj.createTestStep('DS_ManagerDeInitialize');
-                expectedresult="SUCCESS"
                 tdkTestObj.executeTestCase(expectedresult);
                 actualresult = tdkTestObj.getResult();
                 #Check for SUCCESS/FAILURE return value of DS_ManagerDeInitialize 

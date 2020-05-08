@@ -48,10 +48,10 @@ Test case ID : CT_DS_101</synopsis>
     <pre_requisite>1. dsMgrMain should be up and running.
 2. IARMDaemonMain should be up and running.</pre_requisite>
     <api_or_interface_used>device::Manager::Initialize()                                  FrontPanelConfig::getInstance()
-FrontPanelConfig::getColors() 
+FrontPanelConfig::getColors()
 FrontPanelConfig::getIndicator(string)
 FrontPanelConfig::getColor()
-FrontPanelConfig::setColor(int)      
+FrontPanelConfig::setColor(int)
 device::Manager::DeInitialize()</api_or_interface_used>
     <input_parameters>getIndicator : string – name
 E.g.: name : “POWER”
@@ -86,6 +86,7 @@ TestMgr_DS_managerDeinitialize</test_stub_interface>
 #use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
 import time;
+import random;
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("devicesettings","1.2");
 #Ip address of the selected STB for testing
@@ -107,64 +108,72 @@ if "SUCCESS" in loadmodulestatus.upper():
         if expectedresult in actualresult:
                 tdkTestObj.setResultStatus("SUCCESS");
                 print "SUCCESS :Application successfully initialized with Device Settings library";
-                print "0-Blue";
-                print "1-Green";
-                print "2-Red";
-                print "3-Yellow";
-                print "4-Orange";
-                i = 0;
-                for i in range(0,100):
-                        print "**************Iteration %d ***********************" %i;
-                        tdkTestObj = obj.createTestStep('DS_SetColor');
-                        #setting color parameter value
-                        color = 0;
-                        print "Color value set to:%d" %color;
-                        tdkTestObj.addParameter("color",color);
-                        expectedresult="SUCCESS"
-                        tdkTestObj.executeTestCase(expectedresult);
-                        actualresult = tdkTestObj.getResult();
-                        colordetails = tdkTestObj.getResultDetails();
-                        setColor = "%s" %color;
-			list = ['255','65280','16711680','16777184','16747520'];
-                        if expectedresult in actualresult:
-                                print "SUCCESS :Application successfully gets and sets the color";
-                                print "getColor %s" %colordetails;
-                                #comparing the color before and after setting
-				if list[int(setColor)] in colordetails :
-                                        tdkTestObj.setResultStatus("SUCCESS");
-                                        print "SUCCESS: Both the colors are same";
-                                else:
-                                        tdkTestObj.setResultStatus("FAILURE");
-                                        print "FAILURE: Both the colors are not same";
-                        else:
-                                tdkTestObj.setResultStatus("FAILURE");
-                                print "Failure: Failed to get and set color for LED";
-                        tdkTestObj = obj.createTestStep('DS_SetColor');
-                        #setting color parameter value
-                        color = 1;
-                        print "Color value set to:%d" %color;
-                        tdkTestObj.addParameter("color",color);
-                        expectedresult="SUCCESS"
-                        tdkTestObj.executeTestCase(expectedresult);
-                        actualresult = tdkTestObj.getResult();
-                        colordetails = tdkTestObj.getResultDetails();
-                        setColor = "%s" %color;
-                        if expectedresult in actualresult:
-                                print "SUCCESS :Application successfully gets and sets the color";
-                                print "getColor %s" %colordetails;
-                                print "Color to be verified: %s"%list[int(setColor)];
-                                #comparing the color before and after setting
-                                if list[int(setColor)] in colordetails :
-                                        tdkTestObj.setResultStatus("SUCCESS");
-                                        print "SUCCESS: Both the colors are same";
-                                else:
-                                        tdkTestObj.setResultStatus("FAILURE");
-                                        print "FAILURE: Both the colors are not same";
-                        else:
-                                tdkTestObj.setResultStatus("FAILURE");
-                                print "Failure: Failed to get and set color for LED";
-                time.sleep(100/1000);
-                #calling DS_ManagerDeInitialize to DeInitialize API
+		tdkTestObj = obj.createTestStep('DS_GetSupportedColors');
+                tdkTestObj.addParameter("indicator_name","Power");
+                tdkTestObj.executeTestCase(expectedresult);
+                actualresult = tdkTestObj.getResult();
+                colordetails = tdkTestObj.getResultDetails();
+                #Check for SUCCESS/FAILURE return value of DS_GetSupportedColors
+                if expectedresult in actualresult:
+                        tdkTestObj.setResultStatus("SUCCESS");
+                        print "SUCCESS :Application successfully gets the list of supported colors";
+                        print "%s" %colordetails
+			colorlist = colordetails.split(",");
+			for i in range(0,len(colorlist)):
+				print "%s-%s"%(i,colorlist[i]);
+	                i = 0;
+	                for i in range(0,100):
+	                        print "**************Iteration %d ***********************" %i;
+	                        tdkTestObj = obj.createTestStep('DS_SetColor');
+	                        color = random.choice(range(0,len(colorlist)));
+	                        print "Color value set as %d to set %s color"%(color,colorlist[color]);
+	                        tdkTestObj.addParameter("color",color);
+	                        tdkTestObj.executeTestCase(expectedresult);
+	                        actualresult = tdkTestObj.getResult();
+	                        colordetails = tdkTestObj.getResultDetails();
+	                        setColor = "%s" %color;
+				list = ['255','65280','16711680','16777184','16747520','16777215'];
+	                        if expectedresult in actualresult:
+	                                print "SUCCESS :Application successfully gets and sets the color";
+	                                print "getColor %s" %colordetails;
+	                                print "Color to be verified: %s"%list[int(setColor)];
+	                                #comparing the color before and after setting
+					if list[int(setColor)] in colordetails :
+	                                        tdkTestObj.setResultStatus("SUCCESS");
+	                                        print "SUCCESS: Both the colors are same";
+	                                else:
+	                                        tdkTestObj.setResultStatus("FAILURE");
+	                                        print "FAILURE: Both the colors are not same";
+	                        else:
+	                                tdkTestObj.setResultStatus("FAILURE");
+	                                print "Failure: Failed to get and set color for LED";
+	                        tdkTestObj = obj.createTestStep('DS_SetColor');
+				color = random.choice(range(0,len(colorlist)));
+	                        print "Color value set as %d to set %s color"%(color,colorlist[color]);
+	                        tdkTestObj.addParameter("color",color);
+	                        tdkTestObj.executeTestCase(expectedresult);
+	                        actualresult = tdkTestObj.getResult();
+	                        colordetails = tdkTestObj.getResultDetails();
+	                        setColor = "%s" %color;
+	                        if expectedresult in actualresult:
+	                                print "SUCCESS :Application successfully gets and sets the color";
+	                                print "getColor %s" %colordetails;
+	                                print "Color to be verified: %s"%list[int(setColor)];
+	                                #comparing the color before and after setting
+	                                if list[int(setColor)] in colordetails :
+	                                        tdkTestObj.setResultStatus("SUCCESS");
+	                                        print "SUCCESS: Both the colors are same";
+	                                else:
+	                                        tdkTestObj.setResultStatus("FAILURE");
+	                                        print "FAILURE: Both the colors are not same";
+	                        else:
+	                                tdkTestObj.setResultStatus("FAILURE");
+	                                print "Failure: Failed to get and set color for LED";
+				time.sleep(100/1000);
+		else:
+			tdkTestObj.setResultStatus("FAILURE");
+                        print "FAILURE :Failed to get the color list";
+	        #calling DS_ManagerDeInitialize to DeInitialize API
                 tdkTestObj = obj.createTestStep('DS_ManagerDeInitialize');
                 expectedresult="SUCCESS"
                 tdkTestObj.executeTestCase(expectedresult);
