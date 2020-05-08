@@ -121,6 +121,7 @@ if "SUCCESS" in loadmodulestatus.upper():
                 	stereomode="SURROUND";
                 	print "Set stereo mode value to %s" %stereomode;
                 	tdkTestObj.addParameter("stereo_mode",stereomode);
+			tdkTestObj.addParameter("persist",1);
                 	tdkTestObj.addParameter("port_name","SPDIF0");
                 	expectedresult="SUCCESS"
                 	tdkTestObj.executeTestCase(expectedresult);
@@ -146,6 +147,7 @@ if "SUCCESS" in loadmodulestatus.upper():
                         	#calling DS_SetStereoMode to get the stereo mode
                         	tdkTestObj = obj.createTestStep('DS_SetStereoMode');
                         	tdkTestObj.addParameter("port_name","SPDIF0");
+				tdkTestObj.addParameter("persist",1);
                         	tdkTestObj.addParameter("get_only",1);
                         	expectedresult="SUCCESS"
                         	stereomode="SURROUND"
