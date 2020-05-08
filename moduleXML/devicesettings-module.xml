@@ -159,6 +159,7 @@
       <parameter funName='TestMgr_DS_AOP_setStereoMode' parameterName='port_name' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_DS_AOP_setStereoMode' parameterName='stereo_mode' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_DS_AOP_setStereoMode' parameterName='get_only' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DS_AOP_setStereoMode' parameterName='persist' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_DS_HOST_setPowerMode' parameterName='new_power_state' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_DS_VOP_setResolution' parameterName='port_name' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_DS_VOP_setResolution' parameterName='resolution' parameterType='STRING' range='A-Z &amp; 0-9' />

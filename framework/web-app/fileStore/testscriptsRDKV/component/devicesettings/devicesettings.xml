@@ -180,6 +180,7 @@
           <parameter name="port_name" value="HDMI0"/>
           <parameter name="stereo_mode" value="SURROUND"/>
           <parameter name="get_only" value="0"/>
+          <parameter name="persist" value="0"/>
         </parameters>
       </primitiveTest>
       <primitiveTest id="86" name="DS_SetText" version="1">

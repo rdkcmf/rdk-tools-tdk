@@ -1118,7 +1118,7 @@ void DeviceSettingsAgent::AOP_setCompression(IN const Json::Value& req, OUT Json
  ***************************************************************************/
 void DeviceSettingsAgent::AOP_setStereoMode(IN const Json::Value& req, OUT Json::Value& response)
 {
-	DEBUG_PRINT(DEBUG_TRACE,"\n AOP_setStreoeMode ---->Entry\n");
+	DEBUG_PRINT(DEBUG_TRACE,"\n AOP_setStereoMode ---->Entry\n");
 	if(&req["port_name"]==NULL||&req["stereo_mode"]==NULL)
 	{
 		return;
@@ -1129,6 +1129,7 @@ void DeviceSettingsAgent::AOP_setStereoMode(IN const Json::Value& req, OUT Json:
 	char *stereoModeDetails = (char*)malloc(sizeof(char)*20);
 	memset(stereoModeDetails,'\0', (sizeof(char)*20));
 	bool getOnly = req["get_only"].asInt();
+	bool persistence = req["persist"].asInt();
 	try
 	{
 		/*getting instance for audio ports*/	
@@ -1139,8 +1140,8 @@ void DeviceSettingsAgent::AOP_setStereoMode(IN const Json::Value& req, OUT Json:
 			aPort.setStereoMode(stereoMode);
 		}
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling getStereoMode\n");
-		DEBUG_PRINT(DEBUG_LOG,"\ngetStereroMode:%s\n",aPort.getStereoMode().getName().c_str());
-		sprintf(stereoModeDetails,"%s",aPort.getStereoMode().getName().c_str());
+		DEBUG_PRINT(DEBUG_LOG,"\ngetStereroMode:%s\n",aPort.getStereoMode(persistence).getName().c_str());
+		sprintf(stereoModeDetails,"%s",aPort.getStereoMode(persistence).getName().c_str());
 		strcat(stereoModeDetails1,stereoModeDetails);
 		response["details"]= stereoModeDetails1; 
 		response["result"]= "SUCCESS"; 
