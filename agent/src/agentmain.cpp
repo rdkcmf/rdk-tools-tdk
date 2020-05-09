@@ -1144,6 +1144,7 @@ int main(int argc, char **argv)
 {
     int nPgid = 0;
     char* pszPath;
+    char* pszLogPath;
     std::string strEnvPath;
     std::string strFolderPath;
     int nReturnValue = RETURN_SUCCESS;
@@ -1194,9 +1195,21 @@ int main(int argc, char **argv)
 		
         return RETURN_FAILURE;   // Returns failure if TDK_PATH not exported
     }
+  
+    /*Checking environment variable TDK_LOG_PATH */
+    pszLogPath = getenv ("TDK_LOG_PATH");
+    if (pszLogPath != NULL)
+    {
+        DEBUG_PRINT (DEBUG_LOG, "TDK_LOG_PATH : %s", pszLogPath);
+    }
+    else
+    {
+        DEBUG_PRINT (DEBUG_ERROR, "Alert!!! TDK_LOG_PATH not exported \n");
+        setenv("TDK_LOG_PATH", pszPath , true);;   // Set TDK_LOG_PATH as TDK_PATH
+    }
 
     /* Extracting path to logs folder */
-    strEnvPath = getenv ("TDK_PATH");
+    strEnvPath = getenv ("TDK_LOG_PATH");
     strFolderPath.append(strEnvPath);
     strFolderPath.append("/");
     RpcMethods::sm_strTDKPath = strFolderPath;

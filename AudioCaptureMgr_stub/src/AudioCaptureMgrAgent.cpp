@@ -633,7 +633,7 @@ void AudioCaptureMgrAgent::AudioCaptureMgr_Start(IN const Json::Value& req, OUT 
 		}
 
 		char cmdstring[200] = {'\0'};
-		std::string g_tdkPath = getenv("TDK_PATH");
+		std::string g_tdkPath = getenv("TDK_LOG_PATH");
         	filename = g_tdkPath + "tmp";
 		DEBUG_PRINT (DEBUG_TRACE, "IARM_Bus_Call to start AudioCaptureMgr successful\n");
 		sprintf (cmdstring, "mkdir -p %s", filename.c_str());

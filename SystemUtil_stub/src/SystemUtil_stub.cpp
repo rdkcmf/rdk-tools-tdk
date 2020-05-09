@@ -416,7 +416,7 @@ void SystemUtilAgent::SystemUtilAgent_ExecuteBinary(IN const Json::Value& req, O
         string logFile = req["log_file"].asCString();
         string toolPath = req["tool_path"].asCString();
         string timeout = req["timeout"].asCString();
-        string ExecutionLogFile,ShellScript,testenvPath;
+        string ExecutionLogFile,ShellScript,testenvPath,testscriptPath;
         int Status;
         if (logFile.empty() or toolPath.empty())
         {
@@ -434,11 +434,12 @@ void SystemUtilAgent::SystemUtilAgent_ExecuteBinary(IN const Json::Value& req, O
                 pid_t idChild = vfork();
                 if(idChild == 0)
                 {
-                      testenvPath = getenv ("TDK_PATH");
+                      testenvPath = getenv ("TDK_LOG_PATH");
                       ExecutionLogFile.append(testenvPath);
                       ExecutionLogFile.append("/");
                       ExecutionLogFile.append(logFile);
-                      ShellScript.append(testenvPath);
+                      testscriptPath = getenv ("TDK_PATH");
+                      ShellScript.append(testscriptPath);
                       ShellScript.append("/");
                       ShellScript.append(scriptFile);
                       int fd = open(ExecutionLogFile.c_str(), O_WRONLY|O_CREAT, 0666);

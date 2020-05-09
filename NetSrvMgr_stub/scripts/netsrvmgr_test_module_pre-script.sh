@@ -18,7 +18,7 @@
 ##########################################################################
 NMCONFIG_PATH=/etc
 TARGET_PATH=/opt
-LOG_PATH=$TDK_PATH/logs
+LOG_PATH=$TDK_LOG_PATH/logs
 NMLOG_PATH=$TARGET_PATH/logs
 CONF_FILE=netsrvmgr.conf
 NM_LOG_FILE=netsrvmgr.log
