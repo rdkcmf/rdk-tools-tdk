@@ -451,10 +451,11 @@ std::string NetSrvMgrAgent::testmodulepre_requisites() {
     DEBUG_PRINT (DEBUG_TRACE, "NetSrvMgr testmodule pre_requisites --> Entry\n");
 #if 1
     string g_tdkPath = getenv("TDK_PATH");
+    string g_tdkLogPath = getenv("TDK_LOG_PATH");
     string NM_testmodule_PR_cmd, NM_testmodule_PR_log,line;
     ifstream logfile;
     NM_testmodule_PR_cmd= g_tdkPath + "/" + PRE_REQUISITE_FILE;
-    NM_testmodule_PR_log= g_tdkPath + "/" + PRE_REQUISITE_LOG_PATH;
+    NM_testmodule_PR_log= g_tdkLogPath + "/" + PRE_REQUISITE_LOG_PATH;
     string pre_req_chk= "source " + NM_testmodule_PR_cmd;
     try {
             system((char *)pre_req_chk.c_str());

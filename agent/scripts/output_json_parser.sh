@@ -18,7 +18,7 @@
 ##########################################################################
 
 SCRIPT_PATH=$TDK_PATH/script/
-LOG_PATH=$TDK_PATH/
+LOG_PATH=$TDK_LOG_PATH/
 LOGFILE=output_json_parser_details.log
 STREAMING_IP=$1
 BASE_URL=$2

@@ -18,14 +18,13 @@
 ##########################################################################
 [Unit]
 Description=TDK Test Agent Service
-After=network-online.target
-Requires=network-online.target
+After=network-online.target apps-rdm.service
+Requires=network-online.target 
+
 
 [Service]
-ExecStartPre=/bin/sh -c 'rm -rf /opt/TDK/lib* && cp -r /var/TDK /opt/'
-ExecStart=/bin/sh -c '/opt/TDK/StartTDK.sh'
-ExecStop=/bin/sh -c '/opt/TDK/StopTDK.sh'
-
+ExecStart=/bin/sh -c '/lib/rdk/tdkstartup.sh'
+ExecStop=/bin/sh -c '/lib/rdk/tdkstop.sh'
 
 [Install]
 WantedBy=multi-user.target

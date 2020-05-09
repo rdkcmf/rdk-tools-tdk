@@ -1,9 +1,8 @@
-#!/bin/sh
 ##########################################################################
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2016 RDK Management
+# Copyright 2020 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,17 +16,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##########################################################################
-#
+APPLN_HOME_PATH=/tmp
+APP_MOUNT_PATH=/media/apps
 
-export PATH=$PATH:/usr/local/bin:/usr/local/lib:/usr/local/lib/sa
-
-if [ -z "$TDK_LOG_PATH" ]
-then
-        echo "TDK_LOG_PATH is not defined so using TDK_PATH"
-        TDK_LOG_PATH=$TDK_PATH
+tst_file=$APP_MOUNT_PATH/testfile
+touch $tst_file
+if [ -e $tst_file ]; then
+	APPLN_HOME_PATH=$APP_MOUNT_PATH
+	rm $tst_file
 fi
-cd $TDK_LOG_PATH
+rdm_tdk_stop_script=$APPLN_HOME_PATH/tdk-dl/var/TDK/StopTDK.sh
+tdk_stop_script=/opt/TDK/StopTDK.sh
 
-sar -r -u 1 1 | awk ' /Average:/ { print $0 }' >> sysStatAvg.log
+is_tdk_as_rdm()
+{
+  package=`cat /etc/rdm/rdm-manifest.json | grep "app_name" | grep -i tdk | cut -d "\"" -f4`
+  if [[ "$package" == "tdk-dl" ]]; then
+    echo "tdk-dl is RDM package in this build"
+    return 1
+  else
+    echo "tdk-dl RDM package is not available.. it is traditional TDK build"
+    return 0
+  fi
+}
 
-echo "ITERATION" >> sysStatAvg.log
+is_tdk_as_rdm
+if [ $? -eq 1 ]; then
+  sh $rdm_tdk_stop_script
+else
+  sh $tdk_stop_script
+fi

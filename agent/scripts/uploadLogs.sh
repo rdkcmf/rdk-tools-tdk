@@ -20,5 +20,10 @@ SRC="$(dirname $1)"
 cd $SRC
 CMND="$4/execution/uploadLogs?fileName=$2 -F logFile=@$(basename $1)"
 #Get the interface to be used from tdkconfig.ini file
-INTERFACE=$(cat $TDK_PATH/tdkconfig.ini | grep "Box Interface" | cut -d@ -f 2 | tr -d '\r\n')
+if [ -z "$TDK_LOG_PATH" ]
+then
+	echo "TDK_LOG_PATH is not defined so using TDK_PATH"
+	TDK_LOG_PATH=$TDK_PATH
+fi
+INTERFACE=$(cat $TDK_LOG_PATH/tdkconfig.ini | grep "Box Interface" | cut -d@ -f 2 | tr -d '\r\n')
 curl -g --interface $INTERFACE $CMND
