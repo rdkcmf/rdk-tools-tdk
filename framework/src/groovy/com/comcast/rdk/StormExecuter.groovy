@@ -348,7 +348,7 @@ class StormExecuter {
 						break;
 					}
 				}else{
-			        if(line.contains("node") && line.contains("rdktest")){
+			        if(line.contains("node") && line.contains("storm_jsonrpc")){
 					    isFound = true;
 					    break;
 				    }
@@ -480,9 +480,21 @@ class StormExecuter {
 				JSONObject jsonObject = new JSONObject(result);
 				iStream.close();
 			JSONObject resultJsonObject = new JSONObject(jsonObject.get('result'))
-			uptime = resultJsonObject.get('uptime')
-			devicename = resultJsonObject.get('devicename')
-			deviceid = resultJsonObject.get('deviceid')
+			if(resultJsonObject?.has('uptime')){
+			    uptime = resultJsonObject.get('uptime')
+			}else{
+			    uptime = "Uptime not available"
+			}
+			if(resultJsonObject?.has('devicename')){
+				devicename = resultJsonObject.get('devicename')
+			}else{
+			    devicename = "Devicename not avaialble"
+			}
+			if(resultJsonObject?.has('deviceid')){
+				deviceid = resultJsonObject.get('deviceid')
+			}else{
+			    deviceid = "Device id not available"
+			}
 			thunderVersionDetailsFormatted = "uptime : "+uptime+"\ndevicename : "+devicename+"\ndeviceid : "+deviceid
 		}
 		catch(Exception e){
