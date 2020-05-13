@@ -955,7 +955,6 @@ void CTRMMonitor::operator() (const TRM::ReserveTunerResponse &msg)
 {
     pthread_mutex_lock( &helper_mutex);
 
-    resrvResponseReceived = true;
     reservationSuccess = "";
 
     if ( NULL == trmClient )
@@ -1022,6 +1021,7 @@ void CTRMMonitor::operator() (const TRM::ReserveTunerResponse &msg)
                 reservationSuccess = "InsufficientResource";
         }
     }
+    resrvResponseReceived = true;
     pthread_mutex_unlock( &helper_mutex);
 }
 
