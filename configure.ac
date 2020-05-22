@@ -220,6 +220,22 @@ AC_ARG_ENABLE([deepsleephal],
            [echo "deepsleephal component is not enabled"])
 AM_CONDITIONAL([DEEPSLEEPHAL], [test x$DEEPSLEEPHAL = xtrue])
 
+AC_ARG_ENABLE([powermgrhal],
+         AS_HELP_STRING([--enable-powermgrhal],[enable powermgrhal (default is no)]),
+         [
+           case "${enableval}" in
+              yes) POWERMGRHAL=true
+                   AS_IF([test x$HYBRID = xtrue], [SUBDIR_HYBRID+=" PowerMgrHal_stub "],
+                          [echo PowerMgrHal enabled in Hybrid])
+                   AS_IF([test x$CLIENT = xtrue], [SUBDIR_CLIENT+=" PowerMgrHal_stub "],
+                          [echo PowerMgrHal enabled in Client]) ;;
+             no) POWERMGRHAL=false ;;
+            *) AC_MSG_ERROR([bad value ${enableval} for --enable-powermgrhal ]) ;;
+             esac
+            ],
+           [echo "powermgrhal component is not enabled"])
+AM_CONDITIONAL([POWERMGRHAL], [test x$POWERMGRHAL = xtrue])
+
 AC_ARG_ENABLE([trace],
               AS_HELP_STRING([--enable-trace],[enable trace (default is no)]),
               [
@@ -290,5 +306,6 @@ AC_CONFIG_FILES([Makefile
 	 SystemUtil_stub/Makefile
 	 DSHal_stub/Makefile
          DeepSleepHal_stub/Makefile
+         PowerMgrHal_stub/Makefile
 	 WIFIHAL_stub/Makefile])
 AC_OUTPUT
