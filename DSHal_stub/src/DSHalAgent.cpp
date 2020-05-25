@@ -81,7 +81,8 @@ bool DSHalAgent::testmodulepost_requisites()
     dsVideoPortTerm();
     dsDisplayTerm();
     dsVideoDeviceTerm();
-    dsFPTerm();
+    /*Commented to address RDKTT-2015. Developed has suggested to comment since DS itself is not using this API*/
+    //dsFPTerm();
     dsHdmiInTerm();
     vpHandle = 0;
     vdHandle = 0;
