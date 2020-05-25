@@ -126,6 +126,7 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetDialogEnhancement", PARAMS_BY_NAME, JSON_STRING, "level", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetDialogEnhancement);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetDialogEnhancement", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetDialogEnhancement);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetEDID", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetEDID);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetEDIDBytes", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetEDIDBytes);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_HdmiInSelectZoomMode", PARAMS_BY_NAME, JSON_STRING, "mode", JSON_INTEGER,NULL), &DSHalAgent::DSHal_HdmiInSelectZoomMode);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetCurrentOutputSettings", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetCurrentOutputSettings);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_HdmiInSelectPort", PARAMS_BY_NAME, JSON_STRING, "port", JSON_INTEGER,NULL), &DSHalAgent::DSHal_HdmiInSelectPort);
@@ -208,6 +209,7 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                 void DSHal_GetDialogEnhancement(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_HdmiInSelectZoomMode(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_GetEDID(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetEDIDBytes(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_GetCurrentOutputSettings(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_HdmiInSelectPort(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_GetHdmiInCurrentVideoMode(IN const Json::Value& req, OUT Json::Value& response);

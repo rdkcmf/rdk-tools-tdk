@@ -2500,6 +2500,96 @@ void DSHalAgent::DSHal_GetEDID(IN const Json::Value& req, OUT Json::Value& respo
     }
 }
 /***************************************************************************
+ *Function name : EDID_Verify
+ *Description   : Verify the EDID bytes
+ ***************************************************************************/
+bool EDID_Verify(unsigned char* bytes, size_t count) {
+    if (!bytes || count < 128) {
+        return false;
+    }
+    static const unsigned char header[8] = {0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00};
+    if (memcmp(bytes, header, sizeof(header)) != 0) {
+        DEBUG_PRINT(DEBUG_ERROR, "Incorrect input, header does not match: %02x %02x %02x %02x %02x %02x %02x %02x\n", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7]);
+        return false;
+    }
+    return true;
+}
+/***************************************************************************
+ *Function name : DSHal_GetEDIDBytes
+ *Description    : This function is to get the EDID Bytes of the connected display
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetEDIDBytes(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetEDIDBytes --->Entry\n");
+    char details[512];
+    dsError_t ret = dsERR_NONE;
+
+    std::vector<unsigned char> edid;
+    int length = 0;
+    struct MemGuard {
+        MemGuard() : edidBytes(NULL) {}
+        ~MemGuard() {
+            if (edidBytes) {
+                free(edidBytes);
+                edidBytes = NULL;
+            }
+        }
+        unsigned char *edidBytes;
+    } memguard;
+    ret = dsGetEDIDBytes(dispHandle, &memguard.edidBytes, &length);
+    if (ret == dsERR_NONE)
+    {
+        if(EDID_Verify(memguard.edidBytes, length)==true)
+        {
+               edid.insert(edid.begin(), memguard.edidBytes, memguard.edidBytes + length);
+               DEBUG_PRINT(DEBUG_TRACE, "\t Display [%s] has %d bytes EDID\r\n", "HDMI",  edid.size());
+                /* Dump the bytes */
+                for (int i = 0; i < edid.size(); i++) {
+                   if (i % 16 == 0) {
+                       printf("\r\n");
+                   }
+                   if (i % 128 == 0) {
+                       printf("\r\n");
+                   }
+                   printf("%02X ", edid[i]);
+                   if ((i*2) < sizeof(details))
+                       sprintf(&details[i*2],"%02X",edid[i]);
+                }
+               response["result"] = "SUCCESS";
+               response["details"] = details;
+               DEBUG_PRINT(DEBUG_LOG, "EDIDBytes retrived successfully");
+               DEBUG_PRINT(DEBUG_LOG, "dsGetEDIDBytes call is SUCCESS");
+               DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetEDIDBytes -->Exit\n");
+               return;
+       }
+       else
+       {
+               printf("Failed to verify EDIDbytes\n");
+               response["result"] = "FAILURE";
+               response["details"] = "EDIDBytes are not valid..";
+               DEBUG_PRINT(DEBUG_LOG, "dsGetEDIDBytes call FAILED");
+               DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetEDIDBytes -->Exit\n");
+               return;
+       }
+    }
+    else if (ret == dsERR_INVALID_PARAM){
+        response["result"] = "FAILURE";
+        response["details"] = "Invalid display handle";
+        DEBUG_PRINT(DEBUG_ERROR, "Invalid display handle");
+        DEBUG_PRINT(DEBUG_LOG, "dsGetEDIDBytes call FAILED");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetEDIDBytes -->Exit\n");
+        return;
+    }
+    else
+    {
+        response["result"] = "FAILURE";
+        response["details"] = "GetEDIDBytes call failed";
+        DEBUG_PRINT(DEBUG_LOG, "dsGetEDIDBytes call FAILED");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetEDIDBytes -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
  *Function name : DSHal_GetCurrentOutputSettings
  *Description    : This function is to get the EDID information of the connected display
  *****************************************************************************/

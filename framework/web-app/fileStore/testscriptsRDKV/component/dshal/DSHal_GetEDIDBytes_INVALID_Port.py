@@ -19,13 +19,13 @@
 '''
 <?xml version="1.0" encoding="UTF-8"?><xml>
   <id/>
-  <version>1</version>
-  <name>DSHal_GetTVHDRCapabilities</name>
+  <version>3</version>
+  <name>DSHal_GetEDIDBytes_INVALID_Port</name>
   <primitive_test_id/>
-  <primitive_test_name>DSHal_GetTVHDRCapabilities</primitive_test_name>
+  <primitive_test_name>DSHal_GetEDIDBytes</primitive_test_name>
   <primitive_test_version>1</primitive_test_version>
   <status>FREE</status>
-  <synopsis>Test Script to get the HDR capabilities supported by the TV</synopsis>
+  <synopsis>To check whether EDID bytes is retrieved for INVALID Port</synopsis>
   <groups_id/>
   <execution_time>2</execution_time>
   <long_duration>false</long_duration>
@@ -33,45 +33,42 @@
   <remarks/>
   <skip>false</skip>
   <box_types>
-    <box_type>IPClient-3</box_type>
     <box_type>Hybrid-1</box_type>
+    <box_type>IPClient-3</box_type>
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>
   </rdk_versions>
   <test_cases>
-    <test_case_id>CT_DS_HAL_60</test_case_id>
-    <test_objective>Test Script to get the HDR capabilities supported by the TV as ORed value</test_objective>
+    <test_case_id>CT_DS_HAL_129</test_case_id>
+    <test_objective>To check whether EDID bytes is retrieved for INVALID Port</test_objective>
     <test_type>Positive</test_type>
     <test_setup>XG1V3,XI3</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr
 4. Initialize DSHAL subsystems</pre_requisite>
-    <api_or_interface_used>dsGetVideoPort(dsVideoPortType_t type, int index, int *handle)
-dsGetTVHDRCapabilities(vpHandle, &amp;capabilities)</api_or_interface_used>
-    <input_parameters>type - Video port type
-index- Video port index
-handle - Video port handle
-capabilities - to hold TV HDR capabilities</input_parameters>
+    <api_or_interface_used>dsGetEDIDBytes(int handle, unsigned char **edid, int *length)</api_or_interface_used>
+    <input_parameters>None</input_parameters>
     <automation_approch>1. TM loads the DSHAL agent via the test agent.
-2 . DSHAL agent will invoke the API dsGetTVHDRCapabilities
-3. Update test result as SUCCESS/FAILURE based on the API return value
-4.Unload the module</automation_approch>
-    <expected_output>Checkpoint 1.Verify the API call is success
-Checkpoint 2 Should get the TV HDR capabilities if it is supported</expected_output>
+2 . DSHAL agent will invoke the API dsGetEDIDBytes without setting display handle
+3.API should return invalid param i.e handle
+4. Update test result as SUCCESS/FAILURE based on the API return value
+5.Unload the module</automation_approch>
+    <expected_output>API should not get the EDID bytes. It should return invalid param i.e handle</expected_output>
     <priority>High</priority>
     <test_stub_interface>libdshalstub.so.0.0.0</test_stub_interface>
-    <test_script>DSHal_GetTVHDRCapabilities</test_script>
+    <test_script>DSHal_GetEDIDBytes_INVALID_Port</test_script>
     <skipped>No</skipped>
-    <release_version>M75</release_version>
+    <release_version>M77</release_version>
     <remarks/>
   </test_cases>
+  <script_tags/>
 </xml>
 
 '''
-# use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+from dshalUtility import *;
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("dshal","1");
@@ -80,7 +77,7 @@ obj = tdklib.TDKScriptingLibrary("dshal","1");
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'DSHal_GetTVHDRCapabilities');
+obj.configureTestCase(ip,port,'DSHal_GetEDIDBytes_INVALID_Port');
 
 #Get the result of connection with test component and STB
 loadModuleStatus = obj.getLoadModuleResult();
@@ -116,22 +113,24 @@ if "SUCCESS" in loadModuleStatus.upper():
 
             #Check for display connection status
             if isDisplayConnected == "TRUE":
-                print "\nTEST STEP3 : Get the HDR capabilities supported by the TV using dsGetTVHDRCapabilities API"
-                print "EXEPECTED OUTPUT : Should get the OR-ed value of TV HDR capabilities"
-                tdkTestObj = obj.createTestStep('DSHal_GetTVHDRCapabilities');
+                print "\nTEST STEP3: Get EDID bytes without setting the display handle using dsGetEDIDBytes API"
+                print "EXPECTED RESULT : Should not get the EDID bytes details"
+                expectedResult="FAILURE";
+                tdkTestObj = obj.createTestStep('DSHal_GetEDIDBytes');
                 tdkTestObj.executeTestCase(expectedResult);
                 actualResult = tdkTestObj.getResult();
                 if expectedResult in actualResult:
                     tdkTestObj.setResultStatus("SUCCESS");
                     details = tdkTestObj.getResultDetails();
-                    print "ACTUAL RESULT  : dsGetTVHDRCapabilities call is success"
-                    print "Value Returned : TV HDR Capabilities : ",details
+                    print "Value Returned : ",details
+                    print "ACTUAL RESULT  : EDID bytes not retrieved"
                     print "[TEST EXECUTION RESULT] : SUCCESS\n"
+
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
                     details = tdkTestObj.getResultDetails();
-                    print "ACTUAL RESULT  : dsGetTVHDRCapabilities call failed"
                     print "Value Returned : ",details
+                    print "ACTUAL RESULT  : EDID bytes retrieved"
                     print "[TEST EXECUTION RESULT] : FAILURE\n"
             else:
                 tdkTestObj.setResultStatus("FAILURE");
@@ -153,5 +152,4 @@ if "SUCCESS" in loadModuleStatus.upper():
 else:
     print "Load module failed";
     obj.setLoadModuleStatus(loadModuleStatus.upper());
-
 
