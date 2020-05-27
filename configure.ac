@@ -206,6 +206,20 @@ AC_ARG_ENABLE([bluetooth],
            [echo "bluetooth component is not enabled"])
 AM_CONDITIONAL([BLUETOOTH], [test x$BLUETOOTH = xtrue])
 
+AC_ARG_ENABLE([deepsleephal],
+         AS_HELP_STRING([--enable-deepsleephal],[enable deepsleephal (default is no)]),
+         [
+           case "${enableval}" in
+              yes) DEEPSLEEPHAL=true
+                   AS_IF([test x$CLIENT = xtrue], [SUBDIR_CLIENT+=" DeepSleepHal_stub "],
+                          [echo box type not specified]) ;;
+             no) DEEPSLEEPHAL=false ;;
+            *) AC_MSG_ERROR([bad value ${enableval} for --enable-deepsleephal ]) ;;
+             esac
+            ],
+           [echo "deepsleephal component is not enabled"])
+AM_CONDITIONAL([DEEPSLEEPHAL], [test x$DEEPSLEEPHAL = xtrue])
+
 AC_ARG_ENABLE([trace],
               AS_HELP_STRING([--enable-trace],[enable trace (default is no)]),
               [
@@ -275,5 +289,6 @@ AC_CONFIG_FILES([Makefile
 	 USBCtrl_stub/Makefile
 	 SystemUtil_stub/Makefile
 	 DSHal_stub/Makefile
+         DeepSleepHal_stub/Makefile
 	 WIFIHAL_stub/Makefile])
 AC_OUTPUT
