@@ -111,7 +111,7 @@ AC_ARG_ENABLE([client],
         [
           case "${enableval}" in
              yes) CLIENT=true
-                  SUBDIR_CLIENT="TR069_stub NetSrvMgr_stub MocaHal_stub";;
+                  SUBDIR_CLIENT="TR069_stub NetSrvMgr_stub";;
            no) CLIENT=false ;;
           *) AC_MSG_ERROR([bad value ${enableval} for --enable-client ]) ;;
            esac
@@ -188,6 +188,20 @@ AC_ARG_ENABLE([dtcp],
             ],
            [echo "dtcp component is not enabled"])
 AM_CONDITIONAL([DTCP], [test x$DTCP = xtrue])
+
+AC_ARG_ENABLE([mocal-hal],
+         AS_HELP_STRING([--enable-mocal-hal],[enable mocal-hal (default is no)]),
+         [
+           case "${enableval}" in
+              yes) MOCAHAL=true
+                   AS_IF([test x$CLIENT = xtrue], [SUBDIR_CLIENT+=" MocaHal_stub"],
+                          [echo box type not specified]) ;;
+             no) MOCAHAL=false ;;
+            *) AC_MSG_ERROR([bad value ${enableval} for --enable-mocal-hal ]) ;;
+             esac
+            ],
+           [echo "mocal-hal component is not enabled"])
+AM_CONDITIONAL([MOCAHAL], [test x$MOCAHAL = xtrue])
 
 AC_ARG_ENABLE([bluetooth],
          AS_HELP_STRING([--enable-bluetooth],[enable bluetooth (default is no)]),

@@ -22,10 +22,7 @@ AM_CPPFLAGS = ${COPTS} -std=c++0x -fPIC -DGCC4_XXX -g ${DTCP_FLAGS}
 
 INCLUDES = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)
 
-AM_CXXFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/json \
-	      -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rdk/dtcp/include/ \
-	      -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/jsonrpc \
-	      -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/curl \
+AM_CXXFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rdk/dtcp/include/ \
               -I${top_srcdir}/DTCP_stub/include -I${top_srcdir}/agent/include
 
 lib_LTLIBRARIES = libdtcpstub.la
