@@ -125,7 +125,7 @@ public class SocketPortConnector extends Thread {
 							if(dataArray[0] && dataArray[1]){
 								String stbName = dataArray[0]
 								String stbIp = dataArray[1]
-								Device device = Device.findByStbName(stbName.trim())
+								Device device = Device.findByStbName(stbName.trim(), [fetch:[childDevices:"eager"]])
 								if(device){
 									if(!device?.isChild){
 										Device.executeUpdate("update Device c set c.stbIp = :newStatus where c.id = :devId",[newStatus: stbIp,  devId: (device?.id)])
