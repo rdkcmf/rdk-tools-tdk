@@ -882,6 +882,7 @@ class ExecutedbService {
 				String output = executionResultInstance?.executionOutput
 				String executionOutput
 				String moduleName = ""
+				String tabName = ""
 				String ticketNo = ""
 				String remarks = ""
 				String issueType = ""
@@ -905,8 +906,10 @@ class ExecutedbService {
 				else if(executionResultInstance?.category == Category.RDKB_TCL){
 					moduleName = 'tcl'
 				}
-				else{
-					moduleName = 'thunder'
+				else if(executionResultInstance?.category == Category.RDKV_THUNDER){
+					moduleName = Constants.THUNDER
+					def sMap = scriptService.getScriptNameTabNameMappingThunder(realPath)
+					tabName = sMap.get(scriptName)
 				}
 				
 				int i = 0
@@ -916,11 +919,20 @@ class ExecutedbService {
 	
 					def scriptObj = ScriptFile.findByScriptNameAndModuleName(scriptName,moduleName)
 					if(scriptObj){
-						def dataList					
-						Map dataMapList = detailDataMap.get(moduleName)
+						def dataList
+						Map dataMapList
+						if(moduleName == Constants.THUNDER){
+							dataMapList = detailDataMap.get(tabName)
+						}else{
+						    dataMapList = detailDataMap.get(moduleName)
+						}
 							if(dataMapList == null){
 								dataMapList = [:]
-								detailDataMap.put(moduleName,dataMapList)
+								if(moduleName == Constants.THUNDER){
+									detailDataMap.put(tabName,dataMapList)
+								}else{
+								    detailDataMap.put(moduleName,dataMapList)
+								}
 								//detailDataMap.put("total", summaryMap.get("Total Scripts"))
 							}				
 						

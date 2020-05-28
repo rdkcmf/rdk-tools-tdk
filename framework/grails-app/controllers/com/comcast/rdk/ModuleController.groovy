@@ -23,6 +23,7 @@ import static com.comcast.rdk.Constants.*
 import java.util.List;
 import java.util.zip.ZipOutputStream
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject
 import grails.converters.JSON
@@ -43,6 +44,12 @@ class ModuleController {
 	def utilityService
 	def moduleService
 	def logZipService
+	def scriptService
+	
+	/**
+	 * Injects the grailsApplication.
+	 */
+	def grailsApplication
 	
 	def rootPath = null
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -1047,6 +1054,29 @@ class ModuleController {
 				flash.message="Error, The file extension is not in .xml format"
 			}
 			redirect(action:"list", params:[category:params?.category])
+	}
+	
+	/**
+	 * Function for restating node and performing a scriptlist refresh
+	 * @return
+	 */
+	def nodeRestartAndScriptListRefresh(){
+		boolean nodeRestarted
+		try{
+			nodeRestarted = StormExecuter.reStartNode(grailsApplication)
+		}catch(Exception e){
+			e.printStackTrace()
+		}
+		if(nodeRestarted){
+			try{
+			    scriptService.initializeThunderScripts()
+			}catch(Exception e){
+			    e.printStackTrace()
+			}
+			render new Gson().toJson(true)
+		} else{
+		    render new Gson().toJson(false)
+		}
 	}
 	
 }

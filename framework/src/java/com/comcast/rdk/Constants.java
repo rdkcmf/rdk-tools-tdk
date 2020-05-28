@@ -344,6 +344,8 @@ public final class Constants
    	public static final String LOG_UPLOAD_IPV6= "log.upload.ipv6"; 
    	public static final String TM_CONFIG_FILE= "/fileStore/tm.config";
    	public static final String STORM_CONFIG_FILE= "/fileStore/storm.config";
+   	public static final String STORM_DEFAULT_TIME_OUT= "2";
+   	public static final String STORM_TESTS_TIME_OUT_CONFIG_FILE= "/fileStore/storm_tests_time_out.config";
 	public static final String TFTP_MECHANISM= "tftp";
 	public static final String REST_MECHANISM= "REST";
 	public static final String FILE_NOT_FOUND= "File not found.";
