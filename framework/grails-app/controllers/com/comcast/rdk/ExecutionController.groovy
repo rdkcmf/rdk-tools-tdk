@@ -4161,7 +4161,7 @@ class ExecutionController {
 	 */
 	def readOutputFileDataThunder(){
         File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-        String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION)
+        String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION) + Constants.URL_SEPERATOR
         String folderName = Constants.SCRIPT_OUTPUT_FILE_PATH_STORM
 		String fullLogFilePath = folderName+params?.executionName+Constants.UNDERSCORE+Constants.FULLLOG_LOG
 		File fullLogFile = grailsApplication.parentContext.getResource(fullLogFilePath).file
