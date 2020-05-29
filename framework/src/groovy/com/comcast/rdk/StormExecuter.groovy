@@ -93,7 +93,7 @@ class StormExecuter {
 	public static boolean parseThunderResult(def grailsApplication, String scriptname,String executionId){
 		boolean resultThunder = false
 		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		String STORM_FRAMEWORK_LOCATION = getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION)
+		String STORM_FRAMEWORK_LOCATION = getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION) + Constants.URL_SEPERATOR
 		String STORM_FRAMEWORK_LOG_LOCATION = STORM_FRAMEWORK_LOCATION+Constants.SRC+File.separator+Constants.LOGS+File.separator
 		String LOG_FILE = STORM_FRAMEWORK_LOG_LOCATION+scriptname+Constants.JAVASCRIPT_EXTENSION+Constants.UNDERSCORE+executionId+Constants.UNDERSCORE+Constants.EXECUTION_LOG
 		File log_file = new File(LOG_FILE)
@@ -149,7 +149,7 @@ class StormExecuter {
 	public static boolean checkThunderExecution(def grailsApplication, String scriptname,String executionId){
 		boolean resultThunder = false
 		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		String STORM_FRAMEWORK_LOCATION = getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION)
+		String STORM_FRAMEWORK_LOCATION = getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION) + Constants.URL_SEPERATOR
 		String STORM_FRAMEWORK_LOG_LOCATION = STORM_FRAMEWORK_LOCATION+Constants.SRC+File.separator+Constants.LOGS+File.separator
 		String LOG_FILE = STORM_FRAMEWORK_LOG_LOCATION+scriptname+Constants.JAVASCRIPT_EXTENSION+Constants.UNDERSCORE+executionId+Constants.UNDERSCORE+Constants.EXECUTION_LOG
 		File log_file = new File(LOG_FILE)
@@ -201,7 +201,7 @@ class StormExecuter {
 	 */	
 	static String returnThunderLogFile(def grailsApplication, String scriptname,String executionId){
 		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		String STORM_FRAMEWORK_LOCATION = getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION)
+		String STORM_FRAMEWORK_LOCATION = getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION) + Constants.URL_SEPERATOR
 		String STORM_FRAMEWORK_LOCATION_LOG_LOCATION_WINDOWS = STORM_FRAMEWORK_LOCATION+"src\\logs\\"
 		String STORM_FRAMEWORK_LOCATION_LOG_LOCATION_LINUX = STORM_FRAMEWORK_LOCATION+"src/logs/"
 		String LOG_FILE_LINUX_GRAILS = STORM_FRAMEWORK_LOCATION_LOG_LOCATION_LINUX+scriptname+".js_"+executionId+"_Execution.log"
@@ -254,7 +254,7 @@ class StormExecuter {
 		BufferedReader reader
 		String serverlogData = ""
 		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		String STORM_FRAMEWORK_LOCATION = getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION)
+		String STORM_FRAMEWORK_LOCATION = getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION) + Constants.URL_SEPERATOR
 		String STORM_FRAMEWORK_LOCATION_LOG_LOCATION_WINDOWS = STORM_FRAMEWORK_LOCATION+"src\\logs\\"
 		String STORM_FRAMEWORK_LOCATION_LOG_LOCATION_LINUX = STORM_FRAMEWORK_LOCATION+"src/logs/"
 		String SERVER_CONSOLE_LOG_FILE_LINUX_GRAILS = STORM_FRAMEWORK_LOCATION_LOG_LOCATION_LINUX+scriptname+".js_"+executionName+"_Serverconsole.log"
@@ -334,24 +334,15 @@ class StormExecuter {
 		try {
 			String line;
 			Process p;
-			String osName = System.getProperty(Constants.OS_NAME)
-			if(osName?.startsWith(Constants.OS_WINDOWS)){
-				p = Runtime.getRuntime().exec("tasklist");
-			} else {
-				p = Runtime.getRuntime().exec("ps -ef");
-			}
+			ProcessBuilder pb;
+			String command = "ps -ef"
+			pb = new ProcessBuilder("bash", "-c", command)
+			p = pb.start()
 			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			while ((line = input.readLine()) != null) {
-                if(osName?.startsWith(Constants.OS_WINDOWS)){
-					if(line.contains("node")){
-						isFound = true;
-						break;
-					}
-				}else{
-			        if(line.contains("node") && line.contains("storm_jsonrpc")){
-					    isFound = true;
-					    break;
-				    }
+				if(line.contains("node") && line.contains("storm_jsonrpc")){
+					isFound = true;
+					break;
 				}
 			}
 			input.close();
@@ -381,7 +372,7 @@ class StormExecuter {
 	 */
 	def static boolean initializeNodeServer (def application) {
 		File configFile = application.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		String STORM_FRAMEWORK_LOCATION = getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION)
+		String STORM_FRAMEWORK_LOCATION = getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION) + Constants.URL_SEPERATOR
 		String STORM_FRAMEWORK_LOCATION_SRC_WINDOWS = STORM_FRAMEWORK_LOCATION+"src\\"
 		String STORM_FRAMEWORK_LOCATION_SRC_LINUX = STORM_FRAMEWORK_LOCATION+"src/"
 		String command = "node -r esm storm_jsonrpc.js"
@@ -526,5 +517,48 @@ class StormExecuter {
 			e.printStackTrace()
 		}
 		return null
+	}
+	
+	/**
+	 * Method which will kill the node server
+	 * @param application
+	 * @return
+	 */
+	def static boolean killNode(application) {
+			try{
+			    String line
+			    Process p;
+			    ProcessBuilder pb
+				String command = "pkill -9 -f storm_jsonrpc"
+			    pb = new ProcessBuilder("bash", "-c", command)
+			    p = pb.start()
+				if( !(isNodeAvailable())){
+					return true
+				}else{
+					return false
+				}
+			}catch(Exception e){
+			    e.printStackTrace()
+			}
+	}
+	
+	/**
+	 * Method which will restart the node server
+	 * @param application
+	 * @return
+	 */
+	def static boolean reStartNode (application){
+		boolean nodeRestarted = false
+		try{
+		    if( !(isNodeAvailable())){
+			    startNode(application)
+		    }else{
+                killNode()
+			    nodeRestarted = startNode(application)
+		    }
+		} catch(Exception e){
+		    e.printStackTrace()
+		}
+		return nodeRestarted
 	}
 }

@@ -40,6 +40,8 @@ class ScriptService {
 	public static volatile List scriptNameList = []
 
 	public static volatile Map scriptMapping = [:]
+	
+	public static volatile Map scriptMappingThunder = [:]
 
 	public static volatile Map scriptGroupMap = [:]
 	
@@ -253,10 +255,11 @@ class ScriptService {
 	 */
 	def initializeThunderScripts(final String path){
 		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION)
+		String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION) + Constants.URL_SEPERATOR
 		try {
 			totalThunderScriptList.clear()
 			scriptsListStorm.clear()
+			scriptMappingThunder.clear()
 			def fileStorePath
 			String osName = System.getProperty(Constants.OS_NAME)
 			if(osName?.startsWith(Constants.OS_WINDOWS)){
@@ -297,12 +300,13 @@ class ScriptService {
 								totalThunderScriptList.add(scriptName)
 							}
 						    if(path){
-							    boolean updateReqd = isDefaultSGUpdateRequired(path)
+							    boolean updateReqd = isDefaultSGUpdateRequiredThunder(path)
 								if(updateReqd){
-									updateThunderScriptSuite(scriptName , RDKV_THUNDER)
+									updateThunderScriptSuite(directory, scriptName , RDKV_THUNDER)
 								}
 						    }
 							scriptListForDirectory?.add(scriptName)
+							scriptMappingThunder?.put(fileName,directory)
 						}
 					}
 					scriptGroupMapThunder.put(directory,scriptListForDirectory)
@@ -319,7 +323,7 @@ class ScriptService {
 	 */
 	def updateThunderScripts(final String path){
 		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION)
+		String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION) + Constants.URL_SEPERATOR
 		try {
 			totalThunderScriptList.clear()
 			def fileStorePath
@@ -358,7 +362,7 @@ class ScriptService {
 								totalThunderScriptList.add(scriptName)
 							}
 							if(path){
-								updateThunderScriptSuite(scriptName , RDKV_THUNDER)
+								updateThunderScriptSuite(directory, scriptName , RDKV_THUNDER)
 							}
 						}
 					}
@@ -375,10 +379,22 @@ class ScriptService {
 	 * @param category
 	 * @return
 	 */
-	def updateThunderScriptSuite(def ScriptFile scriptFileInstance , def String category){
+	def updateThunderScriptSuite(def String directory, def ScriptFile scriptFileInstance , def String category){
 		try{
 			def moduleName =  "THUNDER"
 			def scriptGrpInstance = ScriptGroup.findByName(moduleName)
+			if(!scriptGrpInstance){
+				scriptGrpInstance = new ScriptGroup()
+				scriptGrpInstance.name = moduleName
+				scriptGrpInstance.scriptList = []
+				scriptGrpInstance.category = Utility.getCategory(category)
+				scriptGrpInstance.save()
+			}
+			if(!scriptGrpInstance?.scriptList?.contains(scriptFileInstance)){
+				scriptGrpInstance.addToScriptList(scriptFileInstance)
+			}
+			moduleName =  directory
+			scriptGrpInstance = ScriptGroup.findByName(moduleName)
 			if(!scriptGrpInstance){
 				scriptGrpInstance = new ScriptGroup()
 				scriptGrpInstance.name = moduleName
@@ -400,7 +416,7 @@ class ScriptService {
 	 def getThundertScript(final String name){
 		 boolean scriptFound = false
 		 File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		 String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION)
+		 String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION) + Constants.URL_SEPERATOR
 		 String osName = System.getProperty(Constants.OS_NAME)
 		 def thunderPath
 		 def fileStorePath
@@ -1024,6 +1040,13 @@ class ScriptService {
 		}
 		return scriptMapping
 	}
+	
+	def getScriptNameTabNameMappingThunder(def realPath){
+		if(scriptMappingThunder == null || scriptMappingThunder.keySet().size() == 0){
+			initializeThunderScripts(realPath)
+		}
+		return scriptMappingThunder
+	}
 
 
 	def Map getScriptsMap(def realPath){
@@ -1518,6 +1541,28 @@ class ScriptService {
 				InputStream is = new FileInputStream(fileName);
 				prop.load(is);
 				def value = prop.getProperty("defaultScriptGroup");
+				if(value){
+					if(value.equals("true")){
+						return true
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace()
+		}
+		return false
+	}
+	
+	def isDefaultSGUpdateRequiredThunder(def realPath){
+		try {
+			Properties prop = new Properties();
+			String fileName = realPath+"/fileStore/script.config";
+			File ff = new File(fileName)
+			if(ff.exists()){
+				InputStream is = new FileInputStream(fileName);
+				prop.load(is);
+				def value = prop.getProperty("defaultScriptGroupThunder");
 				if(value){
 					if(value.equals("true")){
 						return true

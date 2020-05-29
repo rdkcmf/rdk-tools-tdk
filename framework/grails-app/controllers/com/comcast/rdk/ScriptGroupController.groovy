@@ -2204,7 +2204,7 @@ class ScriptGroupController {
 	def exportScriptThunder(def params){
 		try{
 		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION)
+		String STORM_FRAMEWORK_LOCATION = StormExecuter.getConfigProperty(configFile,Constants.STORM_FRAMEWORK_LOCATION) + Constants.URL_SEPERATOR
 		def fileStorePath = STORM_FRAMEWORK_LOCATION+Constants.TESTCASES+File.separator+Constants.STORM_TESTCASES+File.separator+Constants.SRC+File.separator+Constants.TESTS+File.separator
 		List directories = new File(fileStorePath).listFiles()
 		List dirList = []

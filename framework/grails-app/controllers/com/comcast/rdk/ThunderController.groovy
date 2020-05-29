@@ -103,9 +103,25 @@ class ThunderController {
 	 * @return
 	 */
 	def thirdPartySingleTestExecutionThunder(final String stbName, final String scriptName){
-		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		String STORM_TIME_OUT = thunderService.getConfigProperty(configFile, Constants.STORM_TIME_OUT)
-		def STORM_TIME_OUT_INTEGER = Integer.parseInt(STORM_TIME_OUT)
+		File configFile
+		def STORM_TIME_OUT = null
+		def STORM_TIME_OUT_INTEGER
+		try{
+		    configFile = grailsApplication.parentContext.getResource(Constants.STORM_TESTS_TIME_OUT_CONFIG_FILE).file
+		    STORM_TIME_OUT = thunderService.getConfigProperty(configFile, scriptName)
+		    if(STORM_TIME_OUT == null || STORM_TIME_OUT == ""){
+			    configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
+			    STORM_TIME_OUT = thunderService.getConfigProperty(configFile, Constants.STORM_TIME_OUT)
+		    }
+			if(STORM_TIME_OUT == null || STORM_TIME_OUT == ""){
+				STORM_TIME_OUT = Constants.STORM_DEFAULT_TIME_OUT
+			}
+	        STORM_TIME_OUT_INTEGER = Integer.parseInt(STORM_TIME_OUT)
+		}catch(Exception e){
+		    e.printStackTrace()
+			STORM_TIME_OUT_INTEGER = Constants.STORM_DEFAULT_TIME_OUT
+			STORM_TIME_OUT_INTEGER = Integer.parseInt(STORM_TIME_OUT)
+		}
 		def STORM_COUNTER_MAXIMUM = (STORM_TIME_OUT_INTEGER * 60 * 1000)/(10000)
 		def htmlData = "No data"
 		def deviceName
@@ -312,9 +328,14 @@ class ThunderController {
 	 */
 	 def thirdPartyScriptListExecutionThunder(String stbName, def scriptList, String scriptName){
 		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
-		String STORM_TIME_OUT = thunderService.getConfigProperty(configFile, Constants.STORM_TIME_OUT)
-		def STORM_TIME_OUT_INTEGER = Integer.parseInt(STORM_TIME_OUT)
-		def STORM_COUNTER_MAXIMUM = (STORM_TIME_OUT_INTEGER * 60 * 1000)/(10000)
+		String STORM_TIME_OUT
+		try{
+		    STORM_TIME_OUT = thunderService.getConfigProperty(configFile, Constants.STORM_TIME_OUT)
+		}catch(Exception e){
+		    e.printStackTrace()
+		}
+		def STORM_TIME_OUT_INTEGER
+		def STORM_COUNTER_MAXIMUM
 		def htmlData = ""
 		def deviceName
 		def executionName
@@ -329,7 +350,7 @@ class ThunderController {
 		def deviceInstance = Device.findByStbName(stbName)
 		deviceName = deviceInstance?.stbName
 		executionName = CI_EXECUTION+deviceName+"-"+dateFormat.format(cal.getTime()).toString()
-		String STORM_FRAMEWORK_LOCATION = thunderService.getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION)
+		String STORM_FRAMEWORK_LOCATION = thunderService.getConfigProperty(configFile, Constants.STORM_FRAMEWORK_LOCATION) + Constants.URL_SEPERATOR
 		def folderName = Constants.SCRIPT_OUTPUT_FILE_PATH_STORM
 		File folder = grailsApplication.parentContext.getResource(folderName).file
 		folder.mkdirs();
@@ -425,6 +446,25 @@ class ThunderController {
 								Calendar cal1 = Calendar.getInstance()
 								String timeStamp = dateFormat1.format(cal1.getTime()).toString()
 								def scriptStartTime = new Date()
+								File timeoutConfigFile = grailsApplication.parentContext.getResource(Constants.STORM_TESTS_TIME_OUT_CONFIG_FILE).file
+								def STORM_SPECIFIC_TIME_OUT = null
+								try{
+								    STORM_SPECIFIC_TIME_OUT = thunderService.getConfigProperty(timeoutConfigFile, scriptList[i]?.scriptName)
+								    if(STORM_SPECIFIC_TIME_OUT != null && STORM_SPECIFIC_TIME_OUT != ""){
+									    STORM_TIME_OUT_INTEGER = Integer.parseInt(STORM_SPECIFIC_TIME_OUT)
+								    }else if(STORM_TIME_OUT != null && STORM_TIME_OUT != ""){
+								        STORM_TIME_OUT_INTEGER = Integer.parseInt(STORM_TIME_OUT)
+								    }else{
+									    STORM_TIME_OUT = Constants.STORM_DEFAULT_TIME_OUT
+										STORM_TIME_OUT_INTEGER = Integer.parseInt(STORM_TIME_OUT)
+								    }
+									STORM_COUNTER_MAXIMUM = (STORM_TIME_OUT_INTEGER * 60 * 1000)/(10000)
+								}catch(Exception e){
+								    e.printStackTrace()
+									STORM_TIME_OUT = Constants.STORM_DEFAULT_TIME_OUT
+									STORM_TIME_OUT_INTEGER = Integer.parseInt(STORM_TIME_OUT)
+									STORM_COUNTER_MAXIMUM = (STORM_TIME_OUT_INTEGER * 60 * 1000)/(10000)
+								}
 								StormExecuter.executeThunderScript(grailsApplication,scriptList[i]?.scriptName,deviceInstance?.stbIp,executionName)
 								sleep(10000)
 								waitCounter++
