@@ -1001,7 +1001,11 @@ class ExecutionService {
 						executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.category='${category}' and b.executionStatus='${completedStatus}' and b.scriptGroup like '%${scriptValue}%' order by id desc ")
 					}
 					else{
-						executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.category='${category}' and b.executionStatus='${completedStatus}' and b.scriptGroup is not null  order by id desc")
+						if(category == Constants.RDKV_THUNDER){
+							executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.category='${category}' and b.executionStatus='${completedStatus}' and b.scriptGroup is not ''  order by id desc")
+						}else{
+						    executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.category='${category}' and b.executionStatus='${completedStatus}' and b.scriptGroup is not null  order by id desc")
+						}
 					}
 				}
 				else{
@@ -1009,7 +1013,11 @@ class ExecutionService {
 						executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.category='${category}' and b.executionStatus='${completedStatus}'and (b.script like '%Multiple%' or b.script like '%${scriptValue}%' ) order by id desc")
 					}
 					else{
-						executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.category='${category}' and b.executionStatus='${completedStatus}' and b.script is not null order by id desc")
+						if(category == Constants.RDKV_THUNDER){
+							executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.category='${category}' and b.executionStatus='${completedStatus}' and b.script is not '' order by id desc")
+						}else{
+						    executionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.category='${category}' and b.executionStatus='${completedStatus}' and b.script is not null order by id desc")
+						}
 					}
 				}
 			}
