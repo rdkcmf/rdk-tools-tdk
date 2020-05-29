@@ -1189,7 +1189,7 @@ class ScriptexecutionService {
 	
 	public boolean validateBoxTypeOfScripts(final Map script, String boxType){
 		boolean scriptStatus = true
-			if(!(script?.boxTypes?.find { (it.name).equalsIgnoreCase( boxType ) })){
+			if(!(script?.boxTypes?.find { (it?.name)?.equalsIgnoreCase( boxType ) })){ 
 				scriptStatus = false
 			}
 		return scriptStatus
