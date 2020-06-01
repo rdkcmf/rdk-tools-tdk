@@ -270,6 +270,60 @@ class PrimitiveTestCase:
 
 	########## End of Function ##########
 
+        def executeTestCaseReboot(self, expectedResult):
+
+        # Send the JSON Message to Server over TCP
+
+        # Syntax       : OBJ.executeTestCaseReboot()
+        # Description  : Send the JSON Message to Server over TCP
+        #                Used when stub function direcly reboots the device
+        # Parameters   : expectedResult - Expected result for that particular test
+        # Return Value : None
+                print "[executeTestCaseReboot]: Executing %s...." %self.testCaseName
+                sys.stdout.flush()
+
+                data = json.loads(self.jsonMsgValue)
+                pObj=data["params"]
+                pObj["module"] = self.parentTestCase.componentName
+                jsonAscii = json.dumps(data, ensure_ascii = False)
+                self.jsonMsgValue = jsonAscii
+
+                self.jsonMsgValue=  self.jsonMsgValue +"\r\n"
+                self.tcpClient.close()
+                try:
+                        self.tcpClient = self.getSocketInstance(self.ip)
+                        self.tcpClient.connect((self.ip, self.parentTestCase.portValue))
+                        self.tcpClient.send(self.jsonMsgValue)
+                        t1 = time.time();
+                        self.tcpClient.close()
+                        t2 = time.time();
+                        self.result = '{"id":"2","jsonrpc":"2.0","result":{"details":"Request Sent","result":"SUCCESS"}}'
+                        # TODO check if required                self.executionName=executionName
+                        self.expectedResult = expectedResult
+                        self.result=self.getValueFromJSONOutput("result")
+                        self.result=self.result+"\""
+                        self.result = self.result.replace("\"result\"","\"TDK__#@$00_result\"")
+                        self.result = self.result.replace("\"details\"","\"TDK__#@$00_details\"")
+                        self.result = self.result.replace("\"log-path\"","\"TDK__#@$00_log-path\"")
+
+                        self.result = self.result.replace("performanceDataReading","TDK__#@$00_performanceDataReading")
+                        self.result = self.result.replace("performanceDataName","TDK__#@$00_performanceDataName")
+                        self.result = self.result.replace("performanceDataUnit","TDK__#@$00_performanceDataUnit")
+                        self.result = self.result.replace("performanceDataInfo","TDK__#@$00_performanceDataInfo")
+
+
+                        if self.xmlLogEnabled==True:
+                            addTxtEle(self.parentTestCase.xmlLogDom,self.TestFnLogDom,"ResultStr",str(self.result))
+                            addTxtEle(self.parentTestCase.xmlLogDom,self.TestFnLogDom,"ExecutionTime",str(self.executionTime))
+                        return self.executionTime;
+                except socket.error:
+                        print "#TDK_@error-ERROR: Unable to connect agent.."
+                        sys.stdout.flush()
+                        sys.exit()
+                        return 0;
+
+        ########## End of Function ##########
+
 	def getResult(self):
 
 	# To get the result

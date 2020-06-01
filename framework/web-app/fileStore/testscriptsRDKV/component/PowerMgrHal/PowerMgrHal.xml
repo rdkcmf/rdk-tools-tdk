@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<xml>
+  <module name="PowerMgrHal" testGroup="Component">
+    <primitiveTests>
+      <primitiveTest name="PowerMgrHal_GetPowerState" id="" version="1">
+        <function>TestMgr_PowerMgrHal_GetPowerState</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="PowerMgrHal_GetTemperature" id="" version="1">
+        <function>TestMgr_PowerMgrHal_GetTemperature</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="PowerMgrHal_GetTempThresholds" id="" version="1">
+        <function>TestMgr_PowerMgrHal_GetTempThresholds</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="PowerMgrHal_SetTempThresholds" id=" " version="1">
+        <function>TestMgr_PowerMgrHal_SetTempThresholds</function>
+        <parameters>
+          <parameter name="critical" value="0"/>
+          <parameter name="high" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="PowerMgrHal_DetemineClockSpeeds" id="" version="1">
+        <function>TestMgr_PowerMgrHal_DetemineClockSpeeds</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="PowerMgrHal_GetClockSpeed" id="" version="1">
+        <function>TestMgr_PowerMgrHal_GetClockSpeed</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="PowerMgrHal_SetClockSpeed" id=" " version="1">
+        <function>TestMgr_PowerMgrHal_SetClockSpeed</function>
+        <parameters>
+          <parameter name="speed" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="PowerMgrHal_SetPowerState" id=" " version="1">
+        <function>TestMgr_PowerMgrHal_SetPowerState</function>
+        <parameters>
+          <parameter name="state" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="PowerMgrHal_Reset" id="" version="1">
+        <function>TestMgr_PowerMgrHal_Reset</function>
+        <parameters/>
+      </primitiveTest>
+    </primitiveTests>
+  </module>
+</xml>
