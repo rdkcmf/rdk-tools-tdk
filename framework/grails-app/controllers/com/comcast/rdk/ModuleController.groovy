@@ -80,6 +80,14 @@ class ModuleController {
 	}
 	
 	/**
+	 * Method to pass the category to stormConfiguration view page
+	 * @return
+	 */
+	def stormConfiguration(){
+		[category : params?.category]
+	}
+	
+	/**
 	 * Method to get the file list based on module
 	 * @param max
 	 * @return

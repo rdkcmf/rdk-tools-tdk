@@ -49,15 +49,6 @@ function display(val) {
 	} else {}
 }
 
-function nodeRestart(){
-	$.get('nodeRestartAndScriptListRefresh',function(data){
-		var val = JSON.parse(data);
-		if( val == true ){
-			alert(" Storm JSON RPC server Restarted!");
-		}
-	});
-}
-
 </script>
 
 </head>
@@ -161,12 +152,11 @@ function nodeRestart(){
 					<td>Option to configure device templates</td>
 				</tr>
 				<tr>
-				    <td>
-				        <span id="nodeRestartButton" class="buttons">
-                            <input type=button onclick="nodeRestart()" value="Storm JSON RPC Server Restart" />
-                        </span>
-				    </td>
-				    <td>Storm JSON RPC Server restart button for RDKV storm execution</td>
+					<td><g:link controller="module" action="stormConfiguration"
+							params="[category:com.comcast.rdk.Category.RDKV ]">
+							<span>Storm JSON RPC Server</span>
+						</g:link></td>
+					<td>Option to configure Storm JSON RPC Server</td>
 				</tr>
 				<%--<g:if test="${SecurityUtils.subject.principal.equals("admin")}">
 					<tr>
