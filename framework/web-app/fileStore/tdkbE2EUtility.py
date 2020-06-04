@@ -155,6 +155,9 @@ def parseDeviceConfig(obj):
         	global lan_ip
         	lan_ip = config.get(deviceConfig, "LAN_IP")
 
+                global lan_public_ip
+                lan_public_ip = config.get(deviceConfig, "LAN_PUBLIC_IP")
+
 		global lan_username
         	lan_username = config.get(deviceConfig, "LAN_USERNAME")
 
