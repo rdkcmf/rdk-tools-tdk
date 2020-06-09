@@ -23,11 +23,13 @@ AM_CPPFLAGS = -g -Wall -std=c++0x -DGCC4_XXX \
 
 AM_CXXFLAGS =  ${PWRMGRHAL_FLAGS} -I${PKG_CONFIG_SYSROOT_DIR}$(includedir) \
               -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rdk/iarmmgrs-hal \
+              -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rdk/iarmmgrs/mfr \
               -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rdk/iarmbus \
               -I${top_srcdir}/PowerMgrHal_stub/include -I${top_srcdir}/agent/include
 
 AM_CFLAGS =  ${PWRMGRHAL_FLAGS} -I${PKG_CONFIG_SYSROOT_DIR}$(includedir) \
             -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rdk/iarmmgrs-hal \
+            -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rdk/iarmmgrs/mfr \
             -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rdk/iarmbus
 
 
