@@ -551,7 +551,7 @@ class StormExecuter {
 		boolean nodeRestarted = false
 		try{
 		    if( !(isNodeAvailable())){
-			    startNode(application)
+			    nodeRestarted = startNode(application)
 		    }else{
                 killNode()
 			    nodeRestarted = startNode(application)
