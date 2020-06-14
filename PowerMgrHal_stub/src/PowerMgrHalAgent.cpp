@@ -18,6 +18,8 @@
 */
 
 #include "PowerMgrHalAgent.h"
+std::chrono::time_point<std::chrono::high_resolution_clock> start;
+std::chrono::time_point<std::chrono::high_resolution_clock> stop;
 /***************************************************************************
  *Function name : testmodulepre_requisites
  *Description   : testmodulepre_requisites will be used for setting the
@@ -134,6 +136,8 @@ void PowerMgrHalAgent::PowerMgrHal_SetPowerState(IN const Json::Value& req, OUT 
     DEBUG_PRINT(DEBUG_TRACE, "PowerMgrHal_SetPowerState --->Entry\n");
     if(&req["state"] == NULL )
     {
+        response["result"]="FAILURE";
+        response["details"]="No Input State";
         return;
     }
     char pwr_state[20];
@@ -264,6 +268,8 @@ void PowerMgrHalAgent::PowerMgrHal_SetTempThresholds(IN const Json::Value& req, 
     DEBUG_PRINT(DEBUG_TRACE, "PowerMgrHal_SetTempThresholds --->Entry\n");
     if(&req["high"] == NULL || &req["critical"] == NULL)
     {
+        response["result"]="FAILURE";
+        response["details"]="No Input Temp Thresholds";
         return;
     }
 #ifdef ENABLE_THERMAL_PROTECTION
@@ -376,6 +382,8 @@ void PowerMgrHalAgent::PowerMgrHal_SetClockSpeed(IN const Json::Value& req, OUT 
     DEBUG_PRINT(DEBUG_TRACE, "PowerMgrHal_SetClockSpeed --->Entry\n");
     if(&req["speed"] == NULL)
     {
+        response["result"]="FAILURE";
+        response["details"]="No Input Clock Speed";
         return;
     }
 #ifdef ENABLE_THERMAL_PROTECTION
@@ -401,6 +409,46 @@ void PowerMgrHalAgent::PowerMgrHal_SetClockSpeed(IN const Json::Value& req, OUT 
     DEBUG_PRINT(DEBUG_TRACE, "Thermal Protection Not Supported\n");
     DEBUG_PRINT(DEBUG_TRACE, "PowerMgrHal_SetClockSpeed ---> Exit\n");
 #endif
+    return;
+}
+
+/***************************************************************************
+ *Function name  : PowerMgrHal_GetCmdTimeTaken
+ *Description    : This function is to get the time taken for executing the
+                   input cmd in nano seconds. This function does not invoke
+                   any HAL API
+ *****************************************************************************/
+void PowerMgrHalAgent::PowerMgrHal_GetCmdTimeTaken(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "PowerMgrHal_GetCmdTimeTaken --->Entry\n");
+    if(&req["cmd"] == NULL)
+    {
+        response["result"]="FAILURE";
+        response["details"]="No Input Command";
+        return;
+    }
+    char *command = (char*)req["cmd"].asCString();
+    char details[100];
+
+    DEBUG_PRINT(DEBUG_TRACE, "Going to execute the cmd : %s",command);
+    start = std::chrono::high_resolution_clock::now();
+    int ret = system(command);
+    stop = std::chrono::high_resolution_clock::now();
+    int timeTaken = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start).count();
+    if (ret == 0){
+        DEBUG_PRINT(DEBUG_TRACE, "Command execution using system call success\n");
+        DEBUG_PRINT(DEBUG_TRACE, "Time Taken for %s cmd : %d (nano seconds)\n",command,timeTaken);
+        sprintf(details,"Time Taken for %s cmd : %d (nano seconds)",command,timeTaken);
+        response["result"]="SUCCESS";
+        response["details"]=details;
+        DEBUG_PRINT(DEBUG_TRACE, "PowerMgrHal_GetCmdTimeTaken ---> Exit\n");
+    }
+    else{
+        response["result"]="FAILURE";
+        response["details"]="Command execution using system call failed";
+        DEBUG_PRINT(DEBUG_TRACE, "Command execution failed\n");
+        DEBUG_PRINT(DEBUG_TRACE, "PowerMgrHal_GetCmdTimeTaken ---> Exit\n");
+    }
     return;
 }
 

@@ -123,35 +123,84 @@ if "SUCCESS" in loadModuleStatus.upper():
             print "Value Returned : ",details
             print "ACTUAL RESULT  : PLAT_API_GetClockSpeed call is success"
 
-            # PLAT_API_SetClockSpeed  API is applicable for ARM platform only. Not supposed to execute on MIPS platform
-            print "\nTEST STEP3 : Set the CPU clock speed using PLAT_API_SetClockSpeed API"
-            print "EXPECTED RESULT : Should set the cpu minimal speed value"
-            tdkTestObj = obj.createTestStep('PowerMgrHal_SetClockSpeed');
-            print "CPU Minimal speed to be set : %d" %(cpu_speed_minimal)
-            tdkTestObj.addParameter("speed",int(cpu_speed_minimal));
+            #Get the time taken to excute uptime cmd in nano-seconds with Normal clock speed
+            print "\nTEST STEP3 : Get the uptime command execution time with Normal clock speed"
+            print "EXEPECTED OUTPUT : Should get the time taken for uptime cmd in nano seconds"
+            tdkTestObj = obj.createTestStep('PowerMgrHal_GetCmdTimeTaken');
+            cmd = "uptime"
+            tdkTestObj.addParameter("cmd",cmd);
             tdkTestObj.executeTestCase(expectedResult);
             actualResult = tdkTestObj.getResult();
             details = tdkTestObj.getResultDetails();
             if expectedResult in actualResult:
                 tdkTestObj.setResultStatus("SUCCESS");
-                print "ACTUAL RESULT  : ",details
-                print "[TEST EXECUTION RESULT] : SUCCESS"
+                cmd_time_actual = int(str(str(details).split(":")[1].split("(")[0].strip()))
+                print "Value Returned : %s" %(str(details).split(";")[0])
+                print "ACTUAL RESULT  : %s command execution using system call is success" %(cmd)
 
-                print "\nTEST STEP3 : Revert the CPU clock speed using PLAT_API_SetClockSpeed API"
-                print "EXPECTED RESULT : Should set the cpu normal speed value"
+                # PLAT_API_SetClockSpeed  API is applicable for ARM platform only. Not supposed to execute on MIPS platform
+                print "\nTEST STEP4 : Set the CPU clock speed using PLAT_API_SetClockSpeed API"
+                print "EXPECTED RESULT : Should set the cpu minimal speed value"
                 tdkTestObj = obj.createTestStep('PowerMgrHal_SetClockSpeed');
-                print "CPU Normal speed to be set : %d" %(cpu_speed_actual)
-                tdkTestObj.addParameter("speed",int(cpu_speed_actual));
+                print "CPU Minimal speed to be set : %d" %(cpu_speed_minimal)
+                tdkTestObj.addParameter("speed",int(cpu_speed_minimal));
                 tdkTestObj.executeTestCase(expectedResult);
                 actualResult = tdkTestObj.getResult();
                 details = tdkTestObj.getResultDetails();
                 if expectedResult in actualResult:
                     tdkTestObj.setResultStatus("SUCCESS");
-                    print "ACTUAL RESULT  : CPU clock speed reverted to normal successfully"
-                    print "[TEST EXECUTION RESULT] : SUCCESS\n"
+                    print "ACTUAL RESULT  : ",details
+                    print "[TEST EXECUTION RESULT] : SUCCESS"
+
+                    #Get the time taken to excute uptime cmd in nano-seconds with Minimal clock speed
+                    print "\nTEST STEP5 : Get the uptime command execution time with Minimal clock speed"
+                    print "EXEPECTED OUTPUT : Should get the time taken for uptime cmd in nano seconds"
+                    tdkTestObj = obj.createTestStep('PowerMgrHal_GetCmdTimeTaken');
+                    cmd = "uptime"
+                    tdkTestObj.addParameter("cmd",cmd);
+                    tdkTestObj.executeTestCase(expectedResult);
+                    actualResult = tdkTestObj.getResult();
+                    details = tdkTestObj.getResultDetails();
+                    if expectedResult in actualResult:
+                        tdkTestObj.setResultStatus("SUCCESS");
+                        cmd_time_minimal = int(str(str(details).split(":")[1].split("(")[0].strip()))
+                        print "Value Returned : %s" %(str(details).split(";")[0])
+                        print "ACTUAL RESULT  : %s command execution using system call is success" %(cmd)
+
+                        print "\nTEST STEP6 : Compare the Normal & Minimal clock speed command execution time taken"
+                        print "EXEPECTED OUTPUT : Time taken with Minimal clock should be > than Normal clock time taken"
+                        if cmd_time_minimal > cmd_time_actual:
+                            tdkTestObj.setResultStatus("SUCCESS");
+                            print "ACTUAL RESULT  : Time taken with minimal clock speed is greater as expected"
+                            print "[TEST EXECUTION RESULT] : SUCCESS\n"
+                        else:
+                            tdkTestObj.setResultStatus("FAILURE");
+                            print "ACTUAL RESULT  : Time taken with minimal clock speed is not as expected"
+                            print "[TEST EXECUTION RESULT] : FAILURE\n"
+                    else:
+                        tdkTestObj.setResultStatus("FAILURE");
+                        print "ACTUAL RESULT  : %s command execution using system call is failed" %(cmd)
+                        print "[TEST EXECUTION RESULT] : FAILURE\n"
+
+                    print "\nTEST STEP7 : Revert the CPU clock speed using PLAT_API_SetClockSpeed API"
+                    print "EXPECTED RESULT : Should set the cpu normal speed value"
+                    tdkTestObj = obj.createTestStep('PowerMgrHal_SetClockSpeed');
+                    print "CPU Normal speed to be set : %d" %(cpu_speed_actual)
+                    tdkTestObj.addParameter("speed",int(cpu_speed_actual));
+                    tdkTestObj.executeTestCase(expectedResult);
+                    actualResult = tdkTestObj.getResult();
+                    details = tdkTestObj.getResultDetails();
+                    if expectedResult in actualResult:
+                        tdkTestObj.setResultStatus("SUCCESS");
+                        print "ACTUAL RESULT  : CPU clock speed reverted to normal successfully"
+                        print "[TEST EXECUTION RESULT] : SUCCESS\n"
+                    else:
+                        tdkTestObj.setResultStatus("FAILURE");
+                        print "ACTUAL RESULT  : CPU clock speed revert to normal failed"
+                        print "[TEST EXECUTION RESULT] : FAILURE\n"
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
-                    print "ACTUAL RESULT  : CPU clock speed revert to normal failed"
+                    print "ACTUAL RESULT  : ",details
                     print "[TEST EXECUTION RESULT] : FAILURE\n"
             else:
                 tdkTestObj.setResultStatus("FAILURE");
