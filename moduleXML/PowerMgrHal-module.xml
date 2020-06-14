@@ -38,6 +38,7 @@
       <function name='TestMgr_PowerMgrHal_SetClockSpeed' />
       <function name='TestMgr_PowerMgrHal_SetPowerState' />
       <function name='TestMgr_PowerMgrHal_Reset' />
+      <function name='TestMgr_PowerMgrHal_GetCmdTimeTaken' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -45,6 +46,7 @@
       <parameter funName='TestMgr_PowerMgrHal_SetTempThresholds' parameterName='critical' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_PowerMgrHal_SetClockSpeed' parameterName='speed' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_PowerMgrHal_SetPowerState' parameterName='state' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_PowerMgrHal_GetCmdTimeTaken' parameterName='cmd' parameterType='STRING' range='A-Z' />
     </parameters>
   </module>
 </xml>

@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <chrono>
 #include "rdkteststubintf.h"
 #include "rdktestagentintf.h"
 #include "plat_power.h"
@@ -57,6 +58,7 @@ class PowerMgrHalAgent : public RDKTestStubInterface , public AbstractServer<Pow
                     this->bindAndAddMethod(Procedure("TestMgr_PowerMgrHal_DetemineClockSpeeds", PARAMS_BY_NAME, JSON_STRING, NULL), &PowerMgrHalAgent::PowerMgrHal_DetemineClockSpeeds);
                     this->bindAndAddMethod(Procedure("TestMgr_PowerMgrHal_GetClockSpeed", PARAMS_BY_NAME, JSON_STRING, NULL), &PowerMgrHalAgent::PowerMgrHal_GetClockSpeed);
                     this->bindAndAddMethod(Procedure("TestMgr_PowerMgrHal_SetClockSpeed", PARAMS_BY_NAME, JSON_STRING, "speed", JSON_INTEGER, NULL), &PowerMgrHalAgent::PowerMgrHal_SetClockSpeed);
+                    this->bindAndAddMethod(Procedure("TestMgr_PowerMgrHal_GetCmdTimeTaken", PARAMS_BY_NAME, JSON_STRING, "cmd", JSON_STRING, NULL), &PowerMgrHalAgent::PowerMgrHal_GetCmdTimeTaken);
                 }
 
 
@@ -76,6 +78,7 @@ class PowerMgrHalAgent : public RDKTestStubInterface , public AbstractServer<Pow
                 void PowerMgrHal_DetemineClockSpeeds(IN const Json::Value& req, OUT Json::Value& response);
                 void PowerMgrHal_GetClockSpeed(IN const Json::Value& req, OUT Json::Value& response);
                 void PowerMgrHal_SetClockSpeed(IN const Json::Value& req, OUT Json::Value& response);
+                void PowerMgrHal_GetCmdTimeTaken(IN const Json::Value& req, OUT Json::Value& response);
 
 };
 #endif //__POWERMGRHAL_STUB_H__

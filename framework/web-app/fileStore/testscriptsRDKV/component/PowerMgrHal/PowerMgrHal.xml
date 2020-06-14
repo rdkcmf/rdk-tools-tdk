@@ -59,6 +59,12 @@
         <function>TestMgr_PowerMgrHal_Reset</function>
         <parameters/>
       </primitiveTest>
+      <primitiveTest name="PowerMgrHal_GetCmdTimeTaken" id=" " version="1">
+        <function>TestMgr_PowerMgrHal_GetCmdTimeTaken</function>
+        <parameters>
+          <parameter name="cmd" value="A-Z"/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
