@@ -63,15 +63,15 @@ class PrimitivetestService {
 		
         log.info(" getJsonData ::::::::: "+primitiveTest?.name)        
         JsonObject outData = new JsonObject()
-        if(primitiveTest){
+        if(primitiveTest && primitiveTest?.function?.name){
 //            outData.addProperty(KEY_ID, idValue);
 //            outData.addProperty(KEY_JSONRPC, VAL_JSONRPC);
-			outData.addProperty(KEY_MODULE, primitiveTest?.module?.name.trim());
-            outData.addProperty(KEY_METHOD, primitiveTest?.function?.name.trim());            
+			outData.addProperty(KEY_MODULE, primitiveTest?.module?.name?.trim());
+            outData.addProperty(KEY_METHOD, primitiveTest?.function?.name?.trim());     
 			JsonObject paramsObj = new JsonObject()
             Set parameters = primitiveTest?.parameters;
             for ( Map parameter : parameters ) {
-                if(parameter?.parameterType?.parameterTypeEnum.getTypeValue().equals("integer") ){
+                if(parameter?.parameterType?.parameterTypeEnum?.getTypeValue()?.equals("integer") ){
 					int val = 0 ;
                     try{
                         val = Integer.parseInt(parameter?.value);
@@ -80,7 +80,7 @@ class PrimitivetestService {
                     }
                     paramsObj.addProperty (parameter?.parameterType.name, val);
                 }
-				else if(parameter?.parameterType?.parameterTypeEnum.getTypeValue().equals("float") ){
+				else if(parameter?.parameterType?.parameterTypeEnum?.getTypeValue()?.equals("float") ){
 					float floatVal = 0.0 ;
 					try{
 						floatVal = Float.parseFloat(parameter?.value)
@@ -89,7 +89,7 @@ class PrimitivetestService {
 					}
 					paramsObj.addProperty (parameter?.parameterType.name, floatVal);
 				}
-				else if(parameter?.parameterType?.parameterTypeEnum.getTypeValue().equals("double") ){
+				else if(parameter?.parameterType?.parameterTypeEnum?.getTypeValue()?.equals("double") ){
 					double doubleVal = 0.00 ;
 					try{
 						doubleVal = Double.parseDouble(parameter?.value)
@@ -99,7 +99,9 @@ class PrimitivetestService {
 					paramsObj.addProperty (parameter?.parameterType.name, doubleVal);
 				}				
                 else{
-                    paramsObj.addProperty( parameter?.parameterType.name, parameter?.value.trim() );
+					if(parameter?.parameterType?.name){
+						paramsObj.addProperty( parameter?.parameterType?.name, parameter?.value?.trim() );
+                	}
                 }
             }
 			if(parameters?.size() > 0){
