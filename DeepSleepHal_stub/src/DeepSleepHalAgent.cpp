@@ -112,19 +112,41 @@ void DeepSleepHalAgent::DeepSleepHal_SetDeepSleep(IN const Json::Value& req, OUT
         return;
     }
 #ifdef ENABLE_DEEP_SLEEP
+#ifdef ENABLE_DEEPSLEEP_WAKEUP_EVT
+    bool isGPIOWakeup = 0;
+#endif //ENABLE_DEEPSLEEP_WAKEUP_EVT
     uint32_t deep_sleep_timeout = (uint32_t)req["timeout"].asInt();
     DEBUG_PRINT(DEBUG_TRACE, "SetDeepSleep for %u seconds\n",(unsigned int)deep_sleep_timeout);
-    start = std::chrono::high_resolution_clock::now();
-    PLAT_DS_SetDeepSleep(deep_sleep_timeout);
-    stop = std::chrono::high_resolution_clock::now();
-    int freezeDuration = std::chrono::duration_cast<std::chrono::seconds>(stop - start).count();
-    DEBUG_PRINT(DEBUG_TRACE, "Resumed from DeepSleep\n");
-    DEBUG_PRINT(DEBUG_TRACE, "CPU freeze duration : %d\n",freezeDuration);
 
-    response["result"]="SUCCESS";
-    sprintf(details,"CPU freeze duration : %d;PLAT_DS_SetDeepSleep call is SUCCESS",freezeDuration);
-    response["details"]=details;
-    DEBUG_PRINT(DEBUG_TRACE, "DeepSleepHal_SetDeepSleep --> Exit\n");
+    start = std::chrono::high_resolution_clock::now();
+#ifdef ENABLE_DEEPSLEEP_WAKEUP_EVT
+    int ret = PLAT_DS_SetDeepSleep(deep_sleep_timeout, &isGPIOWakeup);
+#else
+    int ret = PLAT_DS_SetDeepSleep(deep_sleep_timeout);
+#endif //ENABLE_DEEPSLEEP_WAKEUP_EVT
+    stop = std::chrono::high_resolution_clock::now();
+
+    int freezeDuration = std::chrono::duration_cast<std::chrono::seconds>(stop - start).count();
+    if (ret == 0){
+        DEBUG_PRINT(DEBUG_TRACE, "Resumed from DeepSleep\n");
+#ifdef ENABLE_DEEPSLEEP_WAKEUP_EVT
+        DEBUG_PRINT(DEBUG_TRACE, "CPU freeze duration : %d, isGPIOWakeup : %d\n",freezeDuration,isGPIOWakeup);
+        sprintf(details,"CPU freeze duration : %d;isGPIOWakeup : %d;PLAT_DS_SetDeepSleep call is SUCCESS",freezeDuration,isGPIOWakeup);
+#else
+        DEBUG_PRINT(DEBUG_TRACE, "CPU freeze duration : %d\n",freezeDuration);
+        sprintf(details,"CPU freeze duration : %d;PLAT_DS_SetDeepSleep call is SUCCESS",freezeDuration);
+#endif //ENABLE_DEEPSLEEP_WAKEUP_EVT
+        DEBUG_PRINT(DEBUG_TRACE, "PLAT_DS_SetDeepSleep call success\n");
+        response["result"]="SUCCESS";
+        response["details"]=details;
+        DEBUG_PRINT(DEBUG_TRACE, "DeepSleepHal_SetDeepSleep --> Exit\n");
+    }
+    else{
+        response["result"]="FAILURE";
+        response["details"]="PLAT_DS_SetDeepSleep call failed";
+        DEBUG_PRINT(DEBUG_TRACE, "PLAT_DS_SetDeepSleep call failed\n");
+        DEBUG_PRINT(DEBUG_TRACE, "DeepSleepHal_SetDeepSleep --> Exit\n");
+    }
 #else
     response["result"]="FAILURE";
     response["details"]="DeepSleepHal Not Supported";
