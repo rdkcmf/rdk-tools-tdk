@@ -2454,7 +2454,7 @@ class JobSchedulerService implements Job{
 		return output
 	}
 	def getCurrentTime(){
-		SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss")
+		SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss")
 		String timeString = format.format(new Date())
 		return timeString
 	}
