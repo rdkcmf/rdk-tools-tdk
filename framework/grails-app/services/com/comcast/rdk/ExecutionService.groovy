@@ -138,6 +138,11 @@ class ExecutionService {
 				if (file.isFile()) {
 					String fileName = file.getName()
 					if(fileName.startsWith( "AgentConsole" )){
+						ExecutionResult execRes = ExecutionResult.findById(execResId)
+						Execution execution = Execution.findById(executionId)
+						fileContents = fileContents + "<br>"+ "Execution Name: "+execution.name
+						fileContents = fileContents + "<br>"+ "Script : "+execRes.script
+						fileContents = fileContents + "<br>"+ "======================================="
 						file.eachLine { line ->
 							String lineData = line?.replaceAll("<","&lt;")
 							lineData = lineData?.replaceAll(">","&gt;")
