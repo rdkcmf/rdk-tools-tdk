@@ -21,7 +21,7 @@ ACLOCAL_AMFLAGS = -Im4 --install
 AM_CPPFLAGS = -g -Wall -std=c++0x -DGCC4_XXX \
               -fPIC ${COPTS}
 
-AM_CXXFLAGS = -DENABLE_DEEP_SLEEP -I${PKG_CONFIG_SYSROOT_DIR}$(includedir) \
+AM_CXXFLAGS = ${DEEPSLEEPHAL_FLAGS} -DENABLE_DEEP_SLEEP -I${PKG_CONFIG_SYSROOT_DIR}$(includedir) \
               -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rdk/iarmmgrs-hal \
               -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rdk/iarmbus \
               -I${top_srcdir}/DeepSleepHal_stub/include -I${top_srcdir}/agent/include
@@ -29,6 +29,6 @@ AM_CXXFLAGS = -DENABLE_DEEP_SLEEP -I${PKG_CONFIG_SYSROOT_DIR}$(includedir) \
 lib_LTLIBRARIES = libdeepsleephalstub.la
 libdeepsleephalstub_la_SOURCES = src/DeepSleepHalAgent.cpp
 libdeepsleephalstub_la_includedir = ${includedir}
-libdeepsleephalstub_la_LIBADD = -liarmmgrs-deepsleep-hal
+libdeepsleephalstub_la_LIBADD = -liarmmgrs-deepsleep-hal $(DEEPSLEEPHAL_LIBS)
 libdeepsleephalstub_la_include_HEADERS = ${top_srcdir}/DeepSleepHal_stub/include/DeepSleepHalAgent.h
 
