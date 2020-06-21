@@ -69,6 +69,7 @@ public final class Constants
     public static final String UNDEFINED_STATUS     = "UNDEFINED";
     public static final String INPROGRESS_STATUS    = "IN-PROGRESS";
     public static final String SKIPPED_STATUS    	= "SKIPPED";
+    public static final String OVERALL_PASS_PERCENTAGE = "Overall Pass %";
     public static final String ABORTED_STATUS    	= "ABORTED";
     public static final String COMPLETED_STATUS    	= "COMPLETED";
     public static final String NOT_APPLICABLE_STATUS= "N/A";
@@ -339,7 +340,9 @@ public final class Constants
    	public static final String DATE="Date";
    	public static final String DATATMAP="DataMap";
    	public static final String DETAIL_DATA_MAP ="DetailDataMap";
-   	public static final String PASS_RATE= "PassRate"; 
+   	public static final String PASS_RATE= "PassRate";
+   	public static final String PASS_RATE_SMALL= "passrate";
+   	public static final String OVERALL_PASS_RATE= "OverallPassRate";
    	public static final String LOG_UPLOAD_IPV4= "log.upload.ipv4"; 
    	public static final String LOG_UPLOAD_IPV6= "log.upload.ipv6"; 
    	public static final String TM_CONFIG_FILE= "/fileStore/tm.config";

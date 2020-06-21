@@ -1602,7 +1602,55 @@ class ExecutionController {
 			def script = Script.findByName(executionInstance?.script)
 			testGroup = script?.primitiveTest?.module?.testGroup
 		}
-		[statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus]
+		def detailDataMap = executedbService.prepareDetailMap(executionInstance,request.getRealPath('/'))
+		def tDataMap = [:]
+		int total = 0
+		detailDataMap?.keySet()?.each { k ->
+			Map mapp = detailDataMap?.get(k)
+			int tCount = 0
+			mapp?.keySet()?.each { status ->
+				def tStatusCounter = tDataMap.get(status)
+				def statusCounter = mapp.get(status)
+				if(!tStatusCounter){
+					tStatusCounter = 0
+				}
+				if(!status.equals(Constants.PENDING)){
+					tCount = tCount + statusCounter
+					tStatusCounter = tStatusCounter + statusCounter
+					tDataMap.put(status, tStatusCounter)
+				}
+			}
+			int na = 0
+			if(mapp?.keySet().contains(Constants.NOT_APPLICABLE_STATUS)){
+				na = mapp?.get(Constants.NOT_APPLICABLE_STATUS)
+			}
+			mapp.put(Constants.EXECUTED, tCount)
+			def success = mapp?.get(Constants.SUCCESS_STATUS)
+			if(success){
+				int rate = 0
+				if(tCount > 0){
+					if(mapp?.keySet().contains(Constants.NOT_APPLICABLE_STATUS)){
+						na = mapp?.get(Constants.NOT_APPLICABLE_STATUS)
+					}
+					rate = ((success * 100)/(tCount - na))
+				}
+				mapp.put(Constants.PASS_RATE_SMALL,rate)
+			}
+			total = total + tCount
+		}
+		tDataMap.put(Constants.EXECUTED, total)
+		int rate
+		if(tDataMap?.get(Constants.SUCCESS_STATUS)){
+			int success = tDataMap?.get(Constants.SUCCESS_STATUS)
+			int na = 0
+			if(tDataMap?.keySet().contains(Constants.NOT_APPLICABLE_STATUS)){
+				na = tDataMap?.get(Constants.NOT_APPLICABLE_STATUS)
+			}
+			rate = ((success * 100)/(total - na))
+		}
+		tDataMap.put(Constants.PASS_RATE_SMALL,rate)
+		
+		[tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus]
 	}
 
 	/**
