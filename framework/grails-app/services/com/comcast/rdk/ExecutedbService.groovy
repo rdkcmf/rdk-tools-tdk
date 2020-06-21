@@ -576,6 +576,7 @@ class ExecutedbService {
 			def totalAnalysedCount = 0;
 			def totalExecutionTime;
 			def executionInstanceForImage;
+			int totalPassRate = 0;
 			List executionDeviceList = [];
 			detailsMap.put("Execution Names ", executionNames)
 			detailsMap.put("Device", deviceNameList)
@@ -754,6 +755,9 @@ class ExecutedbService {
 			resultMap.put(Constants.SCRIPT_TIME_OUT, totalTimeoutCount)
 			resultMap.put(Constants.NOT_APPLICABLE_STATUS, totalNaCount)
 			resultMap.put(Constants.SKIPPED_STATUS, totalSkippedCount)
+			if((totalExecutionCount - totalNaCount)!=0){
+				totalPassRate = ((totalSuccessCount * 100)/(totalExecutionCount - totalNaCount))
+			}
 			totalAnalysedCount  = totalNewIssueCount + totalInterfaceChangeCount + totalEnvIssueCount + totalScriptIssueCount + totalRdkIssueCount
 			if(totalAnalysedCount > 0){
 				resultMap.put("Number of failed scripts linked with open defects", totalRdkIssueCount)
@@ -766,6 +770,7 @@ class ExecutedbService {
 				resultMap.put("Remarks","")
 			}
 			coverPageMap.put("Total", resultMap)
+			coverPageMap.put(Constants.OVERALL_PASS_RATE, totalPassRate)
 			detailDataMap.each{ page, data ->
 				if(!page.equals("CoverPage")){
 					def dataMapList = detailDataMap.get(page)
@@ -1004,128 +1009,136 @@ class ExecutedbService {
 	 * Method to populate status list to show in cover page of consolidated report.
 	 */
 	def prepareStatusList(Map detailDataMap, Map defectDetailsMap){
-		Set keySet = detailDataMap.keySet();
-		int counter = 1
-		int totalScripts = 0
-		int tSuccess = 0
-		int tFailure = 0
-		int tNa = 0
-		int tSkip = 0
-		int tTimeOut =0
-		int scriptCount = 0;
-		int totalScript = 0
+		try{
+		    Set keySet = detailDataMap.keySet();
+		    int counter = 1
+		    int totalScripts = 0
+		    int tSuccess = 0
+		    int tFailure = 0
+		    int tNa = 0
+		    int tSkip = 0
+		    int tTimeOut =0
+		    int scriptCount = 0;
+		    int totalScript = 0
+		    int tRate = 0;
 		
-		boolean isAnalyzed = false
-		def totalAnalyzedDetailsCount = defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.getAt(ANALYZED)
-		if(totalAnalyzedDetailsCount > 0) {
-			isAnalyzed = true
-		}
+		    boolean isAnalyzed = false
+		    def totalAnalyzedDetailsCount = defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.getAt(ANALYZED)
+		    if(totalAnalyzedDetailsCount > 0) {
+			    isAnalyzed = true
+		    }
 		
-		keySet.each { key ->
-			if(!key.equals("CoverPage")){	
-				int success = 0
-				int failure = 0
-				int na = 0
-				int skip = 0
-				int total = 0
-				int timeOut = 0
+		    keySet.each { key ->
+			    if(!key.equals("CoverPage")){	
+				    int success = 0
+				    int failure = 0
+				    int na = 0
+				    int skip = 0
+				    int total = 0
+				    int timeOut = 0
 			
-				Map dataMap = detailDataMap.get(key)
-				List dataList = dataMap.get("dataList")
-				dataList.each { dMap ->
-					if(!dMap.get("C4").equals("PENDING")){
-						total ++
-					}
+				    Map dataMap = detailDataMap.get(key)
+				    List dataList = dataMap.get("dataList")
+				    dataList.each { dMap ->
+					    if(!dMap.get("C4").equals("PENDING")){
+						    total ++
+					    }
 					
-					if(dMap.get("C4").equals(Constants.SUCCESS_STATUS)){
-						success ++
-					}else if(dMap.get("C4").equals(Constants.FAILURE_STATUS)){
-						failure ++
-					}else if(dMap.get("C4").equals(Constants.NOT_APPLICABLE_STATUS)){
-						na ++
-					}else if(dMap.get("C4").equals(Constants.SKIPPED_STATUS)){
-						skip ++
-					}else if(dMap.get("C4").equals("SCRIPT TIME OUT")){
-						timeOut ++
-					}
+					    if(dMap.get("C4").equals(Constants.SUCCESS_STATUS)){
+						    success ++
+					    }else if(dMap.get("C4").equals(Constants.FAILURE_STATUS)){
+						    failure ++
+					    }else if(dMap.get("C4").equals(Constants.NOT_APPLICABLE_STATUS)){
+						    na ++
+					    }else if(dMap.get("C4").equals(Constants.SKIPPED_STATUS)){
+						    skip ++
+					    }else if(dMap.get("C4").equals("SCRIPT TIME OUT")){
+						    timeOut ++
+					    }
 					//scriptCount = Integer.parseInt(dMap.get("total"))
 					//scriptCount =dMap.get("total")
-				}
-				Map coverPageMap = detailDataMap.get("CoverPage")
-				Map resultMap = [:]
-				resultMap.put("Sl No", counter)
-				resultMap.put("Module", key)
-				//resultMap.put("Total",	scriptCount)
-				resultMap.put("Executed", total)
-				resultMap.put(Constants.SUCCESS_STATUS, success)
-				resultMap.put(Constants.FAILURE_STATUS, failure)
-				resultMap.put("SCRIPT TIME OUT", timeOut)
-				resultMap.put(Constants.NOT_APPLICABLE_STATUS, na)
-				resultMap.put(Constants.SKIPPED_STATUS, skip)
-				
-				if(isAnalyzed) {
+				    }
+				    Map coverPageMap = detailDataMap.get("CoverPage")
+				    Map resultMap = [:]
+				    resultMap.put("Sl No", counter)
+				    resultMap.put("Module", key)
+				    //resultMap.put("Total",	scriptCount)
+				    resultMap.put("Executed", total)
+				    resultMap.put(Constants.SUCCESS_STATUS, success)
+				    resultMap.put(Constants.FAILURE_STATUS, failure)
+				    resultMap.put("SCRIPT TIME OUT", timeOut)
+				    resultMap.put(Constants.NOT_APPLICABLE_STATUS, na)
+				    resultMap.put(Constants.SKIPPED_STATUS, skip)
+				 
+				    if(isAnalyzed) {
 
-					def rdkIssueCount = defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(RDK_ISSUE)
-					def newIssueCount = defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(NEW_ISSUE)
-					def scriptIssueCount =  defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(SCRIPT_ISSUE)
-					def envIssueCount = defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(ENVIRONMENT_ISSUE)
-					def interfaceChangeCount = defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(INTERFACE_CHANGE)
-					if(!newIssueCount) {newIssueCount = 0}
-					if(!rdkIssueCount) {rdkIssueCount = 0}
-					def existingIssueCount = rdkIssueCount - newIssueCount
-					resultMap.put("Number of failed scripts linked with open defects", rdkIssueCount)
-					resultMap.put(SCRIPT_ISSUE, scriptIssueCount?scriptIssueCount:0)
-					resultMap.put("Existing Issue", existingIssueCount)
-					resultMap.put(NEW_ISSUE, newIssueCount)
-					resultMap.put(ENVIRONMENT_ISSUE, envIssueCount? envIssueCount: 0)
-					resultMap.put(INTERFACE_CHANGE, interfaceChangeCount? interfaceChangeCount : 0)
-					resultMap.put("Remarks","")
-				}
-				coverPageMap.put(key, resultMap)
-				counter ++
+					    def rdkIssueCount = defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(RDK_ISSUE)
+					    def newIssueCount = defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(NEW_ISSUE)
+					    def scriptIssueCount =  defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(SCRIPT_ISSUE)
+					    def envIssueCount = defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(ENVIRONMENT_ISSUE)
+					    def interfaceChangeCount = defectDetailsMap?.get(MODULE_DATA)?.get(key)?.get(INTERFACE_CHANGE)
+					    if(!newIssueCount) {newIssueCount = 0}
+					    if(!rdkIssueCount) {rdkIssueCount = 0}
+					    def existingIssueCount = rdkIssueCount - newIssueCount
+					    resultMap.put("Number of failed scripts linked with open defects", rdkIssueCount)
+					    resultMap.put(SCRIPT_ISSUE, scriptIssueCount?scriptIssueCount:0)
+					    resultMap.put("Existing Issue", existingIssueCount)
+					    resultMap.put(NEW_ISSUE, newIssueCount)
+					    resultMap.put(ENVIRONMENT_ISSUE, envIssueCount? envIssueCount: 0)
+					    resultMap.put(INTERFACE_CHANGE, interfaceChangeCount? interfaceChangeCount : 0)
+					    resultMap.put("Remarks","")
+				    }
+				    coverPageMap.put(key, resultMap)
+				    counter ++
 
-				tSuccess += success
-				tFailure += failure
-				tNa += na
-				tSkip += skip
-				totalScripts += total
-				tTimeOut += timeOut
-				//totalScript +=scriptCount
-
-			}
-		}
-		//scriptCount=Integer.parseInt(resultMap.getAt("total"))
-		Map coverPageMap = detailDataMap.get("CoverPage")
-		Map resultMap = [:]
+				    tSuccess += success
+				    tFailure += failure
+				    tNa += na
+				    tSkip += skip
+				    totalScripts += total
+				    tTimeOut += timeOut
+				    //totalScript +=scriptCount
+			    }
+		    }
+		    //scriptCount=Integer.parseInt(resultMap.getAt("total"))
+		    Map coverPageMap = detailDataMap.get("CoverPage")
+		    Map resultMap = [:]
 		
-		resultMap.put("Sl No", "")
-		resultMap.put("Module", "Total")
-		//resultMap.put("Total", 	totalScript)
-		resultMap.put("Executed", totalScripts)
-		resultMap.put(Constants.SUCCESS_STATUS, tSuccess)
-		resultMap.put(Constants.FAILURE_STATUS, tFailure)
-		resultMap.put("SCRIPT TIME OUT", tTimeOut)
-		resultMap.put(Constants.NOT_APPLICABLE_STATUS, tNa)
-		resultMap.put(Constants.SKIPPED_STATUS, tSkip)
+		    resultMap.put("Sl No", "")
+		    resultMap.put("Module", "Total")
+		    //resultMap.put("Total", 	totalScript)
+		    resultMap.put("Executed", totalScripts)
+		    resultMap.put(Constants.SUCCESS_STATUS, tSuccess)
+		    resultMap.put(Constants.FAILURE_STATUS, tFailure)
+		    resultMap.put("SCRIPT TIME OUT", tTimeOut)
+		    resultMap.put(Constants.NOT_APPLICABLE_STATUS, tNa)
+		    resultMap.put(Constants.SKIPPED_STATUS, tSkip)
+		    if((totalScripts - tNa) != 0){
+			    tRate = ((tSuccess * 100)/(totalScripts - tNa))
+		    }
 		
-		if(isAnalyzed) {
-			resultMap.put("Number of failed scripts linked with open defects", defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(RDK_ISSUE))
-			resultMap.put(SCRIPT_ISSUE, defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(SCRIPT_ISSUE))
-			def existingIssueCount = defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(RDK_ISSUE) - defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(NEW_ISSUE)
-			resultMap.put("Existing Issue", existingIssueCount)
-			resultMap.put(NEW_ISSUE, defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(NEW_ISSUE))
-			resultMap.put(ENVIRONMENT_ISSUE, defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(ENVIRONMENT_ISSUE))
-			resultMap.put(INTERFACE_CHANGE, defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(INTERFACE_CHANGE))
-			resultMap.put("Remarks","")
-		}
+		    if(isAnalyzed) {
+			    resultMap.put("Number of failed scripts linked with open defects", defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(RDK_ISSUE))
+			    resultMap.put(SCRIPT_ISSUE, defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(SCRIPT_ISSUE))
+			    def existingIssueCount = defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(RDK_ISSUE) - defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(NEW_ISSUE)
+			    resultMap.put("Existing Issue", existingIssueCount)
+			    resultMap.put(NEW_ISSUE, defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(NEW_ISSUE))
+			    resultMap.put(ENVIRONMENT_ISSUE, defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(ENVIRONMENT_ISSUE))
+			    resultMap.put(INTERFACE_CHANGE, defectDetailsMap?.get(TOTAL_ANALYZED_DATA)?.get(INTERFACE_CHANGE))
+			    resultMap.put("Remarks","")
+		    }
 
-		//resultMap.put("New Issue","")
-		//resultMap.put("Environment Issue", "")
-		//resultMap.put("Interface Change","")
+		    //resultMap.put("New Issue","")
+		    //resultMap.put("Environment Issue", "")
+		    //resultMap.put("Interface Change","")
 	    
 		
-		coverPageMap.put("Total", resultMap)
-	}
+		    coverPageMap.put("Total", resultMap)
+		    coverPageMap.put(Constants.OVERALL_PASS_RATE, tRate)
+		    }catch(Exception e){
+		        e.printStackTrace()
+		    }
+	    }
 	/**
 	 * Function to populate performance data in db if the data is available only as files
 	 * @param executionInstance

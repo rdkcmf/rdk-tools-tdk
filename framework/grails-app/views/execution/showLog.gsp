@@ -270,6 +270,17 @@ function hideScriptTrend(execResId){
 		</g:else>
 		</td>				
 	</tr>
+	<tr class="odd">
+        <td class="tdhead">Overall Pass %</td>
+        <td>
+            <g:if test="${tDataMap?.get("passrate") != null}">
+                ${tDataMap?.get("passrate")}
+            </g:if>
+            <g:else>
+                0
+            </g:else>
+        </td>
+	</tr>
 	<g:if test="${statusList.size() > 1}">
 		<tr class="odd" id="filterRow">
 			<td> Filter By: </td>

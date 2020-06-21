@@ -86,6 +86,13 @@ class ExcelExporter extends AbstractExporter {
 										cell(row: rowIndex, column: 5 +1, value: value, format: "cell")
 										rowIndex ++
 									}
+									if(coverPageMap.containsKey(Constants.OVERALL_PASS_RATE)){
+										int passRate = coverPageMap.get(Constants.OVERALL_PASS_RATE)
+										String passRateString = passRate.toString()
+										cell(row: rowIndex, column: 5, value: Constants.OVERALL_PASS_PERCENTAGE, format: "header")
+										cell(row: rowIndex, column: 5 +1, value: passRateString, format: "cell")
+										rowIndex ++
+									}
 								}
 								
 								for(int i = 0 ; i < 4 ; i ++ ){
@@ -104,7 +111,7 @@ class ExcelExporter extends AbstractExporter {
 								
 
 								keySet.eachWithIndex {  object, k ->
-									if(!object.equals("Details")){
+									if(!object.equals("Details") && !object.equals(Constants.OVERALL_PASS_RATE)){
 									Map resultMap = coverPageMap.get(object)
 									Set kSet = resultMap.keySet()
 									kSet.eachWithIndex {field, i ->
