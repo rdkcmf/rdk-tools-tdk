@@ -97,22 +97,41 @@ if "SUCCESS" in loadModuleStatus.upper():
     if expectedResult in actualResult:
         tdkTestObj.setResultStatus("SUCCESS");
         details = tdkTestObj.getResultDetails();
-        freezeDuration = int(details.split(";")[0].split(":")[1].strip())
-        print "Value Returned : %s secs (approx)" %(details.split(";")[0])
-        print "ACTUAL RESULT  : %s" %(details.split(";")[1])
-        print "[TEST EXECUTION RESULT] : SUCCESS\n"
-
-        print "\nTEST STEP2: Check CPU freeze duration and reboot the device"
-        print "EXPECTED RESULT : Reboot if freeze duration is >= timeout"
-        if int(freezeDuration) >= int(timeout):
-            tdkTestObj.setResultStatus("SUCCESS");
-            print "ACTUAL RESULT  : CPU freeze duration is as expected"
+        if "GPIOWakeup" in str(details):
+            freezeDuration = int(str(details).split(";")[0].split(":")[1].strip())
+            GPIOWakeup = int(str(details).split(";")[1].split(":")[1].strip())
+            print "Value Returned : %s secs (approx), %s" %(str(details).split(";")[0],str(details).split(";")[1])
+            print "ACTUAL RESULT  : %s" %(str(details).split(";")[2])
             print "[TEST EXECUTION RESULT] : SUCCESS\n"
-            obj.initiateReboot();
+
+            print "\nTEST STEP2: Check CPU freeze duration & GPIO Wakeup status and reboot the device"
+            print "EXPECTED RESULT : Reboot if freeze duration is >= timeout & GPIO Wakeup status should be 0"
+            if int(freezeDuration) >= int(timeout) and int(GPIOWakeup) == 0:
+                tdkTestObj.setResultStatus("SUCCESS");
+                print "ACTUAL RESULT  : CPU freeze duration & GPIO Wakeup status are as expected"
+                print "[TEST EXECUTION RESULT] : SUCCESS\n"
+                obj.initiateReboot();
+            else:
+                tdkTestObj.setResultStatus("FAILURE");
+                print "ACTUAL RESULT  : CPU freeze duration & GPIO Wakeup status are not as expected"
+                print "[TEST EXECUTION RESULT] : FAILURE\n"
         else:
-            tdkTestObj.setResultStatus("FAILURE");
-            print "ACTUAL RESULT  : CPU freeze duration is not as expected"
-            print "[TEST EXECUTION RESULT] : FAILURE\n"
+            freezeDuration = int(str(details).split(";")[0].split(":")[1].strip())
+            print "Value Returned : %s secs (approx)" %(str(details).split(";")[0])
+            print "ACTUAL RESULT  : %s" %(str(details).split(";")[1])
+            print "[TEST EXECUTION RESULT] : SUCCESS\n"
+
+            print "\nTEST STEP2: Check CPU freeze duration and reboot the device"
+            print "EXPECTED RESULT : Reboot if freeze duration is >= timeout"
+            if int(freezeDuration) >= int(timeout):
+                tdkTestObj.setResultStatus("SUCCESS");
+                print "ACTUAL RESULT  : CPU freeze duration is as expected"
+                print "[TEST EXECUTION RESULT] : SUCCESS\n"
+                obj.initiateReboot();
+            else:
+                tdkTestObj.setResultStatus("FAILURE");
+                print "ACTUAL RESULT  : CPU freeze duration is not as expected"
+                print "[TEST EXECUTION RESULT] : FAILURE\n"
     else:
         tdkTestObj.setResultStatus("FAILURE");
         details = tdkTestObj.getResultDetails();
