@@ -821,6 +821,10 @@ class ScriptexecutionService {
 			diagnosticsFilePath = "${realPath}//logs//stblogs//${executionId}//${executionDeviceInstance?.id}//${executionResultId}//"
 		}
 		def tmUrl = executionService.updateTMUrl(url,deviceInstance)
+		def urlFromConfigFile = executionService.getTMUrlFromConfigFile()
+		if(urlFromConfigFile != null){
+			tmUrl = urlFromConfigFile
+		}
 		if(isBenchMark.equals(TRUE)){
 			File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callPerformanceTest.py").file
 			def absolutePath = layoutFolder.absolutePath

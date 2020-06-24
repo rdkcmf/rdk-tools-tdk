@@ -658,6 +658,10 @@ class ExecutionService {
 			
 			if(scriptName?.equals(FILE_UPLOAD_SCRIPT)){
 				url = updateTMUrl(url,device)
+				def urlFromConfigFile = getTMUrlFromConfigFile()
+				if(urlFromConfigFile != null){
+					url = urlFromConfigFile
+				}
 				cmdList.push(url)
 			}
 			
@@ -788,6 +792,10 @@ class ExecutionService {
 
 		if(scriptName?.equals(FILE_UPLOAD_SCRIPT)){
 			url = updateTMUrl(url,device)
+			def urlFromConfigFile = getTMUrlFromConfigFile()
+			if(urlFromConfigFile != null){
+				url = urlFromConfigFile
+			}
 			cmdList.push(url)
 		}
 				
@@ -802,8 +810,25 @@ class ExecutionService {
 			e.printStackTrace()
 		}		
 	}
-    
-	
+
+	/**
+	 * Method to return the Test Manager URl if the url is configured in tm.config file
+	 * @return
+	 */
+	def getTMUrlFromConfigFile(){
+		File configFile = grailsApplication.parentContext.getResource("/fileStore/tm.config").file
+		Properties prop = new Properties();
+		if (configFile.exists()) {
+			InputStream is = new FileInputStream(configFile);
+			prop.load(is);
+			String value = prop.getProperty("tmURL");
+			if (value != null && !value.isEmpty()) {
+				return value;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * For getting the image name on a particular device
 	 * - Accessing the getimagename_cmndline file

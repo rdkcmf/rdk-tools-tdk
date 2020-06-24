@@ -1382,6 +1382,10 @@ class JobSchedulerService implements Job{
 
 			if(scriptName?.equals(FILE_UPLOAD_SCRIPT)){
 				url = updateTMUrl(url,device)
+				def urlFromConfigFile = getTMUrlFromConfigFile()
+				if(urlFromConfigFile != null){
+					url = urlFromConfigFile
+				}
 				cmdList.push(url)
 			}
 
@@ -1689,6 +1693,10 @@ class JobSchedulerService implements Job{
 			diagnosticsFilePath = "${realPath}//logs//stblogs//${executionId}//${executionDevice?.id}//${executionResultId}//"
 		}
 		def tmUrl = updateTMUrl(url,deviceInstance)
+		def urlFromConfigFile = getTMUrlFromConfigFile()
+		if(urlFromConfigFile != null){
+			tmUrl = urlFromConfigFile
+		}
 		if(isBenchMark.equals("true")){
 			File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callPerformanceTest.py").file
 			def absolutePath = layoutFolder.absolutePath
@@ -2164,6 +2172,10 @@ class JobSchedulerService implements Job{
 				diagnosticsFilePath = "${realPath}//logs//stblogs//${executionId}//${executionDevice?.id}//${executionResultId}//"
 			}
 			def tmUrl = updateTMUrl(url,deviceInstance)
+			def urlFromConfigFile = getTMUrlFromConfigFile()
+			if(urlFromConfigFile != null){
+				tmUrl = urlFromConfigFile
+			}
 			if(isBenchMark.equals(TRUE)){
 				File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callPerformanceTest.py").file
 				def absolutePath = layoutFolder.absolutePath
@@ -2335,6 +2347,10 @@ class JobSchedulerService implements Job{
 			]
 
 			if(scriptName?.equals(CONSOLE_FILE_UPLOAD_SCRIPT)){
+				def urlFromConfigFile = getTMUrlFromConfigFile()
+				if(urlFromConfigFile != null){
+					url = urlFromConfigFile
+				}
 				cmdList.push(url)
 			}
 
@@ -2393,6 +2409,10 @@ class JobSchedulerService implements Job{
 
 					if(scriptName?.equals(FILE_UPLOAD_SCRIPT)){
 						url = ExecutionService.updateTMUrl(url,dev)
+						def urlFromConfigFile = getTMUrlFromConfigFile()
+						if(urlFromConfigFile != null){
+							url = urlFromConfigFile
+						}
 						cmdList.push(url)
 					}
 					String [] cmd = cmdList.toArray()
@@ -2542,6 +2562,10 @@ class JobSchedulerService implements Job{
 		]
 
 		if(scriptName?.equals(CONSOLE_FILE_UPLOAD_SCRIPT)){
+			def urlFromConfigFile = getTMUrlFromConfigFile()
+			if(urlFromConfigFile != null){
+				url = urlFromConfigFile
+			}
 			cmdList.push(url)
 		}
 
@@ -2552,6 +2576,24 @@ class JobSchedulerService implements Job{
 		def resetExecutionData = scriptExecutor.executeScript(cmd,1)
 		copyAgentconsoleLogIntoDir(realPath,logTransferFilePath,executionId,executionDeviceId,executionResultId  )
 		Thread.sleep(4000)
+	}
+
+	/**
+	 * Method to return the Test Manager URl if the url is configured in tm.config file
+	 * @return
+	 */
+	def getTMUrlFromConfigFile(){
+		File configFile = grailsApplication.parentContext.getResource("/fileStore/tm.config").file
+		Properties prop = new Properties();
+		if (configFile.exists()) {
+			InputStream is = new FileInputStream(configFile);
+			prop.load(is);
+			String value = prop.getProperty("tmURL");
+			if (value != null && !value.isEmpty()) {
+				return value;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -2914,6 +2956,10 @@ class JobSchedulerService implements Job{
 
 			if(scriptName?.equals(FILE_UPLOAD_SCRIPT)){
 				url = updateTMUrl(url,device)
+				def urlFromConfigFile = getTMUrlFromConfigFile()
+				if(urlFromConfigFile != null){
+					url = urlFromConfigFile
+				}
 				cmdList.push(url)
 			}
 
@@ -3658,6 +3704,10 @@ class JobSchedulerService implements Job{
 	   def initiateDiagnosticsTest(def deviceInstance , def diagFileName , def tmUrl ,def uniqueExecutionName){
 		   def output = ""
 		   try{
+					   def urlFromConfigFile = getTMUrlFromConfigFile()
+					   if(urlFromConfigFile != null){
+						   tmUrl = urlFromConfigFile
+					   }
 					   File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callDiagnosticsTest.py").file
 					   def absolutePath = layoutFolder.absolutePath
 			   
