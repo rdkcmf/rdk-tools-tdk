@@ -319,6 +319,10 @@ class ExecutescriptService {
 			diagnosticsFilePath = "${realPath}//logs//stblogs//${executionId}//${executionDevice?.id}//${executionResultId}//"
 		}
 		def tmUrl = executionService.updateTMUrl(url,deviceInstance)
+		def urlFromConfigFile = executionService.getTMUrlFromConfigFile()
+		if(urlFromConfigFile != null){
+			tmUrl = urlFromConfigFile
+		}
 		if(isBenchMark.equals(TRUE)){
 			File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callPerformanceTest.py").file
 			def absolutePath = layoutFolder.absolutePath
@@ -675,6 +679,10 @@ class ExecutescriptService {
 			
 			if(scriptName?.equals(CONSOLE_FILE_UPLOAD_SCRIPT)){
 				url = executionService.updateTMUrl(url,deviceInstance)
+				def urlFromConfigFile = executionService.getTMUrlFromConfigFile()
+				if(urlFromConfigFile != null){
+					url = urlFromConfigFile
+				}
 				cmdList.push(url)
 			}
 			
@@ -2402,6 +2410,10 @@ class ExecutescriptService {
 				
 				if(scriptName?.equals(FILE_UPLOAD_SCRIPT)){
 					url = executionService.updateTMUrl(url,dev)
+					def urlFromConfigFile = executionService.getTMUrlFromConfigFile()
+					if(urlFromConfigFile != null){
+						url = urlFromConfigFile
+					}
 					cmdList.push(url)
 				}
 				
@@ -2428,6 +2440,10 @@ class ExecutescriptService {
 	def initiateDiagnosticsTest(def deviceInstance , def diagFileName , def tmUrl , def uniqueExecutionName ){
 		def output = ""
 		try{
+				def urlFromConfigFile = executionService.getTMUrlFromConfigFile()
+				if(urlFromConfigFile != null){
+					tmUrl = urlFromConfigFile
+				}
 				File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callDiagnosticsTest.py").file
 				def absolutePath = layoutFolder.absolutePath
 		
