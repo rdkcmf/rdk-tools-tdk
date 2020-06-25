@@ -887,7 +887,7 @@ void DSHalAgent::DSHal_IsAudioMute(IN const Json::Value& req, OUT Json::Value& r
     else
     {
         response["result"] = "FAILURE";
-        response["details"] = "Audio port enable status not retrieved";
+        response["details"] = "Audio mute status not retrieved";
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsAudioMute call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMute -->Exit\n");
         return;
@@ -1079,7 +1079,7 @@ void DSHalAgent::DSHal_IsAudioMSDecode(IN const Json::Value& req, OUT Json::Valu
     else
     {
         response["result"] = "FAILURE";
-        response["details"] = "Audio port enable status not retrieved";
+        response["details"] = "AudioMSDecode status not retrieved";
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsAudioMSDecode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMSDecode -->Exit\n");
         return;
@@ -1109,7 +1109,7 @@ void DSHalAgent::DSHal_IsAudioMS12Decode(IN const Json::Value& req, OUT Json::Va
     else
     {
         response["result"] = "FAILURE";
-        response["details"] = "Audio port enable status not retrieved";
+        response["details"] = "AudioMS12Decode status not retrieved";
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsAudioMS12Decode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMS12Decode -->Exit\n");
         return;
