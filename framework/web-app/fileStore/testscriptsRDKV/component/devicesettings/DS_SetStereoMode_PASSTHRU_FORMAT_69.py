@@ -20,12 +20,12 @@
 <?xml version="1.0" encoding="UTF-8"?><xml>
   <id>619</id>
   <version>1</version>
-  <name>DS_SetStereoMode_MONO_FORMAT_69</name>
+  <name>DS_SetStereoMode_PASSTHRU_FORMAT_69</name>
   <primitive_test_id>85</primitive_test_id>
   <primitive_test_name>DS_SetStereoMode</primitive_test_name>
   <primitive_test_version>1</primitive_test_version>
   <status>ALLOCATED</status>
-  <synopsis>This test script Sets and gets the MONO Stereo Mode of Audio.
+  <synopsis>This test script Sets and gets the PASSTHRU Stereo Mode of Audio.
 Test Case ID:CT_DS_69.
 Note:This script will return duplicates, If running second time without restarting agent. Agent process may lead to crash/restart.This is an issue with DS.</synopsis>
   <groups_id/>
@@ -45,7 +45,7 @@ Note:This script will return duplicates, If running second time without restarti
   </rdk_versions>
   <test_cases>
     <test_case_id>CT_DS_69</test_case_id>
-    <test_objective>Device Setting –  Get and set stereo format to MONO</test_objective>
+    <test_objective>Device Setting –  Get and set stereo format to PASSTHRU</test_objective>
     <test_type>Positive(Boundary condition)</test_type>
     <test_setup>XI3-1/XG1-1</test_setup>
     <pre_requisite>1. dsMgrMain should be up and running.
@@ -59,7 +59,7 @@ AudioOutputPort::setStereoMode(int)
 AudioOutputPort::setStereoMode(string)
 device::Manager::DeInitialize()</api_or_interface_used>
     <input_parameters>setStereoMode : string
-E.g.: MONO
+E.g.: PASSTHRU
 setStereoMode : int – id
 E.g.: 1</input_parameters>
     <automation_approch>1. TM loads the Device_Settings_Agent via the test agent.
@@ -76,7 +76,7 @@ Checkpoint 2. Check the stereo mode before and after setting it.</except_output>
 TestMgr_DS_AOP_getSupportedStereoModes
 TestMgr_DS_AOP_setStereoMode
 TestMgr_DS_managerDeinitialize</test_stub_interface>
-    <test_script>DS_SetStereoMode_MONO_FORMAT_69</test_script>
+    <test_script>DS_SetStereoMode_PASSTHRU_FORMAT_69</test_script>
     <skipped>No</skipped>
     <release_version>M21</release_version>
     <remarks/>
@@ -117,54 +117,50 @@ if "SUCCESS" in loadmodulestatus.upper():
                 if expectedresult in actualresult:
                         print "SUCCESS :Application successfully gets the list of supported StereoModes";
                         print "%s" %stereomodedetails
-                else:
-                        tdkTestObj.setResultStatus("FAILURE");
-                        print "FAILURE :Failed to get supported streoe modes";
-		#Check for MONO among the return value of DS_GetSupportedStereoModes
-		if "MONO" in stereomodedetails:
-			#calling DS_SetStereoMode to get and set the stereo modes
-                	tdkTestObj = obj.createTestStep('DS_SetStereoMode');
-                	stereomode="MONO";
-                	print "Stereo mode value set to:%s" %stereomode;  
-                	tdkTestObj.addParameter("stereo_mode",stereomode);
-                	expectedresult="SUCCESS"
-                	tdkTestObj.executeTestCase(expectedresult);
-                	actualresult = tdkTestObj.getResult();
-                	stereomodedetails = tdkTestObj.getResultDetails();
-                	#Check for SUCCESS/FAILURE return value of DS_SetStereoMode
-                	if expectedresult in actualresult:
-                        	print "SUCCESS :Application successfully get and set the MONO stereo mode";
-                        	print "getstereomode: %s" %stereomodedetails;
-                        	#comparing stereo modes before and after setting
-                        	if stereomode in stereomodedetails:
-                                	tdkTestObj.setResultStatus("SUCCESS");
-                                	print "SUCCESS: Both the stereo modes are same";
-                        	else:
-                                	tdkTestObj.setResultStatus("FAILURE");
-                                	print "FAILURE: Both the stereo modes are not same";
-                	else:
-                        	tdkTestObj.setResultStatus("FAILURE");
-                        	print "FAILURE :Application failed to set and get the MONO stereo mode";
-               
-		 	#calling DS_ManagerDeInitialize to DeInitialize API 
-                	tdkTestObj = obj.createTestStep('DS_ManagerDeInitialize');
-                	expectedresult="SUCCESS"
-                	tdkTestObj.executeTestCase(expectedresult);
-                	actualresult = tdkTestObj.getResult();
-                	#Check for SUCCESS/FAILURE return value of DS_ManagerDeInitialize 
-                	if expectedresult in actualresult:
-                        	tdkTestObj.setResultStatus("SUCCESS");
-                        	print "SUCCESS :Application successfully DeInitialized the DeviceSetting library";
-                	else:
-                        	tdkTestObj.setResultStatus("FAILURE");
-                        	print "FAILURE: Deinitalize failed" ;
-      		else:
-	  		tdkTestObj.setResultStatus("FAILURE");
-			print "FAILURE: Device does not support MONO mode"
+			#Check for PASSTHRU among the return value of DS_GetSupportedStereoModes
+			if "PASSTHRU" in stereomodedetails:
+				#calling DS_SetStereoMode to get and set the stereo modes
+				tdkTestObj = obj.createTestStep('DS_SetStereoMode');
+				stereomode="PASSTHRU";
+				print "Stereo mode value set to:%s" %stereomode;
+				tdkTestObj.addParameter("stereo_mode",stereomode);
+				tdkTestObj.executeTestCase(expectedresult);
+				actualresult = tdkTestObj.getResult();
+				stereomodedetails = tdkTestObj.getResultDetails();
+				#Check for SUCCESS/FAILURE return value of DS_SetStereoMode
+				if expectedresult in actualresult:
+					print "SUCCESS :Application successfully get and set the PASSTHRU stereo mode";
+					print "getstereomode: %s" %stereomodedetails;
+					#comparing stereo modes before and after setting
+					if stereomode in stereomodedetails:
+						tdkTestObj.setResultStatus("SUCCESS");
+						print "SUCCESS: Both the stereo modes are same";
+					else:
+						tdkTestObj.setResultStatus("FAILURE");
+						print "FAILURE: Both the stereo modes are not same";
+				else:
+					tdkTestObj.setResultStatus("FAILURE");
+					print "FAILURE :Application failed to set and get the PASSTHRU stereo mode";
+			else:
+	                        tdkTestObj.setResultStatus("FAILURE");
+	                        print "FAILURE: Device does not support PASSTHRU mode"
+		else:
+			tdkTestObj.setResultStatus("FAILURE");
+			print "FAILURE: Application failed to get supported stereoModes"
+		#calling DS_ManagerDeInitialize to DeInitialize API
+		tdkTestObj = obj.createTestStep('DS_ManagerDeInitialize');
+		tdkTestObj.executeTestCase(expectedresult);
+		actualresult = tdkTestObj.getResult();
+		#Check for SUCCESS/FAILURE return value of DS_ManagerDeInitialize
+		if expectedresult in actualresult:
+			tdkTestObj.setResultStatus("SUCCESS");
+			print "SUCCESS :Application successfully DeInitialized the DeviceSetting library";
+		else:
+			tdkTestObj.setResultStatus("FAILURE");
+			print "FAILURE: Deinitalize failed" ;
 	else:
                 tdkTestObj.setResultStatus("FAILURE");
                 print "FAILURE: Device Setting Initialize failed";
-        print "[TEST EXECUTION RESULT] : %s" %actualresult;
         #Unload the deviceSettings module
         obj.unloadModule("devicesettings");
 else:
