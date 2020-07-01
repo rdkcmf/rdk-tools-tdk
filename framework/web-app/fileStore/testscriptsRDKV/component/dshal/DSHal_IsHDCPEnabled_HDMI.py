@@ -92,25 +92,20 @@ from dshalUtility import *;
 
 #Test component to be tested
 dshalObj = tdklib.TDKScriptingLibrary("dshal","1");
-sysObj = tdklib.TDKScriptingLibrary("systemutil","1");
 
 #IP and Port of box, No need to change,
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
 dshalObj.configureTestCase(ip,port,'DSHal_IsHDCPEnabled_HDMI');
-sysObj.configureTestCase(ip,port,'DSHal_IsHDCPEnabled_HDMI');
 
 #Get the result of connection with test component and STB
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
-sysloadModuleStatus = dshalObj.getLoadModuleResult();
-print "[LIB LOAD STATUS]  :  %s" %sysloadModuleStatus;
 
 dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
-sysObj.setLoadModuleStatus(sysloadModuleStatus);
 
-if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStatus.upper():
+if "SUCCESS" in dshalloadModuleStatus.upper():
     expectedResult="SUCCESS";
     #Prmitive test case which associated to this Script
     tdkTestObj = dshalObj.createTestStep('DSHal_GetVideoPort');
@@ -143,23 +138,12 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStat
                 if expectedResult in actualResult:
                     hdcpStatus = tdkTestObj.getResultDetails();
                     print "HDCP satus: ", hdcpStatus;
-                    logName = "/proc/brcm/hdmi_output";
-                    pattern1 = "HDCP Status";
-                    pattern2 = "Supported Version";
-                    tdkTestObj = sysObj.createTestStep('ExecuteCommand');
-                    cmd = "cat " + logName + " | grep -A 2 \"" + pattern1 + "\" | grep \"" + pattern2 + "\"";
-                    print cmd;
-                    tdkTestObj.addParameter("command", cmd);
-                    tdkTestObj.executeTestCase("SUCCESS");
-                    actualresult = tdkTestObj.getResult();
-                    details = tdkTestObj.getResultDetails();
-                    print "OUTPUT:", details;
-                    if (pattern2 in details and hdcpStatus == "true") or (pattern2 not in details and hdcpStatus == "false"):
+                    if hdcpStatus:
                         tdkTestObj.setResultStatus("SUCCESS");
-                        print "HDCP Status verified";
+                        print "HDCP Status retrieved";
                     else:
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "HDCP Status not verified";
+                        print "HDCP Status not retrieved";
  
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
@@ -175,7 +159,6 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStat
         print "VideooPort handle not retrieved";
 
     dshalObj.unloadModule("dshal");
-    sysObj.unloadModule("systemutil");
 
 else:
     print "Module load failed";
