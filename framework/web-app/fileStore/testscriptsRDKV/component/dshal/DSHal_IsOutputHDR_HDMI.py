@@ -92,25 +92,20 @@ from dshalUtility import *;
 
 #Test component to be tested
 dshalObj = tdklib.TDKScriptingLibrary("dshal","1");
-sysObj = tdklib.TDKScriptingLibrary("systemutil","1");
 
 #IP and Port of box, No need to change,
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
 dshalObj.configureTestCase(ip,port,'DSHal_IsOutputHDR_HDMI');
-sysObj.configureTestCase(ip,port,'DSHal_IsOutputHDR_HDMI');
 
 #Get the result of connection with test component and STB
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
-sysloadModuleStatus = dshalObj.getLoadModuleResult();
-print "[LIB LOAD STATUS]  :  %s" %sysloadModuleStatus;
 
 dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
-sysObj.setLoadModuleStatus(sysloadModuleStatus);
 
-if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStatus.upper():
+if "SUCCESS" in dshalloadModuleStatus.upper():
     expectedResult="SUCCESS";
     #Prmitive test case which associated to this Script
     tdkTestObj = dshalObj.createTestStep('DSHal_GetVideoPort');
@@ -143,22 +138,12 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStat
                 if expectedResult in actualResult:
                     hdrStatus = tdkTestObj.getResultDetails();
                     print "HDR satus: ", hdrStatus;
-                    logName = "/proc/brcm/hdmi_output";
-                    pattern = "does not support HDR";
-                    tdkTestObj = sysObj.createTestStep('ExecuteCommand');
-                    cmd = "grep " + pattern + " " + logName;
-                    print cmd;
-                    tdkTestObj.addParameter("command", cmd);
-                    tdkTestObj.executeTestCase("SUCCESS");
-                    actualresult = tdkTestObj.getResult();
-                    details = tdkTestObj.getResultDetails();
-                    print "OUTPUT:", details;
-                    if (pattern in details and hdrStatus == "false") or (pattern not in details and hdrStatus == "true"):
+                    if hdrStatus:
                         tdkTestObj.setResultStatus("SUCCESS");
-                        print "HDR Status verified";
+                        print "HDR Status retrieved";
                     else:
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "HDR Status not verified";
+                        print "HDR Status not retrieved";
  
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
@@ -171,10 +156,9 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStat
             print "Failed to get display connection status";
     else:
         tdkTestObj.setResultStatus("FAILURE");
-        print "VideooPort handle not retrieved";
+        print "VideoPort handle not retrieved";
 
     dshalObj.unloadModule("dshal");
-    sysObj.unloadModule("systemutil");
 
 else:
     print "Module load failed";

@@ -94,25 +94,20 @@ from dshalUtility import *;
 
 #Test component to be tested
 dshalObj = tdklib.TDKScriptingLibrary("dshal","1");
-sysObj = tdklib.TDKScriptingLibrary("systemutil","1");
 
 #IP and Port of box, No need to change,
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
 dshalObj.configureTestCase(ip,port,'DSHal_GetColorDepth_HDMI');
-sysObj.configureTestCase(ip,port,'DSHal_GetColorDepth_HDMI');
 
 #Get the result of connection with test component and STB
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
-sysloadModuleStatus = sysObj.getLoadModuleResult();
-print "[LIB LOAD STATUS]  :  %s" %sysloadModuleStatus;
 
 dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
-sysObj.setLoadModuleStatus(sysloadModuleStatus);
 
-if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStatus.upper():
+if "SUCCESS" in dshalloadModuleStatus.upper():
         expectedResult="SUCCESS";
         #Prmitive test case which associated to this Script
         tdkTestObj = dshalObj.createTestStep('DSHal_GetVideoPort');
@@ -147,25 +142,12 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStat
                         depth = tdkTestObj.getResultDetails();
                         print "Color depth value using DSHAL API: ", depth;
 
-                        #Getting color depth value using linux command
-                        tdkTestObj = sysObj.createTestStep('ExecuteCommand');
-                        cmd = "cat '/proc/brcm/hdmi_output' | grep \"ColorDepth:\" | tr -d '\n'";
-                        tdkTestObj.addParameter("command", cmd);
-                        tdkTestObj.executeTestCase("SUCCESS");
-                        actualResult = tdkTestObj.getResult();
-                        colorDepth = tdkTestObj.getResultDetails();
-                        print "Color depth from linux command: ", colorDepth
-
-                        if expectedResult in actualResult and "ColorDepth:" in colorDepth:
-                            if depth == colorDepth.split(':')[-1].strip():
-                                tdkTestObj.setResultStatus("SUCCESS");
-                                print "Color depth value verified";
-                            else:
-                                tdkTestObj.setResultStatus("FAILURE");
-                                print "Color depth value not verified";
+                        if depth:
+                            tdkTestObj.setResultStatus("SUCCESS");
+                            print "Color depth value retrieved";
                         else:
                             tdkTestObj.setResultStatus("FAILURE");
-                            print "Failed to get color depth value using linux command";
+                            print "Color depth value not retrieved";
                     else:
                         tdkTestObj.setResultStatus("FAILURE");
                         print "Failed to get color depth";
@@ -177,10 +159,8 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStat
                 print "Failed to get display connection status";
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "VideooPort handle not retrieved";
+            print "VideoPort handle not retrieved";
 
         dshalObj.unloadModule("dshal");
-        sysObj.unloadModule("systemutil");
-
 else:
     print "Module load failed";
