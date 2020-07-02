@@ -768,12 +768,15 @@ class ScriptGroupController {
 		def moduleList = []
 		def moduleListRDKV = []
 		def moduleListRDKB = []
+		def directoryListRDKVThunder = []
 		ArrayList<String> scriptGroupList = new ArrayList<String>();
 		int moduleListSizeRDKV 
 		int moduleListSizeRDKB
+		int directoryListSizeRDKVThunder
 		
 		moduleListRDKV = Module.findAllByCategory(Category.RDKV)
 		moduleListRDKB = Module.findAllByCategory(Category.RDKB)
+		directoryListRDKVThunder = scriptService.scriptGroupMapThunder.keySet()
 		moduleListRDKB.remove(Module.findByName('tcl'))
 		
 		scriptGroupList = ScriptGroup.findAll ()
@@ -783,24 +786,26 @@ class ScriptGroupController {
 	
 		 moduleListSizeRDKB = moduleListRDKB.size()
 		 
-		[moduleListSizeRDKV:moduleListSizeRDKV,moduleListSizeRDKB :moduleListSizeRDKB ,moduleListRDKV :moduleListRDKV ,moduleListRDKB :moduleListRDKB ,scriptGroupList:scriptGroupList]
+		 directoryListSizeRDKVThunder = directoryListRDKVThunder.size()
+		 
+		[moduleListSizeRDKV:moduleListSizeRDKV,moduleListSizeRDKB :moduleListSizeRDKB ,directoryListSizeRDKVThunder :directoryListSizeRDKVThunder ,moduleListRDKV :moduleListRDKV ,moduleListRDKB :moduleListRDKB ,directoryListRDKVThunder :directoryListRDKVThunder,scriptGroupList:scriptGroupList]
 	}
 	
-
+    
 	def saveCustomGrp()
 	{
 		def testSuiteName = params.name
-		def boxType =  BoxType.findById(params?.boxname)
-		def rdkVersions = RDKVersions.findById(params?.RDKVersionsName)
 		def countVariable = 0
 		def moduleInstance
 		def moduleSelectList = []
+		def directorySelectList = []
 		def scriptFileList =[]
+		def scriptFileListThunder =[]
 		def scriptModuleList
 		def dirName
 		def fileName
 		def script
-		def scriptGroupInstance = new ScriptGroup()
+		
 		def errorList = []
 		
 		
@@ -810,8 +815,64 @@ class ScriptGroupController {
 			flash.message = "TestSuite name is already in use. Please use a different name."
 			render("Duplicate Script Name not allowed. Try Again.")
 		}
+		else if(params?.customCategory == "RDKVTHUNDER"){
+			if(params?.listCount)
+			{
+				for (iterateVariable in params?.listCount)
+				{
+					countVariable++
+					if(params?.("chkbox"+countVariable) == KEY_ON)
+					{
+						def directoryName = params?.("id"+countVariable)
+						if (directoryName)
+						{
+							directorySelectList?.add(directoryName)
+						}
+					}
+				}
+			}
+			for (directory in directorySelectList)
+			{
+				def scriptListForDirectory = scriptService.scriptGroupMapThunder.get(directory)
+				scriptListForDirectory.each {scriptValueObj->
+					  ScriptFile.withNewSession{scriptFileSession->
+						  def scriptFileObject = ScriptFile.findByScriptName(scriptValueObj?.scriptName)
+						  if(scriptFileObject){
+							  scriptFileListThunder?.add(scriptFileObject)
+						  }
+						  scriptFileSession.clear()
+					  }
+                }
+			}
+			if(scriptFileListThunder.size()== 0)
+			{
+				flash.message = "No script with given condition. Suite not created"
+            }
+			else
+			{
+				ScriptGroup.withSession{session->
+					def scriptGroupInstance = new ScriptGroup()
+                    scriptGroupInstance.name = testSuiteName
+				    scriptGroupInstance.groups = utilityService.getGroup()
+				    scriptGroupInstance.category = Constants.RDKV_THUNDER
+					for(scrpt in scriptFileListThunder){
+						scriptGroupInstance?.addToScriptList(scrpt)
+					}
+				    if (!scriptGroupInstance.save(flush: true))
+				    {
+					    flash.message = "Script Not Saved"
+				    }
+				    else{
+					    flash.message = "Test Suite Created Successfully "
+				    }
+					session.clear()
+				}
+			}
+		}
 		else
-		{ 
+		{  
+			def boxType =  BoxType.findById(params?.boxname)
+			def rdkVersions = RDKVersions.findById(params?.RDKVersionsName)
 			/* To get the Selected Modules*/
 			if(params?.listCount)
 			{ 
@@ -875,19 +936,21 @@ class ScriptGroupController {
 			}
 			else
 			{
-						
-				scriptGroupInstance.name = testSuiteName
-				scriptGroupInstance.groups = utilityService.getGroup()
-				scriptGroupInstance.category = category
-				scriptGroupInstance.scriptList = scriptFileList
-				if (!scriptGroupInstance.save(flush: true))
-				 {
-					 flash.message = "Script Not Saved"
-					println "not saved"
+				ScriptGroup.withTransaction{
+					def scriptGroupInstance = new ScriptGroup()
+				    scriptGroupInstance.name = testSuiteName
+				    scriptGroupInstance.groups = utilityService.getGroup()
+				    scriptGroupInstance.category = category
+				    scriptGroupInstance.scriptList = scriptFileList
+				    if (!scriptGroupInstance.save(flush: true))
+				    {
+					    flash.message = "Script Not Saved"
+					    println "not saved"
+				    }
+				    else{
+					    flash.message = "Test Suite Created Successfully "
+				    }
 				}
-				 else{
-					 flash.message = "Test Suite Created Successfully "
-				 }
 			}
 		}
 		redirect(action: "list")

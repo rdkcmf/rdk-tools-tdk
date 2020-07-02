@@ -26,20 +26,28 @@
 <script type="text/javascript">
 window.onload = $(function(){
 	$("#rdkB").hide();
+	$("#rdkVThunder").hide();
 	$("#rdkV").show();
 	var ele = document.getElementsByName("category");
-		ele[0].checked = true;
-		ele[1].checked = false;
+	ele[0].checked = true;
+	ele[1].checked = false;
+    ele[2].checked = false;
 });
 
 function display(val) {
 	if (val.trim() === 'RDKV') {
 		$("#rdkB").hide();
+		$("#rdkVThunder").hide();
 		$("#rdkV").show();
 	} else if (val.trim() === 'RDKB') {
 		$("#rdkV").hide();
+		$("#rdkVThunder").hide();
 		$("#rdkB").show();
-	} else {}
+	} else if (val.trim() === 'RDKV_THUNDER') {
+		$("#rdkV").hide();
+		$("#rdkB").hide();
+		$("#rdkVThunder").show();
+	}else{}
 }
 
 $('#selectAllV').click(function() {
@@ -64,6 +72,17 @@ $('#selectAllB').click(function() {
 	       });
 	   } 
 	});
+$('#selectAllVThunder').click(function() {
+	   if (this.checked) {
+	       $(':checkbox').each(function() {
+	           this.checked = true;                        
+	       });
+	   } else {
+	      $(':checkbox').each(function() {
+	           this.checked = false;                        
+	       });
+	   } 
+	});	
 	
 
 
@@ -105,7 +124,8 @@ function checkChecked(moduleSelect,scriptGroupList,newScriptName)
 	<div style="padding: 20px;margin-left:1%;">
 		<b style="color: #A24C15;">Select the Category</b>&nbsp;&nbsp;&nbsp;
 		<input type="radio" onclick="display('RDKV')" name="category" checked >RDK-V</input> &nbsp;&nbsp;
-		<input type="radio" onclick="display('RDKB')" name="category">RDK-B</input>
+		<input type="radio" onclick="display('RDKB')" name="category" >RDK-B</input>
+		<input type="radio" onclick="display('RDKV_THUNDER')" name="category" >RDKV-THUNDER</input>
 	</div>
 
 
@@ -318,5 +338,74 @@ function checkChecked(moduleSelect,scriptGroupList,newScriptName)
 				</g:if>
 			</div>
 		</g:form>	
- 	 </div> 
-
+ 	 </div>
+ 	<div id="rdkVThunder">
+		<g:form action="saveCustomGrp" id="searchForm" name="searchForm" method="POST" onsubmit="return confirm('Test Suite creation takes some time');" >
+    	<g:hiddenField id="customCategory" name="customCategory" value="RDKVTHUNDER"/>
+		<div class="contextMenu" style="padding: 20px; margin-left:1%; width: 950px;">
+			<table style="width: 80%">
+				<tr >
+					<td width = "40%" >
+						<label for="name">
+							<g:message code="scriptGroup.name.label" default="Name" />
+							<span class="required-indicator">*</span>
+						</label>
+						<g:textField id= "scriptNameThunder" name="name" required=""  style="width: 240px"/>
+					</td>
+				</tr>
+			</table>
+			<br><br>			
+			<h1><g:message code="Module List" /></h1>					
+			<br><br>
+			<input type="checkbox" id="selectAllVThunder" value="selectAll"> Select / Deselect All<br/><br/>			
+			<table style="width:100%; align: center;">
+				<thead>								
+					<tr >
+						<th style="text-align : center;" width="1%">  Select</th>
+						<th style="text-align : center;" >Module Name</th>
+							
+						<th style="text-align : center; " width="1%">Select</th>
+						
+						<th style="text-align : center;" >Module Name</th>																				
+					</tr>
+				</thead>	
+				<tbody>
+					<% int count = 0; %> 
+					<% int halfSizeThunder = (int)((directoryListSizeRDKVThunder/2)+1) %>
+					<g:each in="${0..<halfSizeThunder}" status="k" var="i">																
+						<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+							<g:if test = "${directoryListRDKVThunder[2*i]!=null }">	
+								<g:hiddenField id="listCount" name="listCount" value="${count}"/>
+								<% count++ %>
+								<td style="text-align : center;" width="1%" >						
+									<g:checkBox name="chkbox${count}" class ="checkbox" id ="${directoryListRDKVThunder[2*i]}" value="${false}"  checked = "false"  onclick ="checkBoxClicked(this)" /> 
+									<g:hiddenField id="id${count}" name="id${count}" value="${directoryListRDKVThunder[2*i]}" />
+								</td>
+								<td style="text-align : center;"  >
+									${directoryListRDKVThunder[2*i]}
+								</td>	
+								<g:hiddenField id="listCount" name="listCount" value="${count}"/>
+								<% count++ %>
+								<g:if test = "${directoryListRDKVThunder[2*i+1]!=null }">
+									<td style="text-align : center;" width="1%" >						
+										<g:checkBox name="chkbox${count}" class ="checkbox" id ="${directoryListRDKVThunder[2*i+1]}" value="${false}"  checked = "false"  onclick ="checkBoxClicked(this)" /> 
+										<g:hiddenField id="id${count}" name="id${count}" value="${directoryListRDKVThunder[2*i+1]}" />
+									</td>
+									<td style="text-align : center;" >
+										${directoryListRDKVThunder[2*i+1]}								
+									</td>	
+								</g:if>	
+							</g:if>
+						</tr>
+					</g:each>													
+				</tbody>
+			</table>	
+			<br>
+			<br>
+			<g:if test="${SecurityUtils.getSubject().hasRole('ADMIN')}" >
+				<g:actionSubmit value="Create" action="saveCustomGrp"
+				 onclick=" return checkChecked('searchForm','${scriptGroupList }',document.getElementById('scriptNameThunder').value);"/>
+			</g:if>
+		</div>		
+	</g:form>	
+  </div>
