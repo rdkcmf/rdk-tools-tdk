@@ -41,12 +41,7 @@
 							var="executionInstance">
 							<tr class="${(i % 2) == 0 ? 'evenForCombined' : 'oddForCombined'}">
 								<td style="width: 5%;">
-								<g:if test="${executionInstance.isMarked == 1 }">
-									<g:checkBox name="combinedExecutionCheckbox" id="combinedExecutionCheckbox_${executionInstance?.id}" class="combinedCheckbox" onClick="mark(this);" checked="true"/>
-								</g:if>
-								<g:else>
-									<g:checkBox name="combinedExecutionCheckbox" id="combinedExecutionCheckbox_${executionInstance?.id}" class="combinedCheckbox" onClick="mark(this);" />
-								</g:else>
+									<g:checkBox name="combinedExecutionCheckbox" id="combinedExecutionCheckbox_${executionInstance?.id}" class="combinedCheckbox" />
 								</td>
 								<td align="center"
 									style="width: 35%; overflow: hidden; word-wrap: break-word;">
