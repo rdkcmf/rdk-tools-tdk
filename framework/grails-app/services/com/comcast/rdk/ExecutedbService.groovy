@@ -510,23 +510,25 @@ class ExecutedbService {
 				if(scriptFile){
 					def sMap = scriptService.getScriptNameModuleNameMapping(realPath)
 					moduleName = sMap.get(scriptName)
-					def moduleNameFromMap = moduleNameScriptListMap.get(moduleName)
-					if(moduleNameScriptListMap.containsKey(moduleName)){
-						def scriptPresentList = []
-						scriptPresentList = moduleNameScriptListMap.get(moduleName)
-						if(scriptPresentList.contains(scriptName)){
-							log.info "Script Name already present in map"
+					if(moduleName){
+						def moduleNameFromMap = moduleNameScriptListMap.get(moduleName)
+						if(moduleNameScriptListMap.containsKey(moduleName)){
+							def scriptPresentList = []
+							scriptPresentList = moduleNameScriptListMap.get(moduleName)
+							if(scriptPresentList.contains(scriptName)){
+								log.info "Script Name already present in map"
+							}
+							else{
+								def scriptNameListFromMap = []
+								scriptNameListFromMap = moduleNameScriptListMap.get(moduleName)
+								scriptNameListFromMap.add(scriptName)
+								moduleNameScriptListMap.put(moduleName, scriptNameListFromMap)
+							}
 						}
 						else{
-							def scriptNameListFromMap = []
-							scriptNameListFromMap = moduleNameScriptListMap.get(moduleName)
-							scriptNameListFromMap.add(scriptName)
-							moduleNameScriptListMap.put(moduleName, scriptNameListFromMap)
+							scriptNameListForMap.add(scriptName)
+							moduleNameScriptListMap.put(moduleName, scriptNameListForMap)
 						}
-					}
-					else{
-						scriptNameListForMap.add(scriptName)
-						moduleNameScriptListMap.put(moduleName, scriptNameListForMap)
 					}
 				}
 			}
