@@ -360,46 +360,48 @@ class PrimitiveService {
 
 		Map primitiveMap = [:]
 		try {
-			File primitiveXml = new File(newFilePath)
-			//def local = new XmlParser()
-			//def node = local.parse(primitiveXml)
-
-			def lines = primitiveXml?.readLines()
-			int indx = lines?.findIndexOf { it.startsWith("<?xml")}
-			String xmlContent =""
-			while(indx < lines.size()){
-				xmlContent = xmlContent + lines.get(indx)+"\n"
-				indx++
-			}
-			def parser = new XmlParser();
-			def node = parser.parseText(xmlContent?.toString())
-
-			node.each{
-				it.primitiveTests.each{
-					it.primitiveTest.each {
-						if("${it.attribute('name')}".equalsIgnoreCase(primitiveTestName)){
-							primitiveMap.put("name", "${it.attribute('name')}")
-							primitiveMap.put("version",  "${it.attribute('version')}")
-							primitiveMap.put("id","${it.attribute('id')}")
-							Set paramList = []
-							def moduleName = primitiveModuleMap.get(primitiveTestName)
-							primitiveMap.put("module",Module.findByName(moduleName))
-							def fun = Function.findByModuleAndName(Module.findByName(moduleName),it.function.text())
-							primitiveMap.put("function",fun)
-							it.parameters.each {
-								it.parameter.each{
-									def pType = ParameterType.findByNameAndFunction("${it.attribute('name')}",fun)
-									Map param = [:]
-									param.put("parameterType",pType)
-									param.put("value", "${it.attribute('value')}")
-									paramList.add(param)
+			if(newFilePath != null){
+				File primitiveXml = new File(newFilePath)
+				//def local = new XmlParser()
+				//def node = local.parse(primitiveXml)
+	
+				def lines = primitiveXml?.readLines()
+				int indx = lines?.findIndexOf { it.startsWith("<?xml")}
+				String xmlContent =""
+				while(indx < lines.size()){
+					xmlContent = xmlContent + lines.get(indx)+"\n"
+					indx++
+				}
+				def parser = new XmlParser();
+				def node = parser.parseText(xmlContent?.toString())
+	
+				node.each{
+					it.primitiveTests.each{
+						it.primitiveTest.each {
+							if("${it.attribute('name')}".equalsIgnoreCase(primitiveTestName)){
+								primitiveMap.put("name", "${it.attribute('name')}")
+								primitiveMap.put("version",  "${it.attribute('version')}")
+								primitiveMap.put("id","${it.attribute('id')}")
+								Set paramList = []
+								def moduleName = primitiveModuleMap.get(primitiveTestName)
+								primitiveMap.put("module",Module.findByName(moduleName))
+								def fun = Function.findByModuleAndName(Module.findByName(moduleName),it.function.text())
+								primitiveMap.put("function",fun)
+								it.parameters.each {
+									it.parameter.each{
+										def pType = ParameterType.findByNameAndFunction("${it.attribute('name')}",fun)
+										Map param = [:]
+										param.put("parameterType",pType)
+										param.put("value", "${it.attribute('value')}")
+										paramList.add(param)
+									}
+									primitiveMap.put("parameters",paramList)
 								}
-								primitiveMap.put("parameters",paramList)
-							}
-							//				 return primitiveMap
-						}else{
-							def ss = "${it.attribute('name')}"
-							if(ss == primitiveTestName){
+								//				 return primitiveMap
+							}else{
+								def ss = "${it.attribute('name')}"
+								if(ss == primitiveTestName){
+								}
 							}
 						}
 					}
