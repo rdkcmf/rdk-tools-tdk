@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
  If not stated otherwise in this file or this component's Licenses.txt file the
  following copyright and licenses apply:
@@ -12,8 +13,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
-<?xml version="1.0" encoding="UTF-8"?>
 <parameters>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -29,8 +28,6 @@
                <!--default valueof the param after factory reset -->
                <defaultValue>0</defaultValue>
         </parameter>
-
-
 		<parameter>
                 <!--the tr-181 parameter name -->
                <name>Device.Hosts.X_CISCO_COM_ConnectedWiFiNumber</name>
@@ -227,7 +224,6 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue>0</defaultValue>
-
         </parameter>
 		<parameter>
                 <!--the tr-181 parameter name -->
@@ -438,7 +434,6 @@
                <!--default value of the param after factory reset -->
                <defaultValue>900</defaultValue>
         </parameter>
-
 		<parameter>
                 <!--the tr-181 parameter name -->
                <name>Device.X_RDKCENTRAL-COM_Report.NetworkDevicesTraffic.PollingPeriod</name>
@@ -524,7 +519,3 @@
                <defaultValue>300</defaultValue>
         </parameter>
 </parameters>
-
-
-
-
