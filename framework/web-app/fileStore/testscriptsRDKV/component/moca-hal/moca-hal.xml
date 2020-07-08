@@ -186,7 +186,7 @@
         <function>TestMgr_MocaHal_GetTxGCDPhyRate</function>
         <parameters/>
       </primitiveTest>
-      <primitiveTest id="" name="MocaHal_GetResetCount" version="1">
+      <primitiveTest id="" name="MocaHal_Get_ResetCount" version="1">
         <function>TestMgr_MocaHal_GetResetCount</function>
         <parameters/>
       </primitiveTest>
