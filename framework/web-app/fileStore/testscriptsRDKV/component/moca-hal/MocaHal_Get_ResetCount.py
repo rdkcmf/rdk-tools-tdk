@@ -22,7 +22,7 @@
   <version>2</version>
   <name>MocaHal_Get_ResetCount</name>
   <primitive_test_id/>
-  <primitive_test_name>MocaHal_GetResetCount</primitive_test_name>
+  <primitive_test_name>MocaHal_Get_ResetCount</primitive_test_name>
   <primitive_test_version>1</primitive_test_version>
   <status>FREE</status>
   <synopsis>To to get the number of times the MoCA link got reset</synopsis>
@@ -84,7 +84,7 @@ mocahalObj.setLoadModuleStatus(mocaLoadStatus.upper());
 if "SUCCESS" in mocaLoadStatus.upper():
     expectedresult="SUCCESS"
     #Prmitive test case which associated to this Script
-    tdkTestObj = mocahalObj.createTestStep('MocaHal_GetResetCount');
+    tdkTestObj = mocahalObj.createTestStep('MocaHal_Get_ResetCount');
     #Execute the test case in STB
     tdkTestObj.executeTestCase(expectedresult);
     actualresult = tdkTestObj.getResult();
