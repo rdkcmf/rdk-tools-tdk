@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
  If not stated otherwise in this file or this component's Licenses.txt file the
  following copyright and licenses apply:
@@ -12,8 +13,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
-<?xml version="1.0" encoding="UTF-8"?>
 <parameters>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -461,7 +460,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>comcast</defaultValue>
+               <defaultValue>RDKM</defaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -489,9 +488,9 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!-- the range of values acceptable -->
-               <expectedValues></expectedValues>
+               <expectedValues>255.255.255.0</expectedValues>
                <!--default value of the param after factory reset -->
-               <defaultValue></defaultValue>
+               <defaultValue>255.255.255.0</defaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -505,9 +504,9 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!-- the range of values acceptable -->
-               <expectedValues></expectedValues>
+               <expectedValues>admin</expectedValues>
                <!--default value of the param after factory reset -->
-               <defaultValue></defaultValue>
+               <defaultValue>admin</defaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -521,9 +520,9 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!-- the range of values acceptable -->
-               <expectedValues></expectedValues>
+               <expectedValues>password</expectedValues>
                <!--default value of the param after factory reset -->
-               <defaultValue></defaultValue>
+               <defaultValue>password</defaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -541,4 +540,3 @@
                <defaultValue></defaultValue>
         </parameter>
 </parameters>
-
