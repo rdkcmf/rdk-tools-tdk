@@ -53,6 +53,7 @@ int vpHandle = 0;
 int vdHandle = 0;
 int apHandle = 0;
 int dispHandle = 0;
+string error = "";
 
 class RDKTestAgent;
 class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgent>
@@ -133,6 +134,8 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetHdmiInCurrentVideoMode", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetHdmiInCurrentVideoMode);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetAudioAtmosOutputMode", PARAMS_BY_NAME, JSON_STRING, "enable", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetAudioAtmosOutputMode);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetSinkDeviceAtmosCapability", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetSinkDeviceAtmosCapability);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetAudioCompression", PARAMS_BY_NAME, JSON_STRING, "audioCompression", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetAudioCompression);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetAudioCompression", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetAudioCompression);
                 }
 
                 //Inherited functions
@@ -215,5 +218,7 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                 void DSHal_GetHdmiInCurrentVideoMode(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_SetAudioAtmosOutputMode(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_GetSinkDeviceAtmosCapability(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetAudioCompression(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetAudioCompression(IN const Json::Value& req, OUT Json::Value& response);
 };
 #endif //__DSHAL_STUB_H__

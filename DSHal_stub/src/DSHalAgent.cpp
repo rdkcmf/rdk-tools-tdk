@@ -142,6 +142,37 @@ bool DSHalAgent::initialize(IN const char* szVersion)
     DEBUG_PRINT (DEBUG_TRACE, "DSHal Initialization Exit\n");
     return TEST_SUCCESS;
 }
+
+/***************************************************************************
+ *Function name : checkERROR
+ *Description    : This function is to check the ERROR return code of API
+******************************************************************************/
+void checkERROR(dsError_t ret,string *error)
+{
+    switch(ret)
+    {
+     case dsERR_NONE : DEBUG_PRINT(DEBUG_TRACE, "NO ERROR : dsERR_NONE\n");
+		       *error="dsERR_NONE";
+		       break;
+     case dsERR_GENERAL : DEBUG_PRINT(DEBUG_ERROR, "ERROR : dsERR_GENERAL\n");
+			  *error=" ERROR:dsERR_GENERAL";
+                          break;
+     case dsERR_INVALID_PARAM : DEBUG_PRINT(DEBUG_ERROR, "ERROR : dsERR_INVALID_PARAM\n");
+				*error=" ERROR:dsERR_INVALID_PARAM";
+                                break;
+     case dsERR_INVALID_STATE : DEBUG_PRINT(DEBUG_ERROR, "ERROR : dsERR_INVALID_STATE\n");
+				*error=" ERROR:dsERR_INVALID_STATE";
+                                break;
+     case dsERR_OPERATION_NOT_SUPPORTED : DEBUG_PRINT(DEBUG_ERROR, "ERROR : dsERR_OPERATION_NOT_SUPPORTED\n");
+					  *error=" ERROR:dsERR_OPERATION_NOT_SUPPORTED";
+                                          break;
+     case dsERR_UNKNOWN : DEBUG_PRINT(DEBUG_ERROR, "ERROR : dsERR_UNKNOWN\n");
+			  *error=" ERROR:dsERR_UNKNOWN";
+                          break;
+     default :DEBUG_PRINT(DEBUG_ERROR, "UNEXPECTED ERROR OBSERVED\n");
+	      *error="ERROR:UNEXPECTED ERROR";
+    }
+}
 /***************************************************************************
  *Function name : DSHal_GetVideoPort
  *Description    : This function is to get the video port handle
@@ -169,8 +200,10 @@ void DSHalAgent::DSHal_GetVideoPort(IN const Json::Value& req, OUT Json::Value& 
     }
     else
     {
+        checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Videoport handle not retrieved";
+        response["details"] = "Videoport handle not retrieved" + error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Handle : %d\n",vpHandle);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetVideoPort call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVideoPort -->Exit\n");
         return;
@@ -195,7 +228,7 @@ void DSHalAgent::DSHal_GetAudioPort(IN const Json::Value& req, OUT Json::Value& 
     dsError_t ret = dsERR_NONE;
     ret = dsGetAudioPort(portType, index, &apHandle);
 
-    if (ret == dsERR_NONE and apHandle)
+    if (ret == dsERR_NONE)
     {
         response["result"] = "SUCCESS";
         response["details"] = "Audioport handle retrieved";
@@ -205,8 +238,10 @@ void DSHalAgent::DSHal_GetAudioPort(IN const Json::Value& req, OUT Json::Value& 
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Audioport handle not retrieved";
+        response["details"] = "Audioport handle not retrieved"+ error;
+        DEBUG_PRINT(DEBUG_TRACE1, "Handle : %d\n",apHandle);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetAudioPort call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioPort -->Exit\n");
         return;
@@ -241,8 +276,10 @@ void DSHalAgent::DSHal_GetDisplay(IN const Json::Value& req, OUT Json::Value& re
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Display handle not retrieved";
+        response["details"] = "Display handle not retrieved"+ error;
+        DEBUG_PRINT(DEBUG_TRACE1, "Handle : %d\n",dispHandle);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetDisplay call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDisplay -->Exit\n");
         return;
@@ -271,8 +308,10 @@ void DSHalAgent::DSHal_GetSurroundMode(IN const Json::Value& req, OUT Json::Valu
     }
     else
     {
+        checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Surround mode not retrieved";
+        response["details"] = "Surround mode not retrieved"+ error;
+        DEBUG_PRINT(DEBUG_TRACE1, "Mode : %d\n",surroundMode);	
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetSurroundMode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSurroundMode -->Exit\n");
         return;
@@ -301,8 +340,10 @@ void DSHalAgent::DSHal_GetStereoMode(IN const Json::Value& req, OUT Json::Value&
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "StereoMode not retrieved";
+        response["details"] = "Stereo mode not retrieved"+ error;
+        DEBUG_PRINT(DEBUG_TRACE1, "Mode : %d\n",stereoMode);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetStereoMode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetStereoMode -->Exit\n");
         return;
@@ -335,8 +376,10 @@ void DSHalAgent::DSHal_SetStereoMode(IN const Json::Value& req, OUT Json::Value&
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "SetStereoMode call failed";
+        response["details"] = "SetStereoMode not retrieved"+ error;
+        DEBUG_PRINT(DEBUG_TRACE1, "Mode : %d\n",stereoMode);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetStereoMode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetStereoMode -->Exit\n");
         return;
@@ -365,8 +408,10 @@ void DSHalAgent::DSHal_GetAudioEncoding(IN const Json::Value& req, OUT Json::Val
     }
     else
     {
+        checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Encoding setting not retrieved";
+        response["details"] = "Encoding setting not retrieved"+ error;
+        DEBUG_PRINT(DEBUG_TRACE1, "Encoding : %d\n",encoding);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetAudioEncoding call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioEncoding -->Exit\n");
         return;
@@ -395,8 +440,10 @@ void DSHalAgent::DSHal_IsAudioPortEnabled(IN const Json::Value& req, OUT Json::V
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Audio port enable status not retrieved";
+        response["details"] = "Audio port enable status not retrieved"+ error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Port Status : %d\n",enabled);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsAudioPortEnabled call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioPortEnabled -->Exit\n");
         return;
@@ -429,8 +476,10 @@ void DSHalAgent::DSHal_EnableAudioPort(IN const Json::Value& req, OUT Json::Valu
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "EnableAudioPort call failed";
+        response["details"] = "EnableAudioPort call failed"+ error;
+        DEBUG_PRINT(DEBUG_TRACE1, "Port Status : %d\n",enable);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_EnableAudioPort call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_EnableAudioPort -->Exit\n");
         return;
@@ -459,8 +508,10 @@ void DSHalAgent::DSHal_IsDisplayConnected(IN const Json::Value& req, OUT Json::V
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Display connection status not retrieved";
+        response["details"] = "Display connection status not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Status : %d\n",connected);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsDisplayConnected call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsDisplayConnected -->Exit\n");
         return;
@@ -489,8 +540,10 @@ void DSHalAgent::DSHal_IsDisplaySurround(IN const Json::Value& req, OUT Json::Va
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Display surround status not retrieved";
+        response["details"] = "Display surround status not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Surround : %d\n",surround);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsDisplaySurround call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsDisplaySurround -->Exit\n");
         return;
@@ -519,8 +572,10 @@ void DSHalAgent::DSHal_GetHDCPProtocol(IN const Json::Value& req, OUT Json::Valu
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "HDCP protocol version not retrieved";
+        response["details"] = "HDCP protocol version not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Protocol : %d\n",protocolVersion);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetHDCPProtocol call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHDCPProtocol -->Exit\n");
         return;
@@ -550,8 +605,10 @@ void DSHalAgent::DSHal_GetHDCPReceiverProtocol(IN const Json::Value& req, OUT Js
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "HDCP receiver protocol version not retrieved";
+        response["details"] = "HDCP receiver protocol version not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Protocol : %d\n",protocolVersion);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetHDCPReceiverProtocol call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHDCPReceiverProtocol -->Exit\n");
         return;
@@ -580,8 +637,10 @@ void DSHalAgent::DSHal_GetHDCPCurrentProtocol(IN const Json::Value& req, OUT Jso
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "HDCP receiver protocol version not retrieved";
+        response["details"] = "HDCP receiver protocol version not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Protocol : %d\n",protocolVersion);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetHDCPCurrentProtocol call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHDCPCurrentProtocol -->Exit\n");
         return;
@@ -610,8 +669,10 @@ void DSHalAgent::DSHal_IsVideoPortEnabled(IN const Json::Value& req, OUT Json::V
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Audio port enable status not retrieved";
+        response["details"] = "Audio port enable status not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Status : %d\n",enabled);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsVideoPortEnabled call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsVideoPortEnabled -->Exit\n");
         return;
@@ -644,8 +705,10 @@ void DSHalAgent::DSHal_EnableVideoPort(IN const Json::Value& req, OUT Json::Valu
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "EnableVideoPort call failed";
+        response["details"] = "EnableVideoPort call failed"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Status : %d\n",enable);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_EnableVideoPort call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_EnableVideoPort -->Exit\n");
         return;
@@ -674,8 +737,10 @@ void DSHalAgent::DSHal_GetDisplayAspectRatio(IN const Json::Value& req, OUT Json
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Display aspect ratio not retrieved";
+        response["details"] = "Display aspect ratio not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Aspect Ratio : %d\n",aspect);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetDisplayAspectRatio call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDisplayAspectRatio -->Exit\n");
         return;
@@ -704,8 +769,10 @@ void DSHalAgent::DSHal_GetColorDepth(IN const Json::Value& req, OUT Json::Value&
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Color depth value not retrieved";
+        response["details"] = "Color depth value not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Color Depth : %d\n",depth);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetColorDepth call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetColorDepth -->Exit\n");
         return;
@@ -734,8 +801,10 @@ void DSHalAgent::DSHal_GetColorSpace(IN const Json::Value& req, OUT Json::Value&
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Color space value not retrieved";
+        response["details"] = "Color space value not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Color Space : %d\n",space);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetColorSpace call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetColorSpace -->Exit\n");
         return;
@@ -764,8 +833,10 @@ void DSHalAgent::DSHal_IsVideoPortActive(IN const Json::Value& req, OUT Json::Va
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Video port active status not retrieved";
+        response["details"] = "Video port active status not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Port : %d\n",active);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsVideoPortActive call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsVideoPortActive -->Exit\n");
         return;
@@ -794,8 +865,10 @@ void DSHalAgent::DSHal_HdmiInGetNumberOfInputs(IN const Json::Value& req, OUT Js
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Hdmi Number Of Inputs not retrieved";
+        response["details"] = "Hdmi Number Of Inputs not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "noofInputs : %d\n",noOfInputs);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_HdmiInGetNumberOfInputs call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetNumberOfInputs -->Exit\n");
         return;
@@ -826,8 +899,10 @@ void DSHalAgent::DSHal_HdmiInGetStatus(IN const Json::Value& req, OUT Json::Valu
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Hdmi status not retrieved";
+        response["details"] = "Hdmi status not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Status : %d\n",status);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_HdmiInGetStatus call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus -->Exit\n");
         return;
@@ -856,8 +931,10 @@ void DSHalAgent::DSHal_IsOutputHDR(IN const Json::Value& req, OUT Json::Value& r
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Output HDR status not retrieved";
+        response["details"] = "Output HDR status not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Status : %d\n",hdr);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsOutputHDR call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsOutputHDR -->Exit\n");
         return;
@@ -886,8 +963,10 @@ void DSHalAgent::DSHal_IsAudioMute(IN const Json::Value& req, OUT Json::Value& r
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Audio mute status not retrieved";
+        response["details"] = "Audio mute status not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Status : %d\n",muted);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsAudioMute call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMute -->Exit\n");
         return;
@@ -920,8 +999,9 @@ void DSHalAgent::DSHal_SetAudioMute(IN const Json::Value& req, OUT Json::Value& 
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "SetAudioMute call failed";
+        response["details"] = "SetAudioMute call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetAudioMute call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioMute -->Exit\n");
         return;
@@ -950,8 +1030,10 @@ void DSHalAgent::DSHal_GetAudioDelay(IN const Json::Value& req, OUT Json::Value&
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "StereoMode not retrieved";
+        response["details"] = "StereoMode not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Delay : %d\n",audioDelayMs);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetAudioDelay call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioDelay -->Exit\n");
         return;
@@ -984,8 +1066,9 @@ void DSHalAgent::DSHal_SetAudioDelay(IN const Json::Value& req, OUT Json::Value&
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "SetAudioDelay call failed";
+        response["details"] = "SetAudioDelay call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetAudioDelay call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioDelay -->Exit\n");
         return;
@@ -1014,8 +1097,10 @@ void DSHalAgent::DSHal_GetAudioDelayOffset(IN const Json::Value& req, OUT Json::
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "StereoMode not retrieved";
+        response["details"] = "StereoMode not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Delay : %d\n",audioDelayOffsetMs);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetAudioDelayOffset call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioDelayOffset -->Exit\n");
         return;
@@ -1048,8 +1133,9 @@ void DSHalAgent::DSHal_SetAudioDelayOffset(IN const Json::Value& req, OUT Json::
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "SetAudioDelayOffset call failed";
+        response["details"] = "SetAudioDelayOffset call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetAudioDelayOffset call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioDelayOffset -->Exit\n");
         return;
@@ -1078,8 +1164,10 @@ void DSHalAgent::DSHal_IsAudioMSDecode(IN const Json::Value& req, OUT Json::Valu
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "AudioMSDecode status not retrieved";
+        response["details"] = "AudioMSDecode status not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Status : %d", ms11Enabled);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsAudioMSDecode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMSDecode -->Exit\n");
         return;
@@ -1108,8 +1196,10 @@ void DSHalAgent::DSHal_IsAudioMS12Decode(IN const Json::Value& req, OUT Json::Va
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "AudioMS12Decode status not retrieved";
+        response["details"] = "AudioMS12Decode status not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Status : %d", ms12Enabled);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsAudioMS12Decode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsAudioMS12Decode -->Exit\n");
         return;
@@ -1139,8 +1229,10 @@ void DSHalAgent::DSHal_GetHdmiPreference(IN const Json::Value& req, OUT Json::Va
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "StereoMode not retrieved";
+        response["details"] = "StereoMode not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Protocol : %d", hdcpProtocol);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetHdmiPreference call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHdmiPreference -->Exit\n");
         return;
@@ -1173,8 +1265,9 @@ void DSHalAgent::DSHal_SetHdmiPreference(IN const Json::Value& req, OUT Json::Va
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "SetHdmiPreference call failed";
+        response["details"] = "SetHdmiPreference call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetHdmiPreference call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetHdmiPreference -->Exit\n");
         return;
@@ -1207,8 +1300,9 @@ void DSHalAgent::DSHal_SetBackgroundColor(IN const Json::Value& req, OUT Json::V
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "SetBackgroundColor call failed";
+        response["details"] = "SetBackgroundColor call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetBackgroundColor call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetBackgroundColor -->Exit\n");
         return;
@@ -1238,6 +1332,7 @@ void DSHalAgent::DSHal_SetFPBrightness(IN const Json::Value& req, OUT Json::Valu
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
         if(ret == dsERR_INVALID_PARAM)
         {
@@ -1245,7 +1340,7 @@ void DSHalAgent::DSHal_SetFPBrightness(IN const Json::Value& req, OUT Json::Valu
         }
         else
         {
-            response["details"] = "Brightness not set successfully";
+            response["details"] = "Brightness not set successfully"+error;
         }
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetFPBrightness call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPBrightness -->Exit\n");
@@ -1276,6 +1371,7 @@ void DSHalAgent::DSHal_GetFPBrightness(IN const Json::Value& req, OUT Json::Valu
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
         if(ret == dsERR_INVALID_PARAM)
         {
@@ -1283,7 +1379,7 @@ void DSHalAgent::DSHal_GetFPBrightness(IN const Json::Value& req, OUT Json::Valu
         }
         else
         {
-            response["details"] = "Brightness value not retrieved";
+            response["details"] = "Brightness value not retrieved"+error;
         }
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetFPBrightness call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetFPBrightness -->Exit\n");
@@ -1310,8 +1406,10 @@ void DSHalAgent::DSHal_GetCPUTemperature(IN const Json::Value& req, OUT Json::Va
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "CPU Temperature value not retrieved";
+        response["details"] = "CPU Temperature value not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "TEMPERATURE :%f",temp);
         DEBUG_PRINT(DEBUG_ERROR, "dsGetCPUTemperature call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetCPUTemperature -->Exit\n");
         return;
@@ -1337,8 +1435,10 @@ void DSHalAgent::DSHal_GetVersion(IN const Json::Value& req, OUT Json::Value& re
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "DSHAL version number not retrieved";
+        response["details"] = "DSHAL version number not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Version :%d",version);
         DEBUG_PRINT(DEBUG_ERROR, "dsGetVersion call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVersion -->Exit\n");
         return;
@@ -1369,8 +1469,9 @@ void DSHalAgent::DSHal_SetVersion(IN const Json::Value& req, OUT Json::Value& re
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "DSHAL version number not set";
+        response["details"] = "DSHAL version number not set"+error;
         DEBUG_PRINT(DEBUG_ERROR, "dsSetVersion call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetVersion -->Exit\n");
         return;
@@ -1396,8 +1497,10 @@ void DSHalAgent::DSHal_GetHDRCapabilities(IN const Json::Value& req, OUT Json::V
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "STB HDR capabilities not retrieved";
+        response["details"] = "STB HDR capabilities not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Capability :%d",capability);
         DEBUG_PRINT(DEBUG_ERROR, "dsGetHDRCapabilities call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHDRCapabilities -->Exit\n");
         return;
@@ -1423,8 +1526,10 @@ void DSHalAgent::DSHal_GetSupportedVideoCodingFormats(IN const Json::Value& req,
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Supported video coding formats not retrieved";
+        response["details"] = "Supported video coding formats not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Format :%d",supportedFormat);
         DEBUG_PRINT(DEBUG_ERROR, "dsGetSupportedVideoCodingFormats call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSupportedVideoCodingFormats -->Exit\n");
         return;
@@ -1530,8 +1635,9 @@ void DSHalAgent::DSHal_GetVideoCodecInfo(IN const Json::Value& req, OUT Json::Va
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "Video Codec Info not retrieved";
+        response["details"] = "Video Codec Info not retrieved"+error;
         DEBUG_PRINT(DEBUG_ERROR, "dsGetVideoCodecInfo call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVideoCodecInfo -->Exit\n");
         return;
@@ -1557,8 +1663,10 @@ void DSHalAgent::DSHal_GetTVHDRCapabilities(IN const Json::Value& req, OUT Json:
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "TV HDR capabilities not retrieved";
+        response["details"] = "TV HDR capabilities not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Capability : %d",capabilities);
         DEBUG_PRINT(DEBUG_ERROR, "dsGetTVHDRCapabilities call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetTVHDRCapabilities -->Exit\n");
         return;
@@ -1604,8 +1712,9 @@ void DSHalAgent::DSHal_SetFPBlink(IN const Json::Value& req, OUT Json::Value& re
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "dsSetFPBlink call failed";
+        response["details"] = "dsSetFPBlink call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetFPBlink call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPBlink -->Exit\n");
         return;
@@ -1678,8 +1787,9 @@ void DSHalAgent::DSHal_SetFPColor(IN const Json::Value& req, OUT Json::Value& re
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "dsSetFPColor call failed";
+        response["details"] = "dsSetFPColor call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "dsSetFPColor call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPColor -->Exit\n");
         return;
@@ -1743,8 +1853,9 @@ void DSHalAgent::DSHal_SetFPTime(IN const Json::Value& req, OUT Json::Value& res
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "dsSetFPTime call failed";
+        response["details"] = "dsSetFPTime call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "dsSetFPTime call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPTime -->Exit\n");
         return;
@@ -1783,8 +1894,9 @@ void DSHalAgent::DSHal_SetFPText(IN const Json::Value& req, OUT Json::Value& res
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "dsSetFPText call failed";
+        response["details"] = "dsSetFPText call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "dsSetFPText call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPText -->Exit\n");
         return;
@@ -1823,8 +1935,9 @@ void DSHalAgent::DSHal_SetFPTextBrightness(IN const Json::Value& req, OUT Json::
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "dsSetFPTextBrightness call failed";
+        response["details"] = "dsSetFPTextBrightness call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "dsSetFPTextBrightness call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetFPTextBrightness -->Exit\n");
         return;
@@ -1853,8 +1966,10 @@ void DSHalAgent::DSHal_GetVideoEOTF(IN const Json::Value& req, OUT Json::Value& 
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "EOTF value not retrieved";
+        response["details"] = "EOTF value not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "EOTF : %d",eotf);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetVideoEOTF call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVideoEOTF -->Exit\n");
         return;
@@ -1890,8 +2005,9 @@ void DSHalAgent::DSHal_HdmiInScaleVideo(IN const Json::Value& req, OUT Json::Val
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "DSHal_HdmiInScaleVideo call is FAILURE";
+        response["details"] = "DSHal_HdmiInScaleVideo call is FAILURE"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_HdmiInScaleVideo call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInScaleVideo -->Exit\n");
         return;
@@ -1920,8 +2036,10 @@ void DSHalAgent::DSHal_IsHDCPEnabled(IN const Json::Value& req, OUT Json::Value&
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "HDCP status not retrieved";
+        response["details"] = "HDCP status not retrieved"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Status: %d",contentProtected);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_IsHDCPEnabled call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_IsHDCPEnabled -->Exit\n");
         return;
@@ -1962,8 +2080,10 @@ void DSHalAgent::DSHal_EnableLEConfig(IN const Json::Value& req, OUT Json::Value
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "EnableLEConfig call failed";
+        response["details"] = "EnableLEConfig call failed"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Status : %d",enable);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_EnableLEConfig call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_EnableLEConfig -->Exit\n");
         return;
@@ -2000,8 +2120,10 @@ void DSHalAgent::DSHal_GetLEConfig(IN const Json::Value& req, OUT Json::Value& r
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetLEConfig call failed";
+        response["details"] = "GetLEConfig call failed"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Status : %d",enable);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetLEConfig call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetLEConfig -->Exit\n");
         return;
@@ -2038,8 +2160,10 @@ void DSHalAgent::DSHal_GetSupportedTvResolutions(IN const Json::Value& req, OUT 
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetSupportedTvResolutions call failed";
+        response["details"] = "GetSupportedTvResolutions call failed"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Resolutions : %d",resolutions);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetSupportedTvResolutions call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSupportedTvResolutions -->Exit\n");
         return;
@@ -2068,8 +2192,10 @@ void DSHalAgent::DSHal_GetMatrixCoefficients(IN const Json::Value& req, OUT Json
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetMatrixCoefficients call failed";
+        response["details"] = "GetMatrixCoefficients call failed"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Coefficients : %d",coefficients);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetMatrixCoefficients call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetMatrixCoefficients -->Exit\n");
         return;
@@ -2110,8 +2236,9 @@ void DSHalAgent::DSHal_SetDolbyVolumeMode(IN const Json::Value& req, OUT Json::V
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "SetDolbyVolumeMode call failed";
+        response["details"] = "SetDolbyVolumeMode call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetDolbyVolumeMode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetDolbyVolumeMode -->Exit\n");
         return;
@@ -2148,8 +2275,10 @@ void DSHalAgent::DSHal_GetDolbyVolumeMode(IN const Json::Value& req, OUT Json::V
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetDolbyVolumeMode call failed";
+        response["details"] = "GetDolbyVolumeMode call failed"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Mode : %d",mode);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetDolbyVolumeMode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDolbyVolumeMode -->Exit\n");
         return;
@@ -2195,8 +2324,9 @@ void DSHalAgent::DSHal_SetResolution(IN const Json::Value& req, OUT Json::Value&
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "SetResolution call failed";
+        response["details"] = "SetResolution call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetResolution call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetResolution -->Exit\n");
         return;
@@ -2235,8 +2365,10 @@ void DSHalAgent::DSHal_GetResolution(IN const Json::Value& req, OUT Json::Value&
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetResolution call failed";
+        response["details"] = "GetResolution call failed"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Resolutions : %d",resolution);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetResolution call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetResolution -->Exit\n");
         return;
@@ -2265,8 +2397,10 @@ void DSHalAgent::DSHal_GetSocIDFromSDK(IN const Json::Value& req, OUT Json::Valu
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetSocIDFromSDK call failed";
+        response["details"] = "GetSocIDFromSDK call failed"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "SocID : %d",id);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetSocIDFromSDK call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSocIDFromSDK -->Exit\n");
         return;
@@ -2307,8 +2441,9 @@ void DSHalAgent::DSHal_SetIntelligentEqualizerMode(IN const Json::Value& req, OU
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "SetIntelligentEqualizerMode call failed";
+        response["details"] = "SetIntelligentEqualizerMode call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetIntelligentEqualizerMode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetIntelligentEqualizerMode -->Exit\n");
         return;
@@ -2345,8 +2480,10 @@ void DSHalAgent::DSHal_GetIntelligentEqualizerMode(IN const Json::Value& req, OU
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetIntelligentEqualizerMode call failed";
+        response["details"] = "GetIntelligentEqualizerMode call failed"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Mode : %d",mode);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetIntelligentEqualizerMode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetIntelligentEqualizerMode -->Exit\n");
         return;
@@ -2388,8 +2525,9 @@ void DSHalAgent::DSHal_SetDialogEnhancement(IN const Json::Value& req, OUT Json:
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "SetDialogEnhancement call failed";
+        response["details"] = "SetDialogEnhancement call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetDialogEnhancement call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetDialogEnhancement -->Exit\n");
         return;
@@ -2426,8 +2564,10 @@ void DSHalAgent::DSHal_GetDialogEnhancement(IN const Json::Value& req, OUT Json:
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetDialogEnhancement call failed";
+        response["details"] = "GetDialogEnhancement call failed"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Level : %d",level);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetDialogEnhancement call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDialogEnhancement -->Exit\n");
         return;
@@ -2460,8 +2600,9 @@ void DSHalAgent::DSHal_HdmiInSelectZoomMode(IN const Json::Value& req, OUT Json:
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "HdmiInSelectZoomMode call failed";
+        response["details"] = "HdmiInSelectZoomMode call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_HdmiInSelectZoomMode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInSelectZoomMode -->Exit\n");
         return;
@@ -2492,8 +2633,9 @@ void DSHalAgent::DSHal_GetEDID(IN const Json::Value& req, OUT Json::Value& respo
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetEDID call failed";
+        response["details"] = "GetEDID call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetEDID call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetEDID -->Exit\n");
         return;
@@ -2582,8 +2724,9 @@ void DSHalAgent::DSHal_GetEDIDBytes(IN const Json::Value& req, OUT Json::Value& 
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetEDIDBytes call failed";
+        response["details"] = "GetEDIDBytes call failed"+error;
         DEBUG_PRINT(DEBUG_LOG, "dsGetEDIDBytes call FAILED");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetEDIDBytes -->Exit\n");
         return;
@@ -2617,8 +2760,9 @@ void DSHalAgent::DSHal_GetCurrentOutputSettings(IN const Json::Value& req, OUT J
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetCurrentOutputSettings call failed";
+        response["details"] = "GetCurrentOutputSettings call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetCurrentOutputSettings call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetCurrentOutputSettings -->Exit\n");
         return;
@@ -2651,6 +2795,7 @@ void DSHalAgent::DSHal_HdmiInSelectPort(IN const Json::Value& req, OUT Json::Val
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
         response["details"] = "HdmiInSelectPort call failed";
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_HdmiInSelectPort call is FAILURE");
@@ -2667,7 +2812,7 @@ void DSHalAgent::DSHal_GetHdmiInCurrentVideoMode(IN const Json::Value& req, OUT 
     DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHdmiInCurrentVideoMode --->Entry\n");
 
     dsError_t ret = dsERR_NONE;
-    char output[50];
+    char output[100];
     dsVideoPortResolution_t resolution;
 
     ret =  dsHdmiInGetCurrentVideoMode(&resolution);
@@ -2683,8 +2828,9 @@ void DSHalAgent::DSHal_GetHdmiInCurrentVideoMode(IN const Json::Value& req, OUT 
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetHdmiInCurrentVideoMode call failed";
+        response["details"] = "GetHdmiInCurrentVideoMode call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetHdmiInCurrentVideoMode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHdmiInCurrentVideoMode -->Exit\n");
         return;
@@ -2721,8 +2867,10 @@ void DSHalAgent::DSHal_GetSinkDeviceAtmosCapability(IN const Json::Value& req, O
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "GetSinkDeviceAtmosCapability call failed";
+        response["details"] = "GetSinkDeviceAtmosCapability call failed"+error;
+	DEBUG_PRINT(DEBUG_TRACE1, "Capability :%d",capability);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetSinkDeviceAtmosCapability call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSinkDeviceAtmosCapability -->Exit\n");
         return;
@@ -2763,13 +2911,83 @@ void DSHalAgent::DSHal_SetAudioAtmosOutputMode(IN const Json::Value& req, OUT Js
     }
     else
     {
+	checkERROR(ret,&error);
         response["result"] = "FAILURE";
-        response["details"] = "SetAudioAtmosOutputMode call failed";
+        response["details"] = "SetAudioAtmosOutputMode call failed"+error;
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetAudioAtmosOutputMode call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioAtmosOutputMode -->Exit\n");
         return;
     }
 }
+/***************************************************************************
+ *Function name : DSHal_GetAudioCompression
+ *Description    : This function is to get the audio compression
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetAudioCompression(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioCompression --->Entry\n");
+
+    dsError_t ret = dsERR_NONE;
+    int audioCompression;
+
+    ret = dsGetAudioCompression(apHandle, &audioCompression);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = audioCompression;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetAudioCompression call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioCompression -->Exit\n");
+        return;
+    }
+    else
+    {
+        checkERROR(ret,&error);
+        response["result"] = "FAILURE";
+        response["details"] = "AudioCompression not retrieved" + error;
+        DEBUG_PRINT(DEBUG_TRACE1, "Handle : %d\n",apHandle);
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetAudioCompression call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetAudioCompression -->Exit\n");
+        return;
+    }
+}
+/***************************************************************************
+ *Function name : DSHal_SetAudioCompression
+ *Description    : This function is to set the audio compression
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetAudioCompression(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioCompression --->Entry\n");
+    if(&req["audioCompression"] == NULL)
+    {
+        return;
+    }
+
+    int audioCompression = req["audioCompression"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsSetAudioCompression(apHandle, audioCompression);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetAudioCompression call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetAudioCompression call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioCompression -->Exit\n");
+        return;
+    }
+    else
+    {
+        checkERROR(ret,&error);
+        response["result"] = "FAILURE";
+        response["details"] = "SetAudioCompression call failed" + error;
+   	    DEBUG_PRINT(DEBUG_TRACE1, "Handle : %d\n",apHandle);
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetAudioCompression call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioCompression -->Exit\n");
+        return;
+    }
+}
+
 /**************************************************************************
 Function Name   : cleanup
 
