@@ -1079,6 +1079,7 @@ void DeviceSettingsAgent::AOP_setCompression(IN const Json::Value& req, OUT Json
 	std::string portName=req["port_name"].asCString();
 	char compressionDetails1[60] ="Compression format:";
         const int compressionFormat=req["compression_format"].asInt();
+	const int get_only=req["get_only"].asInt();
 	char *compressionDetails = (char*)malloc(sizeof(char)*200);
 	memset(compressionDetails,'\0', (sizeof(char)*200));
 	try
@@ -1088,8 +1089,11 @@ void DeviceSettingsAgent::AOP_setCompression(IN const Json::Value& req, OUT Json
 		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
 		/*getting instance for audio ports*/	
 		device::AudioOutputPort aPort = vPort.getAudioOutputPort();
-		DEBUG_PRINT(DEBUG_LOG,"\nCalling setCompression\n");
-		aPort.setCompression(compressionFormat);
+		if(!get_only)
+		{
+			DEBUG_PRINT(DEBUG_LOG,"\nCalling setCompression\n");
+			aPort.setCompression(compressionFormat);
+		}
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling getCompression\n");
 		DEBUG_PRINT(DEBUG_LOG,"\nGetCompression:%d\n",aPort.getCompression());
 		sprintf(compressionDetails,"%d",aPort.getCompression());

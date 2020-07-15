@@ -127,7 +127,8 @@
         <function>TestMgr_DS_AOP_setCompression</function>
         <parameters>
           <parameter name="port_name" value="HDMI0"/>
-          <parameter name="compression_format" value="LIGHT"/>
+          <parameter name="compression_format" value="0"/>
+	  <parameter name="get_only" value="0"/>
         </parameters>
       </primitiveTest>
       <primitiveTest id="79" name="DS_SetDFC" version="1">

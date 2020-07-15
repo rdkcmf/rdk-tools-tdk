@@ -155,7 +155,8 @@
       <parameter funName='TestMgr_DS_AOP_setEncoding' parameterName='port_name' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_DS_AOP_setEncoding' parameterName='encoding_format' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_DS_AOP_setCompression' parameterName='port_name' parameterType='STRING' range='A-Z' />
-      <parameter funName='TestMgr_DS_AOP_setCompression' parameterName='compression_format' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_AOP_setCompression' parameterName='compression_format' parameterType='INTEGER' range='-10-20' />
+      <parameter funName='TestMgr_DS_AOP_setCompression' parameterName='get_only' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_DS_AOP_setStereoMode' parameterName='port_name' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_DS_AOP_setStereoMode' parameterName='stereo_mode' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_DS_AOP_setStereoMode' parameterName='get_only' parameterType='INTEGER' range='0-1' />
