@@ -1879,20 +1879,19 @@ class ExecutionController {
 	 */
 	def searchExecutionList(){
 		def executionList = []
-		def executionResultList = []
-		def executions = Execution.findAllByNameLike("%${params?.searchName.trim()}%")
+		def executions = Execution.findAllByNameLike("%${params?.searchName.trim()}%",[max: 1000])
 		if(executions?.size() > 0){
 			executions.each{ execution ->
 				executionList.add(execution)
 			}
 		}else{
-			executions = Execution.findAllByScriptGroupLike("%${params?.searchName.trim()}%")
+			executions = Execution.findAllByScriptGroupLike("%${params?.searchName.trim()}%",[max: 1000])
 			if(executions?.size() >0){
 				executions.each{ execution ->
 					executionList.add(execution)
 				}
 			}
-			executionResultList = ExecutionResult.findAllByScriptLike("%${params?.searchName.trim()}%")
+			def executionResultList = ExecutionResult.findAllByScriptLike("%${params?.searchName.trim()}%",[sort: 'id', order: 'desc',max: 1000])
 			if(executionResultList?.size() >0){
 				executionResultList.each{ executionResultInstance ->
 					if(!executionList.contains(executionResultInstance.execution)){
@@ -1905,14 +1904,14 @@ class ExecutionController {
 				if(searchString?.equalsIgnoreCase("SUCCESS")){
 					searchString = "COMPLETED"
 				}
-				executions = Execution.findAllByExecutionStatusLike("%${searchString}%")
+				executions = Execution.findAllByExecutionStatusLike("%${searchString}%",[max: 1000])
 				if(executions?.size() >0){
 					executions.each{ execution ->
 						executionList.add(execution)
 					}
 				}else{
 				searchString = searchString?.trim()
-				def executionDevices = ExecutionDevice.findAllByBuildNameLike("%${searchString}%")
+				def executionDevices = ExecutionDevice.findAllByBuildNameLike("%${searchString}%",[max: 1000])
 				if(executionDevices?.size() >0){
 					executionDevices.each{ execDev ->
 						executionList.add(execDev?.execution)
