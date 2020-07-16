@@ -59,6 +59,7 @@
 
 #define CRASH_STATUS_FILE "crashStatus.ini"
 #define FLUSH_IP_TABLE "sh $TDK_PATH/flush_iptables.sh"
+#define FREE_UP_TDK_PORTS "sh $TDK_PATH/FreeUpTDKPorts.sh"
 
 using namespace std;
 using namespace Json;
@@ -1014,10 +1015,12 @@ void *AgentExecuter (void *pProcessDetails)
     int nPID = RETURN_SUCCESS;
 
     struct sProcessInfo *pProcessInfo = (struct sProcessInfo *) pProcessDetails;
-
+  
     /* Restart the agent if s_bAgentReset is true */
     while(s_bAgentReset)
     {
+        /* Freeing up TDK ports 8087 and 8088"*/
+        system (FREE_UP_TDK_PORTS);
         nPID = fork();
         if (nPID == RETURN_SUCCESS)
         {
