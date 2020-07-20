@@ -15,31 +15,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-##########################################################################
-#
-import json;
-import pycurl
-import os
+###########################################################################
+
 import sys
+import urllib2
 from StringIO import StringIO
-
-response_buffer = StringIO()
-curl = pycurl.Curl()
-
 if ( (len(sys.argv)) != 2):
-	print "Usage : python " + sys.argv[0] + " Device_IP_Address"
-	print "eg    : python " + sys.argv[0] + " 192.168.160.229"
-	exit()
+        print "Usage : python " + sys.argv[0] + " Device_IP_Address"
+        print "eg    : python " + sys.argv[0] + " 192.168.160.229"
+        exit()
 else:
-	url = 'http://'+sys.argv[1]+'/Service/DeviceInfo'
-	curl.setopt(curl.URL, url)
-	curl.setopt(pycurl.HTTPGET, True)
-	curl.setopt(curl.WRITEFUNCTION, response_buffer.write)
-	curl.perform()
-	response = response_buffer.getvalue()
-	statusCode = curl.getinfo(pycurl.RESPONSE_CODE);
-
-	if statusCode == 200:
-		print "FREE"
-	else:
-		print "NOTFOUND"	
+    try:
+        url = 'http://'+sys.argv[1]+'/jsonrpc'
+        statusCode = urllib2.urlopen(url,timeout=3).getcode()
+        if statusCode == 200:
+                print "FREE"
+        else:
+                print "NOTFOUND"
+    except:
+        e = sys.exc_info()
+        print "NOTFOUND"
