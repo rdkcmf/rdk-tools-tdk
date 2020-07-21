@@ -293,7 +293,13 @@ function isDeviceExist(stbName){
 	});
 }
 
-
-
-
-
+/**
+ * Function to hide/show the port configuration div's while adding or editing a device
+ */
+function showPortConfigDiv(){
+	if(document.getElementById('portConfigureRadio').checked) {
+		 $("#deviceConfigurePorts").show();	
+	}else{
+		$("#deviceConfigurePorts").hide();	
+	}
+}

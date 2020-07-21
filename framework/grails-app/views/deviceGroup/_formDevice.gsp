@@ -295,6 +295,37 @@
 			checked="${deviceInstance?.isThunderEnabled == 1}" />
 	</div>
 </g:if>
+<div id="portConfigureDiv" class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'portConfigure', 'error')}">
+	<label for="portConfigure"> <g:message code="device.portConfigure.label" default="Configure Device Ports" />
+	</label>
+	<input onclick="showPortConfigDiv();" id="portConfigureRadio" type="checkbox" name="portConfigure" value="true">
+</div>
+<div style="display: none;" id="deviceConfigurePorts">
+	<div
+		class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'stbPort', 'error')} required">
+		<label for="stbPort"> <g:message
+				code="device.stbPort.label" default="Agent Port" />
+		</label>
+		<g:textField name="agentport" id="stbPort"
+			value="${deviceInstance?.stbPort}" class="textwidth" />
+	</div>
+	<div
+		class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'statusPort', 'error')} required">
+		<label for="statusPort"> <g:message
+				code="device.statusPort.label" default="Agent Status Port" />
+		</label>
+		<g:textField name="agentstatusPort" id="statusPort"
+			value="${deviceInstance?.statusPort}" class="textwidth" />
+	</div>
+	<div
+		class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'agentMonitorPort', 'error')} required">
+		<label for="agentMonitorPort"> <g:message
+				code="device.agentMonitorPort.label" default="Agent Monitor Port" />
+		</label>
+		<g:textField name="agentmonitorPort" id="agentMonitorPort"
+			value="${deviceInstance?.agentMonitorPort}" class="textwidth" />
+	</div>
+</div>
 <div style="display: none;" id="gatewayIdedit"
 	class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'gatewayIp', 'error')}">
 	<label for="gatewayIp"> <g:message
