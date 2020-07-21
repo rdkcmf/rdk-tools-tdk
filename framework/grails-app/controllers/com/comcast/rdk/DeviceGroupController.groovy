@@ -22,12 +22,17 @@ package com.comcast.rdk
  * @author sreejasuma
  */
 import static com.comcast.rdk.Constants.*
+
 import com.comcast.rdk.Category
+
 import grails.converters.JSON
+
 import java.sql.Timestamp
 import java.util.concurrent.ExecutorService
+
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.MarkupBuilder
+
 
 
 import org.apache.shiro.SecurityUtils;
@@ -317,13 +322,14 @@ class DeviceGroupController {
 			render(flash.message)
             return
         }
-		
-		def stbIps = Device.findAllByStbIpAndIsChild(params?.stbIp, 0)
-		
-		if(stbIps){
-			flash.message = message(code: 'stbip.already.exists')
-			render(flash.message)
-			return
+		if(!(params?.portConfigure)){
+			def stbIps = Device.findAllByStbIpAndIsChild(params?.stbIp, 0)
+			
+			if(stbIps){
+				flash.message = message(code: 'stbip.already.exists')
+				render(flash.message)
+				return
+			}
 		}
 		
 		if(params?.macId){
@@ -345,6 +351,13 @@ class DeviceGroupController {
 			    return
 			}
 		}
+		if(params?.portConfigure){
+			if ((params?.agentport?.trim()?.length() ==  0 ) || (params?.agentstatusPort?.trim()?.length() ==  0 ) || (params?.agentmonitorPort?.trim()?.length() ==  0 )){
+				flash.message = "Device ports should not be empty"
+				render(flash.message)
+				return
+			}
+		}
         
         /**
          * Check whether streams are present
@@ -362,6 +375,11 @@ class DeviceGroupController {
         }
 		}
 		def deviceInstance = new Device(params)
+		if(params?.portConfigure){
+			deviceInstance.stbPort = params?.agentport
+			deviceInstance.statusPort = params?.agentstatusPort
+			deviceInstance.agentMonitorPort = params?.agentmonitorPort
+		}
 		int enabled = 1;
 		int notEnabled = 0;
 		deviceInstance.isThunderEnabled = params?.thunderEnabled == "on"? enabled : notEnabled
@@ -421,7 +439,6 @@ class DeviceGroupController {
      */
     def updateDevice(Long id, Long version) {
         def deviceInstance = Device.get(id)
-
         if (!deviceInstance) {
             flash.message = message(code: 'default.not.found.message', args: [
                 message(code: 'device.label', default: 'Device'),
@@ -430,7 +447,15 @@ class DeviceGroupController {
             redirect(action: "list")
             return
         }
-
+		def stbIps
+		if(!(params?.portConfigure)){
+			stbIps = Device.findAllByStbIpAndIsChildAndStbNameNotEqual(params?.stbIp, 0,deviceInstance?.stbName)
+			if(stbIps){
+				flash.message = message(code: 'stbip.already.exists')
+				redirect(action: "list")
+				return
+			}
+		}
         if (version != null) {
             if (deviceInstance.version > version) {
                 deviceInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
@@ -441,9 +466,13 @@ class DeviceGroupController {
                 return
             }
         }
-		
-		
-		
+		if(params?.portConfigure){
+			if ((params?.agentport?.trim()?.length() ==  0 ) || (params?.agentstatusPort?.trim()?.length() ==  0 ) || (params?.agentmonitorPort?.trim()?.length() ==  0 )){
+				flash.message = "Device ports should not be empty"
+				redirect(action: "list")
+				return
+			}	
+		}	
 		
         boolean deviceInUse = devicegroupService.checkDeviceStatus(deviceInstance)
         if(deviceInUse){
@@ -478,6 +507,11 @@ class DeviceGroupController {
             deviceInstance.properties = params
 			int enabled = 1;
 			int notEnabled = 0;
+			if(params?.portConfigure){
+				deviceInstance.stbPort = params?.agentport
+				deviceInstance.statusPort = params?.agentstatusPort
+				deviceInstance.agentMonitorPort = params?.agentmonitorPort
+			}
 			deviceInstance.isThunderEnabled = params?.thunderEnabled == "on"? enabled : notEnabled
 			if(deviceInstance?.category == Category.RDKV){
 				if(currentBoxType.equals( BOXTYPE_CLIENT )){
@@ -2382,6 +2416,24 @@ class DeviceGroupController {
 			}
 		} catch (Exception e) {
 			e.printStackTrace()
+		}
+	}
+	
+	/**
+	 * Method to render all the ports configured for a device
+	 * @param stbIp
+	 * @return
+	 */
+	def getDevicePorts(final String stbIp) {
+		Device device = Device.findByStbIp(stbIp?.trim());
+		JsonObject outData = new JsonObject()
+		if(device){
+			outData.addProperty("agentPort", Integer.parseInt(device?.stbPort));
+			outData.addProperty("agentStatusPort", Integer.parseInt(device?.statusPort));
+			outData.addProperty("agentMonitorPort", Integer.parseInt(device?.agentMonitorPort));
+			render outData
+		}else{
+			render "Device not found"
 		}
 	}
 	
