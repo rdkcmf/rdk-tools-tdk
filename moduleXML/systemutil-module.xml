@@ -38,6 +38,7 @@
       <parameter funName='TestMgr_ExecuteBinary' parameterName='shell_script' parameterType='STRING' range='a-z' />
       <parameter funName='TestMgr_ExecuteBinary' parameterName='log_file' parameterType='STRING' range='a-z' />
       <parameter funName='TestMgr_ExecuteBinary' parameterName='tool_path' parameterType='STRING' range='a-z' />
+      <parameter funName='TestMgr_ExecuteBinary' parameterName='timeout' parameterType='INTEGER' range='0-30' />
     </parameters>
   </module>
 </xml>

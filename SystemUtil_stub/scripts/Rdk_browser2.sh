@@ -18,7 +18,8 @@
 ##########################################################################
 
 URL=$1
+TIMEOUT=$2
 rdkbrowser2.sh $URL &
-sleep 30
+sleep $TIMEOUT
 pkill rdkbrowser.sh
 pkill rdkbrowser2

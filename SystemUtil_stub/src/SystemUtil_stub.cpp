@@ -415,6 +415,7 @@ void SystemUtilAgent::SystemUtilAgent_ExecuteBinary(IN const Json::Value& req, O
         string scriptFile = req["shell_script"].asCString();
         string logFile = req["log_file"].asCString();
         string toolPath = req["tool_path"].asCString();
+        string timeout = req["timeout"].asCString();
         string ExecutionLogFile,ShellScript,testenvPath;
         int Status;
         if (logFile.empty() or toolPath.empty())
@@ -443,7 +444,7 @@ void SystemUtilAgent::SystemUtilAgent_ExecuteBinary(IN const Json::Value& req, O
                       int fd = open(ExecutionLogFile.c_str(), O_WRONLY|O_CREAT, 0666);
                       dup2(fd, 1);
                       close(fd);
-                      execlp("/bin/sh","sh",ShellScript.c_str(),toolPath.c_str(),NULL);
+                      execlp("/bin/sh","sh",ShellScript.c_str(),toolPath.c_str(),timeout.c_str(),NULL);
                 }
                 else if(idChild <0)
                 {
