@@ -236,6 +236,22 @@ AC_ARG_ENABLE([powermgrhal],
            [echo "powermgrhal component is not enabled"])
 AM_CONDITIONAL([POWERMGRHAL], [test x$POWERMGRHAL = xtrue])
 
+AC_ARG_ENABLE([hdmicechal],
+         AS_HELP_STRING([--enable-hdmicechal],[enable hdmicechal (default is no)]),
+         [
+           case "${enableval}" in
+              yes) HDMICECHAL=true
+                   AS_IF([test x$HYBRID = xtrue], [SUBDIR_HYBRID+=" HdmicecHal_stub "],
+                          [echo HdmicecHal enabled in Hybrid])
+                   AS_IF([test x$CLIENT = xtrue], [SUBDIR_CLIENT+=" HdmicecHal_stub "],
+                          [echo HdmicecHal enabled in Client]) ;;
+             no) HDMICECHAL=false ;;
+            *) AC_MSG_ERROR([bad value ${enableval} for --enable-hdmicechal ]) ;;
+             esac
+            ],
+           [echo "hdmicechal component is not enabled"])
+AM_CONDITIONAL([HDMICECHAL], [test x$HDMICECHAL = xtrue])
+
 AC_ARG_ENABLE([trace],
               AS_HELP_STRING([--enable-trace],[enable trace (default is no)]),
               [
@@ -307,5 +323,6 @@ AC_CONFIG_FILES([Makefile
 	 DSHal_stub/Makefile
          DeepSleepHal_stub/Makefile
          PowerMgrHal_stub/Makefile
+         HdmicecHal_stub/Makefile
 	 WIFIHAL_stub/Makefile])
 AC_OUTPUT
