@@ -64,7 +64,7 @@ class SystemUtilAgent : public RDKTestStubInterface, public AbstractServer<Syste
                    this->bindAndAddMethod(Procedure("TestMgr_GetrouteInfo", PARAMS_BY_NAME, JSON_STRING,"ip6enable",JSON_INTEGER,NULL), &SystemUtilAgent::SystemUtilAgent_GetrouteInfo);
                    this->bindAndAddMethod(Procedure("TestMgr_ExecuteCmd", PARAMS_BY_NAME, JSON_STRING,"command",JSON_STRING,NULL), &SystemUtilAgent::SystemUtilAgent_ExecuteCmd);
                    this->bindAndAddMethod(Procedure("TestMgr_Getoutput_json_file", PARAMS_BY_NAME, JSON_STRING,NULL), &SystemUtilAgent::SystemUtilAgent_Getoutput_json_file);
-                   this->bindAndAddMethod(Procedure("TestMgr_ExecuteBinary", PARAMS_BY_NAME, JSON_STRING,"shell_script",JSON_STRING,"log_file",JSON_STRING,NULL), &SystemUtilAgent::SystemUtilAgent_ExecuteBinary);
+                   this->bindAndAddMethod(Procedure("TestMgr_ExecuteBinary", PARAMS_BY_NAME, JSON_STRING,"shell_script",JSON_STRING,"tool_path",JSON_STRING,"log_file",JSON_STRING,"timeout",JSON_STRING,NULL), &SystemUtilAgent::SystemUtilAgent_ExecuteBinary);
                }
 
                 /*Inherited functions*/

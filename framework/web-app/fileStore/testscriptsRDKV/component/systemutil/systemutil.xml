@@ -29,6 +29,7 @@
           <parameter name="shell_script" value=""/>
           <parameter name="log_file" value=""/>
           <parameter name="tool_path" value=""/>
+          <parameter name="timeout" value=""/>
         </parameters>
       </primitiveTest>
     </primitiveTests>
