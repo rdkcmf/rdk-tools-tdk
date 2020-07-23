@@ -149,9 +149,13 @@ td {
 		<th>Test Group 
 		</th>
 		<th align="left">
-		 <g:if test="${executionInstance?.script}">
+		 <g:if test="${executionInstance?.script  || executionInstance?.scriptGroup}">
 		 	<g:if test="${executionInstance?.script?.toString()?.equals("Multiple Scripts")}">
 		 	<a href="${baseUrl}scriptGroup/downloadMultiScriptXml?name=${executionInstance?.name}&id=${executionInstance?.name}" target="_blank">MultipleScripts </a>
+<%--		 	<g:link controller="scriptGroup" action="downloadMultiScriptXml" name = "${executionInstance?.name}" id="${executionInstance?.name}" target="_blank" >MultipleScripts </g:link>	--%>
+		 	</g:if>
+		 	<g:if test="${executionInstance?.scriptGroup?.toString()?.equals("Multiple Scriptgroups")}">
+		 	<a href="${baseUrl}scriptGroup/downloadMultiScriptXml?name=${executionInstance?.name}&id=${executionInstance?.name}" target="_blank">Multiple Scriptgroups </a>
 <%--		 	<g:link controller="scriptGroup" action="downloadMultiScriptXml" name = "${executionInstance?.name}" id="${executionInstance?.name}" target="_blank" >MultipleScripts </g:link>	--%>
 		 	</g:if>
 			 <g:else>${testGroup}

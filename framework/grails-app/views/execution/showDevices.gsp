@@ -24,6 +24,7 @@
 $(document).ready(function() {
 	$("#scripts").select2();	
 	$("#devices").select2();
+	$("#scriptGrp").select2();
 	$("#scriptsThunder").select2();
 });
 
@@ -33,6 +34,7 @@ $(document).ready(function() {
 <g:form  method="post">
 	<input type="hidden" name="id" id="id" value="${device?.id}">
 	<g:hiddenField name="stbname" id="stbname" value="${device?.stbName}" />
+	<g:hiddenField name="stbtype" id="stbtype" value="${device?.isThunderEnabled}" />
 	<g:hiddenField name="exId" id="exId" value="${device?.id}" />	
 	<g:hiddenField name="category" id="category" value="${category}"/>
 	<table>
@@ -96,11 +98,18 @@ $(document).ready(function() {
 		</tr>
 		</g:if>
 		<tr>
-			<td>Select Script</td>
+			<td>
+			    <div id="testSuiteSpan" style="display: none;">
+			        <label>Select TestSuite</label>
+			    </div>
+			    <div id="scriptSpan">
+			        <label>Select Script</label>
+			    </div>
+			</td>
 			<td>
 			    <g:if test="${device?.isThunderEnabled != 1}">	
 				    <div id="testSuite" style="display: none;">
-				        <g:select id="scriptGrp" onchange="showDateTime();" name="scriptGrp" noSelection="['' : 'Please Select']" from="${scriptGrpList}" optionKey="id" required="" value="" class="many-to-one selectCombo"/>
+				        <g:select id="scriptGrp" multiple="true" style="height:200px;width:400px" onchange="showDateTime();" name="scriptGrp"  from="${scriptGrpList}" value="" class="many-to-one selectCombo"/>
 				    </div>
 				    <div id="singletest" >
 				        <g:select id="scripts" multiple="true" style="height:200px;width:400px" onchange="showDateTime();" name="scripts"  from="${scriptList}" value="" class="many-to-one selectCombo"/>
@@ -108,7 +117,7 @@ $(document).ready(function() {
 				</g:if>
 				<g:else>
 					<div id="testSuiteThunder" style="display: none;">
-				        <g:select id="scriptGrpThunder" onchange="showDateTime();" name="scriptGrpThunder" noSelection="['' : 'Please Select']" from="${scriptGrpList}" optionKey="id" required="" value="" class="many-to-one selectCombo"/>
+						<g:select id="scriptGrpThunder" onchange="showDateTime();" name="scriptGrpThunder" noSelection="['' : 'Please Select']" from="${scriptGrpList}" optionKey="id" required="" value="" class="many-to-one selectCombo"/>
 				    </div>
 				    <div id="singletestThunder" >
 				        <g:select id="scriptsThunder" name="scriptsThunder" multiple="true" style="height:200px;width:400px" onchange="showDateTime();" name="scriptsThunder"  from="${scriptListStorm}" value="" class="many-to-one selectCombo"/>
@@ -117,13 +126,22 @@ $(document).ready(function() {
 			</td>						
 		</tr>	
 		<tr>
-			<td>Repeat Test</td>
+			<td>Repeat Test Type</td>
 			<td>				
 				<%--<g:textField size="5" onkeypress="return digitonly(event);" id="repeatId" name="repeatNo" required="" value="1" />&nbsp; times (Not Applicable for scheduling)
 				--%>
-				<input size="5" id="repeatId" onkeypress="return isNumberKey(event)" type="text" name="repeatNo" required="" value="1">&nbsp; times		
-				&emsp;&emsp;<g:checkBox id="rerunId" name="rerun" checked="false" />&nbsp;Re-Run on Failure										
-			</td>						
+				<input onclick="showfullRepeat();" id="fullRepeatRadio" type="radio" name="myGroupRepeat" checked="checked" value="fullRepeat" title="Repeat the full execution"/><label title="Repeat the full execution">Full execution</label>
+				&emsp;<input onclick="showindividualRepeat();" id="individualRepeatRadio" type="radio" name="myGroupRepeat" value="individualRepeat" title="Repeat each individual script execution"/><label title="Repeat each individual script execution">Individual scripts</label>
+				<g:hiddenField id="repeatType" name="repeatType" value="full"/>
+			</td>
+		</tr>
+		<tr>
+		    <td></td>
+		    <td>
+				    <input size="5" id="repeatId" onkeypress="return isNumberKey(event)" type="text" name="repeatNo" required="" value="1">
+		            <input size="5" id="individualRepeatId" onkeypress="return isNumberKey(event)" type="text" name="individualRepeatNo" style="display: none;" required="" value="1">&nbsp; times
+				    &emsp;&emsp;<g:checkBox id="rerunId" name="rerun" checked="false" />&nbsp;Re-Run on Failure
+			</td>
 		</tr>
 		<tr>
 			<td>Execution Options</td>
@@ -142,7 +160,7 @@ $(document).ready(function() {
 					</g:submitToRemote>&emsp;	
 					</span>
 					<span id="scheduleBtn" class="buttons">
-						<input type=button class="save"  onclick="showScheduler(${device?.id}, '${category}');return false;"
+						<input id="scheduleBtnID" type=button class="save"  onclick="showScheduler(${device?.id}, '${category}');return false;"
 						value="Schedule" />	
 					</span>
 				</g:if>
@@ -152,8 +170,8 @@ $(document).ready(function() {
                     onComplete="completedThunder(${device?.id})" onFailure="changeStylesThunder()"  onSuccess="changeStylesThunder()">
                     </g:submitToRemote></span>&emsp;
 				    <span id="scheduleBtnThunder" class="buttons">
-					<input type=button class="save"  onclick="showScheduler(${device?.id}, '${category}');return false;"
-					value="Schedule" />
+					<input id="scheduleBtnThunderID" type=button class="save"  onclick="showScheduler(${device?.id}, '${category}');return false;"
+					value="Schedule" disabled/>
 					</span>
 				</g:else>
 				<div id="popup" style="display: none;">

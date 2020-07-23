@@ -135,6 +135,7 @@ public final class Constants
     public static final String KEY_RECCURENCE       = "ReccurenceSchedule";
     public static final String KEY_ONETIME          = "OnetimeSchedule";
     public static final String MULTIPLESCRIPT       = "Multiple Scripts";
+    public static final String MULTIPLESCRIPTGROUPS = "Multiple Scriptgroups";
     public static final String KEY_EXISTING         = "Existing";
     public static final String KEY_EXPECT           = "expect";
     public static final String KEY_BINARYTRANSFER   = "Binaries Transferred";

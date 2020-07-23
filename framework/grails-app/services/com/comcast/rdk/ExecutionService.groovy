@@ -1612,7 +1612,52 @@ class ExecutionService {
 		   return executionSaveStatus
 	   }
 	
-	
+		/**
+		 * Method to save details of execution in Execution Domain For Multiple ScriptGroup execution
+		 * @param execName
+		 * @param scriptName
+		 * @param deviceName
+		 * @param scriptGroupInstance
+		 * @return
+		 */
+		/*public boolean saveExecutionDetails(final String execName, String scriptName, String deviceName,
+		 ScriptGroup scriptGroupInstance , String appUrl,String isBenchMark , String isSystemDiagnostics,String rerun,String isLogReqd){*/
+		public boolean saveExecutionDetailsOnMultipleScriptgroups(final String execName, def map){
+			def executionSaveStatus = true
+			try {
+				Execution execution = new Execution()
+				execution.name = execName
+				execution.script = null
+				execution.scriptGroup = map.scriptName
+				execution.device = map.deviceName
+				execution.result = UNDEFINED_STATUS
+				execution.executionStatus = INPROGRESS_STATUS
+				execution.dateOfExecution = new Date()
+				if(map.containsKey("groups")){
+					execution.groups = map.groups
+				}
+				else{
+					execution.groups = getGroup()
+				}
+				execution.applicationUrl = map.appUrl
+				execution.isRerunRequired = map.rerun?.equals("true")
+				execution.isBenchMarkEnabled = map.isBenchMark?.equals("true")
+				execution.isStbLogRequired = map.isLogReqd?.equals("true")
+				execution.isSystemDiagnosticsEnabled = map.isSystemDiagnostics?.equals("true")
+				execution.rerunOnFailure= map.rerunOnFailure?.equals("true")
+				execution.scriptCount = map.scriptCount
+				execution.category = Utility.getCategory(map.category)
+				if(! execution.save(flush:true)) {
+					log.error "Error saving Execution instance : ${execution.errors}"
+					executionSaveStatus = false
+				}
+			}
+			catch(Exception th) {
+				th.printStackTrace()
+				executionSaveStatus = false
+			}
+			return executionSaveStatus
+		}
 	
 	
 	
@@ -1643,9 +1688,14 @@ class ExecutionService {
 			}
 			Execution execution = new Execution()
 			execution.name = execName
-			execution.script = map.scriptName
+			if(map.scriptName == MULTIPLESCRIPTGROUPS){
+				execution.script = null
+				execution.scriptGroup = map.scriptName
+			}else{
+			    execution.script = map.scriptName
+				execution.scriptGroup = map.scriptGroupInstance?.name
+			}
 			execution.device = map.deviceName
-			execution.scriptGroup = map.scriptGroupInstance?.name
 			execution.result = UNDEFINED_STATUS
 			execution.executionStatus = INPROGRESS_STATUS
 			execution.dateOfExecution = new Date()
