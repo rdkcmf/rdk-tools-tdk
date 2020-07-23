@@ -110,7 +110,7 @@ class ExecutescriptService {
 				e.printStackTrace()
 			}
 
-			def resultArray1 = ExecutionResult.executeQuery("select a.id from ExecutionResult a where a.execution = :exId and a.script = :scriptname and device = :devName ",[exId: executionInstance, scriptname: scriptInstance.name, devName: deviceInstance?.stbName.toString()])
+			def resultArray1 = ExecutionResult.executeQuery("select a.id from ExecutionResult a where a.execution = :exId and a.script = :scriptname and device = :devName and a.dateOfExecution = :doe",[exId: executionInstance, scriptname: scriptInstance.name, devName: deviceInstance?.stbName.toString(), doe: startTime])
 			if(resultArray1[0]){
 				executionResultId = resultArray1[0]
 			}
@@ -896,7 +896,11 @@ class ExecutescriptService {
 
 						def resultSize = executionResultList.size()
 						if(cnt == 0){
-							scriptName = executionInstance?.script
+							if(executionInstance?.scriptGroup == MULTIPLESCRIPTGROUPS){
+								scriptName = executionInstance?.scriptGroup
+							}else{
+								scriptName = executionInstance?.script
+							}
 							def deviceName = deviceInstance?.stbName
 							if(executionDeviceList.size() > 1){
 								deviceName = MULTIPLE
@@ -1194,8 +1198,8 @@ class ExecutescriptService {
 	 * @param rerun
 	 * @return
 	 */
-	def executescriptsOnDevice(String execName, String device, ExecutionDevice executionDevice, def scripts, def scriptGrp,
-			def executionName, def filePath, def realPath, def groupType, def url, def isBenchMark, def isSystemDiagnostics, def rerun,def isLogReqd, def category)
+	def executescriptsOnDevice(boolean singleScriptGroup, String execName, String device, ExecutionDevice executionDevice, def scripts, def scriptGrp,
+			def executionName, def filePath, def realPath, def groupType, def url, def isBenchMark, def isSystemDiagnostics, def rerun,def isLogReqd, def category, def repeatBackToBackCount)
 	{
 		boolean aborted = false
 		boolean pause = false
@@ -1212,74 +1216,95 @@ class ExecutescriptService {
 			deviceInstance= Device.findById(device)
 		}
 		deviceId = deviceInstance?.id
-		ScriptGroup scriptGroupInstance
 		StringBuilder output = new StringBuilder();
 		int scriptGrpSize = 0
 		int scriptCounter = 0
 		def isMultiple = TRUE
 		List pendingScripts = []
+		def scriptGroupScriptListMap = [:]
 
 		if(groupType == TEST_SUITE){
 			scriptCounter = 0
 			boolean skipStatus = false
 			boolean notApplicable = false
 			List validScriptList = new ArrayList()
+			List fullScriptList = new ArrayList()
 			String rdkVersion = executionService.getRDKBuildVersion(deviceInstance);
-
+            if(singleScriptGroup){
+				ScriptGroup.withSession{session->
+				    def scrptGroupInstance = ScriptGroup.findByName(scriptGrp,[fetch : [scriptList : "eager"]])
+					scriptGroupScriptListMap.put(scrptGroupInstance,scrptGroupInstance?.scriptList)
+					session.clear()
+				}
+			}else{
+			    for(scrptGrp in scriptGrp){
+					ScriptGroup.withSession{session->
+					    def scrptGroupInstance = ScriptGroup.findByName(scrptGrp,[fetch : [scriptList : "eager"]])
+						scriptGroupScriptListMap.put(scrptGroupInstance,scrptGroupInstance?.scriptList)
+					    session.clear()
+					}
+				}
+			}
 			ScriptGroup.withTransaction { trans ->
-				scriptGroupInstance = ScriptGroup.findById(scriptGrp)
-				scriptGroupInstance?.scriptList?.each { script ->
-				def scriptInstance1 = scriptService.getScript(realPath,script?.moduleName, script?.scriptName, category)
-				if(scriptInstance1){
-					if(executionService.validateScriptBoxTypes(scriptInstance1,deviceInstance)){
-						if(executionService.validateScriptRDKVersions(scriptInstance1,rdkVersion)){
-						if(scriptInstance1?.skip?.toString().equals("true")){
-							skipStatus = true
-							executionService.saveSkipStatus(Execution.findByName(execName), executionDevice, scriptInstance1, deviceInstance, category)
-							}else{
-								validScriptList << scriptInstance1
-							}
-						}else{
-							notApplicable = true
-							String rdkVersionData = ""
+				scriptGroupScriptListMap?.keySet()?.each{scriptGroupInstance ->
+
+				        scriptGroupInstance?.scriptList?.each { script ->
+						if(!(fullScriptList?.contains(script))){
+							fullScriptList << script
+				        def scriptInstance1 = scriptService.getScript(realPath,script?.moduleName, script?.scriptName, category)
+
+				        if(scriptInstance1){
+
+					        if(executionService.validateScriptBoxTypes(scriptInstance1,deviceInstance)){
+						        if(executionService.validateScriptRDKVersions(scriptInstance1,rdkVersion)){
+						            if(scriptInstance1?.skip?.toString().equals("true")){
+											skipStatus = true
+											executionService.saveSkipStatus(Execution.findByName(execName), executionDevice, scriptInstance1, deviceInstance, category)
+							        }else{
+											validScriptList << scriptInstance1
+							        }
+						        }else{
+							        notApplicable = true
+							        String rdkVersionData = ""
 
 //							Script.withTransaction {
 //								def scriptInstance2 = Script.findById(script?.id)
-								rdkVersionData = scriptInstance1?.rdkVersions
+								    rdkVersionData = scriptInstance1?.rdkVersions
 //							}
 
-							String reason = "RDK Version mismatch.<br>Device RDK Version : "+rdkVersion+", Script supported RDK Versions :"+rdkVersionData
-							executionService.saveNotApplicableStatus(Execution.findByName(execName), executionDevice, scriptInstance1, deviceInstance,reason, category)
-						}
-					}else{
+							        String reason = "RDK Version mismatch.<br>Device RDK Version : "+rdkVersion+", Script supported RDK Versions :"+rdkVersionData
+							        executionService.saveNotApplicableStatus(Execution.findByName(execName), executionDevice, scriptInstance1, deviceInstance,reason, category)
+						        }
+					        }else{
 					
-						notApplicable = true
-						String boxTypeData = ""
+						        notApplicable = true
+						        String boxTypeData = ""
 
-						String deviceBoxType = ""
+						        String deviceBoxType = ""
 
-						Device.withTransaction {
-							Device dev = Device.findById(deviceInstance?.id)
-							deviceBoxType = dev?.boxType
-						}
+						        Device.withTransaction {
+							        Device dev = Device.findById(deviceInstance?.id)
+							        deviceBoxType = dev?.boxType
+						        }
 
 //						Script.withTransaction {
 //							def scriptInstance1 = Script.findById(script?.id)
-							boxTypeData = scriptInstance1?.boxTypes
+							    boxTypeData = scriptInstance1?.boxTypes
 //						}
 
-						String reason = "Box Type mismatch.<br>Device Box Type : "+deviceBoxType+", Script supported Box Types :"+boxTypeData
-						executionService.saveNotApplicableStatus(Execution.findByName(execName), executionDevice, scriptInstance1, deviceInstance,reason, category)
-					}
-				}else{
+						        String reason = "Box Type mismatch.<br>Device Box Type : "+deviceBoxType+", Script supported Box Types :"+boxTypeData
+						        executionService.saveNotApplicableStatus(Execution.findByName(execName), executionDevice, scriptInstance1, deviceInstance,reason, category)
+					        }
+				        }else{
 				
-				String reason = "No script is available with name :"+script?.scriptName+" in module :"+script?.moduleName
-				executionService.saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, script?.scriptName, deviceInstance,reason, category)
+				            String reason = "No script is available with name :"+script?.scriptName+" in module :"+script?.moduleName
+				            executionService.saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, script?.scriptName, deviceInstance,reason, category)
 				
-				}
+				        }
+				    }
+				  }
 				}
 			}
-
 			scriptGrpSize = validScriptList?.size()
 			Execution ex = Execution.findByName(execName)
 			def exeId = ex?.id
@@ -1303,8 +1328,9 @@ class ExecutescriptService {
 			} catch (Exception e) {
 				e.printStackTrace()
 			}
+
 			validScriptList.each{ scriptObj ->
-				
+				for(int j = 0; j < repeatBackToBackCount; j++ ){
 				executionStarted = true
 				scriptCounter++
 				if(scriptCounter == scriptGrpSize){
@@ -1400,6 +1426,7 @@ class ExecutescriptService {
 					}
 				}
 			}
+			}
 			
 				if(validScriptList.size() > 0){
 					LogTransferService.closeLogTransfer(execName)
@@ -1451,63 +1478,65 @@ class ExecutescriptService {
 				boolean notApplicable = false
 				boolean skipStatus = false
 					scripts.each { script ->
-//						scriptInstance = Script.findById(script,[lock: true])
-						def moduleName= scriptService.scriptMapping.get(script)
-						if(moduleName){
-						scriptInstance = scriptService.getScript(realPath,moduleName,script, category)
-						if(scriptInstance){
-						if(executionService.validateScriptBoxTypes(scriptInstance,deviceInstance)){
-							if(executionService.validateScriptRDKVersions(scriptInstance,rdkVersion)){
-								if(scriptInstance?.skip?.toString().equals("true")){
-									skipStatus = true
-									executionService.saveSkipStatus(Execution.findByName(execName), executionDevice, scriptInstance, deviceInstance,category)
+						for(int j = 0; j < repeatBackToBackCount; j++ ){
+//							scriptInstance = Script.findById(script,[lock: true])
+						    def moduleName= scriptService.scriptMapping.get(script)
+						    if(moduleName){
+						        scriptInstance = scriptService.getScript(realPath,moduleName,script, category)
+						        if(scriptInstance){
+						            if(executionService.validateScriptBoxTypes(scriptInstance,deviceInstance)){
+							            if(executionService.validateScriptRDKVersions(scriptInstance,rdkVersion)){
+											if(scriptInstance?.skip?.toString().equals("true")){
+												skipStatus = true
+												executionService.saveSkipStatus(Execution.findByName(execName), executionDevice, scriptInstance, deviceInstance,category)
+											}else{
+												validScripts << scriptInstance
+											}
+										}else{
+											notApplicable = true
+											String rdkVersionData = ""
+											rdkVersionData = scriptInstance?.rdkVersions
+
+											String reason = "RDK Version mismatch.<br>Device RDK Version : "+rdkVersion+", Script supported RDK Versions :"+rdkVersionData
+											executionService.saveNotApplicableStatus(Execution.findByName(execName), executionDevice, scriptInstance, deviceInstance,reason,category)
+										}
+									}else{
+										notApplicable = true
+										String boxTypeData = ""
+
+										String deviceBoxType = ""
+
+										Device.withTransaction {
+											Device dev = Device.findById(deviceInstance?.id)
+											deviceBoxType = dev?.boxType
+										}
+										boxTypeData = scriptInstance?.boxTypes
+
+										String reason = "Box Type mismatch.<br>Device Box Type : "+deviceBoxType+", Script supported Box Types :"+boxTypeData
+										executionService.saveNotApplicableStatus(Execution.findByName(execName), executionDevice, scriptInstance, deviceInstance,reason, category)
+									}
 								}else{
-									validScripts << scriptInstance
+				
+									String reason = "No script is available with name :"+script+" in module :"+moduleName
+									executionService.saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, script, deviceInstance,reason, category)
+				
 								}
 							}else{
-								notApplicable = true
-								String rdkVersionData = ""
-								rdkVersionData = scriptInstance?.rdkVersions
-
-								String reason = "RDK Version mismatch.<br>Device RDK Version : "+rdkVersion+", Script supported RDK Versions :"+rdkVersionData
-								executionService.saveNotApplicableStatus(Execution.findByName(execName), executionDevice, scriptInstance, deviceInstance,reason,category)
-							}
-						}else{
-							notApplicable = true
-							String boxTypeData = ""
-
-							String deviceBoxType = ""
-
-							Device.withTransaction {
-								Device dev = Device.findById(deviceInstance?.id)
-								deviceBoxType = dev?.boxType
-							}
-								boxTypeData = scriptInstance?.boxTypes
-
-							String reason = "Box Type mismatch.<br>Device Box Type : "+deviceBoxType+", Script supported Box Types :"+boxTypeData
-							executionService.saveNotApplicableStatus(Execution.findByName(execName), executionDevice, scriptInstance, deviceInstance,reason, category)
-						}
-						}else{
 				
-							String reason = "No script is available with name :"+script+" in module :"+moduleName
+								String reason = "No module information is present for script :"+script
 								executionService.saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, script, deviceInstance,reason, category)
 				
+							}
 						}
-					}else{
-				
-					String reason = "No module information is present for script :"+script
-					executionService.saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, script, deviceInstance,reason, category)
-				
-				}
 					}
-				scriptGrpSize = validScripts?.size()
-				Execution ex = Execution.findByName(execName)
-				def exeId = ex?.id
-				if((skipStatus || notApplicable)&& scriptGrpSize == 0){
-					executionService.updateExecutionSkipStatusWithTransaction(FAILURE_STATUS, exeId)
-					executionService.updateExecutionDeviceSkipStatusWithTransaction(FAILURE_STATUS, executionDevice?.id)
-				}
-				String devStatus = ""
+					scriptGrpSize = validScripts?.size()
+					Execution ex = Execution.findByName(execName)
+					def exeId = ex?.id
+					if((skipStatus || notApplicable)&& scriptGrpSize == 0){
+						executionService.updateExecutionSkipStatusWithTransaction(FAILURE_STATUS, exeId)
+						executionService.updateExecutionDeviceSkipStatusWithTransaction(FAILURE_STATUS, executionDevice?.id)
+					}
+					String devStatus = ""
 					validScripts.each{ script ->
 						scriptCounter++
 						if(scriptCounter == scriptGrpSize){
@@ -1714,12 +1743,12 @@ class ExecutescriptService {
 	 * @param rerun
 	 * @return
 	 */
-	def executeScriptInThread(String execName, String device, ExecutionDevice executionDevice, def scripts, def scriptGrp,
-			def executionName, def filePath, def realPath, def groupType, def url, def isBenchMark, def isSystemDiagnostics, def rerun,def isLogReqd, def category){
+	def executeScriptInThread(boolean singleScriptGroup, String execName, String device, ExecutionDevice executionDevice, def scripts, def scriptGrp,
+			def executionName, def filePath, def realPath, def groupType, def url, def isBenchMark, def isSystemDiagnostics, def rerun,def isLogReqd, def category, def repeatBackToBackCount){
 
 		Future<String> future =  executorService.submit( {
-			executescriptsOnDevice(execName, device, executionDevice, scripts, scriptGrp,
-					executionName, filePath, realPath, groupType, url, isBenchMark, isSystemDiagnostics, rerun,isLogReqd, category)} as Callable< String > )
+			executescriptsOnDevice(singleScriptGroup, execName, device, executionDevice, scripts, scriptGrp,
+					executionName, filePath, realPath, groupType, url, isBenchMark, isSystemDiagnostics, rerun,isLogReqd, category, repeatBackToBackCount)} as Callable< String > )
 		
 	}
 			

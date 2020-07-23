@@ -1165,9 +1165,12 @@ class ExecutedbService {
 		def listStatusCount = [:]
 		int scriptCount = 0
 
-		if(executionInstance?.scriptGroup || executionInstance?.script.toString().equals("Multiple Scripts")){
-			ScriptGroup scriptGrp = ScriptGroup.findByName(executionInstance?.scriptGroup)
-			if(scriptGrp || executionInstance?.script.toString().equals("Multiple Scripts")){
+		if(executionInstance?.scriptGroup || executionInstance?.script.toString().equals("Multiple Scripts") || executionInstance?.scriptGroup.toString().equals("Multiple Scriptgroups")){
+			ScriptGroup scriptGrp = null
+			if(executionInstance?.scriptGroup!=null && executionInstance?.scriptGroup!="Multiple Scriptgroups"){
+				scriptGrp = ScriptGroup.findByName(executionInstance?.scriptGroup)
+			}
+			if(scriptGrp || executionInstance?.script.toString().equals("Multiple Scripts") || executionInstance?.scriptGroup.toString().equals("Multiple Scriptgroups")){
 
 				def successCount = ExecutionResult.countByExecutionDeviceAndStatus(executionDevice,"SUCCESS")
 

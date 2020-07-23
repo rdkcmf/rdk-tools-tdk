@@ -301,7 +301,12 @@ function hideScriptTrend(execResId){
 			 </g:else>		 
 		  </g:if>
 		  <g:else>
-		  <g:link controller="scriptGroup" action="downloadTestSuiteXml" name="${executionInstance?.scriptGroup}" id="${executionInstance?.scriptGroup}" target="_blank" >${executionInstance?.scriptGroup} </g:link>	
+		  <g:if test="${executionInstance?.scriptGroup?.toString()?.equals("Multiple Scriptgroups")}">
+		  	<g:link controller="scriptGroup" action="downloadMultiScriptXml" name = "${executionInstance?.name}" id="${executionInstance?.name}" target="_blank" >MultipleScriptgroups </g:link>
+		  </g:if>
+		  <g:else>
+		  	<g:link controller="scriptGroup" action="downloadTestSuiteXml" name="${executionInstance?.scriptGroup}" id="${executionInstance?.scriptGroup}" target="_blank" >${executionInstance?.scriptGroup} </g:link>
+		  </g:else>
 		  </g:else> &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
 		  
 		  Result : 
@@ -329,7 +334,12 @@ function hideScriptTrend(execResId){
 			<table >
 			<g:if test="${(statusResults?.get(executionDeviceInstance))?.size() > 0}">
 			<tr class="scripthead" >
-					<td colspan="2" class="tdhead">Summary</td>
+			        <g:if test="${repeatExecution == "true"}">
+			            <td colspan="2" class="tdhead">Summary - Repeat Execution (${repeatCount})</td>
+			        </g:if>
+			        <g:else>
+					    <td colspan="2" class="tdhead">Summary</td>
+					</g:else>
 			</tr>
 			</g:if>
 			<g:each in="${statusResults.get(executionDeviceInstance)}" status="i"  var="executionStatusInstance">						
@@ -352,7 +362,7 @@ function hideScriptTrend(execResId){
 	 %>	
 	 	<%-- For Test Suite / Multiple scripts execution completed then shows the rerun on failure and repeat execution option  --%>
 		<g:if test = "${(executionInstance?.executionStatus).equals("COMPLETED")}" >
-			<g:if test="${executionInstance?.scriptGroup  || executionInstance?.script?.toString()?.equals("Multiple Scripts")}">
+			<g:if test="${executionInstance?.scriptGroup  || executionInstance?.script?.toString()?.equals("Multiple Scripts") || executionInstance?.scriptGroup?.toString()?.equals("Multiple Scriptgroups")}">
 						<tr class="even" id="testing">
 					<td colspan="2">
 						<table>						
@@ -367,11 +377,11 @@ function hideScriptTrend(execResId){
 									</g:link></td>
 							--%>
 							<td><g:submitToRemote value="Repeat Execution"
-											url="[action: 'repeatExecution',params:[executionName : executionInstance?.name , device  : executionInstance?.device , scriptGroup : executionInstance?.scriptGroup , script : executionInstance?.script, devices :executionInstance?.device?.size(), rerun :1, isBenchMark :executionInstance?.isBenchMarkEnabled , isSystemDiagonisticEnabled :executionIntstance?.isSystemDiagnosticsEnabled ]]"
+											url="[action: 'repeatExecution',params:[executionName : executionInstance?.name , device  : executionInstance?.device , scriptGroup : executionInstance?.scriptGroup , script : executionInstance?.script, devices :executionInstance?.device?.size(), rerun :1, isBenchMark :executionInstance?.isBenchMarkEnabled , isSystemDiagonisticEnabled :executionIntstance?.isSystemDiagnosticsEnabled]]"
 										    before="deviceStatusCheck('${deviceInstance}','${deviceStatus}');" />
 									</td>
 								<td><g:submitToRemote value="Rerun Of Failure Scripts"
-											url="[action :'rerunOnFailure', params:[executionName : executionInstance , device  : executionInstance?.device, scriptGroup : executionInstance?.scriptGroup , script : executionInstance?.script]]"
+											url="[action :'rerunOnFailure', params:[executionName : executionInstance , device  : executionInstance?.device, scriptGroup : executionInstance?.scriptGroup , script : executionInstance?.script ]]"
 											before="failureScriptCheck('${executionInstance}','${deviceInstance}','${deviceStatus}'  );" />
 								</td>
 							</tr>
