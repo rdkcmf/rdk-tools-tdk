@@ -929,14 +929,18 @@ class ExecutedbService {
 						def dataList
 						Map dataMapList
 						if(moduleName == Constants.THUNDER){
-							dataMapList = detailDataMap.get(tabName)
+							if(tabName!=null){
+								dataMapList = detailDataMap.get(tabName)
+							}
 						}else{
 						    dataMapList = detailDataMap.get(moduleName)
 						}
 							if(dataMapList == null){
 								dataMapList = [:]
 								if(moduleName == Constants.THUNDER){
-									detailDataMap.put(tabName,dataMapList)
+									if(tabName!=null){
+										detailDataMap.put(tabName,dataMapList)
+									}
 								}else{
 								    detailDataMap.put(moduleName,dataMapList)
 								}
