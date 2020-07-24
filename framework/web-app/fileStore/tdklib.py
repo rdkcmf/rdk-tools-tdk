@@ -50,7 +50,7 @@ from mySQLConfig import *
 #------------------------------------------------------------------------------
 # Initialization
 #------------------------------------------------------------------------------
-AGENTPORT = 8087
+#AGENTPORT = 8087
 
 #Getting the ipv6 address of TM using REST API
 def get_ipv6_address(self):
@@ -66,6 +66,19 @@ def get_ipv6_address(self):
     sys.stdout.flush()
     return ipv6_interface['IP']
 
+#Getting the port details of device
+def getPortDetails(tmURL, deviceIP):
+    # Constructing Query URL
+    url = tmURL + "/deviceGroup/getDevicePorts?stbIp=" + deviceIP
+    try:
+        data = urllib.urlopen(url).read()
+        portDetails = json.loads(data)
+    except:
+        print "#TDK_@error-ERROR : Unable to access url for getting port details !!!"
+        exit()
+
+    sys.stdout.flush()
+    return portDetails
 
 #------------------------------------------------------------------------------
 # module class
@@ -1590,6 +1603,8 @@ class TDKScriptingLibrary:
         # Return Value : null
 
                 print "Resetting connection to device.."
+                portDetails = getPortDetails(self.url , self.IP)
+                AGENTPORT = portDetails["agentPort"]
 		if(self.portValue == AGENTPORT):
                     self.tcpClient.close()
                     time.sleep(5)
