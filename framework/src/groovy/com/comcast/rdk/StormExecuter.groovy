@@ -122,7 +122,7 @@ class StormExecuter {
 			    while(line != null){
 					if(line.contains("Success")){
 						line = reader?.readLine()
-						if(line.contains("finished running")){
+						if(line?.contains("finished running")){
 							resultThunder = true
 							break
 						}
@@ -291,7 +291,7 @@ class StormExecuter {
 			    e.printStackTrace()
 	        }
 		}
-		String folderPath = realPath+"logs"
+		String folderPath = realPath+File.separator+"logs"
 		String consoleLogPath = folderPath+File.separator+"consolelog"
 		File consoleLogPathDir = new File(consoleLogPath)
 		if(!consoleLogPathDir.exists()){
@@ -312,6 +312,7 @@ class StormExecuter {
 					File executionResultInstanceDir = new File(executionResultInstanceDirPath)
 					if(!executionResultInstanceDir.exists()){
 						executionResultInstanceDir.mkdir()
+					}
 						String serverConsoleLogFileName = "ServerConsoleLog.txt"
 						String serverConsoleLogFileAbsolutePath = executionResultInstanceDirPath +File.separator+serverConsoleLogFileName
 						File serverConsoleLogFile = new File(serverConsoleLogFileAbsolutePath)
@@ -321,7 +322,7 @@ class StormExecuter {
 							fr.close()
 							serverConsoleLogFilecreationSuccess = true
 						}
-					}
+					
 		return serverConsoleLogFilecreationSuccess
 	}
 	
@@ -411,7 +412,7 @@ class StormExecuter {
 	 */
 	def static boolean createThunderVersionFile(def realPath, def executionInstanceId, def executionDeviceInstanceId, def stbIP){
 		boolean versionFilecreationSuccess = false
-		String folderPath = realPath+"logs"+File.separator+"version"
+		String folderPath = realPath+File.separator+"logs"+File.separator+"version"
 		String executionInstanceDirPath = folderPath+File.separator+executionInstanceId
 		File executionInstanceDir = new File(executionInstanceDirPath)
 		if(!executionInstanceDir.exists()){

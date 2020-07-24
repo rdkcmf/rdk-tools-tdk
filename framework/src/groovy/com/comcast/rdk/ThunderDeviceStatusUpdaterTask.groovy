@@ -61,18 +61,49 @@ class ThunderDeviceStatusUpdaterTask implements Runnable {
 			}
 			outData = outData?.trim()
 			if(outData){
-				if(outData.equals(Status.FREE.toString()) || outData.equals(Status.BUSY.toString())){
+				if(outData.equals(Status.FREE.toString())){
+					deviceStatusService.updateDeviceStatus(device,outData)
+					String status = "FREE"
+					def executionList = Execution.findAllByExecutionStatusAndDevice("PAUSED",device.getStbName());
+					if(executionList.size() > 0){
+						executionList.each{
+							Execution execution = it
+							def execDevice = ExecutionDevice.findByStatusAndDeviceAndExecution("PAUSED",device.getStbName(),execution);
+							boolean paused = false
+							if(execDevice){
+								synchronized (ExecutionController.lock) {
+									if(ExecutionService.deviceAllocatedList.contains(device?.id)){
+										status = "BUSY"
+									}
+								}
+								if(status == "FREE"){
+									try{
+										paused = executescriptService.restartThunderExecution(execDevice,grailsApplication)
+									}finally{
+										if(ExecutionService.deviceAllocatedList.contains(device?.id)){
+											ExecutionService.deviceAllocatedList.remove(device?.id)
+										}
+									}
+								}
+							}
+							if(!paused){
+							}
+						}
+					}
+				}else if(outData.equals(Status.BUSY.toString())){
 					deviceStatusService.updateDeviceStatus(device,outData)
 				}else if(outData.equals("")){
 					deviceStatusService.updateDeviceStatus(device,"NOT_FOUND")
+				}else if(outData.equals("NOTFOUND")){
+					deviceStatusService.updateDeviceStatus(device,"NOT_FOUND")
+				}else{
+				    synchronized (ExecutionController.lock) {
+				        if(ExecutionService.deviceAllocatedList.contains(device?.id)){
+					        outData = "BUSY"
+					        deviceStatusService.updateDeviceStatus(device,outData)
+				        }
+			        }
 				}
-				
-			    synchronized (ExecutionController.lock) {
-				    if(ExecutionService.deviceAllocatedList.contains(device?.id)){
-					    outData = "BUSY"
-					    deviceStatusService.updateDeviceStatus(device,outData)
-				    }
-			    }
 		    }else{
 			    deviceStatusService.updateDeviceStatus(device,"NOT_FOUND")
 		    }

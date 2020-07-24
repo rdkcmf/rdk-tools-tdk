@@ -58,6 +58,11 @@ class ExecutescriptService {
 	 * Injects the deviceStatusService.
 	 */
 	def deviceStatusService
+	
+	/**
+	 * Injects the thunderService.
+	 */
+	def thunderService
 
 	/**
 	 * Injects the scriptexecutionService.
@@ -1998,6 +2003,37 @@ class ExecutescriptService {
 			//			}
 		}
 		return pause;	
+	}
+	
+	/**
+	 * Method to restart thunder execution
+	 */
+	public boolean restartThunderExecution(ExecutionDevice execDevice, def grailsApplication){
+		def rootFolder = grailsApplication.parentContext.getResource("/").file
+		String rootPath = rootFolder.absolutePath
+		String filePath = rootPath + "//fileStore"
+		String realPath = rootPath
+		def exResults
+		def execDeviceId = execDevice?.id
+		def executionId
+		Device device
+		Execution execution
+		ExecutionDevice exDevice
+		ExecutionDevice.withTransaction {
+			exDevice =  ExecutionDevice.findById(execDeviceId)
+			executionId = exDevice?.execution?.id
+			device = Device.findByStbIp(exDevice?.deviceIp)
+		}
+		Execution.withTransaction {
+			execution = Execution.findById(executionId)
+		}
+		ExecutionResult.withTransaction {
+			exResults =  ExecutionResult.findAllByExecutionAndExecutionDeviceAndStatus(execution,exDevice,PENDING)
+		}
+		if(exResults?.size() > 0){
+			executionService.updateExecutionStatusData(INPROGRESS_STATUS, execution?.id)
+			thunderService.restartThunderExecution(execution,exDevice,device,exResults,realPath,grailsApplication)
+		}
 	}
 	
 	/**
