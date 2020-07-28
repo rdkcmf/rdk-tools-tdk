@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>3</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>PowerMgrHal_GetClockSpeed</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -61,10 +61,11 @@
     <test_case_id>TC_PowerMgrHal_07</test_case_id>
     <test_objective>Test Script to get the current clock speed of the CPU using PLAT_API_GetClockSpeed API</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XI3</test_setup>
+    <test_setup>XI3,XI6</test_setup>
     <pre_requisite>1.TDK Agent should be up and running
 2.Initialize CPE Power management module</pre_requisite>
-    <api_or_interface_used>PLAT_API_GetClockSpeed(uint32_t *speed)</api_or_interface_used>
+    <api_or_interface_used>int PLAT_INIT(void)
+int PLAT_API_GetClockSpeed(uint32_t *speed)</api_or_interface_used>
     <input_parameters>None</input_parameters>
     <automation_approch>1.Load the PowerMgr Hal module
 2.Initialise the powerMgr hal module using PLAT_INIT API
@@ -101,6 +102,11 @@ print "[LIB LOAD STATUS]  :  %s" %loadModuleStatus;
 if "SUCCESS" in loadModuleStatus.upper():
     obj.setLoadModuleStatus("SUCCESS");
     expectedResult="SUCCESS";
+
+    # Sample stub output:
+    # PLAT_API_GetClockSpeed
+    #   Default Frequency=%d
+
     print "\nTEST STEP1 : Get the CPU clock speed using PLAT_API_GetClockSpeed"
     print "EXEPECTED OUTPUT : Should get the clock speed of CPU"
     tdkTestObj = obj.createTestStep('PowerMgrHal_GetClockSpeed');

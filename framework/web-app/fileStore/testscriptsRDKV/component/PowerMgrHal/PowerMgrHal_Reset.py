@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>Test script to invoke the HAL API PLAT_Reset , which will reboot the device</synopsis>
   <groups_id/>
-  <execution_time>7</execution_time>
+  <execution_time>10</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -44,10 +44,11 @@
     <test_case_id>TC_PowerMgrHal_10</test_case_id>
     <test_objective>Test script to invoke the HAL API PLAT_Reset , which will reboot the device</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XI3</test_setup>
+    <test_setup>XG,XI3,XI6</test_setup>
     <pre_requisite>1.TDK Agent should be up and running
 2.Initialize CPE Power management module</pre_requisite>
-    <api_or_interface_used>PLAT_Reset(IARM_Bus_PWRMgr_PowerState_t newState)</api_or_interface_used>
+    <api_or_interface_used>int PLAT_INIT(void)
+void PLAT_Reset(IARM_Bus_PWRMgr_PowerState_t newState)</api_or_interface_used>
     <input_parameters>None</input_parameters>
     <automation_approch>1.Load the PowerMgr Hal module
 2.Initialise the powerMgr hal module using PLAT_INIT API

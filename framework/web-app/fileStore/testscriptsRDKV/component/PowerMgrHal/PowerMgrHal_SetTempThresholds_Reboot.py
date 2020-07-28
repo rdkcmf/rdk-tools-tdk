@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>3</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>PowerMgrHal_SetTempThresholds</name>
+  <name>PowerMgrHal_SetTempThresholds_Reboot</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id> </primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to set high and critical temperature threshold values using PLAT_API_SetTempThresholds API</synopsis>
+  <synopsis>Test Script to set high and critical temperature threshold values using PLAT_API_SetTempThresholds API and check whether thresholds levels are initialized with default values after reboot</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>3</execution_time>
+  <execution_time>10</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -58,8 +58,8 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>TC_PowerMgrHal_05</test_case_id>
-    <test_objective>Test Script to set high and critical temperature threshold values using PLAT_API_SetTempThresholds API</test_objective>
+    <test_case_id>TC_PowerMgrHal_11</test_case_id>
+    <test_objective>Test Script to set high and critical temperature threshold values using PLAT_API_SetTempThresholds API and check whether thresholds levels are initialized with default values after reboot</test_objective>
     <test_type>Positive</test_type>
     <test_setup>XI3,XI6</test_setup>
     <pre_requisite>1.TDK Agent should be up and running
@@ -71,17 +71,18 @@ int PLAT_API_SetTempThresholds(float tempHigh, float tempCritical)</api_or_inter
 critical - temp critical value</input_parameters>
     <automation_approch>1.Load the PowerMgr Hal module
 2.Initialize the PowerMgr Hal module using PLAT_INIT API
-3.Get the default temperature threshold levels using PLAT_API_GetTempThresholds. Add 10 to the default levels to get new threshold levels
-4.Invoke PLAT_API_SetTempThresholds API to set the new temperature thresholds
-5.Get current threshold levels using PLAT_API_GetTempThresholds. Current levels should be equal to the new values set.
-6.Based on the API return value and and comparing the current threshold levels with new levels set, update the test status as SUCCESS/FAILURE
-7.Unload the module</automation_approch>
-    <expected_output>Should set the new temperature threshold levels using PLAT_API_SetTempThresholds  and get new  threshold levels set using PLAT_API_GetTempThresholds</expected_output>
+3.Get the default temperature threshold levels using PLAT_API_GetTempThresholds.Add 10 to the default levels to get new threshold levels
+4.Invoke PLAT_API_SetTempThresholds API to set the new temperature threshold levels
+5. Reboot the device
+6.Get the current threshold levels using PLAT_API_GetTempThresholds  API
+7.Based on the API return value and comparing the current threshold levels with default levels, update the test status as SUCCESS/FAILURE
+8.Unload the module</automation_approch>
+    <expected_output>Temperature thresholds are set each time when pwrMgrMain is initialized. So, should get the default threshold levels after reboot</expected_output>
     <priority>High</priority>
     <test_stub_interface>libpwrmgrhalstub.so.0.0.0</test_stub_interface>
-    <test_script>PowerMgrHal_SetTempThresholds</test_script>
+    <test_script>PowerMgrHal_SetTempThresholds_Reboot</test_script>
     <skipped>No</skipped>
-    <release_version>M77</release_version>
+    <release_version>M79</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -97,7 +98,7 @@ obj = tdklib.TDKScriptingLibrary("pwrmgrhal","1");
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'PowerMgrHal_SetTempThresholds');
+obj.configureTestCase(ip,port,'PowerMgrHal_SetTempThresholds_Reboot');
 
 #Get the result of connection with test component and STB
 loadModuleStatus = obj.getLoadModuleResult();
@@ -119,16 +120,16 @@ if "SUCCESS" in loadModuleStatus.upper():
     details = tdkTestObj.getResultDetails();
     if expectedResult in actualResult:
         tdkTestObj.setResultStatus("SUCCESS");
-        actual_high     = float(str(str(details).split(":")[1].split(",")[0].split("=")[1]))
-        actual_critical = float(str(str(details).split(":")[1].split(",")[1].split("=")[1]))
+        default_high     = float(str(str(details).split(":")[1].split(",")[0].split("=")[1]))
+        default_critical = float(str(str(details).split(":")[1].split(",")[1].split("=")[1]))
         print "Value Returned : ",details
         print "ACTUAL RESULT  : PLAT_API_GetTempThresholds call is success"
 
         print "\nTEST STEP2 : Set the high & critical temperature threshold using PLAT_API_SetTempThresholds API"
         print "EXEPECTED OUTPUT : Should set the new temperature thresholds"
         tdkTestObj = obj.createTestStep('PowerMgrHal_SetTempThresholds');
-        new_high     = int(actual_high)     + 10
-        new_critical = int(actual_critical) + 10
+        new_high     = int(default_high)     + 10
+        new_critical = int(default_critical) + 10
         print "New Thermal threshold : high=%f, critical=%f" %(new_high,new_critical)
         tdkTestObj.addParameter("high",int(new_high));
         tdkTestObj.addParameter("critical",int(new_critical));
@@ -151,25 +152,31 @@ if "SUCCESS" in loadModuleStatus.upper():
                 updated_critical = float(str(str(details).split(":")[1].split(",")[1].split("=")[1]))
                 print "Value Returned : ",details
                 if updated_high == float(new_high) and updated_critical == float(new_critical):
-                    print "ACTUAL RESULT : Thermal thresholds set operation success"
-                    print "[TEST EXECUTION RESULT] : SUCCESS"
+                    print "ACTUAL RESULT : Thermal thresholds set operation success\n"
 
-                    print "\nTEST STEP4 : Revert the high & critical temperature threshold using PLAT_API_SetTempThresholds API"
-                    print "EXEPECTED OUTPUT : Should set the actual temperature thresholds"
-                    tdkTestObj = obj.createTestStep('PowerMgrHal_SetTempThresholds');
-                    print "Actual Thermal threshold : high=%f, critical=%f" %(actual_high,actual_critical)
-                    tdkTestObj.addParameter("high",int(actual_high));
-                    tdkTestObj.addParameter("critical",int(actual_critical));
+                    obj.initiateReboot();
+
+                    print "\nTEST STEP4 : Get the high & critical temperature threshold using PLAT_API_GetTempThresholds API"
+                    print "EXEPECTED OUTPUT : Should get the default temperature thresholds"
+                    tdkTestObj = obj.createTestStep('PowerMgrHal_GetTempThresholds');
                     tdkTestObj.executeTestCase(expectedResult);
                     actualResult = tdkTestObj.getResult();
                     details = tdkTestObj.getResultDetails();
                     if expectedResult in actualResult:
                         tdkTestObj.setResultStatus("SUCCESS");
-                        print "ACTUAL RESULT : Thermal thresholds revert operation success"
-                        print "[TEST EXECUTION RESULT] : SUCCESS\n"
+                        actual_high     = float(str(str(details).split(":")[1].split(",")[0].split("=")[1]))
+                        actual_critical = float(str(str(details).split(":")[1].split(",")[1].split("=")[1]))
+                        print "Value Returned : ",details
+                        if actual_high == float(default_high) and actual_critical == float(default_critical):
+                            print "ACTUAL RESULT  : Thermal thresholds are initialized with default values"
+                            print "[TEST EXECUTION RESULT] : SUCCESS\n"
+                        else:
+                            tdkTestObj.setResultStatus("FAILURE");
+                            print "ACTUAL RESULT : Thermal thresholds are not initialized with default values"
+                            print "[TEST EXECUTION RESULT] : FAILURE\n"
                     else:
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "ACTUAL RESULT : Thermal thresholds revert operation failed"
+                        print "ACTUAL RESULT  : ",details
                         print "[TEST EXECUTION RESULT] : FAILURE\n"
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
@@ -192,5 +199,4 @@ if "SUCCESS" in loadModuleStatus.upper():
 else:
     print "Load module failed";
     obj.setLoadModuleStatus("FAILURE");
-
 
