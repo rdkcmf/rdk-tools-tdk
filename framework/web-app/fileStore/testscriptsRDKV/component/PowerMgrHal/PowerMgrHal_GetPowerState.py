@@ -63,11 +63,12 @@
     <test_case_id>TC_PowerMgrHal_01</test_case_id>
     <test_objective>Test Script to get the CPE Power using PLAT_API_GetPowerState API. As far as Broadcom is concerned, this API reads the power state from the global variable only </test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XG1V3,XI3</test_setup>
+    <test_setup>XG,XI3,XI6</test_setup>
     <pre_requisite>1.TDK Agent should be up and running
 2.Initialize CPE Power management module
 </pre_requisite>
-    <api_or_interface_used>PLAT_API_GetPowerState(IARM_Bus_PWRMgr_PowerState_t *state)</api_or_interface_used>
+    <api_or_interface_used>int PLAT_INIT(void)
+int PLAT_API_GetPowerState(IARM_Bus_PWRMgr_PowerState_t *curState)</api_or_interface_used>
     <input_parameters>None</input_parameters>
     <automation_approch>1.Load the PowerMgr Hal module
 2.Initialise the powerMgr hal module using PLAT_INIT API

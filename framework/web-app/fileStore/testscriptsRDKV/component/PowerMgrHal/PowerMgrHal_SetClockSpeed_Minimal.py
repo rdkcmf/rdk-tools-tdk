@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>3</version>
+  <version>4</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>PowerMgrHal_SetClockSpeed_Minimal</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -62,14 +62,22 @@
     <test_setup>XI6</test_setup>
     <pre_requisite>1.TDK Agent should be up and running
 2.Initialize CPE Power management module</pre_requisite>
-    <api_or_interface_used>PLAT_API_SetClockSpeed(uint32_t speed)</api_or_interface_used>
+    <api_or_interface_used>int PLAT_INIT(void)
+int PLAT_API_DetemineClockSpeeds(uint32_t *cpu_rate_Normal, uint32_t *cpu_rate_Scaled, uint32_t *cpu_rate_Minimal);
+int PLAT_API_GetClockSpeed(uint32_t *speed)
+int PLAT_API_SetClockSpeed(uint32_t speed)</api_or_interface_used>
     <input_parameters>speed - minimal  cpu clock speed</input_parameters>
     <automation_approch>1.Load the PowerMgr Hal module
 2.Initialise the powerMgr hal module using PLAT_INIT API
-3.Invoke PLAT_API_SetClockSpeed  API to set the current CPU clock speed
-4.Based on the API return value update the test status as SUCCESS/FAILURE
-5.Unload the module</automation_approch>
-    <expected_output>API should set the cpu speed value</expected_output>
+3. Get the normal,scaled and minimal clock speeds using PLAT_API_DetemineClockSpeeds API. 
+4. Get the current clock speed using PLAT_API_GetClockSpeed
+5. Calculate the time taken for executing the command "uptime" with current clock speed
+6.Invoke PLAT_API_SetClockSpeed  API to set minimal clock speed
+7. Calculate the time taken for executing the command "uptime" with minimal clock speed
+8.Based on the API return value and comparing the command execution time taken with normal and minimal clock speeds, update the test status as SUCCESS/FAILURE
+9.Revert the clock speed to normal
+10.Unload the module</automation_approch>
+    <expected_output>API should set the cpu speed value. Command execution taken taken with minimal clock speed  should be greater than time taken with normal clock speed</expected_output>
     <priority>High</priority>
     <test_stub_interface>libpwrmgrhalstub.so.0.0.0</test_stub_interface>
     <test_script>PowerMgrHal_SetClockSpeed_Minimal</test_script>
@@ -99,6 +107,18 @@ print "[LIB LOAD STATUS]  :  %s" %loadModuleStatus;
 if "SUCCESS" in loadModuleStatus.upper():
     obj.setLoadModuleStatus("SUCCESS");
     expectedResult="SUCCESS";
+
+    # Test script gets the time taken for "uptime" command execution with noraml
+    # and minimal clock speeds. Time taken with minimal clock speed > than time
+    # taken with normal clock speed. Since normal clock speed value > than minimal
+    # clock speed value
+
+    # Sample stub output:
+    # PLAT_API_DetemineClockSpeeds
+    #   CPU_SPEED_NORMAL=%d, CPU_SPEED_SCALED=%d, CPU_SPEED_MINIMAL=%d
+    # PLAT_API_GetClockSpeed
+    #   Default Frequency=%d
+
     print "\nTEST STEP1 : Get the CPU clock speed using PLAT_API_DetemineClockSpeeds API"
     print "EXEPECTED OUTPUT : Should get the cpu minimal speed"
     tdkTestObj = obj.createTestStep('PowerMgrHal_DetemineClockSpeeds');

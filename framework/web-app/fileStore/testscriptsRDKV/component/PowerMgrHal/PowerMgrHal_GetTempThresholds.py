@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>3</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>PowerMgrHal_GetTempThresholds</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test script to get high and critical temperatures thresholds using PLAT_API_GetTempThresholds at which mfrTEMPERATURE_HIGH and mfrTEMPERATURE_CRITICAL are reported.</synopsis>
+  <synopsis>Test script to invoke PLAT_API_GetTempThresholds to get high and critical temperatures thresholds at which mfrTEMPERATURE_HIGH and mfrTEMPERATURE_CRITICAL are reported.</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -59,20 +59,22 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>TC_PowerMgrHal_04</test_case_id>
-    <test_objective>Test script to get high and critical temperatures thresholds using PLAT_API_GetTempThresholds at which mfrTEMPERATURE_HIGH and mfrTEMPERATURE_CRITICAL are reported.</test_objective>
+    <test_objective>Test script to invoke PLAT_API_GetTempThresholds to get high and critical temperatures thresholds at which mfrTEMPERATURE_HIGH and mfrTEMPERATURE_CRITICAL are reported.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XI3</test_setup>
+    <test_setup>XI3,XI6</test_setup>
     <pre_requisite>1.TDK Agent should be up and running
 2.Initialize CPE Power management module
 </pre_requisite>
-    <api_or_interface_used>PLAT_API_GetTempThresholds(float *tempHigh, float *tempCritical)</api_or_interface_used>
+    <api_or_interface_used>int PLAT_INIT(void)
+int PLAT_API_GetTempThresholds(float *tempHigh, float *tempCritical)</api_or_interface_used>
     <input_parameters>None</input_parameters>
     <automation_approch>1.Load the PowerMgr Hal module
-2.Initialise the powerMgr hal module using PLAT_INIT API
+2.Initialize the PowerMgr Hal module using PLAT_INIT API
 3.Invoke PLAT_API_GetTempThresholds API to get the temperature thresholds
-4.Based on the API return value update the test status as SUCCESS/FAILURE
-5.Unload the module</automation_approch>
-    <expected_output>API should give the temperature thresholds at which mfrTEMPERATURE_HIGH and mfrTEMPERATURE_CRITICAL state are reported</expected_output>
+4.Compare the threshold levels obtained with default threshold levels set during power manager initialization
+5.Based on the API return value and comparing the current threshold levels with default levels set, update the test status as SUCCESS/FAILURE
+6.Unload the module</automation_approch>
+    <expected_output>High and Critical threshold levels should be equal to 100 and 110 </expected_output>
     <priority>High</priority>
     <test_stub_interface>libpwrmgrhalstub.so.0.0.0</test_stub_interface>
     <test_script>PowerMgrHal_GetTempThresholds</test_script>
@@ -102,8 +104,19 @@ print "[LIB LOAD STATUS]  :  %s" %loadModuleStatus;
 if "SUCCESS" in loadModuleStatus.upper():
     obj.setLoadModuleStatus("SUCCESS");
     expectedResult="SUCCESS";
+
+    # Temperature Threshold levels are set as high:100 and critical:110
+    # by power manager each time when the module is initialized
+
+    # Sample stub output:
+    # PLAT_API_GetTempThresholds
+    #   Thermal threshold : high=%f, critical=%f
+
+    default_high_level     = 100
+    default_critical_level = 110
+
     print "\nTEST STEP1 : Get the high & critical temperature threshold using PLAT_API_GetTempThresholds API"
-    print "EXEPECTED OUTPUT : Should get the temperature thresholds"
+    print "EXEPECTED OUTPUT : Should get the default temperature thresholds"
     tdkTestObj = obj.createTestStep('PowerMgrHal_GetTempThresholds');
     tdkTestObj.executeTestCase(expectedResult);
     actualResult = tdkTestObj.getResult();
@@ -111,9 +124,16 @@ if "SUCCESS" in loadModuleStatus.upper():
     if expectedResult in actualResult:
         tdkTestObj.setResultStatus("SUCCESS");
         print "Value Returned : ",details
-        print "ACTUAL RESULT  : PLAT_API_GetTempThresholds call is success"
-        print "[TEST EXECUTION RESULT] : SUCCESS\n"
-
+        actual_high_level     = float(str(str(details).split(":")[1].split(",")[0].split("=")[1]))
+        actual_critical_level = float(str(str(details).split(":")[1].split(",")[1].split("=")[1]))
+        if actual_high_level == float(default_high_level) and  actual_critical_level == float(default_critical_level):
+            print "Thermal Threshold levels are same as that of expected default levels"
+            print "ACTUAL RESULT  : PLAT_API_GetTempThresholds call is success"
+            print "[TEST EXECUTION RESULT] : SUCCESS\n"
+        else:
+            print "Thermal Threshold levels are not same as that of expected default levels"
+            print "ACTUAL RESULT  : PLAT_API_GetTempThresholds call is success"
+            print "[TEST EXECUTION RESULT] : FAILURE\n"
     else:
         tdkTestObj.setResultStatus("FAILURE");
         print "ACTUAL RESULT  : ",details
