@@ -378,6 +378,16 @@
         <function>TestMgr_DSHal_GetDialogEnhancement</function>
         <parameters/>
       </primitiveTest>
+      <primitiveTest name="DSHal_SetAudioCompression" id=" " version="1">
+        <function>TestMgr_DSHal_SetAudioCompression</function>
+        <parameters>
+          <parameter name="audioCompression" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetAudioCompression" id="" version="1">
+        <function>TestMgr_DSHal_GetAudioCompression</function>
+        <parameters/>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
