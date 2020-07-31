@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<params>
+   <element>
+      <!-- TR181 Parameter Name to get the value -->
+      <parametername>Device.DeviceInfo.X_CISCO_COM_FirmwareName</parametername>
+      <!-- WEBPA Parameter Name -->
+      <webpaparamname>Device.DeviceInfo.X_CISCO_COM_FirmwareName</webpaparamname>
+      <!-- HAL API Module Name -->
+      <module>PlatformHAL</module>
+      <!-- Primitive Test Case Name to call the HAL API -->
+      <primitive>platform_stub_hal_GetFirmwareName</primitive>
+      <!-- HAL and TR181 parameter values are expected to be same or not -->
+      <matchflag>true</matchflag>
+      <!-- If match Flag is false then expected value for TR181 parameter -->
+      <tr181_expectedvalue>none</tr181_expectedvalue>
+      <!-- If match Flag is false then expected value for HAL API -->
+      <hal_expectedvaue>none</hal_expectedvaue>
+   </element>
+   <element>
+      <!-- TR181 Parameter Name to get the value -->
+      <parametername>Device.DeviceInfo.SerialNumber</parametername>
+      <!-- WEBPA Parameter Name -->
+      <webpaparamname>Device.DeviceInfo.SerialNumber</webpaparamname>
+      <!-- HAL API Module Name -->
+      <module>PlatformHAL</module>
+      <!-- Primitive Test Case Name to call the HAL API -->
+      <primitive>platform_stub_hal_GetSerialNumber</primitive>
+      <!-- HAL and TR181 parameter values are expected to be same or not -->
+      <matchflag>true</matchflag>
+      <!-- If match Flag is false then expected value for TR181 parameter -->
+      <tr181_expectedvalue>none</tr181_expectedvalue>
+      <!-- If match Flag is false then expected value for HAL API -->
+      <hal_expectedvaue>none</hal_expectedvaue>
+   </element>
+</params>
