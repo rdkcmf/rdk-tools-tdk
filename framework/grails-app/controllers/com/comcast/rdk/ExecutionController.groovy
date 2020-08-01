@@ -315,7 +315,13 @@ class ExecutionController {
 					scriptList.add(scriptid)
 				}
 			}
-
+			def scriptgroupObject
+			def scriptgroupId
+			if(params?.scriptGroup){
+				scriptgroupObject = ScriptGroup.findByName(params?.scriptGroup)
+				scriptgroupId = scriptgroupObject?.id
+			}
+			
 			JobDetail job = JobBuilder.newJob(JobSchedulerService.class)
 					.withIdentity(jobName).build();
 
@@ -369,7 +375,7 @@ class ExecutionController {
 				jobDetails.jobName = jobName
 				jobDetails.triggerName = triggerName
 				jobDetails.script = scriptList
-				jobDetails.scriptGroup = params?.scriptGroup
+				jobDetails.scriptGroup = scriptgroupId
 				jobDetails.device = params?.deviceId
 				jobDetails.deviceGroup = null
 				jobDetails.realPath = getRealPath()
@@ -1027,6 +1033,7 @@ class ExecutionController {
 		boolean aborted = false
 		def exId
 		def scriptGroupInstance
+		def scriptGroupList = []
 		def scriptStatus = true
 		def scriptVersionStatus = true
 		Device deviceInstance //= Device.findById(params?.id, [lock: true])
@@ -1039,9 +1046,22 @@ class ExecutionController {
 		String boxType
 		boolean allocated = false
 		boolean singleScript = false
+		boolean singleScriptGroup = false
 		String rerunOnFailure =FALSE
 
 		ExecutionDevice executionDevice = new ExecutionDevice()
+		int  scriptCountMultipleSuite = 0
+		def scriptListMultipleSuite = []
+		if(!(params?.scriptGrp instanceof String)){
+			for(scrptGrp in params?.scriptGrp){
+				def scrptGroupInstance = ScriptGroup.findByName(scrptGrp,[fetch : [scriptList : "eager"]])
+				scrptGroupInstance?.scriptList?.each{scrpt->
+					scriptListMultipleSuite.add(scrpt?.scriptName)
+				}
+			}
+			def Set<ScriptFile> scriptFileObjectSet = new HashSet(scriptListMultipleSuite)
+			scriptCountMultipleSuite = scriptFileObjectSet?.size()
+		}
 		if(params?.devices instanceof String){
 			deviceList << params?.devices
 			deviceInstance = Device.findById(params?.devices, [lock: true])
@@ -1062,8 +1082,11 @@ class ExecutionController {
 		}
 
 		int repeatCount = 1
-		if(params?.repeatNo){
+		int repeatBackToBackCount = 1
+		if(params?.repeatType == "full"){
 			repeatCount = (params?.repeatNo)?.toInteger()
+		}else{
+		    repeatBackToBackCount = (params?.individualRepeatNo)?.toInteger()
 		}
 
 		def executionInstance = Execution.findByName(executionName)
@@ -1091,7 +1114,7 @@ class ExecutionController {
 		}else if(deviceInstance?.deviceStatus.toString().equals(Status.TDK_DISABLED.toString()))	{
 			htmlData= deviceName+ " : "+message(code: 'execution.device.notfree')
 		}
-		else if(repeatCount == 0){
+		else if(repeatCount == 0 || repeatBackToBackCount == 0){
 			htmlData = "Give a valid entry in repeat"
 		}
 		else{
@@ -1121,7 +1144,7 @@ class ExecutionController {
 					if(params?.rerun.equals(KEY_ON)){
 						rerun = TRUE
 					}
-					def scriptName
+					def scriptName = null
 					String url = getApplicationUrl()
 					String filePath = "${request.getRealPath('/')}//fileStore"
 					def execName
@@ -1176,11 +1199,21 @@ class ExecutionController {
 
 								}
 							}else{
-								def scriptGroup = ScriptGroup.findById(params?.scriptGrp,[lock: true])
+                                def scriptGroups = params?.scriptGrp
+								if(scriptGroups instanceof String){
+									singleScriptGroup = true
+									def scriptGroup = ScriptGroup.findByName(scriptGroups)
+									scriptGroupList.add(scriptGroup)
+								}else{
+								    for(scrptGrp in scriptGroups){
+										def scriptGroup = ScriptGroup.findByName(scrptGrp)
+										scriptGroupList.add(scriptGroup)
+									}
+								}
+								scriptGroupList?.each{eachScriptGroup ->
 								String rdkVersion = executionService.getRDKBuildVersion(deviceInstance);								
 								try{
-									scriptGroup?.scriptList?.each{ script ->
-
+									eachScriptGroup?.scriptList?.each{ script ->
 										def scriptInstance1 = scriptService.getMinimalScript(getRealPath(),script?.moduleName, script?.scriptName, params?.category)
 
 										/**
@@ -1202,6 +1235,7 @@ class ExecutionController {
 									}
 								}
 							}
+                        }
 
 							if(validScript){
 								if(deviceList.size() > 1){
@@ -1269,7 +1303,11 @@ class ExecutionController {
 											scriptName = MULTIPLESCRIPT
 										}
 									}else{
-										scriptGroupInstance = ScriptGroup.findById(params?.scriptGrp,[lock: true])
+										if(singleScriptGroup){
+											scriptGroupInstance = ScriptGroup.findByName(params?.scriptGrp)
+										}else{
+										    scriptName = MULTIPLESCRIPTGROUPS
+										}
 									}
 									if(scriptStatus && scriptVersionStatus){
 										if(!executionNameForCheck){
@@ -1284,10 +1322,16 @@ class ExecutionController {
 											else{
 												execName = exName
 											}
+											if(repeatBackToBackCount > 1){
+												execName = execName + "(R"+repeatBackToBackCount+")"
+											}
 											// Test case count include in the multiple scripts executions
 											if(scriptName.equals(MULTIPLESCRIPT)){
 												def  scriptCount = params?.scripts?.size()
 												executionSaveStatus = executionService.saveExecutionDetailsOnMultipleScripts(execName, scriptName, deviceName, scriptGroupInstance,url,isBenchMark,isSystemDiagnostics,rerun,isLogReqd,scriptCount, params?.category,rerunOnFailure)
+											}else if(scriptName.equals(MULTIPLESCRIPTGROUPS)){
+												executionSaveStatus = executionService.saveExecutionDetailsOnMultipleScriptgroups(execName,[scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:scriptGroupInstance,
+													appUrl:url, isBenchMark:isBenchMark, isSystemDiagnostics:isSystemDiagnostics, rerun:rerun, isLogReqd:isLogReqd,category:params?.category , rerunOnFailure:rerunOnFailure, scriptCount:scriptCountMultipleSuite])
 											}else{
 												//executionSaveStatus = executionService.saveExecutionDetails(execName, scriptName, deviceName, scriptGroupInstance,url,isBenchMark,isSystemDiagnostics,rerun,isLogReqd)
 
@@ -1330,21 +1374,21 @@ class ExecutionController {
 												executionService.executeVersionTransferScript(request.getRealPath('/'),filePath,execName, executionDevice?.id, deviceInstance?.stbName, deviceInstance?.logTransferPort,url)
 											}
 											if(deviceList.size() > 1){
-												executescriptService.executeScriptInThread(execName, device, executionDevice, params?.scripts, params?.scriptGrp, executionName,
-														filePath, getRealPath(), params?.myGroup, url, isBenchMark, isSystemDiagnostics, params?.rerun,isLogReqd, params?.category)
-												htmlData=" <br> " + deviceName+"  :   Execution triggered "
-												output.append(htmlData)
+												    executescriptService.executeScriptInThread(singleScriptGroup, execName, device, executionDevice, params?.scripts, params?.scriptGrp, executionName,
+														filePath, getRealPath(), params?.myGroup, url, isBenchMark, isSystemDiagnostics, params?.rerun,isLogReqd, params?.category, repeatBackToBackCount)
+												    htmlData=" <br> " + deviceName+"  :   Execution triggered "
+												    output.append(htmlData)
 
 
 											}else{
-												htmlData = executescriptService.executescriptsOnDevice(execName, device, executionDevice, params?.scripts, params?.scriptGrp, executionName,
-														filePath, getRealPath(), params?.myGroup, url, isBenchMark, isSystemDiagnostics, params?.rerun,isLogReqd, params?.category)
-												output.append(htmlData)
-												Execution exe = Execution.findByName(execName)
-												if(exe){
-													def executionList = Execution.findAllByExecutionStatusAndName("PAUSED",execName);
-													paused = (executionList.size() > 0)
-												}
+												    htmlData = executescriptService.executescriptsOnDevice(singleScriptGroup, execName, device, executionDevice, params?.scripts, params?.scriptGrp, executionName,
+														filePath, getRealPath(), params?.myGroup, url, isBenchMark, isSystemDiagnostics, params?.rerun,isLogReqd, params?.category, repeatBackToBackCount)
+												    output.append(htmlData)
+												    Execution exe = Execution.findByName(execName)
+												    if(exe){
+													    def executionList = Execution.findAllByExecutionStatusAndName("PAUSED",execName);
+													    paused = (executionList.size() > 0)
+												    }
 											}
 
 											if(paused){
@@ -1408,9 +1452,15 @@ class ExecutionController {
 
 												Execution execution = new Execution()
 												execution.name = execName1
-												execution.script = scriptName
+												if(scriptName!="Multiple Scriptgroups"){
+												    execution.script = scriptName
+												}
 												execution.device = deviceName
-												execution.scriptGroup = scriptGroupInstance?.name
+												if(singleScriptGroup){
+													execution.scriptGroup = scriptGroupInstance?.name
+												}else if(scriptName!="Multiple Scripts"){
+												    execution.scriptGroup = "Multiple Scriptgroups"
+												}
 												execution.result = FAILURE_STATUS
 												execution.executionStatus = FAILURE_STATUS
 												execution.dateOfExecution = new Date()
@@ -1564,6 +1614,21 @@ class ExecutionController {
 	 */
 	def showLog(){
 		Execution executionInstance = Execution.findById(params?.id)
+		String executionNameCheck = executionInstance?.name
+        def repeatCount
+        def repeatCountInt
+		String repeatExecution = "false"
+        if(executionNameCheck.contains("(R")){
+	        def executionNameCheckList = executionNameCheck.split("\\(R")
+	        if(executionNameCheckList[1].contains(")")){
+		        def executionNameCheckListTwo = executionNameCheckList[1].split("\\)")
+		        repeatCount = executionNameCheckListTwo[0]
+	        }
+	        repeatCountInt = Integer.parseInt(repeatCount)
+        }
+		if(repeatCountInt > 1){
+			repeatExecution = "true"
+		}
 		//	if(!executionInstance.isPerformanceDone){
 		executionService.setPerformance(executionInstance,request.getRealPath('/'))
 		//}
@@ -1650,7 +1715,7 @@ class ExecutionController {
 		}
 		tDataMap.put(Constants.PASS_RATE_SMALL,rate)
 		
-		[tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus]
+		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus]
 	}
 
 	/**
@@ -3306,6 +3371,7 @@ class ExecutionController {
 			def executionInstance =  Execution.findByName(params?.executionName)			
 			def  multipleScript = []
 			def execName1 =  executionInstance?.name
+			boolean singleScriptGroup = false
 			if(!(execName1.toString().contains("RERUN"))){
 				int executionCount=0
 				int execCount = 0
@@ -3406,10 +3472,20 @@ class ExecutionController {
 						log.error "Error "+eX.getMessage()
 						eX.printStackTrace()
 					}
-					if(params?.scriptGroup){
+					if(params?.scriptGroup && params?.scriptGroup!="Multiple Scriptgroups"){
 						scriptGroupInstance  =  ScriptGroup?.findByName(params?.scriptGroup,[lock: true])
+						singleScriptGroup = true
 					}
 					def scripts = null
+					if(params?.scriptGroup == "Multiple Scriptgroups"){
+						scripts = "Multiple Scriptgroups"
+					}else if((params?.scriptGroup != "Multiple Scriptgroups") && ((params?.scriptGroup != null) || (params?.scriptGroup != ""))){
+						scripts = params?.scriptGroup
+					}else if(params?.script == "Multiple Scripts"){
+						scripts = "Multiple Scripts"
+					}else if(params?.script){
+					    scripts = params?.script
+					}
 					def saveExecutionDetails = true
 					if( devStatus.equals( Status.FREE.toString())){
 						if(!executionService.deviceAllocatedList.contains(deviceInstance?.id)){
@@ -3422,16 +3498,19 @@ class ExecutionController {
 						}
 						def executionDevice
 						def execResult
-	
+						execResult = ExecutionResult?.findAllByExecution(executionInstance)
 						if(params?.script?.toString().equals(MULTIPLESCRIPT)){
-							execResult = ExecutionResult?.findAllByExecution(executionInstance)
 							int scriptCount  = execResult?.size()
 							
 							//For multiple script execution
 							//saveExecutionDetails = executionService.saveExecutionDetailsOnMultipleScripts(execName?.toString(), MULTIPLESCRIPT, deviceInstance?.toString(), scriptGroupInstance,url?.toString(),isBenchMark?.toString(),isSystemDiagnostics?.toString(),rerun?.toString(),isLogReqd?.toString(),scriptCount,)
 							saveExecutionDetails= executionService.saveExecutionDetails(execName?.toString(),[scriptName:MULTIPLESCRIPT, deviceName:deviceInstance?.toString(), scriptGroupInstance:scriptGroupInstance,
 														appUrl:url?.toString(), isBenchMark:isBenchMark?.toString(), isSystemDiagnostics:isSystemDiagnostics?.toString(), rerun:rerun?.toString(), isLogReqd:isLogReqd?.toString(),category:executionInstance1?.category?.toString(), rerunOnFailure : FALSE])
-						}else{						//For test suite execution
+						}else if(params?.scriptGroup?.toString().equals(MULTIPLESCRIPTGROUPS)){
+							int scriptCount  = execResult?.size()
+							saveExecutionDetails= executionService.saveExecutionDetails(execName?.toString(),[scriptName:MULTIPLESCRIPTGROUPS, deviceName:deviceInstance?.toString(), scriptGroupInstance:scriptGroupInstance,
+								appUrl:url?.toString(), isBenchMark:isBenchMark?.toString(), isSystemDiagnostics:isSystemDiagnostics?.toString(), rerun:rerun?.toString(), isLogReqd:isLogReqd?.toString(),category:executionInstance1?.category?.toString(), rerunOnFailure : FALSE])
+						}else{
 							//saveExecutionDetails = executionService.saveExecutionDetails(execName?.toString(), scripts, deviceInstance?.toString(), scriptGroupInstance ,url?.toString(),isBenchMark?.toString(),isSystemDiagnostics?.toString(),rerun?.toString(),isLogReqd?.toString())
 						saveExecutionDetails= executionService.saveExecutionDetails(execName?.toString(),[scriptName:scripts, deviceName:deviceInstance?.toString(), scriptGroupInstance:scriptGroupInstance,
 							appUrl:url?.toString(), isBenchMark:isBenchMark?.toString(), isSystemDiagnostics:isSystemDiagnostics?.toString(), rerun:rerun?.toString(), isLogReqd:isLogReqd?.toString(),category:executionInstance1?.category?.toString(), rerunOnFailure:FALSE])
@@ -3452,24 +3531,15 @@ class ExecutionController {
 								e.printStackTrace()
 							}
 							if(saveExecutionDetails){
-								if(params?.scriptGroup){
-									scriptGroupInstance  =  ScriptGroup?.findByName(params?.scriptGroup,[lock: true])
-								}
 								String myGroup = ""
-								if(params?.script?.toString()?.equals("Multiple Scripts")){
 									myGroup = SINGLE_SCRIPT
 									scripts = execResult?.script
-	
-								} else{
-									myGroup = "TestSuite"
-	
-								}
 		                        if(executionInstance1?.category?.toString().equals(RDKB_TCL)){
 									tclExecutionService?.executescriptsOnDevice(execName?.toString(), deviceId?.toString(), executionDevice, scripts, scriptGroupInstance?.id.toString(), executionName?.toString(),
 										filePath, getRealPath(),myGroup?.toString(), url?.toString(), isBenchMark?.toString(), isSystemDiagnostics?.toString(),rerun?.toString(),isLogReqd?.toString(),executionInstance1?.category?.toString())
 								}else{
-									executescriptService.executescriptsOnDevice(execName?.toString(), deviceId?.toString(), executionDevice, scripts, scriptGroupInstance?.id.toString(), executionName?.toString(),
-										filePath, getRealPath(),myGroup?.toString(), url?.toString(), isBenchMark?.toString(), isSystemDiagnostics?.toString(),rerun?.toString(),isLogReqd?.toString(),executionInstance1?.category?.toString())
+									executescriptService.executescriptsOnDevice(singleScriptGroup, execName?.toString(), deviceId?.toString(), executionDevice, scripts, scriptGroupInstance?.name, executionName?.toString(),
+										filePath, getRealPath(),myGroup?.toString(), url?.toString(), isBenchMark?.toString(), isSystemDiagnostics?.toString(),rerun?.toString(),isLogReqd?.toString(),executionInstance1?.category?.toString(),1)
 								}
 								/*executescriptService.executescriptsOnDevice(execName?.toString(), deviceId?.toString(), executionDevice, scripts, scriptGroupInstance?.id.toString(), executionName?.toString(),
 										filePath, getRealPath(),myGroup?.toString(), url?.toString(), isBenchMark?.toString(), isSystemDiagnostics?.toString(),rerun?.toString(),isLogReqd?.toString(),deviceInstance.category?.toString())*/

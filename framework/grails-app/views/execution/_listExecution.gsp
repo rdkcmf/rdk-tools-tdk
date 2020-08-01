@@ -110,8 +110,9 @@
 								<g:elseif test="${executionInstance?.script }">
 						 			<%
 									 String scriptName = executionInstance?.script.toString();
+								     String scriptGroupName = executionInstance?.scriptGroup.toString();
 									 String multiple = "FALSE"
-									 if(scriptName.toString().equals("Multiple Scripts")){
+									 if((scriptName.toString().equals("Multiple Scripts")) || (scriptGroupName.toString().equals("Multiple Scriptgroups"))){
 										multiple = "TRUE" 							
 						 			}
 						  			%>
