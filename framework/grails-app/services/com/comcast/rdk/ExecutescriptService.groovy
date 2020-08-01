@@ -135,9 +135,9 @@ class ExecutescriptService {
 		}
 		mocaString = mocaString + CURLY_BRACKET_CLOSE
 		
-		scriptData = scriptData.replace( IP_ADDRESS , stbIp )
-		scriptData = scriptData.replace( PORT , deviceInstance?.stbPort )		
-		scriptData = scriptData.replace( CLIENTLIST , mocaString )
+		scriptData = scriptData?.replace( IP_ADDRESS , stbIp )
+		scriptData = scriptData?.replace( PORT , deviceInstance?.stbPort )		
+		scriptData = scriptData?.replace( CLIENTLIST , mocaString )
 		
 		String gatewayIp = deviceInstance?.gatewayIp		
 		String logFilePath = realPath?.toString()+"/logs/logs/"
@@ -149,7 +149,7 @@ class ExecutescriptService {
 				sFile?.id + COMMA_SEPERATOR + deviceInstance?.id + COMMA_SEPERATOR + SINGLE_QUOTES + isBenchMark + SINGLE_QUOTES + COMMA_SEPERATOR + SINGLE_QUOTES + isSystemDiagnostics + SINGLE_QUOTES + COMMA_SEPERATOR +
 				SINGLE_QUOTES + isMultiple + SINGLE_QUOTES + COMMA_SEPERATOR)*/
 		
-		scriptData = scriptData.replace( REPLACE_TOKEN, METHOD_TOKEN + LEFT_PARANTHESIS + SINGLE_QUOTES + url + SINGLE_QUOTES + COMMA_SEPERATOR + SINGLE_QUOTES + realPath + SINGLE_QUOTES + COMMA_SEPERATOR + SINGLE_QUOTES +logFilePath+SINGLE_QUOTES + COMMA_SEPERATOR +
+		scriptData = scriptData?.replace( REPLACE_TOKEN, METHOD_TOKEN + LEFT_PARANTHESIS + SINGLE_QUOTES + url + SINGLE_QUOTES + COMMA_SEPERATOR + SINGLE_QUOTES + realPath + SINGLE_QUOTES + COMMA_SEPERATOR + SINGLE_QUOTES +logFilePath+SINGLE_QUOTES + COMMA_SEPERATOR +
 			executionId  + COMMA_SEPERATOR + executionDevice?.id + COMMA_SEPERATOR + executionResultId  + REPLACE_BY_TOKEN + deviceInstance?.agentMonitorPort + COMMA_SEPERATOR + deviceInstance?.statusPort + COMMA_SEPERATOR +
 			sFile?.id + COMMA_SEPERATOR + deviceInstance?.id + COMMA_SEPERATOR + SINGLE_QUOTES + isBenchMark + SINGLE_QUOTES + COMMA_SEPERATOR + SINGLE_QUOTES + isSystemDiagnostics + SINGLE_QUOTES + COMMA_SEPERATOR +
 			SINGLE_QUOTES + isMultiple + SINGLE_QUOTES + COMMA_SEPERATOR)
