@@ -67,7 +67,6 @@
 3. Initialize dsMgr
 4. Initialize DSHAL subsystems</pre_requisite>
     <api_or_interface_used>dsGetVideoPort(dsVideoPortType_t type, int index, int *handle)
-dsGetResolution(int handle, dsVideoPortResolution_t *resolution)
 dsSetResolution(int handle, dsVideoPortResolution_t *resolution, bool persist)</api_or_interface_used>
     <input_parameters>type - Video port type
 index- Video port index
@@ -76,10 +75,8 @@ resolution - resolution</input_parameters>
     <automation_approch>1. TM loads the DSHAL agent via the test agent.
 2 . DSHAL agent will invoke the api dsGetVideoPort to get the handle for HDMI port
 3 . DSHAL agent will invoke the api dsSetResolution to set the resolution for InvalidStereoScopicMode
-4 . DSHAL agent will invoke the api dsGetResolution
-5. TM checks if the resolution is set and return SUCCESS/FAILURE status.</automation_approch>
-    <expected_output>Checkpoint 1.Verify the API call is failure
-Checkpoint 2 Verify that the resolution is not set</expected_output>
+4 . TM checks if the API call is success and return SUCCESS/FAILURE status.</automation_approch>
+    <expected_output>Checkpoint 1.Verify the API call is failure</expected_output>
     <priority>High</priority>
     <test_stub_interface>libdshalstub.so.0.0.0</test_stub_interface>
     <test_script>DSHal_GetAndSetResolution_HDMI_InvalidStereoScopicMode</test_script>
@@ -135,6 +132,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
             print "Display connection status: ", details
             if details == "true":
                 resolution = "576i";
+                expectedResult = "FAILURE";
                 tdkTestObj = dshalObj.createTestStep('DSHal_SetResolution');
                 tdkTestObj.addParameter("resolution",resolution);
                 tdkTestObj.addParameter("pixelResolution",10); #Invalid Resolution
@@ -145,29 +143,11 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
                 actualResult = tdkTestObj.getResult();
                 print "DSHal_SetResolution result: ", actualResult;
                 if expectedResult in actualResult:
-                    details = tdkTestObj.getResultDetails();
-                    print details;
-                    tdkTestObj = dshalObj.createTestStep('DSHal_GetResolution');
-                    #Execute the test case in STB
-                    tdkTestObj.executeTestCase(expectedResult);
-                    actualResult = tdkTestObj.getResult();
-                    print "DSHal_GetResolution result: ", actualResult;
-                    if expectedResult in actualResult:
-                        resolutionName = tdkTestObj.getResultDetails();
-                        print "Resolution Name retrieved: ", resolutionName;
-
-                        if resolution not in resolutionName:
-                            tdkTestObj.setResultStatus("SUCCESS");
-                            print "Resolution not set for invalid StereoScopicMode";
-                        else:
-                            tdkTestObj.setResultStatus("FAILURE");
-                            print "Resolution set for invalid StereoScopicMode";
-                    else:
-                        tdkTestObj.setResultStatus("FAILURE");
-                        print "DSHal_GetResolution call failed";
+                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "DSHal_SetResolution call failed for invalid stereoscopic mode which is expected";
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
-                    print "DSHal_SetResolution call failed";
+                    print "DSHal_SetResolution call success for invalid stereoscopic mode which is not expected";
             else:
                 tdkTestObj.setResultStatus("FAILURE");
                 print "Please test connecting a display device";
