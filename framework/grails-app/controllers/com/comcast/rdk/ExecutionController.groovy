@@ -3107,8 +3107,8 @@ class ExecutionController {
 
 								}else{
 									if(!TCL ){
-										htmlData = executescriptService.executeScriptInThread(execName, ""+deviceInstance?.id, executionDevice, scriptName, "", execName,
-												filePath, getRealPath(), SINGLE_SCRIPT, url, timeInfo, performance, rerun,isLog,category?.toString())
+										htmlData = executescriptService.executeScriptInThread(true,execName, ""+deviceInstance?.id, executionDevice, scriptName, "", execName,
+												filePath, getRealPath(), SINGLE_SCRIPT, url, timeInfo, performance, rerun,isLog,category?.toString(),1)
 
 										// The Execution is done through only one device
 										//											htmlData = executescriptService.executescriptsOnDevice(execName, ""+deviceInstance?.id, executionDevice, scriptName, "", execName,
@@ -3953,8 +3953,8 @@ class ExecutionController {
 											String getRealPathString  = getRealPath()
 											executionService.executeVersionTransferScript(getRealPathString,filePath,execName, executionDevice?.id, deviceInstance?.stbName, deviceInstance?.logTransferPort, url)
 											if(!TCL){
-												htmlData = executescriptService.executeScriptInThread(execName, ""+deviceInstance?.id, executionDevice, newScriptList, "", execName,
-														filePath, getRealPath(), SINGLE_SCRIPT, url, time, perfo, rerun,isLog,newCategory?.toString())
+												htmlData = executescriptService.executeScriptInThread(true,execName, ""+deviceInstance?.id, executionDevice, newScriptList, "", execName,
+														filePath, getRealPath(), SINGLE_SCRIPT, url, time, perfo, rerun,isLog,newCategory?.toString(),1)
 												executed = true
 												url = url + "/execution/thirdPartyJsonResult?execName=${execName}"
 												jsonOutData.addProperty("Status", "RUNNING")
