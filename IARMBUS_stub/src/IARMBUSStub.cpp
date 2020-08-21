@@ -30,7 +30,7 @@ int LastKeyCode;
 char LastEvent[80],g_ManagerName[20];
 int gSysState;
 int gSysError;
-char gSysPayload[20];
+char gSysPayload[128];
 IARM_Bus_SYSMgr_SystemState_t gstateId ;
 
 double LastKeyTime;
