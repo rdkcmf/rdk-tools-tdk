@@ -1020,6 +1020,19 @@ function showCombinedExcelPopUp(){
 		  $.modal.close(); } });
 	 $( "#generateFromDate" ).datepicker();
 	 $( "#generateToDate" ).datepicker();
+	 var today = new Date();
+	 var priorDate = new Date();
+	 priorDate.setDate(today.getDate() - 30)
+	 var ddtoday = String(today.getDate()).padStart(2, '0');
+	 var mmtoday = String(today.getMonth() + 1).padStart(2, '0');
+	 var yyyytoday = today.getFullYear();
+	 today = mmtoday + '/' + ddtoday + '/' + yyyytoday;
+	 var ddprior = String(priorDate.getDate()).padStart(2, '0');
+	 var mmprior = String(priorDate.getMonth() + 1).padStart(2, '0');
+	 var yyyyprior = priorDate.getFullYear();
+	 priorDate = mmprior + '/' + ddprior + '/' + yyyyprior;
+	 document.getElementById("generateFromDate").value = priorDate
+	 document.getElementById("generateToDate").value = today
 	 var category_id = "RDKV"
 	 var url = $("#url").val();
 	 $.get(url+'/boxType/getBoxTypeFromCategory', {category: category_id}, function(data) {

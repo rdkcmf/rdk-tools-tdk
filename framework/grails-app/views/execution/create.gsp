@@ -520,8 +520,8 @@ $(document).ready(function() {
 			</tr>
 			<g:hiddenField name = "validate" id = "validate" value = ""/>
 		</table>
-		<span id="searchFilterResultDiv" style="width: 100%;overflow: auto;"></span>
 		</g:formRemote>
+		<span id="searchFilterResultDiv" style="width: 100%;overflow: auto;"></span>
 	</div>
 	<g:hiddenField name = "selectedDevice" id = "selectedDevice" value = ""/>
 	<g:hiddenField name = "deviceInstance" id = "deviceInstance" value = "${deviceInstanceTotal}"/>
