@@ -291,7 +291,8 @@
 					<tr >
 						<td style="vertical-align: middle;" >
 							&emsp;&emsp;&emsp;&emsp;Build Name  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-							<g:select id="buildname" name="buildname"  noSelection="['' : 'Please Select']" 	from="${executionBuildList}"   value="" class="many-to-one " /></td>
+							<g:select id="buildname" name="buildname"  noSelection="['' : 'Please Select']" from="" value="" class="many-to-one " />
+						</td>
 						<td>
 							&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<input onclick="showBuildGroupBased();" type="radio" name="BuildOption" value="BuildGroupBased"  checked=true />
 							&emsp;&emsp;Show Results by Script Group&emsp;

@@ -24,6 +24,10 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+
 /**
  * Controller class for showing charts 
  * 
@@ -49,7 +53,6 @@ class TrendsController {
 		List<String> executionList = null
 		List<String> executionTotalList = null
 		
-		List<String> executionBuildList =[]
 		def scripts = []
 		if(!category)
 			category = RDKV
@@ -61,9 +64,7 @@ class TrendsController {
 		if(RDKV.equals(category.trim())){
 			executionList = Execution.executeQuery("select exe.name from Execution exe where exe.category=? and exe.isBenchMarkEnabled=? and exe.isSystemDiagnosticsEnabled=? and exe.scriptGroup is not null",
 					[Category.RDKV, true, true])
-			executionBuildList = ExecutionDevice.executeQuery("select distinct  exe.buildName from ExecutionDevice exe where exe.category=? and exe.buildName!=? and exe.buildName!=? order by id desc  ",
-					[Category.RDKV,"null","Image name not available"])
-			
+
 			executionTotalList = Execution.executeQuery("select exe.name from Execution exe where exe.category=? and exe.executionStatus!=? and exe.scriptGroup is not null and exe.name not like '%RERUN%' order by id desc  ",
 					[Category.RDKV,INPROGRESS_STATUS])
 		}
@@ -72,8 +73,6 @@ class TrendsController {
 					[Category.RDKV, true, true])
 			executionTotalList = Execution.executeQuery("select exe.name from Execution exe where exe.category!=? and exe.executionStatus!= ? and exe.scriptGroup is not null",
 					[Category.RDKV,INPROGRESS_STATUS])
-			executionBuildList = ExecutionDevice.executeQuery("select distinct  exe.buildName from ExecutionDevice exe where exe.category!=? and exe.buildName!=? and exe.buildName!=? order by id desc  ",
-					[Category.RDKV,"null","Image name not available"])
 		}
 		def groups =  utilityService.getGroup()? utilityService.getGroup() : null
 		def scriptGrp = ScriptGroup.withCriteria {
@@ -84,7 +83,7 @@ class TrendsController {
 			}
 			order('name')
 		}
-		[executionList : executionList, category:category, startIndex:0,endIndex:8, scriptList : sList, scriptGrpList : scriptGrp,executionTotalList :executionTotalList ,executionBuildList :executionBuildList]
+		[executionList : executionList, category:category, startIndex:0,endIndex:8, scriptList : sList, scriptGrpList : scriptGrp,executionTotalList :executionTotalList]
 	}
 	
 	/**
@@ -1451,6 +1450,34 @@ class TrendsController {
 	 */
 	def getExecutionDetails () {
 		redirect(controller:"execution", action: "getExecutionDetails", params: params)
+	}
+
+	/**
+	 * Gets the list of buildnames associated with all the executions
+	 */
+	def getExecutionBuildList(){
+		def category = params?.category
+		List<String> executionBuildList =[]
+		if(RDKV.equals(category.trim())){
+			def executionBuildListDuplicate = ExecutionDevice.executeQuery("select exe.buildName from ExecutionDevice exe where exe.category=? and exe.buildName!=? and exe.buildName!=? order by id desc  ",
+				[Category.RDKV,"null","Image name not available"])
+			executionBuildListDuplicate.each{buildName->
+				if(!executionBuildList.contains(buildName)){
+					executionBuildList.add(buildName)
+				}
+			}
+		}
+		else{
+			def executionBuildListDuplicate = ExecutionDevice.executeQuery("select exe.buildName from ExecutionDevice exe where exe.category!=? and exe.buildName!=? and exe.buildName!=? order by id desc  ",
+				[Category.RDKV,"null","Image name not available"])
+			executionBuildListDuplicate.each{buildName->
+				if(!executionBuildList.contains(buildName)){
+					executionBuildList.add(buildName)
+				}
+			}
+		}
+	
+		render new Gson().toJson(executionBuildList)
 	}
 
 	/**

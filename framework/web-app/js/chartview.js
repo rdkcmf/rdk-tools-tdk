@@ -1559,7 +1559,7 @@ function showNormalBased(){
  * Function display the  build name  section 
  */
 
-function showBuildNameBased(){
+function showBuildNameBased(category){
 	$('input[name=BuildOption][value=BuildScriptBased]').prop(
 						'checked', false);
 	$('input[name=BuildOption][value=BuildGroupBased]').prop(
@@ -1580,10 +1580,28 @@ function showBuildNameBased(){
 	$("#boxgroupbased").hide();
 	$("#boxscriptbased").hide();
 	$("#chartdiv").hide();
+	$.ajax({
+		type: "get",
+		url: 'getExecutionBuildList',
+		data: {category: category},
+		success: function (data) {
+			var parsedData = JSON.parse(data);
+			for(index in parsedData){
+				addingBuildNames(parsedData[index])
+			}
+		}
+	});
 	$("#buildnamebased").show();
 	$("#buildscriptbased").hide();
 	$("#buildgroupbased").show();
 	
+}
+
+/**
+ *Function to add execution buildnames to the Buildname list in chart page 
+ */
+function addingBuildNames(buildName){
+	$("#buildname").append(`<option value="${buildName}">${buildName}</option>`);
 }
 
 /**
@@ -1643,6 +1661,7 @@ function showBuildGroupBased()
 function submitNormalChartType()
 {
 	var chartType =$("#chartOption").val();
+	var category = $("#category").val();
 	
 	if( chartType == 'Show Results by Box Type')
 	{
@@ -1658,7 +1677,7 @@ function submitNormalChartType()
 	}
 	else if( chartType == 'Show Results by Build Name')
 	{
-		showBuildNameBased();
+		showBuildNameBased(category);
 	}
 	
 }
