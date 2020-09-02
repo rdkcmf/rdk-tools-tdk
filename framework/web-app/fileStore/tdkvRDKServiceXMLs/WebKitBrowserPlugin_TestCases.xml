@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<testPlugin pluginName="WebKitBrowser" pluginVersion="1">
+
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="WebKitBrowser" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,WebKitBrowser" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,WebKitBrowser" />
+                <params>
+                  <param tag="callsign" value="WebKitBrowser" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,WebKitBrowser" />
+                <params>
+                  <param tag="plugin" value="WebKitBrowser" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,WebKitBrowser" />
+            </testStep>
+            <testStep testStepId="4" name="Is_WebKitBrowser_Resumed" method="Get_WebKitBrowser_State" pluginName="WebKitBrowser" saveResult="true" >
+                <resultGeneration useMethodTag="webkitbrowser_get_state" />
+            </testStep>
+            <testStep testStepId="5" name="Resume_WebKitBrowser" method="Set_WebKitBrowser_State" pluginName="WebKitBrowser" >
+                <conditionalExecution enable="true" Id="4" useMethodTag="webkitbrowser_check_state" arguments="isSuspended" />
+                <params>
+                  <param tag="state" useDefault="true" />
+                </params>
+            </testStep>
+            <testStep testStepId="6" name="Is_WebKitBrowser_Resumed" method="Get_WebKitBrowser_State" pluginName="WebKitBrowser" delay="5">
+                <conditionalExecution enable="true" Id="4" useMethodTag="webkitbrowser_check_state" arguments="isSuspended" />
+                <resultGeneration useMethodTag="webkitbrowser_get_state" expectedValues="resumed" />
+            </testStep>
+          </prerequisite>
+
+          <prerequisite requisiteId="2" requisiteName="Deactivate_Plugins">
+            <testStep testStepId="1" name="Check_And_Deactivate_Plugins" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Deactivate_Plugin" method="Deactivate_Plugin"  pluginName="Controller">
+                  <params>
+                    <param tag="callsign"  iteration="true" useConfigFile="true" key="WEBKIT_PREREQ_DEACTIVATE_PLUGINS" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller" >
+                  <params>
+                    <param tag="plugin" useIterable="true" indexOnly="true" />
+                  </params>
+                  <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status" useIterableArg="true" expectedValues="deactivated"/>
+              </subtestStep>
+            </testStep>
+          </prerequisite>
+
+        </pluginPreRequisite>
+
+
+        <testCase testCaseId="WEB_01" testCaseName="WebkitBrowser_SetAndGet_URL" desc="Launches given URL in the browser">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Set_Browser_Test_URL" method="Set_Browser_URL">
+              <params>
+                <param tag="url" useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </params>
+            </testStep>
+            <testStep testStepId="2" name="Get_Browser_Test_URL" method="Get_Browser_URL" delay="3">
+              <resultGeneration useMethodTag="webkitbrowser_check_url" >
+                <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </resultGeneration>
+            </testStep>
+        </testCase>
+
+
+        <testCase testCaseId="WEB_02" testCaseName="WebkitBrowser_Toggle_Visibility" desc="Toggle current browser visibility" >
+           <testCaseInfo testCaseType="setandget" revert="true" />
+            <testStep testStepId="1" name="Set_Browser_Test_URL" method="Set_Browser_URL">
+              <params>
+                <param tag="url" useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </params>
+            </testStep>
+            <testStep testStepId="2" name="Get_Browser_Test_URL" method="Get_Browser_URL" delay="3">
+              <resultGeneration useMethodTag="webkitbrowser_check_url" >
+                <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Get_Browser_Visibility" method="Get_Browser_Visibility" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="webkitbrowser_get_visibility" />
+            </testStep>
+            <testStep testStepId="4" name="Set_Browser_Visibility" method="Set_Browser_Visibility" revertSet="yes">
+                <params>
+                  <param tag="visibility" usePreviousResult="true" Id="3" useMethodTag="webkitbrowser_toggle_visibility" revertParam="yes" />
+                </params>
+            </testStep>
+            <testStep testStepId="5" name="Get_Browser_Visibility" method="Get_Browser_Visibility" revertFlag="yes" delay="2">
+                <resultGeneration useMethodTag="webkitbrowser_get_visibility">
+                    <expectedValues usePreviousResult="true" Id="3" useMethodTag="webkitbrowser_toggle_visibility" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WEB_03" testCaseName="WebkitBrowser_Check_FPS" desc="Launches playback URL &amp; checks fps">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Set_Browser_Test_URL" method="Set_Browser_URL">
+              <params>
+                <param tag="url" useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
+              </params>
+            </testStep>
+            <testStep testStepId="2" name="Get_Browser_Test_URL" method="Get_Browser_URL" delay="3">
+              <resultGeneration useMethodTag="webkitbrowser_check_url" >
+                <expectedValues useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Browser_FPS_Value" method="Get_Browser_FPS" delay="15">
+              <resultGeneration useMethodTag="webkitbrowser_check_fps" >
+                <expectedValues useConfigFile="true" key="WEBKIT_EXPECTED_FPS" />
+              </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WEB_04" testCaseName="WebkitBrowser_Change_Cookie_Accept_Policy" desc="Change http cookie accept policy" >
+           <testCaseInfo testCaseType="setandget" revert="true" />
+            <testStep testStepId="1" name="Set_Browser_Test_URL" method="Set_Browser_URL">
+              <params>
+                <param tag="url" useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </params>
+            </testStep>
+            <testStep testStepId="2" name="Get_Browser_Test_URL" method="Get_Browser_URL" delay="3">
+              <resultGeneration useMethodTag="webkitbrowser_check_url" >
+                <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Get_Cookie_Accept_Policy" method="Get_Cookie_Accept_Policy" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="webkitbrowser_get_cookie_policy" />
+            </testStep>
+            <testStep testStepId="4" name="Set_Cookie_Accept_Policy" method="Set_Cookie_Accept_Policy" revertSet="yes">
+                <params>
+                  <param tag="cookie_accept_policy" usePreviousResult="true" Id="3" useMethodTag="webkitbrowser_change_cookie_policy" revertParam="yes" />
+                </params>
+            </testStep>
+            <testStep testStepId="5" name="Get_Cookie_Accept_Policy" method="Get_Cookie_Accept_Policy" revertFlag="yes" >
+                <resultGeneration useMethodTag="webkitbrowser_get_cookie_policy">
+                    <expectedValues usePreviousResult="true" Id="3" useMethodTag="webkitbrowser_change_cookie_policy" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WEB_05" testCaseName="WebkitBrowser_Toggle_Local_Storage_Enabled_Status" desc="Toggles local storage availability" >
+           <testCaseInfo testCaseType="setandget" revert="true" />
+            <testStep testStepId="1" name="Get_Local_Storage_Availability" method="Get_Local_Storage_Availability" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="webkitbrowser_get_local_storage_availability" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Local_Storage_Availability" method="Set_Local_Storage_Availability" revertSet="yes">
+                <params>
+                  <param tag="enabled" usePreviousResult="true" Id="1" useMethodTag="webkitbrowser_toggle_local_storage_availability" revertParam="yes" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Get_Local_Storage_Availability" method="Get_Local_Storage_Availability" revertFlag="yes" >
+                <resultGeneration useMethodTag="webkitbrowser_get_local_storage_availability">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="webkitbrowser_toggle_local_storage_availability" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WEB_06" testCaseName="WebkitBrowser_SetAndGet_Preferred_Languages" desc="Sets user preferred languages" >
+           <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Set_Browser_Test_URL" method="Set_Browser_URL">
+              <params>
+                <param tag="url" useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </params>
+            </testStep>
+            <testStep testStepId="2" name="Get_Browser_Test_URL" method="Get_Browser_URL" delay="3">
+              <resultGeneration useMethodTag="webkitbrowser_check_url" >
+                <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_Preferred_Languages" method="Set_Languages" >
+                <params>
+                  <param tag="languages" useDefault="true"/>
+                </params>
+            </testStep>
+            <testStep testStepId="4" name="Get_Preferred_Languages" method="Get_Languages" >
+                <resultGeneration useMethodTag="webkitbrowser_check_languages" />
+            </testStep>
+        </testCase>
+
+</testPlugin>
+
+

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<testPlugin pluginName="Network" pluginVersion="1">
+
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="org.rdk.Network" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Network" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Network" />
+                <params>
+                  <param tag="callsign" value="org.rdk.Network" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Network" />
+                <params>
+                  <param tag="plugin" value="org.rdk.Network" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Network" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+        </pluginPreRequisite>
+
+        <testCase testCaseId="NW_01" testCaseName="Network_Get_Device_Interfaces" desc="Gets list of interfaces supported by device" >
+           <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_Interfaces" method="Get_Interfaces">
+                <resultGeneration useMethodTag="network_get_interface_info" arguments="get_all_info" />
+            </testStep>
+        </testCase>
+
+
+        <testCase testCaseId="NW_02" testCaseName="Network_Get_Default_Interface" desc="Gets the default network interface" >
+           <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_Interfaces" method="Get_Interfaces" saveResult="true">
+                <resultGeneration useMethodTag="network_get_interface_info" arguments="get_interface_names" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Default_Interface" method="Get_Default_Interface">
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="network_get_interface_names" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="NW_03" testCaseName="Network_Get_STB_IP" desc="Gets IP address of the default interface" >
+           <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_STB_IP" method="Get_STB_IP">
+                <resultGeneration useMethodTag="network_get_stb_ip" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="NW_04" testCaseName="Network_Ping_Host" desc="Pings the specified end point" >
+           <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Ping_Host" method="Ping">
+                <params>
+                  <param tag="endpoint"  useConfigFile="true" key="PING_IP" />
+                  <param tag="packets"   useDefault="true" />
+                </params>
+                <resultGeneration useMethodTag="network_get_ping_response" arguments="check_target">
+                    <expectedValues useDefault="true" useConfigFile="true" key="PING_IP"/>
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="NW_05" testCaseName="Network_Ping_Named_EndPoints" desc="Pings the endpoint named by endpointName" >
+           <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Named_EndPoints" method="Get_NamedEndPoints" saveResult="true">
+                <resultGeneration useMethodTag="network_get_named_endpoints" />
+            </testStep>
+            <testStep testStepId="2" name="Ping_Named_Endpoint" method="Ping_NamedEndpoint">
+                <params>
+                  <param tag="endpointName"  usePreviousResult="true" Id="1" useMethodTag="network_get_endpoint_name" />
+                  <param tag="packets"   useDefault="true" />
+                </params>
+                <resultGeneration useMethodTag="network_get_ping_response" >
+                    <expectedValues useDefault="true" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="NW_06" testCaseName="Network_Trace_Host" desc="Traces the specified endpoint host IP" >
+           <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Trace_Host" method="Trace">
+                <params>
+                  <param tag="endpoint"  useConfigFile="true" key="TRACE_IP" />
+                  <param tag="packets"   useDefault="true" />
+                </params>
+                <resultGeneration useMethodTag="network_get_trace_response" arguments="check_target">
+                    <expectedValues useConfigFile="true" key="TRACE_IP"/>
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+
+        <testCase testCaseId="NW_07" testCaseName="Network_Trace_Named_EndPoints" desc="Traces the endpoint named by endpointName" >
+           <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Named_EndPoints" method="Get_NamedEndPoints" saveResult="true">
+                <resultGeneration useMethodTag="network_get_named_endpoints" />
+            </testStep>
+            <testStep testStepId="2" name="Trace_Named_Endpoint" method="Trace_NamedEndpoint">
+                <params>
+                  <param tag="endpointName"  usePreviousResult="true" Id="1" useMethodTag="network_get_endpoint_name" />
+                  <param tag="packets"   useDefault="true" />
+                  <param tag="guid"   useDefault="true" />
+                </params>
+                <resultGeneration useMethodTag="network_get_trace_response" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="NW_08" testCaseName="Network_Get_Default_Interface_IP_Settings" desc="Gets IP settings of default interface" >
+           <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Default_Interface" method="Get_Default_Interface" saveResult="true">
+                <resultGeneration useMethodTag="network_get_default_interface"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_IP_Settings" method="Get_IP_Settings">
+                <params>
+                  <param tag="interface"  usePreviousResult="true" Id="1" useMethodTag="network_get_default_interface_name" />
+                </params>
+                <resultGeneration useMethodTag="network_get_ip_settings" >
+                    <expectedValues  usePreviousResult="true" Id="1" useMethodTag="network_get_default_interface_name" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="NW_09" testCaseName="Network_Toggle_WIFI_Interface_Status" desc="Toggle wifi interface enabled status" >
+           <testCaseInfo testCaseType="setandget" revert="true" />
+            <testStep testStepId="1" name="Is_WIFI_Interface_Enabled" method="Is_Interface_Enabled" saveResult="true" revertGet="yes">
+                <params>
+                  <param tag="interface" value="WIFI" />
+                </params>
+                <resultGeneration useMethodTag="network_get_interface_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Set_WIFI_Interface_Enabled" method="Set_Interface_Enabled" revertSet="yes">
+                <params>
+                  <param tag="interface"  value="WIFI" />
+                  <param tag="enabled"   usePreviousResult="true" Id="1" useMethodTag="network_toggle_interface_status" revertParam="yes" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
+            </testStep>
+            <testStep testStepId="3" name="Is_WIFI_Interface_Enabled" method="Is_Interface_Enabled" revertFlag="yes">
+                <params>
+                  <param tag="interface" value="WIFI" />
+                </params>
+                <resultGeneration useMethodTag="network_get_interface_status">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="network_toggle_interface_status" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+</testPlugin>
+

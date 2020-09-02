@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<testPlugin pluginName="DisplaySettings" pluginVersion="1">
+
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+                <params>
+                  <param tag="callsign" value="org.rdk.DisplaySettings" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+                <params>
+                  <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+        </pluginPreRequisite>
+
+        <testCase testCaseId="DS_01" testCaseName= "Check_Settop_Supported_Resolutions" desc="Check whether settop displays all supported resoltions">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Settop_Supported_Resolutions" method="Get_Supported_Settop_Resolutions">
+                <resultGeneration useMethodTag="check_settop_supported_resolutions">
+                  <expectedValues useConfigFile="true" key="SETTOP_SUPPORTED_RESOLUTIONS" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_02" testCaseName= "Check_Supported_Tv_Resolutions"  desc="Check whether settop displays supported TV resoltions">
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+            <testStep testStepId="2" name="Get_Supported_Tv_Resolutions" method="Get_Supported_Tv_Resolutions" >
+                  <params>
+                    <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display" />
+                  </params>
+                <resultGeneration useMethodTag="check_supported_tv_resolutions"/>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_03" testCaseName= "Check_Supported_Video_Displays" desc="Check whether settop displays supported video displays">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Supported_Video_Displays" method="Get_Supported_VideoDisplays">
+                <resultGeneration useMethodTag="check_supported_video_displays">
+                  <expectedValues useConfigFile="true" key="SUPPORTED_VIDEO_DISPLAYS" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_04" testCaseName= "Check_Supported_Audio_Ports" desc="Check whether settop lists supported audio ports">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Supported_Audio_Ports" method="Get_Supported_AudioPorts">
+                <resultGeneration useMethodTag="check_supported_audio_ports">
+                  <expectedValues useConfigFile="true" key="SUPPORTED_AUDIO_PORTS" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_05" testCaseName= "Check_Settop_HDR_Support" desc="Check whether settop has HDR support or not">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Settop_HDR_Support_Details" method="GetSettopHDRSupport">
+                <resultGeneration useMethodTag="check_settop_HDR_support">
+                  <expectedValues useConfigFile="true" key="HDR_SUPPORT" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_06" testCaseName= "Check_TV_HDR_Support" desc="Check whether TV has HDR support or not">
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+
+            <testStep testStepId="1" name="Get_TV_HDR_Support_Details" method="Get_Tv_HDR_Support">
+                <resultGeneration useMethodTag="check_TV_HDR_support"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_07" testCaseName= "Read_Host_EDID" desc="Check the EDID status of host">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Host_EDID_Details" method="Read_Host_EDID">
+                <resultGeneration useMethodTag="check_host_edid"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_08" testCaseName= "Read_Connected_Device_EDID" desc="Check the EDID status of connected device">
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+
+            <testStep testStepId="1" name="Get_Connected_Device__EDID_Details" method="Read_EDID">
+                <resultGeneration useMethodTag="check_connected_device_edid"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_09" testCaseName= "Set_And_Get_Supported_Audio_Modes "  desc="Check whether supported audio modes are able to set">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+            <testStep testStepId="2" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Get_Supported_Audio_Modes" method="Get_Supported_AudioModes" saveResult="true">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="2" useMethodTag="get_audio_port" />
+                  </params>
+                <resultGeneration useMethodTag="check_supported_audio_modes"/>
+            </testStep>
+            <testStep testStepId="4" name="Get_Sound_Mode" method="Get_Sound_Mode" saveResult="true" revertGet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="2" useMethodTag="get_audio_port" />
+                  </params>
+                <resultGeneration useMethodTag="check_sound_mode"/>
+            </testStep>
+            <testStep testStepId="5"  name="Set_Sound_Mode" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Sound_Mode" method="Set_Sound_Mode" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="2" useMethodTag="get_audio_port" />
+                    <param tag="soundMode" usePreviousResult="true" Id="3" useMethodTag="get_supported_sound_modes" iteration="true" revertParam="yes" />
+                    <param tag="persist" value="false" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Sound_Mode" method="Get_Sound_Mode" revertFlag="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="2" useMethodTag="get_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_sound_mode" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_10" testCaseName= "Set_And_Get_Zoom_Settings"  desc="Check whether supported zoom modes are able to set and get">
+            <testCaseInfo testCaseType="loop" revert="true"/>
+            <testStep testStepId="1" name="Get_Zoom_Setting" method="Get_Zoom_Setting" saveResult="true" revertGet="yes" >
+              <resultGeneration useMethodTag="check_zoom_settings" >
+                <expectedValues useConfigFile="true" key="ZOOM_SETTINGS" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Set_Zoom_Setting" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Zoom_Setting" method="Set_Zoom_Setting" revertSet="yes">
+                  <params>
+                    <param tag="zoomSetting" useConfigFile="true" key="ZOOM_SETTINGS" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Zoom_Setting" method="Get_Zoom_Setting" revertFlag="yes" >
+                  <resultGeneration useMethodTag="check_zoom_settings" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_11" testCaseName= "Set_And_Get_VideoPort_Status_InStandby" desc="Check whether video port status to be used in stand by mode is able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+            </testStep>
+            <testStep testStepId="2" name="Get_VideoPort_Status_InStandby"  method="Get_VideoPort_Status_InStandby" saveResult="true" revertGet="yes" >
+                <params>
+                  <param tag="portName" usePreviousResult="true" Id="1" useMethodTag="set_video_display" />
+                </params>
+              <resultGeneration useMethodTag="check_video_port_status_standby" />
+            </testStep>
+            <testStep testStepId="3" name="Set_VideoPort_Status_InStandby"  testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_VideoPort_Status_InStandby" method="Set_VideoPort_Status_InStandby" revertSet="yes">
+                  <params>
+                    <param tag="portName" usePreviousResult="true" Id="1" useMethodTag="set_video_display" />
+                    <param tag="enabled" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_VideoPort_Status_InStandby"  method="Get_VideoPort_Status_InStandby" revertFlag="yes" >
+                  <params>
+                    <param tag="portName" usePreviousResult="true" Id="1" useMethodTag="set_video_display" />
+                  </params>
+                  <resultGeneration useMethodTag="check_video_port_status_standby" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_12" testCaseName= "Check_Current_Output_Settings" desc="Check the current output settings of device">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Check_Current_Output_Settings" method="Get_Current_Output_Settings">
+                <resultGeneration useMethodTag="check_current_output_settings"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_13" testCaseName= "Check_Active_Input_Value" desc="Check the active input value ">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Check_Get_Active_Input" method="Get_Active_Input">
+                <resultGeneration useMethodTag="check_active_input"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_14" testCaseName= "SetAndGet_All_Supported_Resolutions" desc="Set and get all the supported resolution by both TV and STB">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true">
+                <resultGeneration useMethodTag="display_connected_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_Resolutions" method="Get_Supported_Resolutions" saveResult="true">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="display_supported_resolutions"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Current_Resolution"  method="Get_Current_Resolution" saveResult="true" revertGet="yes">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="check_current_resolution"/>
+            </testStep>
+            <testStep testStepId="4" name="Set_Resolution" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Resolution" method="Set_Current_Resolution" revertSet="yes">
+                  <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                  <param tag="resolution" usePreviousResult="true" Id="2" iteration="true" useMethodTag="get_supported_resolutions" revertParam="yes"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Current_Resolution"  method="Get_Current_Resolution" revertFlag="yes" >
+                  <resultGeneration useMethodTag="check_current_resolution" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+</testPlugin>
+
+

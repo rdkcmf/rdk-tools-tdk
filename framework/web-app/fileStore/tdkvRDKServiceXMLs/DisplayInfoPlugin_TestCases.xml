@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<testPlugin pluginName="DisplayInfo" pluginVersion="1">
+
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="DisplayInfo" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DisplayInfo" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,DisplayInfo" />
+                <params>
+                  <param tag="callsign" value="DisplayInfo" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,DisplayInfo" />
+                <params>
+                  <param tag="plugin" value="DisplayInfo" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DisplayInfo" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+
+          <prerequisite requisiteId="2" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+                <params>
+                  <param tag="callsign" value="org.rdk.DisplaySettings" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+                <params>
+                  <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+
+          <!-- check if TV connect. Test case need to be executed only when TV is connected. -->
+          <prerequisite requisiteId="3" requisiteName="Get_Display_Connected_Status">
+              <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings">
+                  <resultGeneration useMethodTag="display_connected_status" />
+              </testStep>
+          </prerequisite>
+
+        </pluginPreRequisite>
+
+        <!-- Test case 01 -->
+        <testCase testCaseId="DISP_01" testCaseName= "DisplayInfo_GET_audiopassthrough" desc="Read isaudioPassthrough property on HDMI.">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="IsAudiopassthrough" method="DisplayInfo_Isaudiopassthrough">
+                <resultGeneration useMethodTag="displayinfo_validate_boolean_result" />
+            </testStep>
+        </testCase>
+
+
+        <!-- Test case 02 -->
+        <testCase testCaseId="DISP_02" testCaseName= "DisplayInfo_GET_HDMI_Connected" desc="Is HDMI connected.">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="IsHDMIConnected" method="DisplayInfo_Isconnected">
+                <resultGeneration useMethodTag="displayinfo_validate_boolean_result" />
+            </testStep>
+        </testCase>
+
+
+        <!-- Test case 03 -->
+        <testCase testCaseId="DISP_03" testCaseName= "DisplayInfo_GET_resolution_width" desc="Get width of the current resolution.">
+            <testCaseInfo testCaseType="direct"/>
+
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" pluginName="DisplaySettings">
+                  <resultGeneration useMethodTag="display_connected_status" />
+            </testStep>
+
+            <testStep testStepId="2" name="DisplaySettings_getsupportedresolutions" method="Get_Supported_Resolutions" saveResult="true" pluginName="DisplaySettings">
+                  <params>
+                         <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display" />
+                  </params>
+                  <resultGeneration useMethodTag="displayinfo_check_for_nonempty_result" />
+            </testStep>
+
+            <testStep testStepId="3" name="Getresolutionwidth" method="DisplayInfo_GetWidth">
+                <resultGeneration useMethodTag="displayinfo_validate_width_or_height" arguments="width" >
+                        <expectedValues usePreviousResult="true" Id="2" useMethodTag="display_info_get_supported_resolution_list" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+
+        <!-- Test case 04 -->
+        <testCase testCaseId="DISP_04" testCaseName= "DisplayInfo_GET_resolution_height" desc="Get height of the current resolution.">
+        <testCaseInfo testCaseType="direct"/>
+
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" pluginName="DisplaySettings">
+                <resultGeneration useMethodTag="display_connected_status" />
+            </testStep>
+
+            <testStep testStepId="2" name="DisplaySettings_getsupportedresolutions" method="Get_Supported_Resolutions" saveResult="true" pluginName="DisplaySettings">
+                <params>
+                        <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display" />
+                </params>
+                <resultGeneration useMethodTag="displayinfo_check_for_nonempty_result" />
+            </testStep>
+
+            <testStep testStepId="3" name="Getresolutionheight" method="DisplayInfo_GetHeight">
+                <resultGeneration useMethodTag="displayinfo_validate_width_or_height" arguments="height" >
+                        <expectedValues usePreviousResult="true" Id="2" useMethodTag="display_info_get_supported_resolution_list" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+
+        <!-- Test case 05 -->
+        <testCase testCaseId="DISP_05" testCaseName= "DisplayInfo_GET_vertical_frequency" desc="Get Vertical frequency.">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Getverticalfrequency" method="DisplayInfo_Getverticalfreq">
+                <resultGeneration useMethodTag="displayinfo_validate_boolean_result" />
+            </testStep>
+        </testCase>
+
+
+        <!-- Test case 06 -->
+        <testCase testCaseId="DISP_06" testCaseName= "DisplayInfo_GET_HDCP_protocol_version" desc="Get HDCP version.">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Gethdcpversion" method="DisplayInfo_GetHDCPversion">
+                <resultGeneration useMethodTag="displayinfo_validate_hdcp_version" expectedValues="HdcpUnencrypted, Hdcp1X, Hdcp2X" />
+            </testStep>
+        </testCase>
+
+
+        <!-- Test case 07 -->
+        <testCase testCaseId="DISP_07" testCaseName= "DisplayInfo_GET_portname" desc="Get portname used for TV connection.">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Getportname" method="DisplayInfo_GetPortname">
+                <resultGeneration useMethodTag="displayinfo_check_for_nonempty_result" />
+            </testStep>
+        </testCase>
+
+
+        <!-- Test case 08 -->
+        <!--
+        <testCase testCaseId="DISP_08" testCaseName= "DisplayInfo_Get_EDID_DATA" desc="Get EDID of connected display">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="GetEDID" method="DisplayInfo_GetEDID">
+                         #TODO: Need to add params.length parameter
+                <resultGeneration useMethodTag="displayinfo_check_for_nonempty_result" />
+            </testStep>
+        </testCase> -->
+
+
+
+        <!-- Test case 09 -->
+       <testCase testCaseId="DISP_09" testCaseName="DisplayInfo_ActivateDeactivate_STRESS" desc="Activates and deactivates the plugin">
+             <testCaseInfo testCaseType="stress" configurableRepeat="true" repeatKey="STRESS_TEST_REPEAT_COUNT" />
+
+             <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+                   <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                     <params>
+                       <param tag="plugin" value="DeviceInfo" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" />
+                   </testStep>
+                   <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,DeviceInfo" />
+                     <params>
+                       <param tag="callsign" value="DeviceInfo" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,DeviceInfo" />
+                     <params>
+                       <param tag="plugin" value="DeviceInfo" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" expectedValues="activated"/>
+                   </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+
+            <testStep testStepId="1" name="Check_DisplayInfo_Active_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                  <params>
+                    <param tag="plugin"  value="DisplayInfo" indexOnly="true" />
+                  </params>
+                  <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DisplayInfo"/>
+            </testStep>
+            <testStep testStepId="2" name="Plugin_ActivateDeactivate_STRESS" testStepType="repeat">
+              <subtestStep subtestStepId="1" name="Deactivate_DisplayInfo_Plugin" method="Deactivate_Plugin"  pluginName="Controller">
+                  <params>
+                    <param tag="callsign"  value="DisplayInfo" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Activate_DisplayInfo_Plugin" method="Activate_Plugin"  pluginName="Controller" delay="1">
+                  <params>
+                    <param tag="callsign" value="DisplayInfo" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Get_CPU_Load" method="Get_System_Info" pluginName="DeviceInfo" >
+                  <resultGeneration useMethodTag="deviceinfo_get_system_info" arguments="check_cpu_load" />
+              </subtestStep>
+            </testStep>
+    </testCase>
+
+</testPlugin>
+
+
