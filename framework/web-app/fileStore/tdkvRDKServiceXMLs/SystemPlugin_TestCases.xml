@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<testPlugin pluginName="System" pluginVersion="1">
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="org.rdk.System" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.System" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.System" />
+                <params>
+                  <param tag="callsign" value="org.rdk.System" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.System" />
+                <params>
+                  <param tag="plugin" value="org.rdk.System" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.System" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+        </pluginPreRequisite>
+
+
+
+        <testCase testCaseId="SYS_01" testCaseName= "System_Get_ESTB_MAC" desc="Get requested device detail">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_ESTB_MAC" method="Get_Device_Info">
+                <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SYS_02" testCaseName= "System_Get_Serial_Number" desc="Gets the serial number">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_Serial_No" method="Get_Serial_No">
+                <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SYS_03" testCaseName="System_Get_Version" desc="Gets system version details">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_System_Version" method="Get_System_Version">
+                <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SYS_04" testCaseName= "System_Get_Uptime" desc="Gets system version details">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_System_Uptime" method="Get_System_Uptime">
+                <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SYS_05" testCaseName= "System_Get_Milestones" desc="Gets list of milestones">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_System_Milestones" method="Get_Milestones">
+                <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SYS_06" testCaseName= "System_Get_Device_XConf_Params" desc="Gets Xconf configuration parameters for the device">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_XConf_Params" method="Get_XConf_Params">
+                <resultGeneration useMethodTag="system_get_xconf_info"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SYS_07" testCaseName= "System_Get_RFC_Config" desc="Gets RFC configurations">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_System_RFC_Config" method="Get_RFC_Config">
+                <params>
+                  <param tag="rfcList"  useConfigFile="true" key="SYSTEM_RFC_PARAMS" />
+                </params>
+                <resultGeneration useMethodTag="system_get_rfc_info"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SYS_08" testCaseName="System_Toggle_GZ_Enabled_Status" desc="Toggle GZ enabled status" >
+           <testCaseInfo testCaseType="setandget" revert="true" />
+            <testStep testStepId="1" name="Get_GZ_Enable_Status" method="Get_GZ_Enable_Status" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="system_get_gz_enabled_status" />
+            </testStep>
+            <testStep testStepId="2" name="Set_GZ_Enable_Status" method="Set_GZ_Enable_Status" revertSet="yes">
+                <params>
+                  <param tag="enabled" usePreviousResult="true" Id="1" useMethodTag="system_toggle_gz_enabled_status" revertParam="yes" />
+                </params>
+                <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="3" name="Get_GZ_Enable_Status" method="Get_GZ_Enable_Status" revertFlag="yes">
+                <resultGeneration useMethodTag="system_get_gz_enabled_status">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_toggle_gz_enabled_status" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SYS_09" testCaseName="System_SetAndGet_Cache_Key_Value" desc="Set and Get Cache Key" >
+           <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Set_Cache_Value" method="Set_Cache_Value">
+                <params>
+                  <param tag="key"   useDefault="true"/>
+                  <param tag="value" useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="2" name="Cache_Contains" method="Cache_Contains">
+                <params>
+                  <param tag="key"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="system_check_cache" expectedValues="True" />
+            </testStep>
+            <testStep testStepId="3" name="Get_Cache_Value" method="Get_Cache_Value">
+                <params>
+                  <param tag="key"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="system_check_cache_key">
+                  <expectedValues useDefault="true" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Remove_Cache_Key" method="Remove_Cache_Key">
+                <params>
+                  <param tag="key"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="5" name="Cache_Contains" method="Cache_Contains">
+                <params>
+                  <param tag="key"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="system_check_cache" expectedValues="False" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SYS_10" testCaseName="System_SetAndGet_Power_State" desc="Set and get device power state" >
+           <testCaseInfo testCaseType="setandget" revert="true" />
+            <testStep testStepId="1" name="Get_Power_State" method="Get_Power_State" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="system_get_power_state"/>
+            </testStep>
+            <testStep testStepId="2" name="Set_Power_State" method="Set_Power_State" revertSet="yes">
+                <params>
+                  <param tag="standbyReason"  useDefault="true" />
+                  <param tag="powerState"   usePreviousResult="true" Id="1" useMethodTag="system_switch_power_state" revertParam="yes" />
+                </params>
+                <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="3" name="Get_Power_State" method="Get_Power_State" revertFlag="yes">
+                <resultGeneration useMethodTag="system_get_power_state">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_switch_power_state" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SYS_11" testCaseName="System_SetAndGet_Preferred_StandBy_Mode" desc="Set and get preferred standby mode" >
+           <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Available_StandBy_Modes" method="Get_Available_StandBy_Modes" saveResult="true">
+                <resultGeneration useMethodTag="system_get_available_standby_modes" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Preferred_StandBy_Mode" method="Get_Preferred_StandBy_Mode" revertGet="yes">
+                <resultGeneration useMethodTag="system_get_preferred_standby_mode" />
+            </testStep>
+            <testStep testStepId="3" name="SetAndGet_Preferred_StandBy_Mode" testStepType="loop">
+              <subtestStep testStepId="1" name="Set_Preferred_StandBy_Mode" method="Set_Preferred_StandBy_Mode" revertSet="yes">
+                  <params>
+                    <param tag="standbyMode" usePreviousResult="true" Id="1" useMethodTag="system_get_available_standby_modes" iteration="true" />
+                  </params>
+                  <resultGeneration useMethodTag="system_check_set_operation" />
+              </subtestStep>
+              <subtestStep testStepId="2" name="Get_Preferred_StandBy_Mode" method="Get_Preferred_StandBy_Mode" revertFlag="yes">
+                  <resultGeneration useMethodTag="system_get_preferred_standby_mode">
+                      <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SYS_12" testCaseName="System_SetAndGet_TimeZone_DST" desc="Set and get DST time zone" >
+           <testCaseInfo testCaseType="setandget" revert="true" />
+            <testStep testStepId="1" name="Get_TimeZone_DST" method="Get_TimeZone_DST" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="system_get_timezone_dst" />
+            </testStep>
+            <testStep testStepId="2" name="Set_TimeZone_DST" method="Set_TimeZone_DST" revertSet="yes">
+                <params>
+                  <param tag="timeZone" usePreviousResult="true" Id="1" useMethodTag="system_switct_timezone_dst" revertParam="yes" />
+                </params>
+                <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="3" name="Get_TimeZone_DST" method="Get_TimeZone_DST" revertFlag="yes">
+                <resultGeneration useMethodTag="system_get_timezone_dst" arguments="check_timezone" >
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_switch_timezone_dst" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SYS_13" testCaseName= "System_Get_State_Info" desc="Gets state info of provided property">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_State_Info" method="Get_State_Info">
+              <params>
+                <param tag="param"  value="org.rdk.System" />
+              </params>
+                <resultGeneration useMethodTag="system_get_state_info" />
+            </testStep>
+        </testCase>
+
+
+</testPlugin>
+
