@@ -159,6 +159,10 @@ static void messageOpcodeAndOperandDecoder()
                 sprintf(result,"Menu language: %s",std::string(language.begin(), language.end()).c_str());
                 DEBUG_PRINT(DEBUG_TRACE, "Menu language: %s\n",std::string(language.begin(), language.end()).c_str());
                 break;
+            case FEATURE_ABORT:
+                DEBUG_PRINT(DEBUG_TRACE, "Feature Abort Message\n");
+                sprintf(result,"Feature Abort");
+                break;
             default:
                 sprintf(result,"Unhandled Message Received");
                 DEBUG_PRINT(DEBUG_TRACE, "Unhandled Message Received \n");
@@ -222,6 +226,7 @@ static void clearCECFlagsAndFrameInfo()
     cec_device_ready  = 0;
     cec_frame_size_tx = 0;
     cec_frame_size_rx = 0;
+    cec_receive_flag  = 1;
     cec_frame_rx_str.clear();
     cec_frame_header.clear();
     cec_frame_result.clear();
@@ -456,6 +461,12 @@ void HdmicecHalAgent::HdmicecHal_Tx(IN const Json::Value& req, OUT Json::Value& 
         response["details"]="No Input Opcode Frame";
         return;
     }
+    if(&req["receive_frames"] == NULL)
+    {
+        response["result"]="FAILURE";
+        response["details"]="No Input Receive Frame Flag";
+        return;
+    }
     char details[500];
     char frame[200];
 
@@ -478,10 +489,18 @@ void HdmicecHalAgent::HdmicecHal_Tx(IN const Json::Value& req, OUT Json::Value& 
     strcat(frame," ");
     strcat(frame,req["opcode"].asCString());
 
+    /* If a opcode is intended for sending purpose only, then
+       receive_frames should be set as 0. If a opcode is expected
+       to receive cec frames from target device, then receive_frames
+       should be set as 1. By default its set as 1 in TM
+    */
+    cec_receive_flag = req["receive_frames"].asInt();
+
     // convert string CEC frame to array & display
     get_cec_frame_tx(frame);
     disp_cec_frame((unsigned char*)cec_frame_tx,cec_frame_size_tx);
     sprintf(txMethod,"HdmiCecTx");
+    DEBUG_PRINT(DEBUG_TRACE, "Receive CEC Frame : %s\n",cec_receive_flag?"TRUE":"FALSE");
 
     int sendStatus = HDMI_CEC_IO_SUCCESS;
     int ret = HdmiCecTx(driverHandle, cec_frame_tx, cec_frame_size_tx, &sendStatus);
@@ -499,6 +518,12 @@ void HdmicecHalAgent::HdmicecHal_Tx(IN const Json::Value& req, OUT Json::Value& 
                 sprintf(details, "Received CEC Frame: %s;Header: %s;Result: %s",cec_frame_rx_str.c_str(),cec_frame_header.c_str(),cec_frame_result.c_str());
                 response["result"]="SUCCESS";
                 response["details"]=details;
+                DEBUG_PRINT(DEBUG_TRACE, "HdmicecHal_Tx --> Exit\n");
+            }
+            else if (cec_receive_flag == false){
+                DEBUG_PRINT(DEBUG_TRACE, "CEC Frame Transmitted Successfully !!\n");
+                response["result"]="SUCCESS";
+                response["details"]="CEC Frame Transmitted Successfully";
                 DEBUG_PRINT(DEBUG_TRACE, "HdmicecHal_Tx --> Exit\n");
             }
             else{
@@ -541,6 +566,12 @@ void HdmicecHalAgent::HdmicecHal_TxAsync(IN const Json::Value& req, OUT Json::Va
         response["details"]="No Input Opcode Frame";
         return;
     }
+    if(&req["receive_frames"] == NULL)
+    {
+        response["result"]="FAILURE";
+        response["details"]="No Input Receive Frame Flag";
+        return;
+    }
     char details[500];
     char frame[200];
 
@@ -563,10 +594,18 @@ void HdmicecHalAgent::HdmicecHal_TxAsync(IN const Json::Value& req, OUT Json::Va
     strcat(frame," ");
     strcat(frame,req["opcode"].asCString());
 
+    /* If a opcode is intended for sending purpose only, then
+       receive_frames should be set as 0. If a opcode is expected
+       to receive cec frames from target device, then receive_frames
+       should be set as 1. By default its set as 1 in TM
+    */
+    cec_receive_flag = req["receive_frames"].asInt();
+
     // convert string CEC frame to array & display
     get_cec_frame_tx(frame);
     disp_cec_frame((unsigned char*)cec_frame_tx,cec_frame_size_tx);
     sprintf(txMethod,"HdmiCecTxAsync");
+    DEBUG_PRINT(DEBUG_TRACE, "Receive CEC Frame : %s\n",cec_receive_flag?"TRUE":"FALSE");
 
     int ret = HdmiCecTxAsync(driverHandle, cec_frame_tx, cec_frame_size_tx);
     DEBUG_PRINT(DEBUG_TRACE, "Ret: %x HdmiCecTxAsync call DONE\n",ret);
@@ -585,7 +624,13 @@ void HdmicecHalAgent::HdmicecHal_TxAsync(IN const Json::Value& req, OUT Json::Va
         }
         else{
             DEBUG_PRINT(DEBUG_TRACE, "\nRx waiting timeout. DONE\n");
-            if (transmit_status){
+            if (transmit_status && cec_receive_flag == false){
+                DEBUG_PRINT(DEBUG_TRACE, "CEC Frame Transmitted Successfully !!\n");
+                response["result"]="SUCCESS";
+                response["details"]="CEC Frame Transmitted Successfully";
+                DEBUG_PRINT(DEBUG_TRACE, "HdmicecHal_Tx --> Exit\n");
+            }
+            else if (transmit_status && cec_receive_flag == true){
                 response["result"]="FAILURE";
                 response["details"]="Rx waiting timeout";
                 DEBUG_PRINT(DEBUG_TRACE, "HdmicecHal_TxAsync --> Exit\n");

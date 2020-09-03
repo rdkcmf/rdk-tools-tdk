@@ -66,6 +66,7 @@ int transmit_status = 0;
 int received_status = 0;
 int cec_header_flag = 0;
 int cec_device_ready = 0;
+bool cec_receive_flag = 1;
 
 std::mutex              m_idle;
 std::condition_variable m_cv;
@@ -83,8 +84,8 @@ class HdmicecHalAgent : public RDKTestStubInterface , public AbstractServer<Hdmi
                 {
                     this->bindAndAddMethod(Procedure("TestMgr_HdmicecHal_GetLogicalAddress", PARAMS_BY_NAME, JSON_STRING, "dev_type", JSON_INTEGER, NULL), &HdmicecHalAgent::HdmicecHal_GetLogicalAddress);
                     this->bindAndAddMethod(Procedure("TestMgr_HdmicecHal_GetPhysicalAddress", PARAMS_BY_NAME, JSON_STRING, NULL), &HdmicecHalAgent::HdmicecHal_GetPhysicalAddress);
-                    this->bindAndAddMethod(Procedure("TestMgr_HdmicecHal_Tx", PARAMS_BY_NAME, JSON_STRING, "header", JSON_STRING, "opcode", JSON_STRING, NULL), &HdmicecHalAgent::HdmicecHal_Tx);
-                    this->bindAndAddMethod(Procedure("TestMgr_HdmicecHal_TxAsync", PARAMS_BY_NAME, JSON_STRING, "header", JSON_STRING, "opcode", JSON_STRING, NULL), &HdmicecHalAgent::HdmicecHal_TxAsync);
+                    this->bindAndAddMethod(Procedure("TestMgr_HdmicecHal_Tx", PARAMS_BY_NAME, JSON_STRING, "header", JSON_STRING, "opcode", JSON_STRING, "receive_frames", JSON_INTEGER, NULL), &HdmicecHalAgent::HdmicecHal_Tx);
+                    this->bindAndAddMethod(Procedure("TestMgr_HdmicecHal_TxAsync", PARAMS_BY_NAME, JSON_STRING, "header", JSON_STRING, "opcode", JSON_STRING, "receive_frames", JSON_INTEGER, NULL), &HdmicecHalAgent::HdmicecHal_TxAsync);
                     this->bindAndAddMethod(Procedure("TestMgr_HdmicecHal_SetTxCallback", PARAMS_BY_NAME, JSON_STRING, NULL), &HdmicecHalAgent::HdmicecHal_SetTxCallback);
                     this->bindAndAddMethod(Procedure("TestMgr_HdmicecHal_SetRxCallback", PARAMS_BY_NAME, JSON_STRING, NULL), &HdmicecHalAgent::HdmicecHal_SetRxCallback);
                 }
