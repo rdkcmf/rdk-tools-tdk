@@ -464,7 +464,217 @@ class ExecutedbService {
 		}
 		return dataList
 	}
-
+	
+	/**
+	 * Method to getting execution details as a map for generating comparison report.
+	 * @param baseExecution
+	 * @param comparisonExecution
+	 * @param counter
+	 * @param realPath
+	 * @return
+	 */
+	def getExecutionDetailsAsMap(Execution baseExecution,Execution comparisonExecution,def counter,String realPath){
+		Map executionMap = [:]
+		List baseExecutionScriptList = []
+		def successCount = 0;
+		def failureCount = 0;
+		def skippedCount = 0;
+		def timeoutCount = 0;
+		def naCount = 0;
+		def pendingCount = 0;
+		def executedCount = 0;
+		def newFailureCount = 0;
+		def newScriptCount = 0;
+		def newTimedOutCount = 0;
+		int rate = 0;
+		def image = ""
+		def baseExecutionResultList = ExecutionResult.findAllByExecution(baseExecution)
+		baseExecutionResultList.each {executionResult ->
+			def moduleName
+			def scriptName = executionResult?.script
+			def sMap = scriptService.getScriptNameModuleNameMapping(realPath)
+			moduleName = sMap.get(scriptName)
+			if(moduleName){
+				baseExecutionScriptList.add(scriptName)
+			}
+		}
+		def comparisonExecutionResultList = ExecutionResult.findAllByExecution(comparisonExecution)
+		ExecutionDevice comparisonExecutionDevice = ExecutionDevice.findByExecution(comparisonExecution)
+		if(comparisonExecutionDevice){
+			if(comparisonExecutionDevice?.buildName){
+				image = comparisonExecutionDevice?.buildName
+			}else{
+				image = "Image name not available"
+			}
+		}
+		def scriptNameList = []
+		executionMap.put("Sl No", counter)
+		executionMap.put("Execution Name", comparisonExecution?.name)
+		if(comparisonExecution?.script){
+			executionMap.put("Test Suite", comparisonExecution?.script)
+		}else{
+			executionMap.put("Test Suite", comparisonExecution?.scriptGroup)
+		}
+		executionMap.put("Image Name", image)
+		comparisonExecutionResultList.each {executionResult ->
+			def moduleName
+			def scriptName = executionResult?.script
+			def sMap = scriptService.getScriptNameModuleNameMapping(realPath)
+			moduleName = sMap.get(scriptName)
+			if(moduleName){
+				if(!baseExecutionScriptList?.contains(scriptName)){
+					newScriptCount++
+				}
+				def status = executionResult?.status
+				executedCount++
+				if(Constants.SUCCESS_STATUS.equals(status)){
+					successCount++
+				}
+				else if(Constants.FAILURE_STATUS.equals(status)){
+					failureCount++
+					if(!baseExecutionScriptList?.contains(scriptName)){
+						newFailureCount++
+					}
+				}
+				else if(Constants.SKIPPED_STATUS.equals(status)){
+					skippedCount++
+				}
+				else if(Constants.NOT_APPLICABLE_STATUS.equals(status)){
+					naCount++
+				}
+				else if(Constants.SCRIPT_TIME_OUT.equals(status)){
+					timeoutCount++
+					if(!baseExecutionScriptList?.contains(scriptName)){
+						newTimedOutCount++
+					}
+				}else if(Constants.PENDING.equals(status)){
+					pendingCount++
+				}
+			}
+		}
+		executedCount = executedCount - pendingCount
+		executionMap.put(Constants.EXECUTED, executedCount)
+		executionMap.put(Constants.SUCCESS_STATUS, successCount)
+		executionMap.put(Constants.FAILURE_STATUS, failureCount)
+		executionMap.put(Constants.SCRIPT_TIME_OUT, timeoutCount)
+		executionMap.put(Constants.NOT_APPLICABLE_STATUS, naCount)
+		executionMap.put(Constants.SKIPPED_STATUS, skippedCount)
+		if(executedCount!=naCount){
+			rate =successCount*100/(executedCount-naCount)
+		}
+		executionMap.put("Pass %", rate)
+		executionMap.put("New Failure Script Count", newFailureCount)
+		executionMap.put("New Timedout Script Count", newTimedOutCount)
+		executionMap.put("New Script Count", newScriptCount)
+		return executionMap
+	}
+	
+	/**
+	 * Method to generate the data for creating the comparison report in excel format.
+	 * @param baseExecutionName
+	 * @param comparisonExecutionNames
+	 * @param appUrl
+	 * @param realPath
+	 * @return
+	 */
+	def getDataForComparisonReportGeneration(String baseExecutionName, List comparisonExecutionNames ,String appUrl, String realPath) {
+		Map detailDataMap = [:]
+		List allexecutionsList = []
+		List totalScriptList = []
+		Map summaryLabels = ["Sl No":"", "Execution Name":"", "Test Suite":"","Image Name":"" ,"Executed":"", "SUCCESS":"", "FAILURE":"", "SCRIPT TIME OUT":"", "N/A":"", "SKIPPED":"", "Pass %":"", "New Failure Script Count":"", "New Timedout Script Count":"", "New Script Count":""]
+		Map detailsMap = [:]
+		Map coverPageMap = [:]
+		Map coverPageExecutionMap = [:]
+		Execution baseExecution = Execution.findByName(baseExecutionName)
+		allexecutionsList.add(baseExecution)
+		if(baseExecution){			
+			detailsMap.put("Base Execution Name ", baseExecutionName)
+			detailsMap.put("Device", baseExecution?.device)
+			coverPageMap.put("Details",detailsMap)
+			int counter = 1
+			//setting the base execution details as the 1st row in cover page
+			coverPageExecutionMap = getExecutionDetailsAsMap(baseExecution, baseExecution,counter,realPath)
+			coverPageMap.put(baseExecutionName,coverPageExecutionMap)
+			//getting the comparison execution details as a map to be displayed in cover page
+			for(int i=0;i<comparisonExecutionNames.size();i++){
+				coverPageExecutionMap = [:]
+				counter ++ 
+				Execution comparisonExecution = Execution.findByName(comparisonExecutionNames[i])
+				if(comparisonExecution){
+					coverPageExecutionMap = getExecutionDetailsAsMap(baseExecution, comparisonExecution,counter,realPath)
+					coverPageMap.put(comparisonExecutionNames[i],coverPageExecutionMap)
+					allexecutionsList.add(comparisonExecution)
+				}
+			}
+			coverPageMap.put("Labels",summaryLabels)
+			detailDataMap.put("CoverPage", coverPageMap)
+			//generating the comparison report page 
+			allexecutionsList.each {execution ->
+				def executionResultList = ExecutionResult.findAllByExecution(execution)
+				executionResultList.each {executionResult ->
+					if(!totalScriptList.contains(executionResult?.script)){
+						totalScriptList.add(executionResult?.script)
+					}
+				}
+			}
+			totalScriptList = totalScriptList?totalScriptList?.sort():[]
+			//to generate the data map for each script
+			int scriptCounter = 1
+			List dataList = []
+			Map dataMapList = [:]
+			List fieldsList = []
+			fieldsList.add("Sl No")
+			fieldsList.add("Module Name")
+			fieldsList.add("Script Name")
+			fieldsList.add("Pass %")
+			totalScriptList.each {scriptName ->
+				int rate = 0
+				def successCount = 0;
+				def naCount = 0;
+				def totalCount = 0;
+				Map dataMap = [:]
+				def moduleName
+				def sMap = scriptService.getScriptNameModuleNameMapping(realPath)
+				moduleName = sMap.get(scriptName)
+				if(moduleName){
+					dataMap.put("Sl No",scriptCounter)
+					dataMap.put("Module Name",moduleName)
+					dataMap.put("Script Name",scriptName)
+					dataMap.put("Pass %","")
+					allexecutionsList.each {execution ->
+						String executionName = execution?.name
+						def executionResult = ExecutionResult.findByExecutionAndScript(execution,scriptName)
+						if(!(fieldsList.contains(executionName))){
+							fieldsList.add(executionName)
+						}
+						if(executionResult){
+							dataMap.put(executionName,executionResult?.status)
+							if(executionResult?.status == SUCCESS_STATUS){
+								successCount++
+							}
+							if(executionResult?.status == NOT_APPLICABLE_STATUS){
+								naCount++
+							}
+							totalCount++
+						}else{
+							dataMap.put(executionName,"Not Executed")
+						}
+						
+					}
+					scriptCounter++
+					if(totalCount!=naCount){
+						rate =successCount*100/(totalCount-naCount)
+					}
+					dataMap.put("Pass %",rate.toString())
+					dataList.add(dataMap)
+				}
+			}
+			dataMapList.put("dataList",dataList)
+			dataMapList.put("fieldsList",fieldsList)
+			detailDataMap.put("Comparison Results",dataMapList)
+		}
+		return detailDataMap
+	}
 	/**
 	 * Method to generate the data for creating the combined report in excel format.
 	 */
