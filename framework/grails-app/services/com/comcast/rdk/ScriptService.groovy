@@ -1509,9 +1509,11 @@ class ScriptService {
 	def getExecutionTime(String exTime){
 		int execTime = 2
 		if(exTime){
-			execTime = Integer.parseInt(exTime?.trim())
+			boolean isNumber = Pattern.matches("[0-9]+", exTime)
+			if(isNumber) {
+				execTime = Integer.parseInt(exTime?.trim())
+			}
 		}
-
 		return execTime
 	}
 

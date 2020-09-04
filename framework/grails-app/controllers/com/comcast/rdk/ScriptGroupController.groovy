@@ -46,6 +46,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 /*import com.sun.corba.se.impl.orbutil.graph.Node
 import groovy.xml.StreamingMarkupBuilder
@@ -1699,7 +1700,10 @@ class ScriptGroupController {
 			int time = 0
 			if(params?.executionTime){
 				try {
-					time = Integer.parseInt(params?.executionTime)
+					boolean isNumber = Pattern.matches("[0-9]+", params?.executionTime)
+					if(isNumber) {
+						time = Integer.parseInt(params?.executionTime)
+					}
 				} catch (Exception e) {
 					e.printStackTrace()
 				}
