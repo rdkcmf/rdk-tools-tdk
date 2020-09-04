@@ -20,13 +20,13 @@
 import sys
 import urllib2
 from StringIO import StringIO
-if ( (len(sys.argv)) != 2):
-        print "Usage : python " + sys.argv[0] + " Device_IP_Address"
-        print "eg    : python " + sys.argv[0] + " 192.168.160.229"
+if ( (len(sys.argv)) != 3):
+        print "Usage : python " + sys.argv[0] + " Device_IP_Address Thunder_Port"
+        print "eg    : python " + sys.argv[0] + " 192.168.160.229 9998"
         exit()
 else:
     try:
-        url = 'http://'+sys.argv[1]+'/jsonrpc'
+        url = 'http://'+sys.argv[1]+':'+sys.argv[2]+'/jsonrpc'
         statusCode = urllib2.urlopen(url,timeout=3).getcode()
         if statusCode == 200:
                 print "FREE"

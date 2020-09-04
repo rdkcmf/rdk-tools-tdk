@@ -32,6 +32,7 @@ import urllib
 import datetime
 import threading
 import streamlib
+import tdkStandAlonelib
 from sys import exit
 from resetAgent import resetAgent
 from time import gmtime, strftime
@@ -107,7 +108,7 @@ class PrimitiveTestCase:
     	#------------------------------------------------------------------------------
     	# __init__ and __del__ block
     	#------------------------------------------------------------------------------
-	def __init__(self, name, url, execId, execDeviceId, execResId, ipAddr, realPath, logPath, tcpClient, logTransferPort, testcaseId, deviceId):
+	def __init__(self, name, url, execId, execDeviceId, execResId, ipAddr, realPath, logPath, tcpClient, logTransferPort, testcaseId, deviceId, standAlone=False):
 		try:
 			self.url = url
 			self.execID = execId
@@ -116,6 +117,7 @@ class PrimitiveTestCase:
 			self.execDevId = execDeviceId
 			self.testcaseId = testcaseId
 			self.deviceId = deviceId
+                        self.isStandAlone = standAlone
 			self.realpath = realPath
 			self.logpath = logPath
 			self.tcpClient = tcpClient
@@ -245,36 +247,47 @@ class PrimitiveTestCase:
 		print "Executing %s...." %self.testCaseName
 		sys.stdout.flush()
 
-		data = json.loads(self.jsonMsgValue)
-                pObj=data["params"]
-		pObj["module"] = self.parentTestCase.componentName
-		jsonAscii = json.dumps(data, ensure_ascii = False)
-                self.jsonMsgValue = jsonAscii
+                if self.isStandAlone == False:
+		    data = json.loads(self.jsonMsgValue)
+                    pObj=data["params"]
+		    pObj["module"] = self.parentTestCase.componentName
+		    jsonAscii = json.dumps(data, ensure_ascii = False)
+                    self.jsonMsgValue = jsonAscii
 
-		self.jsonMsgValue=  self.jsonMsgValue +"\r\n"
-		#self.tcpClient.resetConnection(self.tcpClient,8087)
-		self.tcpClient.close()
-	#	time.sleep(5)
-		self.tcpClient = self.getSocketInstance(self.ip)
-		self.tcpClient.connect((self.ip, self.parentTestCase.portValue))
-		self.tcpClient.send(self.jsonMsgValue)
-		t1 = time.time();
-		self.result = self.tcpClient.recv(1048)
-		self.tcpClient.close()
-		t2 = time.time();
-		# TODO check if required		self.executionName=executionName
-		self.expectedResult = expectedResult
-		self.result=self.getValueFromJSONOutput("result")
-		self.result=self.result+"\""
-		self.result = self.result.replace("\"result\"","\"TDK__#@$00_result\"")
-		self.result = self.result.replace("\"details\"","\"TDK__#@$00_details\"")
-		self.result = self.result.replace("\"log-path\"","\"TDK__#@$00_log-path\"")
+		    self.jsonMsgValue=  self.jsonMsgValue +"\r\n"
+		    #self.tcpClient.resetConnection(self.tcpClient,8087)
+		    self.tcpClient.close()
+	#	    time.sleep(5)
+		    self.tcpClient = self.getSocketInstance(self.ip)
+		    self.tcpClient.connect((self.ip, self.parentTestCase.portValue))
+		    self.tcpClient.send(self.jsonMsgValue)
+		    t1 = time.time();
+		    self.result = self.tcpClient.recv(1048)
+		    self.tcpClient.close()
+		    t2 = time.time();
+		    # TODO check if required		self.executionName=executionName
+		    self.expectedResult = expectedResult
+		    self.result=self.getValueFromJSONOutput("result")
+		    self.result=self.result+"\""
+		    self.result = self.result.replace("\"result\"","\"TDK__#@$00_result\"")
+		    self.result = self.result.replace("\"details\"","\"TDK__#@$00_details\"")
+		    self.result = self.result.replace("\"log-path\"","\"TDK__#@$00_log-path\"")
 
-		self.result = self.result.replace("performanceDataReading","TDK__#@$00_performanceDataReading")
-		self.result = self.result.replace("performanceDataName","TDK__#@$00_performanceDataName")
-		self.result = self.result.replace("performanceDataUnit","TDK__#@$00_performanceDataUnit")
-		self.result = self.result.replace("performanceDataInfo","TDK__#@$00_performanceDataInfo")
-
+		    self.result = self.result.replace("performanceDataReading","TDK__#@$00_performanceDataReading")
+		    self.result = self.result.replace("performanceDataName","TDK__#@$00_performanceDataName")
+		    self.result = self.result.replace("performanceDataUnit","TDK__#@$00_performanceDataUnit")
+		    self.result = self.result.replace("performanceDataInfo","TDK__#@$00_performanceDataInfo")
+                
+                else:
+                    data = json.loads(self.jsonMsgValue)
+                    pObj=data["params"]
+                    self.expectedResult = expectedResult
+                    t1 = time.time();
+                    status,details = tdkStandAlonelib.executeTest(self)
+                    t2 = time.time()
+                    self.executionTime = t2-t1;
+                    self.xmlLogEnabled = False
+                    self.result = '{"TDK__#@$00_details":"'+str(details)+'","TDK__#@$00_result":"'+status+'"}'
 
 		if self.xmlLogEnabled==True:
 			addTxtEle(self.parentTestCase.xmlLogDom,self.TestFnLogDom,"ResultStr",str(self.result))
@@ -818,11 +831,12 @@ class TDKScriptingLibrary:
     	# __init__ and __del__ block
     	#------------------------------------------------------------------------------
 
-	def __init__(self, cName, version):
+	def __init__(self, cName, version, standAlone=False):
 		self.serviceIp = None
 		self.servicePort = None
 		self.componentName = cName
 		self.rdkversion = version
+                self.isStandAlone = standAlone
 		self.url = None
 		self.execID = None
 		self.resultId = None
@@ -995,25 +1009,34 @@ class TDKScriptingLibrary:
                                 sys.stdout.flush()
                                 exit()
 
-			# Connecting to device
-			self.tcpClient.connect((self.IP, self.portValue))
-			self.uiLogData =str(self.uiLogData)+ "<br/> Connected to "+ str(self.IP) +" Box for testing "+ str(self.componentName);
-			#print "Connected to "+ self.IP +" Box for testing "+ self.componentName
-			self.execName = executionName
-			print "Test Execution Name is: %s" %self.execName
+                        if self.isStandAlone is False :
+			    # Connecting to device
+			    self.tcpClient.connect((self.IP, self.portValue))
+			    self.uiLogData =str(self.uiLogData)+ "<br/> Connected to "+ str(self.IP) +" Box for testing "+ str(self.componentName);
+			    #print "Connected to "+ self.IP +" Box for testing "+ self.componentName
+			    self.execName = executionName
+			    print "Test Execution Name is: %s" %self.execName
 
-			#For DynamicLoading ....
-			#Load the particular shared object  before executing
-			print "Connected to "+ self.IP +" Box for testing "+ self.componentName
-       			sys.stdout.flush()
+			    #For DynamicLoading ....
+			    #Load the particular shared object  before executing
+			    print "Connected to "+ self.IP +" Box for testing "+ self.componentName
+       			    sys.stdout.flush()
 
 
-                        final = '{"jsonrpc":"2.0","id":"2","method":"loadModule","params":{"param1":"'+str(self.componentName)+'","version":"'+str(self.rdkversion)+'",\
-                                 "execID":"'+str(self.execID)+'","deviceID":"'+str(self.deviceId)+'","testcaseID":"'+str(self.testcaseId)+'",\
-                                 "execDevID":"'+str(self.execDevId)+'","resultID":"'+str(self.resultId)+'",\
-                                 "performanceBenchMarkingEnabled":"'+str(self.performanceBenchMarkingEnabled)+'", \
-                                 "performanceSystemDiagnosisEnabled":"'+str(self.performanceSystemDiagnosisEnabled)+'"}}\r\n'
-                        self.tcpClient.send(final)
+                            final = '{"jsonrpc":"2.0","id":"2","method":"loadModule","params":{"param1":"'+str(self.componentName)+'","version":"'+str(self.rdkversion)+'",\
+                                     "execID":"'+str(self.execID)+'","deviceID":"'+str(self.deviceId)+'","testcaseID":"'+str(self.testcaseId)+'",\
+                                     "execDevID":"'+str(self.execDevId)+'","resultID":"'+str(self.resultId)+'",\
+                                     "performanceBenchMarkingEnabled":"'+str(self.performanceBenchMarkingEnabled)+'", \
+                                     "performanceSystemDiagnosisEnabled":"'+str(self.performanceSystemDiagnosisEnabled)+'"}}\r\n'
+                            self.tcpClient.send(final)
+
+                        else:
+                            self.uiLogData =str(self.uiLogData)+ "<br/> Starting standalone testing of "+ str(self.componentName) +" in device "+ str(self.componentName);
+                            self.execName = executionName
+                            print "Test Execution Name is: %s" %self.execName
+                            self.result = '{"details":"SUCCESS","result":"SUCCESS"}'
+                            self.result = '{"id":"2","jsonrpc":"2.0","result":{"details":"Module Loaded Successfully","id":null,"jsonrpc":"2.0","result":"Success"}}'
+
 		except socket.error:
 			print "******************************************************************************************"
 			print " #TDK_@error-Error while Connecting to Server ... "
@@ -1035,7 +1058,8 @@ class TDKScriptingLibrary:
 			print "Connected to Server!\n"
 			self.uiLogData = self.uiLogData+"<br/> Connected to Server!";#print "Connected to Server!\n";
 			sys.stdout.flush()
-			self.result = self.tcpClient.recv(1048)
+                        if self.isStandAlone is False :
+			    self.result = self.tcpClient.recv(1048)
 		return
 
 	########## End of Function ##########
@@ -1173,20 +1197,29 @@ class TDKScriptingLibrary:
 	# Return Value: An instance of PrimitiveTestCase
 
 		sys.stdout.flush()
-		testObj = PrimitiveTestCase(testCaseName, self.url, self.execID, self.execDevId, self.resultId, self.IP, self.realpath, self.logpath, self.tcpClient, self.logTransferPort, self.testcaseId, self.deviceId)
-		testObj.setParentTestCase(self)
-		if bXmlLogEnabledForTestFn == True:
-			testFnEl=self.xmlLogDom.createElement("TestFunction")
-			testFnEl.setAttribute("name",str(testCaseName))
-			testFnEl.setAttribute("description",str(testFnDescription))
-			self.xmlLogDom.getElementsByTagName("TestCase")[0].appendChild(testFnEl)
-			testObj.setXmlLog(testFnEl,testFnDescription)
-			testObj.enableXmlLog(True)
-		else:
+                if self.isStandAlone == False:
+		    testObj = PrimitiveTestCase(testCaseName, self.url, self.execID, self.execDevId, self.resultId, self.IP, self.realpath, self.logpath, self.tcpClient, self.logTransferPort, self.testcaseId, self.deviceId)
+		    testObj.setParentTestCase(self)
+		    if bXmlLogEnabledForTestFn == True:
+		    	testFnEl=self.xmlLogDom.createElement("TestFunction")
+		    	testFnEl.setAttribute("name",str(testCaseName))
+		    	testFnEl.setAttribute("description",str(testFnDescription))
+		    	self.xmlLogDom.getElementsByTagName("TestCase")[0].appendChild(testFnEl)
+		    	testObj.setXmlLog(testFnEl,testFnDescription)
+		    	testObj.enableXmlLog(True)
+		    else:
 			testObj.enableXmlLog(False)
 
-		self.primitiveTests.append(testObj)
-		self.primitiveTests.append("\r\n")
+	            self.primitiveTests.append(testObj)
+		    self.primitiveTests.append("\r\n")
+ 
+                else:
+                    testObj = PrimitiveTestCase(testCaseName, self.url, self.execID, self.execDevId, self.resultId, self.IP, self.realpath, self.logpath, self.tcpClient, self.logTransferPort, self.testcaseId, self.deviceId,standAlone=True)
+                    testObj.setParentTestCase(self)
+                    testObj.enableXmlLog(False)
+                    self.primitiveTests.append(testObj)
+                    self.primitiveTests.append("\r\n")
+               
 		return testObj
 
 	########## End of Function ##########
@@ -1309,6 +1342,7 @@ class TDKScriptingLibrary:
 	# Parameters   : cName - Component name
 	# Return Value : null
     		try:
+                    if self.isStandAlone == False:
 			if(self.enabledXmlLogging == True):
 				logdir=self.logpath+"/logs/"+str(self.execID)+"/"+str(self.execDevId)+"/"+str(self.resultId)
 				print "print the xml log to  "+logdir
@@ -1331,6 +1365,9 @@ class TDKScriptingLibrary:
 			unloadmoduleresult = self.tcpClient.recv(1048)
                         sys.stdout.flush()
 			self.tcpClient.close()
+
+                    else:
+                        unloadmoduleresult = "SUCCESS"
 
 		except socket.error:
 			print "******************************************************************************************"
