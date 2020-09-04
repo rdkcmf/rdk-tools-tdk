@@ -1,0 +1,93 @@
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+
+ Copyright 2020 RDK Management
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<?xml version="1.0" encoding="UTF-8"?><xml>
+  <module name="rdkservices" testGroup="Component">
+    <primitiveTests>
+      <primitiveTest name="RdkService_Test" id=" " version="3">
+        <function>TestMgr_RdkService_Test</function>
+        <parameters>
+          <parameter name="xml_name" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_getValue" id=" " version="1">
+        <function>rdkservice_getValue</function>
+        <parameters>
+          <parameter name="method" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_getPluginStatus" id=" " version="1">
+        <function>rdkservice_getPluginStatus</function>
+        <parameters>
+          <parameter name="plugin" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_getAllPluginStatus" id="" version="1">
+        <function>rdkservice_getAllPluginStatus</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_setPluginStatus" id=" " version="1">
+        <function>rdkservice_setPluginStatus</function>
+        <parameters>
+          <parameter name="plugin" value=""/>
+          <parameter name="status" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_setPluginState" id=" " version="1">
+        <function>rdkservice_setPluginState</function>
+        <parameters>
+          <parameter name="plugin" value=""/>
+          <parameter name="state" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_setValue" id=" " version="1">
+        <function>rdkservice_setValue</function>
+        <parameters>
+          <parameter name="method" value=""/>
+          <parameter name="value" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_getReqValueFromResult" id=" " version="1">
+        <function>rdkservice_getReqValueFromResult</function>
+        <parameters>
+          <parameter name="method" value=""/>
+          <parameter name="reqValue" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_getNoOfPlugins" id="" version="1">
+        <function>rdkservice_getNoOfPlugins</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_rebootDevice" id=" " version="1">
+        <function>rdkservice_rebootDevice</function>
+        <parameters>
+          <parameter name="waitTime" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_getBrowserScore_CSS3" id="" version="1">
+        <function>rdkservice_getBrowserScore_CSS3</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_getBrowserScore_Octane" id="" version="1">
+        <function>rdkservice_getBrowserScore_Octane</function>
+        <parameters/>
+      </primitiveTest>
+    </primitiveTests>
+  </module>
+</xml>
