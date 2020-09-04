@@ -50,6 +50,7 @@
 <g:javascript library="jquery.more" />
 <g:javascript library="select2" />
 <g:javascript library="chartview" />
+<g:javascript library="jquery-ui"/>
 <link rel="stylesheet"
 	href="${resource(dir:'css',file:'jquery-ui.css')}" type="text/css" />
 <link rel="stylesheet" href="${resource(dir:'css',file:'select2.css')}"
@@ -118,12 +119,17 @@
 			</ul>
 		</g:if>
 		<br>
+		<g:hiddenField id="url" name="url" value="${url}"/>
+		<g:hiddenField id="finalBaseExecFromDate" name="finalBaseExecFromDate" value=""/>
+		<g:hiddenField id="finalBaseExecToDate" name="finalBaseExecToDate" value=""/>
+		<g:hiddenField id="finalBaseExecCategory" name="finalBaseExecCategory" value=""/>
+		<g:hiddenField id="finalBoxTypeBaseExec" name="finalBoxTypeBaseExec" value=""/>
 		<div>
 			<table class="noClass" style="border: 1; border-color: black; width:90%;" >
 				<tr>
 					<td>
-						<div style="float: left;">&emsp;&emsp;&emsp;&emsp;Category&emsp;&emsp;&emsp;&emsp;&emsp; &emsp; </div>
-						<div style="float: left; margin-left: 20px;">
+						<div style="float: left;" id="categoryLabel">&emsp;&emsp;&emsp;&emsp;Category&emsp;&emsp;&emsp;&emsp;&emsp; &emsp; </div>
+						<div style="float: left; margin-left: 20px;" id="categoryId">
 							<g:form controller="trends" action="chart">
 								<g:select id="category" name="category" from="['RDKV','RDKB']"
 									onchange="submit()" value="${category}" />
@@ -133,7 +139,7 @@
 					<td>
 						<div id = "normal" >
 							<div style="float: left;">&emsp;&emsp;&emsp;&emsp; Result Type</div>
-							&emsp;<g:select id = "chartOption" name="chartOption" from="['Show Results by Box Type','Show Results by Device','Show Results by Build Name', 'Analyze execution']"
+							&emsp;<g:select id = "chartOption" name="chartOption" from="['Show Results by Box Type','Show Results by Device','Show Results by Build Name', 'Analyze execution','Comparison Report Download']"
 								onchange="submitNormalChartType();" value="${chartOption}" />
 							
 						</div>
@@ -188,7 +194,163 @@
 				<div id = "executionDetails" style = "height:90%; width:90%; margin-left:5%"></div>
   	            <div id="resultAnalysisPopup" style="display: none; overflow: auto; width : 98%; height : 98%;"></div>        
 			</div>
+			<div id="showComparisonReport" style="display: none;">
+				<div style="margin-left:50px;">
+					<button style="font-weight: bold;font-size:15px;color:#2989b3;font-style: italic;font-family: Times New Roman;" onclick="helpDivToggle()" >i</button>
+				</div>
+				<p id="helpDivComparison" style="display: none; border-style: ridge;font-style: italic;width:90%;margin-left:50px;padding: 5px 5px 5px 5px;">Comparison report can be used to compare the execution results of a base execution with other 
+					executions. For this, user has to select a single Base execution by either pasting the execution name in the 
+					input box or selecting the execution by clicking on "Choose" button displayed to its right.
+					Then User can select a list of comparison executions either by pasting the list of execution names separated by commas in the 
+					text area provided (Min : 1 and Max : 10) or selecting the executions by clicking on "Choose" button displayed to its right.
+					After selecting base execution and the comparison executions, click on the button "Generate Comparison Report" to generate the report
+				</p>
+				<g:form controller="execution" action="comparisonExcelReportGeneration">
 
+					
+					<table class="noClass" style="width:50%;margin-left:50px;">
+						<tr >
+							<td>Base Execution Name</td>
+							<td style="width:50%;"><input type="text" id="baseExecutionName" name="baseExecutionName" placeholder="Give one execution name or choose" value="" style="width:90%;" required/><span class="required-indicator">*</span></td>		
+							<td style="width:10px;">OR</td>
+							<td><input type="button" class=" buttons" value="Choose" onclick="showBaseDetails();"/> <br></td>
+						</tr>
+						<tr >
+							<td>Comparison Execution Names</td>
+							<td style="width:50%;"><textarea type="text" id="comparisonExecutionName" name="comparisonExecutionNames" placeholder="Give list of execution names separated by comma (Min : 1 and Max : 10) or choose" style="height: 120px; width:90%;" required/></textarea><span class="required-indicator">*</span></td>		
+							<td style="width:10px;vertical-align:middle;">OR</td>
+							<td style="vertical-align:middle;"><input type="button" id="comparisonExecutionButton" class=" buttons" value="Choose" onclick="showComparisonDetails();"/> <br></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>
+								<div id="comparisonReportDiv">
+									<g:link onclick="return comparisonExcelReportGeneration()" id="comparisonReportLink">
+										<span class = "buttons"><input type="button" style="font-weight: bold;" id="comparisonReportButton" value="Generate Comparison Report"><img src="../images/excel.png"  title = " Download Comparison Report(Excel)"/></span>
+									</g:link>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</g:form>
+			</div>
+			<div id="baseExecutionPopUp" style="display: none; overflow: auto; width : 98%; height : 98%;" >	
+				<div>
+					<div>
+		   			 	<div style="font-size:20px;font-weight: bold;text-align: center;position: relative;">
+		   			 		Select Base Execution for Comparison Report Generation
+		   			 	</div>
+					</div>
+					<div style="height : 20px;">
+					</div>
+				</div>
+				<g:formRemote name="myBaseForm" update="searchFilterResultDivBase" method="GET"
+								before="validateBaseInputFields();"
+		              			action="${createLink(controller: 'trends', action: 'filterBaseExecutions')}"
+		              			url="[controller: 'trends', action: 'filterBaseExecutions']"><br>
+				<table>																
+					<tr>
+						<td valign="middle">From</td>
+						<td valign="middle"><input type="text" id="generateFromDateBaseExec" name="generateFromDateBaseExec" required/><span class="required-indicator">*</span>
+						</td>
+						<td valign="middle">To</td>
+						<td valign="middle"><input type="text" id="generateToDateBaseExec" name="generateToDateBaseExec" required/><span class="required-indicator">*</span>										
+						</td>
+						<td></td>
+						<td valign="middle">
+							<span class="buttons"><input type="submit" style="font-weight: bold;" name="filterBaseExecutions" value="Filter Executions">
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Category</td>
+						<td>
+							<g:select id="categoryIdBaseExec" name="categoryBaseExec" from="${['RDKV','RDKB','RDKC' ,'RDKV_THUNDER']}" value="${params?.category}" required="required"/><span class="required-indicator">*</span>
+						</td>
+						<td>Box Type</td>
+						<td id="boxTypeIdBaseExec">
+							<select name="boxTypeBaseExec" id = "boxTypeBaseExec">
+								<option value="">Please Select</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>ScriptType</td>
+						<td>											
+							<select name="scriptTypeValueBaseExec" id="scriptTypeBase" onchange="showScriptTypesForBaseExec();" style="width: 150px">
+								<option value="">All</option>
+								<option value="Script">SINGLE SCRIPT</option>
+								<option value="TestSuite">SCRIPTGROUP</option>												
+							</select>
+						</td>
+						<td><span id="scriptLabelBaseId" style="display:none;">Script/ScriptGroup</span></td>
+						<td><span id="scriptFieldBaseId" style="display:none;"><g:textField id="scriptValueBaseId" name="scriptValueBasicExec"/></span>									
+						</td>
+					</tr>
+					<g:hiddenField name = "validate" id = "validate" value = ""/>
+				</table>
+				</g:formRemote>
+				<span id="searchFilterResultDivBase" style="width: 100%;overflow: auto;"></span>
+			</div>
+			<div id="comparisonExecutionPopUp" style="display: none; overflow: auto; width : 98%; height : 98%;" >	
+				<div>
+					<div>
+		   			 	<div style="font-size:20px;font-weight: bold;text-align: center;position: relative;">
+		   			 		Select Comparison Executions
+		   			 	</div>
+					</div>
+					<div style="height : 20px;">
+					</div>
+				</div>
+				<g:formRemote name="myComparisonForm" update="searchFilterResultDivComparison" method="GET"
+								before="validateComparisonInputFields();"
+		              			action="${createLink(controller: 'trends', action: 'filterComparisonExecutions')}"
+		              			url="[controller: 'trends', action: 'filterComparisonExecutions']"><br>
+				<table>																
+					<tr>
+						<td valign="middle">From</td>
+						<td valign="middle"><input type="text" id="generateFromDateComparisonExec" name="generateFromDateComparisonExec" required/><span class="required-indicator">*</span>
+						</td>
+						<td valign="middle">To</td>
+						<td valign="middle"><input type="text" id="generateToDateComparisonExec" name="generateToDateComparisonExec" required/><span class="required-indicator">*</span>										
+						</td>
+						<td></td>
+						<td valign="middle">
+							<span class="buttons"><input type="submit" style="font-weight: bold;" name="filterBaseExecutions" value="Filter Executions">
+							</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Category</td>
+						<td>
+							<g:select id="categoryIdComparisonExec" name="categoryComparisonExec" from="${['RDKV','RDKB','RDKC' ,'RDKV_THUNDER']}" value="${params?.category}" required="required"/><span class="required-indicator">*</span>
+						</td>
+						<td>Box Type</td>
+						<td id="boxTypeIdComparisonExec">
+							<select name="boxTypeComparisonExec" id = "boxTypeComparisonExec">
+								<option value="">Please Select</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>ScriptType</td>
+						<td>											
+							<select name="scriptTypeValueComparisonExec" id="scriptTypeComparison" onchange="showScriptTypesForComparisonExec();" style="width: 150px">
+								<option value="">All</option>
+								<option value="Script">SINGLE SCRIPT</option>
+								<option value="TestSuite">SCRIPTGROUP</option>												
+							</select>
+						</td>
+						<td><span id="scriptLabelComparisonId" style="display:none;">Script/ScriptGroup</span></td>
+						<td><span id="scriptFieldComparisonId" style="display:none;"><g:textField id="scriptValueComparisonId" name="scriptValueComparisonExec"/></span>									
+						</td>
+					</tr>
+					<g:hiddenField id="finalBaseExecName" name="finalBaseExecName" value=""/>
+					<g:hiddenField name = "validateComparison" id = "validateComparison" value = ""/>
+				</table>
+				</g:formRemote>
+				<span id="searchFilterResultDivComparison" style="width: 100%;overflow: auto;"></span>
+			</div>
 			<div id="executionbased" style="display: none;">
 				<table class="noClass" style="border: 1; border-color: black;">
 					<tr>

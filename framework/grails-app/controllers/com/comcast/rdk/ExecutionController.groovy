@@ -116,6 +116,7 @@ class ExecutionController {
 	public static final String EXPORT_SHEET_NAME 			= "Execution_Results"
 	public static final String EXPORT_FILENAME 				= "ExecutionResults-"
 	public static final String COMBINED_EXPORT_FILENAME 	= "CombinedExecutionResults-"
+	public static final String COMPARISON_EXPORT_FILENAME 	= "ComparisonExecutionResults-"
 	public static final String EXPORT_COMPARE_FILENAME 		= "ExecutionResultsComparison-"
 	public static final String EXPORT_EXCEL_FORMAT 			= "excel"
 	public static final String EXPORT_ZIP_FORMAT 			= "zip"
@@ -2488,6 +2489,39 @@ class ExecutionController {
 	}
 	
 	/**
+	 * Method to export the comparison report of the selected executions in excel format.
+	 * 
+	 */
+	def comparisonExcelReportGeneration = {
+		Map dataMap = [:]
+		Map fieldMap = [:]
+		Map parameters = [:]
+		List fieldLabels = []
+		List columnWidthList = [0.08,0.2,0.4,0.08,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.2]
+		if(params?.comparisonExecutionNames != UNDEFINED && params?.comparisonExecutionNames != BLANK_SPACE && params?.comparisonExecutionNames != null && params?.baseExecutionName != null){
+			def baseExecutionName = params?.baseExecutionName
+			def comparisonExecutionNames = params?.comparisonExecutionNames
+			List comparisonExecutionNameList = comparisonExecutionNames?.split(",")
+			dataMap = executedbService.getDataForComparisonReportGeneration(baseExecutionName, comparisonExecutionNameList,getApplicationUrl(), getRealPath())
+			if(!(dataMap.isEmpty())){
+				parameters = [ title: EXPORT_SHEET_NAME, "column.widths": columnWidthList]
+	
+				params.format = EXPORT_EXCEL_FORMAT
+				params.extension = EXPORT_EXCEL_EXTENSION
+				response.contentType = grailsApplication.config.grails.mime.types[params.format]
+				def fileName = baseExecutionName
+				response.setHeader("Content-disposition", "attachment; filename="+COMPARISON_EXPORT_FILENAME+ fileName +".${params.extension}")
+				excelExportService.exportComparison(params.format, response.outputStream,dataMap, null,fieldMap,[:], parameters)
+				log.info "Completed excel export............. "
+			}
+			else{
+			    redirect(controller:'trends' , action:'chart');
+				flash.message= "No valid execution reports are available."
+				return
+			}
+		}
+	}
+	/**
 	 * Ajax call to update the isMarked status of execution instance.
 	 * This will be called during mark operation of corresponding checkbox of execution results.
 	 */
@@ -4309,4 +4343,60 @@ class ExecutionController {
         render output as String
 	}
 	
+	/**
+	 * Function to get the execution name according to execution id
+	 * @return
+	 */
+	def getExecutionName(){
+		Execution executionInstance = Execution.findById(params?.id)
+		render executionInstance?.name
+	}
+	
+	/**
+	 * Function to return list of execution names according to execution id's
+	 * @return
+	 */
+	def getExecutionNamesAsList(){
+		def selectedRows = []
+		def selectedRowsDefined = []
+		def executionNameList = ""
+		if(params?.checkedRows != UNDEFINED && params?.checkedRows != BLANK_SPACE && params?.checkedRows != null){
+			selectedRows = params?.checkedRows.split(COMMA_SEPERATOR)
+			for(int i=0;i<selectedRows.size();i++){
+				if(selectedRows[i] != UNDEFINED){
+					selectedRowsDefined.add(selectedRows[i])
+				}
+			}
+		}
+		for(int i=0;i<selectedRowsDefined.size();i++){
+			Execution executionInstance = Execution.findById(selectedRowsDefined[i])
+			executionNameList = executionInstance?.name + "," + executionNameList
+		}
+		executionNameList = executionNameList.substring(0, executionNameList.length() - 1);
+		render executionNameList
+	}
+	
+	/**
+	 * Function to check if the list of executions are valid
+	 * @return
+	 */
+	def checkValidMultipleExecutions(){
+		def execNames = params?.execNames
+		List executionNameList = execNames?.split(",")
+		def validCheck
+		for(int i=0;i<executionNameList.size();i++){
+			Execution executionInstance = Execution.findByName(executionNameList[i])
+			if(executionInstance){
+				validCheck =  true
+			}else{
+				validCheck =  false
+				break
+			}
+		}
+		if(validCheck){
+			render "valid"
+		}else{
+			render "invalid"
+		}
+	}
 }

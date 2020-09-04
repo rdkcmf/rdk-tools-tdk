@@ -422,4 +422,146 @@ class ExcelExporter extends AbstractExporter {
 			e.printStackTrace()
 		}
 	}
+	/**
+	 * Function to export comparison report in excel format
+	 * @param outputStream
+	 * @param dataMap
+	 * @return
+	 */
+	def exportComparisonData(OutputStream outputStream, Map dataMap){
+		try {
+			def builder = new ExcelBuilder()
+
+			// Enable/Disable header output
+			boolean isHeaderEnabled = true
+			if(getParameters().containsKey("header.enabled")){
+				isHeaderEnabled = getParameters().get("header.enabled")
+			}
+
+
+			def sheetsList = dataMap.keySet()
+			builder {
+				workbook(outputStream: outputStream){
+					sheetsList.each { sheetName ->
+						if(sheetName.equals("CoverPage")){
+							Map coverPageMap = dataMap.get(sheetName)
+							List columnWidthList = [0.05,0.08,0.6,0.2,0.2,0.15,0.15,0.15,0.2,0.08,0.15,0.15,0.15,0.15,0.2,0.2,0.2]
+							sheet(name: "Summary" ?: "Export", widths: columnWidthList){
+								int rowIndex = 0
+								//Default format
+								format(name: "header"){
+									font(name: "arial", bold: true)
+								}
+
+								format(name: "titlecell"){
+									font(name: "arial", bold: true)
+								}
+								
+								format(name: "cell"){
+									font(name: "arial", bold: false)
+								}
+
+								
+								Set keySet = coverPageMap.keySet()
+								if(keySet.size() > 0){
+									def key = keySet.first()
+									Map resultMap = coverPageMap.get("Details")
+									Set kSet = resultMap.keySet()
+									kSet.eachWithIndex { field, index ->
+										String label = getLabel(field)
+										cell(row: rowIndex, column: 2, value: label, format: "header")
+										String value = resultMap.get(field)
+										cell(row: rowIndex, column: 2 +1, value: value, format: "cell")
+										rowIndex ++
+									}
+									if(coverPageMap.containsKey(Constants.OVERALL_PASS_RATE)){
+										int passRate = coverPageMap.get(Constants.OVERALL_PASS_RATE)
+										String passRateString = passRate.toString()
+										cell(row: rowIndex, column: 2, value: Constants.OVERALL_PASS_PERCENTAGE, format: "header")
+										cell(row: rowIndex, column: 2 +1, value: passRateString, format: "cell")
+										rowIndex ++
+									}
+								}
+								
+								for(int i = 0 ; i < 4 ; i ++ ){
+									cell(row: rowIndex, column: 5 +1, value: "", format: "cell")
+									rowIndex ++
+								}
+								
+								if(keySet.size() > 0){
+									Map resultMap = coverPageMap.get("Labels")
+									Set kSet = resultMap?.keySet()
+									kSet?.eachWithIndex { field, index ->
+										String value = getLabel(field)
+										cell(row: rowIndex, column: 1+index, value: value, format: "header")
+									}
+								}
+								
+
+								keySet.eachWithIndex {  object, k ->
+									if(!object.equals("Details") && !object.equals(Constants.OVERALL_PASS_RATE)){
+									Map resultMap = coverPageMap.get(object)
+									Set kSet = resultMap.keySet()
+									kSet.eachWithIndex {field, i ->
+										Object value = resultMap.get(field)//getValue(object, field)
+										String formatString = "cell"
+										if(i == 1){
+											formatString = "titlecell"
+										}
+										cell(row: k + rowIndex, column: 1+i, value: value , format :formatString)
+									}
+
+									}
+								}
+
+							}
+						}else{
+						int rowIndex = 0
+							Map tabMap = dataMap.get(sheetName)
+							if(tabMap != null){
+								List data = tabMap?.get("dataList")
+								List fields = tabMap?.get("fieldsList")
+								if(data != null && fields != null){
+									sheet(name: sheetName ?: "Export", widths: getParameters().get("column.widths")){
+										//Default format
+										format(name: "header"){
+											font(name: "arial", bold: true)
+										}
+
+										format(name: "cell"){
+											font(name: "arial", bold: false)
+										}
+
+
+										//Create header
+										if(isHeaderEnabled){
+											fields.eachWithIndex { field, index ->
+												String value = getLabel(field)
+												cell(row: rowIndex, column: index, value: value, format: "header")
+											}
+
+											rowIndex ++
+										}
+
+										//Rows
+										data.eachWithIndex { object, k ->
+											fields.eachWithIndex { field, i ->
+												Object value = getValue(object, field)
+												cell(row: k + rowIndex, column: i, value: value , format :"cell")
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			builder.write()
+		}
+		catch(Exception e){
+			throw new ExportingException("Error during export", e)
+		}
+	}
 }

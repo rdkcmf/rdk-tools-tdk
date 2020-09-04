@@ -96,7 +96,27 @@ class ExcelExportService {
 		exporter?.exportScriptGroupTestCase(suiteName ,outputStream ,dataMap, testCaseKeyList)
 	}
 	
-	
+	/**
+	 * Method to export comparison excel report
+	 * @param type
+	 * @param outputStream
+	 * @param dataMap
+	 * @param fields
+	 * @param labels
+	 * @param formatters
+	 * @param parameters
+	 * @throws ExportingException
+	 */
+	public void exportComparison(String type, OutputStream outputStream, Map dataMap, List fields, Map labels, Map formatters, Map parameters) throws ExportingException {
+		ExcelExporter exporter = new ExcelExporter()
+		if(labels){
+			exporter.setLabels(labels)
+		}
+		if(parameters){
+			exporter.setParameters(parameters)
+		}
+		exporter.exportComparisonData(outputStream, dataMap)
+	}
 	
 	
 	

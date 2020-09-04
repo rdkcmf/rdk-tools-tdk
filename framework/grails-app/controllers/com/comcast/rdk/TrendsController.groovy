@@ -83,7 +83,7 @@ class TrendsController {
 			}
 			order('name')
 		}
-		[executionList : executionList, category:category, startIndex:0,endIndex:8, scriptList : sList, scriptGrpList : scriptGrp,executionTotalList :executionTotalList]
+		[executionList : executionList, category:category, startIndex:0,endIndex:8, scriptList : sList, scriptGrpList : scriptGrp,executionTotalList :executionTotalList,url : getApplicationUrl()]
 	}
 	
 	/**
@@ -1529,6 +1529,116 @@ class TrendsController {
 			executionTotalList = Execution.findAll("from Execution as b where b.category='${Category.RDKB}' and b.executionStatus='${completedStatus}' and b.result='${result}' and b.dateOfExecution>'${formated}' and (b.script like '%Multiple%' or b.scriptGroup is not null ) ")
 		}
 		render executionTotalList
+	}
+	
+	/**
+	 * Method to get the current url and to create
+	 * new url upto the application name
+	 * @return
+	 */
+	def String getApplicationUrl(){
+		String currenturl = request.getRequestURL().toString();
+		String[] urlArray = currenturl.split( URL_SEPERATOR );
+		String serverAddr = urlArray[INDEX_TWO]
+		if(serverAddr.contains("localhost:")){
+			String localAddr = request.getProperties().get("localAddr")
+			String localPort = request.getProperties().get("localPort")
+			if((!localAddr.startsWith("0:0:0:0:0:0:0:1")) && (!localAddr.startsWith("0.0.0.0"))){
+				serverAddr = ""+localAddr+":"+localPort
+			}
+		}
+		String url = urlArray[INDEX_ZERO] + DOUBLE_FWD_SLASH + serverAddr + URL_SEPERATOR + urlArray[INDEX_THREE]
+		return url
+	}
+	
+	/**
+	 * Method which filters comparison executions based on FromDate, ToDate, boxType, Category and script type
+	 * @return
+	 */
+	def filterComparisonExecutions(){
+		def validate = params?.validateComparison
+		def checker = 0
+		String messageDiv = ""
+		List executionList =[]
+		List executionIdList = []
+		SimpleDateFormat myFormat = new SimpleDateFormat("MM/dd/yyyy");
+		String dateBeforeString = params?.generateFromDateComparisonExec?.trim()
+		String dateAfterString = params?.generateToDateComparisonExec?.trim()
+		Date dateBefore = myFormat.parse(dateBeforeString);
+		Date dateAfter = myFormat.parse(dateAfterString);
+		long difference = dateAfter.getTime() - dateBefore.getTime();
+		float daysBetween = (difference / (1000*60*60*24));
+		daysBetween=(int)daysBetween;
+		if(daysBetween > 30){
+			checker = 1;
+			messageDiv = "Maximum number of days allowed is 30"
+		}
+		else{
+			String fromDateString = params?.generateFromDateComparisonExec?.trim()
+			def fromDateList = fromDateString.split("/")
+			def year = fromDateList[2]
+			def month = fromDateList[0]
+			def day = fromDateList[1]
+			String fromDate = year + "-" + month + "-" +day + " 00:00:00"
+			String toDateString = params?.generateToDateComparisonExec?.trim()
+			def toDateList = toDateString.split("/")
+			year = toDateList[2]
+			month = toDateList[0]
+			day = toDateList[1]
+			String toDate = year + "-" + month + "-" +day + " 23:59:59"
+			executionList = executionService.filterExecutions( fromDate, toDate, params?.boxTypeComparisonExec?.trim(), params?.categoryComparisonExec?.trim(),params?.scriptTypeValueComparisonExec?.trim(),params?.scriptValueComparisonExec?.trim())
+			Execution baseExecution = Execution.findByName(params?.finalBaseExecName)
+			if(baseExecution){
+				executionList.remove(baseExecution)
+			}
+			executionList.each {eachExecution ->
+				executionIdList.add(eachExecution.id)
+			}
+		}
+		render(template: "comparisonExecutionExcelList", model: [executionInstanceList : executionList,executionIdList : executionIdList,checker:checker,messageDiv:messageDiv,validate:validate])
+	}
+	
+	/**
+	 * Method which filters base executions based on FromDate, ToDate, boxType, Category and script type
+	 * @return
+	 */
+	def filterBaseExecutions(){
+		def validate = params?.validate
+		def checker = 0
+		String messageDiv = ""
+		List executionList =[]
+		List executionIdList = []
+		SimpleDateFormat myFormat = new SimpleDateFormat("MM/dd/yyyy");
+		String dateBeforeString = params?.generateFromDateBaseExec?.trim()
+		String dateAfterString = params?.generateToDateBaseExec?.trim()
+		Date dateBefore = myFormat.parse(dateBeforeString);
+		Date dateAfter = myFormat.parse(dateAfterString);
+		long difference = dateAfter.getTime() - dateBefore.getTime();
+		float daysBetween = (difference / (1000*60*60*24));
+		daysBetween=(int)daysBetween;
+		if(daysBetween > 30){
+			checker = 1;
+			messageDiv = "Maximum number of days allowed is 30"
+		}
+		else{
+			String fromDateString = params?.generateFromDateBaseExec?.trim()
+			def fromDateList = fromDateString.split("/")
+			def year = fromDateList[2]
+			def month = fromDateList[0]
+			def day = fromDateList[1]
+			String fromDate = year + "-" + month + "-" +day + " 00:00:00"
+			String toDateString = params?.generateToDateBaseExec?.trim()
+			def toDateList = toDateString.split("/")
+			year = toDateList[2]
+			month = toDateList[0]
+			day = toDateList[1]
+			String toDate = year + "-" + month + "-" +day + " 23:59:59"
+			executionList = executionService.filterExecutions( fromDate, toDate, params?.boxTypeBaseExec?.trim(), params?.categoryBaseExec?.trim(),params?.scriptTypeValueBaseExec?.trim(),params?.scriptValueBasicExec?.trim())
+			executionList.each {eachExecution ->
+				executionIdList.add(eachExecution.id)
+			}
+		}
+		render(template: "baseExecutionExcelList", model: [executionInstanceList : executionList,executionIdList : executionIdList,checker:checker,messageDiv:messageDiv,validate:validate])
 	}
 	
 }

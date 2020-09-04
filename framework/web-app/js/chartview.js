@@ -22,6 +22,79 @@ var endIndex = 8  ;
 var maxSize = -1;
 var previousCount = 0;
 var nextCount = 0 ;
+
+$(document).ready(function() {
+	/**
+	 * Change the boxtype dropdown according to the category selected for base execution
+	 */
+	$("#categoryIdBaseExec").live('change', function(){
+		var category_id = $(this).val();
+		if(category_id != '') {
+			getBoxTypes(category_id);
+		}
+		else {
+			$("#boxTypeIdBaseExec").html('<select><option value="">Please Select</option></select>');
+		}
+	});
+	
+	/**
+	 * Change the boxtype dropdown according to the category selected for comparison execution
+	 */
+	$("#categoryIdComparisonExec").live('change', function(){
+		var category_id = $(this).val();
+		if(category_id != '') {
+			getBoxTypesForComparison(category_id);
+		}
+		else {
+			$("#boxTypeIdComparisonExec").html('<select><option value="">Please Select</option></select>');
+		}
+	});
+});
+
+/**
+ * Function to get the box types according to category and fill it in the boxtype dropdown of base execution
+ * @param category_id
+ */
+function getBoxTypes(category_id) {
+	var url = $("#url").val();
+	if(category_id != '') {
+		$.get(url+'/boxType/getBoxTypeFromCategory', {category: category_id}, function(data) {
+			var select = '<select id="boxTypeBaseExec" name="boxTypeBaseExec"><option value="">Please Select</option>';
+			for(var index = 0; index < data.length; index ++ ) {
+				select += '<option value="' + data[index].name + '">' + data[index].name + '</option>';
+			}
+			select += '</select>';
+			$("#boxTypeIdBaseExec").html(''); 
+			$("#boxTypeIdBaseExec").html(select); 
+		});
+	}
+	else {
+		$("#boxTypeIdBaseExec").html('');
+	}
+}
+
+/**
+ * Function to get the box types according to category and fill it in the boxtype dropdown of comparison executions
+ * @param category_id
+ */
+function getBoxTypesForComparison(category_id) {
+	var url = $("#url").val();
+	if(category_id != '') {
+		$.get(url+'/boxType/getBoxTypeFromCategory', {category: category_id}, function(data) {
+			var select = '<select id="boxTypeComparisonExec" name="boxTypeComparisonExec"><option value="">Please Select</option>';
+			for(var index = 0; index < data.length; index ++ ) {
+				select += '<option value="' + data[index].name + '">' + data[index].name + '</option>';
+			}
+			select += '</select>';
+			$("#boxTypeIdComparisonExec").html(''); 
+			$("#boxTypeIdComparisonExec").html(select); 
+		});
+	}
+	else {
+		$("#boxTypeIdComparisonExec").html('');
+	}
+}
+
 /**
  * Compare the result by execution name 
  */
@@ -1323,6 +1396,9 @@ function showExecutionBased(){
 	$("#buildnamebased").hide();
 	$("#buildscriptbased").hide();
 	$("#buildgroupbased").hide();
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
 }
 /**
  * Function display the device based chart 
@@ -1347,6 +1423,9 @@ function showDeviceBased(){
 	$("#buildscriptbased").hide();
 	$("#buildgroupbased").hide();
 	$("#resultCategory").show();
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
 }
 
 /**
@@ -1378,6 +1457,9 @@ function showBoxTypeBased(){
 	$("#buildscriptbased").hide();
 	$("#buildgroupbased").hide();
 	$("#resultCategory").show();
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
 }
 
 /**
@@ -1402,6 +1484,39 @@ function showScriptBased(){
 	$("#buildscriptbased").hide();
 	$("#buildgroupbased").hide();
 	$("#resultCategory").show();
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
+}
+
+/**
+ * Function to show the showComparisonReport div to generate comparison report
+ */
+function showComparisonReport(){
+	$("#showComparisonReport").show();
+	
+	$("#normalexecutionsbased").hide();
+	$( ".chartdivisionclass" ).empty();
+	$( ".chartdivBoxtypeclass" ).empty();
+	$(".chartdivclass").empty();
+	$(".chartdivBuildScriptclass").empty();
+	$(".chartdivisionbuildclass").empty();
+	$(".chartdivScriptclass").empty();
+	$("#executionbased").hide();	
+	$("#devicebased").hide();	
+	$("#scriptbased").hide();
+	$("#scriptgroupbased").hide();	
+	$("#boxtypebased").hide();
+	$("#boxgroupbased").hide();
+	$("#boxscriptbased").hide();
+	$("#buildnamebased").hide();
+	$("#buildscriptbased").hide();
+	$("#buildgroupbased").hide();
+	$("#resultCategory").hide();
+	
+	$("#categoryLabel").hide();
+	$("#categoryId").hide();
+	
 }
 /**
  * Function display the execution based chart 
@@ -1425,6 +1540,9 @@ function showNormalExecutionBased(){
 	$("#buildscriptbased").hide();
 	$("#buildgroupbased").hide();
 	$("#resultCategory").hide();
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
 	
 	var category = $('#category').val();
 	$.get('executionsForAnalysis', {category: category}, function(data) {
@@ -1466,6 +1584,9 @@ function showBoxScriptBased()
 	$("#buildnamebased").hide();
 	$("#buildscriptbased").hide();
 	$("#buildgroupbased").hide();
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
 }
 /**
  * Function display the script based chart based on boxtype 
@@ -1489,6 +1610,9 @@ function showBoxGroupBased()
 	$("#buildnamebased").hide();
 	$("#buildscriptbased").hide();
 	$("#buildgroupbased").hide();
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
 }
 
 /**
@@ -1518,6 +1642,9 @@ function showPerformanceBased(){
 	$("#buildnamebased").hide();
 	$("#buildscriptbased").hide();
 	$("#buildgroupbased").hide();	
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
 }
 
 /**
@@ -1553,6 +1680,9 @@ function showNormalBased(){
 	$("#buildnamebased").show();
 	$("#buildscriptbased").hide();
 	$("#buildgroupbased").hide();
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
 }
 
 /**
@@ -1594,6 +1724,9 @@ function showBuildNameBased(category){
 	$("#buildnamebased").show();
 	$("#buildscriptbased").hide();
 	$("#buildgroupbased").show();
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
 	
 }
 
@@ -1628,6 +1761,9 @@ function showBuildScriptBased()
 	$("#buildnamebased").show();
 	$("#buildscriptbased").show();
 	$("#buildgroupbased").hide();
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
 }
 
 /**
@@ -1653,6 +1789,9 @@ function showBuildGroupBased()
 	$("#buildnamebased").show();
 	$("#buildscriptbased").hide();
 	$("#buildgroupbased").show();
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
 }
 
 /**
@@ -1674,6 +1813,10 @@ function submitNormalChartType()
 	else if( chartType == 'Analyze execution')
 	{
 		showNormalExecutionBased();
+	}
+	else if( chartType == 'Comparison Report Download')
+	{
+		showComparisonReport();
 	}
 	else if( chartType == 'Show Results by Build Name')
 	{
@@ -2072,6 +2215,294 @@ function homePage(){
 
 }
 
+/**
+ * Method to display the script field based on script type in comparison excel popup
+ */
+function showScriptTypesForComparisonExec(){
+	var choice = $( "#scriptTypeComparison" ).val()
+	if((choice == "")){
+		$("#scriptLabelComparisonId").hide();
+		$("#scriptFieldComparisonId").hide();
+		$("#scriptValueComparisonId").val('');
+	}
+	else{
+		$("#scriptLabelComparisonId").show();
+		$("#scriptFieldComparisonId").show();
+		$("#scriptValueComparisonId").val('');
+	}
+}
+
+/**
+ * Method to display the script field based on script type in base excel popup
+ */
+function showScriptTypesForBaseExec(){
+	var choice = $( "#scriptTypeBase" ).val()
+	if((choice == "")){
+		$("#scriptLabelBaseId").hide();
+		$("#scriptFieldBaseId").hide();
+		$("#scriptValueBaseId").val('');
+	}
+	else{
+		$("#scriptLabelBaseId").show();
+		$("#scriptFieldBaseId").show();
+		$("#scriptValueBaseId").val('');
+	}
+}
+
+/**
+ * Function to toggle the div containing the comparison report feature explanation
+ */
+function helpDivToggle(){
+	  var x = document.getElementById("helpDivComparison");
+	  if (x.style.display === "none") {
+	    x.style.display = "block";
+	  } else {
+	    x.style.display = "none";
+	  }
+}
+
+/**
+ * Function to finalize the base execution selection when the confirm button is clicked in the popup
+ * @param executionIdList
+ */
+function baseExecutionSelection(executionIdList) {
+	var notChecked = [];
+	var baseExecId = "";
+	var url = $("#url").val();
+	var executionIdArray = JSON.parse(executionIdList);
+	for(i=0;i<=executionIdArray.length;i++){
+		if ($('#baseExecutionRadio_'+executionIdArray[i]).is(":checked"))
+		{
+			baseExecId =  executionIdArray[i];
+		}
+	}
+	if (baseExecId == "") {
+	    alert("Please select any one execution");
+	}
+	else{
+		$.get(url+'/execution/getExecutionName', {id: baseExecId}, function(data) {
+			document.getElementById("baseExecutionName").value = data;
+			document.getElementById("finalBaseExecFromDate").value = document.getElementById("generateFromDateBaseExec").value;
+			document.getElementById("finalBaseExecToDate").value = document.getElementById("generateToDateBaseExec").value;
+			document.getElementById("finalBaseExecCategory").value = document.getElementById("categoryIdBaseExec").value;
+			document.getElementById("finalBoxTypeBaseExec").value = document.getElementById("boxTypeBaseExec").value;
+
+			//setting the base execution name in the hidden field to pass it to filterComparisonExecutions function 
+			// to exclude the base execution while filtering the comparison executions
+			document.getElementById("finalBaseExecName").value = data;
+			//closing the current modal
+			$.modal.close();
+		});
+	}
+}
+
+/**
+ * Function to show the selected base execution in popup
+ * @param id
+ */
+function showSelectedBaseExecution(id){
+	document.getElementById("selectedExecution").value = id
+	var selectedExecution = id 
+	selectedExecution = selectedExecution.split("_")[1]
+	var url = $("#url").val();
+	$.get(url+'/execution/getExecutionName', {id: selectedExecution}, function(data) {
+		document.getElementById("selectedExecution").innerHTML = data
+	});
+	
+}
+/**
+ * Function to finalize the comparison executions selection when the confirm button is clicked in the popup
+ * @param executionIdList
+ */
+function comparisonExecutionSelection(executionIdList) {
+	var notChecked = [];
+	var selectedRows = [];
+	var checkedRows = "";
+	var url = $("#url").val();
+	var executionIdArray = JSON.parse(executionIdList);
+	for(i=0;i<=executionIdArray.length;i++){
+		if ($('#comparisonExecutionsCheckbox_'+executionIdArray[i]).is(":checked"))
+		{
+			checkedRows =  executionIdArray[i] + "," + checkedRows;
+		}
+	}
+	checkedRows = checkedRows.slice(0, -1)
+	selectedRows = checkedRows.split(",")
+	if((selectedRows.length > 10) || (checkedRows  == "")){
+		alert("Maximum number of executions that can be compared is 10 and minimum number is 1")
+		document.getElementById("comparisonExecutionName").value = ""
+	}else{
+		$.get(url+'/execution/getExecutionNamesAsList', {checkedRows: checkedRows}, function(data) {
+			document.getElementById("comparisonExecutionName").value = data;
+			//closing the current modal
+			$.modal.close();
+		});
+	}
+}
+
+/**
+ * Function to validate all input fields in base execution PopUp
+ */
+function validateBaseInputFields(){
+	document.getElementById("validate").value = "";
+	var fromDateString = document.getElementById("generateFromDateBaseExec").value;
+	var toDateString = document.getElementById("generateToDateBaseExec").value;
+	var boxType = document.getElementById("boxTypeBaseExec").value;
+	var category = document.getElementById("categoryIdBaseExec").value;
+	if (fromDateString == "" || toDateString == "" || boxType == "" || category == "") {
+	    alert("From date, To date, Category and Box Type fields are mandatory");
+	    document.getElementById("validate").value = "false";
+	}
+	var today = new Date();
+	var fromDate = new Date(fromDateString);
+	var toDate = new Date(toDateString);
+	if((fromDate > today) || (toDate > today)){
+	    alert('Selected date cannot be greater than todays date');
+	    document.getElementById("validate").value = "false";
+	}
+	if(fromDate > toDate){
+		alert('From Date cannot be greater than To Date');
+		document.getElementById("validate").value = "false";
+	}
+}
+
+
+/**
+ * Function to validate all input fields in comparison executions PopUp
+ */
+function validateComparisonInputFields(){
+	document.getElementById("validateComparison").value = "";
+	var fromDateString = document.getElementById("generateFromDateComparisonExec").value;
+	var toDateString = document.getElementById("generateToDateComparisonExec").value;
+	var boxType = document.getElementById("boxTypeComparisonExec").value;
+	var category = document.getElementById("categoryIdComparisonExec").value;
+	if (fromDateString == "" || toDateString == "" || boxType == "" || category == "") {
+	    alert("From date, To date, Category and Box Type fields are mandatory");
+	    document.getElementById("validateComparison").value = "false";
+	}
+	var today = new Date();
+	var fromDate = new Date(fromDateString);
+	var toDate = new Date(toDateString);
+	if((fromDate > today) || (toDate > today)){
+	    alert('Selected date cannot be greater than todays date');
+	    document.getElementById("validateComparison").value = "false";
+	}
+	if(fromDate > toDate){
+		alert('From Date cannot be greater than To Date');
+		document.getElementById("validateComparison").value = "false";
+	}
+}
+
+/**
+ * Function to generate modal popup for base execution when choose button is clicked
+ */
+function showBaseDetails(){
+	$("#baseExecutionPopUp").modal({ opacity : 40, overlayCss : {
+		  backgroundColor : "#c4c4c4" }, containerCss: {
+	            width: 1200,
+	            height: 450	            
+	        } }, { onClose : function(dialog) {
+		  $.modal.close(); } });
+	 $( "#generateFromDateBaseExec" ).datepicker();
+	 $( "#generateToDateBaseExec" ).datepicker();
+	 var today = new Date();
+	 var priorDate = new Date();
+	 priorDate.setDate(today.getDate() - 30)
+	 var ddtoday = String(today.getDate()).padStart(2, '0');
+	 var mmtoday = String(today.getMonth() + 1).padStart(2, '0');
+	 var yyyytoday = today.getFullYear();
+	 today = mmtoday + '/' + ddtoday + '/' + yyyytoday;
+	 var ddprior = String(priorDate.getDate()).padStart(2, '0');
+	 var mmprior = String(priorDate.getMonth() + 1).padStart(2, '0');
+	 var yyyyprior = priorDate.getFullYear();
+	 priorDate = mmprior + '/' + ddprior + '/' + yyyyprior;
+	 document.getElementById("generateFromDateBaseExec").value = priorDate
+	 document.getElementById("generateToDateBaseExec").value = today
+	 var category_id = "RDKV"
+	 var url = $("#url").val();
+	 $.get(url+'/boxType/getBoxTypeFromCategory', {category: category_id}, function(data) {
+		var select = '<select id="boxTypeBaseExec" name="boxTypeBaseExec"><option value="">Please Select</option>';
+		for(var index = 0; index < data.length; index ++ ) {
+			select += '<option value="' + data[index].name + '">' + data[index].name + '</option>';
+		}
+		select += '</select>';
+		$("#boxTypeIdBaseExec").html(''); 
+		$("#boxTypeIdBaseExec").html(select); 
+	 });
+}
+
+/**
+ * Function to generate modal popup for comparison execution when choose button is clicked
+ */
+function showComparisonDetails(){
+	$("#comparisonExecutionPopUp").modal({ opacity : 40, overlayCss : {
+		  backgroundColor : "#c4c4c4" }, containerCss: {
+	            width: 1200,
+	            height: 450	            
+	        } }, { onClose : function(dialog) {
+		  $.modal.close(); } });
+	document.getElementById("generateFromDateComparisonExec").value = document.getElementById("finalBaseExecFromDate").value
+	document.getElementById("generateToDateComparisonExec").value = document.getElementById("finalBaseExecToDate").value
+	document.getElementById("categoryIdComparisonExec").value = document.getElementById("finalBaseExecCategory").value
+	 $( "#generateFromDateComparisonExec" ).datepicker();
+	 $( "#generateToDateComparisonExec" ).datepicker();
+	var category_id = document.getElementById("finalBaseExecCategory").value
+	var finalBoxType = document.getElementById("finalBoxTypeBaseExec").value
+	var url = $("#url").val();
+	if (category_id == "") {
+		document.getElementById("categoryIdComparisonExec").value = "RDKV"
+		category_id = "RDKV"
+		$.get(url+'/boxType/getBoxTypeFromCategory', {category: category_id}, function(data) {
+			var select = '<select id="boxTypeComparisonExec" name="boxTypeComparisonExec"><option value="">Please Select</option>';
+			for(var index = 0; index < data.length; index ++ ) {
+				select += '<option value="' + data[index].name + '">' + data[index].name + '</option>';
+			}
+			select += '</select>';
+			$("#boxTypeIdComparisonExec").html(''); 
+			$("#boxTypeIdComparisonExec").html(select); 
+		});
+	}else{
+		 $.get(url+'/boxType/getBoxTypeFromCategory', {category: category_id}, function(data) {
+			var select = '<select id="boxTypeComparisonExec" name="boxTypeComparisonExec"><option value="'+finalBoxType+'">'+ finalBoxType +'</option>';
+			for(var index = 0; index < data.length; index ++ ) {
+				if(data[index].name != finalBoxType){
+					select += '<option value="' + data[index].name + '">' + data[index].name + '</option>';
+				}
+			}
+			select += '</select>';
+			$("#boxTypeIdComparisonExec").html(''); 
+			$("#boxTypeIdComparisonExec").html(select); 
+		 });
+	}
+}
+/**
+ * Function to generate comparison excel report after base and comparison executions are selected
+ * @returns {Boolean}
+ */
+function comparisonExcelReportGeneration(){
+	var baseExecution = document.getElementById("baseExecutionName").value
+	var comparisonExecList = document.getElementById("comparisonExecutionName").value
+	var url = $("#url").val();
+	if(baseExecution == "" || comparisonExecList == ""){
+		alert("Base execution and comparison execution fields should not be empty")
+	}else{
+		$.get(url+'/execution/checkValidMultipleExecutions', {execNames: baseExecution}, function(data) {
+			if(data == "valid"){
+				$.get(url+'/execution/checkValidMultipleExecutions', {execNames: comparisonExecList}, function(dataList) {
+					if(dataList == "valid"){
+						alert("Please wait, Report generation may take few minutes...")
+						window.open(url+"/execution/comparisonExcelReportGeneration/?comparisonExecutionNames="+comparisonExecList+"&baseExecutionName="+baseExecution,'_self');
+					}else{
+						alert("Valid Comparison Execution not found to generate report")
+					}
+				});
+			}else {
+				alert("Valid Base Execution not found to generate report")
+			}
+		});
+	}
+	return false
+}
 /**
  * Function to show the execution details
  */
