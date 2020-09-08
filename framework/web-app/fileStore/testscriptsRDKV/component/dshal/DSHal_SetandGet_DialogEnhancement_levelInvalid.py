@@ -43,9 +43,9 @@
   <!--  -->
   <advanced_script>false</advanced_script>
   <!-- execution_time is the time out time for test execution -->
-  <remarks></remarks>
+  <remarks>RDK API used in this script is temporarily updated/removed to analyze RDK-25879</remarks>
   <!-- Reason for skipping the tests if marked to skip -->
-  <skip>false</skip>
+  <skip>true</skip>
   <!--  -->
   <box_types>
     <box_type>IPClient-Wifi</box_type>
