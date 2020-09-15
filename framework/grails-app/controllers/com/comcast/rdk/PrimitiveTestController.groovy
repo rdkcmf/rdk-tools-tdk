@@ -609,14 +609,17 @@ class PrimitiveTestController {
 				String gateway = device?.gatewayIp.toString()
 				Device gatewayDevice =  Device.findByStbName(gateway.trim())
 				if(gateway) {
-
 					if(idVal?.startsWith("R")){
 						RadioStreamingDetails streamingDetails = RadioStreamingDetails.findByStreamId(idVal)
 						DeviceRadioStream deviceStream = DeviceRadioStream.findByDeviceAndStream( gatewayDevice, streamingDetails )
 						outData.addProperty(KEY_JSONRPC, VAL_JSONRPC);
 						outData.addProperty(KEY_GATEWAYIP, gatewayDevice?.stbIp?.toString());
 						outData.addProperty(KEY_CHANNELTYPE, "radio");
-						outData.addProperty(KEY_OCAPID, deviceStream?.ocapId?.toString());
+						if(deviceStream){
+							outData.addProperty(KEY_OCAPID, deviceStream?.ocapId?.toString());
+						}else{
+							outData.addProperty(KEY_OCAPID, "");
+						}
 						outData.addProperty(KEY_RECORDERID, gatewayDevice?.recorderId?.toString());
 						outData.addProperty(KEY_AUDIOFORMAT, "N/A");
 						outData.addProperty(KEY_VIDEOFORMAT, "N/A");
@@ -626,7 +629,11 @@ class PrimitiveTestController {
 						outData.addProperty(KEY_JSONRPC, VAL_JSONRPC);
 						outData.addProperty(KEY_GATEWAYIP, gatewayDevice?.stbIp?.toString());
 						outData.addProperty(KEY_CHANNELTYPE, streamingDetails?.channelType?.toString());
-						outData.addProperty(KEY_OCAPID, deviceStream?.ocapId?.toString());
+						if(deviceStream){
+							outData.addProperty(KEY_OCAPID, deviceStream?.ocapId?.toString());
+						}else{
+							outData.addProperty(KEY_OCAPID, "");
+						}
 						outData.addProperty(KEY_RECORDERID, gatewayDevice?.recorderId?.toString());
 						outData.addProperty(KEY_AUDIOFORMAT, streamingDetails?.audioFormat?.toString());
 						outData.addProperty(KEY_VIDEOFORMAT, streamingDetails?.videoFormat?.toString());
@@ -636,14 +643,17 @@ class PrimitiveTestController {
 				String gateway = device?.gatewayIp.toString()
 				Device gatewayDevice =  Device.findByStbName(gateway.trim())
 				if(gateway) {
-
 					if(idVal?.startsWith("R")){
 						RadioStreamingDetails streamingDetails = RadioStreamingDetails.findByStreamId(idVal)
 						DeviceRadioStream deviceStream = DeviceRadioStream.findByDeviceAndStream( device, streamingDetails )
 						outData.addProperty(KEY_JSONRPC, VAL_JSONRPC);
 						outData.addProperty(KEY_GATEWAYIP, gatewayDevice?.stbIp?.toString());
 						outData.addProperty(KEY_CHANNELTYPE, "radio");
-						outData.addProperty(KEY_OCAPID, deviceStream?.ocapId?.toString());
+						if(deviceStream){
+							outData.addProperty(KEY_OCAPID, deviceStream?.ocapId?.toString());
+						}else{
+							outData.addProperty(KEY_OCAPID, "");
+						}
 						outData.addProperty(KEY_RECORDERID, gatewayDevice?.recorderId?.toString());
 						outData.addProperty(KEY_AUDIOFORMAT, "N/A");
 						outData.addProperty(KEY_VIDEOFORMAT, "N/A");
@@ -653,7 +663,11 @@ class PrimitiveTestController {
 						outData.addProperty(KEY_JSONRPC, VAL_JSONRPC);
 						outData.addProperty(KEY_GATEWAYIP, gatewayDevice?.stbIp?.toString());
 						outData.addProperty(KEY_CHANNELTYPE, streamingDetails?.channelType?.toString());
-						outData.addProperty(KEY_OCAPID, deviceStream?.ocapId?.toString());
+						if(deviceStream){
+							outData.addProperty(KEY_OCAPID, deviceStream?.ocapId?.toString());
+						}else{
+							outData.addProperty(KEY_OCAPID, "");
+						}
 						outData.addProperty(KEY_RECORDERID, gatewayDevice?.recorderId?.toString());
 						outData.addProperty(KEY_AUDIOFORMAT, streamingDetails?.audioFormat?.toString());
 						outData.addProperty(KEY_VIDEOFORMAT, streamingDetails?.videoFormat?.toString());
@@ -669,7 +683,11 @@ class PrimitiveTestController {
 					outData.addProperty(KEY_JSONRPC, VAL_JSONRPC);
 					outData.addProperty(KEY_GATEWAYIP, device?.stbIp?.toString());
 					outData.addProperty(KEY_CHANNELTYPE, "radio");
-					outData.addProperty(KEY_OCAPID, deviceStream?.ocapId?.toString());
+					if(deviceStream){
+						outData.addProperty(KEY_OCAPID, deviceStream?.ocapId?.toString());
+					}else{
+						outData.addProperty(KEY_OCAPID, "");
+					}
 					outData.addProperty(KEY_RECORDERID, device?.recorderId?.toString());
 					outData.addProperty(KEY_AUDIOFORMAT, "N/A");
 					outData.addProperty(KEY_VIDEOFORMAT, "N/A");
@@ -679,7 +697,11 @@ class PrimitiveTestController {
 					outData.addProperty(KEY_JSONRPC, VAL_JSONRPC);
 					outData.addProperty(KEY_GATEWAYIP, device?.stbIp?.toString());
 					outData.addProperty(KEY_CHANNELTYPE, streamingDetails?.channelType?.toString());
-					outData.addProperty(KEY_OCAPID, deviceStream?.ocapId?.toString());
+					if(deviceStream){
+						outData.addProperty(KEY_OCAPID, deviceStream?.ocapId?.toString());
+					}else{
+						outData.addProperty(KEY_OCAPID, "");
+					}
 					outData.addProperty(KEY_RECORDERID, device?.recorderId?.toString());
 					outData.addProperty(KEY_AUDIOFORMAT, streamingDetails?.audioFormat?.toString());
 					outData.addProperty(KEY_VIDEOFORMAT, streamingDetails?.videoFormat?.toString());
