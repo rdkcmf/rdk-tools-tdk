@@ -245,12 +245,14 @@ class ExecutedbService {
 	def executionTimeFormat ( def executionTime )
 	{
 		try {
-			if(executionTime.contains(".") ){
+			if(executionTime){
+				if(executionTime.contains(".") ){
 					int index = executionTime.indexOf(".")
 					if((index + 3) < executionTime.length() ){
 						executionTime = executionTime?.substring(0, index+3);
 					}
 				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace()
 		}
