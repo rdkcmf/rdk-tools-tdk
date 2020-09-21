@@ -27,6 +27,7 @@ import org.apache.shiro.crypto.hash.Sha256Hash
 class UserController {
 
    def mailService
+   def utilityService
 	
    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
@@ -270,5 +271,15 @@ class UserController {
 		redirect(action: "create")
 	}
 	
+	/**
+	 * Method to generate an encrypted key for accessing REST API'S if authentication is required
+	 * @param user
+	 * @return
+	 */
+	def generateKey (String user) {
+		User userInstance = User.findByUsername(user)
+		String key = utilityService.generateKey(userInstance.username)
+		render key
+	}
 	
 }

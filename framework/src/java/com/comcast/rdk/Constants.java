@@ -346,6 +346,7 @@ public final class Constants
    	public static final String OVERALL_PASS_RATE= "OverallPassRate";
    	public static final String LOG_UPLOAD_IPV4= "log.upload.ipv4"; 
    	public static final String LOG_UPLOAD_IPV6= "log.upload.ipv6"; 
+   	public static final String REST_AUTH_ENABLED = "rest.authentication.enabled";
    	public static final String TM_CONFIG_FILE= "/fileStore/tm.config";
    	public static final String STORM_CONFIG_FILE= "/fileStore/storm.config";
    	public static final String STORM_DEFAULT_TIME_OUT= "2";

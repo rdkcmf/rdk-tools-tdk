@@ -136,5 +136,14 @@ function populateTestProfileField(that){
 		$("#createBtn").hide(); 
 	});
 }
-	
-	
+
+/**
+ * Method to generate an encrypted key for accessing REST API'S if authentication is required
+ */
+function generateKey() {
+	var selectedUser =  $('select[name="selectedUser"]').val();
+	$.get('generateKey', {user: selectedUser}, function(data) {
+		$("#key").show();
+		$("#key").val(data);
+	});
+}	
