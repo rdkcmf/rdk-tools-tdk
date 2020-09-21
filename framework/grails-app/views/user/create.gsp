@@ -126,5 +126,13 @@
 			&nbsp;<span class="buttons"><g:actionSubmit disabled="true" class="delete" id="delete"  action="deleteUser" value="${message(code: 'default.button.delete.label', default: 'Delete')}" formnovalidate="" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /></span>
 		</div>
 		</g:form>
+		
+		<div style="margin-top: 20px; width: 700px; margin-left:5px; float:left; margin-bottom:5px; height:65px">
+		<h1>Authentication key</h1>
+		<g:set var="entityName" value="key" />
+		<g:select id="selectedUser" name="selectedUser" from="${com.comcast.rdk.User.list().username}" optionValue="" style="width:150px; margin-right:10px" class="many-to-one" />
+		<span id="generateBtn"  class="buttons" style="width:100px; margin-right:10px"><input type="button" class="save" id="generate" onclick="generateKey()" value="${message(code: 'default.show.label', args: [entityName], default: 'Show key')}" /></span>
+		<input id="key" type="text" style="width:300px; display:none">
+		</div>
 	</body>
 </html>

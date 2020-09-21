@@ -18,11 +18,25 @@
 */
 package com.comcast.rdk
 
+import org.apache.catalina.util.Base64;
 import org.apache.shiro.SecurityUtils
+import org.apache.shiro.crypto.hash.Sha256Hash
+
 import groovy.xml.MarkupBuilder
+
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.Cipher
+import javax.crypto.spec.SecretKeySpec
+import javax.xml.bind.DatatypeConverter;
+
 import org.custommonkey.xmlunit.*
+
+
 class UtilityService {
 	static datasource = 'DEFAULT'
+	static String ENCRYPT_KEY = "RDK_TEST_TOOL_KEY";
 	
 	def scriptService
 
@@ -59,7 +73,50 @@ class UtilityService {
 				}
 			}		
 		}
-	}	
+	}
+	
+	/**
+	 * Method to generate an encrypted key for accessing REST API'S if authentication is required
+	 * @param userName
+	 * @return
+	 */
+	def String generateKey (String userName) {
+		String combinedKey = userName + ENCRYPT_KEY
+		byte[] encryptedCode
+		String encoded = "";
+		try {
+			encryptedCode = combinedKey.getBytes("UTF-8");
+			encoded = DatatypeConverter.printBase64Binary(encryptedCode);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return encoded
+	}
+	
+	/**
+	 * Method to validate an encrypted key for accessing REST API'S if authentication is required
+	 * @param key
+	 * @return
+	 */
+	def static boolean validateKey(String key) {
+		byte[] decoded = DatatypeConverter.parseBase64Binary(key);
+		String decrypted = "";
+		boolean isValid = false;
+		try {
+			decrypted = new String(decoded, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String userName = decrypted.replace(ENCRYPT_KEY, "")
+		User user = User.findByUsername(userName);
+		if(user != null) {
+			isValid = true;
+		}
+		
+		return isValid;
+
+	}
 
 }
 
