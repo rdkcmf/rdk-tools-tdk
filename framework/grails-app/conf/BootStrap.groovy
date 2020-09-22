@@ -128,6 +128,19 @@ class BootStrap {
 
 			}
 		}*/
+		
+		Device.withTransaction {
+			def thunderDevices = Device.findAllByIsThunderEnabled(1)
+			if(thunderDevices){
+				thunderDevices.each{ thunderDevice ->
+					if(!thunderDevice?.thunderPort){
+						thunderDevice?.thunderPort = 80
+						thunderDevice.save(flush:true)
+					}
+				}
+			}
+		}
+		
 		def rootFile = grailsApplication.parentContext.getResource("/")
 		scriptService?.testProfileTestSuiteList()
 		scriptService.initializeScriptsData(rootFile.file.getAbsolutePath())

@@ -45,7 +45,8 @@ class ThunderDeviceStatusUpdaterTask implements Runnable {
 			String [] cmdArray = [
 						          cmd[0],
 						          cmd[1],
-						          devIp
+						          devIp,
+								  cmd[3]
 					             ]
 			cmd = cmdArray
 		} catch (Exception e) {

@@ -133,6 +133,8 @@ class Device
 	 * Category of device
 	 */
 	Category category = Category.RDKV
+	
+	String thunderPort
     
     static constraints = {
         stbIp(nullable:false, blank:false)
@@ -147,6 +149,7 @@ class Device
 		category(nullable:false, blank:false)
 		serialNo(nullable:true, blank:true)
 		isThunderEnabled(nullable:true, blank:true)
+		thunderPort(nullable:true, blank:true)
     }
 	
 	static hasMany = [childDevices:Device]

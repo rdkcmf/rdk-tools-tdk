@@ -358,6 +358,13 @@ class DeviceGroupController {
 				return
 			}
 		}
+		if(params?.thunderEnabled){
+			if ((params?.thunderPortValue?.trim()?.length() ==  0 )){
+				flash.message = "Thunder port should not be empty"
+				render(flash.message)
+				return
+			}
+		}
         
         /**
          * Check whether streams are present
@@ -379,6 +386,9 @@ class DeviceGroupController {
 			deviceInstance.stbPort = params?.agentport
 			deviceInstance.statusPort = params?.agentstatusPort
 			deviceInstance.agentMonitorPort = params?.agentmonitorPort
+		}
+		if(params?.thunderEnabled){
+			deviceInstance.thunderPort = params?.thunderPortValue
 		}
 		int enabled = 1;
 		int notEnabled = 0;
@@ -473,7 +483,13 @@ class DeviceGroupController {
 				return
 			}	
 		}	
-		
+		if(params?.thunderEnabled){
+			if ((params?.thunderPortValue?.trim()?.length() ==  0 )){
+				flash.message = "Thunder port should not be empty"
+				redirect(action: "list")
+				return
+			}
+		}
         boolean deviceInUse = devicegroupService.checkDeviceStatus(deviceInstance)
         if(deviceInUse){
 			flash.message = message(code: 'device.not.update', args: [deviceInstance.stbIp])
@@ -511,6 +527,11 @@ class DeviceGroupController {
 				deviceInstance.stbPort = params?.agentport
 				deviceInstance.statusPort = params?.agentstatusPort
 				deviceInstance.agentMonitorPort = params?.agentmonitorPort
+			}
+			if(params?.thunderEnabled){
+				deviceInstance.thunderPort = params?.thunderPortValue
+			}else{
+				deviceInstance.thunderPort = null
 			}
 			deviceInstance.isThunderEnabled = params?.thunderEnabled == "on"? enabled : notEnabled
 			if(deviceInstance?.category == Category.RDKV){
@@ -1412,6 +1433,7 @@ class DeviceGroupController {
 									def gateway = node?.device?.gateway_name?.text()?.trim()
 									def category = node?.device?.category?.text()?.trim()
 									def isThunderEnabled = 0
+									def thunderPort = node?.device?.thunderPort?.text()?.trim()
 									if(node?.device?.isThunderEnabled?.text()?.trim() == "1"){
 										isThunderEnabled = node?.device?.isThunderEnabled?.text()?.trim()
 									}
@@ -1462,6 +1484,9 @@ class DeviceGroupController {
 										deviceObj.addProperty("STATUS","FAILURE")
 										deviceObj.addProperty("Remarks","No valid category available with name "+category)
 
+									}else if(isThunderEnabled && !thunderPort){
+										deviceObj.addProperty("STATUS","FAILURE")
+										deviceObj.addProperty("Remarks","Thunder device port must not be empty ")
 									}else{
 										BoxType boxTypeInastnce = BoxType.findByNameAndCategory(boxType,Utility.getCategory(category))
 										boolean valid = true
@@ -1517,6 +1542,9 @@ class DeviceGroupController {
 												deviceInstance.boxManufacturer =boxManufactureObj
 												deviceInstance.category= Utility.getCategory(category) 
 												deviceInstance.isThunderEnabled = isThunderEnabled
+												if(thunderPort){
+													deviceInstance.thunderPort = thunderPort
+												}
 												//deviceInstance.groups=utilityService.getGroup()
 												if(boxTypeInastnce?.type?.toString()?.toLowerCase()?.equals(BOXTYPE_CLIENT)){
 													if(category?.equals(RDKV )){
@@ -1716,6 +1744,7 @@ class DeviceGroupController {
 								isThunderEnabled = node?.device?.isThunderEnabled?.text()?.trim()
 							}
 							isThunderEnabled = isThunderEnabled.toInteger()
+							def thunderPort = node?.device?.thunderPort?.text()?.trim()
 							def boxTypeObj = BoxType.findByNameAndCategory(boxType,Utility.getCategory(category))
 							def boxManufactureObj = BoxManufacturer.findByNameAndCategory(boxManufacture,Utility.getCategory(category))
 							def socVendorObj = SoCVendor.findByNameAndCategory(socVendor,Utility.getCategory(category))
@@ -1745,6 +1774,8 @@ class DeviceGroupController {
 								flash.message=" No valid box manufacture available with name"
 							}else if(category && !Utility.getCategory(category)){
 								flash.message=" No valid  category name available with name"
+							}else if(isThunderEnabled && !thunderPort){
+								flash.message=" Thunder device port must not be empty"
 							}
 							else{
 								BoxType boxTypeInastnce = BoxType.findByNameAndCategory(boxType,Utility.getCategory(category))
@@ -1785,6 +1816,9 @@ class DeviceGroupController {
 										deviceInstance.boxManufacturer =boxManufactureObj
 										deviceInstance.category= Utility.getCategory(category)
 										deviceInstance.isThunderEnabled = isThunderEnabled
+										if(thunderPort){
+											deviceInstance.thunderPort = thunderPort
+										}
 										//deviceInstance.groups=utilityService.getGroup()
 										if(boxTypeInastnce?.type?.toString()?.toLowerCase()?.equals(BOXTYPE_CLIENT) && category?.equals(RDKV )){
 											status = 1
@@ -2282,6 +2316,15 @@ class DeviceGroupController {
 							xml.isThunderEnabled("")
 							mkp.yield "\r\n  "
 						}
+						if(deviceInstance?.thunderPort){
+							mkp.comment " Thunder port for thunder devices"
+							xml.thunderPort(deviceInstance?.thunderPort)
+							mkp.yield "\r\n  "
+						}else{
+							mkp.comment "Thunder port for thunder devices"
+							xml.thunderPort("")
+							mkp.yield "\r\n  "
+						}
 						mkp.comment " BoxType for STB  "
 						xml.box_type(deviceInstance?.boxType)
 						mkp.yield "\r\n  "
@@ -2436,7 +2479,32 @@ class DeviceGroupController {
 			render "Device not found"
 		}
 	}
-	
+	/**
+	 * Method to render the thunder port configured for a device
+	 * @param stbIp
+	 * @return
+	 */
+	def getThunderDevicePorts(final String stbIp) {
+		Device device = Device.findByStbIp(stbIp?.trim());
+		JsonObject outData = new JsonObject()
+		if(device){
+			if(device?.isThunderEnabled){
+				if(device?.thunderPort){
+					outData.addProperty("thunderPort", Integer.parseInt(device?.thunderPort));
+					render outData
+				}else{
+					outData.addProperty("Result", "Thunder port is not configured");
+					render outData
+				}
+			}else{
+				outData.addProperty("Result", "Device is not thunder enabled");
+				render outData
+			}
+		}else{
+			outData.addProperty("Result",  "Device not found");
+			render outData
+		}
+	}
 }
 
 
