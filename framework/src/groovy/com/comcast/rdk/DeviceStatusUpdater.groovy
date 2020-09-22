@@ -117,8 +117,9 @@ public class DeviceStatusUpdater {
 				File nontdkstatus = grailsApplication.parentContext.getResource("//fileStore//callthunderdevicestatus_cmndline.py").file
 				def scriptPath = nontdkstatus.absolutePath
 				devIp = dev?.stbIp
+				def thunderPort = dev?.thunderPort
 				device = Device.findById(dev?.id)
-				String[] cmd = [PYTHON_COMMAND, scriptPath, devIp]
+				String[] cmd = [PYTHON_COMMAND, scriptPath, devIp, thunderPort]
 				Runnable statusUpdator = new ThunderDeviceStatusUpdaterTask(cmd, device, deviceStatusService,executescriptService,grailsApplication);
 				executorService.execute(statusUpdator);
 			}else{
@@ -165,8 +166,9 @@ public class DeviceStatusUpdater {
 		if(device?.isThunderEnabled == 1){
 			File nontdkstatus = grailsApplication.parentContext.getResource("//fileStore//callthunderdevicestatus_cmndline.py").file
 			def scriptPath = nontdkstatus.absolutePath
+			def thunderPort = device?.thunderPort
 			def devIp = device?.stbIp
-			cmd = [PYTHON_COMMAND, scriptPath, devIp]
+			cmd = [PYTHON_COMMAND, scriptPath, devIp, thunderPort]
 		}else{
 		File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//calldevicestatus_cmndline.py").file
 

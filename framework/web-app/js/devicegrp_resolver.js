@@ -303,3 +303,14 @@ function showPortConfigDiv(){
 		$("#deviceConfigurePorts").hide();	
 	}
 }
+
+/**
+ * Function to hide/show the thunder port div's while adding or editing a device
+ */
+function showThunderPortDiv(){
+	if(document.getElementById('isThunderEnabled').checked) {
+		 $("#thunderPortConfigure").show();	
+	}else{
+		$("#thunderPortConfigure").hide();	
+	}
+}
