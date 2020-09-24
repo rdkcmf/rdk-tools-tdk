@@ -83,7 +83,7 @@ class ThunderService {
 			if(repeatCount > 0) {
 				executionName = currentExecutionName + "_" + repeatCount
 			}
-			if( params?.myGroupThunder == "TestSuiteThunder") {
+			if( params?.myGroupThunder == "TestSuite") {
 				htmlData = executeThunderScriptGroup(scriptGroupName, executionName, params, realPath)
 			}
 			else if (params?.scriptsThunder != null){
@@ -202,7 +202,7 @@ class ThunderService {
 						}
 					}
 					def executionResultStatusScript = FAILURE_STATUS
-					if(!aborted && !(status == "NOTFOUND" || status == "HANG")){
+					if(!aborted && !(status == "NOT_FOUND" || status == "HANG")){
 						try {
 									executionResultObject = ExecutionResult.findByScriptAndExecution(scriptList[i]?.scriptName,execution)
 									executionResultId = executionResultObject?.id
@@ -318,7 +318,7 @@ class ThunderService {
 						if(aborted && executionService.abortList.contains(execution?.id?.toString())){
 							break
 						}
-						if(!aborted && (status == "NOTFOUND" || status == "HANG")){
+						if(!aborted && (status == "NOT_FOUND" || status == "HANG")){
 							pause = true
 						}
 						if(!aborted && pause) {
@@ -641,7 +641,7 @@ class ThunderService {
 					}
 				}
 				def executionResultStatusScript = FAILURE_STATUS
-				if(!aborted && !(status == "NOTFOUND" || status == "HANG")){
+				if(!aborted && !(status == "NOT_FOUND" || status == "HANG")){
 					try {
 								def scriptObject = ScriptFile.findByScriptNameAndCategory(scriptList[i]?.scriptName,Category.RDKV_THUNDER)
 								def fileStorePath = STORM_FRAMEWORK_LOCATION+Constants.TESTCASES+File.separator+Constants.STORM_TESTCASES+File.separator+Constants.SRC+File.separator+Constants.TESTS+File.separator
@@ -797,7 +797,7 @@ class ThunderService {
 					if(aborted && executionService.abortList.contains(executionId?.toString())){
 						break
 					}
-					if(!aborted && (status == "NOTFOUND" || status == "HANG")){
+					if(!aborted && (status == "NOT_FOUND" || status == "HANG")){
 						pause = true
 					}
 					if(!aborted && pause) {
@@ -931,7 +931,7 @@ class ThunderService {
 				scriptGroupName = scriptGroup?.name
 			}
 			htmlData = ""
-			if( params?.myGroupThunder == "TestSuiteThunder") {
+			if( params?.myGroupThunder == "TestSuite") {
 				htmlData = executeThunderScriptList(scriptInstanceList, device, params?.grailsUrl, realPath,scriptGroupName, newExecName, grailsApplication, params)
 			}
 			else if (params?.scriptsThunder != null){

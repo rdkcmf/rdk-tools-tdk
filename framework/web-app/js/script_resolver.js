@@ -106,6 +106,10 @@ $(document).ready(function() {
 	
 	$('#addscriptGrpId').contextMenu('scriptgrp_root_menu', {
 		bindings : {
+			'add_scriptgrpVRdkService' : function(node) {
+			hideAllSearchoptions();
+			createScriptGrpForm('RDKV_RDKSERVICE');
+			},			
 			'add_scriptgrpV' : function(node) {
 				hideAllSearchoptions();
 				createScriptGrpForm('RDKV');
@@ -543,7 +547,6 @@ function updateSG() {
 function createSG() {
 	var category = document.getElementById("createCategory").value;
 	var sortable = document.getElementById("sortable");
-
 	var dataList = ""
 	
 	$( "li[id*='sgscript-']" ).each(function(index) {
@@ -702,7 +705,7 @@ function removeScript(id, category){
 }
 
 
-function createScriptGrpForm(category) {	
+function createScriptGrpForm(category) {
 	$("#list-scriptDetailsV").hide();
 	$("#list-scriptDetailsB").hide();
 	$("#list-scriptDetailsC").hide();
@@ -946,7 +949,6 @@ function showSkipRemarks(me){
 }
 
 function enableEdit(me,scriptName,session){
-	
 	$("#scriptName").val(scriptName);
 	
 	$.get('addEditLock', {scriptName: scriptName,session:session}, function(data) {

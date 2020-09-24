@@ -26,6 +26,7 @@ $(document).ready(function() {
 	$("#devices").select2();
 	$("#scriptGrp").select2();
 	$("#scriptsThunder").select2();
+	$("#scriptsThunderPython").select2();
 });
 
 </script>
@@ -37,6 +38,7 @@ $(document).ready(function() {
 	<g:hiddenField name="stbtype" id="stbtype" value="${device?.isThunderEnabled}" />
 	<g:hiddenField name="exId" id="exId" value="${device?.id}" />	
 	<g:hiddenField name="category" id="category" value="${category}"/>
+	<g:hiddenField id="thunderExecutionType" name="thunderExecutionType" value="javascript"/>
 	<table>
 		<tr>
 			<th colspan="2" align="center">Execute script on ${device?.stbName}</th>
@@ -70,6 +72,16 @@ $(document).ready(function() {
 				</select>
 			</td>		
 		</tr>
+		<g:if test="${device?.isThunderEnabled == 1}">
+			<tr>
+				<td>Select Execution Type</td>
+				<td>
+					<input onclick="jsExecution();" id="javaScriptThunderRadio" type="radio" name="myGroupExecutionTypeThunder" checked="checked" value="JavascriptThunder" />Javascript
+				    &emsp;<input onclick="pythonExecution();" id="pythonThunderRadio" type="radio" name="myGroupExecutionTypeThunder" value="PythonThunder" />Python
+				    
+				</td>
+			</tr>
+		</g:if>
 		<tr>
 			<td>Select Type</td>
 			<td>
@@ -78,8 +90,8 @@ $(document).ready(function() {
 				    &emsp;<input onclick="showSingle();" id="singleTestRadio" type="radio" name="myGroup" checked="checked" value="SingleScript" />SingleScript
 				</g:if>
 				<g:else>
-		            <input onclick="showSuiteThunder();" id="testSuiteRadioThunder" type="radio" name="myGroupThunder" value="TestSuiteThunder" />TestSuite 
-				    &emsp;<input onclick="showSingleThunder();" id="singleTestRadioThunder" type="radio" name="myGroupThunder" checked="checked" value="SingleScriptThunder" />SingleScript				    
+		            <input onclick="showSuiteThunder();" id="testSuiteRadioThunder" type="radio" name="myGroupThunder" value="TestSuite" />TestSuite 
+				    &emsp;<input onclick="showSingleThunder();" id="singleTestRadioThunder" type="radio" name="myGroupThunder" checked="checked" value="SingleScript" />SingleScript				    
 				</g:else>	
 			</td>		
 		</tr>	
@@ -121,6 +133,12 @@ $(document).ready(function() {
 				    </div>
 				    <div id="singletestThunder" >
 				        <g:select id="scriptsThunder" name="scriptsThunder" multiple="true" style="height:200px;width:400px" onchange="showDateTime();" name="scriptsThunder"  from="${scriptListStorm}" value="" class="many-to-one selectCombo"/>
+				    </div>
+				    <div id="testSuiteThunderPython" style="display: none;">
+						<g:select id="scriptGrpThunderPython" onchange="showDateTime();" name="scriptGrpThunderPython" noSelection="['' : 'Please Select']" from="${scriptGrpRdkService}" optionKey="id" required="" value="" class="many-to-one selectCombo"/>
+				    </div>
+				    <div id="singletestThunderPython" style="display: none;">
+				        <g:select id="scriptsThunderPython" name="scriptsThunderPython" multiple="true" style="height:200px;width:400px" onchange="showDateTime();" from="${sRdkList}" value="" class="many-to-one selectCombo"/>
 				    </div>
 				</g:else>						
 			</td>						
@@ -165,14 +183,27 @@ $(document).ready(function() {
 					</span>
 				</g:if>
 				<g:else>
-				    <span id="executeBtnThunder" class="buttons"><g:submitToRemote class="save" before="showWaitSpinnerThunder();" 
-                    action="executeThunderScript" controller="thunder" update="resultDiv${device?.id}" value="Execute" 
-                    onComplete="completedThunder(${device?.id})" onFailure="changeStylesThunder()"  onSuccess="changeStylesThunder()">
-                    </g:submitToRemote></span>&emsp;
-				    <span id="scheduleBtnThunder" class="buttons">
-					<input id="scheduleBtnThunderID" type=button class="save"  onclick="showScheduler(${device?.id}, '${category}');return false;"
-					value="Schedule" disabled/>
-					</span>
+					<div id="thunderJavascriptExecuteButtons">
+				    	<span id="executeBtnThunder" class="buttons"><g:submitToRemote class="save" before="showWaitSpinnerThunder();" 
+                    	action="executeThunderScript" controller="thunder" update="resultDiv${device?.id}" value="Execute" 
+                    	onComplete="completedThunder(${device?.id})" onFailure="changeStylesThunder()"  onSuccess="changeStylesThunder()">
+                    	</g:submitToRemote></span>&emsp;
+				    	<span id="scheduleBtnThunder" class="buttons">
+						<input id="scheduleBtnThunderID" type=button class="save"  onclick="showScheduler(${device?.id}, '${category}');return false;"
+						value="Schedule" disabled/>
+						</span>
+					</div>
+					<div id="thunderPythonExecuteButtons" style="display: none;">
+						<span id="executeBtnPython" class="buttons"><g:submitToRemote class="save" before="showWaitSpinner();" 
+						action="executeScriptMethod" controller="execution" update="resultDiv${device?.id}" value="Execute" 
+						onComplete="completed(${device?.id})" onFailure="changeStyles()"  onSuccess="changeStyles()" >
+						</g:submitToRemote>&emsp;	
+						</span>
+						<span id="scheduleBtnPython" class="buttons">
+						<input id="scheduleBtnPythonID" type=button class="save"  onclick="showScheduler(${device?.id}, '${category}');return false;"
+						value="Schedule" disabled/>	
+						</span>
+					</div>
 				</g:else>
 				<div id="popup" style="display: none;">
 			              Please wait.....<img id="s" src="${resource(dir:'images',file:'spinner.gif')}" />

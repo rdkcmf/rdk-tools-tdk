@@ -452,9 +452,15 @@ class StormExecuter {
 		String devicename
 		String deviceid
 		String thunderVersionDetailsFormatted = ""
+		def dev
+		def thunderPort = THUNDER_DEFAULT_PORT
+		if(stbIP){
+			dev = Device?.findByStbIp(stbIP)
+			thunderPort = dev?.thunderPort
+		}
 		try
 		{
-			String urlString = "http://"+stbIP+":80/jsonrpc"
+			String urlString = "http://"+stbIP+":"+thunderPort+"/jsonrpc"
 			URL url = new URL(urlString);
 			URLConnection con = url.openConnection();
 			HttpURLConnection http = (HttpURLConnection)con;

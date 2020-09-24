@@ -31,7 +31,7 @@ else:
         if statusCode == 200:
                 print "FREE"
         else:
-                print "NOTFOUND"
+                print "NOT_FOUND"
     except:
         e = sys.exc_info()
-        print "NOTFOUND"
+        print "NOT_FOUND"

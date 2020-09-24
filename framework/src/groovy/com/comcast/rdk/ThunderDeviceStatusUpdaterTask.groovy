@@ -79,7 +79,21 @@ class ThunderDeviceStatusUpdaterTask implements Runnable {
 								}
 								if(status == "FREE"){
 									try{
-										paused = executescriptService.restartThunderExecution(execDevice,grailsApplication)
+										if(execDevice?.category == Category.RDKV){
+											Thread.start {
+												try{
+													if(!ExecutionService.deviceAllocatedList.contains(device?.id)){
+														ExecutionService.deviceAllocatedList.add(device?.id)
+													}
+													deviceStatusService.updateOnlyDeviceStatus(device,"BUSY")
+												}
+												catch(Exception e){
+												}
+											}
+											paused = executescriptService.restartExecution(execDevice,grailsApplication)
+										}else{
+											paused = executescriptService.restartThunderExecution(execDevice,grailsApplication)
+										}
 									}finally{
 										if(ExecutionService.deviceAllocatedList.contains(device?.id)){
 											ExecutionService.deviceAllocatedList.remove(device?.id)
@@ -95,7 +109,7 @@ class ThunderDeviceStatusUpdaterTask implements Runnable {
 					deviceStatusService.updateDeviceStatus(device,outData)
 				}else if(outData.equals("")){
 					deviceStatusService.updateDeviceStatus(device,"NOT_FOUND")
-				}else if(outData.equals("NOTFOUND")){
+				}else if(outData.equals("NOT_FOUND")){
 					deviceStatusService.updateDeviceStatus(device,"NOT_FOUND")
 				}else{
 				    synchronized (ExecutionController.lock) {

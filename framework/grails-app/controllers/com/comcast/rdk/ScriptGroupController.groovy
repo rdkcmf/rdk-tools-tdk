@@ -47,7 +47,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
-
 /*import com.sun.corba.se.impl.orbutil.graph.Node
 import groovy.xml.StreamingMarkupBuilder
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -178,7 +177,7 @@ class ScriptGroupController {
 		scriptGroupMapThunder = scriptGroupMapThunder?scriptGroupMapThunder:[:]
 		def scriptGroupMapC = scriptService.getScriptsMap(requestGetRealPath, RDKC)
 		scriptGroupMapC = scriptGroupMapC?scriptGroupMapC:[:]
-		def listsV = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKV])
+		def listsV = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category or category=:rdkserviceCategory order by name",[category:Category.RDKV,rdkserviceCategory:Category.RDKV_RDKSERVICE])
 		listsV = listsV?listsV : []
 		def listsB = ScriptGroup.executeQuery("select name from ScriptGroup where category=:category order by name",[category:Category.RDKB])
 		listsB = listsB?listsB : []
@@ -357,10 +356,12 @@ class ScriptGroupController {
 		def category = params?.category?.trim()
 		def scriptNameList = []
 		def sList = null
-		if(!(Category.RDKB_TCL.toString().equals(category)) && !(Category.RDKV_THUNDER.toString().equals(category))){
+		if(!(Category.RDKB_TCL.toString().equals(category)) && !(Category.RDKV_THUNDER.toString().equals(category)) && !(Category.RDKV_RDKSERVICE.toString().equals(category))){
 			scriptNameList = scriptService.getScriptNameFileList(getRealPath(), category)
 		}else if(Category.RDKV_THUNDER.toString().equals(category)){
 			scriptNameList = scriptService.getScriptFileListStorm()
+		}else if(Category.RDKV_RDKSERVICE.toString().equals(category)){
+			scriptNameList = scriptService.getScriptFileListRdkService(getRealPath(), category)
 		}else{
 			//issue fix
 			scriptService.totalTclScriptList.each{
@@ -614,13 +615,14 @@ class ScriptGroupController {
 		}
 		//def scripts = scriptService.getScriptNameFileList(getRealPath());
 		def scripts = null
-		if(scriptGroupInstance.category != Category.RDKB_TCL && scriptGroupInstance.category != Category.RDKV_THUNDER){
+		if(scriptGroupInstance.category != Category.RDKB_TCL && scriptGroupInstance.category != Category.RDKV_THUNDER && scriptGroupInstance.category != Category.RDKV_RDKSERVICE){
 			scripts = scriptService.getScriptNameFileList(getRealPath(), scriptGroupInstance?.category?.toString());
 		}
 		else if(scriptGroupInstance.category == Category.RDKV_THUNDER){
 			scripts = scriptService.getScriptFileListStorm()
-		}
-		else{
+		}else if(scriptGroupInstance.category == Category.RDKV_RDKSERVICE){
+		    scripts = scriptService.getScriptFileListRdkService(getRealPath(), scriptGroupInstance?.category?.toString())
+		}else{
 			scripts = scriptService.totalTclScriptList
 		}
 		def list4 = scripts.findAll(){
@@ -1560,7 +1562,11 @@ class ScriptGroupController {
 					script = new ScriptFile()
 					script.setScriptName(params?.name?.trim())
 					script.setModuleName(ptest?.module?.name)
-					script.category = Utility.getCategory(params?.category)
+					if(ptest?.module?.name == Constants.RDKSERVICES){
+						script.category = Utility.getCategory(Category?.RDKV_RDKSERVICE.toString())
+					}else{
+						script.category = Utility.getCategory(params?.category)
+					}
 					script.save(flush:true)
 				}
 				def sObject = new ScriptObject()
@@ -1572,13 +1578,17 @@ class ScriptGroupController {
 				sObject.setScriptFile(script)
 				sObject.setLongDuration(longDuration)
 				sObject?.setTestProfile(testProfileList)
-				scriptService.updateScript(script, params?.category)
-				scriptgroupService.saveToScriptGroups(script,sObject, params?.category)
-				scriptgroupService.saveToDefaultGroups(script,sObject, boxTypes, params?.category)
-				scriptgroupService.updateScriptsFromScriptTag(script,sObject,[],[], params?.category)
-				scriptService?.updateScriptsFromTestProfile(script,sObject, params.category)
-				scriptService.createDefaultGroupWithoutOS(sObject,script, params?.category)
-				scriptService.updateAdvScriptMap(params?.name?.trim(), dirname, Utility.getCategory(params?.category), isAdvanced)
+				if(ptest?.module?.name != Constants.RDKSERVICES){
+					scriptService.updateScript(script, params?.category)
+					scriptgroupService.saveToScriptGroups(script,sObject, params?.category)
+					scriptgroupService.saveToDefaultGroups(script,sObject, boxTypes, params?.category)
+					scriptgroupService.updateScriptsFromScriptTag(script,sObject,[],[], params?.category)
+					scriptService?.updateScriptsFromTestProfile(script,sObject, params.category)
+					scriptService.createDefaultGroupWithoutOS(sObject,script, params?.category)
+					scriptService.updateAdvScriptMap(params?.name?.trim(), dirname, Utility.getCategory(params?.category), isAdvanced)
+				}else{
+					scriptService.updateScript(script,Category?.RDKV_RDKSERVICE.toString())
+				}
 				def sName = params?.name
 				render(message(code: 'default.created.message', args: [
 					message(code: 'script.label', default: 'Script'),
@@ -1980,6 +1990,11 @@ class ScriptGroupController {
 				script = new ScriptFile()
 				script.setScriptName(newScriptName)
 				script.setModuleName(ptest?.module?.name)
+				if(ptest?.module?.name == Constants.RDKSERVICES){
+					script.category = Utility.getCategory(Category?.RDKV_RDKSERVICE.toString())
+				}else{
+					script.category = Utility.getCategory(params?.category)
+				}
 				script.setCategory(Utility.getCategory(params?.category))
 				script.save(flush:true)
 			}
@@ -1993,28 +2008,26 @@ class ScriptGroupController {
 			sObject.setScriptTags(scrptTags)
 			sObject.setLongDuration(longDuration)
 			sObject.setTestProfile(testProfileList)
-
-			if(boxTypes){
-				//			boxTypesList = scriptgroupService.createBoxTypeList(boxTypes)
-				scriptgroupService.removeScriptsFromBoxScriptGroup(script,boxTypes,oldBoxTypes)
-				//			scriptgroupService.removeScriptsFromBoxSuites1(script)
-				if(isLongDuration != longDuration){
-					scriptgroupService.updateScriptGroup(script,sObject, params?.category)
+			if(ptest?.module?.name != Constants.RDKSERVICES){
+				if(boxTypes){
+					scriptgroupService.removeScriptsFromBoxScriptGroup(script,boxTypes,oldBoxTypes)
+					if(isLongDuration != longDuration){
+						scriptgroupService.updateScriptGroup(script,sObject, params?.category)
+					}
 				}
-				//			scriptgroupService.saveToDefaultGroup(script, boxTypesList)
-			}
-			scriptgroupService.saveToScriptGroups(script,sObject, params?.category)
-			scriptgroupService.saveToDefaultGroups(script,sObject, bTypes,  params?.category)
-			scriptgroupService.updateScriptsFromRDKVersionBoxTypeTestSuites1(script, sObject, params?.category)
-			scriptgroupService.updateScriptsFromRDKVersionBoxTypeTestGroup(script,sObject,oldRDKVersions,oldBoxTypes)
-			scriptgroupService.updateScriptsFromScriptTag(script,sObject,oldTags,oldBoxTypes ,params?.category)
-			scriptService?.updateScriptsFromTestProfile(script,sObject, params.category)
-			flash.message = message(code: 'default.updated.message', args: [
-				message(code: 'script.label', default: 'Script'),
-				params.name
-			])
 			
-			scriptService.updateAdvScriptMap(newScriptName, dirname, Utility.getCategory(params?.category), isAdvanced)
+				scriptgroupService.saveToScriptGroups(script,sObject, params?.category)
+				scriptgroupService.saveToDefaultGroups(script,sObject, bTypes,  params?.category)
+				scriptgroupService.updateScriptsFromRDKVersionBoxTypeTestSuites1(script, sObject, params?.category)
+				scriptgroupService.updateScriptsFromRDKVersionBoxTypeTestGroup(script,sObject,oldRDKVersions,oldBoxTypes)
+				scriptgroupService.updateScriptsFromScriptTag(script,sObject,oldTags,oldBoxTypes ,params?.category)
+				scriptService?.updateScriptsFromTestProfile(script,sObject, params.category)
+				flash.message = message(code: 'default.updated.message', args: [
+					message(code: 'script.label', default: 'Script'),
+					params.name
+				])
+				scriptService.updateAdvScriptMap(newScriptName, dirname, Utility.getCategory(params?.category), isAdvanced)
+			}
 		}
 		def newid= params?.id
 		if(params?.id?.contains("@")){
@@ -2691,7 +2704,6 @@ class ScriptGroupController {
 	}
 
 	def addEditLock(){
-
 		def scriptName = params?.scriptName
 		if(ScriptService.scriptLockList.contains(scriptName)){
 			ScriptService.scriptLockList.add(params?.scriptName)
@@ -2915,6 +2927,9 @@ class ScriptGroupController {
 			case Category.RDKB_TCL:
 				path = getRealPath()  + FILESTORE + FILE_SEPARATOR + FileStorePath.RDKTCL.value()
 				break;
+			case Category.RDKV_RDKSERVICE:
+				path = getRealPath()  + FILESTORE + FILE_SEPARATOR + FileStorePath.RDKV_RDKSERVICE.value()
+				break;
 			default:
 				break;
 		}
@@ -3124,6 +3139,7 @@ class ScriptGroupController {
 		def scriptGroupMap = scriptService.getScriptsMap(requestGetRealPath)
 		def refreshStatus = scriptService.scriptListRefresh(realPath ,scriptGroupMap )
 		scriptService.initializeThunderScripts(realPath)
+		scriptService.initializeRdkServiceScripts(realPath)
 		if(refreshStatus){
 			flash.message =  "Script lists are same not modified "
 		} else {
@@ -3620,47 +3636,55 @@ class ScriptGroupController {
 								script = new ScriptFile()
 								script.setScriptName(scriptName?.trim())
 								script.setModuleName(ptest?.module?.name)
-								script.category = Utility.getCategory(category)
+								if(ptest?.module?.name == Constants.RDKSERVICES){
+									script.category = Utility.getCategory(Category?.RDKV_RDKSERVICE.toString())
+								}else{
+									script.category = Utility.getCategory(category)
+								}
 								script.save(flush:true)
 							}
-							def scr = ScriptFile.findByScriptNameAndModuleName(scriptName?.trim(),ptest?.module?.name)
-							if(RDKV.equals(category)){
-								if(advanced.equals("true")){
-									ScriptService.scriptsListAdvanced.put(scr?.id, TESTSCRIPTS_RDKV_ADV)
+							if(ptest?.module?.name != Constants.RDKSERVICES){
+								def scr = ScriptFile.findByScriptNameAndModuleName(scriptName?.trim(),ptest?.module?.name)
+								if(RDKV.equals(category)){
+									if(advanced.equals("true")){
+										ScriptService.scriptsListAdvanced.put(scr?.id, TESTSCRIPTS_RDKV_ADV)
+									}
+									else{
+										ScriptService.scriptsListAdvanced.put(scr?.id, TESTSCRIPTS_RDKV)
+									}
 								}
-								else{
-									ScriptService.scriptsListAdvanced.put(scr?.id, TESTSCRIPTS_RDKV)
+								else if(RDKB.equals(category)){
+									if(advanced.equals("true")){
+										ScriptService.scriptsListAdvanced.put(scr?.id, TESTSCRIPTS_RDKB_ADV)
+									}
+									else{
+										ScriptService.scriptsListAdvanced.put(scr?.id, TESTSCRIPTS_RDKB)
+									}
 								}
-							}
-							else if(RDKB.equals(category)){
-								if(advanced.equals("true")){
-									ScriptService.scriptsListAdvanced.put(scr?.id, TESTSCRIPTS_RDKB_ADV)
+								boolean longDurationTest= false
+								if(longDuration.equals("true")){
+									longDurationTest = true
+								}else{
+									longDurationTest = false
 								}
-								else{
-									ScriptService.scriptsListAdvanced.put(scr?.id, TESTSCRIPTS_RDKB)
-								}
-							}
-							boolean longDurationTest= false
-							if(longDuration.equals("true")){
-								longDurationTest = true
+								def sObject = new ScriptObject()
+								sObject.setBoxTypes(boxTypeList)
+								sObject.setRdkVersions(rdkVersions)
+								sObject.setScriptTags(scrptTags)
+								sObject.setTestProfile(testProfile)
+								sObject.setName(scriptName?.trim())
+								sObject.setModule(ptest?.module?.name)
+								sObject.setScriptFile(script)
+								sObject.setLongDuration(longDurationTest)
+								scriptService.updateScript(script , category)
+								scriptgroupService.saveToScriptGroups(script,sObject, category)
+								scriptgroupService.saveToDefaultGroups(script,sObject, boxTypeList,category)
+								scriptgroupService.updateScriptsFromScriptTag(script,sObject,[],[],category)
+								scriptService.createDefaultGroupWithoutOS(sObject,script, params?.category)
+								scriptService?.updateScriptsFromTestProfile(script,sObject,category)
 							}else{
-								longDurationTest = false
+								scriptService.updateScript(script,Category?.RDKV_RDKSERVICE.toString())
 							}
-							def sObject = new ScriptObject()
-							sObject.setBoxTypes(boxTypeList)
-							sObject.setRdkVersions(rdkVersions)
-							sObject.setScriptTags(scrptTags)
-							sObject.setTestProfile(testProfile)
-							sObject.setName(scriptName?.trim())
-							sObject.setModule(ptest?.module?.name)
-							sObject.setScriptFile(script)
-							sObject.setLongDuration(longDurationTest)
-							scriptService.updateScript(script , category)
-							scriptgroupService.saveToScriptGroups(script,sObject, category)
-							scriptgroupService.saveToDefaultGroups(script,sObject, boxTypeList,category)
-							scriptgroupService.updateScriptsFromScriptTag(script,sObject,[],[],category)
-							scriptService.createDefaultGroupWithoutOS(sObject,script, params?.category)
-							scriptService?.updateScriptsFromTestProfile(script,sObject,category)
 							flash.message =" Script uploaded successfully"
 						}catch(Exception e){
 							flash.message =" Script not uploaded, please try again "

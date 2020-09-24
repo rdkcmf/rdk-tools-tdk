@@ -170,6 +170,9 @@ public final class Constants
     public static final	int customAgentMonitorPort = 40000;
     public static final String CI_EXECUTION = "CI_";
     
+    public static final String THUNDER_DEFAULT_PORT = "80";
+    public static final String RDKSERVICE_DEFAULT_PORT = "9998";
+    
     public static final String RERUN = "_RERUN";
     public static final String MULTIPLE = "Multiple";
     
@@ -257,12 +260,14 @@ public final class Constants
     private static final String RDKC="RDKC";
     private static final String RDKB_TCL = "RDKB_TCL";
     private static final String RDKV_THUNDER = "RDKV_THUNDER";
+    private static final String RDKV_RDKSERVICE = "RDKV_RDKSERVICE";
     
     private static final String  TESTSCRIPTS_RDKV="testscriptsRDKV";
     private static final String  TESTSCRIPTS_RDKB="testscriptsRDKB"; 
     private static final String  TESTSCRIPTS_RDKC="testscriptsRDKC";
     private static final String  TESTSCRIPTS_RDKV_ADV="testscriptsRDKVAdvanced";
-    private static final String  TESTSCRIPTS_RDKB_ADV="testscriptsRDKBAdvanced"; 
+    private static final String  TESTSCRIPTS_RDKB_ADV="testscriptsRDKBAdvanced";
+    private static final String  RDKSERVICES="rdkservices";
     
 	private static final String SUCCESS ="SUCCESS";
 	private static final String FAILED ="FAILED";

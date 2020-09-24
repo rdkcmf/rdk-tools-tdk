@@ -694,6 +694,7 @@
 
 	       <div class="contextMenu" id="scriptgrp_root_menu" height="12px" width="12px">
 				<ul>
+					<li id="add_scriptgrpVRdkService"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-V RdkService Test Suite</li>
 	          		<li id="add_scriptgrpV"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-V Test Suite</li>
 	          		<li id="add_scriptgrpB"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-B Test Suite</li>
 					<li id="add_scriptgrpC"><img src="../images/add_new.png" height="15px" width="15px"/>Add New RDK-C Test Suite</li>
