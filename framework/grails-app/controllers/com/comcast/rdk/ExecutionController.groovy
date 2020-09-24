@@ -508,7 +508,7 @@ class ExecutionController {
 			jobDetailList : jobDetailList, jobInstanceTotal: jobDetailList.size(), deviceInstanceTotalV: deviceInstanceListV?.size(), deviceInstanceTotalB: deviceInstanceListB?.size(), category : params?.category ,
 			deviceListC : deviceInstanceListC,deviceInstanceTotalC: deviceInstanceListC?.size() ]
 	}
-
+	
 	/**
 	 * Show the device IP and the scripts based on the selection
 	 * of device name from the list
@@ -518,6 +518,7 @@ class ExecutionController {
 		def category = params?.category?.trim()
 		def device = Device.get( params?.id )
 		def scripts = []
+		def scriptListRdkService = []
 		def newScripts = []
 		def scriptListStorm = []
 		if(category?.toString()?.equals('RDKB_TCL') ){
@@ -530,10 +531,12 @@ class ExecutionController {
 		}
 		else{
 			scripts = scriptService.getScriptNameFileList(getRealPath(), category)
+			scriptListRdkService = scriptService.getScriptNameFileListRdkService(getRealPath(), Category.RDKV_RDKSERVICE.toString())
 			scriptListStorm = scriptService.getScriptNameFileListStorm()
 		}
 		def sList = scripts?.clone()
 		sList?.sort{a,b -> a?.scriptName <=> b?.scriptName}
+		def sRdkList = scriptListRdkService?.clone()
 		def groups =  utilityService.getGroup()? utilityService.getGroup() : null
 		def devices = getDeviceList(category)
 		if(device.isThunderEnabled == 1){
@@ -548,10 +551,17 @@ class ExecutionController {
 			}
 			order('name')
 		}
-
+		def scriptGrpRdkService = ScriptGroup.withCriteria {
+			eq('category',Utility.getCategory(Category.RDKV_RDKSERVICE.toString()))
+			or{
+				eq('groups',groups)
+				isNull('groups')
+			}
+			order('name')
+		}
 		DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT1)
 		Calendar cal = Calendar.getInstance()
-		[datetime :  dateFormat.format(cal.getTime()).toString(), device : device, scriptGrpList : scriptGrp, scriptList : sList, scriptListStorm: scriptListStorm, category:category, devices:devices, grailsUrl: getApplicationUrl()]
+		[datetime :  dateFormat.format(cal.getTime()).toString(), device : device, scriptGrpList : scriptGrp, scriptList : sList, sRdkList : sRdkList, scriptGrpRdkService : scriptGrpRdkService, scriptListStorm: scriptListStorm, category:category, devices:devices, grailsUrl: getApplicationUrl()]
 	}
 
 	def getDeviceList(def category){
@@ -673,23 +683,24 @@ class ExecutionController {
 			def isSystemDiagnostics1 = FALSE
 			def isLogReqd1 = FALSE
 			def rerun1 = FALSE
-
-			if(timeInfo != null ){
-				isBenchMark1 = timeInfo
+			def deviceInstanceIsThunder = Device.findByStbName(stbName)
+			if(deviceInstanceIsThunder?.isThunderEnabled != 1){
+				if(timeInfo != null ){
+					isBenchMark1 = timeInfo
+				}
+				if(performance != null  ){
+					isSystemDiagnostics1 = performance
+				}
+				if(isLogReqd != null ){
+					isLogReqd1  = isLogReqd
+	
+				}
+				if(reRunOnFailure != null ){
+					rerun1 = reRunOnFailure
+				}
 			}
-			if(performance != null  ){
-				isSystemDiagnostics1 = performance
-			}
-			if(isLogReqd != null ){
-				isLogReqd1  = isLogReqd
-
-			}
-			if(reRunOnFailure != null ){
-				rerun1 = reRunOnFailure
-			}
-
 			String filePath = "${request.getRealPath('/')}//fileStore"
-			if(test_request){
+			if(test_request && deviceInstanceIsThunder?.isThunderEnabled != 1){
 				String status = scriptexecutionService.generateResultBasedOnTestRequest(test_request,callbackUrl,filePath, url, imageName, boxType,getRealPath())
 				if(status){
 					jsonOutData.addProperty("status", "SUCCESS");
@@ -724,7 +735,12 @@ class ExecutionController {
 								String rdkVersion = executionService.getRDKBuildVersion(deviceInstance);
 								scriptGroup?.scriptList?.each{ scrpt ->
 									if(scriptGroup.category != Category.RDKB_TCL){
-										def script = scriptService.getScript(getRealPath(), scrpt?.moduleName, scrpt?.scriptName, category?.toString())
+										def script
+										if(deviceInstance?.isThunderEnabled != 1){
+											script = scriptService.getScript(getRealPath(), scrpt?.moduleName, scrpt?.scriptName, category?.toString())
+										}else{
+											script = scriptService.getScript(getRealPath(), scrpt?.moduleName, scrpt?.scriptName, Category.RDKV.toString())
+										}
 
 										if(script){
 											/**
@@ -801,8 +817,13 @@ class ExecutionController {
 												
 												// for saving the execution details includes the performance information
 												//executionSaveStatus = executionService.saveExecutionDetails(execName, scriptname, deviceName, scriptGroup,url,isBenchMark1,isSystemDiagnostics1,rerun1,isLogReqd1)
-												executionSaveStatus = executionService.saveExecutionDetails(execName,[scriptName:scriptname, deviceName:deviceName, scriptGroupInstance:scriptGroup,
-													appUrl:url, isBenchMark:isBenchMark1, isSystemDiagnostics:isSystemDiagnostics1, rerun:rerun1, isLogReqd:isLogReqd1,category:category.toString(), rerunOnFailure:FALSE  ])
+												if(deviceInstance?.isThunderEnabled != 1){
+													executionSaveStatus = executionService.saveExecutionDetails(execName,[scriptName:scriptname, deviceName:deviceName, scriptGroupInstance:scriptGroup,
+														appUrl:url, isBenchMark:isBenchMark1, isSystemDiagnostics:isSystemDiagnostics1, rerun:rerun1, isLogReqd:isLogReqd1,category:category.toString(), rerunOnFailure:FALSE  ])
+												}else{
+												    executionSaveStatus = executionService.saveExecutionDetails(execName,[scriptName:scriptname, deviceName:deviceName, scriptGroupInstance:scriptGroup,
+													    appUrl:url, isBenchMark:isBenchMark1, isSystemDiagnostics:isSystemDiagnostics1, rerun:rerun1, isLogReqd:isLogReqd1,category:Category.RDKV.toString(), rerunOnFailure:FALSE  ])
+												}
 												//
 												//	executionSaveStatus = scriptexecutionService.saveExecutionDetails(execName, scriptname, deviceName, scriptGroup,url, category)
 											} catch (Exception e) {
@@ -823,7 +844,11 @@ class ExecutionController {
 												executionDevice.category = category
 												if(executionDevice.save(flush:true)){
 													String getRealPathString  = getRealPath()
-													executionService.executeVersionTransferScript(getRealPathString,filePath,execName, executionDevice?.id, deviceInstance?.stbName, deviceInstance?.logTransferPort,url)
+													if(deviceInstance?.isThunderEnabled != 1){
+														executionService.executeVersionTransferScript(getRealPathString,filePath,execName, executionDevice?.id, deviceInstance?.stbName, deviceInstance?.logTransferPort,url)
+													}else{
+														StormExecuter.createThunderVersionFile(getRealPathString, execution?.id, executionDevice?.id, executionDevice?.deviceIp)
+													}
 													//	scriptexecutionService.executeScriptGroup(scriptGroup, boxType, execName, executionDevice?.id.toString(), deviceInstance,url, filePath, getRealPathString, callbackUrl, imageName, category )
 													def rerun = null
 													if(rerun1?.equals(TRUE)){
@@ -833,7 +858,11 @@ class ExecutionController {
 														tclExecutionService.executeScriptGroup(scriptGroup, boxType, execName, executionDevice?.id.toString(), deviceInstance, url, filePath, getRealPathString, callbackUrl, imageName, isBenchMark1,isSystemDiagnostics1,rerun,isLogReqd1, category?.toString())
 													}
 													else{
-														scriptexecutionService.executeScriptGroup(scriptGroup, boxType, execName, executionDevice?.id.toString(), deviceInstance, url, filePath, getRealPathString, callbackUrl, imageName, isBenchMark1,isSystemDiagnostics1,rerun,isLogReqd1, category?.toString())
+														if(deviceInstance?.isThunderEnabled != 1){
+															scriptexecutionService.executeScriptGroup(scriptGroup, boxType, execName, executionDevice?.id.toString(), deviceInstance, url, filePath, getRealPathString, callbackUrl, imageName, isBenchMark1,isSystemDiagnostics1,rerun,isLogReqd1, category?.toString())
+														}else{
+														    scriptexecutionService.executeScriptGroup(scriptGroup, boxType, execName, executionDevice?.id.toString(), deviceInstance, url, filePath, getRealPathString, callbackUrl, imageName, isBenchMark1,isSystemDiagnostics1,rerun,isLogReqd1, Category.RDKV.toString())
+														}
 													}
 												}
 											}
@@ -911,6 +940,7 @@ class ExecutionController {
 		}
 		render jsonOutData
 	}
+	
 	/** 
 	 * REST method to retrieve the device status list
 	 * @param boxType
@@ -1031,6 +1061,23 @@ class ExecutionController {
 	 * @return
 	 */
 	def executeScriptMethod() {
+		boolean thunderPythonExecution = false
+		if(params?.thunderExecutionType == "python"){
+			thunderPythonExecution = true
+		}
+		def scriptType
+		def paramsScripts
+		def paramsScriptGrp
+		if(!thunderPythonExecution){
+			scriptType = params?.myGroup
+			paramsScripts = params?.scripts
+			paramsScriptGrp = params?.scriptGrp
+		}else{
+			scriptType = params?.myGroupThunder
+			paramsScripts = params?.scriptsThunderPython
+			def scriptGroupObjectForName = ScriptGroup.findById(params?.scriptGrpThunderPython,[lock: true])
+			paramsScriptGrp = scriptGroupObjectForName?.name
+		}
 		boolean aborted = false
 		def exId
 		def scriptGroupInstance
@@ -1041,7 +1088,7 @@ class ExecutionController {
 		String htmlData = ""
 		def deviceId
 		def executionName
-		def scriptType = params?.myGroup
+		
 		def deviceList = []
 		def deviceName
 		String boxType
@@ -1053,15 +1100,17 @@ class ExecutionController {
 		ExecutionDevice executionDevice = new ExecutionDevice()
 		int  scriptCountMultipleSuite = 0
 		def scriptListMultipleSuite = []
-		if(!(params?.scriptGrp instanceof String)){
-			for(scrptGrp in params?.scriptGrp){
-				def scrptGroupInstance = ScriptGroup.findByName(scrptGrp,[fetch : [scriptList : "eager"]])
-				scrptGroupInstance?.scriptList?.each{scrpt->
-					scriptListMultipleSuite.add(scrpt?.scriptName)
+		if(!thunderPythonExecution){
+			if(!(paramsScriptGrp instanceof String)){
+				for(scrptGrp in paramsScriptGrp){
+					def scrptGroupInstance = ScriptGroup.findByName(scrptGrp,[fetch : [scriptList : "eager"]])
+					scrptGroupInstance?.scriptList?.each{scrpt->
+						scriptListMultipleSuite.add(scrpt?.scriptName)
+					}
 				}
+				def Set<ScriptFile> scriptFileObjectSet = new HashSet(scriptListMultipleSuite)
+				scriptCountMultipleSuite = scriptFileObjectSet?.size()
 			}
-			def Set<ScriptFile> scriptFileObjectSet = new HashSet(scriptListMultipleSuite)
-			scriptCountMultipleSuite = scriptFileObjectSet?.size()
 		}
 		if(params?.devices instanceof String){
 			deviceList << params?.devices
@@ -1100,10 +1149,9 @@ class ExecutionController {
 		else if(!(params?.devices)){
 			htmlData = message(code: 'execution.nodevice.selected')
 		}
-		else if(!params?.scriptGrp && !params?.scripts){
+		else if(!paramsScriptGrp && !paramsScripts){
 			htmlData = message(code: 'execution.noscript.selected')
 		}
-
 		else if(deviceInstance?.deviceStatus.toString().equals(Status.BUSY.toString())){
 			htmlData =deviceName+ " : "+message(code: 'execution.device.notfree')
 		}
@@ -1160,12 +1208,12 @@ class ExecutionController {
 							boolean validScript = false
 							deviceName = deviceInstance?.stbName
 							if(scriptType == SINGLE_SCRIPT){
-								def scripts = params?.scripts
+								def scripts = paramsScripts
 								if(scripts instanceof String){
 									singleScript = true
-									def moduleName= scriptService.scriptMapping.get(params?.scripts)
+									def moduleName= scriptService.scriptMapping.get(paramsScripts)
 									if(moduleName){
-										def scriptInstance1 = scriptService.getScript(getRealPath(),moduleName, params?.scripts, params?.category)
+										def scriptInstance1 = scriptService.getScript(getRealPath(),moduleName, paramsScripts, params?.category)
 										if(scriptInstance1){
 											if(executionService.validateScriptBoxTypes(scriptInstance1,deviceInstance)){
 												String rdkVersion = executionService.getRDKBuildVersion(deviceInstance);
@@ -1178,14 +1226,14 @@ class ExecutionController {
 												htmlData = "<br>"+deviceName +" : "+ message(code: 'execution.boxtype.nomatch')
 											}
 										}else{
-											htmlData = "<br>"+deviceName +"  : No Script is available with name ${params?.scripts} in module ${moduleName}"
+											htmlData = "<br>"+deviceName +"  : No Script is available with name ${paramsScripts} in module ${moduleName}"
 										}
-									}else{
-										htmlData = "<br>"+deviceName +" : No module associated with script ${params?.scripts}"
+									}else{ 
+										htmlData = "<br>"+deviceName +" : No module associated with script ${paramsScripts}"
 									}
 								}
 								else{
-									scripts.each { script ->										
+									scripts.each { script ->
 										def moduleName= scriptService.scriptMapping.get(script)
 										def scriptInstance1 = scriptService.getScript(getRealPath(),moduleName, script, params?.category)
 										if(scriptInstance1){
@@ -1200,7 +1248,7 @@ class ExecutionController {
 
 								}
 							}else{
-                                def scriptGroups = params?.scriptGrp
+								def scriptGroups = paramsScriptGrp
 								if(scriptGroups instanceof String){
 									singleScriptGroup = true
 									def scriptGroup = ScriptGroup.findByName(scriptGroups)
@@ -1212,7 +1260,7 @@ class ExecutionController {
 									}
 								}
 								scriptGroupList?.each{eachScriptGroup ->
-								String rdkVersion = executionService.getRDKBuildVersion(deviceInstance);								
+								String rdkVersion = executionService.getRDKBuildVersion(deviceInstance);
 								try{
 									eachScriptGroup?.scriptList?.each{ script ->
 										def scriptInstance1 = scriptService.getMinimalScript(getRealPath(),script?.moduleName, script?.scriptName, params?.category)
@@ -1256,7 +1304,6 @@ class ExecutionController {
 								deviceInstance = Device.findById(device)
 								try {
 									status = DeviceStatusUpdater.fetchDeviceStatus(grailsApplication, deviceInstance)
-
 									synchronized (lock) {
 										if(executionService.deviceAllocatedList.contains(deviceInstance?.id)){
 											status = "BUSY"
@@ -1289,11 +1336,11 @@ class ExecutionController {
 									def scripts = null
 									deviceId = deviceInstance?.id
 									if(scriptType == SINGLE_SCRIPT){
-										scripts = params?.scripts
+										scripts = paramsScripts
 										if(scripts instanceof String){
 											//							scriptInstance = Script.findById(params?.scripts,[lock: true])
-											def moduleName= scriptService.scriptMapping.get(params?.scripts)
-											def scriptInstance1 = scriptService.getScript(getRealPath(),moduleName, params?.scripts, params?.category)
+											def moduleName= scriptService.scriptMapping.get(paramsScripts)
+											def scriptInstance1 = scriptService.getScript(getRealPath(),moduleName, paramsScripts, params?.category)
 											//							def scriptInstance1 = executionService.getScript(getRealPath(),"ClosedCaption", scripts)
 											scriptStatus = executionService.validateScriptBoxTypes(scriptInstance1,deviceInstance)
 											String rdkVersion = executionService.getRDKBuildVersion(deviceInstance);
@@ -1305,7 +1352,7 @@ class ExecutionController {
 										}
 									}else{
 										if(singleScriptGroup){
-											scriptGroupInstance = ScriptGroup.findByName(params?.scriptGrp)
+											scriptGroupInstance = ScriptGroup.findByName(paramsScriptGrp)
 										}else{
 										    scriptName = MULTIPLESCRIPTGROUPS
 										}
@@ -1328,14 +1375,13 @@ class ExecutionController {
 											}
 											// Test case count include in the multiple scripts executions
 											if(scriptName.equals(MULTIPLESCRIPT)){
-												def  scriptCount = params?.scripts?.size()
+												def  scriptCount = paramsScripts?.size()
 												executionSaveStatus = executionService.saveExecutionDetailsOnMultipleScripts(execName, scriptName, deviceName, scriptGroupInstance,url,isBenchMark,isSystemDiagnostics,rerun,isLogReqd,scriptCount, params?.category,rerunOnFailure)
 											}else if(scriptName.equals(MULTIPLESCRIPTGROUPS)){
 												executionSaveStatus = executionService.saveExecutionDetailsOnMultipleScriptgroups(execName,[scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:scriptGroupInstance,
 													appUrl:url, isBenchMark:isBenchMark, isSystemDiagnostics:isSystemDiagnostics, rerun:rerun, isLogReqd:isLogReqd,category:params?.category , rerunOnFailure:rerunOnFailure, scriptCount:scriptCountMultipleSuite])
 											}else{
 												//executionSaveStatus = executionService.saveExecutionDetails(execName, scriptName, deviceName, scriptGroupInstance,url,isBenchMark,isSystemDiagnostics,rerun,isLogReqd)
-
 												executionSaveStatus = executionService.saveExecutionDetails(execName,[scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:scriptGroupInstance,
 													appUrl:url, isBenchMark:isBenchMark, isSystemDiagnostics:isSystemDiagnostics, rerun:rerun, isLogReqd:isLogReqd,category:params?.category , rerunOnFailure:rerunOnFailure])
 											}
@@ -1367,23 +1413,33 @@ class ExecutionController {
 												e.printStackTrace()
 											}
 											def scriptId
-											if((!(params?.scriptGrp)) && (!(params?.scripts))){
+											if((!(paramsScriptGrp)) && (!(paramsScripts))){
 												render ""
 												return
 											}
 											else{
-												executionService.executeVersionTransferScript(request.getRealPath('/'),filePath,execName, executionDevice?.id, deviceInstance?.stbName, deviceInstance?.logTransferPort,url)
+												if(thunderPythonExecution){
+													try{
+														def executionObject = Execution.findByName(execName)
+														def executionId = executionObject?.id
+														StormExecuter.createThunderVersionFile(request.getRealPath('/'), executionId, executionDevice?.id, executionDevice?.deviceIp)
+													}catch(Exception e){
+														e.printStackTrace()
+													}
+												}else{
+													executionService.executeVersionTransferScript(request.getRealPath('/'),filePath,execName, executionDevice?.id, deviceInstance?.stbName, deviceInstance?.logTransferPort,url)
+												}
 											}
 											if(deviceList.size() > 1){
-												    executescriptService.executeScriptInThread(singleScriptGroup, execName, device, executionDevice, params?.scripts, params?.scriptGrp, executionName,
-														filePath, getRealPath(), params?.myGroup, url, isBenchMark, isSystemDiagnostics, params?.rerun,isLogReqd, params?.category, repeatBackToBackCount)
+												    executescriptService.executeScriptInThread(singleScriptGroup, execName, device, executionDevice, paramsScripts, paramsScriptGrp, executionName,
+														filePath, getRealPath(), scriptType, url, isBenchMark, isSystemDiagnostics, params?.rerun,isLogReqd, params?.category, repeatBackToBackCount)
 												    htmlData=" <br> " + deviceName+"  :   Execution triggered "
 												    output.append(htmlData)
 
 
 											}else{
-												    htmlData = executescriptService.executescriptsOnDevice(singleScriptGroup, execName, device, executionDevice, params?.scripts, params?.scriptGrp, executionName,
-														filePath, getRealPath(), params?.myGroup, url, isBenchMark, isSystemDiagnostics, params?.rerun,isLogReqd, params?.category, repeatBackToBackCount)
+												    htmlData = executescriptService.executescriptsOnDevice(singleScriptGroup, execName, device, executionDevice, paramsScripts, paramsScriptGrp, executionName,
+														filePath, getRealPath(), scriptType, url, isBenchMark, isSystemDiagnostics, params?.rerun,isLogReqd, params?.category, repeatBackToBackCount)
 												    output.append(htmlData)
 												    Execution exe = Execution.findByName(execName)
 												    if(exe){
@@ -2612,7 +2668,13 @@ class ExecutionController {
 			resultNode.addProperty("LogData",executionResult?.executionOutput.toString())
 			//agent console link added
 			def executionInstance = Execution.findById(executionResult?.execution?.id)
-			resultNode.addProperty("agentConsoleLogURL",executionInstance?.applicationUrl+"/execution/getAgentConsoleLog?execResId="+executionResult?.id)
+			def deviceInstance
+			if(executionResult?.device.toString()){
+				deviceInstance = Device.findByStbName(executionResult?.device.toString())
+			}
+			if(deviceInstance?.isThunderEnabled != 1){
+				resultNode.addProperty("agentConsoleLogURL",executionInstance?.applicationUrl+"/execution/getAgentConsoleLog?execResId="+executionResult?.id)
+			}
 		}
 		render resultNode
 	}
@@ -2963,8 +3025,13 @@ class ExecutionController {
 		if(isLogRequired && isLogRequired?.equals(TRUE)){
 			isLog = TRUE
 		}
-
-		singleTestRestExecution(stbName,boxType,scriptName,exeCount,rerun,time,perfo,isLog)
+		
+		def deviceInstance = Device.findByStbName(stbName)
+		if(deviceInstance && deviceInstance?.isThunderEnabled == 1){
+			singleTestRestExecutionRdkService(stbName,boxType,scriptName,exeCount,rerun)
+		}else{
+			singleTestRestExecution(stbName,boxType,scriptName,exeCount,rerun,time,perfo,isLog)
+		}
 	}
 
 	//	def thirdPartySingleTestExecution(final String stbName, final String boxType, final String scriptName ){
@@ -3220,6 +3287,246 @@ class ExecutionController {
 						println " Device instance is still there in the allocated list :  "+deviceInstance?.stbName + " id "+ deviceInstance?.id
 						executionService.deviceAllocatedList.removeAll(deviceInstance?.id)
 						println " Again checking the device lock  for "+deviceInstance?.stbName + " status =  "+executionService.deviceAllocatedList.contains(deviceInstance?.id)
+					}
+				}else{
+					htmlData = "No device found with this name "+stbName
+				}
+
+					jsonOutData.addProperty("status", "FAILURE")
+					jsonOutData.addProperty("result", htmlData)
+				
+			}
+		}
+		println " singleTestRestExecution [stbName="+stbName+"] [scriptName="+scriptName+"] [jsonOutData="+jsonOutData+"]"
+		render jsonOutData
+	}
+	
+	/**
+	 * Function to handle REST API single script execution of rdkservice scripts
+	 * @param stbName
+	 * @param boxType
+	 * @param scriptName
+	 * @param repeat
+	 * @param reRunOnFailure
+	 * @return - Return JSON with status of REST call
+	 */
+	
+	def singleTestRestExecutionRdkService(final String stbName, final String boxType, final String scriptName , final int repeat, final String reRunOnFailure){
+		String timeInfo = FALSE
+		String performance = FALSE
+		String isLog = FALSE
+		def deviceInstance = Device.findByStbName(stbName)
+		String  url = getApplicationUrl()
+		String htmlData = ""
+		def execName = ""
+		def newExecName = ""
+		String filePath = "${request.getRealPath('/')}//fileStore"
+		boolean executed = false
+		JsonObject jsonOutData = new JsonObject()
+		String  sName = scriptName
+		int i =0;
+		boolean valid = false;
+		boolean TCL = false;
+		try {
+			if(deviceInstance){
+				def category = deviceInstance.category
+				if(!TCL ){
+					def moduleName= scriptService.scriptMapping.get(scriptName)
+					if(moduleName){
+						def scriptInstance1 = scriptService.getScript(getRealPath(),moduleName, scriptName, category.toString())
+						if(scriptInstance1){
+							if(executionService.validateScriptBoxTypes(scriptInstance1,deviceInstance)){
+								String rdkVersion = executionService.getRDKBuildVersion(deviceInstance);
+								if(executionService.validateScriptRDKVersions(scriptInstance1,rdkVersion)){
+									valid = true
+								}else{
+									htmlData = "RDK Version supported by the script is not matching with the RDK Version of selected Device "+deviceInstance?.stbName+"<br>"
+								}
+							}else{
+								htmlData = message(code: 'execution.boxtype.nomatch')
+							}
+						}else{
+							htmlData = "No Script is available with name ${scriptName} in module ${moduleName}"
+						}
+					}else{
+						htmlData = "No module associated with script ${scriptName}"
+					}
+
+				}else{
+
+					def scriptInstance1 = [:]
+					boolean compoundTCL = false
+					def combainedTclScript =  scriptService?.combinedTclScriptMap
+					combainedTclScript?.each{
+						if(it?.value?.toString().contains(sName)){
+							compoundTCL = true
+						}
+					}
+					if((scriptService?.totalTclScriptList?.toString()?.contains(sName)) && compoundTCL ){
+						combainedTclScript?.each{
+							if(it?.value?.toString()?.contains(sName)){
+								sName = it.key?.toString()
+							}
+						}
+					}
+					def scriptValid = Utility.isTclScriptExists(realPath,  sName)
+					if(scriptValid) {
+						if(Utility.isConfigFileExists(realPath, deviceInstance?.stbName)){
+							scriptInstance1.put('scriptName',sName )
+							valid = true
+						}
+						else{
+							htmlData = "<br>"+stbName +"  : No Config file is available with name Config_${deviceInstance?.stbName}.txt"
+						}
+
+					}else{
+						htmlData = "<br>"+stbName +"  : No TCL Script is available with name ${scriptName}"
+					}
+				}
+				String status = ""
+				if(valid){
+					try {
+						status = DeviceStatusUpdater.fetchDeviceStatus(grailsApplication, deviceInstance)
+
+						synchronized (lock) {
+							if(executionService.deviceAllocatedList.contains(deviceInstance?.id)){
+								status = "BUSY"
+							}else{
+								if(!status.equals( Status.FREE.toString() )){
+									status = DeviceStatusUpdater.fetchDeviceStatus(grailsApplication, deviceInstance)
+								}
+								if((status.equals( Status.FREE.toString() ))){
+									if(!executionService.deviceAllocatedList.contains(deviceInstance?.id)){
+										executionService.deviceAllocatedList.add(deviceInstance?.id)
+										Thread.start{
+											deviceStatusService.updateOnlyDeviceStatus(deviceInstance, Status.BUSY.toString())
+										}
+									}
+								}
+							}
+						}
+					}
+					catch(Exception eX){
+					}
+			
+				status = status.trim()
+				if((status.equals( Status.FREE.toString() ))){
+					if(!executionService.deviceAllocatedList.contains(deviceInstance?.id)){
+						executionService.deviceAllocatedList.add(deviceInstance?.id)
+					}
+
+					def deviceName
+					ExecutionDevice executionDevice
+					def execution
+					def executionSaveStatus = true
+					DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT1)
+					Calendar cal = Calendar.getInstance()
+					deviceName = deviceInstance?.stbName
+
+
+					execName = CI_EXECUTION+deviceName+dateFormat.format(cal.getTime()).toString()
+					newExecName = execName
+
+					try {
+						executionSaveStatus =  executionService.saveExecutionDetails(execName,[scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:null,
+							appUrl:url, isBenchMark:timeInfo, isSystemDiagnostics:performance, rerun:reRunOnFailure, isLogReqd:FALSE,category:category?.toString(),rerunOnFailure:FALSE])
+					} catch (Exception e) {
+						executionSaveStatus = false
+					}
+
+					if(executionSaveStatus){
+						execution = Execution.findByName(execName)
+						try{
+							executionDevice = new ExecutionDevice()
+							executionDevice.execution = execution
+							executionDevice.dateOfExecution = new Date()
+							executionDevice.device = deviceInstance?.stbName
+							executionDevice.boxType = deviceInstance?.boxType?.name
+							executionDevice.deviceIp = deviceInstance?.stbIp
+							executionDevice.buildName = executionService.getBuildName( deviceInstance?.stbName )
+							executionDevice.status = UNDEFINED_STATUS
+							executionDevice.category = category
+							if(executionDevice.save(flush:true)){
+								String getRealPathString  = getRealPath()
+								StormExecuter.createThunderVersionFile(getRealPathString, execution?.id, executionDevice?.id, executionDevice?.deviceIp)
+								def rerun = null
+								if(reRunOnFailure?.equals(TRUE)){
+									rerun = "on"
+								}
+
+								if(repeat > 1){
+
+								}else{
+									if(!TCL ){
+										htmlData = executescriptService.executeScriptInThread(true,execName, ""+deviceInstance?.id, executionDevice, scriptName, "", execName,
+												filePath, getRealPath(), SINGLE_SCRIPT, url, timeInfo, performance, rerun,isLog,category?.toString(),1)
+                                        executed = true
+										url = url + "/execution/thirdPartyJsonResult?execName=${execName}"
+										jsonOutData.addProperty("status", "RUNNING")
+										jsonOutData.addProperty("result", url)
+
+									}else{
+										tclExecutionService.executeScriptInThread(execName, ""+deviceInstance?.id, executionDevice, scriptName, "", execName,
+												filePath, getRealPath(), SINGLE_SCRIPT, url, timeInfo, performance, rerun,isLog,category?.toString())
+										executed = true
+										url = url + "/execution/thirdPartyJsonResult?execName=${execName}"
+										jsonOutData.addProperty("status", "RUNNING")
+										jsonOutData.addProperty("result", url)
+									}
+
+								}
+							}
+						}
+						catch(Exception e){
+							println " ERROR "+e.getMessage()
+						}
+					}
+					else{
+						htmlData = htmlData + "Device ${deviceInstance?.stbName} is not free to execute Scripts"
+					}
+				}
+				else if(status.equals( Status.ALLOCATED.toString() )){
+					htmlData = htmlData + "Device ${deviceInstance?.stbName} is not free to execute Scripts"
+				}
+				else if(status.equals( Status.NOT_FOUND.toString() )){
+					htmlData = htmlData + "Device ${deviceInstance?.stbName} is not free to execute Scripts"
+				}
+				else if(status.equals( Status.HANG.toString() )){
+					htmlData = htmlData + "Device ${deviceInstance?.stbName} is not free to execute Scripts"
+				}
+				else if(status.equals( Status.BUSY.toString() )){
+					htmlData = htmlData + "Device ${deviceInstance?.stbName} is not free to execute Scripts"
+				}else if(status.equals( Status.TDK_DISABLED.toString() )){
+					htmlData = htmlData + "TDK is not enabled  in the Device to execute scripts"
+
+				}
+				else{
+					htmlData = htmlData + "Device ${deviceInstance?.stbName} is not free to execute Scripts"
+				}
+
+							
+				}
+
+			}else{
+				htmlData = "No device found with this name "+stbName
+			}
+		} finally {
+			if(!executed){
+				if(deviceInstance){
+					if(executionService.deviceAllocatedList.contains(deviceInstance?.id)){
+						executionService.deviceAllocatedList.removeAll(deviceInstance?.id)
+					}
+
+					String devStatus = DeviceStatusUpdater.fetchDeviceStatus(grailsApplication, deviceInstance)
+					Thread.start{
+						deviceStatusService.updateOnlyDeviceStatus(deviceInstance, devStatus)
+					}
+
+					Thread.sleep(1000);
+
+					Device devv = Device.get(deviceInstance?.id)
+					if(executionService.deviceAllocatedList.contains(deviceInstance?.id)){
+						executionService.deviceAllocatedList.removeAll(deviceInstance?.id)
 					}
 				}else{
 					htmlData = "No device found with this name "+stbName
@@ -3822,17 +4129,20 @@ class ExecutionController {
 		if(reRunOnFailure && reRunOnFailure?.equals(TRUE)){
 			rerun = TRUE
 		}
+		def deviceInstanceIsThunder = Device.findByStbName(stbName)
 		String time = FALSE
-		if(timeInfo && timeInfo?.equals(TRUE)){
-			time = TRUE
-		}
 		String perfo = FALSE
-		if(performance && performance?.equals(TRUE)){
-			perfo = TRUE
-		}
 		String isLog = FALSE
-		if(isLogRequired && isLogRequired?.equals(TRUE)){
-			isLog = TRUE
+		if(deviceInstanceIsThunder?.isThunderEnabled != 1){
+			if(timeInfo && timeInfo?.equals(TRUE)){
+				time = TRUE
+			}
+			if(performance && performance?.equals(TRUE)){
+				perfo = TRUE
+			}
+			if(isLogRequired && isLogRequired?.equals(TRUE)){
+				isLog = TRUE
+			}
 		}
 		JsonObject jsonOutData = new JsonObject()
 		boolean validScript = false
@@ -3985,7 +4295,11 @@ class ExecutionController {
 										executionDevice.category =Utility.getCategory(newCategory?.toString())
 										if(executionDevice.save(flush:true)){
 											String getRealPathString  = getRealPath()
-											executionService.executeVersionTransferScript(getRealPathString,filePath,execName, executionDevice?.id, deviceInstance?.stbName, deviceInstance?.logTransferPort, url)
+											if(deviceInstance?.isThunderEnabled != 1){
+												executionService.executeVersionTransferScript(getRealPathString,filePath,execName, executionDevice?.id, deviceInstance?.stbName, deviceInstance?.logTransferPort, url)
+											}else{
+												StormExecuter.createThunderVersionFile(getRealPathString, execution?.id, executionDevice?.id, executionDevice?.deviceIp)
+											}
 											if(!TCL){
 												htmlData = executescriptService.executeScriptInThread(true,execName, ""+deviceInstance?.id, executionDevice, newScriptList, "", execName,
 														filePath, getRealPath(), SINGLE_SCRIPT, url, time, perfo, rerun,isLog,newCategory?.toString(),1)
@@ -4059,7 +4373,6 @@ class ExecutionController {
 		}
 		render jsonOutData
 	}
-
 
 	/**
 	 * REST API : for getting the image name on a particular device

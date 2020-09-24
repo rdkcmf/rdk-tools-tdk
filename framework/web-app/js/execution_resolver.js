@@ -156,6 +156,58 @@ function showSingle(){
 	scheduleToggle();
 }
 
+function jsExecution(){
+	var testSuite = document.getElementById("testSuiteRadioThunder");
+	var singleTest = document.getElementById("singleTestRadioThunder");
+	var thunderJavascriptExecuteButtons = document.getElementById("thunderJavascriptExecuteButtons");
+	var thunderPythonExecuteButtons = document.getElementById("thunderPythonExecuteButtons");
+	thunderJavascriptExecuteButtons.style.display = "block";
+	thunderPythonExecuteButtons.style.display = "none";
+	document.getElementById("thunderExecutionType").value = "javascript";
+	document.getElementById("category").value = "RDKV_THUNDER"
+	if(singleTest.checked){
+		$('#testSuiteThunderPython').hide();
+		$('#singletestThunderPython').hide();
+		$('#testSuiteThunder').hide();
+		$('#singletestThunder').show();
+		$('#scriptSpan').show();
+		$('#testSuiteSpan').hide();
+	}else if(testSuite.checked){
+		$('#testSuiteThunderPython').hide();
+		$('#singletestThunderPython').hide();
+		$('#testSuiteThunder').show();
+		$('#singletestThunder').hide();
+		$('#scriptSpan').hide();
+		$('#testSuiteSpan').show();
+	}
+}
+
+function pythonExecution(){
+	var testSuite = document.getElementById("testSuiteRadioThunder");
+	var singleTest = document.getElementById("singleTestRadioThunder");
+	document.getElementById("thunderExecutionType").value = "python";
+	var thunderJavascriptExecuteButtons = document.getElementById("thunderJavascriptExecuteButtons");
+	var thunderPythonExecuteButtons = document.getElementById("thunderPythonExecuteButtons");
+	thunderJavascriptExecuteButtons.style.display = "none";
+	thunderPythonExecuteButtons.style.display = "block";
+	document.getElementById("category").value = "RDKV"
+	if(singleTest.checked){
+		$('#testSuiteThunderPython').hide();
+		$('#singletestThunderPython').show();
+		$('#testSuiteThunder').hide();
+		$('#singletestThunder').hide();
+		$('#scriptSpan').show();
+		$('#testSuiteSpan').hide();
+	}else if(testSuite.checked){
+		$('#testSuiteThunderPython').show();
+		$('#singletestThunderPython').hide();
+		$('#testSuiteThunder').hide();
+		$('#singletestThunder').hide();
+		$('#scriptSpan').hide();
+		$('#testSuiteSpan').show();
+	}
+}
+
 function showfullRepeat(){
 	var fullRepeatCount = document.getElementById("repeatId");
 	var individualRepeatCount = document.getElementById("individualRepeatId");
@@ -180,20 +232,46 @@ function showindividualRepeat(){
  * Function to display thunder test suites in execution page when the user clicks on a device
  */
 function showSuiteThunder(){
-	$('#testSuiteThunder').show();
-	$('#singletestThunder').hide();
-	$('#scriptSpan').hide();
-	$('#testSuiteSpan').show();
+	var executionTypePython = document.getElementById("pythonThunderRadio");
+	var executionTypeJavascript = document.getElementById("javaScriptThunderRadio");
+	if(executionTypePython.checked){
+		$('#testSuiteThunderPython').show();
+		$('#singletestThunderPython').hide();
+		$('#testSuiteThunder').hide();
+		$('#singletestThunder').hide();
+		$('#scriptSpan').hide();
+		$('#testSuiteSpan').show();
+	}else if(executionTypeJavascript.checked){
+		$('#testSuiteThunderPython').hide();
+		$('#singletestThunderPython').hide();
+		$('#testSuiteThunder').show();
+		$('#singletestThunder').hide();
+		$('#scriptSpan').hide();
+		$('#testSuiteSpan').show();
+	}
 }
 
 /**
  * Function to display thunder scripts in execution page when the user clicks on a device
  */
 function showSingleThunder(){
-	$('#singletestThunder').show();
-	$('#testSuiteThunder').hide();
-	$('#scriptSpan').show();
-	$('#testSuiteSpan').hide();
+	var executionTypePython = document.getElementById("pythonThunderRadio");
+	var executionTypeJavascript = document.getElementById("javaScriptThunderRadio");
+	if(executionTypePython.checked){
+		$('#testSuiteThunderPython').hide();
+		$('#singletestThunderPython').show();
+		$('#singletestThunder').hide();
+		$('#testSuiteThunder').hide();
+		$('#scriptSpan').show();
+		$('#testSuiteSpan').hide();
+	}else if(executionTypeJavascript.checked){
+		$('#testSuiteThunderPython').hide();
+		$('#singletestThunderPython').hide();
+		$('#singletestThunder').show();
+		$('#testSuiteThunder').hide();
+		$('#scriptSpan').show();
+		$('#testSuiteSpan').hide();
+	}
 }
 function pageLoadOnScriptType(category, id){
 	var isTestSuiteRadio = document.getElementById('testSuiteRadio').checked;
@@ -519,7 +597,7 @@ var repeatTaskThunder;
 function showWaitSpinner(){	
 	$("#popup").show();
 	$("#executeBtn").hide();
-	
+	$("#executeBtnPython").hide();
 	var execId = $('#exId').val();
 	var deviceList= $('#devices').val();
 	if(deviceList  && deviceList.length > 1 )
@@ -650,7 +728,12 @@ function completed(id) {
 function changeStyles(){
 	showDateTime();
 	$("#popup").hide();
-	$("#executeBtn").show();
+	var thunderExecutionType = document.getElementById("thunderExecutionType");
+	if(thunderExecutionType.value == "javascript"){
+		$("#executeBtn").show();
+	}else if(thunderExecutionType.value == "python"){
+		$("#executeBtnPython").show();
+	}
 }
 
 function baseScheduleTableRemove(){		

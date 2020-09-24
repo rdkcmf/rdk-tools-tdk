@@ -71,6 +71,10 @@ class ScriptService {
 	
 	public static volatile List scriptsListStorm = []
 	
+	public static volatile List scriptsListRdkService = []
+	
+	public static volatile List scriptsFileListRdkService = []
+	
 	def primitiveService
 
 	def scriptgroupService
@@ -94,8 +98,22 @@ class ScriptService {
 	}
 
 	def updateScript(def script, def category){
+		if(category == Category?.RDKV_RDKSERVICE.toString()){
+			if(!scriptsListRdkService.contains(script?.scriptName)){
+				scriptsListRdkService.add(script?.scriptName)
+			}
+		}
+		if(category == Category?.RDKV_RDKSERVICE.toString()){
+			if(!scriptsFileListRdkService.contains(script)){
+				scriptsFileListRdkService.add(script)
+			}
+		}
 		scriptsListMap.get(category)?.add(script)
-		scriptNameListMap.get(category)?.add(script?.scriptName)
+		if(category == Category?.RDKV_RDKSERVICE.toString()){
+			scriptNameListMap.get(Constants.RDKV)?.add(script?.scriptName)
+		}else{
+			scriptNameListMap.get(category)?.add(script?.scriptName)
+		}
 		def list = scriptGroupMap.get(script?.moduleName)
 		if(list == null){
 			list = []
@@ -147,18 +165,48 @@ class ScriptService {
 		def scriptnamelist =  scriptNameListMap.get(category)
 		scriptnamelist.add(newScript?.scriptName)
 		scriptnamelist.remove(oldName)
-		boolean removedOld = false
-		Iterator<ScriptFile> iter = scriptsListMap.get(category)?.iterator()
-		while(iter.hasNext()){
-			def obj = iter.next()
-			if(oldName.equals(obj.scriptName)){
-				iter.remove()
-				removedOld = true
+		if(newScript?.category == Category?.RDKV_RDKSERVICE){
+			boolean removedOld = false
+			Iterator<ScriptFile> iter = scriptsListMap.get(Constants.RDKV_RDKSERVICE)?.iterator()
+			while(iter?.hasNext()){
+				def obj = iter.next()
+				if(oldName.equals(obj.scriptName)){
+					iter.remove()
+					removedOld = true
+				}
 			}
-		}
-
-		if(removedOld){
-			scriptsListMap.get(category)?.add(newScript)
+			if(removedOld){
+				scriptsListMap.get(Constants.RDKV_RDKSERVICE)?.add(newScript)
+			}
+			if(scriptsListRdkService?.contains(oldName)){
+				scriptsListRdkService.remove(oldName)
+				scriptsListRdkService.add(newScript?.scriptName)
+			}
+			boolean removeOldSFile = false
+			Iterator<ScriptFile> iteratorSFile = scriptsFileListRdkService.iterator()
+			while(iteratorSFile?.hasNext()){
+				def obj = iteratorSFile.next()
+				if(oldName.equals(obj.scriptName)){
+					iteratorSFile.remove()
+					removeOldSFile = true
+				}
+			}
+			if(removeOldSFile){
+				scriptsFileListRdkService?.add(newScript)
+			}
+		}else{
+		    boolean removedOld = false
+		    Iterator<ScriptFile> iter = scriptsListMap.get(category)?.iterator()
+		    while(iter.hasNext()){
+			    def obj = iter.next()
+			    if(oldName.equals(obj.scriptName)){
+				    iter.remove()
+				    removedOld = true
+			    }
+		    }
+		    if(removedOld){
+			    scriptsListMap.get(category)?.add(newScript)
+		    }
 		}
 		def list = scriptGroupMap.get(newScript?.moduleName)
 		if(list == null){
@@ -182,14 +230,39 @@ class ScriptService {
 	}
 
 	def deleteScript(def script, def category){
-		def scriptslist = scriptsListMap.get(category)
-		if(!CollectionUtils.isEmpty(scriptslist)){
-			scriptslist.remove(script)
+		if(script?.category == Category?.RDKV_RDKSERVICE){
+			def scriptslist = scriptsListMap.get(Constants.RDKV_RDKSERVICE)
+			if(scriptslist && !CollectionUtils.isEmpty(scriptslist)){
+				scriptslist.remove(script)
+			}
+			if(scriptsListRdkService?.contains(script?.scriptName)){
+				scriptsListRdkService.remove(script?.scriptName)
+			}
+			boolean removeOldSFile = false
+			String scriptNameForRemoval = script?.scriptName
+			Iterator<ScriptFile> iteratorSFile = scriptsFileListRdkService.iterator()
+			while(iteratorSFile?.hasNext()){
+				def obj = iteratorSFile.next()
+				if(scriptNameForRemoval.equals(obj.scriptName)){
+					iteratorSFile.remove()
+					removeOldSFile = true
+				}
+			}
+			def scriptNamelist = scriptNameListMap.get(Constants.RDKV)
+			if(scriptNamelist && !CollectionUtils.isEmpty(scriptNamelist)){
+				scriptNamelist.remove(script?.scriptName)
+			}
+		}else{
+			def scriptslist = scriptsListMap.get(category)
+			if(!CollectionUtils.isEmpty(scriptslist)){
+				scriptslist.remove(script)
+			}
+			def scriptNamelist = scriptNameListMap.get(category)
+			if(!CollectionUtils.isEmpty(scriptNamelist)){
+				scriptNamelist.remove(script?.scriptName)
+			}
 		}
-		def scriptNamelist = scriptNameListMap.get(category)
-		if(!CollectionUtils.isEmpty(scriptNamelist)){
-			scriptNamelist.remove(script?.scriptName)
-		}
+
 		def list = scriptGroupMap.get(script?.moduleName)
 		if(!CollectionUtils.isEmpty(list)){
 			list.remove(script?.scriptName)
@@ -208,7 +281,6 @@ class ScriptService {
 			def scriptFileList = ScriptFile?.findAll()
 			scriptsList.clear()
 			List scriptList = []
-
 			boolean updateReqd = isDefaultSGUpdateRequired(realPath)
 
 			List dirList = [Constants.COMPONENT, Constants.INTEGRATION]
@@ -219,19 +291,21 @@ class ScriptService {
 					if(scriptsDir.exists()){
 						def modules = scriptsDir.listFiles()
 
-
 						//Arrays.sort(modules);
 
 						modules.each { module ->
-							def category = null
-							if(Constants.TESTSCRIPTS_RDKV.equals(fileStorePath) || Constants.TESTSCRIPTS_RDKV_ADV.equals(fileStorePath)){
-								category = Constants.RDKV
-							}else if(Constants.TESTSCRIPTS_RDKB.equals(fileStorePath) || Constants.TESTSCRIPTS_RDKB_ADV.equals(fileStorePath)){
-								category = Constants.RDKB
-							}else if(Constants.TESTSCRIPTS_RDKC.equals(fileStorePath)){
-								category = Constants.RDKC
+							String moduleNameString = module.toString()
+							if(!moduleNameString.contains(Constants.RDKSERVICES)){
+								def category = null
+								if(Constants.TESTSCRIPTS_RDKV.equals(fileStorePath) || Constants.TESTSCRIPTS_RDKV_ADV.equals(fileStorePath)){
+									category = Constants.RDKV
+								}else if(Constants.TESTSCRIPTS_RDKB.equals(fileStorePath) || Constants.TESTSCRIPTS_RDKB_ADV.equals(fileStorePath)){
+									category = Constants.RDKB
+								}else if(Constants.TESTSCRIPTS_RDKC.equals(fileStorePath)){
+									category = Constants.RDKC
+								}
+								initialize( module, updateReqd, realPath, category,fileStorePath)
 							}
-							initialize( module, updateReqd, realPath, category,fileStorePath)
 						}
 					}
 
@@ -241,12 +315,82 @@ class ScriptService {
 			//removeOrphanScriptFile(realPath,scriptFileList, scriptsList)
 			initializeTCLScripts("${realPath}//fileStore//"+FileStorePath.RDKTCL.value())
 			initializeThunderScripts("${realPath}")
+			initializeRdkServiceScripts("${realPath}")
 			//removeOrphanScriptFile(realPath,scriptFileList, scriptsListMap) // debug needed
 		} catch (Exception e) {
 			e.printStackTrace()
 		}
-
 		return scriptsList
+	}
+	
+	/**
+	 * Method to initialize thunder rdk service scripts
+	 *
+	 */
+	def initializeRdkServiceScripts(def realPath){
+		try {
+			File directory = new File( "${realPath}//fileStore//"+Constants.TESTSCRIPTS_RDKV+"//"+Constants.COMPONENT+"//"+Constants.RDKSERVICES+"//")
+				if(directory.exists()){
+					List scriptsListRdkServiceTemp = []
+					List scriptsFileListRdkServiceTemp = []
+					List sLstEmpty = []
+					scriptGroupMap.put(Constants.RDKSERVICES,sLstEmpty)
+					List sLst = []
+					File [] testscriptfiles = directory.listFiles(new FilenameFilter() {
+						@Override
+						public boolean accept(File dir, String name) {
+							return name.endsWith(".py");
+						}
+					});
+					testscriptfiles.each { testscriptfile ->
+							String fileName = ""+testscriptfile?.name?.trim()?.replace(".py", "")
+							if(scriptGroupMap.keySet().contains(Constants.RDKSERVICES)){
+								sLst = scriptGroupMap.get(Constants.RDKSERVICES)
+							}
+							if(!sLst.contains(fileName)){
+								sLst?.add(fileName)
+							}
+							def scriptNameListmap = scriptNameListMap.get(Constants.RDKV)
+							if(scriptNameListmap == null){
+								scriptNameListmap = []
+								scriptNameListMap.put(Constants.RDKV, scriptNameListmap)
+							}
+			
+							if(!scriptNameListmap.contains(fileName)){
+								scriptNameListmap.add(fileName)
+							}
+							if(!scriptsListRdkServiceTemp.contains(fileName)){
+								scriptsListRdkServiceTemp.add(fileName)
+							}
+							thunderScriptService.saveRdkServiceThunderScriptFile(fileName)
+							def scriptName =ScriptFile.findByScriptNameAndCategory(fileName, Category.RDKV_RDKSERVICE)
+							if(scriptName && !scriptsFileListRdkServiceTemp.contains(scriptName)){
+								scriptsFileListRdkServiceTemp.add(scriptName)
+							}
+							if(!scriptMapping.containsKey(fileName)){
+								scriptMapping.put(fileName, Constants.RDKSERVICES)
+							}
+							if(!scriptsListMap.get(Constants.RDKV_RDKSERVICE)?.contains(scriptName) && scriptName){
+								scriptsListMap.get(Constants.RDKV_RDKSERVICE)?.add(scriptName)
+							}
+							boolean updateReqd = isDefaultSGUpdateRequiredThunder()
+							if(scriptName && updateReqd){
+								updateRdkServiceScriptSuite(Constants.RDKSERVICES, scriptName , Category.RDKV_RDKSERVICE)
+							}
+					}
+					scriptGroupMap.put(Constants.RDKSERVICES,sLst)
+					if(scriptsListRdkServiceTemp?.size() >= 0){
+						scriptsListRdkService.clear()
+						scriptsListRdkService = scriptsListRdkServiceTemp?.clone()
+					}
+					if(scriptsFileListRdkServiceTemp?.size() >= 0){
+						scriptsFileListRdkService.clear()
+						scriptsFileListRdkService = scriptsFileListRdkServiceTemp?.clone()
+					}
+				}
+		}catch (Exception e) {
+			e.printStackTrace()
+		}
 	}
 
 	/**
@@ -374,7 +518,7 @@ class ScriptService {
 	}
 	
 	/**
-	 * Updating Firebolt script suite
+	 * Updating Thunder script suite
 	 * @param scriptFileInstance
 	 * @param category
 	 * @return
@@ -395,6 +539,31 @@ class ScriptService {
 			}
 			moduleName =  directory
 			scriptGrpInstance = ScriptGroup.findByName(moduleName)
+			if(!scriptGrpInstance){
+				scriptGrpInstance = new ScriptGroup()
+				scriptGrpInstance.name = moduleName
+				scriptGrpInstance.scriptList = []
+				scriptGrpInstance.category = Utility.getCategory(category)
+				scriptGrpInstance.save()
+			}
+			if(!scriptGrpInstance?.scriptList?.contains(scriptFileInstance)){
+				scriptGrpInstance.addToScriptList(scriptFileInstance)
+			}
+		}catch(Exception e){
+			log.error " Error "+ e.printStackTrace()
+		}
+	}
+	
+	/**
+	 * Updating RdkService script suite
+	 * @param scriptFileInstance
+	 * @param category
+	 * @return
+	 */
+	def updateRdkServiceScriptSuite(def String directory, def ScriptFile scriptFileInstance , def String category){
+		try{
+			def moduleName =  Constants.RDKSERVICES
+			def scriptGrpInstance = ScriptGroup.findByName(moduleName)
 			if(!scriptGrpInstance){
 				scriptGrpInstance = new ScriptGroup()
 				scriptGrpInstance.name = moduleName
@@ -514,9 +683,30 @@ class ScriptService {
 		 }
 		 return scriptsListStorm
 	 }
+	 
+	 /**
+	  * Method to get all rdkservice script names as a list
+	  * @return
+	  */
+	 def getScriptNameFileListRdkService(def realPath, def category){
+		 if(scriptsListRdkService == null || scriptsListRdkService.size() == 0){
+			 initializeRdkServiceScripts(realPath)
+		 }
+		 return scriptsListRdkService
+	 }
+	 
+	 /**
+	  * Method to get all rdkservice scriptfile objects as a list
+	  * @return
+	  */
+	 def getScriptFileListRdkService(def realPath, def category){
+		 if(scriptsFileListRdkService == null || scriptsFileListRdkService.size() == 0){
+			 initializeRdkServiceScripts(realPath)
+		 }
+		 return scriptsFileListRdkService
+	 }
 
 	private void initialize(def module, def updateReqd, def realPath, def category,def fileStorePath){
-
 		def start1 =System.currentTimeMillis()
 		try {
 			File [] files = module.listFiles(new FilenameFilter() {
@@ -1609,86 +1799,88 @@ class ScriptService {
 						def modules = scriptsDir.listFiles()
 						Arrays.sort(modules);
 						modules.each { module ->
-							def start1 =System.currentTimeMillis()
-							try {
-								File [] files = module.listFiles(new FilenameFilter() {
+							String moduleNameString = module?.toString()
+							if(!moduleNameString.contains(Constants.RDKSERVICES)){
+								def start1 =System.currentTimeMillis()
+								try {
+									File [] files = module.listFiles(new FilenameFilter() {
 											@Override
 											public boolean accept(File dir, String name) {
 												return name.endsWith(".py");
 											}
-										});
-								def start2 = System.currentTimeMillis()
-								def sLst = []
-								if(tempScriptGroupMap.keySet().contains(module?.getName())){
-									sLst = tempScriptGroupMap.get(module?.getName())
-								}
-								files.each { file ->
-									String name = ""+file?.name?.trim()?.replace(".py", "")
-									def sFile
-									if(!sLst.contains(name)){
-										sLst.add(name)
+									});
+									def start2 = System.currentTimeMillis()
+									def sLst = []
+									if(tempScriptGroupMap.keySet().contains(module?.getName())){
+										sLst = tempScriptGroupMap.get(module?.getName())
 									}
-									ScriptFile.withTransaction {
+									files.each { file ->
+										String name = ""+file?.name?.trim()?.replace(".py", "")
+										def sFile
+										if(!sLst.contains(name)){
+											sLst.add(name)
+										}
+										ScriptFile.withTransaction {
+											sFile = ScriptFile.findByScriptNameAndModuleName(name,module.getName())
+											if(sFile == null){
+												sFile = new ScriptFile()
+												sFile.setModuleName(module?.getName())
+												sFile.setScriptName(name)
+											}
+											sFile.category = Utility.getCategory(category)
+											sFile.save(flush:true)
+										}
+
 										sFile = ScriptFile.findByScriptNameAndModuleName(name,module.getName())
-										if(sFile == null){
-											sFile = new ScriptFile()
-											sFile.setModuleName(module?.getName())
-											sFile.setScriptName(name)
+
+										def scriptsListmap = scriptsListMap.get(category)
+										if(scriptsListmap == null){
+											scriptsListmap = []
+											scriptsListMap.put(category, scriptsListmap)
 										}
-										sFile.category = Utility.getCategory(category)
-										sFile.save(flush:true)
-									}
+										if(!scriptsListmap.contains(sFile)){
+											scriptsListmap.add(sFile)
+											scriptMapping.put(name, module?.getName())
+										}
 
-									sFile = ScriptFile.findByScriptNameAndModuleName(name,module.getName())
-
-									def scriptsListmap = scriptsListMap.get(category)
-									if(scriptsListmap == null){
-										scriptsListmap = []
-										scriptsListMap.put(category, scriptsListmap)
-									}
-									if(!scriptsListmap.contains(sFile)){
-										scriptsListmap.add(sFile)
-										scriptMapping.put(name, module?.getName())
-									}
-
-									def scriptNameListmap = scriptNameListMap.get(category)
-									if(scriptNameListmap == null){
-										scriptNameListmap = []
-										scriptNameListMap.put(category, scriptNameListmap)
-									}
-									if(!scriptNameListmap.contains(name)){
-										scriptNameListmap.add(name)
-									}
-									if(!scriptsList.contains(sFile)){
-										scriptsList.add(sFile)
-										scriptMapping.put(name, module?.getName())
-									}
-									scriptsListAdvanced.put(sFile?.id, path)
-									if(!scriptNameList.contains(name)){
-										scriptNameList.add(name)
-									}
-									if(updateReqd == true){
-										updateDefaultScriptGroups(realPath,name,module?.getName(), category)
-									}
-								}
-
-								sLst?.sort()
-
-								totalScriptList?.each{ key, value ->
-									if( key.toString()  ==  module.getName()?.toString()){
-										if(!(value?.equals(sLst))){
-											scriptGroupMap.put(module?.getName(), sLst)
-											tempScriptGroupMap.put(module?.getName(), sLst)
-											value1 = false
-										}else {
-											value1 = true
+										def scriptNameListmap = scriptNameListMap.get(category)
+										if(scriptNameListmap == null){
+											scriptNameListmap = []
+											scriptNameListMap.put(category, scriptNameListmap)
+										}
+										if(!scriptNameListmap.contains(name)){
+											scriptNameListmap.add(name)
+										}
+										if(!scriptsList.contains(sFile)){
+											scriptsList.add(sFile)
+											scriptMapping.put(name, module?.getName())
+										}
+										scriptsListAdvanced.put(sFile?.id, path)
+										if(!scriptNameList.contains(name)){
+											scriptNameList.add(name)
+										}
+										if(updateReqd == true){
+											updateDefaultScriptGroups(realPath,name,module?.getName(), category)
 										}
 									}
+
+									sLst?.sort()
+
+									totalScriptList?.each{ key, value ->
+										if( key.toString()  ==  module.getName()?.toString()){
+											if(!(value?.equals(sLst))){
+												scriptGroupMap.put(module?.getName(), sLst)
+												tempScriptGroupMap.put(module?.getName(), sLst)
+												value1 = false
+											}else {
+												value1 = true
+											}
+										}
+									}
+								} catch (Exception e) {
+									e.printStackTrace()
 								}
-							} catch (Exception e) {
-								e.printStackTrace()
 							}
-
 						}
 					}
 				}

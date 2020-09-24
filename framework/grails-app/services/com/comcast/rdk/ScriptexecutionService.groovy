@@ -188,42 +188,36 @@ class ScriptexecutionService {
 			scriptGroup.scriptList.each { scrpt ->
 				def script = scriptService.getScript(realPath, scrpt?.moduleName, scrpt?.scriptName, category.toString())
 				if(script){
-				if(validateBoxTypeOfScripts(script,boxType)){
-					if(executionService.validateScriptRDKVersions(script, rdkVersion)){
-						if(script?.skip?.toString().equals("true")){
-							skipStatus = true
-							executionService.saveSkipStatus(Execution.findByName(execName), ExecutionDevice.findById(execDeviceId), script, deviceInstance, category.toString())
-						}else{
-							validScripts << script
-						}
-					}else{
-						notApplicable =true
-						String rdkVersionData = ""
+				    if(validateBoxTypeOfScripts(script,boxType)){
+					    if(executionService.validateScriptRDKVersions(script, rdkVersion)){
+						    if(script?.skip?.toString().equals("true")){
+							    skipStatus = true
+							    executionService.saveSkipStatus(Execution.findByName(execName), ExecutionDevice.findById(execDeviceId), script, deviceInstance, category.toString())
+						    }else{
+							    validScripts << script
+						    }
+					    }else{
+						    notApplicable =true
+						    String rdkVersionData = ""
 							rdkVersionData = script?.rdkVersions
-
-						String reason = "RDK Version mismatch.<br>Device RDK Version : "+rdkVersion+", Script supported RDK Versions :"+rdkVersionData
-						executionService.saveNotApplicableStatus(Execution.findByName(execName), ExecutionDevice.findById(execDeviceId), script, deviceInstance,reason, category.toString())
-					}
-				}else{
-					notApplicable = true
-					String boxTypeData = ""
-
-					String deviceBoxType = ""
-
-					Device.withTransaction {
-						Device dev = Device.findById(deviceInstance?.id)
-						deviceBoxType = dev?.boxType
-					}
-
+						    String reason = "RDK Version mismatch.<br>Device RDK Version : "+rdkVersion+", Script supported RDK Versions :"+rdkVersionData
+						    executionService.saveNotApplicableStatus(Execution.findByName(execName), ExecutionDevice.findById(execDeviceId), script, deviceInstance,reason, category.toString())
+					    }
+				    }else{
+					    notApplicable = true
+					    String boxTypeData = ""
+					    String deviceBoxType = ""
+					    Device.withTransaction {
+						    Device dev = Device.findById(deviceInstance?.id)
+						    deviceBoxType = dev?.boxType
+					    }
 						boxTypeData = script?.boxTypes
-
-					String reason = "Box Type mismatch.<br>Device Box Type : "+deviceBoxType+", Script supported Box Types :"+boxTypeData
-					executionService.saveNotApplicableStatus(Execution.findByName(execName), ExecutionDevice.findById(execDeviceId), script, deviceInstance,reason, category.toString())
-				}
-				}else{
+					    String reason = "Box Type mismatch.<br>Device Box Type : "+deviceBoxType+", Script supported Box Types :"+boxTypeData
+					    executionService.saveNotApplicableStatus(Execution.findByName(execName), ExecutionDevice.findById(execDeviceId), script, deviceInstance,reason, category.toString())
+				    }
+			    }else{
 					String reason = "No script is available with name :"+scrpt?.scriptName+" in module :"+scrpt?.moduleName
 					executionService.saveNoScriptAvailableStatus(Execution.findByName(execName), ExecutionDevice.findById(execDeviceId), scrpt?.scriptName, deviceInstance,reason, category.toString())
-				
 				}
 			}
 			int scriptGrpSize = validScripts?.size()
@@ -267,7 +261,7 @@ class ScriptexecutionService {
 							deviceStatusService.updateDeviceStatus(deviceInstance, devStatus)
 						}*/
 						
-						if(devStatus.equals(Status.HANG.toString())){
+						if(devStatus.equals(Status.HANG.toString()) && deviceInstance?.isThunderEnabled != 1){
 							executionService.resetAgent(deviceInstance, TRUE)
 							Thread.sleep(6000)
 							devStatus = DeviceStatusUpdater.fetchDeviceStatus(grailsApplication, deviceInstance)
@@ -282,15 +276,15 @@ class ScriptexecutionService {
 					def startExecutionTime = new Date()
 					try {
 						executionStarted = true
-								def htmlData = executeScripts(execName, execDeviceId, scriptInstance , deviceInstance , url, filePath, realPath, isMultiple, isBenchMark,isSystemDiagnostics,isLogReqd,rerun, category)
-								if(isMultiple.equals("false")){
-									Execution.withTransaction {
-										Execution executionInstance = Execution.findByName(execName)
-												executionInstance.executionStatus = COMPLETED_STATUS
-												executionInstance.save(flush:true)
-									}
-								}
-					} catch (Exception e) {
+						def htmlData = executeScripts(execName, execDeviceId, scriptInstance , deviceInstance , url, filePath, realPath, isMultiple, isBenchMark,isSystemDiagnostics,isLogReqd,rerun, category)
+						if(isMultiple.equals("false")){
+							Execution.withTransaction {
+								Execution executionInstance = Execution.findByName(execName)
+								executionInstance.executionStatus = COMPLETED_STATUS
+								executionInstance.save(flush:true)
+							}
+						}
+					}catch(Exception e){
 						e.printStackTrace()
 					}
 					def endExecutionTime = new Date()
@@ -344,8 +338,9 @@ class ScriptexecutionService {
 					executionInstance.isAborted = true
 					executionInstance.save(flush:true)
 				}
-				
-				executionService.resetAgent(deviceInstance, FALSE)
+				if(deviceInstance?.isThunderEnabled != 1){
+				    executionService.resetAgent(deviceInstance, FALSE)
+				}
 			}
 			
 			if(pause && pendingScripts.size() > 0 ){
@@ -696,7 +691,6 @@ class ScriptexecutionService {
 	 */
 	def String executeScripts(String executionName, String execDeviceId, def scriptInstance,
 			Device deviceInstance, final String url, final String filePath, final String realPath, final String isMultiple, final String isBenchMark,final String  isSystemDiagnostics, final String isLogReqd, final String rerun, final String category ) {
-	
 		String htmlData = ""
 		Date startTime = new Date()
 		String scriptData = convertScriptFromHTMLToPython(scriptInstance.scriptContent)
@@ -869,22 +863,23 @@ class ScriptexecutionService {
 			executescriptService.transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId,realPath,url)
 		}
 		
-			
-		//def logTransferFilePath = "${realPath}/logs//consolelog//${executionId}//${execDeviceId}//${executionResultId}//"
-		//new File("${realPath}/logs//consolelog//${executionId}//${execDeviceId}//${executionResultId}").mkdirs()
-		def logTransferFileName1 = "${executionId}_${execDeviceId}_${executionResultId}_AgentConsoleLog.txt"
-		def logTransferFilePath = "${realPath}/logs//consolelog//${executionId}//${execDeviceId}//${executionResultId}//"
-		executescriptService.logTransfer(deviceInstance,logTransferFilePath,logTransferFileName1, realPath,executionId,execDeviceId,executionResultId,url)
+		if(deviceInstance?.isThunderEnabled != 1){
+		    //def logTransferFilePath = "${realPath}/logs//consolelog//${executionId}//${execDeviceId}//${executionResultId}//"
+		    //new File("${realPath}/logs//consolelog//${executionId}//${execDeviceId}//${executionResultId}").mkdirs()
+		    def logTransferFileName1 = "${executionId}_${execDeviceId}_${executionResultId}_AgentConsoleLog.txt"
+		    def logTransferFilePath = "${realPath}/logs//consolelog//${executionId}//${execDeviceId}//${executionResultId}//"
+		    executescriptService.logTransfer(deviceInstance,logTransferFilePath,logTransferFileName1, realPath,executionId,execDeviceId,executionResultId,url)
 
-		
+		}
 		outData?.eachLine { line ->
-			htmlData += (line + HTML_BR )
+		    htmlData += (line + HTML_BR )
 		}
 		
 		file.delete()			
 		//TFTP  New Changes 
 		def logPath = "${realPath}/logs//${executionId}//${execDeviceId}//${executionResultId}//"
 		executescriptService.copyLogsIntoDir(realPath,logPath, executionId,execDeviceId,executionResultId)
+
 		String outputData = htmlData
 		
 		Date execEndDate = new Date()
@@ -927,39 +922,42 @@ class ScriptexecutionService {
 		   /* Execution.executeUpdate("update Execution c set c.outputData = :newStatus , c.executionTime = :newTime where c.id = :execId",
 				[newStatus: outputData, newTime: timeDiff, execId: executionId.toLong()])*/
 	   // }
-		if(executionService.abortList.contains(executionInstance?.id?.toString())){
+		if(executionService.abortList.contains(executionInstance?.id?.toString())&& deviceInstance?.isThunderEnabled != 1){
 			executionService.resetAgent(deviceInstance,TRUE)
 		}	else if(htmlData.contains(TDK_ERROR)){
 			htmlData = htmlData.replaceAll(TDK_ERROR,"")
 			if(htmlData.contains("SCRIPTEND#!@~")){
 				htmlData = htmlData.replaceAll("SCRIPTEND#!@~","")
 			}
-			executescriptService.logTransfer(deviceInstance,logTransferFilePath,logTransferFileName,realPath, executionId,execDeviceId, executionResultId,url)
+			if(deviceInstance?.isThunderEnabled != 1){
+			    executescriptService.logTransfer(deviceInstance,logTransferFilePath,logTransferFileName,realPath, executionId,execDeviceId, executionResultId,url)
+			}
 			if(isLogReqd){
 				executescriptService.transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId, realPath,url)
 			}	
 			
-			
 			executionService.updateExecutionResultsError(htmlData,executionResult?.id,executionInstance?.id,executionDeviceInstance?.id,timeDiff.toString(),singleScriptExecTime)
 			Thread.sleep(5000)
-			File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callResetAgent.py").file
-			def absolutePath = layoutFolder.absolutePath
-			String[] cmd = [
-				PYTHON_COMMAND,
-				absolutePath,
-				deviceInstance?.stbIp,
-				deviceInstance?.agentMonitorPort,
-				"true"
-			]
-			def resetExecutionData
-			try {
-				ScriptExecutor scriptExecutor = new ScriptExecutor()
-				resetExecutionData = scriptExecutor.executeScript(cmd,1)
-				executionService.callRebootOnAgentResetFailure(resetExecutionData, deviceInstance)
-			} catch (Exception e) {
+			if(deviceInstance?.isThunderEnabled != 1){
+			    File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callResetAgent.py").file
+			    def absolutePath = layoutFolder.absolutePath
+			    String[] cmd = [
+				    PYTHON_COMMAND,
+				    absolutePath,
+				    deviceInstance?.stbIp,
+				    deviceInstance?.agentMonitorPort,
+				    "true"
+			    ]
+			    def resetExecutionData
+			    try {
+				    ScriptExecutor scriptExecutor = new ScriptExecutor()
+				    resetExecutionData = scriptExecutor.executeScript(cmd,1)
+				    executionService.callRebootOnAgentResetFailure(resetExecutionData, deviceInstance)
+			   }catch(Exception e){
 				e.printStackTrace()
-			}
-			Thread.sleep(6000)
+			   }
+			   Thread.sleep(6000)
+		    }
 		}
 		else{
 			if(htmlData.contains("SCRIPTEND#!@~")){
@@ -968,9 +966,10 @@ class ScriptexecutionService {
 				executionService.updateExecutionResults(outputData1,executionResult?.id,executionInstance?.id,executionDeviceInstance?.id,timeDiff.toString(),singleScriptExecTime)
 			}
 			else{
-				if((timeDifference >= scriptInstance.executionTime) && (scriptInstance.executionTime != 0))	{
-					File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callResetAgent.py").file
-					def absolutePath = layoutFolder.absolutePath
+				if((timeDifference >= scriptInstance.executionTime) && (scriptInstance.executionTime != 0) ){
+					if(deviceInstance?.isThunderEnabled != 1){
+						File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callResetAgent.py").file
+						def absolutePath = layoutFolder.absolutePath
 						String[] cmd = [
 							PYTHON_COMMAND,
 							absolutePath,
@@ -984,28 +983,37 @@ class ScriptexecutionService {
 						executionService.updateExecutionResultsTimeOut(htmlData,executionResult?.id,executionInstance?.id,executionDeviceInstance?.id,timeDiff.toString(),singleScriptExecTime)
 						Thread.sleep(6000)
 						executionService.callRebootOnAgentResetFailure(resetExecutionData, deviceInstance)
+					}else{
+						executionService.updateExecutionResultsTimeOut(htmlData,executionResult?.id,executionInstance?.id,executionDeviceInstance?.id,timeDiff.toString(),singleScriptExecTime)
+						Thread.sleep(6000)
+					}
 				}else{
 					try {
-						executionService.updateExecutionResultsError(htmlData,executionResult?.id,executionInstance?.id,executionDeviceInstance?.id,timeDiff.toString(),singleScriptExecTime)
-						Thread.sleep(5000)
-						File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callResetAgent.py").file
-						def absolutePath = layoutFolder.absolutePath
-						String[] cmd = [
-							PYTHON_COMMAND,
-							absolutePath,
-							deviceInstance?.stbIp,
-							deviceInstance?.agentMonitorPort,
-							"false"
-						]
-						def resetExecutionData
-						try {
-							ScriptExecutor scriptExecutor = new ScriptExecutor()
-							resetExecutionData = scriptExecutor.executeScript(cmd,1)
-							executionService.callRebootOnAgentResetFailure(resetExecutionData, deviceInstance)
-						} catch (Exception e) {
-							e.printStackTrace()
+						if(deviceInstance?.isThunderEnabled != 1){
+							executionService.updateExecutionResultsError(htmlData,executionResult?.id,executionInstance?.id,executionDeviceInstance?.id,timeDiff.toString(),singleScriptExecTime)
+							Thread.sleep(5000)
+							File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callResetAgent.py").file
+							def absolutePath = layoutFolder.absolutePath
+							String[] cmd = [
+								PYTHON_COMMAND,
+								absolutePath,
+								deviceInstance?.stbIp,
+								deviceInstance?.agentMonitorPort,
+								"false"
+							]
+							def resetExecutionData
+							try {
+								ScriptExecutor scriptExecutor = new ScriptExecutor()
+								resetExecutionData = scriptExecutor.executeScript(cmd,1)
+								executionService.callRebootOnAgentResetFailure(resetExecutionData, deviceInstance)
+							} catch (Exception e) {
+								e.printStackTrace()
+							}
+							Thread.sleep(6000)
+						}else{
+							executionService.updateExecutionResultsError(htmlData,executionResult?.id,executionInstance?.id,executionDeviceInstance?.id,timeDiff.toString(),singleScriptExecTime)
+							Thread.sleep(6000)
 						}
-						Thread.sleep(6000)
 					} catch (Exception e) {
 						e.printStackTrace()
 					}

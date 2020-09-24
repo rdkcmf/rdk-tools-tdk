@@ -152,6 +152,7 @@ class BootStrap {
 		createTclModule()
 		//create thunder module if it doesn't exist
 		createThunderModule()
+		createRdkServiceModule()
 		/*List<Script> scriptList = Script.list()
 		
 		scriptList.each{ scriptInstance ->
@@ -313,28 +314,28 @@ class BootStrap {
 	def migratetoUnifiedTM(){
         println " migrate to UnifiedTM Start "
        
-        BoxType.executeUpdate("update BoxType m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        Function.executeUpdate("update Function m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        Module.executeUpdate("update Module m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        RDKVersions.executeUpdate("update RDKVersions m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        ScriptFile.executeUpdate("update ScriptFile m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        ScriptTag.executeUpdate("update ScriptTag m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        SoCVendor.executeUpdate("update SoCVendor m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        BoxManufacturer.executeUpdate("update BoxManufacturer m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
+        BoxType.executeUpdate("update BoxType m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        Function.executeUpdate("update Function m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        Module.executeUpdate("update Module m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        RDKVersions.executeUpdate("update RDKVersions m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        ScriptFile.executeUpdate("update ScriptFile m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        ScriptTag.executeUpdate("update ScriptTag m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        SoCVendor.executeUpdate("update SoCVendor m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        BoxManufacturer.executeUpdate("update BoxManufacturer m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
        
-        ScriptGroup.executeUpdate("update ScriptGroup m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
+        ScriptGroup.executeUpdate("update ScriptGroup m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
        
-        Device.executeUpdate("update Device m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        DeviceGroup.executeUpdate("update DeviceGroup m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        ExecuteMethodResult.executeUpdate("update ExecuteMethodResult m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        Execution.executeUpdate("update Execution m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        ExecutionDevice.executeUpdate("update ExecutionDevice m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        ExecutionResult.executeUpdate("update ExecutionResult m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
+        Device.executeUpdate("update Device m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        DeviceGroup.executeUpdate("update DeviceGroup m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        ExecuteMethodResult.executeUpdate("update ExecuteMethodResult m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        Execution.executeUpdate("update Execution m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        ExecutionDevice.executeUpdate("update ExecutionDevice m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        ExecutionResult.executeUpdate("update ExecutionResult m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
        
-        JobDetails.executeUpdate("update JobDetails m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        Performance.executeUpdate("update Performance m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        RepeatPendingExecution.executeUpdate("update RepeatPendingExecution m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
-        ThirdPartyExecutionDetails.executeUpdate("update ThirdPartyExecutionDetails m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC]);
+        JobDetails.executeUpdate("update JobDetails m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        Performance.executeUpdate("update Performance m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        RepeatPendingExecution.executeUpdate("update RepeatPendingExecution m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
+        ThirdPartyExecutionDetails.executeUpdate("update ThirdPartyExecutionDetails m set m.category=:rdkvcat where m.category !=:rdkbcat and category !=:rdkbtclcat and category !=:rdkvthundercat and category !=:rdkc and category !=:rdkvrdkservicecat",[rdkvcat:Category.RDKV,rdkbcat:Category.RDKB,rdkbtclcat:Category.RDKB_TCL,rdkvthundercat:Category.RDKV_THUNDER,rdkc:Category.RDKC,rdkvrdkservicecat:Category.RDKV_RDKSERVICE]);
        
         println " migrate to UnifiedTM End "
     }
@@ -353,6 +354,29 @@ class BootStrap {
 				moduleInstance.groups= null
 			   
 				moduleInstance.category= Category.RDKV_THUNDER
+				if(!moduleInstance.save(flush:true)){
+					moduleInstance.errors.each{
+						println it
+					}
+				}
+			}
+		}
+	}
+	
+	
+	/**
+	 * Method to create RdkService module if it is not already present
+	 * @return
+	 */
+	def createRdkServiceModule() {
+		def rdkServiceModule = Module.findByName(Constants.RDKSERVICES)
+		if(rdkServiceModule == null){
+			Module?.withTransaction{
+				def moduleInstance = new Module()
+				moduleInstance.name = Constants.RDKSERVICES
+				moduleInstance.testGroup = TestGroup.Component
+				moduleInstance.groups= null
+				moduleInstance.category= Category.RDKV
 				if(!moduleInstance.save(flush:true)){
 					moduleInstance.errors.each{
 						println it

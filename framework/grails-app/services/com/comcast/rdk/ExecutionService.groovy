@@ -1294,50 +1294,51 @@ class ExecutionService {
 	 * @return
 	 */
 	def getRDKBuildVersion(Device device){
-		
 		def outputData
 		def absolutePath
 		def boxIp = device?.stbIp
 		def port = device?.agentMonitorPort
-
-		File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callGetRDKVersion.py").file
-		absolutePath = layoutFolder.absolutePath
-
-		try {
-			if(boxIp != null && port != null ){
-				String[] cmd = [
-				                PYTHON_COMMAND,
-				                absolutePath,
-				                boxIp,
-				                port
-				                ]
-				                		
-				ScriptExecutor scriptExecutor = new ScriptExecutor()
-				outputData = scriptExecutor.executeScript(cmd,1)
-			}
-		} catch (Exception e) {
-			e.printStackTrace()
-		}
-		if(outputData){
-			outputData = outputData.trim()
-		}else{
-			outputData = ""
-		}
+		boolean isThunderEnabled = device?.isThunderEnabled
 		String rdkVersion = ""
-		if(outputData.equals("METHOD_NOT_FOUND") || outputData.equals("AGENT_NOT_FOUND") || outputData.equals("NOT_DEFINED")){
-			rdkVersion = "NOT_AVAILABLE"
-		}else if(outputData.contains("DOT")){
-			rdkVersion = outputData.replace("DOT",".")
-		}else if(!outputData.equals("") && !outputData.startsWith("RDK")){
-			rdkVersion = "RDK"+outputData.replace("DOT",".")
-		}else{
-			rdkVersion = outputData
-		}
+		if(!isThunderEnabled){
+			File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callGetRDKVersion.py").file
+			absolutePath = layoutFolder.absolutePath
+
+			try {
+				if(boxIp != null && port != null ){
+					String[] cmd = [
+				                	PYTHON_COMMAND,
+									absolutePath,
+									boxIp,
+									port
+				                	]
+				                		
+					ScriptExecutor scriptExecutor = new ScriptExecutor()
+					outputData = scriptExecutor.executeScript(cmd,1)
+				}
+			} catch (Exception e) {
+				e.printStackTrace()
+			}
+			if(outputData){
+				outputData = outputData.trim()
+			}else{
+				outputData = ""
+			}
 		
-		if(rdkVersion && rdkVersion.contains(" ")){
-			rdkVersion.replaceAll(" ", "")
-		}
+			if(outputData.equals("METHOD_NOT_FOUND") || outputData.equals("AGENT_NOT_FOUND") || outputData.equals("NOT_DEFINED")){
+				rdkVersion = "NOT_AVAILABLE"
+			}else if(outputData.contains("DOT")){
+				rdkVersion = outputData.replace("DOT",".")
+			}else if(!outputData.equals("") && !outputData.startsWith("RDK")){
+				rdkVersion = "RDK"+outputData.replace("DOT",".")
+			}else{
+				rdkVersion = outputData
+			}
 		
+			if(rdkVersion && rdkVersion.contains(" ")){
+				rdkVersion.replaceAll(" ", "")
+			}
+		}
 		return rdkVersion
 	}
 
@@ -1546,7 +1547,6 @@ class ExecutionService {
 	 */
 	public void updateExecutionResultsError(final String resultData,final long executionResultId, final long executionId, final long executionDeviceId,
 		final String timeDiff, final String singleScriptExecTime){
-
 		ExecutionResult executionResult = ExecutionResult.findById(executionResultId)
 		ExecutionResult.executeUpdate("update ExecutionResult c set c.executionOutput = :newOutput, c.status = :newStatus, c.executionTime = :newTime where c.id = :execId",
 				[newOutput: resultData, newStatus: "FAILURE", newTime: singleScriptExecTime, execId: executionResultId])
