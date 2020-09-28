@@ -24,6 +24,7 @@
 #------------------------------------------------------------------------------
 import os
 import sys
+from time import sleep;
 
 def getInstanceNumber(paramName,index):
                 try:
@@ -101,7 +102,7 @@ def getMultipleParameterValues(obj,paramList):
 ######### End of Function ##########
 
 def changeAdminPassword(pamobj,password):
-  
+
 # changeAdminPassword
 
 # Syntax      : changeAdminPassword
@@ -132,4 +133,188 @@ def changeAdminPassword(pamobj,password):
          print "[TEST EXECUTION RESULT] :%s" %actualresult;
 
 ######### End of Function ##########
+def getTR181Value(tdkTestObj_Tr181_Get,parameter_Name):
 
+# getTR181Value
+
+# Syntax      : getTR181Value
+# Description : Function to get a value of TR181 parameter value
+# Parameters  : tdkTestObj_Tr181_Get - TR181 Get object
+#               parameter_Name - Parameter Name to get a value
+# Return Value: actualresult - Result of the execution
+#               details - value of the TR181 value
+
+    tdkTestObj_Tr181_Get.addParameter("ParamName",parameter_Name);
+    tdkTestObj_Tr181_Get.executeTestCase("SUCCESS");
+    actualresult = tdkTestObj_Tr181_Get.getResult();
+    details  = tdkTestObj_Tr181_Get.getResultDetails();
+    return actualresult,details;
+
+######### End of Function ##########
+
+def setTR181Value(tdkTestObj_Tr181_Set,parameter_Name,parameter_value,parameter_type):
+
+# setTR181Value
+
+# Syntax      : setTR181Value
+# Description : Function to set a new value to the TR181 parameter
+# Parameters  : tdkTestObj_Tr181_Set - TR181 Set object
+#               parameter_Name - Parameter Name to set a value
+#               parameter_value - Value to be set
+#               parameter_type - Type of the parameter
+# Return Value: actualresult - Result of the execution
+#               details - execution details
+
+    tdkTestObj_Tr181_Set.addParameter("ParamName",parameter_Name);
+    tdkTestObj_Tr181_Set.addParameter("ParamValue",parameter_value);
+    tdkTestObj_Tr181_Set.addParameter("Type",parameter_type);
+    tdkTestObj_Tr181_Set.executeTestCase("SUCCESS");
+    actualresult = tdkTestObj_Tr181_Set.getResult();
+    details = tdkTestObj_Tr181_Set.getResultDetails();
+    return actualresult,details;
+
+######### End of Function ##########
+
+def doSysutilExecuteCommand(tdkTestObj_Sys_ExeCmd,cmd):
+
+# doSysutilExecuteCommand
+
+# Syntax      : doSysutilExecuteCommand
+# Description : Function to do the Execute command operation of sysuti
+# Parameters  : tdkTestObj_Sys_ExeCmd - Sysyutil object
+#               cmd - command to be executed
+# Return Value: actualresult - Result of the execution
+#               details - value to be return after execution
+
+    tdkTestObj_Sys_ExeCmd.addParameter("command",cmd);
+    tdkTestObj_Sys_ExeCmd.executeTestCase("SUCCESS");
+    actualresult = tdkTestObj_Sys_ExeCmd.getResult();
+    details = tdkTestObj_Sys_ExeCmd.getResultDetails().strip().replace("\\n", "");
+    return actualresult,details;
+
+######### End of Function ##########
+
+def doRebootDUT(sysobj):
+
+# doRebootDUT
+
+# Syntax      : doRebootDUT
+# Description : Function to initiate Reboot on DUT
+# Parameters  : tdkTestObj_Sys_ExeCmd - Sysyutil object
+#               sysobj - sysutil object
+# Return Value: None
+
+    print "******************************************************"
+    print "Initiating Reboot Please wait till the device comes up";
+    sysobj.initiateReboot();
+    sleep(300);
+    print"*******************************************************"
+    print "Reboot operation Successful"
+
+######### End of Function ##########
+
+def getPID(tdkTestObj_Sys_ExeCmd,ps_name):
+
+# getPID
+
+# Syntax      : getPID
+# Description : Function to get the PID value of the given process
+# Parameters  : tdkTestObj_Sys_ExeCmd - Sysyutil object
+#               ps_name - Process Name
+# Return Value: actualresult - Result of the execution
+#             : details - PID Value of the given process
+
+    cmd = "pidof %s" %ps_name;
+    expectedresult="SUCCESS";
+    tdkTestObj_Sys_ExeCmd.addParameter("command",cmd);
+    tdkTestObj_Sys_ExeCmd.executeTestCase(expectedresult);
+    actualresult = tdkTestObj_Sys_ExeCmd.getResult();
+    details = tdkTestObj_Sys_ExeCmd.getResultDetails().strip().replace("\\n", "");
+    return actualresult,details;
+
+######### End of Function ##########
+
+def isFilePresent(tdkTestObj_Sys_ExeCmd,file_name):
+
+# isFilePresent
+
+# Syntax      : isFilePresent
+# Description : Function to Check if given file is present or not
+# Parameters  : tdkTestObj_Sys_ExeCmd - Sysyutil object
+#               file_name - File Name
+# Return Value: actualresult - Result of the execution
+#             : details - Details of the execution
+
+    cmd = "ls %s" %file_name;
+    expectedresult="SUCCESS";
+    tdkTestObj_Sys_ExeCmd.addParameter("command",cmd);
+    tdkTestObj_Sys_ExeCmd.executeTestCase(expectedresult);
+    actualresult = tdkTestObj_Sys_ExeCmd.getResult();
+    details = tdkTestObj_Sys_ExeCmd.getResultDetails().strip().replace("\\n", "");
+    return actualresult,details;
+
+######### End of Function ##########
+
+def killProcess(tdkTestObj_Sys_ExeCmd,pid,scriptname):
+
+# killProcess
+
+# Syntax      : killProcess
+# Description : Function to Kill the running proccess
+# Parameters  : tdkTestObj_Sys_ExeCmd - Sysyutil object
+#             : pid - PID of the process to be killed
+#             : scriptname - Name of the script to be executed if any
+# Return Value: actualresult - Result of the execution
+
+    expectedresult="SUCCESS";
+    if scriptname !="":
+       cmd = "kill %d ;sh %s &" %(pid,scriptname);
+       tdkTestObj_Sys_ExeCmd.addParameter("command",cmd);
+       tdkTestObj_Sys_ExeCmd.executeTestCase(expectedresult);
+       actualresult = tdkTestObj_Sys_ExeCmd.getResult();
+       details = tdkTestObj_Sys_ExeCmd.getResultDetails().strip().replace("\\n", "");
+    else:
+        cmd = "kill %d " %pid;
+        tdkTestObj_Sys_ExeCmd.addParameter("command",cmd);
+        tdkTestObj_Sys_ExeCmd.executeTestCase(expectedresult);
+        actualresult = tdkTestObj_Sys_ExeCmd.getResult();
+        details = tdkTestObj_Sys_ExeCmd.getResultDetails().strip().replace("\\n", "");
+    return actualresult;
+
+######### End of Function ##########
+
+def checkProcessRestarted(tdkTestObj_Sys_ExeCmd,processname):
+
+# checkProcessRestarted
+
+# Syntax      : checkProcessRestarted
+# Description : Function to Check if process restarted
+# Parameters  : tdkTestObj_Sys_ExeCmd - Sysyutil object
+#             : processname - Process Name
+# Return Value: actualresult - Result of the execution
+#             : pid - PID value of the given process
+
+    print "Check for every 10 secs whether the process is up"
+    retryCount = 0;
+    MAX_RETRY =5 ;
+    expectedresult="SUCCESS";
+    while retryCount < MAX_RETRY:
+          pid,actualresult = getPID(tdkTestObj_Sys_ExeCmd,processname);
+          if expectedresult in actualresult and pid != "":
+             break;
+          else:
+              sleep(10);
+              retryCount = retryCount + 1;
+    if pid == "":
+       print "Retry Again: Check for every 5 mins whether the process is up"
+       retryCount = 0;
+       while retryCount < MAX_RETRY:
+             pid,actualresult = getPID(tdkTestObj_Sys_ExeCmd,processname);
+             if expectedresult in actualresult and pid != "":
+                break;
+             else:
+                 sleep(300);
+                 retryCount = retryCount + 1;
+    return  actualresult,pid;
+
+######### End of Function ##########
