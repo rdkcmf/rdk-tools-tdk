@@ -41,8 +41,10 @@
       <parameter funName='TestMgr_HdmicecHal_GetLogicalAddress' parameterName='dev_type' parameterType='INTEGER' range='0-15' />
       <parameter funName='TestMgr_HdmicecHal_Tx' parameterName='header' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_HdmicecHal_Tx' parameterName='opcode' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_HdmicecHal_Tx' parameterName='receive_frames' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_HdmicecHal_TxAsync' parameterName='opcode' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_HdmicecHal_TxAsync' parameterName='header' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_HdmicecHal_TxAsync' parameterName='receive_frames' parameterType='INTEGER' range='0-1' />
     </parameters>
   </module>
 </xml>

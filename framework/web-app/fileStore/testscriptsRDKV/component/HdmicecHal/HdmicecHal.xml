@@ -26,18 +26,20 @@
         <function>TestMgr_HdmicecHal_GetPhysicalAddress</function>
         <parameters/>
       </primitiveTest>
-      <primitiveTest name="HdmicecHal_Tx" id=" " version="3">
+      <primitiveTest name="HdmicecHal_Tx" id=" " version="5">
         <function>TestMgr_HdmicecHal_Tx</function>
         <parameters>
           <parameter name="header" value=""/>
           <parameter name="opcode" value=""/>
+          <parameter name="receive_frames" value="1"/>
         </parameters>
       </primitiveTest>
-      <primitiveTest name="HdmicecHal_TxAsync" id=" " version="3">
+      <primitiveTest name="HdmicecHal_TxAsync" id=" " version="4">
         <function>TestMgr_HdmicecHal_TxAsync</function>
         <parameters>
           <parameter name="opcode" value=""/>
           <parameter name="header" value=""/>
+          <parameter name="receive_frames" value="1"/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="HdmicecHal_SetTxCallback" id="" version="1">
