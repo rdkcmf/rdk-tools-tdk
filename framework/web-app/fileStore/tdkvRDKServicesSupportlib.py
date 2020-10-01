@@ -570,8 +570,8 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
-        elif tag == "rdkshell_check_for_nonempty_result":
-            info = checkAndGetAllResultInfo(result)
+        elif tag == "rdkshell_check_for_results":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
 
         elif tag == "rdkshell_check_for_visibility_result":
             if result.get("visible") in expectedValues:
@@ -602,8 +602,8 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
 
         elif tag == "rdkshell_validate_opacity":
             status = result.get("opacity")
-            if expectedValues is not None:
-                if int(expectedValues) is int(status):
+            if len(expectedValues)>0:
+                if int(expectedValues[0]) == int(status):
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
@@ -682,7 +682,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
 
         elif tag == "display_connected_status":
             info["video_display"] = result.get('connectedVideoDisplays')
-            if json.dumps(result.get('success')) == "true" and any(item in result.get('connectedVideoDisplays') for item in ["HDMI0"]):
+            if json.dumps(result.get('success')) == "true" and result.get('connectedVideoDisplays'):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -761,7 +761,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
 
         elif tag == "check_connected_audio_ports":
             info["connected_audio_port"] = result.get('connectedAudioPorts')
-            if json.dumps(result.get('success')) == "true" and any(item in result.get('connectedAudioPorts') for item in ["HDMI0"]):
+            if json.dumps(result.get('success')) == "true" and result.get('connectedAudioPorts') :
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -1206,11 +1206,11 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             testStepResults = testStepResults[0].values()[0]
             clients = testStepResults[0].get("clients")
             index = int(arg[0])
-            param = arg[1]
 
             if len(clients):
-                if param is "target":
-                    info["target"] = clients[index]
+                if len(arg) > 1:
+                    if arg[1] == "target":
+                        info["target"] = clients[index]
                 else:
                     info["client"] = clients[index]
             else:
@@ -1442,6 +1442,5 @@ def checkNonEmptyResultData(resultData):
         status = "FALSE"
 
     return status
-
 
 

@@ -226,7 +226,7 @@
         <testCase testCaseId="RDKShell_08" testCaseName= "RDKShell_GetScreen_Resolution_08" desc="Get Screen resolution">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="getscreenresolution" method="GetScreenResolution">
-              <resultGeneration useMethodTag="rdkshell_check_for_nonempty_result" />
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
         </testCase>
 
@@ -246,13 +246,13 @@
         <testCase testCaseId="RDKShell_10" testCaseName= "RDKShell_SetandGet_Screen_Resolution_10" desc="Set and Get Screen resolution">
             <testCaseInfo testCaseType="setandget" revert="true" />
             <testStep testStepId="1" name="getscreenresolution" method="GetScreenResolution" saveResult="true" revertGet="yes">
-              <resultGeneration useMethodTag="rdkshell_check_for_nonempty_result"/>
+              <resultGeneration useMethodTag="rdkshell_check_for_results"/>
             </testStep>
             <testStep testStepId="2" name="setscreenresolution" method="SetScreenResolution" revertSet="yes">
               <params>
                 <!-- #TODO: Insted of hard coding the values, read the current resolution from displaysetting plugin and set accordingly -->
                 <param tag="w"   value="1920" revertParam="yes" />
-                <param tag="h"   valie="1080" revertParam="yes" />
+                <param tag="h"   value="1080" revertParam="yes" />
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
@@ -292,7 +292,7 @@
               <params>
                 <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />
               </params>
-              <resultGeneration useMethodTag="rdkshell_check_for_nonempty_result" />
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
         </testCase>
 
@@ -324,7 +324,7 @@
               <params>
                 <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />
               </params>
-              <resultGeneration useMethodTag="rdkshell_check_for_nonempty_result" />
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
             <testStep testStepId="3" name="setbounds" method="SetBounds" revertSet="yes">
               <params>
@@ -390,7 +390,7 @@
               <params>
                 <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />
               </params>
-              <resultGeneration useMethodTag="rdkshell_check_for_nonempty_result" />
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
             <testStep testStepId="3" name="setbounds" method="SetBounds" revertSet="yes">
               <params>
@@ -475,11 +475,11 @@
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
             </testStep>
-            <testStep testStepId="2" name="getscale" method="Getscale">
+            <testStep testStepId="2" name="GetScale" method="GetScale">
               <params>
                 <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />
               </params>
-              <resultGeneration useMethodTag="rdkshell_check_for_nonempty_result" />
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
         </testCase>
 
@@ -493,6 +493,7 @@
               <params>
                 <param tag="sx" value="1" />
                 <param tag="sy" value="1" />
+                <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
@@ -508,7 +509,7 @@
               <params>
                 <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />
               </params>
-              <resultGeneration useMethodTag="rdkshell_check_for_nonempty_result" />
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
             <testStep testStepId="3" name="setscale" method="SetScale" revertSet="yes">
               <params>
@@ -556,5 +557,5 @@
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
         </testCase>
-		
+
 </testPlugin>
