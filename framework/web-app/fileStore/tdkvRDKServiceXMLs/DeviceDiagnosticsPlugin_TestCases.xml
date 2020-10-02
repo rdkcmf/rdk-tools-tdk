@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<testPlugin pluginName="DeviceDiagnostics" pluginVersion="1">
+
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="org.rdk.DeviceDiagnostics" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DeviceDiagnostics" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DeviceDiagnostics" />
+                <params>
+                  <param tag="callsign" value="org.rdk.DeviceDiagnostics" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DeviceDiagnostics" />
+                <params>
+                  <param tag="plugin" value="org.rdk.DeviceDiagnostics" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DeviceDiagnostics" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+        </pluginPreRequisite>
+
+        <testCase testCaseId="DD_01" testCaseName="DeviceDiagnostics_Get_Configurations" desc="Gets value of provided property names" >
+           <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Configuration" method="Get_Configuration">
+                <params>
+                  <param tag="names" useConfigFile="true" key="DEVICE_DIAGNOSTICS_RFC_PARAMS" />
+                </params>
+                <resultGeneration useMethodTag="devicediagnostics_get_configurations" />
+            </testStep>
+        </testCase>
+
+
+       <testCase testCaseId="DD_02" testCaseName="DeviceDiagnostics_ActivateDeactivate_STRESS" desc="Activates and deactivates the plugin">
+             <testCaseInfo testCaseType="stress" configurableRepeat="true" repeatKey="STRESS_TEST_REPEAT_COUNT" />
+
+             <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+                   <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                     <params>
+                       <param tag="plugin" value="DeviceInfo" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" />
+                   </testStep>
+                   <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,DeviceInfo" />
+                     <params>
+                       <param tag="callsign" value="DeviceInfo" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,DeviceInfo" />
+                     <params>
+                       <param tag="plugin" value="DeviceInfo" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" expectedValues="activated"/>
+                   </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+
+            <testStep testStepId="1" name="Check_DeviceDiagnostics_Active_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                  <params>
+                    <param tag="plugin"  value="org.rdk.DeviceDiagnostics" indexOnly="true" />
+                  </params>
+                  <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DeviceDiagnostics"/>
+            </testStep>
+            <testStep testStepId="2" name="Plugin_ActivateDeactivate_STRESS" testStepType="repeat">
+              <subtestStep subtestStepId="1" name="Deactivate_DeviceDiagnostics_Plugin" method="Deactivate_Plugin"  pluginName="Controller">
+                  <params>
+                    <param tag="callsign"  value="org.rdk.DeviceDiagnostics" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Activate_DeviceDiagnostics_Plugin" method="Activate_Plugin"  pluginName="Controller" delay="1">
+                  <params>
+                    <param tag="callsign" value="org.rdk.DeviceDiagnostics" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Get_CPU_Load" method="Get_System_Info" pluginName="DeviceInfo" >
+                  <resultGeneration useMethodTag="deviceinfo_get_system_info" arguments="check_cpu_load" />
+              </subtestStep>
+            </testStep>
+    </testCase>
+
+</testPlugin>
+

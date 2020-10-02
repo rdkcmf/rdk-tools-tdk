@@ -1,0 +1,867 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<thunderPlugins>
+
+    <!-- Controller Plugin Information -->
+    <plugin pluginName="Controller" serviceName="Controller" serviceVersion="1" >
+        <method name="Get_Plugin_Status" api="status"  type="property" desc="Provides the information about plugins" >
+            <expectedValues>activated,deactivated,suspended,resumed</expectedValues>
+        </method>
+        <method name="Activate_Plugin" api="activate" type="method" desc="Activates a plugin" >
+            <params>
+                <param tag="callsign" defaultValue="null"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Deactivate_Plugin" api="deactivate" type="method" desc="deactivates a plugin" >
+            <params>
+                <param tag="callsign" defaultValue="null"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+    </plugin>
+
+
+    <!-- DeviceInfo Plugin Information -->
+    <plugin pluginName="DeviceInfo" serviceName="DeviceInfo" serviceVersion="1">
+        <method name="Get_System_Info" api="systeminfo" type="property" desc="System general information"/>
+        <method name="Get_Network_Interfaces" api="addresses" type="property" desc="Network interface addresses"/>
+        <method name="Get_Socket_Info" api="socketinfo" type="property" desc="Socket information"/>
+    </plugin>
+
+
+    <!-- LocationSync Plugin Information -->
+    <plugin pluginName="LocationSync" serviceName="LocationSync" serviceVersion="1">
+        <method name="Sync_Location" api="sync" type="method" desc="Synchronizes the location">
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Get_Location_Info" api="location" type="property" desc="Location information"/>
+    </plugin>
+
+
+
+    <!-- TraceControl Plugin Information -->
+    <plugin pluginName="TraceControl" serviceName="TraceControl" serviceVersion="1">
+        <!-- TraceControl.1.status -->
+        <method name="Get_Trace_Status" api="status" type="method" desc="Retrieves actual trace status information">
+            <params>
+                <param tag="module"   defaultValue="null"/>
+                <param tag="category" defaultValue="Information"/>
+            </params>
+            <expectedValues>enabled,disabled</expectedValues>
+        </method>
+
+        <!-- TraceControl.1.set -->
+        <method name="Set_Trace_Status" api="set" type="method" desc="Sets traces">
+            <params>
+                <param tag="module"   defaultValue="null"/>
+                <param tag="category" defaultValue="Information"/>
+                <param tag="state"    defaultValue="enabled"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+    </plugin>
+
+
+    <!-- OCDM Plugin Information -->
+    <plugin pluginName="OCDM" serviceName="OCDM" serviceVersion="1">
+        <method name="Get_Supported_DRM_Systems" api="drms" type="property" desc="Retrieves supported DRM systems"/>
+        <method name="Get_DRM_Key_Systems" api="keysystems" type="property" desc="Provides access to the DRM key systems">
+            <params>
+                <param tag="drm" defaultValue="null"/>
+            </params>
+        </method>
+    </plugin>
+
+
+
+    <!-- Network Plugin Information -->
+    <plugin pluginName="Network" serviceName="org.rdk.Network" serviceVersion="1">
+        <method name="Get_Interfaces" api="getInterfaces" type="method" desc="Gives suported interfaces and their states"/>
+        <method name="Is_Interface_Enabled" api="isInterfaceEnabled" type="method" desc="Gives specific interface state">
+            <params>
+                <param tag="interface" defaultValue="null"/>
+            </params>
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Set_Interface_Enabled" api="setInterfaceEnabled" type="method" desc="Sets specific interface state">
+            <params>
+                <param tag="interface" defaultValue="null"/>
+                <param tag="enabled"   defaultValue="true" type="bool"/>
+                <param tag="persist"   defaultValue="true" type="bool"/>
+            </params>
+        </method>
+        <method name="Get_Default_Interface" api="getDefaultInterface" type="method" desc="Gets the default network interface"/>
+        <method name="Set_Default_Interface" api="setDefaultInterface" type="method" desc="Sets the default interface">
+            <params>
+                <param tag="interface"  defaultValue="null" />
+                <param tag="persist"   defaultValue="true" type="bool"/>
+            </params>
+        </method>
+        <method name="Get_STB_IP" api="getStbIp" type="method" desc="Gets the IP address of the default interface"/>
+        <method name="Ping" api="ping" type="method" desc="Pings the specified endpoint">
+            <params>
+                <param tag="endpoint"  defaultValue="null" />
+                <param tag="packets"   defaultValue="15" type="int"/>
+            </params>
+            <expectedValues>15</expectedValues>
+        </method>
+        <method name="Ping_NamedEndpoint" api="pingNamedEndpoint" type="method" desc="Pings the endpoint named by endpointName">
+            <params>
+                <param tag="endpointName"  defaultValue="null" />
+                <param tag="packets"   defaultValue="15" type="int"/>
+            </params>
+            <expectedValues>15</expectedValues>
+        </method>
+        <method name="Trace" api="trace" type="method" desc="Traces the specified endpoint">
+            <params>
+                <param tag="endpoint"  defaultValue="null" />
+                <param tag="packets"   defaultValue="15" type="int"/>
+            </params>
+        </method>
+        <method name="Trace_NamedEndpoint" api="traceNamedEndpoint" type="method" desc="Traces the endpoint named by endpointName">
+            <params>
+                <param tag="endpointName"  defaultValue="null" />
+                <param tag="packets"   defaultValue="15" type="int"/>
+                <param tag="guid"   defaultValue="iasoviubejcv"/>
+            </params>
+        </method>
+        <method name="Get_NamedEndPoints" api="getNamedEndpoints" type="method" desc="Returns a list of endpoint names"/>
+        <method name="Get_IP_Settings" api="getIPSettings" type="method" desc="Gets the IP setting for the given interface">
+            <params>
+                <param tag="interface"  defaultValue="null" />
+            </params>
+        </method>
+        <method name="Set_IP_Settings" api="setIPSettings" type="method" desc="Sets the IP settings">
+            <params>
+                <param tag="interface "   defaultValue="null" />
+                <param tag="ipversion"    defaultValue="null"/>
+                <param tag="autoconfig"   defaultValue="null"/>
+                <param tag="ipaddr"       defaultValue="null"/>
+                <param tag="netmask"      defaultValue="null"/>
+                <param tag="gateway"      defaultValue="null"/>
+                <param tag="primarydns"   defaultValue="null"/>
+                <param tag="secondarydns" defaultValue="null"/>
+            </params>
+        </method>
+    </plugin>
+
+
+    <!-- Front Panel Plugin Information -->
+    <plugin pluginName="FrontPanel" serviceName="org.rdk.FrontPanel" serviceVersion="1">
+        <method name="Get_All_FP_LEDs" api="getFrontPanelLights" type="method" desc="Gets Front Panel LEDs"/>
+        <method name="Get_FP_Brightness" api="getBrightness" type="method" desc="Get Brightness of the Front Panel"/>
+        <method name="Set_FP_Brightness" api="setBrightness" type="method" desc="Set Brightness of the Front Panel all indicators"/>
+        <method name="Get_LED_Brightness" api="getBrightness" type="method" desc="Get Brightness of the specified LED">
+            <params>
+                <param tag="index"  defaultValue="null" />
+            </params>
+        </method>
+        <method name="Set_LED_Brightness" api="setBrightness" type="method" desc="Set Brightness of the specified LED">
+            <params>
+                <param tag="index"       defaultValue="null" />
+                <param tag="brightness"  defaultValue="null" type="int" />
+            </params>
+        </method>
+        <method name="Power_LED_ON" api="powerLedOn" type="method" desc="Turn on LED indicator">
+            <params>
+                <param tag="index"  defaultValue="null" />
+            </params>
+        </method>
+        <method name="Power_LED_OFF" api="powerLedOff" type="method" desc="Turn off LED indicator">
+            <params>
+                <param tag="index"  defaultValue="null" />
+            </params>
+        </method>
+        <method name="Get_Clock_Brightness" api="getClockBrightness" type="method" desc="Gives current clock brightness"/>
+        <method name="Set_Clock_Brightness" api="setClockBrightness" type="method" desc="Set clock brightness">
+            <params>
+                <param tag="brightness"  defaultValue="null" type="int" />
+            </params>
+        </method>
+        <method name="Set_LED_Blink" api="setBlink" type="method" desc="Set LED blinking pattern">
+            <params>
+                <param tag="ledIndicator"  defaultValue="null" />
+                <param tag="iteration"  defaultValue="null" />
+                <param tag="brightness_levels"  defaultValue="1,100" type="int" />
+                <param tag="duration"  defaultValue="5000" type="int" />
+                <param tag="color"  defaultValue="null"  />
+                <param tag="red"   defaultValue="0" type="int" />
+                <param tag="blue"  defaultValue="0" type="int" />
+                <param tag="green" defaultValue="0" type="int" />
+            </params>
+        </method>
+        <method name="Is_24_Hour_Clock" api="is24HourClock" type="method" desc="Get clock version (12 vs 24 hour)">
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Set_24_Hour_Clock" api="set24HourClock" type="method" desc="Set between 12/24 hour clock">
+            <params>
+                <param tag="is24Hour"  defaultValue="true" type="bool"/>
+            </params>
+        </method>
+        <method name="Set_Clock_Pattern" api="setClockTestPattern" type="method" desc="Allows to set test pattern on the STB clock">
+            <params>
+                <param tag="show"  defaultValue="true" type="bool"/>
+                <param tag="timerInterval"  defaultValue="4" type="int"/>
+            </params>
+        </method>
+
+    </plugin>
+
+
+    <!-- WebKit browser Plugin Information -->
+    <plugin pluginName="WebKitBrowser" serviceName="WebKitBrowser" serviceVersion="1">
+        <method name="Get_WebKitBrowser_State" api="state" type="method" desc="Gives running state of the service">
+            <expectedValues>resumed,suspended</expectedValues>
+        </method>
+        <method name="Set_WebKitBrowser_State" api="state" type="method" desc="Set service state">
+            <params paramType="directString" >
+                <param tag="state" defaultValue="resumed"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Get_Browser_FPS" api="fps" type="property" desc="Gets No of frames per second the browser is rendering" />
+        <method name="Get_Browser_Visibility" api="visibility" type="property" desc="Gets current browser visibility">
+            <expectedValues>visible,hidden</expectedValues>
+        </method>
+        <method name="Set_Browser_Visibility" api="visibility" type="property" desc="Sets current browser visibility" >
+            <params paramType="directString" >
+                <param tag="visibility" defaultValue="visible"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Get_Browser_URL" api="url" type="property" desc="Gets browser load URL" />
+        <method name="Set_Browser_URL" api="url" type="property" desc="Sets browser load URL" >
+            <params paramType="directString" >
+                <param tag="url" defaultValue="null"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Get_Cookie_Accept_Policy" api="httpcookieacceptpolicy" type="property" desc="Gets http cookie accept policy">
+            <expectedValues>always,never,onlyfrommaindocumentdomain,exclusivelyfrommaindocumentdomain</expectedValues>
+        </method>
+        <method name="Set_Cookie_Accept_Policy" api="httpcookieacceptpolicy" type="property" desc="Sets http cookie accept policy" >
+            <params paramType="directString" >
+                <param tag="cookie_accept_policy" defaultValue="always"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Get_Local_Storage_Availability"  api="localstorageenabled" type="method" desc="Gives local storage availability">
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Set_Local_Storage_Availability"  api="localstorageenabled" type="method" desc="Sets local storage availability " >
+            <params paramType="directBool">
+                <param tag="enabled" defaultValue="null" />
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Get_Languages"  api="languages" type="method" desc="Gives user preferred languages">
+            <expectedValues>en,en-US</expectedValues>
+        </method>
+        <method name="Set_Languages"  api="languages" type="method" desc="Sets user preferred languages" >
+            <params paramType="directList">
+                <param tag="languages" defaultValue="en,en-US" />
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+    </plugin>
+
+
+
+
+    <!-- System Plugin Information -->
+    <plugin pluginName="System" serviceName="org.rdk.System" serviceVersion="1">
+        <method name="Get_Device_Info" api="getDeviceInfo" type="method" desc="Gives device details"/>
+        <method name="Get_Serial_No"  api="getSerialNumber" type="method" desc="Gives device serial number"/>
+        <method name="Get_System_Version"  api="getSystemVersions" type="method" desc="Gives system version details"/>
+        <method name="Get_System_Uptime"  api="requestSystemUptime" type="method" desc="Gives system uptime"/>
+        <method name="Get_Core_Temperature"  api="getCoreTemperature" type="method" desc="Gives core temperature of the device"/>
+        <method name="Get_Milestones"  api="getMilestones" type="method" desc="Gives list of milestones"/>
+        <method name="Get_XConf_Params"  api="getXconfParams" type="method" desc="Gives Xconf configuration of the device"/>
+        <method name="Get_RFC_Config" api="getRFCConfig" type="method" desc="Gets RFC configurations" >
+            <params>
+                <param tag="rfcList" defaultValue="null" type="list" />
+            </params>
+        </method>
+        <method name="Get_GZ_Enable_Status"  api="isGzEnabled" type="method" desc="Gives GZ enabled status">
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Set_GZ_Enable_Status"  api="setGzEnabled" type="method" desc="Sets GZ enabled status " >
+            <params>
+                <param tag="enabled" defaultValue="null" type="bool" />
+            </params>
+        </method>
+        <method name="Get_Temperature_Thresholds" api="getTemperatureThresholds" type="method" desc="Gets temperature thresholds" />
+        <method name="Set_Temperature_Thresholds" api="setTemperatureThresholds" type="method" desc="Gets temperature thresholds">
+            <params>
+                <param tag="WARN" defaultValue="null" />
+                <param tag="MAX"  defaultValue="null" />
+            </params>
+        </method>
+        <method name="Cache_Contains" api="cacheContains" type="method" desc="Checks if key is present in cache" >
+            <params>
+                <param tag="key" defaultValue="sampleKey" />
+            </params>
+        </method>
+        <method name="Get_Cache_Value" api="getCachedValue" type="method" desc="Get value of the key in cache" >
+            <params>
+                <param tag="key" defaultValue="sampleKey" />
+            </params>
+            <expectedValues>sampleKey,100.23</expectedValues>
+        </method>
+        <method name="Set_Cache_Value" api="setCachedValue" type="method" desc="Set value of the key in cache" >
+            <params>
+                <param tag="key"   defaultValue="sampleKey" />
+                <param tag="value" defaultValue="100.23" type="float" />
+            </params>
+        </method>
+        <method name="Remove_Cache_Key" api="removeCacheKey" type="method" desc="Remove key from cache" >
+            <params>
+                <param tag="key" defaultValue="sampleKey" />
+            </params>
+        </method>
+        <method name="Get_State_Info" api="getStateInfo" type="method" desc="Query device state information of various properties" >
+            <params>
+                <param tag="param" defaultValue="null" />
+            </params>
+        </method>
+        <method name="Get_TimeZone_DST" api="getTimeZoneDST" type="method" desc="Get configured time zone" />
+        <method name="Set_TimeZone_DST" api="setTimeZoneDST" type="method" desc="Set configured time zone" >
+            <params>
+                <param tag="timeZone" defaultValue="UTC-5" />
+            </params>
+        </method>
+        <method name="Get_Available_StandBy_Modes" api="getAvailableStandbyModes" type="method" desc="Get available standby modes" />
+        <method name="Get_Preferred_StandBy_Mode" api="getPreferredStandbyMode" type="method" desc="Get preferred standby mode" >
+            <expectedValues>LIGHT_SLEEP,DEEP_SLEEP</expectedValues>
+        </method>
+        <method name="Set_Preferred_StandBy_Mode" api="setPreferredStandbyMode" type="method" desc="Set preferred standby mode" >
+            <params>
+                <param tag="standbyMode" defaultValue="null" />
+            </params>
+        </method>
+        <method name="Get_Mode" api="getMode" type="method" desc="Gets currently set mode" />
+        <method name="Set_Mode" api="setMode" type="method" desc="Set mode for specific duration">
+            <params>
+                <param tag="mode" defaultValue="null" />
+                <param tag="duration" defaultValue="null" type="int" />
+            </params>
+        </method>
+        <method name="Get_Power_State" api="getPowerState" type="method" desc="Get power state" >
+            <expectedValues>STANDBY,DEEP_SLEEP,LIGHT_SLEEP,ON</expectedValues>
+        </method>
+        <method name="Set_Power_State" api="setPowerState" type="method" desc="Set power state">
+            <params>
+                <param tag="powerState"    defaultValue="STANDBY" />
+                <param tag="standbyReason" defaultValue="APIUnitTest" />
+            </params>
+        </method>
+    </plugin>
+
+
+    <!-- Cobalt Plugin Information -->
+    <plugin pluginName="Cobalt" serviceName="Cobalt" serviceVersion="1">
+        <method name="Get_Cobalt_State" api="state" type="method" desc="Gives running state of the service">
+            <expectedValues>resumed,suspended</expectedValues>
+        </method>
+        <method name="Set_Cobalt_State" api="state" type="method" desc="Set service state">
+            <params paramType="directString" >
+                <param tag="state" defaultValue="resumed"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Send_DeepLink" api="deeplink" type="method" desc="Send a deep link to the application" >
+            <params paramType="directString" >
+                <param tag="link" defaultValue="null"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+    </plugin>
+
+
+    <!-- DeviceDiagnostics Plugin Information -->
+    <plugin pluginName="DeviceDiagnostics" serviceName="org.rdk.DeviceDiagnostics" serviceVersion="1">
+        <method name="Get_Configuration" api="getConfiguration" type="method" desc="RDK API interface for the WebPA service" >
+            <params>
+                <param tag="names" defaultValue="null" type="list" />
+            </params>
+        </method>
+    </plugin>
+
+    <!-- HDCP Profile Plugin Information -->
+    <plugin pluginName="HDCPProfile" serviceName="org.rdk.HdcpProfile" serviceVersion="1">
+        <method name="Get_HDCP_Status" api="getHDCPStatus" type="method" desc="Provides interface for HDCP related data and events"/>
+        <method name="Get_STB_Supported_HDCP_Version" api="getSettopHDCPSupport" type="method" desc="Returns which version of HDCP is supported by the STB"/>
+    </plugin>
+
+
+    <!-- User Preferences Plugin Information -->
+    <plugin pluginName="UserPreferences" serviceName="org.rdk.UserPreferences" serviceVersion="1">
+        <method name="Get_UI_Language" api="getUILanguage" type="method" desc="Gets the user preferred UI language" />
+        <method name="Set_UI_Language" api="setUILanguage" type="method" desc="Sets the user preferred UI language" >
+            <params>
+                <param tag="language" defaultValue="null" />
+            </params>
+        </method>
+    </plugin>
+
+
+    <!-- RDK Shell Plugin Information -->
+    <plugin pluginName="RDKShell" serviceName="org.rdk.RDKShell" serviceVersion="1">
+        <method name="MoveToFront" api="moveToFront" type="method" desc="Moves the client to the front or top of the Z order" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="MoveToBack" api="moveToBack" type="method" desc="Moves the client to the back or bottom of the Z order" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="MoveBehind" api="moveBehind" type="method" desc="Moves the client behind the specified target" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+                <param tag="target" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="SetFocus" api="setFocus" type="method" desc="Sets focus to the specified client" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="Kill" api="kill" type="method" desc="Kills the client" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="AddKeyIntercept" api="addKeyIntercept" type="method" desc="Adds a key intercept to the client application specified" >
+            <params>
+                <param tag="keyCode" defaultValue="10" type="int"/>
+                <param tag="modifiers" defaultValue="alt,shift" type="list" />
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="RemoveKeyIntercept" api="removeKeyIntercept" type="method" desc="Removes the key intercept" >
+            <params>
+                <param tag="keyCode" defaultValue="10" type="int" />
+                <param tag="modifiers" defaultValue="alt,shift" type="list" />
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="GetScreenResolution" api="getScreenResolution" type="method" desc="Gets the screen resolution" />
+
+        <method name="SetScreenResolution" api="setScreenResolution" type="method" desc="Sets the screen resolution" >
+            <params>
+                <param tag="w" defaultValue="1080" type="int"/>
+                <param tag="h" defaultValue="720" type="int" />
+            </params>
+        </method>
+
+        <method name="GetClients" api="getClients" type="method" desc="Gets a list of clients" />
+
+        <method name="GetZOrder" api="getZOrder" type="method" desc="Returns an array of clients in Z order, starting with the top most application client first"/>
+
+        <method name="GetBounds" api="getBounds" type="method" desc="Gets the bounds of the specified client" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="SetBounds" api="setBounds" type="method" desc="Sets the bounds of the specified client" >
+            <params>
+                <param tag="x" defaultValue="0" type="int" />
+                <param tag="y" defaultValue="0" type="int" />
+                <param tag="w" defaultValue="750" type="int" />
+                <param tag="h" defaultValue="450" type="int" />
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="GetVisibility" api="getVisibility" type="method" desc="Gets the visibility of the specified client" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="SetVisibility" api="setVisibility" type="method" desc="Sets the visibility of the specified client" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+                <param tag="visible" defaultValue="true" type="bool" />
+            </params>
+        </method>
+
+        <method name="GetOpacity" api="getOpacity" type="method" desc="gets the opacity of the specified client" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="SetOpacity" api="setOpacity" type="method" desc="Sets the opacity of the given client" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+                <param tag="opacity" defaultValue="100" type="int" />
+            </params>
+        </method>
+
+        <method name="AddKeyListener" api="addKeyListener" type="method" desc="Adds a key listener to an app.  The keys are bubbled up based on their z-order" >
+            <params>
+                <param tag="keys" defaultValue="null"/>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="RemoveKeyListener" api="removeKeyListener" type="method" desc="Removes a key listener for an app" >
+            <params>
+                <param tag="keys" defaultValue="null"/>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="AnimateTo" api="animateTo" type="method" desc="Performs a set of animations"/>
+        <!-- need to add input params -->
+
+        <method name="SetScale" api="setScale" type="method" desc="Set Scale Params to an application" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+                <param tag="sx" defaultValue="1" type="int" />
+                <param tag="sy" defaultValue="1" type="int" />
+            </params>
+        </method>
+
+        <method name="GetScale" api="getScale" type="method" desc="Get Scale Params to an application" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="GenerateKey" api="generateKey" type="method" desc="Triggers key events like key press and release" >
+            <params>
+                <param tag="keys" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="LaunchApplication" api="launchApplication" type="method" desc="Launches an application"/>
+        <!-- need to add input params -->
+
+        <method name="SuspendApplication" api="suspendApplication" type="method" desc="Suspend an application" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+
+        <method name="ResumeApplication" api="resumeApplication" type="method" desc="Resumes an application" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+    </plugin>
+
+
+    <!-- DisplayInfo Plugin Information -->
+    <plugin pluginName="DisplayInfo" serviceName="DisplayInfo" serviceVersion="1">
+        <method name="DisplayInfo_GetEDID" api="edid" type="method" desc="Provides TV's Extended Display Identification Data" >
+                <params>
+                        <param tag="length" defaultValue="null" type="int"/>
+                </params>
+        </method>
+        <method name="DisplayInfo_Isaudiopassthrough" api="isaudiopassthrough" type="property" desc="Read isaudioPassthrough property on HDMI." >
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="DisplayInfo_Isconnected" api="connected" type="property" desc="Check for display isconnected">
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="DisplayInfo_GetWidth" api="width" type="property" desc="Provides horizontal resolution of TV."/>
+        <method name="DisplayInfo_GetHeight" api="height" type="property" desc="Provide vertical resolution of TV."/>
+        <method name="DisplayInfo_Getverticalfreq" api="verticalfreq" type="property" desc="Get Vertical Frequency"/>
+        <method name="DisplayInfo_GetHDCPversion" api="hdcpprotection" type="property" desc="Get HDCP Version" >
+            <expectedValues>HdcpUnencrypted,Hdcp1X,Hdcp2X</expectedValues>
+        </method>
+        <method name="DisplayInfo_GetPortname" api="portname" type="property" desc="Get Video output port on the STB used for connection to TV"/>
+    </plugin>
+
+
+    <!-- Power Plugin Information -->
+    <plugin pluginName="Power" serviceName="Power" serviceVersion="1">
+        <!-- Power.1.state : provides access to power state -->
+        <method name="Get_Power_State" api="state" type="property" desc="Provides access to power state">
+            <expectedValues>on,activestandby,passivestandby,suspendtoram,hibernate,poweroff</expectedValues>
+        </method>
+
+        <!-- Power.1.set : sets the power state -->
+        <method name="Set_Power_State" api="set" type="method" desc="Sets power state">
+            <params>
+                <param tag="powerstate" defaultValue="null"/>
+                <param tag="timeout"    defaultValue="0"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+    </plugin>
+
+
+
+    <!-- WifiControl Plugin Information -->
+    <plugin pluginName="WifiControl" serviceName="WifiControl" serviceVersion="1">
+        <method name="Scan_Networks" api="scan" type="method" desc="Searches for available networks">
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Connect" api="connect" type="method" desc="Attempts connection to a network">
+            <params>
+                <param tag="ssid" defaultValue="null"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Disconnect" api="set" type="method" desc="Disconnects from a network">
+            <params>
+                <param tag="ssid" defaultValue="null"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Save_Configurations" api="store" type="method" desc="Stores the configurations in persistent storage">
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Remove_Configurations" api="delete" type="method" desc="Forgets the configuration of a network">
+            <params>
+                <param tag="ssid" defaultValue="null"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Get_Network_Status" api="status" type="property" desc="Gives the network status"/>
+        <method name="Get_Available_Networks" api="networks " type="property" desc="Gives the available networks"/>
+        <method name="Get_All_Network_Configs" api="configs" type="property" desc="Provides access to the all WiFi configurations"/>
+        <method name="Get_Network_Config" api="config"  type="property" desc="Provides access to the single WiFi configuration">
+            <params>
+                <param tag="ssid" defaultValue="null" type="index"/>
+            </params>
+        </method>
+        <method name="Set_Network_Config" api="config"  type="property" desc="Provides access to the single WiFi configuration">
+            <params>
+                <param tag="ssid" defaultValue="null" indexing="true"/>
+                <param tag="type" defaultValue="null" />
+                <param tag="hidden" defaultValue="null" />
+                <param tag="accesspoint" defaultValue="null" />
+                <param tag="psk" defaultValue="null" />
+                <param tag="hash" defaultValue="null" />
+                <param tag="identity" defaultValue="null" />
+                <param tag="password" defaultValue="null" />
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+    </plugin>
+
+
+    <!-- Display Settings Plugin Information -->
+    <plugin pluginName="DisplaySettings" serviceName="org.rdk.DisplaySettings" serviceVersion="1">
+        <method name="Get_Connected_VideoDisplays" api="getConnectedVideoDisplays" type="method" desc="Get the connected video display details"/>
+        <method name="Get_Supported_VideoDisplays" api="getSupportedVideoDisplays" type="method" desc="Get the supported video display details"/>
+        <method name="Get_Supported_Resolutions" api="getSupportedResolutions" type="method" desc="Get the supported resolutions details">
+            <params>
+                <param tag="videoDisplay" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Supported_Tv_Resolutions" api="getSupportedTvResolutions" type="method" desc="Get the supported TV Resolutions details">
+            <params>
+                <param tag="videoDisplay" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Supported_Settop_Resolutions" api="getSupportedSettopResolutions" type="method" desc="Get the supported Set top box Resolutions details">
+        </method>
+        <method name="Get_Current_Resolution" api="getCurrentResolution" type="method" desc="Get the current resolution details">
+            <params>
+                <param tag="videoDisplay" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Set_Current_Resolution" api="setCurrentResolution" type="method" desc="Set the current resolution values">
+            <params>
+                <param tag="videoDisplay" defaultValue="null"/>
+                <param tag="resolution" defaultValue="null"/>
+                <param tag="persist" defaultValue="null" type="bool"/>
+            </params>
+        </method>
+        <method name="Get_Connected_AudioPorts" api="getConnectedAudioPorts" type="method" desc="Get the connected audio port details"/>
+        <method name="Get_Supported_AudioPorts" api="getSupportedAudioPorts" type="method" desc="Get the supported audio port details"/>
+        <method name="Get_Supported_AudioModes" api="getSupportedAudioModes" type="method" desc="Get the supported audio modes details">
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Sound_Mode" api="getSoundMode" type="method" desc="Get the sound mode details">
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Set_Sound_Mode" api="setSoundMode" type="method" desc="Set the sound mode values">
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="soundMode"  defaultValue="null"/>
+                <param tag="persist" defaultValue="null" type="bool"/>
+            </params>
+        </method>
+        <method name="Get_Zoom_Setting" api="getZoomSetting" type="method" desc="Get the zoom setting details"/>
+        <method name="Set_Zoom_Setting" api="setZoomSetting" type="method" desc="Set the zoom setting values">
+            <params>
+                <param tag="zoomSetting" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Read_EDID" api="readEDID" type="method" desc="Read the EDID of connected output device"/>
+        <method name="Read_Host_EDID" api="readHostEDID"  type="method" desc="Read the Host(STB) EDID details"/>
+        <method name="Get_Active_Input" api="getActiveInput" type="method" desc="Get the active input status">
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Get_Tv_HDR_Support" api="getTvHDRSupport" type="method" desc="Get the TV HDR support details">
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="GetSettopHDRSupport" api="getSettopHDRSupport" type="method" desc="Get the Settop HDR support details"/>
+        <method name="Set_VideoPort_Status_InStandby" api="setVideoPortStatusInStandby" type="method" desc="Set the video port status to be used in standby mode">
+            <params>
+                <param tag="portName" defaultValue="null"/>
+                <param tag="enabled" defaultValue="null" type="bool"/>
+            </params>
+        </method>
+        <method name="Get_VideoPort_Status_InStandby" api="getVideoPortStatusInStandby" type="method" desc="Get the video port status to be used in standby mode">
+            <params>
+                <param tag="portName" defaultValue="null"/>
+            </params>
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Get_Current_Output_Settings" api="getCurrentOutputSettings" type="method" desc="Get the current output settings details"/>
+        <method name="Set_MS12_Audio_Compression" api="setMS12AudioCompression" type="method" desc="Set the MS12Audio compression values">
+            <params>
+                <param tag="compresionLevel" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_MS12_Audio_Compression" api="getMS12AudioCompression" type="method" desc="Get the MS12Audio compression  details" >
+            <expectedValues>0,1,2,3,4,5,6,7,8,9,10</expectedValues>
+        </method>
+        <method name="Set_Dolby_Volume_Mode" api="setDolbyVolumeMode" type="method" desc="Set the dolby volume mode as true or false" >
+            <params>
+                <param tag="dolbyVolumeMode" defaultValue="null" type="bool"/>
+            </params>
+        </method>
+        <method name="Get_Dolby_Volume_Mode" api="getDolbyVolumeMode" type="method" desc="Get the dolby volume mode status" >
+            <expectedValues>True,False </expectedValues>
+        </method>
+        <method name="Set_Dialog_Enhancement" api="setDialogEnhancement" type="method" desc="Set the dialog enhancement values" >
+            <params>
+                <param tag="enhancerlevel" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Dialog_Enhancement" api="getDialogEnhancement" type="method" desc="Get the Dialog Enhancement value" >
+            <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16</expectedValues>
+        </method>
+        <method name="SetIntelligentEqualizerMode" api="setIntelligentEqualizerMode" type="method" desc="Set the intelligent equalizer mode values" >
+            <params>
+                <param tag="intelligentEqualizerMode" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Intelligent_Equalizer_Mode" api="getIntelligentEqualizerMode" type="method" desc="Get the intelligent equalizer modevalue" />
+        <method name="Set_Volume_Leveller" api="setVolumeLeveller" type="method" desc="Set the volume leveller values" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="level" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Volume_Leveller" api="getVolumeLeveller" type="method" desc="Get the volume leveller value" />
+        <method name="Set_Bass_Enhancer" api="setBassEnhancer" type="method" desc="Enable or disable the bass enhancer" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="bassEnhancerEnable" defaultValue="null" type="bool" />
+            </params>
+        </method>
+        <method name="Get_Bass_Enhancer" api="getBassEnhancer" type="method" desc="Get the bass enhancer status" />
+        <method name="Set_Surround_Virtualizer" api="setSurroundVirtualizer" type="method" desc="Set the surround virtualizer values" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="boost"  defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Surround_Virtualizer" api="getSurroundVirtualizer" type="method" desc="Get the surround virtualizer value" />
+        <method name="Set_MI_Steering" api="setMISteering" type="method" desc="Enable or disable the MI Steering" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="MISteeringEnable"  defaultValue="null" type="bool"/>
+            </params>
+        </method>
+        <method name="Get_MI_Steering" api="getMISteering" type="method" desc="Get the MI steering status" />
+        <method name="Enable_Surround_Decoder" api="enableSurroundDecoder" type="method" desc="Enable or disable the surround decoder" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="surroundDecoderEnable"  defaultValue="null" type="bool"/>
+            </params>
+        </method>
+        <method name="Is_Surround_Decoder_Enabled" api="isSurroundDecoderEnabled" type="method" desc="Get the surround decoder status" />
+        <method name="Set_DRC_Mode" api="setDRCMode" type="method" desc="Set the DRC mode values " >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="DRCMode"  defaultValue="null" />
+            </params>
+        </method>
+        <method name="Get_DRC_Mode" api="getDRCMode" type="method" desc="Get the DRC mode value" />
+        <method name="Set_Volume_Level" api="setVolumeLevel" type="method" desc="Set the volume level value " >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="volumeLevel"  defaultValue="null" />
+            </params>
+        </method>
+        <method name="Get_Volume_Level" api="getVolumeLevel" type="method" desc="Get the Volume level" />
+        <method name="Set_Muted" api="setMuted" type="method" desc="Set the audio mute " >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="muted"  defaultValue="null" type="bool" />
+            </params>
+        </method>
+        <method name="Get_Muted" api="getMuted" type="method" desc="Get the audio mute status" />
+        <method name="Set_Audio_Delay" api="setAudioDelay" type="method" desc="Set the audio delay value" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="audioDelay"  defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Audio_Delay" api="getAudioDelay" type="method" desc="Get the audio delay value" />
+        <method name="Set_Audio_Delay_Offset" api="setAudioDelayOffset" type="method" desc="Set the audio delay offset value" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="audioDelayOffset"  defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Audio_Delay_Offset" api="getAudioDelayOffset" type="method" desc="Get the audio delay offset value" />
+        <method name="Set_Audio_Atmos_Output_Mode" api="setAudioAtmosOutputMode" type="method" desc="Enable or disable the audio atmos output modee" >
+            <params>
+                <param tag="enable"  defaultValue="null" type="bool" />
+            </params>
+        </method>
+        <method name="Get_Sink_Atmos_Capability" api="getSinkAtmosCapability" type="method" desc="Get the sink atmos capability" />
+        <method name="Get_TV_HDR_Capabilities" api="getTVHDRCapabilities" type="method" desc="Get the TV HDR  capability" />
+        <method name="Is_Connected_Device_Repeater" api="isConnectedDeviceRepeater" type="method" desc="Get the TV HDR capability" />
+        <method name="Get_Default_Resolution" api="getDefaultResolution" type="method" desc="Get the default resolution value" />
+        <method name="setScartParameter" api="setScartParameter" type="method" desc="Set Scart parameter values" >
+            <params>
+                <param tag="scartParameter"  defaultValue="null" />
+                <param tag="scartParameterData"  defaultValue="null" />
+            </params>
+        </method>
+    </plugin>
+
+</thunderPlugins>
+
+

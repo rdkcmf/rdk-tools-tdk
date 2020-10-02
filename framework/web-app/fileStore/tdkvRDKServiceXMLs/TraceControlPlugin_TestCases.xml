@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<testPlugin pluginName="TraceControl" pluginVersion="1">
+
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="TraceControl" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,TraceControl" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,TraceControl" />
+                <params>
+                  <param tag="callsign" value="TraceControl" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,TraceControl" />
+                <params>
+                  <param tag="plugin" value="TraceControl" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,TraceControl" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+        </pluginPreRequisite>
+
+
+        <testCase testCaseId="TC_01" testCaseName= "TraceControl_Application_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Application" />
+            <testStep testStepId="1" name="Get_All_Application_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Get_Application_Tracelevel" method="Get_Trace_Status" saveResult="true" revertGet="yes">
+                  <params>
+                    <param tag="module"   value="Application" />
+                    <param tag="category" value="Activity,WebFlow,SocketFlow,TextFlow,Information,Discovery" iteration="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state" />
+              </subtestStep>
+            </testStep>
+            <testStep testStepId="2" name="SetAndGet_All_Application_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Set_Application_Tracelevel" method="Set_Trace_Status" revertSet="yes">
+                  <params>
+                    <param tag="state" usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true" revertParam="yes" />
+                    <param tag="module"    value="Application" />
+                    <param tag="category"  value="Activity,WebFlow,SocketFlow,TextFlow,Information,Discovery" iteration="true" revertParam="yes" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Application_Tracelevel" method="Get_Trace_Status" revertFlag="yes">
+                  <params>
+                    <param tag="module"   value="Application" />
+                    <param tag="category" useIterable="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state">
+                     <expectedValues usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true"/>
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="TC_02" testCaseName= "TraceControl_Bluetooth_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Bluetooth" />
+            <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Activate_Bluetooth_Plugin">
+                   <testStep testStepId="1" name="Check_Bluetooth_Active_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                     <params>
+                       <param tag="plugin" value="org.rdk.Bluetooth" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Bluetooth" />
+                   </testStep>
+                   <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Bluetooth" />
+                     <params>
+                       <param tag="callsign" value="org.rdk.Bluetooth" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="3" name="Check_Bluethooth_Active_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Bluetooth" />
+                     <params>
+                       <param tag="plugin" value="org.rdk.Bluetooth" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Bluetooth" expectedValues="activated"/>
+                   </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+
+            <testStep testStepId="1" name="Get_All_Bluetooth_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Get_Bluetooth_Tracelevel" method="Get_Trace_Status" saveResult="true" revertGet="yes">
+                  <params>
+                    <param tag="module"   value="Bluetooth" />
+                    <param tag="category" value="Error,Information" iteration="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state" />
+              </subtestStep>
+            </testStep>
+            <testStep testStepId="2" name="SetAndGet_All_Bluetooth_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Set_Bluetooth_Tracelevel" method="Set_Trace_Status" revertSet="yes">
+                  <params>
+                    <param tag="state" usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true" revertParam="yes" />
+                    <param tag="module"    value="Bluetooth" />
+                    <param tag="category"  value="Error,Information" iteration="true" revertParam="yes" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Bluetooth_Tracelevel" method="Get_Trace_Status" revertFlag="yes">
+                  <params>
+                    <param tag="module"   value="Bluetooth" />
+                    <param tag="category" useIterable="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state">
+                     <expectedValues usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true"/>
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="TC_03" testCaseName= "TraceControl_Core_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Core" />
+            <testStep testStepId="1" name="Get_All_Core_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Get_Core_Tracelevel" method="Get_Trace_Status" saveResult="true" revertGet="yes">
+                  <params>
+                    <param tag="module"   value="Core" />
+                    <param tag="category" value="Error,Information" useConfigFile="true" key="CORE_PLUGIN_CATEGORY" iteration="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state" />
+              </subtestStep>
+            </testStep>
+            <testStep testStepId="2" name="SetAndGet_All_Core_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Set_Core_Tracelevel" method="Set_Trace_Status" revertSet="yes">
+                  <params>
+                    <param tag="state" usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true" revertParam="yes" />
+                    <param tag="module"    value="Core" />
+                    <param tag="category"  value="Error,Information" useConfigFile="true" key="CORE_PLUGIN_CATEGORY" iteration="true" revertParam="yes" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Core_Tracelevel" method="Get_Trace_Status" revertFlag="yes">
+                  <params>
+                    <param tag="module"   value="Core" />
+                    <param tag="category" useIterable="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state">
+                     <expectedValues usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true"/>
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="TC_04" testCaseName= "TraceControl_SysLog_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_All_SysLog_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Get_SysLog_Tracelevel" method="Get_Trace_Status" saveResult="true" revertGet="yes">
+                  <params>
+                    <param tag="module"   value="SysLog" />
+                    <param tag="category" value="ParsingError,Startup,Shutdown,Notification,Error,Fatal" iteration="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state" />
+              </subtestStep>
+            </testStep>
+            <testStep testStepId="2" name="SetAndGet_All_SysLog_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Set_SysLog_Tracelevel" method="Set_Trace_Status" revertSet="yes">
+                  <params>
+                    <param tag="state" usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true" revertParam="yes" />
+                    <param tag="module"    value="SysLog" />
+                    <param tag="category"  value="ParsingError,Startup,Shutdown,Notification,Error,Fatal" iteration="true" revertParam="yes" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_SysLog_Tracelevel" method="Get_Trace_Status" revertFlag="yes">
+                  <params>
+                    <param tag="module"   value="SysLog" />
+                    <param tag="category" useIterable="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state">
+                     <expectedValues usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true"/>
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+
+        <testCase testCaseId="TC_05" testCaseName= "TraceControl_Plugin_LocationSync_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+            <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Plugin_LocationSync" />
+
+            <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Activate_LocationSync_Plugin">
+                   <testStep testStepId="1" name="Check_LocationSync_Active_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                     <params>
+                       <param tag="plugin" value="LocationSync" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,LocationSync" />
+                   </testStep>
+                   <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,LocationSync" />
+                     <params>
+                       <param tag="callsign" value="LocationSync" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="3" name="Check_LocationSync_Active_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,LocationSync" />
+                     <params>
+                       <param tag="plugin" value="LocationSync" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,LocationSync" expectedValues="activated"/>
+                   </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+
+            <testStep testStepId="1" name="Get_Plugin_LocationSync_Tracelevel" method="Get_Trace_Status" saveResult="true" revertGet="yes">
+                <params>
+                  <param tag="module"   value="Plugin_LocationSync" />
+                  <param tag="category" useDefault="true" />
+                </params>
+                <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Plugin_LocationSync_Tracelevel" method="Set_Trace_Status" revertSet="yes">
+                <params>
+                  <param tag="module"    value="Plugin_LocationSync" />
+                  <param tag="category"  useDefault="true" />
+                  <param tag="state" usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" revertParam="yes" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Get_Plugin_LocationSync_Tracelevel" method="Get_Trace_Status" revertFlag="yes">
+                <params>
+                  <param tag="module"   value="Plugin_LocationSync" />
+                  <param tag="category" useDefault="true" />
+                </params>
+                <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state">
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="TC_06" testCaseName= "TraceControl_Plugin_OCDM_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+            <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="OCDM" />
+
+            <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Activate_OCDM_Plugin">
+                   <testStep testStepId="1" name="Check_OCDM_Active_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                     <params>
+                       <param tag="plugin" value="OCDM" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,OCDM" />
+                   </testStep>
+                   <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,OCDM" />
+                     <params>
+                       <param tag="callsign" value="OCDM" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="3" name="Check_OCDM_Active_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,OCDM" />
+                     <params>
+                       <param tag="plugin" value="OCDM" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,OCDM" expectedValues="activated"/>
+                   </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+
+            <testStep testStepId="1" name="Get_Plugin_OCDM_Tracelevel" method="Get_Trace_Status" saveResult="true" revertGet="yes">
+                <params>
+                  <param tag="module"   value="Plugin_OCDM" />
+                  <param tag="category" useDefault="true" />
+                </params>
+                <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Plugin_OCDM_Tracelevel" method="Set_Trace_Status" revertSet="yes">
+                <params>
+                  <param tag="module"    value="Plugin_OCDM" />
+                  <param tag="category"  useDefault="true" />
+                  <param tag="state" usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" revertParam="yes" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Get_Plugin_OCDM_Tracelevel" method="Get_Trace_Status" revertFlag="yes">
+                <params>
+                  <param tag="module"   value="Plugin_OCDM" />
+                  <param tag="category" useDefault="true" />
+                </params>
+                <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state">
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+
+        <testCase testCaseId="TC_07" testCaseName= "TraceControl_Plugin_Monitor_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Plugin_Monitor" />
+            <testStep testStepId="1" name="Get_All_Plugin_Monitor_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Get_Plugin_Monitor_Tracelevel" method="Get_Trace_Status" saveResult="true" revertGet="yes">
+                  <params>
+                    <param tag="module"   value="Plugin_Monitor" />
+                    <param tag="category" value="Information,Fatal,Error" iteration="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state" />
+              </subtestStep>
+            </testStep>
+            <testStep testStepId="2" name="SetAndGet_All_Plugin_Monitor_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Set_Plugin_Monitor_Tracelevel" method="Set_Trace_Status" revertSet="yes">
+                  <params>
+                    <param tag="state" usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true" revertParam="yes" />
+                    <param tag="module"    value="Plugin_Monitor" />
+                    <param tag="category"  value="Information,Fatal,Error" iteration="true" revertParam="yes" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Plugin_Monitor_Tracelevel" method="Get_Trace_Status" revertFlag="yes">
+                  <params>
+                    <param tag="module"   value="Plugin_Monitor" />
+                    <param tag="category" useIterable="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state">
+                     <expectedValues usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true"/>
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+
+        <testCase testCaseId="TC_08" testCaseName= "TraceControl_Plugin_WebKitBrowser_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Plugin_WebKitBrowser" />
+
+            <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Activate_WebKitBrowser_Plugin">
+                   <testStep testStepId="1" name="Check_WebKitBrowser_Active_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                     <params>
+                       <param tag="plugin" value="WebKitBrowser" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,WebKitBrowser" />
+                   </testStep>
+                   <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,WebKitBrowser" />
+                     <params>
+                       <param tag="callsign" value="WebKitBrowser" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="3" name="Check_WebKitBrowser_Active_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,WebKitBrowser" />
+                     <params>
+                       <param tag="plugin" value="WebKitBrowser" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,WebKitBrowser" />
+                   </testStep>
+                   <testStep testStepId="4" name="Is_WebKitBrowser_Resumed" method="Get_WebKitBrowser_State" pluginName="WebKitBrowser" saveResult="true" >
+                     <resultGeneration useMethodTag="webkitbrowser_get_state" />
+                   </testStep>
+                   <testStep testStepId="5" name="Resume_WebKitBrowser" method="Set_WebKitBrowser_State" pluginName="WebKitBrowser" >
+                     <conditionalExecution enable="true" Id="4" useMethodTag="webkitbrowser_check_state" arguments="isSuspended" />
+                     <params>
+                       <param tag="state" useDefault="true" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="6" name="Is_WebKitBrowser_Resumed" method="Get_WebKitBrowser_State" pluginName="WebKitBrowser" >
+                     <conditionalExecution enable="true" Id="4" useMethodTag="webkitbrowser_check_state" arguments="isSuspended" />
+                     <resultGeneration useMethodTag="webkitbrowser_get_state" expectedValues="resumed" />
+                   </testStep>
+                </prerequisite>
+        </testCasePreRequisite>
+
+            <testStep testStepId="1" name="Get_All_Plugin_WebKitBrowser_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Get_Plugin_WebKitBrowser_Tracelevel" method="Get_Trace_Status" saveResult="true" revertGet="yes">
+                  <params>
+                    <param tag="module"   value="Plugin_WebKitBrowser" />
+                    <param tag="category" useConfigFile="true" key="WEBKIT_PLUGIN_CATEGORY" iteration="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state" />
+              </subtestStep>
+            </testStep>
+            <testStep testStepId="2" name="SetAndGet_All_Plugin_WebKitBrowser_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Set_Plugin_WebKitBrowser_Tracelevel" method="Set_Trace_Status" revertSet="yes">
+                  <params>
+                    <param tag="state" usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true" revertParam="yes" />
+                    <param tag="module"    value="Plugin_WebKitBrowser" />
+                    <param tag="category"  useConfigFile="true" key="WEBKIT_PLUGIN_CATEGORY" iteration="true" revertParam="yes" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Plugin_WebKitBrowser_Tracelevel" method="Get_Trace_Status" revertFlag="yes">
+                  <params>
+                    <param tag="module"   value="Plugin_WebKitBrowser" />
+                    <param tag="category" useIterable="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state">
+                     <expectedValues usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true"/>
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+
+        <testCase testCaseId="TC_09" testCaseName= "TraceControl_Plugin_Messenger_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Plugin_Messenger" />
+
+            <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Activate_Messenger_Plugin">
+                   <testStep testStepId="1" name="Check_Messenger_Active_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                     <params>
+                       <param tag="plugin" value="Messenger" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,Messenger" />
+                   </testStep>
+                   <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,Messenger" />
+                     <params>
+                       <param tag="callsign" value="Messenger" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="3" name="Check_Bluethooth_Active_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,Messenger" />
+                     <params>
+                       <param tag="plugin" value="Messenger" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,Messenger" expectedValues="activated"/>
+                   </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+
+            <testStep testStepId="1" name="Get_All_Plugin_Messenger_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Get_Plugin_Messenger_Tracelevel" method="Get_Trace_Status" saveResult="true" revertGet="yes">
+                  <params>
+                    <param tag="module"   value="Plugin_Messenger" />
+                    <param tag="category" value="Information,Warning,Error" iteration="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state" />
+              </subtestStep>
+            </testStep>
+            <testStep testStepId="2" name="SetAndGet_All_Plugin_Messenger_Tracelevels" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Set_Plugin_Messenger_Tracelevel" method="Set_Trace_Status" revertSet="yes">
+                  <params>
+                    <param tag="state" usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true" revertParam="yes" />
+                    <param tag="module"    value="Plugin_Messenger" />
+                    <param tag="category"  value="Information,Warning,Error" iteration="true" revertParam="yes" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Plugin_Messenger_Tracelevel" method="Get_Trace_Status" revertFlag="yes">
+                  <params>
+                    <param tag="module"   value="Plugin_Messenger" />
+                    <param tag="category" useIterable="true" />
+                  </params>
+                  <resultGeneration useMethodTag="tracecontrol_get_state" arguments="check_state">
+                     <expectedValues usePreviousResult="true" Id="1" useMethodTag="tracecontrol_toggle_state" useIterableArg="true"/>
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+
+       <testCase testCaseId="TC_10" testCaseName="TraceControl_ActivateDeactivate_STRESS" desc="Activates and deactivates the plugin">
+             <testCaseInfo testCaseType="stress" configurableRepeat="true" repeatKey="STRESS_TEST_REPEAT_COUNT" />
+
+             <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+                   <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                     <params>
+                       <param tag="plugin" value="DeviceInfo" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" />
+                   </testStep>
+                   <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,DeviceInfo" />
+                     <params>
+                       <param tag="callsign" value="DeviceInfo" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,DeviceInfo" />
+                     <params>
+                       <param tag="plugin" value="DeviceInfo" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" expectedValues="activated"/>
+                   </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+
+            <testStep testStepId="1" name="Check_TraceControl_Active_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                  <params>
+                    <param tag="plugin"  value="TraceControl" indexOnly="true" />
+                  </params>
+                  <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,TraceControl"/>
+            </testStep>
+            <testStep testStepId="2" name="Plugin_ActivateDeactivate_STRESS" testStepType="repeat" >
+              <subtestStep subtestStepId="1" name="Deactivate_TraceControl_Plugin" method="Deactivate_Plugin"  pluginName="Controller">
+                  <params>
+                    <param tag="callsign"  value="TraceControl" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Activate_TraceControl_Plugin" method="Activate_Plugin"  pluginName="Controller" delay="1">
+                  <params>
+                    <param tag="callsign" value="TraceControl" />
+                  </params>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Get_CPU_Load" method="Get_System_Info" pluginName="DeviceInfo" >
+                  <resultGeneration useMethodTag="deviceinfo_get_system_info" arguments="check_cpu_load" />
+              </subtestStep>
+            </testStep>
+    </testCase>
+</testPlugin>
+
