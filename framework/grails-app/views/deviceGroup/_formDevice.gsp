@@ -286,14 +286,34 @@
 	</g:if>
 </g:if>
 <g:if test="${ deviceInstance?.category != com.comcast.rdk.Category.RDKB && deviceInstance?.category != com.comcast.rdk.Category.RDKC}">
-	<div id="isThunderEnabled"
+	<div id="isThunderEnabledDiv"
 		class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'isThunderEnabled', 'error')}">
 		<label for="isThunderEnabled"> <g:message
 				code="device.isThunderEnabled.label" default="Is Thunder Enabled" />
 		</label>
 		<g:checkBox id="isThunderEnabled" name="thunderEnabled"
-			checked="${deviceInstance?.isThunderEnabled == 1}" />
+			onclick="showThunderPortDiv();" checked="${deviceInstance?.isThunderEnabled == 1}" />
 	</div>
+	<g:if test="${deviceInstance?.isThunderEnabled == 1}">
+		<div id="thunderPortConfigure" class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'thunderPort', 'error')} required">
+			<label for="thunderPort"> <g:message
+					code="device.thunderPort.label" default="Thunder Port" /><span
+					class="required-indicator">*</span>
+			</label>
+			<g:textField name="thunderPortValue" id="thunderPort"
+				value="${deviceInstance?.thunderPort}" class="textwidth" />
+		</div>
+	</g:if>
+	<g:else>
+		<div id="thunderPortConfigure" style="display: none;" class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'thunderPort', 'error')} required">
+			<label for="thunderPort"> <g:message
+					code="device.thunderPort.label" default="Thunder Port" /><span
+					class="required-indicator">*</span>
+			</label>
+			<g:textField name="thunderPortValue" id="thunderPort"
+				value="80" class="textwidth" />
+		</div>
+	</g:else>
 </g:if>
 <div id="portConfigureDiv" class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'portConfigure', 'error')}">
 	<label for="portConfigure"> <g:message code="device.portConfigure.label" default="Configure Device Ports" />
