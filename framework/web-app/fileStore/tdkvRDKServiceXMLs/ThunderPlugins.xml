@@ -278,9 +278,24 @@
             </params>
             <expectedValues>null</expectedValues>
         </method>
+        <method name="Get_UserAgent"  api="useragent" type="method" desc="Gets userAgent string used by browser" />
+        <method name="Set_UserAgent"  api="useragent" type="method" desc="Sets userAgent string used by browser" >
+            <params paramType="directString">
+                <param tag="useragent" defaultValue="null" />
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Event_Load_Finished" api="loadfinished" eventId="client.events.1" type="event" desc="URL loaded event" >
+            <expectedValues>200</expectedValues>
+        </method>
+        <method name="Event_Load_Failed" api="loadfailed" eventId="client.events.1" type="event" desc="URL load failed event" />
+        <method name="Event_URL_Change" api="urlchange" eventId="client.events.1" type="event" desc="URL Change event" />
+        <method name="Event_Visibility_Change" api="visibilitychange" eventId="client.events.1" type="event" desc="Visibility Change event"/>
+        <method name="Event_Page_Closure" api="pageclosure" eventId="client.events.1" type="event" desc="Web page close event">
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Event_State_Change" api="statechange" eventId="client.events.1" type="event" desc="Service state change event" />
     </plugin>
-
-
 
 
     <!-- System Plugin Information -->
@@ -354,7 +369,9 @@
                 <param tag="standbyMode" defaultValue="null" />
             </params>
         </method>
-        <method name="Get_Mode" api="getMode" type="method" desc="Gets currently set mode" />
+        <method name="Get_Mode" api="getMode" type="method" desc="Gets currently set mode" >
+                <expectedValues>NORMAL,EAS,WAREHOUSE</expectedValues>
+        </method>
         <method name="Set_Mode" api="setMode" type="method" desc="Set mode for specific duration">
             <params>
                 <param tag="mode" defaultValue="null" />
@@ -370,6 +387,17 @@
                 <param tag="standbyReason" defaultValue="APIUnitTest" />
             </params>
         </method>
+        <method name="Has_Reboot_BeenRequested" api="hasRebootBeenRequested" type="method" desc="Check whether a reboot has been requested." >
+            <expectedValues>true,false</expectedValues>
+        </method>
+        <method name="Query_MocaStatus" api="queryMocaStatus" type="method" desc="Check whether Moca is enabled" >
+            <expectedValues>true,false</expectedValues>
+        </method>
+        <method name="Clear_Last_DeepSleep_Reason" api="clearLastDeepSleepReason" type="method" desc="Clear the last deep sleep reason." />
+        <method name="Get_Last_DeepSleep_Reason" api="getLastDeepSleepReason" type="method" desc="Retrieve the last deep sleep reason." />
+        <method name="Get_PreviousReboot_Info" api="getPreviousRebootInfo" type="method" desc="Retrieve basic information about a reboot" />
+        <method name="Get_PreviousReboot_Info2" api="getPreviousRebootInfo2" type="method" desc="Retrieve detailed information about a reboot" />
+        <method name="Get_PreviousReboot_Reason" api="getPreviousRebootReason" type="method" desc="Retrieve the last reboot reason." />
     </plugin>
 
 
@@ -601,130 +629,218 @@
     </plugin>
 
 
-    <!-- Power Plugin Information -->
-    <plugin pluginName="Power" serviceName="Power" serviceVersion="1">
-        <!-- Power.1.state : provides access to power state -->
-        <method name="Get_Power_State" api="state" type="property" desc="Provides access to power state">
-            <expectedValues>on,activestandby,passivestandby,suspendtoram,hibernate,poweroff</expectedValues>
-        </method>
-
-        <!-- Power.1.set : sets the power state -->
-        <method name="Set_Power_State" api="set" type="method" desc="Sets power state">
+    <!-- ActivityMonitor Plugin Information -->
+    <plugin pluginName="ActivityMonitor" serviceName="org.rdk.ActivityMonitor" serviceVersion="1">
+        <method name="EnableMonitoring" api="enableMonitoring" type="method" desc="Enables monitoring for the given application PIDs with the given thresholds for memory and CPU usage at frequencies specified by the intervals"/>
+        <!-- Nested input params needed for enableMonitoring method. This will be covered later -->
+        <method name="DisableMonitoring" api="disableMonitoring" type="method" desc="Disables monitoring"/>
+        <method name="GetApplicationMemoryUsage" api="getApplicationMemoryUsage" type="method" desc="Returns memory usage by this application">
             <params>
-                <param tag="powerstate" defaultValue="null"/>
-                <param tag="timeout"    defaultValue="0"/>
+                <param tag="pid" defaultValue="null" type="int" />
             </params>
-            <expectedValues>null</expectedValues>
+        </method>
+        <method name="GetAllMemoryUsage" api="getAllMemoryUsage" type="method" desc="Returns memory used by all applications"/>
+    </plugin>
+
+
+    <!-- HdmiCec Plugin Information -->
+    <plugin pluginName="HdmiCec" serviceName="org.rdk.HdmiCec" serviceVersion="1">
+        <method name="GetEnabled" api="getEnabled" type="method" desc="Returns if CEC is enabled.">
+        <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="GetCECAddresses" api="getCECAddresses" type="method" desc="return the JSON object CECAddresses that is assigned to the local device."/>
+        <method name="SetEnabled" api="setEnabled" type="method" desc="Enables or disables CEC.">
+            <params>
+                <param tag="enabled" defaultValue="null" type="bool" />
+            </params>
+        </method>
+        <method name="SendMessage" api="sendMessage" type="method" desc="writes CEC frame to the driver">
+            <params>
+                <param tag="message" defaultValue="null" />
+            </params>
         </method>
     </plugin>
 
 
+    <!-- StateObserver Plugin Information -->
+    <plugin pluginName="StateObserver" serviceName="com.comcast.StateObserver" serviceVersion="1">
+        <method name="GetValues" api="getValues" type="method" desc="This API takes a property or an array of properties as input and returns the values and errors of the same" >
+            <params>
+                <param tag="PropertyNames" defaultValue="null" type="list" />
+            </params>
+        </method>
+        <method name="RegisterListeners" api="registerListeners" type="method" desc="This API is used to register listeners to  properties so that any value change occurring in these registered properties will be notified" >
+            <params>
+                <param tag="PropertyNames" defaultValue="null" type="list" />
+            </params>
+        </method>
+        <method name="UnregisterListeners" api="unregisterListeners" type="method" desc="Unregisters the listeners allocated to the properties" >
+            <params>
+                <param tag="PropertyNames" defaultValue="null" type="list" />
+            </params>
+        </method>
+        <method name="GetRegisteredPropertyNames" api="getRegisteredPropertyNames" type="method" desc="Returns an array of all properties, which has active listeners."/>
+        <method name="GetApiVersionNumber" api="getApiVersionNumber" type="method" desc="This API is used to get the api verison number"/>
+        <method name="SetApiVersionNumber" api="setApiVersionNumber" type="method" desc="This API is used to set the api verison number">
+            <params>
+                <param tag="version" defaultValue="null" type="int" />
+            </params>
+        </method>
+        <method name="GetName" api="getName" type="method" desc="This API is used to get the plugin name"/>
+    </plugin>
+
+    <!-- FrameRate Plugin Information -->
+    <plugin pluginName="FrameRate" serviceName="org.rdk.FrameRate" serviceVersion="1">
+        <method name="Set_Collection_Frequency" api="setCollectionFrequency" type="method" desc="Set amount of milliseconds per collection interval">
+            <params>
+                <param tag="frequencyInMs" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Set_Collection_Frequency_Default" api="setCollectionFrequency" type="method" desc="Set 10 milliseconds per collection interval"/>
+        <method name="Start_FPS_Collection" api="startFpsCollection" type="method" desc="Starts the fps collection"/>
+        <method name="Stop_FPS_Collection"  api="stopFpsCollection"  type="method" desc="Stops the fps collection"/>
+        <method name="Event_On_FPS" api="onFpsEvent" eventId="client.events.1" type="event" desc="Fired at given interval and after stopFpsCollection" />
+    </plugin>
+
 
     <!-- WifiControl Plugin Information -->
-    <plugin pluginName="WifiControl" serviceName="WifiControl" serviceVersion="1">
-        <method name="Scan_Networks" api="scan" type="method" desc="Searches for available networks">
-            <expectedValues>null</expectedValues>
-        </method>
-        <method name="Connect" api="connect" type="method" desc="Attempts connection to a network">
+    <plugin pluginName="Wifi" serviceName="org.rdk.Wifi" serviceVersion="1">
+        <method name="Start_Scan" api="startScan" type="method" desc="Searches for available SSIDs">
             <params>
                 <param tag="ssid" defaultValue="null"/>
+                <param tag="incremental" defaultValue="true" type="bool" />
+                <param tag="frequency" defaultValue="null"/>
             </params>
-            <expectedValues>null</expectedValues>
         </method>
-        <method name="Disconnect" api="set" type="method" desc="Disconnects from a network">
+        <method name="Stop_Scan" api="stopScan" type="method" desc="Stops scanning for SSIDs" />
+        <method name="Connect" api="connect" type="method" desc="Attempts connection to SSID">
             <params>
                 <param tag="ssid" defaultValue="null"/>
+                <param tag="passphrase" defaultValue="null"/>
+                <param tag="securityMode" defaultValue="null" type="int" />
             </params>
-            <expectedValues>null</expectedValues>
         </method>
-        <method name="Save_Configurations" api="store" type="method" desc="Stores the configurations in persistent storage">
-            <expectedValues>null</expectedValues>
+        <method name="Disconnect" api="disconnect" type="method" desc="Disconnects from SSID"/>
+        <method name="Get_Current_State" api="getCurrentState" type="method" desc="Gets WIFI state">
+            <expectedValues>0,1,2,3,4,5,6</expectedValues>
         </method>
-        <method name="Remove_Configurations" api="delete" type="method" desc="Forgets the configuration of a network">
+        <method name="Set_Enabled" api="setEnabled" type="method" desc="Enable or disable WIFI Adapter">
+            <params>
+                <param tag="enable" defaultValue="true" type="bool" />
+            </params>
+        </method>
+        <method name="Get_Connect_SSID" api="getConnectedSSID" type="method" desc="Gives connected SSID information"/>
+        <method name="Save_SSID_Info" api="saveSSID" type="method" desc="Saves ssid information">
             <params>
                 <param tag="ssid" defaultValue="null"/>
+                <param tag="passphrase" defaultValue="null"/>
+                <param tag="securityMode" defaultValue="null" type="int" />
             </params>
-            <expectedValues>null</expectedValues>
+            <expectedValues>0</expectedValues>
         </method>
-        <method name="Get_Network_Status" api="status" type="property" desc="Gives the network status"/>
-        <method name="Get_Available_Networks" api="networks " type="property" desc="Gives the available networks"/>
-        <method name="Get_All_Network_Configs" api="configs" type="property" desc="Provides access to the all WiFi configurations"/>
-        <method name="Get_Network_Config" api="config"  type="property" desc="Provides access to the single WiFi configuration">
+        <method name="Clear_SSID_Info" api="clearSSID" type="property" desc="Clears saved SSID information">
+            <expectedValues>0</expectedValues>
+        </method>
+        <method name="Event_On_WIFI_State_Changed" api="onWIFIStateChanged" eventId="client.events.1" type="event" desc="Indicates state change" />
+        <method name="Event_On_Available_SSIDs" api="onAvailableSSIDs" eventId="client.events.1" type="event" desc="Gives SSID after scan" />
+    </plugin>
+
+
+    <!-- Bluetooth Plugin Information -->
+    <plugin pluginName="Bluetooth" serviceName="org.rdk.Bluetooth" serviceVersion="1">
+        <method name="Enable_Stack" api="enable" type="method" desc="Enables the Bluetooth stack"/>
+        <method name="Disable_Stack" api="disable" type="method" desc="Disables the Bluetooth stack"/>
+        <method name="Get_Name" api="getName" type="method" desc="Provides name of the device as seen by other Bluetooth devices"/>
+        <method name="Set_Name" api="setName" type="method" desc="Sets the name of this device as seen by other Bluetooth devices"/>
+        <method name="Is_Discoverable" api="isDiscoverable" type="method" desc="Provides discoverable status of the device">
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Set_Discoverable" api="setDiscoverable" type="method" desc="Sets the discoverable status of the device">
             <params>
-                <param tag="ssid" defaultValue="null" type="index"/>
+                <param tag="discoverable" defaultValue="true" type="bool" />
+                <param tag="timeout"      defaultValue="10" type="int" />
             </params>
         </method>
-        <method name="Set_Network_Config" api="config"  type="property" desc="Provides access to the single WiFi configuration">
+        <method name="Start_Scan" api="startScan" type="method" desc="Searches for available Bluetooth devices">
             <params>
-                <param tag="ssid" defaultValue="null" indexing="true"/>
-                <param tag="type" defaultValue="null" />
-                <param tag="hidden" defaultValue="null" />
-                <param tag="accesspoint" defaultValue="null" />
-                <param tag="psk" defaultValue="null" />
-                <param tag="hash" defaultValue="null" />
-                <param tag="identity" defaultValue="null" />
-                <param tag="password" defaultValue="null" />
+                <param tag="timeout" defaultValue="10" type="int" />
+                <param tag="profile" defaultValue="DEFAULT"/>
             </params>
-            <expectedValues>null</expectedValues>
         </method>
+        <method name="Stop_Scan" api="stopScan" type="method" desc="Stops scanning for Bluetooth devices" />
+        <method name="Get_Discovered_Devices" api="getDiscoveredDevices" type="method" desc="Gives discovered Bluetooth devices" />
+        <method name="Event_On_Discovered_Device" api="onDiscoveredDevice" eventId="client.events.1" type="event" desc="Gives discovered Bluetooth devices" />
+    </plugin>
+
+
+    <!-- Warehouse Plugin Information -->
+    <plugin pluginName="Warehouse" serviceName="org.rdk.Warehouse" serviceVersion="1">
+        <method name="Get_DeviceInfo" api="getDeviceInfo" type="method" desc="Provides STB device information"/>
+        <method name="Set_FrontPanel_State" api="setFrontPanelState" type="method" desc="Sets the discoverable status of the device">
+            <params>
+                <param tag="state" defaultValue="-1" type="int" />
+            </params>
+        </method>
+        <method name="Light_Reset" api="lightReset" type="method" desc="Performs light reset"/>
+        <method name="Is_clean" api="isClean" type="method" desc="Checks locations where customer data may be stored"/>
     </plugin>
 
 
     <!-- Display Settings Plugin Information -->
     <plugin pluginName="DisplaySettings" serviceName="org.rdk.DisplaySettings" serviceVersion="1">
-        <method name="Get_Connected_VideoDisplays" api="getConnectedVideoDisplays" type="method" desc="Get the connected video display details"/>
-        <method name="Get_Supported_VideoDisplays" api="getSupportedVideoDisplays" type="method" desc="Get the supported video display details"/>
-        <method name="Get_Supported_Resolutions" api="getSupportedResolutions" type="method" desc="Get the supported resolutions details">
+	<method name="Get_Connected_VideoDisplays" api="getConnectedVideoDisplays" type="method" desc="Get the connected video display details"/>
+	<method name="Get_Supported_VideoDisplays" api="getSupportedVideoDisplays" type="method" desc="Get the supported video display details"/>
+	<method name="Get_Supported_Resolutions" api="getSupportedResolutions" type="method" desc="Get the supported resolutions details">
+    	    <params>
+	        <param tag="videoDisplay" defaultValue="null"/>
+	    </params>	
+        </method>
+	<method name="Get_Supported_Tv_Resolutions" api="getSupportedTvResolutions" type="method" desc="Get the supported TV Resolutions details">
             <params>
                 <param tag="videoDisplay" defaultValue="null"/>
             </params>
         </method>
-        <method name="Get_Supported_Tv_Resolutions" api="getSupportedTvResolutions" type="method" desc="Get the supported TV Resolutions details">
+	<method name="Get_Supported_Settop_Resolutions" api="getSupportedSettopResolutions" type="method" desc="Get the supported Set top box Resolutions details">
+        </method>
+	<method name="Get_Current_Resolution" api="getCurrentResolution" type="method" desc="Get the current resolution details">
             <params>
                 <param tag="videoDisplay" defaultValue="null"/>
             </params>
         </method>
-        <method name="Get_Supported_Settop_Resolutions" api="getSupportedSettopResolutions" type="method" desc="Get the supported Set top box Resolutions details">
-        </method>
-        <method name="Get_Current_Resolution" api="getCurrentResolution" type="method" desc="Get the current resolution details">
-            <params>
-                <param tag="videoDisplay" defaultValue="null"/>
-            </params>
-        </method>
-        <method name="Set_Current_Resolution" api="setCurrentResolution" type="method" desc="Set the current resolution values">
+	<method name="Set_Current_Resolution" api="setCurrentResolution" type="method" desc="Set the current resolution values">
             <params>
                 <param tag="videoDisplay" defaultValue="null"/>
                 <param tag="resolution" defaultValue="null"/>
                 <param tag="persist" defaultValue="null" type="bool"/>
             </params>
         </method>
-        <method name="Get_Connected_AudioPorts" api="getConnectedAudioPorts" type="method" desc="Get the connected audio port details"/>
-        <method name="Get_Supported_AudioPorts" api="getSupportedAudioPorts" type="method" desc="Get the supported audio port details"/>
-        <method name="Get_Supported_AudioModes" api="getSupportedAudioModes" type="method" desc="Get the supported audio modes details">
+	<method name="Get_Connected_AudioPorts" api="getConnectedAudioPorts" type="method" desc="Get the connected audio port details"/>
+	<method name="Get_Supported_AudioPorts" api="getSupportedAudioPorts" type="method" desc="Get the supported audio port details"/>
+	<method name="Get_Supported_AudioModes" api="getSupportedAudioModes" type="method" desc="Get the supported audio modes details">
             <params>
                 <param tag="audioPort" defaultValue="null"/>
             </params>
         </method>
-        <method name="Get_Sound_Mode" api="getSoundMode" type="method" desc="Get the sound mode details">
+	<method name="Get_Sound_Mode" api="getSoundMode" type="method" desc="Get the sound mode details">
             <params>
                 <param tag="audioPort" defaultValue="null"/>
             </params>
         </method>
-        <method name="Set_Sound_Mode" api="setSoundMode" type="method" desc="Set the sound mode values">
+	<method name="Set_Sound_Mode" api="setSoundMode" type="method" desc="Set the sound mode values">
             <params>
                 <param tag="audioPort" defaultValue="null"/>
                 <param tag="soundMode"  defaultValue="null"/>
                 <param tag="persist" defaultValue="null" type="bool"/>
             </params>
         </method>
-        <method name="Get_Zoom_Setting" api="getZoomSetting" type="method" desc="Get the zoom setting details"/>
-        <method name="Set_Zoom_Setting" api="setZoomSetting" type="method" desc="Set the zoom setting values">
+	<method name="Get_Zoom_Setting" api="getZoomSetting" type="method" desc="Get the zoom setting details"/>
+	<method name="Set_Zoom_Setting" api="setZoomSetting" type="method" desc="Set the zoom setting values">
             <params>
                 <param tag="zoomSetting" defaultValue="null"/>
             </params>
         </method>
-        <method name="Read_EDID" api="readEDID" type="method" desc="Read the EDID of connected output device"/>
-        <method name="Read_Host_EDID" api="readHostEDID"  type="method" desc="Read the Host(STB) EDID details"/>
+	<method name="Read_EDID" api="readEDID" type="method" desc="Read the EDID of connected output device"/>
+	<method name="Read_Host_EDID" api="readHostEDID"  type="method" desc="Read the Host(STB) EDID details"/>
         <method name="Get_Active_Input" api="getActiveInput" type="method" desc="Get the active input status">
             <expectedValues>True,False</expectedValues>
         </method>
@@ -769,89 +885,151 @@
         <method name="Get_Dialog_Enhancement" api="getDialogEnhancement" type="method" desc="Get the Dialog Enhancement value" >
             <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16</expectedValues>
         </method>
-        <method name="SetIntelligentEqualizerMode" api="setIntelligentEqualizerMode" type="method" desc="Set the intelligent equalizer mode values" >
+        <method name="Set_Intelligent_Equalizer_Mode" api="setIntelligentEqualizerMode" type="method" desc="Set the intelligent equalizer mode values" >
             <params>
                 <param tag="intelligentEqualizerMode" defaultValue="null"/>
             </params>
         </method>
-        <method name="Get_Intelligent_Equalizer_Mode" api="getIntelligentEqualizerMode" type="method" desc="Get the intelligent equalizer modevalue" />
+        <method name="Get_Intelligent_Equalizer_Mode" api="getIntelligentEqualizerMode" type="method" desc="Get the intelligent equalizer modevalue" >
+            <expectedValues>1,2,3</expectedValues>
+        </method>
         <method name="Set_Volume_Leveller" api="setVolumeLeveller" type="method" desc="Set the volume leveller values" >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
                 <param tag="level" defaultValue="null"/>
             </params>
         </method>
-        <method name="Get_Volume_Leveller" api="getVolumeLeveller" type="method" desc="Get the volume leveller value" />
+        <method name="Get_Volume_Leveller" api="getVolumeLeveller" type="method" desc="Get the volume leveller value" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+            <expectedValues>0,1,2,3,4,5,6,7,8,9,10</expectedValues>
+        </method>
         <method name="Set_Bass_Enhancer" api="setBassEnhancer" type="method" desc="Enable or disable the bass enhancer" >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
-                <param tag="bassEnhancerEnable" defaultValue="null" type="bool" />
+                <param tag="bassBoost" defaultValue="null" type="bool" />
             </params>
         </method>
-        <method name="Get_Bass_Enhancer" api="getBassEnhancer" type="method" desc="Get the bass enhancer status" />
+        <method name="Get_Bass_Enhancer" api="getBassEnhancer" type="method" desc="Get the bass enhancer status" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
         <method name="Set_Surround_Virtualizer" api="setSurroundVirtualizer" type="method" desc="Set the surround virtualizer values" >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
                 <param tag="boost"  defaultValue="null"/>
             </params>
         </method>
-        <method name="Get_Surround_Virtualizer" api="getSurroundVirtualizer" type="method" desc="Get the surround virtualizer value" />
+        <method name="Get_Surround_Virtualizer" api="getSurroundVirtualizer" type="method" desc="Get the surround virtualizer value" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
         <method name="Set_MI_Steering" api="setMISteering" type="method" desc="Enable or disable the MI Steering" >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
                 <param tag="MISteeringEnable"  defaultValue="null" type="bool"/>
             </params>
         </method>
-        <method name="Get_MI_Steering" api="getMISteering" type="method" desc="Get the MI steering status" />
+        <method name="Get_MI_Steering" api="getMISteering" type="method" desc="Get the MI steering status" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+            <expectedValues>True,False</expectedValues>
+        </method>
         <method name="Enable_Surround_Decoder" api="enableSurroundDecoder" type="method" desc="Enable or disable the surround decoder" >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
                 <param tag="surroundDecoderEnable"  defaultValue="null" type="bool"/>
             </params>
         </method>
-        <method name="Is_Surround_Decoder_Enabled" api="isSurroundDecoderEnabled" type="method" desc="Get the surround decoder status" />
+        <method name="Is_Surround_Decoder_Enabled" api="isSurroundDecoderEnabled" type="method" desc="Get the surround decoder status" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+            <expectedValues>True,False</expectedValues>
+        </method>
         <method name="Set_DRC_Mode" api="setDRCMode" type="method" desc="Set the DRC mode values " >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
                 <param tag="DRCMode"  defaultValue="null" />
             </params>
         </method>
-        <method name="Get_DRC_Mode" api="getDRCMode" type="method" desc="Get the DRC mode value" />
+        <method name="Get_DRC_Mode" api="getDRCMode" type="method" desc="Get the DRC mode value" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+            <expectedValues>line,RF</expectedValues>
+        </method>
         <method name="Set_Volume_Level" api="setVolumeLevel" type="method" desc="Set the volume level value " >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
                 <param tag="volumeLevel"  defaultValue="null" />
             </params>
         </method>
-        <method name="Get_Volume_Level" api="getVolumeLevel" type="method" desc="Get the Volume level" />
+        <method name="Get_Volume_Level" api="getVolumeLevel" type="method" desc="Get the Volume level" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Set_Gain" api="setGain" type="method" desc="Set the audio port gain value " >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="gain"  defaultValue="null" />
+            </params>
+        </method>
+        <method name="Get_Gain" api="getGain" type="method" desc="Get the audio port gain value" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
         <method name="Set_Muted" api="setMuted" type="method" desc="Set the audio mute " >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
                 <param tag="muted"  defaultValue="null" type="bool" />
             </params>
         </method>
-        <method name="Get_Muted" api="getMuted" type="method" desc="Get the audio mute status" />
+        <method name="Get_Muted" api="getMuted" type="method" desc="Get the audio mute status" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+            <expectedValues>True,False</expectedValues>
+        </method>
         <method name="Set_Audio_Delay" api="setAudioDelay" type="method" desc="Set the audio delay value" >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
                 <param tag="audioDelay"  defaultValue="null"/>
             </params>
         </method>
-        <method name="Get_Audio_Delay" api="getAudioDelay" type="method" desc="Get the audio delay value" />
+        <method name="Get_Audio_Delay" api="getAudioDelay" type="method" desc="Get the audio delay value" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
         <method name="Set_Audio_Delay_Offset" api="setAudioDelayOffset" type="method" desc="Set the audio delay offset value" >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
                 <param tag="audioDelayOffset"  defaultValue="null"/>
             </params>
         </method>
-        <method name="Get_Audio_Delay_Offset" api="getAudioDelayOffset" type="method" desc="Get the audio delay offset value" />
+        <method name="Get_Audio_Delay_Offset" api="getAudioDelayOffset" type="method" desc="Get the audio delay offset value" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
         <method name="Set_Audio_Atmos_Output_Mode" api="setAudioAtmosOutputMode" type="method" desc="Enable or disable the audio atmos output modee" >
             <params>
                 <param tag="enable"  defaultValue="null" type="bool" />
             </params>
         </method>
-        <method name="Get_Sink_Atmos_Capability" api="getSinkAtmosCapability" type="method" desc="Get the sink atmos capability" />
-        <method name="Get_TV_HDR_Capabilities" api="getTVHDRCapabilities" type="method" desc="Get the TV HDR  capability" />
+        <method name="Get_Sink_Atmos_Capability" api="getSinkAtmosCapability" type="method" desc="Get the sink atmos capability" >
+            <expectedValues>1,2,3</expectedValues>
+        </method>
+        <method name="Get_TV_HDR_Capabilities" api="getTVHDRCapabilities" type="method" desc="Get the TV HDR  capability" >
+            <expectedValues>0,1,2,4,8</expectedValues>
+        </method>
         <method name="Is_Connected_Device_Repeater" api="isConnectedDeviceRepeater" type="method" desc="Get the TV HDR capability" />
         <method name="Get_Default_Resolution" api="getDefaultResolution" type="method" desc="Get the default resolution value" />
         <method name="setScartParameter" api="setScartParameter" type="method" desc="Set Scart parameter values" >

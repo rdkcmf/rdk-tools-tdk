@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<testPlugin pluginName="ActivityMonitor" pluginVersion="1">
+    <pluginPreRequisite>
+      <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+        <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+            <params>
+              <param tag="plugin" value="org.rdk.ActivityMonitor" indexOnly="true" />
+            </params>
+            <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.ActivityMonitor" />
+        </testStep>
+        <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+            <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.ActivityMonitor" />
+            <params>
+              <param tag="callsign" value="org.rdk.ActivityMonitor" />
+            </params>
+        </testStep>
+        <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+            <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.ActivityMonitor" />
+            <params>
+              <param tag="plugin" value="org.rdk.ActivityMonitor" indexOnly="true" />
+            </params>
+            <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.ActivityMonitor" expectedValues="activated"/>
+        </testStep>
+      </prerequisite>
+    </pluginPreRequisite>
+
+
+    <!-- Test case 01 -->
+    <testCase testCaseId="ActivityMonitor_01" testCaseName= "GetAllMemoryUsuage" desc="Returns memory used by all applications">
+      <testCaseInfo testCaseType="direct"/>
+      <testStep testStepId="1" name="Get_All_Application_Memory_Usage" method="GetAllMemoryUsage">
+        <resultGeneration useMethodTag="activitymonitor_check_applications_memory" />
+      </testStep>
+    </testCase>
+
+    <!-- Test case 02 -->
+    <testCase testCaseId="ActivityMonitor_02" testCaseName= "GetApplicationMemoryUsage" desc="Get memory usage by this application">
+      <testCaseInfo testCaseType="direct"/>
+      <testStep testStepId="1" name="Get_All_Application_Memory_Usage" method="GetAllMemoryUsage" saveResult="true">
+        <resultGeneration useMethodTag="activitymonitor_check_applications_memory" />
+      </testStep>
+      <testStep testStepId="2" name="Get_Application_Memory_Usage" method="GetApplicationMemoryUsage">
+        <params>
+          <param tag="pid" usePreviousResult="true" Id="1" useMethodTag="activitymonitor_get_appPid" />
+        </params>
+        <resultGeneration useMethodTag="activitymonitor_validate_result" arguments="applicationMemory" />
+      </testStep>
+    </testCase>
+
+    <!-- Test case 03 -->
+    <testCase testCaseId="ActivityMonitor_03" testCaseName= "DisableMonitoring" desc="Disable Monitoring">
+      <testCaseInfo testCaseType="direct"/>
+      <testStep testStepId="1" name="DisableMonitoring" method="DisableMonitoring">
+        <resultGeneration useMethodTag="activitymonitor_validate_result" />
+      </testStep>
+    </testCase>
+
+</testPlugin>
+

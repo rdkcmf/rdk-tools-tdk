@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<testPlugin pluginName="Warehouse" pluginVersion="1">
+
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="org.rdk.Warehouse" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Warehouse" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Warehouse" />
+                <params>
+                  <param tag="callsign" value="org.rdk.Warehouse" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Warehouse" />
+                <params>
+                  <param tag="plugin" value="org.rdk.Warehouse" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Warehouse" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+        </pluginPreRequisite>
+
+        <testCase testCaseId="WH_01" testCaseName= "WareHouse_Get_STB_Device_Info"  desc="Gets all STB device info">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Get_STB_DeviceInfo" method="Get_DeviceInfo" >
+              <resultGeneration useMethodTag="warehouse_get_device_info" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WH_02" testCaseName="WareHouse_Set_Front_Panel_State_None" desc="Sets the front panel state to None" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Set_FrontPanel_State" method="Set_FrontPanel_State">
+                <params>
+                  <param tag="state"  useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="warehouse_set_operation"  />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WH_03" testCaseName="WareHouse_Set_Front_Panel_State_Download_In_Progress" desc="Sets the front panel state to DOWNLOAD IN PROGRESS" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Set_FrontPanel_State" method="Set_FrontPanel_State">
+                <params>
+                  <param tag="state"  value="1"/>
+                </params>
+                <resultGeneration useMethodTag="warehouse_set_operation"  />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WH_04" testCaseName="WareHouse_Set_Front_Panel_State_Download_Failed" desc="Sets the front panel state to DOWNLOAD FAILED" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Set_FrontPanel_State" method="Set_FrontPanel_State">
+                <params>
+                  <param tag="state"  value="3"/>
+                </params>
+                <resultGeneration useMethodTag="warehouse_set_operation"  />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WH_05" testCaseName="WareHouse_Set_Front_Panel_State_Download_Invalid" desc="Sets the front panel state to invalid value" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Set_FrontPanel_State" method="Set_FrontPanel_State">
+                <params>
+                  <param tag="state"  value="2"/>
+                </params>
+                <resultGeneration useMethodTag="warehouse_set_operation" arguments="invalid" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WH_06" testCaseName="WareHouse_Light_Reset" desc="Performs a light reset of application data">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Light_Reset" method="Light_Reset" >
+                <resultGeneration useMethodTag="warehouse_set_operation" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WH_07" testCaseName="WareHouse_Check_Is_Clean" desc="Checks locations where customer data may be stored">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Is_Clean" method="Is_clean" >
+                <resultGeneration useMethodTag="warehouse_check_isclean" />
+            </testStep>
+        </testCase>
+
+</testPlugin>
+

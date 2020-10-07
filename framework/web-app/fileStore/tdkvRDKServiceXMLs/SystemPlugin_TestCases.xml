@@ -218,6 +218,91 @@
             </testStep>
         </testCase>
 
+        <!-- Test case 14 -->
+        <testCase testCaseId="SYS_14" testCaseName= "System_Clear_Last_DeepSleep_Reason" desc="Clear the last deep sleep reason.">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Clear_Last_DeepSleep_Reason" method="Clear_Last_DeepSleep_Reason" >
+              <resultGeneration useMethodTag="system_get_state_info"/>
+            </testStep>
+        </testCase>
+
+        <!-- Test case 15 -->
+        <testCase testCaseId="SYS_15" testCaseName= "System_Get_Core_Temperature" desc="Fetch the core temperature of the device.">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Core_Temperature" method="Get_Core_Temperature" >
+              <resultGeneration useMethodTag="system_validate_core_temperature"/>
+            </testStep>
+        </testCase>
+
+        <!-- Test case 16 -->
+        <testCase testCaseId="SYS_16" testCaseName= "System_Get_Last_DeepSleep_Reason" desc="Retrieve the last deep sleep reason.">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Last_DeepSleep_Reason" method="Get_Last_DeepSleep_Reason" >
+              <resultGeneration useMethodTag="system_get_state_info"/>
+            </testStep>
+        </testCase>
+
+        <!-- Test case 17 -->
+        <testCase testCaseId="SYS_17" testCaseName= "System_Get_Mode" desc="Retrieve the currently set mode information.">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Mode" method="Get_Mode" >
+              <resultGeneration useMethodTag="system_validate_modes"  >
+                <expectedValues useDefault="true" />
+              </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <!-- Test case 18 -->
+        <testCase testCaseId="SYS_18" testCaseName= "System_Get_PreviousReboot_Info" desc="Retrieve basic information about a reboot">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_PreviousReboot_Info" method="Get_PreviousReboot_Info" >
+              <resultGeneration useMethodTag="system_get_state_info"  />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 19 -->
+        <testCase testCaseId="SYS_19" testCaseName= "System_Get_PreviousReboot_Info2" desc="Retrieve detailed information about a reboot">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_PreviousReboot_Info2" method="Get_PreviousReboot_Info2" >
+              <resultGeneration useMethodTag="system_get_state_info"  />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 20 -->
+        <testCase testCaseId="SYS_20" testCaseName= "System_Get_PreviousReboot_Reason" desc="Retrieve the last reboot reason.">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_PreviousReboot_Reason" method="Get_PreviousReboot_Reason" >
+              <resultGeneration useMethodTag="system_get_state_info"  />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 21 -->
+        <testCase testCaseId="SYS_21" testCaseName= "System_Get_Temperature_Thresholds" desc="Retrieves temperature threshold values.">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Temperature_Thresholds" method="Get_Temperature_Thresholds" >
+              <resultGeneration useMethodTag="system_get_state_info"  />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 22 -->
+        <testCase testCaseId="SYS_22" testCaseName= "System_Has_Reboot_BeenRequested" desc="Check whether a reboot has been requested.">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Has_Reboot_BeenRequested" method="Has_Reboot_BeenRequested" >
+              <resultGeneration useMethodTag="system_validate_bool_result" arguments="rebootRequested">
+                <expectedValues useDefault="true"/>
+              </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <!-- Test case 23 -->
+        <testCase testCaseId="SYS_23" testCaseName= "System_Query_MocaStatus" desc="Check whether Moca is enabled">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Query_MocaStatus" method="Query_MocaStatus" >
+              <resultGeneration useMethodTag="system_validate_bool_result" arguments="mocaEnabled">
+                <expectedValues useDefault="true"/>
+              </resultGeneration>
+            </testStep>
+        </testCase>
 
 </testPlugin>
 
