@@ -364,18 +364,11 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
 
         elif tag == "webkitbrowser_check_url":
             info["url"] = result
-            if expectedValues[0] in result:
+            status = compareURLs(result,expectedValues[0])
+            if status == "TRUE":
                 info["Test_Step_Status"] = "SUCCESS"
             else:
-                url_data = [ data for data in expectedValues[0].split("/") if data.strip() ]
-                status = "TRUE"
-                for data in url_data:
-                    if data not in result:
-                        status = "FALSE"
-                if status == "TRUE":
-                    info["Test_Step_Status"] = "SUCCESS"
-                else:
-                    info["Test_Step_Status"] = "FAILURE"
+                info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "webkitbrowser_get_visibility":
             info["visibility"] = result
@@ -415,6 +408,20 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "webkitbrowser_get_useragent":
+            info["useragent"] = result
+            status = checkNonEmptyResultData(result)
+            if len(arg) and arg[0] == "check_useragent":
+                if status == "TRUE" and result in ",".join(expectedValues):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif status == "TRUE":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
 
 
         # Cobalt Plugin Response result parser steps
@@ -536,6 +543,29 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
 
         elif tag == "system_get_state_info":
             info = checkAndGetAllResultInfo(result,result.get("success"))
+
+        elif tag == "system_validate_core_temperature":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            if int(float(result.get("temperature"))) > 0:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "system_validate_modes":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            mode_info = result.get("modeInfo")
+            if str(mode_info.get("mode")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "system_validate_bool_result":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            status = str(result.get(arg[0])).lower()
+            if status in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # User Preferces Plugin Response result parser steps
         elif tag == "userpreferences_get_ui_language":
@@ -660,7 +690,99 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        # Parser Code for ActivityMonitor plugin
+        elif tag == "activitymonitor_check_applications_memory":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            app_list=result.get("applicationMemory")
+            status = []
+            if len(app_list) > 0:
+                for app_info in app_list:
+                    status.append(checkNonEmptyResultData(app_info.values))
+                if "FALSE" not in status:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "activitymonitor_validate_result":
+            if len(arg) > 0:
+                info = checkAndGetAllResultInfo(result.get(arg[0]),result.get("success"))
+            else:
+                info = checkAndGetAllResultInfo(result,result.get("success"))
+
+        # Parser Code for HDMICEC plugin
+        elif tag == "hdmicec_get_enabled_status":
+            info["enabled"] = result.get("enabled")
+            success = str(result.get("success")).lower() == "true"
+            if success and str(result.get("enabled")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "hdmicec_check_result":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+
+        elif tag == "hdmicec_get_cec_addresses":
+            cec_addresses = result.get("CECAddresses")
+            if arg[0] == "get_logical_address":
+                logical_address = cec_addresses.get("logicalAddresses")
+                if len(logical_address) > 0:
+                    info = checkAndGetAllResultInfo(logical_address[0],result.get("success"))
+                else:
+                    info["logicalAddresses"] = logical_address
+                    info["Test_Step_Status"] = "FAILURE"
+
+            elif arg[0] == "get_physical_address":
+                physical_address = cec_addresses.get("physicalAddress")
+                hex_code = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
+                physical_address_hex = [ hex_code[int(code)] for code in physical_address ]
+                if len(physical_address) > 0 and str(result.get("success")).lower() == "true":
+                    physical_address = [ str(code) for code in physical_address ]
+                    info["physicalAddress"] = ",".join(physical_address)
+                    info["physicalAddress_hex"] = ",".join(physical_address_hex)
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["physicalAddress"] = physical_address
+                    info["Test_Step_Status"] = "FAILURE"
+
+        #Parser code for State Observer plugin
+        elif tag == "StateObserver_validate_result":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+
+        elif tag == "StateObserver_validate_version":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            version=result.get("version")
+            if len(arg) and arg[0] == "check_version":
+                if int(float(version)) > 0 and int(float(version)) == int(expectedValues[0]):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                if int(float(version)) > 0:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "StateObserver_validate_name":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            name=result.get("Name")
+            if str(expectedValues[0]).lower() in str(name).lower():
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "StateObserver_get_property_info":
+            property_info = result.get("properties")
+            status = []
+            success = str(result.get("success")).lower() == "true"
+            for property_data in property_info:
+                status.append(checkNonEmptyResultData(property_data.values()))
+            info["properties"] = property_info
+            if success and "FALSE" not in status:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # Display Settings Plugin Response result parser steps
         elif tag == "display_is_connected":
@@ -693,7 +815,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
+      
         elif tag == "check_supported_tv_resolutions":
             info["supportedTvResolutions"] = result.get('supportedTvResolutions')
             if json.dumps(result.get("success")) == "true" and any(item not in result.get('supportedTvResolutions') for item in ["none"]) :
@@ -735,7 +857,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
+    
         elif tag == "check_TV_HDR_support":
             info["TVsupportsHDR"] = result.get('supportsHDR')
             if json.dumps(result.get('supportsHDR')) == "true" and any(item not in result.get('standards') for item in ["none"]) :
@@ -761,7 +883,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
 
         elif tag == "check_connected_audio_ports":
             info["connected_audio_port"] = result.get('connectedAudioPorts')
-            if json.dumps(result.get('success')) == "true" and result.get('connectedAudioPorts') :
+            if json.dumps(result.get('success')) == "true" and result.get('connectedAudioPorts'):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -788,14 +910,18 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_current_output_settings":
-            if str(result.get("success")).lower() == "true":
+            info["colorSpace"] = result.get('colorSpace')
+            info["colorDepth"] = result.get('colorDepth')
+            info["matrixCoefficients"] = result.get('matrixCoefficients')
+            info["videoEOTF"] = result.get('videoEOTF')
+            if str(result.get("success")).lower() == "true" and result.get('colorSpace') in [0,1,2,3,4,5] and result.get('matrixCoefficients') in [0,1,2,3,4,5,6,7] :
                 info["Test_Step_Status"] = "SUCCESS"
             else:
-                info["Test_Step_Status"] = "FAILURE"
+                info["Test_Step_Status"] = "FAILURE"        
 
         elif tag == "check_active_input":
             info ["activeInput"] = result.get('activeInput')
-            if str(result.get("success")).lower() == "true" and any(str(result.get('activeInput')) in item for item in expectedValues):
+            if str(result.get("success")).lower() == "true" and str(result.get('activeInput')) in expectedValues:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -809,14 +935,279 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
 
         elif tag == "check_video_port_status_standby":
             info["enabled"] = result.get('videoPortStatusInStandby');
-            if str(result.get("success")).lower() == "true" and any(str(result.get('videoPortStatusInStandby')) in item for item in expectedValues) :
+            if str(result.get("success")).lower() == "true" and str(result.get('videoPortStatusInStandby')) in expectedValues :
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_dolby_volume_mode":
             info["dolbyVolumeMode"] = result.get('dolbyVolumeMode');
-            if str(result.get("success")).lower() == "true" and any(str(result.get('dolbyVolumeMode')) in item for item in expectedValues):
+            if str(result.get("success")).lower() == "true" and str(result.get('dolbyVolumeMode')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_dialog_enhancement":
+            info["enhancerlevel"] = result.get('enhancerlevel');
+            if str(result.get("success")).lower() == "true" and str(result.get('enhancerlevel')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_intelligent_equalizer_mode":
+            info["intelligentEqualizerMode"] = result.get('intelligentEqualizerMode');
+            if str(result.get("success")).lower() == "true" and str(result.get('intelligentEqualizerMode')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_volume_leveller":
+            info["level"] = result.get('level');
+            if str(result.get("success")).lower() == "true" and str(result.get('level')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_bass_enhancer":
+            info["bassBoost"] = result.get('bassBoost');
+            if len(arg) and arg[0] == "check_bass_range":
+                if 0 <= int(result.get('bassBoost')) <= 100 :
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                if str(result.get("success")).lower() == "true" and str(result.get('bassBoost')) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_surround_virtualizer":
+            info["boost"] = result.get('boost');
+            if len(arg) and arg[0] == "check_surround_virtualizer_range":
+                if 0 <= int(result.get('boost')) <= 96 :
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                if str(result.get("success")).lower() == "true" and str(result.get('boost')) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_mi_steering":
+            info["MISteeringEnable"] = result.get('MISteeringEnable');
+            if str(result.get("success")).lower() == "true" and str(result.get('MISteeringEnable')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_surround_decoder":
+            info["surroundDecoderEnable"] = result.get('surroundDecoderEnable');
+            if str(result.get("success")).lower() == "true" and str(result.get('surroundDecoderEnable')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_drc_mode":
+            info["DRCMode"] = result.get('DRCMode');
+            if str(result.get("success")).lower() == "true" and str(result.get('DRCMode')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_volume_level":
+            info["volumeLevel"] = result.get('volumeLevel');
+            if len(arg) and arg[0] == "check_volume_level_range":
+                if 0 <= int(result.get('volumeLevel')) <= 96 :
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                if str(result.get("success")).lower() == "true" and str(result.get('volumeLevel')) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_gain":
+            info["gain"] = result.get('gain');
+            if len(arg) and arg[0] == "check_gain_range":
+                if 0 <= float(result.get('gain')) <= 100 :
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                if str(result.get("success")).lower() == "true" and str(int(float(result.get('gain')))) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE" 
+
+        elif tag == "check_muted":
+            info["muted"] = result.get('muted');
+            if str(result.get("success")).lower() == "true" and str(result.get('muted')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_audio_delay":
+            info["audioDelay"] = result.get('audioDelay');
+            if len(arg) and arg[0] == "check_audio_delay_range":
+                if 0 <= int(result.get('audioDelay')):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                if str(result.get("success")).lower() == "true" and str(result.get('audioDelay')) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_audio_delay_offset":
+            info["audioDelayOffset"] = result.get('audioDelayOffset');
+            if len(arg) and arg[0] == "check_audio_delay_offset_range":
+                if 0 <= int(result.get('audioDelayOffset')):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                if str(result.get("success")).lower() == "true" and str(result.get('audioDelayOffset')) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_sink_atmos_capability":
+            info["atmos_capability"] = result.get('atmos_capability');
+            if str(result.get("success")).lower() == "true" and str(result.get('atmos_capability')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_tv_hdr_capabilities":
+            info["capabilities"] = result.get('capabilities')
+            if str(result.get("success")).lower() == "true" and str(result.get('capabilities')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_device_repeater":
+            info["HdcpRepeater"] = result.get('HdcpRepeater')
+            if str(result.get("success")).lower() == "true" and str(result.get('HdcpRepeater')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_default_resolution" :
+            info["defaultResolution"] = result.get('defaultResolution')
+            if str(result.get("success")).lower() == "true" and str(result.get('defaultResolution')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+
+        # Wifi Plugin Response result parser steps
+        elif tag == "wifi_check_adapter_state":
+            info = result.copy()
+            state = int(result.get("state"))
+            state_names = ["UNINSTALLED","DISABLED","DISCONNECTED","PAIRING","CONNECTING","CONNECTED","FAILED"]
+            success = str(result.get("success")).lower() == "true"
+            info["state_name"] = state_names[state]
+            info["enable"] = "True" if state not in [0,6,1] else "False"
+            if str(result.get("state")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+                if arg[0] == "check_state_valid" and state not in [0,6]:
+                    info["Test_Step_Status"] = "SUCCESS"
+                elif arg[0] == "check_state_enabled" and state not in [0,6,1]:
+                    info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "wifi_check_set_operation":
+            if str(result.get("success")).lower() == "true":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "wifi_check_save_clear_ssid":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            if int(result.get("result")) == int(expectedValues[0]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+
+        # Bluetooth Plugin Response result parser steps
+        elif tag == "bluetooth_set_operation":
+            if str(result.get("success")).lower() == "true":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "bluetooth_get_discoverable_status":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            if str(result.get("discoverable")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "bluetooth_get_name":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            if len(arg) and arg[0] == "check_name":
+                if result.get("name") in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "bluetooth_get_discovered_devices":
+            discoveredDevices = result.get("discoveredDevices")
+            status = []
+            devices = []
+            success = str(result.get("success")).lower() == "true"
+            if len(arg) and arg[0] == "get_devices_info":
+                for device_info in discoveredDevices:
+                    status.append(checkNonEmptyResultData(device_info))
+                    device_data = {}
+                    device_data["deviceID"] = str(device_info.get("deviceID"))
+                    device_data["name"] = str(device_info.get("name"))
+                    device_data["deviceType"] = str(device_info.get("deviceType"))
+                    devices.append(device_data)
+            info["devices"] = devices
+            if "FALSE" not in status and success:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+
+        # FrameRate Plugin Response result parser steps
+        elif tag == "framerate_check_set_operation":
+            if str(result.get("success")).lower() == "true":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+
+        # Warehouse Plugin Response result parser steps
+        elif tag == "warehouse_get_device_info":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+
+        elif tag == "warehouse_set_operation":
+            info = result.copy()
+            if len(arg) and arg[0] == "invalid":
+                if str(result.get("success")).lower() == "false":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                if str(result.get("success")).lower() == "true":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "warehouse_check_isclean":
+            info = result.copy()
+            isclean = str(result.get("clean")).lower()
+            success = str(result.get("success")).lower() == "true"
+            if success and len(result.get("files")) > 0 and isclean == "false":
+                info["Test_Step_Status"] = "SUCCESS"
+            elif success and ( len(result.get("files")) == 0 or result.get("files") is None ) and isclean == "true":
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -970,6 +1361,17 @@ def CheckAndGenerateConditionalExecStatus(testStepResults,methodTag,arguments):
                     result = "TRUE"
                 else:
                     result = "FALSE"
+
+        # Wifi Plugin Response result parser steps
+        elif tag == "wifi_check_adapter_state":
+            testStepResults = testStepResults[0].values()[0]
+            state = str(testStepResults[0].get("state"))
+            if arg[0] == "isDisabled":
+                if state == "1":
+                    result = "TRUE"
+                else:
+                    result = "FALSE"
+
 
 
         else:
@@ -1156,7 +1558,6 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             else:
                 info["enabled"] = False
 
-
         elif tag == "webkitbrowser_change_cookie_policy":
             testStepResults = testStepResults[0].values()[0]
             cookie_accept_policy = testStepResults[0].get("cookie_accept_policy")
@@ -1164,6 +1565,10 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["cookie_accept_policy"] = "never"
             else:
                 info["cookie_accept_policy"] = "always"
+
+        elif tag == "webkitbrowser_get_useragent_string":
+            testStepResults = testStepResults[0].values()[0]
+            info["useragent"] = testStepResults[0].get("useragent")
 
         # System plugin result parser steps
         elif tag == "system_toggle_gz_enabled_status":
@@ -1249,6 +1654,36 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             SupportingRes = testStepResults[0].get("supportedResolutions")
             info["resolutions"] = ",".join(SupportingRes)
 
+        # Parser Code for ActivityMonitor plugin
+        elif tag == "activitymonitor_get_appPid":
+            testStepResults = testStepResults[0].values()[0]
+            app_list=testStepResults[0].get("applicationMemory")
+            if len(app_list) > 0:
+                pid=app_list[0].get("appPid")
+                if pid and int(pid) > 0:
+                    info["pid"] = pid
+                else:
+                    info["pid"] = ""
+            else:
+                info["pid"] = ""
+
+        # HDMI CEC plugin result parser steps
+        elif tag == "hdmicec_toggle_enabled_status":
+            testStepResults = testStepResults[0].values()[0]
+            enabled = testStepResults[0].get("enabled")
+            if str(enabled).lower() == "true":
+                info["enabled"] = False
+            else:
+                info["enabled"] = True
+
+        #Parser code for State Observer plugin
+        elif tag == "StateObserver_change_version":
+            testStepResults = testStepResults[0].values()[0]
+            version = testStepResults[0].get("version")
+            if int(float(version)) == 1:
+                info["version"] = 2
+            else:
+                info["version"] = 1
 
         # Display Settings Plugin result parser steps
         elif tag == "display_get_isconnected_status":
@@ -1258,7 +1693,7 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
 
         elif tag =="set_video_display":
             testStepResults = testStepResults[0].values()[0]
-            video_display = testStepResults[0].get("video_display")
+            video_display = testStepResults[0].get("video_display")       
             info["videoDisplay"] = video_display[0]
             info["portName"] = video_display[0]
 
@@ -1276,6 +1711,30 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             testStepResults = testStepResults[0].values()[0]
             supportedResolutions = testStepResults[0].get("supportedResolutions")
             info["resolution"] = ",".join(supportedResolutions)
+
+        # Wifi Plugin Response result parser steps
+        elif tag == "wifi_toggle_adapter_state":
+            testStepResults = testStepResults[0].values()[0]
+            state = str(testStepResults[0].get("state"))
+            if len(arg) and arg[0] == "get_state_no":
+                if state == "1":
+                    info["state"] = "2"
+                else:
+                    info["state"] = "1"
+            else:
+                if state == "1":
+                    info["enable"] = True
+                else:
+                    info["enable"] = False
+
+        # Bluetooth Plugin Response result parser steps
+        elif tag == "bluetooth_toggle_discoverable_status":
+            testStepResults = testStepResults[0].values()[0]
+            status = testStepResults[0].get("discoverable")
+            if str(status).lower() == "true":
+                info["discoverable"] = False
+            else:
+                info["discoverable"] = True
 
 
         # Controller Plugin Response result parser steps
@@ -1339,6 +1798,12 @@ def checkTestCaseApplicability(methodTag,configKeyData,arguments):
                 result = "TRUE"
             else:
                 result = "FALSE"
+
+	elif tag == "displaysetting_check_feature_applicability":
+    	    if arg[0] in keyData:
+        	result = "TRUE"
+            else:
+        	result = "FALSE"
 
         elif tag == "is_led_supported":
             if arg[0] in keyData:
@@ -1409,8 +1874,6 @@ def generateComplexTestInputParam(methodTag,testParams):
     return status,userGeneratedParam
 
 
-
-
 #-----------------------------------------------------------------------------------------------
 #                    ***  USER CAN ADD SUPPORTING FUNCTIONS BELOW ***
 #-----------------------------------------------------------------------------------------------
@@ -1443,4 +1906,21 @@ def checkNonEmptyResultData(resultData):
 
     return status
 
+def compareURLs(actualURL,expectedURL):
+    if expectedURL in actualURL:
+        status = "TRUE"
+    else:
+        url_data = []
+        url_data_split = [ data for data in expectedURL.split("/") if data.strip() ]
+        for data in url_data_split:
+            if "?" in data:
+                url_data.extend(data.split("?"))
+            else:
+                url_data.append(data)
+        status = "TRUE"
+        for data in url_data:
+            if data not in actualURL:
+                status = "FALSE"
+
+    return status
 

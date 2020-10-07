@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<testPlugin pluginName="Wifi" pluginVersion="1">
+
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="org.rdk.Wifi" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Wifi" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Wifi" />
+                <params>
+                  <param tag="callsign" value="org.rdk.Wifi" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Wifi" />
+                <params>
+                  <param tag="plugin" value="org.rdk.Wifi" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Wifi" />
+            </testStep>
+          </prerequisite>
+
+          <prerequisite requisiteId="2" requisiteName="Check_WIFI_Adapter_State">
+            <testStep testStepId="1" name="Get_Current_State" method="Get_Current_State">
+                <resultGeneration useMethodTag="wifi_check_adapter_state" arguments="check_state_valid"/>
+            </testStep>
+            <testStep testStepId="2" name="Enable_WIFI_Adapter" method="Set_Enabled">
+                <conditionalExecution enable="true" Id="1" useMethodTag="wifi_check_adapter_state" arguments="isDisabled" />
+                <resultGeneration useMethodTag="wifi_check_set_operation" />
+            </testStep>
+            <testStep testStepId="3" name="Get_Current_State" method="Get_Current_State">
+                <conditionalExecution enable="true" Id="1" useMethodTag="wifi_check_adapter_state" arguments="isDisabled" />
+                <resultGeneration useMethodTag="wifi_check_adapter_state" arguments="check_state_enabled"/>
+            </testStep>
+          </prerequisite>
+
+          <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
+            <event pluginName="Wifi" method="Event_On_WIFI_State_Changed" />
+            <event pluginName="Wifi" method="Event_On_Available_SSIDs" />
+          </prerequisite>
+
+        </pluginPreRequisite>
+
+        <testCase testCaseId="WIFI_01" testCaseName="WIFI_Enable_Disable_Adapter" desc="Toggles WIFI Adapter state">
+           <testCaseInfo testCaseType="setandget" revert="true" />
+            <testStep testStepId="1" name="Get_Current_State" method="Get_Current_State" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="wifi_check_adapter_state" arguments="check_state_enabled" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Enabled" method="Set_Enabled" revertSet="yes">
+                <params>
+                  <param tag="enable" usePreviousResult="true" Id="1" useMethodTag="wifi_toggle_adapter_state" revertParam="yes" />
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" />
+            </testStep>
+            <testStep testStepId="3" name="Get_Current_State" method="Get_Current_State" revertFlag="yes">
+                <resultGeneration useMethodTag="wifi_check_adapter_state">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="wifi_toggle_adapter_state" arguments="get_state_no" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+       <testCase testCaseId="WIFI_02" testCaseName="WIFI_Get_Available_SSIDs" desc="Scan and get available SSID using onAvailableSSIDs Event">
+            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value=""/>
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value=""/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" />
+            </testStep>
+            <testStep testStepId="2" name="Check_On_Available_SSIDs_Event" method="Event_On_Available_SSIDs" action="eventListener" delay="5">
+              <resultGeneration useMethodTag="wifi_check_available_ssids_event" arguments="get_ssid_names" />
+            </testStep>
+            <testStep testStepId="3" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" />
+            </testStep>
+       </testCase>
+
+       <testCase testCaseId="WIFI_03" testCaseName="WIFI_Save_And_Clear_SSIDs" desc="Saves and Clears the SSID Info">
+            <testStep testStepId="1" name="Save_SSID_Info" method="Save_SSID_Info" >
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
+                  <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
+                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_save_clear_ssid" />
+            </testStep>
+            <testStep testStepId="2" name="Clear_SSID_Info" method="Clear_SSID_Info" delay="3">
+                <resultGeneration useMethodTag="wifi_check_save_clear_ssid" />
+            </testStep>
+       </testCase>
+
+</testPlugin>
+

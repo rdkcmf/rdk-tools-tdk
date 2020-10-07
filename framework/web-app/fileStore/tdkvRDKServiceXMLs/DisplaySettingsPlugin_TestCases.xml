@@ -39,7 +39,7 @@
             </testStep>
           </prerequisite>
         </pluginPreRequisite>
-
+       
         <testCase testCaseId="DS_01" testCaseName= "Check_Settop_Supported_Resolutions" desc="Check whether settop displays all supported resoltions">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Settop_Supported_Resolutions" method="Get_Supported_Settop_Resolutions">
@@ -48,16 +48,9 @@
                 </resultGeneration>
             </testStep>
         </testCase>
-
+        
         <testCase testCaseId="DS_02" testCaseName= "Check_Supported_Tv_Resolutions"  desc="Check whether settop displays supported TV resoltions">
             <testCaseInfo testCaseType="direct"/>
-            <testCasePreRequisite>
-                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
-                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" >
-                  <resultGeneration useMethodTag="display_connected_status" />
-                </testStep>
-                </prerequisite>
-            </testCasePreRequisite>
             <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" >
                   <resultGeneration useMethodTag="display_connected_status" />
                 </testStep>
@@ -126,7 +119,6 @@
                 </testStep>
                 </prerequisite>
             </testCasePreRequisite>
-
             <testStep testStepId="1" name="Get_Connected_Device__EDID_Details" method="Read_EDID">
                 <resultGeneration useMethodTag="check_connected_device_edid"/>
             </testStep>
@@ -212,7 +204,7 @@
                     <param tag="portName" usePreviousResult="true" Id="1" useMethodTag="set_video_display" />
                     <param tag="enabled" value="True,False" iteration="true" revertParam="yes" />
                   </params>
-                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" /> 
               </subtestStep>
               <subtestStep subtestStepId="2" name="Get_VideoPort_Status_InStandby"  method="Get_VideoPort_Status_InStandby" revertFlag="yes" >
                   <params>
@@ -225,21 +217,44 @@
             </testStep>
         </testCase>
 
-        <testCase testCaseId="DS_12" testCaseName= "Check_Current_Output_Settings" desc="Check the current output settings of device">
+        <testCase testCaseId="DS_12" testCaseName= "Set_And_Get_MS12_Audio_Compression" desc="Check whether MS12 audio compression values are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="AudioCompression" />
+            <testStep testStepId="1" name="Get_MS12_Audio_Compression" method="Get_MS12_Audio_Compression" saveResult="true" revertGet="yes" >
+              <resultGeneration useMethodTag="check_MS12_audio_compression" />
+            </testStep>
+            <testStep testStepId="2" name="Set_MS12_Audio_Compression" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_MS12_Audio_Compression" method="Set_MS12_Audio_Compression" revertSet="yes">
+                  <params>
+                    <param tag="compresionLevel" value="0,5,10" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_MS12_Audio_Compression" method="Get_MS12_Audio_Compression" revertFlag="yes" >
+                  <resultGeneration useMethodTag="check_MS12_audio_compression" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>              
+
+        <testCase testCaseId="DS_13" testCaseName= "Check_Current_Output_Settings" desc="Check the current output settings of device">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Check_Current_Output_Settings" method="Get_Current_Output_Settings">
                 <resultGeneration useMethodTag="check_current_output_settings"/>
             </testStep>
         </testCase>
 
-        <testCase testCaseId="DS_13" testCaseName= "Check_Active_Input_Value" desc="Check the active input value ">
+        <testCase testCaseId="DS_14" testCaseName= "Check_Active_Input_Value" desc="Check the active input value ">
             <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Check_Get_Active_Input" method="Get_Active_Input">
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+            </testStep>
+            <testStep testStepId="2" name="Check_Get_Active_Input" method="Get_Active_Input">
                 <resultGeneration useMethodTag="check_active_input"/>
             </testStep>
         </testCase>
 
-        <testCase testCaseId="DS_14" testCaseName= "SetAndGet_All_Supported_Resolutions" desc="Set and get all the supported resolution by both TV and STB">
+        <testCase testCaseId="DS_15" testCaseName= "SetAndGet_All_Supported_Resolutions" desc="Set and get all the supported resolution by both TV and STB">
             <testCaseInfo testCaseType="loop" revert="true" />
             <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true">
                 <resultGeneration useMethodTag="display_connected_status"/>
@@ -272,6 +287,465 @@
             </testStep>
         </testCase>
 
-</testPlugin>
+        <testCase testCaseId="DS_16" testCaseName= "Enable_And_Disable_Dolby_Volume_Mode"  desc="Check whether dolby volume mode can enable and disable ">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="DolbyVolume"/>
+            <testStep testStepId="1" name="Get_Dolby_Volume_Mode" method="Get_Dolby_Volume_Mode" saveResult="true" revertGet="yes" >
+              <resultGeneration useMethodTag="check_dolby_volume_mode" >
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Enable_And_Disable_Dolby_Volume_Mode" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Enable_Dolby_Volume_Mode" method="Set_Dolby_Volume_Mode" revertSet="yes">
+                  <params>
+                    <param tag="dolbyVolumeMode" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Dolby_Volume_Mode" method="Get_Dolby_Volume_Mode" revertFlag="yes" >
+                  <resultGeneration useMethodTag="check_dolby_volume_mode" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
 
+        <testCase testCaseId="DS_17" testCaseName= "Set_And_Get_Dialog_Enhancement" desc="Check whether dialog enhancement values are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="DialogEnhancement" />
+            <testStep testStepId="1" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" saveResult="true" revertGet="yes" >
+              <resultGeneration useMethodTag="check_dialog_enhancement" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Dialog_Enhancement" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Dialog_Enhancement" method="Set_Dialog_Enhancement" revertSet="yes">
+                  <params>
+                    <param tag="enhancerlevel" value="0,8,16" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" revertFlag="yes" >
+                  <resultGeneration useMethodTag="check_dialog_enhancement" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_18" testCaseName= "Set_And_Get_Intelligent_Equalizer_Mode" desc="Check whether intelligent equalizer mode values are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="IntelligentEqualizer" />
+            <testStep testStepId="1" name="Get_Intelligent_Equalizer_Mode" method="Get_Intelligent_Equalizer_Mode" saveResult="true" revertGet="yes" >
+              <resultGeneration useMethodTag="check_intelligent_equalizer_mode" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Intelligent_Equalizer_Mode" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Intelligent_Equalizer_Mode" method="Set_Intelligent_Equalizer_Mode" revertSet="yes">
+                  <params>
+                    <param tag="intelligentEqualizerMode" value="1,2,3" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Intelligent_Equalizer_Mode" method="Get_Intelligent_Equalizer_Mode" revertFlag="yes" >
+                  <resultGeneration useMethodTag="check_intelligent_equalizer_mode" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_19" testCaseName= "Set_And_Get_Volume_Leveller" desc="Check whether volume values are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Leveller" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+              <resultGeneration useMethodTag="check_volume_leveller" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Volume_Leveller" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Volume_Leveller" method="Set_Volume_Leveller" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                    <param tag="level" value="0,5,10" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Levelle" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_leveller" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_20" testCaseName= "Set_And_Get_Bass_Enhancer" desc="Check whether bass enhancer values are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" >
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+              <resultGeneration useMethodTag="check_bass_enhancer" arguments="check_bass_range" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Bass_Enhancer" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Bass_Enhancer" method="Set_Bass_Enhancer" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                    <param tag="bassBoost" value="0,25,50,100" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_bass_enhancer" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_21" testCaseName= "Set_And_Get_Surround_Virtualizer" desc="Check whether surround virtualizer values are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Surround_Virtualizer" method="Get_Surround_Virtualizer" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+              <resultGeneration useMethodTag="check_surround_virtualizer" arguments="check_surround_virtualizer_range" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Surround_Virtualizer" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Surround_Virtualizer" method="Set_Surround_Virtualizer" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                    <param tag="boost" value="0,24,48,96" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Surround_Virtualizer" method="Get_Surround_Virtualizer" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_surround_virtualizer" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_22" testCaseName= "Enable_And_Disable_MI_Steering" desc="Check whether MI steering values are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_MI_Steering" method="Get_MI_Steering" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+              <resultGeneration useMethodTag="check_mi_steering" />
+            </testStep>
+            <testStep testStepId="3" name="Enable_And_Disable_MI_Steering" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_MI_Steering" method="Set_MI_Steering" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                    <param tag="MISteeringEnable" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_MI_Steering" method="Get_MI_Steering" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_mi_steering" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_23" testCaseName= "Enable_And_Disable_Surround_Decoder" desc="Check whether surround decoder is possible to enable and disable" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Surround_Decoder" method="Is_Surround_Decoder_Enabled" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+              <resultGeneration useMethodTag="check_surround_decoder" />
+            </testStep>
+            <testStep testStepId="3" name="Enable_And_Disable_Surround_Decoder" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Surround_Decoder" method="Enable_Surround_Decoder" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                    <param tag="surroundDecoderEnable" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Surround_Decoder" method="Is_Surround_Decoder_Enabled" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_surround_decoder" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_24" testCaseName= "Set_And_Get_DRC_Mode" desc="Check whether DRC mode values are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_DRC_Mode" method="Get_DRC_Mode" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+              <resultGeneration useMethodTag="check_drc_mode" />
+            </testStep>
+            <testStep testStepId="3" name="Set_DRC_Mode" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_DRC_Mode" method="Set_DRC_Mode" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                    <param tag="DRCMode" value="0,1" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_DRC_Mode" method="Get_DRC_Mode" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_drc_mode" >
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_25" testCaseName= "Set_And_Get_Volume_Level" desc="Check whether volume level values are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Volume_Level" method="Get_Volume_Level" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+              <resultGeneration useMethodTag="check_volume_level" arguments="check_volume_level_range" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Volume_Level" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Volume_Level"  method="Set_Volume_Level" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                    <param tag="volumeLevel" value="0,25,50,100" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Volume_Level" method="Get_Volume_Level" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_level" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_26" testCaseName= "Set_And_Get_Gain" desc="Check whether audio port gain values are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Gain" method="Get_Gain" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+              <resultGeneration useMethodTag="check_gain" arguments="check_gain_range" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Gain" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Gain"  method="Set_Gain" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                    <param tag="gain" value="0,25,50,100" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Gain" method="Get_Gain" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_gain" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_27" testCaseName= "Mute_And_Unmute_Audio" desc="Check whether audio is able to mute and unmute" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Muted" method="Get_Muted" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+              <resultGeneration useMethodTag="check_muted" arguments="check_state"/>
+            </testStep>
+            <testStep testStepId="3" name="Set_Muted" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Muted"  method="Set_Muted" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                    <param tag="muted" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Muted" method="Get_Muted" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_muted" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_28" testCaseName= "Set_And_Get_Audio_Delay" desc="Check whether audio delay values are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Audio_Delay" method="Get_Audio_Delay" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+              <resultGeneration useMethodTag="check_audio_delay" arguments="check_audio_delay_range" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Audio_Delay" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Audio_Delay"  method="Set_Audio_Delay" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                    <param tag="audioDelay" value="0,10,50,100" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Audio_Delay" method="Get_Audio_Delay" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_delay" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_29" testCaseName= "Set_And_Get_Audio_Delay_Offset" desc="Check whether audio delay offset values are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Audio_Delay_Offset" method="Get_Audio_Delay_Offset" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+              <resultGeneration useMethodTag="check_audio_delay_offset" arguments="check_audio_delay_offset_range" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Audio_Delay_Offset" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Audio_Delay_Offset"  method="Set_Audio_Delay_Offset" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                    <param tag="audioDelayOffset" value="0,10,50,100" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Audio_Delay_Offset" method="Get_Audio_Delay_Offset" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_delay_offset" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_30" testCaseName= "Check_Sink_Atmos_Capability" desc="Check the the Atmos capability of the sink">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Check_Sink_Atmos_Capability" method="Get_Sink_Atmos_Capability">
+                <resultGeneration useMethodTag="check_sink_atmos_capability" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_31" testCaseName= "Enable_Disable_Audio_Atmos_Output_Mode" desc="Check whether audio atmos output mode is possile to enable and disable">
+            <testCaseInfo testCaseType="loop" />
+            <testStep testStepId="1" name="Enable_Disable_Audio_Atmos_Output_Mode" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Enable_Disable_Audio_Atmos_Output_Mode" method="Set_Audio_Atmos_Output_Mode" >
+                  <params>
+                    <param tag="enable" value="True,False" iteration="true" />
+                  </params>
+                <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_32" testCaseName= "Get_TV_HDR_Capabilities" desc="Check the HDR capabilities of TV">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" >
+                <resultGeneration useMethodTag="display_connected_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_TV_HDR_Capabilities" method="Get_TV_HDR_Capabilities">
+                <resultGeneration useMethodTag="check_tv_hdr_capabilities" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_33" testCaseName= "Is_Connected_Device_Repeater" desc="Check whether connected device is a repeater" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" >
+                <resultGeneration useMethodTag="display_connected_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Is_Connected_Device_Repeater" method="Is_Connected_Device_Repeater" >
+                <resultGeneration useMethodTag="check_device_repeater" >
+                  <expectedValues useConfigFile="true" key="DEVICE_REPEATER" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_34" testCaseName= "Get_Default_Resolution" desc="Check whether the default resolution is available in supported resolutions" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" >
+                <resultGeneration useMethodTag="display_connected_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_Resolutions" method="Get_Supported_Resolutions" saveResult="true">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="display_supported_resolutions"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Default_Resolution" method="Get_Default_Resolution" >
+                <resultGeneration useMethodTag="check_default_resolution" >
+                  <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_resolutions" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+</testPlugin>  
 

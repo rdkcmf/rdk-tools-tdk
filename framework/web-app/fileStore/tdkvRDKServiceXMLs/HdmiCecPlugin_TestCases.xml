@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<testPlugin pluginName="HdmiCec" pluginVersion="1">
+    <pluginPreRequisite>
+          <!-- Activate HDMICEC plugin -->
+      <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+        <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+            <params>
+              <param tag="plugin" value="org.rdk.HdmiCec" indexOnly="true" />
+            </params>
+            <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.HdmiCec" />
+        </testStep>
+        <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+            <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.HdmiCec" />
+            <params>
+              <param tag="callsign" value="org.rdk.HdmiCec" />
+            </params>
+        </testStep>
+        <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+            <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.HdmiCec" />
+            <params>
+              <param tag="plugin" value="org.rdk.HdmiCec" indexOnly="true" />
+            </params>
+            <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.HdmiCec" expectedValues="activated"/>
+        </testStep>
+      </prerequisite>
+
+          <!-- Activate DisplaySettings plugin -->
+      <prerequisite requisiteId="2" requisiteName="Activate_Plugins">
+        <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+            <params>
+              <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+            </params>
+            <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" />
+        </testStep>
+        <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+            <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+            <params>
+              <param tag="callsign" value="org.rdk.DisplaySettings" />
+            </params>
+        </testStep>
+        <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+            <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+            <params>
+              <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+            </params>
+            <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" expectedValues="activated"/>
+        </testStep>
+      </prerequisite>
+
+      <!-- check if TV connect. Test case need to be executed only when TV is connected. -->
+      <prerequisite requisiteId="3" requisiteName="Get_Display_Connected_Status">
+          <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings">
+              <resultGeneration useMethodTag="display_connected_status" />
+          </testStep>
+      </prerequisite>
+
+
+      <!-- Enable HDMI CEC. Test case need to be executed only when HDMICEC is enabled. -->
+      <prerequisite requisiteId="4" requisiteName="Enable HDMICEC">
+        <!-- Enable HDMICEC -->
+            <testStep testStepId="1" name="SetEnabled" method="SetEnabled" >
+                <params>
+                  <param tag="enabled" value="true" />
+                </params>
+                <resultGeneration useMethodTag="hdmicec_check_result" />
+            </testStep>
+
+        <!-- Get Current status -->
+            <testStep testStepId="2" name="GetEnabled" method="GetEnabled" >
+                <resultGeneration useMethodTag="hdmicec_get_enabled_status" expectedValues="True" />
+            </testStep>
+      </prerequisite>
+    </pluginPreRequisite>
+
+
+    <!-- Test case 01 -->
+    <testCase testCaseId="HdmiCec_01" testCaseName= "Enable_Disable_HDMICEC" desc="Enable HDMICEC">
+        <testCaseInfo testCaseType="setandget" revert="true" />
+        <!-- Get current status -->
+        <testStep testStepId="1" name="GetEnabled" method="GetEnabled" saveResult="true" revertGet="yes">
+          <resultGeneration useMethodTag="hdmicec_get_enabled_status" >
+            <expectedValues useDefault="true" />
+          </resultGeneration>
+        </testStep>
+
+        <!-- Enable HDMICEC -->
+        <testStep testStepId="2" name="SetEnabled" method="SetEnabled" revertSet="yes">
+          <params>
+            <param tag="enabled" usePreviousResult="true" Id="1" useMethodTag="hdmicec_toggle_enabled_status" revertParam="yes" />
+          </params>
+          <resultGeneration useMethodTag="hdmicec_check_result" />
+        </testStep>
+
+        <!-- Get Current status -->
+        <testStep testStepId="3" name="GetEnabled" method="GetEnabled" revertFlag="yes">
+          <resultGeneration useMethodTag="hdmicec_get_enabled_status" >
+            <expectedValue usePreviousResult="true" Id="1" useMethodTag="hdmicec_toggle_enabled_status" />
+          </resultGeneration>
+        </testStep>
+    </testCase>
+
+
+    <!-- Test case 02 -->
+    <testCase testCaseId="HdmiCec_02" testCaseName="Get_CEC_Logical_Address" desc="Get CEC Logical Address">
+        <testCaseInfo testCaseType="direct"/>
+        <!-- Get CEC Address -->
+        <testStep testStepId="1" name="Get_CEC_Logical_Addresses" method="GetCECAddresses">
+          <resultGeneration useMethodTag="hdmicec_get_cec_addresses" arguments="get_logical_address" />
+        </testStep>
+    </testCase>
+
+    <!-- Test case 03 -->
+    <testCase testCaseId="HdmiCec_03" testCaseName="Get_CEC_Physical_Address" desc="Get CEC Physical Address">
+        <testCaseInfo testCaseType="direct"/>
+        <!-- Get CEC Address -->
+        <testStep testStepId="1" name="Get_CEC_Physical_Addresses" method="GetCECAddresses">
+          <resultGeneration useMethodTag="hdmicec_get_cec_addresses" arguments="get_physical_address" />
+        </testStep>
+    </testCase>
+
+</testPlugin>

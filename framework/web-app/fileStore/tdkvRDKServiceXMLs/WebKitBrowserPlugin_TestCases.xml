@@ -68,6 +68,14 @@
             </testStep>
           </prerequisite>
 
+          <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
+            <event pluginName="WebKitBrowser" method="Event_Load_Finished" />
+            <event pluginName="WebKitBrowser" method="Event_Load_Failed" />
+            <event pluginName="WebKitBrowser" method="Event_URL_Change" />
+            <event pluginName="WebKitBrowser" method="Event_Page_Closure" />
+            <event pluginName="WebKitBrowser" method="Event_Visibility_Change" />
+            <event pluginName="WebKitBrowser" method="Event_State_Change" />
+          </prerequisite>
         </pluginPreRequisite>
 
 
@@ -78,7 +86,12 @@
                 <param tag="url" useConfigFile="true" key="WEBKIT_TEST_URL" />
               </params>
             </testStep>
-            <testStep testStepId="2" name="Get_Browser_Test_URL" method="Get_Browser_URL" delay="3">
+            <testStep testStepId="2" name="Check_Load_Finished_Event" method="Event_Load_Finished" action="eventListener" delay="10">
+              <resultGeneration useMethodTag="webkitbrowser_check_load_finished_event" >
+                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Get_Browser_Test_URL" method="Get_Browser_URL">
               <resultGeneration useMethodTag="webkitbrowser_check_url" >
                 <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
               </resultGeneration>
@@ -93,22 +106,32 @@
                 <param tag="url" useConfigFile="true" key="WEBKIT_TEST_URL" />
               </params>
             </testStep>
-            <testStep testStepId="2" name="Get_Browser_Test_URL" method="Get_Browser_URL" delay="3">
+            <testStep testStepId="2" name="Check_Load_Finished_Event" method="Event_Load_Finished" action="eventListener" delay="10">
+              <resultGeneration useMethodTag="webkitbrowser_check_load_finished_event" >
+                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Get_Browser_Test_URL" method="Get_Browser_URL">
               <resultGeneration useMethodTag="webkitbrowser_check_url" >
                 <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
               </resultGeneration>
             </testStep>
-            <testStep testStepId="3" name="Get_Browser_Visibility" method="Get_Browser_Visibility" saveResult="true" revertGet="yes">
+            <testStep testStepId="4" name="Get_Browser_Visibility" method="Get_Browser_Visibility" saveResult="true" revertGet="yes">
                 <resultGeneration useMethodTag="webkitbrowser_get_visibility" />
             </testStep>
-            <testStep testStepId="4" name="Set_Browser_Visibility" method="Set_Browser_Visibility" revertSet="yes">
+            <testStep testStepId="5" name="Set_Browser_Visibility" method="Set_Browser_Visibility" revertSet="yes">
                 <params>
-                  <param tag="visibility" usePreviousResult="true" Id="3" useMethodTag="webkitbrowser_toggle_visibility" revertParam="yes" />
+                  <param tag="visibility" usePreviousResult="true" Id="4" useMethodTag="webkitbrowser_toggle_visibility" revertParam="yes" />
                 </params>
             </testStep>
-            <testStep testStepId="5" name="Get_Browser_Visibility" method="Get_Browser_Visibility" revertFlag="yes" delay="2">
+            <testStep testStepId="6" name="Check_Visibility_Change_Event" method="Event_Visibility_Change" action="eventListener" delay="3">
+              <resultGeneration useMethodTag="webkitbrowser_check_visibility_change_event" >
+                <expectedValues usePreviousResult="true" Id="4" useMethodTag="webkitbrowser_toggle_visibility" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Get_Browser_Visibility" method="Get_Browser_Visibility" revertFlag="yes">
                 <resultGeneration useMethodTag="webkitbrowser_get_visibility">
-                    <expectedValues usePreviousResult="true" Id="3" useMethodTag="webkitbrowser_toggle_visibility" />
+                    <expectedValues usePreviousResult="true" Id="4" useMethodTag="webkitbrowser_toggle_visibility" />
                 </resultGeneration>
             </testStep>
         </testCase>
@@ -120,12 +143,17 @@
                 <param tag="url" useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
               </params>
             </testStep>
-            <testStep testStepId="2" name="Get_Browser_Test_URL" method="Get_Browser_URL" delay="3">
+            <testStep testStepId="2" name="Check_Load_Finished_Event" method="Event_Load_Finished" action="eventListener" delay="10">
+              <resultGeneration useMethodTag="webkitbrowser_check_load_finished_event" >
+                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Get_Browser_Test_URL" method="Get_Browser_URL">
               <resultGeneration useMethodTag="webkitbrowser_check_url" >
                 <expectedValues useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
               </resultGeneration>
             </testStep>
-            <testStep testStepId="2" name="Get_Browser_FPS_Value" method="Get_Browser_FPS" delay="15">
+            <testStep testStepId="4" name="Get_Browser_FPS_Value" method="Get_Browser_FPS" delay="15">
               <resultGeneration useMethodTag="webkitbrowser_check_fps" >
                 <expectedValues useConfigFile="true" key="WEBKIT_EXPECTED_FPS" />
               </resultGeneration>
@@ -139,22 +167,27 @@
                 <param tag="url" useConfigFile="true" key="WEBKIT_TEST_URL" />
               </params>
             </testStep>
-            <testStep testStepId="2" name="Get_Browser_Test_URL" method="Get_Browser_URL" delay="3">
+            <testStep testStepId="2" name="Check_Load_Finished_Event" method="Event_Load_Finished" action="eventListener" delay="10">
+              <resultGeneration useMethodTag="webkitbrowser_check_load_finished_event" >
+                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Get_Browser_Test_URL" method="Get_Browser_URL">
               <resultGeneration useMethodTag="webkitbrowser_check_url" >
                 <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
               </resultGeneration>
             </testStep>
-            <testStep testStepId="3" name="Get_Cookie_Accept_Policy" method="Get_Cookie_Accept_Policy" saveResult="true" revertGet="yes">
+            <testStep testStepId="4" name="Get_Cookie_Accept_Policy" method="Get_Cookie_Accept_Policy" saveResult="true" revertGet="yes">
                 <resultGeneration useMethodTag="webkitbrowser_get_cookie_policy" />
             </testStep>
-            <testStep testStepId="4" name="Set_Cookie_Accept_Policy" method="Set_Cookie_Accept_Policy" revertSet="yes">
+            <testStep testStepId="5" name="Set_Cookie_Accept_Policy" method="Set_Cookie_Accept_Policy" revertSet="yes">
                 <params>
-                  <param tag="cookie_accept_policy" usePreviousResult="true" Id="3" useMethodTag="webkitbrowser_change_cookie_policy" revertParam="yes" />
+                  <param tag="cookie_accept_policy" usePreviousResult="true" Id="4" useMethodTag="webkitbrowser_change_cookie_policy" revertParam="yes" />
                 </params>
             </testStep>
-            <testStep testStepId="5" name="Get_Cookie_Accept_Policy" method="Get_Cookie_Accept_Policy" revertFlag="yes" >
+            <testStep testStepId="6" name="Get_Cookie_Accept_Policy" method="Get_Cookie_Accept_Policy" revertFlag="yes" >
                 <resultGeneration useMethodTag="webkitbrowser_get_cookie_policy">
-                    <expectedValues usePreviousResult="true" Id="3" useMethodTag="webkitbrowser_change_cookie_policy" />
+                    <expectedValues usePreviousResult="true" Id="4" useMethodTag="webkitbrowser_change_cookie_policy" />
                 </resultGeneration>
             </testStep>
         </testCase>
@@ -183,18 +216,123 @@
                 <param tag="url" useConfigFile="true" key="WEBKIT_TEST_URL" />
               </params>
             </testStep>
-            <testStep testStepId="2" name="Get_Browser_Test_URL" method="Get_Browser_URL" delay="3">
+            <testStep testStepId="2" name="Check_Load_Finished_Event" method="Event_Load_Finished" action="eventListener" delay="10">
+              <resultGeneration useMethodTag="webkitbrowser_check_load_finished_event" >
+                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Get_Browser_Test_URL" method="Get_Browser_URL">
               <resultGeneration useMethodTag="webkitbrowser_check_url" >
                 <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
               </resultGeneration>
             </testStep>
-            <testStep testStepId="3" name="Set_Preferred_Languages" method="Set_Languages" >
+            <testStep testStepId="4" name="Set_Preferred_Languages" method="Set_Languages" >
                 <params>
                   <param tag="languages" useDefault="true"/>
                 </params>
             </testStep>
             <testStep testStepId="4" name="Get_Preferred_Languages" method="Get_Languages" >
                 <resultGeneration useMethodTag="webkitbrowser_check_languages" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WEB_07" testCaseName="WebkitBrowser_SetAndGet_Invalid_URL" desc="Launch Invalid URL in the browser and check loadfailed Event">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Set_Browser_Test_URL" method="Set_Browser_URL">
+              <params>
+                <param tag="url" useConfigFile="true" key="WEBKIT_TEST_INVALID_URL" />
+              </params>
+            </testStep>
+            <testStep testStepId="2" name="Check_Load_Failed_Event" method="Event_Load_Failed" action="eventListener" delay="10">
+              <resultGeneration useMethodTag="webkitbrowser_check_load_failed_event" >
+                <expectedValues useConfigFile="true" key="WEBKIT_TEST_INVALID_URL" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Get_Browser_Test_URL" method="Get_Browser_URL">
+              <resultGeneration useMethodTag="webkitbrowser_check_url" >
+                <expectedValues useConfigFile="true" key="WEBKIT_TEST_INVALID_URL" />
+              </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WEB_08" testCaseName="WebkitBrowser_Change_Browser_URLs" desc="Launch different URL in the browser and check urlchange Event">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Set_Browser_Test_URL1" method="Set_Browser_URL">
+              <params>
+                <param tag="url" useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </params>
+            </testStep>
+            <testStep testStepId="2" name="Check_Load_Finished_Event" method="Event_Load_Finished" action="eventListener" delay="10">
+              <resultGeneration useMethodTag="webkitbrowser_check_load_finished_event" >
+                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Get_Browser_Test_URL1" method="Get_Browser_URL">
+              <resultGeneration useMethodTag="webkitbrowser_check_url" >
+                <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Set_Browser_Test_URL2" method="Set_Browser_URL">
+              <params>
+                <param tag="url" useConfigFile="true" key="WEBKIT_TEST_URL_1" />
+              </params>
+            </testStep>
+            <testStep testStepId="5" name="Check_Load_Finished_Event" method="Event_Load_Finished" action="eventListener" delay="10" clear="false">
+              <resultGeneration useMethodTag="webkitbrowser_check_load_finished_event" >
+                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_TEST_URL_1" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="6" name="Check_URL_Change_Event" method="Event_URL_Change" action="eventListener">
+              <resultGeneration useMethodTag="webkitbrowser_check_url_change_event" >
+                <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL_1" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Get_Browser_Test_URL2" method="Get_Browser_URL">
+              <resultGeneration useMethodTag="webkitbrowser_check_url" >
+                <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL_1" />
+              </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WEB_09" testCaseName="WebkitBrowser_SetAndGet_UserAgent" desc="Set and Get userAgent string used by browser" >
+           <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Get_UserAgent" method="Get_UserAgent" saveResult="true">
+                <resultGeneration useMethodTag="webkitbrowser_get_useragent" />
+            </testStep>
+            <testStep testStepId="2" name="Set_UserAgent" method="Set_UserAgent">
+                <params>
+                  <param tag="useragent" usePreviousResult="true" Id="1" useMethodTag="webkitbrowser_get_useragent_string" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Get_UserAgent" method="Get_UserAgent" >
+                <resultGeneration useMethodTag="webkitbrowser_get_useragent" arguments="check_useragent">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="webkitbrowser_get_useragent_string" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WEB_10" testCaseName="WebkitBrowser_SuspendAndResume" desc="Change plugin state and check statechange Event">
+            <testStep testStepId="1" name="Suspend_WebKitBrowser" method="Set_WebKitBrowser_State" >
+                <params>
+                  <param tag="state" value="suspended" />
+                </params>
+            </testStep>
+            <testStep testStepId="2" name="Check_State_Change_Event" method="Event_State_Change" action="eventListener" delay="5">
+              <resultGeneration useMethodTag="webkitbrowser_check_statechange_event" expectedValues="true" />
+            </testStep>
+            <testStep testStepId="3" name="Is_WebKitBrowser_Suspended" method="Get_WebKitBrowser_State">
+                <resultGeneration useMethodTag="webkitbrowser_get_state" expectedValues="suspended" />
+            </testStep>
+            <testStep testStepId="4" name="Resume_WebKitBrowser" method="Set_WebKitBrowser_State" >
+                <params>
+                  <param tag="state" useDefault="true" />
+                </params>
+            </testStep>
+            <testStep testStepId="5" name="Check_State_Change_Event" method="Event_State_Change" action="eventListener" delay="5">
+              <resultGeneration useMethodTag="webkitbrowser_check_statechange_event" expectedValues="false" />
+            </testStep>
+            <testStep testStepId="6" name="Is_WebKitBrowser_Suspended" method="Get_WebKitBrowser_State">
+                <resultGeneration useMethodTag="webkitbrowser_get_state" expectedValues="resumed" />
             </testStep>
         </testCase>
 
