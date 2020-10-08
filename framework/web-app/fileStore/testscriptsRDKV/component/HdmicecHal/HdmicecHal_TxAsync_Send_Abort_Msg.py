@@ -83,7 +83,7 @@ opcode - cec frame opcode</input_parameters>
     <test_stub_interface>libhdmicechalstub.so.0.0.0</test_stub_interface>
     <test_script>HdmicecHal_TxAsync_Send_Abort_Msg</test_script>
     <skipped>No</skipped>
-    <release_version>M80</release_version>
+    <release_version>M81</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
