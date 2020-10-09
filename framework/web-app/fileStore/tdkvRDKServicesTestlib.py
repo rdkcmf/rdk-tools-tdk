@@ -30,6 +30,7 @@ import json,ast
 import ConfigParser
 import xml.etree.ElementTree as ET
 from tdkvRDKServicesSupportlib import *
+from tdkvRDKServicesEventHandlerlib import *
 
 
 #-----------------------------------------------------------------------------------------------
@@ -222,6 +223,9 @@ def executeTestCases(testCaseID="all"):
     global repeatInterval
     repeatInterval = 0
 
+    global eventListener
+    eventListener = None
+
     # ------------------------------- PLUGIN PRE-REQUISITES ----------------------------------
     # Perform plugin pre-requisite steps such as activate or deactivate plugins common for all
     # the tests . Revert operations are not supported as part of pre/post requisite steps. If
@@ -289,6 +293,8 @@ def executeTestCases(testCaseID="all"):
         testCasePreRequisiteStatus  = []
         testCasePostRequisiteStatus = []
 
+        if eventListener is not None:
+            eventListener.clearEventsBuffer()
 
         # ---------------------------- TEST CASE PRE-REQUISITE  --------------------------------
         # Perform test case pre-requisite steps such as activate or deactivate plugins specific
@@ -498,6 +504,10 @@ def executeTestCases(testCaseID="all"):
         else:
             print "\nPlugin Post-requisite Status: SUCCESS"
 
+    if eventListener is not None:
+        eventListener.disconnect()
+        time.sleep(2)
+
     # Append the post-requisite step status along with test cases status
     combinedTestStatus.extend(pluginPostRequisiteStatus)
 
@@ -532,38 +542,10 @@ def executePrePostRequisite(prepostrequisite):
         print "\nPre/Post Requisite : %s" %(requisiteInfo.get("requisiteName"))
         print "Requisite No : %s" %(requisiteInfo.get("requisiteId"))
 
-        requisiteStepStatus = []
-        # Executing all the test steps under each pre/post requisite
-        # and updating the status
-        for testStep in requisite.findall("testStep"):
-            global currentTestStepId
-            currentTestStepId = testStep.attrib.get("testStepId")
-            setTestStepDelay(testStep.attrib)
-
-            # If any of the test step fails, then execution
-            # will be broken
-            if testStep.attrib.get("testStepType") == "loop":
-                global iterInterval
-                iterInterval = 0
-                if testStep.attrib.get("iterInterval") is not None:
-                    iterInterval = int(testStep.attrib.get("iterInterval"))
-                loopTestStepStatus = executeTestStepLoop(requisiteInfo,testStep)
-                if "FAILURE" in loopTestStepStatus:
-                    requisiteStepStatus.append("FAILURE")
-                    break;
-                elif "FALSE" in loopTestStepStatus:
-                    continue;
-                else:
-                    requisiteStepStatus.append("SUCCESS")
-            else:
-                status = executeTestStepDirect(requisiteInfo,testStep)
-                if status == "FAILURE":
-                    requisiteStepStatus.append(status)
-                    break;
-                elif status == "FALSE":
-                    continue;
-                else:
-                    requisiteStepStatus.append(status)
+        if requisiteInfo.get("type") == "eventRegister" and eventListener is None:
+            requisiteStepStatus = executeEventHandlerRequisite(requisite)
+        else:
+            requisiteStepStatus = executeRegularRequisite(requisite)
 
         # If any of the pre/post requisites fails, then
         # execution will be broken
@@ -572,6 +554,114 @@ def executePrePostRequisite(prepostrequisite):
             break;
 
     return allprepostRequisiteStatus
+
+
+#-----------------------------------------------------------------------------------------------
+# executeEventHandlerRequisite
+#-----------------------------------------------------------------------------------------------
+def executeEventHandlerRequisite(requisite):
+    events = []
+    eventAPIs = []
+    registerMethods = []
+    eventtestStepInfo = {}
+    for event in requisite.findall("event"):
+        eventInfo = event.attrib.copy()
+        eventAPIInfo = getTestPluginAPIInfo(eventInfo.get("pluginName"), eventInfo.get("method"))
+        registerMethod = eventAPIInfo.get("serviceName") + "." + eventAPIInfo.get("serviceVersion") + "." + "register"
+        params =  { "event"   : eventAPIInfo.get("api") , "id" : eventAPIInfo.get("eventId") }
+        jsonCmd = { "jsonrpc" : "2.0" , "id" : 2 , "method" : registerMethod , "params" : params}
+        jsonCmd = json.dumps(jsonCmd)
+        events.append(jsonCmd)
+        eventAPIs.append(eventAPIInfo.get("api"))
+        registerMethods.append(registerMethod)
+    registerMethods = list(set(registerMethods))
+
+    # Create Event listener Object
+    global eventListener
+    print "------------- Event-Handling -------------"
+    if requisite.attrib.get("trace") == "true":
+        traceEnable = True
+    else:
+        traceEnable = False
+    eventListener = createEventListener(deviceIP,portNo,events,traceEnable)
+    count = 1
+    maxTime = (len(events) * 2) + 3
+    # Wait until all events are registered
+    while eventListener.getListenerFlag() == False and count <= maxTime:
+        count += 1
+        time.sleep(1)
+
+    # Check listerner flag & registered info
+    registerIssues = []
+    if eventListener.getListenerFlag() == True:
+        registerInfo = eventListener.getEventsRegisterInfo()
+        for eventStatus in registerInfo:
+            if eventStatus.get("status") == "FAILURE":
+                registerIssues.append(eventStatus)
+        if len(registerInfo) != 0 and len(registerIssues) == 0:
+            registerStatus = "SUCCESS"
+        else:
+            registerStatus = "FAILURE"
+    else:
+        registerStatus = "FAILURE"
+
+    # Display details of the event(s) failed to register
+    if len(registerIssues) != 0:
+        print "\n Failed to register below event(s)"
+        for issue in registerIssues:
+            print json.loads(issue).get("response")
+
+    # Display event register test step info
+    eventtestStepInfo["name"] = requisite.attrib.get("requisiteName")
+    eventtestStepInfo["testStepId"] = "1"
+    eventtestStepInfo["pluginAPI"] = ",".join(registerMethods)
+    eventtestStepInfo["paramTypeInfo"] = {"type":"directString"}
+    eventtestStepInfo["resultGeneration"] = {"expectedValues":"null"}
+    eventRegisterParams = ",".join(eventAPIs)
+    result = {"Test_Step_Status":registerStatus}
+    dispTestStepInfo(eventtestStepInfo,eventRegisterParams,result)
+
+    return [registerStatus]
+
+
+
+#-----------------------------------------------------------------------------------------------
+# executeRegularRequisite
+#-----------------------------------------------------------------------------------------------
+def executeRegularRequisite(requisite):
+    requisiteStepStatus = []
+    # Executing all the test steps under each pre/post requisite
+    # and updating the status
+    requisiteInfo = requisite.attrib.copy()
+    for testStep in requisite.findall("testStep"):
+        global currentTestStepId
+        currentTestStepId = testStep.attrib.get("testStepId")
+        setTestStepDelay(testStep.attrib)
+        # If any of the test step fails, then execution
+        # will be broken
+        if testStep.attrib.get("testStepType") == "loop":
+            global iterInterval
+            iterInterval = 0
+            if testStep.attrib.get("iterInterval") is not None:
+                iterInterval = int(testStep.attrib.get("iterInterval"))
+            loopTestStepStatus = executeTestStepLoop(requisiteInfo,testStep)
+            if "FAILURE" in loopTestStepStatus:
+                requisiteStepStatus.append("FAILURE")
+                break;
+            elif "FALSE" in loopTestStepStatus:
+                continue;
+            else:
+                requisiteStepStatus.append("SUCCESS")
+        else:
+            status = executeTestStepDirect(requisiteInfo,testStep)
+            if status == "FAILURE":
+                requisiteStepStatus.append(status)
+                break;
+            elif status == "FALSE":
+                continue;
+            else:
+                requisiteStepStatus.append(status)
+    return requisiteStepStatus
 
 
 
@@ -870,10 +960,10 @@ def executeTestStepRepeat(testCaseInfo,testStep,repeatMax):
             if status == "SUCCESS":
                 allsubTestStepStatus.append(status)
                 subtestStepResultInfo = {}
-                subtestStepResultInfo = {"iterationId":0,"result":result.copy()}
+                subtestStepResultInfo = {"revertId":1,"result":result.copy()}
                 saveRevertTestInfo(testCaseInfo,subTestStepInfo,[subtestStepResultInfo])
                 if revertTestInfo.get("revertFlags") is None and subTestStepInfo.get("revertFlag") == "yes":
-                    revertTestInfo["revertFlags"] = [{"iterationId":0,"status":"TRUE"}]
+                    revertTestInfo["revertFlags"] = [{"revertId":1,"status":"TRUE"}]
             elif status == "FAILURE":
                 allsubTestStepStatus.append(status)
                 break;
@@ -920,15 +1010,30 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
     paramGenStatus,testParams = getTestStepInputParam(testStepInfo.get("paramTypeInfo"),testParams)
     parseStatus = paramGenStatus if paramGenStatus == "FAILURE" else parseStatus
 
+    # Check whether test step is EventListener and check whether events
+    # are registered
+    if testStepInfo.get("action") == "eventListener" and eventListener is not None:
+        eventRegistration = "SUCCESS"
+    elif testStepInfo.get("action") == "eventListener" and eventListener is None:
+        eventRegistration = "FAILURE"
+    else:
+        eventRegistration = "FALSE"
+
     # If the test step does not have any issues in forming the test API
     # and params & if the condition to execute satisfies, then test is initated
-    if parseStatus != "FAILURE" and conditionalExecStatus != "FALSE" and methodNotFound is None:
-        execStatus,response = executeCommand(testMethod,testParams)
+    if parseStatus != "FAILURE" and conditionalExecStatus != "FALSE" and methodNotFound is None and eventRegistration != "FAILURE":
+        if testStepInfo.get("action") == "eventListener":
+            execStatus,response = getListenedEvent(testMethod,testStepInfo.get("clear"))
+        else:
+            execStatus,response = executeCommand(testMethod,testParams)
 
         # After the successful test execution, the response obtained
         # is parsed based on the user configurations and result is generated
         if execStatus == "SUCCESS":
-            result = testStepResultGeneration(response,testStepInfo.get("resultGeneration"))
+            if testStepInfo.get("action") == "eventListener":
+                result = testStepResultGeneration(response,testStepInfo.get("resultGeneration"),"eventListener")
+            else:
+                result = testStepResultGeneration(response,testStepInfo.get("resultGeneration"))
             testStepStatus = result.get("Test_Step_Status")
             dispTestStepInfo(testStepInfo,testParams,result)
 
@@ -951,10 +1056,13 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
     elif conditionalExecStatus == "FALSE":
         return conditionalExecStatus,result
     elif methodNotFound is not None:
-        print "Error Occurred: %s method not found in %s Plugin" %(methodNotFound.get("method"),methodNotFound.get("plugin"))
+        print "\nError Occurred: %s method not found in %s Plugin" %(methodNotFound.get("method"),methodNotFound.get("plugin"))
+        return "FAILURE",result
+    elif eventRegistration == "FAILURE":
+        print "\nError Occurred: No Events are Registered but Listeners are used"
         return "FAILURE",result
     else:
-        print "Error Occurred: Undefined behaviour"
+        print "\nError Occurred: Undefined behaviour"
         return "FAILURE",result
 
 #-----------------------------------------------------------------------------------------------
@@ -1000,6 +1108,29 @@ def executeCommand(testMethod,testParams):
 
     return executeStatus,jsonResponse
 
+
+
+#-----------------------------------------------------------------------------------------------
+# getListenedEvent
+#-----------------------------------------------------------------------------------------------
+def getListenedEvent(eventAPI,clearStatus):
+    status = "SUCCESS"
+    listenedEvents = []
+
+    time.sleep(2)
+    eventsBuffer = eventListener.getEventsBuffer()
+    for eventResponse in eventsBuffer:
+        if eventAPI in eventResponse:
+            try:
+                eventJsonResponse = json.loads(eventResponse)
+            except Exception as e:
+                status = "FAILURE"
+                print "\nException Occurred: [%s] %s" %(inspect.stack()[0][3],e)
+            listenedEvents.append(eventJsonResponse)
+
+    if clearStatus is None or clearStatus == "true":
+        eventListener.clearEventsBuffer()
+    return status,listenedEvents
 
 
 #-----------------------------------------------------------------------------------------------
@@ -1091,6 +1222,10 @@ def setTestStepDelay(testStepInfo):
 # Return Value: Test API
 #-----------------------------------------------------------------------------------------------
 def getTestStepAPI(testStepInfo):
+    if testStepInfo.get("action") == "eventListener":
+        testMethod = str(testStepInfo.get("eventId")) + "." + str(testStepInfo.get("api"))
+        return testMethod
+
     testMethod = str(testStepInfo.get("serviceName"))    + "." + \
                  str(testStepInfo.get("serviceVersion")) + "." + \
                  str(testStepInfo.get("api"))
@@ -1137,6 +1272,8 @@ def getTestStepInfo(testStep):
     testStepInfo["serviceVersion"] = pluginAPIInfo.get("serviceVersion")
 
     testStepInfo["api"] = pluginAPIInfo.get("api")
+    if pluginAPIInfo.get("eventId") is not None:
+        testStepInfo["eventId"] = pluginAPIInfo.get("eventId")
 
 
     # If not able to get the test API info, capture the details under
@@ -1482,10 +1619,16 @@ def dispTestStepInfo(testStepInfo,testParams,result):
 #             : resultGenerationInfo - result generation details
 # Return Value: Test Result Dictionary
 #-----------------------------------------------------------------------------------------------
-def testStepResultGeneration(testStepResponse,resultGenerationInfo):
+def testStepResultGeneration(testStepResponse,resultGenerationInfo, action="execution"):
 
     info = {}
-    result = testStepResponse.get("result")
+    if action == "eventListener":
+        result = []
+        for response in testStepResponse:
+            eventResult = response.get("param") if response.get("param") is not None else response.get("params")
+            result.append(eventResult)
+    else:
+        result = testStepResponse.get("result")
 
     if "useMethodTag" in resultGenerationInfo.keys():
         tag = resultGenerationInfo.get("useMethodTag")
@@ -1496,7 +1639,10 @@ def testStepResultGeneration(testStepResponse,resultGenerationInfo):
             arg = []
         expectedValues = resultGenerationInfo.get("expectedValues")
         expectedValues = expectedValues.split(",") if expectedValues != "null" else []
-        info = CheckAndGenerateTestStepResult(result,tag,arg,expectedValues)
+        if action == "eventListener":
+            info = CheckAndGenerateEventResult(result,tag,arg,expectedValues)
+        else:
+            info = CheckAndGenerateTestStepResult(result,tag,arg,expectedValues)
         if info["Test_Step_Status"] == "FAILURE" and len(info.keys()) == 1:
             print "\nJSON Cmd : ",testStepJSONCmd
             print "\nResponse : ",testStepResponse

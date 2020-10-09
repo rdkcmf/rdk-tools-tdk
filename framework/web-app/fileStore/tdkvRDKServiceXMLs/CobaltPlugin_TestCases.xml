@@ -74,7 +74,7 @@
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Send_DeepLink" method="Send_DeepLink">
               <params>
-                <param tag="link" value="https://youtu.be/QAUzWtLMnU0"/>
+                <param tag="link" useConfigFile="true" key="COBALT_PLAYBACK_URL" />
               </params>
             </testStep>
         </testCase>
