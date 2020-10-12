@@ -49,6 +49,10 @@
                <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -124,6 +128,10 @@
                <!--whether set is applicable or not -->
                <writable>false</writable>
                <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -138,7 +146,7 @@
                <!-- the range of values acceptable -->
                <expectedValues></expectedValues>
                <!--default value of the param after factory reset -->
-               <defaultValue></defaultValue>          
+               <defaultValue></defaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -257,10 +265,11 @@
                <type>string</type>
                <!--whether set is applicable or not -->
                <writable>false</writable>
-                <persistentSet>false</persistentSet>
+               <persistentSet>false</persistentSet>
                <!-- the range of values acceptable -->
                <expectedValues></expectedValues>
-                <defaultValue></defaultValue>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -285,6 +294,7 @@
                <!--whether set is applicable or not -->
                <writable>false</writable>
                <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
                <defaultValue>5</defaultValue>
         </parameter>
         <parameter>
@@ -312,6 +322,7 @@
                <persistentSet>false</persistentSet>
                <!-- the range of values acceptable -->
                <expectedValues></expectedValues>
+               <!--default value of the param after factory reset -->
                <defaultValue></defaultValue>
         </parameter>
         <parameter>
@@ -324,8 +335,10 @@
                <!--whether set is applicable or not -->
                <writable>false</writable>
                <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
                <!--default value of the param after factory reset -->
-               <defaultValue>0</defaultValue>
+               <defaultValue></defaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -370,8 +383,10 @@
                <!--whether set is applicable or not -->
                <writable>false</writable>
                <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <defaultValue></defaultValue>
                <!--default value of the param after factory reset -->
-               <defaultValue>3478</defaultValue>
+               <expectedValues></expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -414,7 +429,9 @@
                <writable>false</writable>
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>30</defaultValue>
+               <defaultValue></defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -427,7 +444,9 @@
                <writable>false</writable>
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>5</defaultValue>
+               <defaultValue></defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -441,6 +460,7 @@
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
                <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
         <parameter>
@@ -467,7 +487,9 @@
                <writable>false</writable>
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>7547</defaultValue>
+               <defaultValue></defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
