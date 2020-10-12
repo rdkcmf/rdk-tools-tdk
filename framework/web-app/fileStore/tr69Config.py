@@ -28,3 +28,6 @@ SERVERURI_GET_XML=""
 
 # Name of the xml file(including its full path), holding the soap request for TS_TR069PA_SetManagementServerURL.py, should be a set request to set a url as Device.ManagementServer.URL
 SERVERURI_SET_XML=""
+
+# Name of the xml file(including its full path), holding the soap request for TS_ETHWAN_CheckTR069Support.py, should be a get request for Device.ManagementServer.Username
+SERVERUSERNAME_GET_XML=""
