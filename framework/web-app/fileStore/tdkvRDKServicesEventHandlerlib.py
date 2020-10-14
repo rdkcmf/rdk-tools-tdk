@@ -27,7 +27,7 @@ import websocket
 import threading
 import thread
 import requests
-import json,ast
+import json,ast,re
 import inspect
 from tdkvRDKServicesSupportlib import checkAndGetAllResultInfo
 from tdkvRDKServicesSupportlib import checkNonEmptyResultData
@@ -37,10 +37,11 @@ from tdkvRDKServicesSupportlib import compareURLs
 #-----------------------------------------------------------------------------------------------
 
 class createEventListener(object):
-    def __init__(self,deviceIP,devicePort,events,trace):
+    def __init__(self,deviceIP,devicePort,eventsInfo,trace):
         self.ip = deviceIP
         self.port = devicePort
-        self.events = events
+        self.eventsregistercmds   = eventsInfo.get("eventsRegisterJsonCmds")
+        self.eventsunregistercmds = eventsInfo.get("eventsUnRegisterJsonCmds")
         self.trace = trace
         thread = threading.Thread(target=self.connect, args=())
         thread.daemon = True
@@ -48,9 +49,14 @@ class createEventListener(object):
         self.listen = True
         self.listenflag = False
         self.eventsbuffer = []
-        self.eventsregisterinfo = []
+        self.eventsregisterstatus   = []
+        self.eventsunregisterstatus = []
+        self.eventsregisterinfo   = []
+        self.eventsunregisterinfo = []
     def getEventsRegisterInfo(self):
         return self.eventsregisterinfo
+    def getEventsUnRegisterInfo(self):
+        return self.eventsunregisterinfo
     def getEventsBuffer(self):
         return self.eventsbuffer
     def clearEventsBuffer(self):
@@ -59,6 +65,8 @@ class createEventListener(object):
         return self.listenflag
     def setListenerFlag(self):
         self.listenflag = True
+    def resetListenerFlag(self):
+        self.listenflag = False
 
     def connect(self):
         try:
@@ -79,29 +87,57 @@ class createEventListener(object):
     def on_open(self):
         def run(*args):
             print("[INFO]: Registering Events...")
-            for event in self.events:
-                if self.trace:
-                    print "\n Register Event %s" %(event)
-                self.clearEventsBuffer()
-                self.ws.send(event)
-                time.sleep(2)
-                registerResponse = json.loads(self.getEventsBuffer()[0])
-                if int(registerResponse.get("result")) == 0:
-                    status = "SUCCESS"
+            self.eventsRegisterAndUnRegister("register")
+            if "FAILURE" not in self.eventsregisterstatus:
+                print("[INFO]: Events Registration success")
+                print("[INFO]: Starting Event listener...")
+                self.setListenerFlag()
+                while self.listen:
+                    time.sleep(1)
+                print ("[INFO]: Stopped Event listener...")
+                print ("[INFO]: UnRegistering Events...")
+                self.eventsRegisterAndUnRegister("unregister")
+                self.resetListenerFlag()
+                if "FAILURE" not in self.eventsunregisterstatus:
+                    print("[INFO]: Events UnRegistration success")
                 else:
-                    status = "FAILURE"
-                eventinfo = {}
-                eventinfo["event"]  = json.loads(event).get("params").get("event")
-                eventinfo["status"] = status
-                eventinfo["response"] = registerResponse
-                self.eventsregisterinfo.append(eventinfo)
-            print("[INFO]: Starting Event listener...")
-            self.setListenerFlag()
-            while self.listen:
-                time.sleep(1)
-            print ("[INFO]: Stopped Event listener...")
-            self.ws.close()
+                    print("[ERROR]: Events UnRegistration failed")
+                self.ws.close()
+            else:
+                print("[ERROR]: Events Registration failed")
         thread.start_new_thread(run, ())
+
+
+    def eventsRegisterAndUnRegister(self,action):
+        if action == "register":
+            eventsjsoncmds = self.eventsregistercmds
+        elif action == "unregister":
+            eventsjsoncmds = self.eventsunregistercmds
+
+        for event in eventsjsoncmds:
+            if self.trace:
+                if action == "register":
+                    print "\n Register Event %s" %(event)
+                elif action == "unregister":
+                    print "\n UnRegister Event %s" %(event)
+            self.clearEventsBuffer()
+            self.ws.send(event)
+            time.sleep(2)
+            response = json.loads(self.getEventsBuffer()[0])
+            if int(response.get("result")) == 0:
+                status = "SUCCESS"
+            else:
+                status = "FAILURE"
+            eventinfo = {}
+            eventinfo["event"]  = json.loads(event).get("params").get("event")
+            eventinfo["status"] = status
+            eventinfo["response"] = response
+            if action == "register":
+                self.eventsregisterstatus.append(status)
+                self.eventsregisterinfo.append(eventinfo)
+            elif action == "unregister":
+                self.eventsunregisterstatus.append(status)
+                self.eventsunregisterinfo.append(eventinfo)
 
 
     def on_message(self,message):
@@ -117,7 +153,7 @@ class createEventListener(object):
 
     def disconnect(self):
         self.listen = False
-        self.listenflag = False
+        #self.listenflag = False
 
 
 #-----------------------------------------------------------------------------------------------
@@ -260,4 +296,3 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
         info["Test_Step_Status"] = "FAILURE"
 
     return info
-

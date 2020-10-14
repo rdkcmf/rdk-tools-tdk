@@ -225,6 +225,8 @@ def executeTestCases(testCaseID="all"):
 
     global eventListener
     eventListener = None
+    global eventsInfo
+    eventsInfo = {}
 
     # ------------------------------- PLUGIN PRE-REQUISITES ----------------------------------
     # Perform plugin pre-requisite steps such as activate or deactivate plugins common for all
@@ -496,17 +498,28 @@ def executeTestCases(testCaseID="all"):
     # all test cases. Revert operations are not supported as part of pre/post requisite steps
     # if any pos-requisite step fails then plugin execution status will be marked as failure
 
-    if testPlugin.find("pluginPostRequisite") is not None:
-        print "#---------------------------- Plugin Post-requisite ----------------------------#"
-        pluginPostRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPostRequisite"))
+    if testPlugin.find("pluginPostRequisite") is not None or eventListener is not None:
+        print "\n#---------------------------- Plugin Post-requisite ----------------------------#"
+        if testPlugin.find("pluginPostRequisite") is not None:
+            pluginPostRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPostRequisite"))
+            postRequisiteCount = 0
+            for requisite in testPlugin.find("pluginPostRequisite"):
+                postRequisiteCount += 1
+        else:
+            postRequisiteCount = 0
+        if eventListener is not None:
+            print "\nPre/Post Requisite : UnRegister_Events"
+            print "Requisite No : %d" %(int(postRequisiteCount) + 1)
+            print "------------- Event-Handling -------------"
+            eventListener.disconnect()
+            unRegisterStatus = getEventsUnRegistrationInfo()
+            pluginPostRequisiteStatus.extend(unRegisterStatus)
+
         if "FAILURE" in pluginPostRequisiteStatus:
             print "\nPlugin Post-requisite Status: FAILURE"
         else:
             print "\nPlugin Post-requisite Status: SUCCESS"
 
-    if eventListener is not None:
-        eventListener.disconnect()
-        time.sleep(2)
 
     # Append the post-requisite step status along with test cases status
     combinedTestStatus.extend(pluginPostRequisiteStatus)
@@ -560,21 +573,40 @@ def executePrePostRequisite(prepostrequisite):
 # executeEventHandlerRequisite
 #-----------------------------------------------------------------------------------------------
 def executeEventHandlerRequisite(requisite):
-    events = []
     eventAPIs = []
     registerMethods = []
+    unregisterMethods = []
     eventtestStepInfo = {}
+    eventsRegisterJsonCmds   = []
+    eventsUnRegisterJsonCmds = []
     for event in requisite.findall("event"):
         eventInfo = event.attrib.copy()
-        eventAPIInfo = getTestPluginAPIInfo(eventInfo.get("pluginName"), eventInfo.get("method"))
-        registerMethod = eventAPIInfo.get("serviceName") + "." + eventAPIInfo.get("serviceVersion") + "." + "register"
-        params =  { "event"   : eventAPIInfo.get("api") , "id" : eventAPIInfo.get("eventId") }
+        eventAPIInfo = getTestPluginAPIInfo(eventInfo.get("pluginName"), eventInfo.get("eventName"), "event")
+        registerMethod   = eventAPIInfo.get("serviceName") + "." + eventAPIInfo.get("serviceVersion") + "." + "register"
+        unregisterMethod = eventAPIInfo.get("serviceName") + "." + eventAPIInfo.get("serviceVersion") + "." + "unregister"
+        params =  { "event"   : eventAPIInfo.get("eventName") , "id" : eventAPIInfo.get("eventId") }
+
         jsonCmd = { "jsonrpc" : "2.0" , "id" : 2 , "method" : registerMethod , "params" : params}
         jsonCmd = json.dumps(jsonCmd)
-        events.append(jsonCmd)
-        eventAPIs.append(eventAPIInfo.get("api"))
+        eventsRegisterJsonCmds.append(jsonCmd)
+
+        jsonCmd = { "jsonrpc" : "2.0" , "id" : 2 , "method" : unregisterMethod , "params" : params}
+        jsonCmd = json.dumps(jsonCmd)
+        eventsUnRegisterJsonCmds.append(jsonCmd)
+
+        eventAPIs.append(eventAPIInfo.get("eventName"))
         registerMethods.append(registerMethod)
-    registerMethods = list(set(registerMethods))
+        unregisterMethods.append(unregisterMethod)
+    registerMethods   = list(set(registerMethods))
+    unregisterMethods = list(set(unregisterMethods))
+
+    # Update EventInfo Global variable
+    global eventsInfo
+    eventsInfo["eventAPIs"] = eventAPIs
+    eventsInfo["registerMethods"]   = registerMethods
+    eventsInfo["unregisterMethods"] = unregisterMethods
+    eventsInfo["eventsRegisterJsonCmds"]   = eventsRegisterJsonCmds
+    eventsInfo["eventsUnRegisterJsonCmds"] = eventsUnRegisterJsonCmds
 
     # Create Event listener Object
     global eventListener
@@ -583,9 +615,9 @@ def executeEventHandlerRequisite(requisite):
         traceEnable = True
     else:
         traceEnable = False
-    eventListener = createEventListener(deviceIP,portNo,events,traceEnable)
+    eventListener = createEventListener(deviceIP,portNo,eventsInfo,traceEnable)
     count = 1
-    maxTime = (len(events) * 2) + 3
+    maxTime = (len(eventsInfo.get("eventAPIs")) * 2) + 3
     # Wait until all events are registered
     while eventListener.getListenerFlag() == False and count <= maxTime:
         count += 1
@@ -1132,6 +1164,47 @@ def getListenedEvent(eventAPI,clearStatus):
         eventListener.clearEventsBuffer()
     return status,listenedEvents
 
+#-----------------------------------------------------------------------------------------------
+# getEventsUnRegistrationInfo
+#-----------------------------------------------------------------------------------------------
+def getEventsUnRegistrationInfo():
+    count = 1
+    maxTime = (len(eventsInfo.get("eventAPIs")) * 2) + 3
+    # Wait until all events are unregistered
+    while eventListener.getListenerFlag() == True and count <= maxTime:
+        count += 1
+        time.sleep(1)
+
+    # Check unregistered info
+    unregisterIssues = []
+    unregisterInfo = eventListener.getEventsUnRegisterInfo()
+    for eventStatus in unregisterInfo:
+        if eventStatus.get("status") == "FAILURE":
+            unregisterIssues.append(eventStatus)
+    if len(unregisterInfo) != 0 and len(unregisterIssues) == 0:
+        unregisterStatus = "SUCCESS"
+    else:
+        unregisterStatus = "FAILURE"
+
+    # Display details of the event(s) failed to unregister
+    if len(unregisterIssues) != 0:
+        print "\n Failed to unregister below event(s)"
+        for issue in unregisterIssues:
+            print json.loads(issue).get("response")
+
+    # Display event register test step info
+    eventtestStepInfo = {}
+    eventtestStepInfo["name"] = "UnRegister_Events"
+    eventtestStepInfo["testStepId"] = "1"
+    eventtestStepInfo["pluginAPI"] = ",".join(eventsInfo.get("unregisterMethods"))
+    eventtestStepInfo["paramTypeInfo"] = {"type":"directString"}
+    eventtestStepInfo["resultGeneration"] = {"expectedValues":"null"}
+    eventUnRegisterParams = ",".join(eventsInfo.get("eventAPIs"))
+    result = {"Test_Step_Status":unregisterStatus}
+    dispTestStepInfo(eventtestStepInfo,eventUnRegisterParams,result)
+
+    return [unregisterStatus]
+
 
 #-----------------------------------------------------------------------------------------------
 # getTestPluginInfo
@@ -1149,18 +1222,19 @@ def getTestPluginInfo(testPlugin):
 #-----------------------------------------------------------------------------------------------
 # getTestPluginAPIInfo
 #-----------------------------------------------------------------------------------------------
-# Syntax      : getTestPluginAPIInfo(pluginName, testMethod)
+# Syntax      : getTestPluginAPIInfo(pluginName, testMethod, type)
 # Description : Method to get the plugin API details from the template XML
 # Parameter   : pluginName - Name of the test plugin
 #             : testMethod - test API name
+#             : apiType       - Type of the API (method/event)
 # Return Value: Plugin API info dictionary
 #-----------------------------------------------------------------------------------------------
-def getTestPluginAPIInfo(pluginName, testMethod):
+def getTestPluginAPIInfo(pluginName, testMethod, apiType="method"):
 
     pluginAPIInfo = {}
     for plugin in thunderPlugins:
         if pluginName in plugin.attrib.get("pluginName"):
-            for method in plugin.findall("method"):
+            for method in plugin.findall(apiType):
                 if testMethod in method.attrib.get("name") and len(testMethod) == len(method.attrib.get("name")):
                     pluginAPIInfo = method.attrib.copy()
                     pluginAPIInfo["serviceName"] = plugin.attrib.get("serviceName")
@@ -1223,7 +1297,7 @@ def setTestStepDelay(testStepInfo):
 #-----------------------------------------------------------------------------------------------
 def getTestStepAPI(testStepInfo):
     if testStepInfo.get("action") == "eventListener":
-        testMethod = str(testStepInfo.get("eventId")) + "." + str(testStepInfo.get("api"))
+        testMethod = str(testStepInfo.get("eventId")) + "." + str(testStepInfo.get("eventName"))
         return testMethod
 
     testMethod = str(testStepInfo.get("serviceName"))    + "." + \
@@ -1258,29 +1332,35 @@ def getTestStepInfo(testStep):
     testStepInfo = testStep.attrib.copy()
     if testStepInfo.get("testStepId") is not None and testStepInfo.get("testStepType") is None:
         testStepInfo["testStepType"] = "direct"
+    if testStepInfo.get("action") == "eventListener":
+        apiType = "event"
+    else:
+        apiType = "method"
 
     # Check whether step step has plugin name and plugin version details
     # If not, use the default plugin info provide in testPlugin node
     # Based on the plugin details, get the test API details from template XML
     if "pluginName" in testStepInfo.keys():
-        pluginAPIInfo = getTestPluginAPIInfo(testStepInfo.get("pluginName"),testStepInfo.get("method")).copy()
+        pluginAPIInfo = getTestPluginAPIInfo(testStepInfo.get("pluginName"),testStepInfo.get(apiType), apiType).copy()
     else:
-        pluginAPIInfo = getTestPluginAPIInfo(testPlugin.attrib.get("pluginName"),testStepInfo.get("method")).copy()
+        pluginAPIInfo = getTestPluginAPIInfo(testPlugin.attrib.get("pluginName"),testStepInfo.get(apiType), apiType).copy()
         testStepInfo["pluginName"] = testPlugin.attrib.get("pluginName")
 
     testStepInfo["serviceName"]   = pluginAPIInfo.get("serviceName")
     testStepInfo["serviceVersion"] = pluginAPIInfo.get("serviceVersion")
 
-    testStepInfo["api"] = pluginAPIInfo.get("api")
-    if pluginAPIInfo.get("eventId") is not None:
+    if testStepInfo.get("action") == "eventListener":
         testStepInfo["eventId"] = pluginAPIInfo.get("eventId")
+        testStepInfo["eventName"] = pluginAPIInfo.get("eventName")
+    else:
+        testStepInfo["api"] = pluginAPIInfo.get("api")
 
 
     # If not able to get the test API info, capture the details under
     # methodNotFound tag
-    if testStepInfo["api"] is None:
+    if testStepInfo.get("api") is None and testStepInfo.get("eventName") is None:
         methodInfo = {}
-        methodInfo = {"method":testStepInfo.get("method"),"plugin":testStepInfo.get("pluginName")}
+        methodInfo = {"method":testStepInfo.get(apiType),"plugin":testStepInfo.get("pluginName")}
         testStepInfo["methodNotFound"] = methodInfo.copy()
 
     # Get the details of all the test params one by one
@@ -1350,14 +1430,17 @@ def getTestStepInfo(testStep):
                     paramTypeInfo["type"] = "directList"
                 elif pluginAPIInfo.get("paramTypeInfo").get("paramType") == "directBool":
                     paramTypeInfo["type"] = "directBool"
+                elif pluginAPIInfo.get("paramTypeInfo").get("paramType") == "userGenerate":
+                    paramTypeInfo["type"] = "userGenerate"
+                    paramTypeInfo["tag"]  = pluginAPIInfo.get("paramTypeInfo").get("useMethodTag")
                 else:
                     paramTypeInfo["type"] = "directDict"
 
-                if pluginAPIInfo.get("paramTypeInfo").get("userGenerate") == "true":
-                    paramTypeInfo["type"] = "userGenerate"
-                    paramTypeInfo["tag"]  = pluginAPIInfo.get("paramTypeInfo").get("useMethodTag")
+                if pluginAPIInfo.get("paramTypeInfo").get("paramKey") is not None:
+                    paramTypeInfo["paramKey"] = pluginAPIInfo.get("paramTypeInfo").get("paramKey")
             else:
                 paramTypeInfo["type"] = "directDict"
+
 
             if pluginAPIInfo.get("paramsType") is not None:
                 paramTypeInfo["individualparamsType"] = pluginAPIInfo.get("paramsType").copy()
@@ -1375,16 +1458,40 @@ def getTestStepInfo(testStep):
     if testStep.find("resultGeneration") is not None:
         testStepInfo["resultGeneration"] = testStep.find("resultGeneration").attrib.copy()
 
-        # Check whether iterable value should be passed as argument for result
-        # generation for a loop test step type
-        if testStepInfo.get("resultGeneration").get("useIterableArg") == "true":
-            testStepInfo["dynamicResultGenArg"] = "true"
+        # Arguments can be updated in any/all of the below ways
+        # a. Get the from device config file if useConfigFile="true"
+        # b. Use the provided expected value
+        # c. Get iterable as expectedValue
+        if "arguments" not in testStepInfo.get("resultGeneration").keys():
+            arguments = testStep.find("resultGeneration").find("arguments")
+            if arguments is not None:
+                allarguments = ""
+                argumentInfo = arguments.attrib.copy()
+                if argumentInfo.get("value") is not None and argumentInfo.get("value") != "":
+                    allarguments = argumentInfo.get("value")
+
+                if argumentInfo.get("useConfigFile") == "true":
+                    status,result = getDeviceConfigKeyValue(argumentInfo.get("key"))
+                    testStepInfo["parseStatus"] = status if status == "FAILURE" else ""
+                    if allarguments != "":
+                        allarguments = allarguments + "," + str(result)
+                    else:
+                        allarguments = result
+
+                # Check whether iterable value should be passed as argument for result
+                # generation for a loop test step type
+                if argumentInfo.get("useIterableArg") == "true":
+                    testStepInfo["dynamicResultGenArg"] = "true"
+
+                if allarguments != "":
+                    testStepInfo.get("resultGeneration")["arguments"] = allarguments
 
         # Expected values can be updated in any/all of the below ways
         # a. Use the default expected values from the template XML
         # b. Get the expected value from the previous test result
         # c. Get the from device config file if useConfigFile="true"
         # d. Use the provided expected value
+        # e. Get iterable as expectedValue
         if "expectedValues" not in testStepInfo.get("resultGeneration").keys():
             expectedValues = testStep.find("resultGeneration").find("expectedValues")
             if expectedValues is not None:
@@ -1520,7 +1627,10 @@ def getTestStepInputParam(paramTypeInfo,testParams):
         tag = paramTypeInfo.get("tag")
         paramGenStatus,inputParams = generateComplexTestInputParam(tag,testParams)
     else:
-        inputParams = testParams.copy()
+        if paramTypeInfo.get("paramKey") is not None:
+            inputParams = {paramTypeInfo.get("paramKey"):testParams.copy()}
+        else:
+            inputParams = testParams.copy()
 
     return paramGenStatus,inputParams
 
@@ -1622,6 +1732,7 @@ def dispTestStepInfo(testStepInfo,testParams,result):
 def testStepResultGeneration(testStepResponse,resultGenerationInfo, action="execution"):
 
     info = {}
+    otherInfo  = {}
     if action == "eventListener":
         result = []
         for response in testStepResponse:
@@ -1629,6 +1740,10 @@ def testStepResultGeneration(testStepResponse,resultGenerationInfo, action="exec
             result.append(eventResult)
     else:
         result = testStepResponse.get("result")
+        responseInfo = testStepResponse.copy()
+        for responseKey in responseInfo.keys():
+            if responseKey not in [ "jsonrpc","id","result" ]:
+                otherInfo[responseKey] = responseInfo[responseKey]
 
     if "useMethodTag" in resultGenerationInfo.keys():
         tag = resultGenerationInfo.get("useMethodTag")
@@ -1642,8 +1757,8 @@ def testStepResultGeneration(testStepResponse,resultGenerationInfo, action="exec
         if action == "eventListener":
             info = CheckAndGenerateEventResult(result,tag,arg,expectedValues)
         else:
-            info = CheckAndGenerateTestStepResult(result,tag,arg,expectedValues)
-        if info["Test_Step_Status"] == "FAILURE" and len(info.keys()) == 1:
+            info = CheckAndGenerateTestStepResult(result,tag,arg,expectedValues,otherInfo)
+        if info["Test_Step_Status"] == "FAILURE" and action != "eventListener":
             print "\nJSON Cmd : ",testStepJSONCmd
             print "\nResponse : ",testStepResponse
 
