@@ -56,7 +56,7 @@ from mySQLConfig import *
 #Getting the ipv6 address of TM using REST API
 def get_ipv6_address(self):
     # Constructing Query URL
-    ipv6_url = self.url + '/execution/getTMIPAddress?type=ipv6.interface'
+    ipv6_url = self.url + '/execution/getTMIPAddress?type=ipv6.interface&preference=dns'
     response = urllib.urlopen(ipv6_url).read()
     if 'SUCCESS' in response:
         ipv6_interface = json.loads(response)
@@ -614,7 +614,6 @@ class PrimitiveTestCase:
 			if self.isValidIpv6Address(deviceIP):
                                 tmIPv4 = self.url.split('/')[2].split(':')[0];
                                 tmIPv6 = get_ipv6_address(self)
-                                tmIPv6 = "[" + tmIPv6 + "]"
                                 logUploadURL = self.url.replace(tmIPv4, tmIPv6)
                                 jsonMsg = '{"jsonrpc":"2.0","id":"2","method":"uploadLog","params":{"STBfilename":"'+ boxFile +'","TMfilename":"'+ tmFile +'", "logUploadURL":"' + logUploadURL +'"}}\r\n'
                         else:

@@ -45,7 +45,8 @@ import rdk.test.tool.*
 import com.google.gson.Gson;
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-
+import org.codehaus.groovy.grails.validation.routines.InetAddressValidator;
+import org.springframework.util.StringUtils;
 /**
  * A class that handles the Execution of scripts.
  * @author sreejasuma
@@ -4545,16 +4546,43 @@ class ExecutionController {
 	/**
 	 * REST API : Method to get the TM IP Address
 	 */
-	def getTMIPAddress(String type){
+	def getTMIPAddress(String type, String preference){
 		def jsonObjMap = [:]
 		String ipAddress = null
+		String ipAddressFromUrl = null
 		File configFile = grailsApplication.parentContext.getResource("/fileStore/tm.config").file
+		String currenturl = request.getRequestURL().toString();
+		String[] urlArray = currenturl.split( URL_SEPERATOR );
+		String url = urlArray[INDEX_TWO]
+		ipAddressFromUrl = url.split( ":" )[0];
+		
 		if(type?.equals(IPV6_INTERFACE)){
 			jsonObjMap.put(STATUS,SUCCESS)
-			ipAddress = InetUtility.getIPAddress(configFile, Constants.IPV6_INTERFACE)
-		}else if(type?.equals(IPV4_INTERFACE)){
+			if(preference?.equals("dns")){
+				InetAddressValidator validator = InetAddressValidator.getInstance();
+				if (validator.isValidInet4Address(ipAddressFromUrl)) {
+					ipAddress = InetUtility.getIPAddress(configFile, Constants.IPV6_INTERFACE)
+					ipAddress = "["+ipAddress+"]"
+				}else{
+					ipAddress = ipAddressFromUrl
+				}
+			}else{
+				ipAddress = InetUtility.getIPAddress(configFile, Constants.IPV6_INTERFACE)
+				ipAddress = "["+ipAddress+"]"
+			}
+		}
+		else if(type?.equals(IPV4_INTERFACE)){
 			jsonObjMap.put(STATUS,SUCCESS)
-			ipAddress = InetUtility.getIPAddress(configFile, Constants.IPV4_INTERFACE)
+			if(preference?.equals("dns")){
+				InetAddressValidator validator = InetAddressValidator.getInstance();
+				if (validator.isValidInet4Address(ipAddressFromUrl)) {
+					ipAddress = InetUtility.getIPAddress(configFile, Constants.IPV4_INTERFACE)
+				}else{
+					ipAddress = ipAddressFromUrl
+				}
+			}else{
+				ipAddress = InetUtility.getIPAddress(configFile, Constants.IPV4_INTERFACE)
+			}
 		}else{
 			jsonObjMap.put(STATUS,FAILED)
 			jsonObjMap.put(REMARKS, "Not a supported IP Type "+type)
