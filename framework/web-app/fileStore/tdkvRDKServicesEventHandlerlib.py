@@ -251,6 +251,43 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                     devices.append(device_data)
             info["devices"] = devices
 
+        # System plugin Events response result parser steps
+        elif tag == "system_check_macaddress_event":
+            result=result[0]
+            info = result
+            info["Test_Step_Status"] = "SUCCESS"
+
+            for mac in arg:
+                if result.get(mac):
+                    if re.match("[0-9a-f]{2}([-:])[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", result.get(mac).lower()) is None:
+                        info["Test_Step_Status"] = "FAILURE"
+                        break
+
+        elif tag == "system_validate_power_mode":
+            result=result[0]
+            info["Test_Step_Status"] = "FAILURE"
+            if str(result.get("powerState")) == str(expectedValues[0]):
+                info["Test_Step_Status"] = "SUCCESS"
+
+        # LoggerPreferences Events response result parser steps
+        elif tag == "loggingpreferences_check_onkeystroke_mask_enabled_change_event":
+            result = result[0]
+            info = result
+            if str(result.get("keystrokeMaskEnabled")) in  expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        # DataCapture Events response result parser steps
+        elif tag == "datacapture_check_on_audioclip_ready_event":
+            result = result[0]
+            info = result
+            if str(result.get("status")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)
             info["Test_Step_Status"] = "FAILURE"

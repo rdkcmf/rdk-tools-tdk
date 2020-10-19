@@ -35,15 +35,16 @@ import collections
 #-----------------------------------------------------------------------------------------------
 # CheckAndGenerateTestStepResult
 #-----------------------------------------------------------------------------------------------
-# Syntax      : CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues)
+# Syntax      : CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,otherInfo)
 # Description : Method to parse the output JSON response and generate test result
 # Parameter   : result - JSON response result value
 #             : methodTag - tag used to identify the parser step
 #             : arguments - list of arguments used for parsing
 #             : expectedValues - list of expected values
+#             : otherInfo - list of other response messages like error/message etc
 # Return Value: Result Info Dictionary
 #-----------------------------------------------------------------------------------------------
-def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
+def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,otherInfo={}):
     tag  = methodTag
     arg  = arguments
 
@@ -52,6 +53,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
     # b. methodTag - string
     # c. arguments - list
     # d. expectedValues - list
+    # e. otherInfo - list
 
     # Output Variable:
     # a.info - dictionary
@@ -422,6 +424,24 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "webkitbrowser_get_headers":
+            info["headers"] = result
+            if len(result) > 0:
+                status = []
+                for data in result:
+                    status.append(checkNonEmptyResultData(data.values()))
+                if len(arg) and arg[0] == "check_header":
+                    if "FAILURE" not in status and data.get("name") in expectedValues and data.get("value") in expectedValues:
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+                else:
+                    if "FAILURE" not in status:
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
 
         # Cobalt Plugin Response result parser steps
@@ -552,8 +572,8 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "system_validate_modes":
-            info = checkAndGetAllResultInfo(result,result.get("success"))
             mode_info = result.get("modeInfo")
+            info = checkAndGetAllResultInfo(mode_info,result.get("success"))
             if str(mode_info.get("mode")) in expectedValues:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
@@ -643,7 +663,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "rdkshell_verify_scale_params":
-            if int(result.get("sx")) is int(expectedValues[0]) and int(result.get("sy")) is int(expectedValues[1]):
+            if float(result.get("sx")) == float(expectedValues[0]) and float(result.get("sy")) == float(expectedValues[1]):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -1212,6 +1232,29 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        # LoggingPreferences Plugin Response result parser steps
+        elif tag == "loggingpreferences_check_keystroke_mask_state":
+            info["keystrokeMaskEnabled"] = result.get("keystrokeMaskEnabled")
+            success = str(result.get("success")).lower() == "true"
+            if success and str(result.get("keystrokeMaskEnabled")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "loggingpreferences_check_set_operation":
+            if str(result.get("success")).lower() == "true":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+
+        # DataCapture Plugin Response result parser steps
+        elif tag == "datacapture_enable_audio_capture":
+            info =  checkAndGetAllResultInfo (result,result.get("success"))
+
+        elif tag == "datacapture_get_audio_clip":
+            info = checkAndGetAllResultInfo (result,result.get("success"))
+
 
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_state":
@@ -1570,6 +1613,16 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             testStepResults = testStepResults[0].values()[0]
             info["useragent"] = testStepResults[0].get("useragent")
 
+        elif tag == "webkitbrowser_get_header":
+            testStepResults = testStepResults[0].values()[0]
+            header = testStepResults[0].get("headers")[0]
+            if len(arg) and arg[0] == "get_name":
+                info["name"] = header.get("name")
+            elif len(arg) and arg[0] == "get_value":
+                info["value"] = header.get("value")
+            else:
+                info = header
+
         # System plugin result parser steps
         elif tag == "system_toggle_gz_enabled_status":
             testStepResults = testStepResults[0].values()[0]
@@ -1616,6 +1669,9 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 if len(arg) > 1:
                     if arg[1] == "target":
                         info["target"] = clients[index]
+                    elif arg[1] == "callsign":
+                        info["callsign"] = clients[index]
+						
                 else:
                     info["client"] = clients[index]
             else:
@@ -1643,10 +1699,14 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag =="rdkshell_generate_new_scale_value":
             testStepResults = testStepResults[0].values()[0]
             #Generate a new scaling values by incrementing 1 to the given value
-            if arg[0] == "sx":
-                info["sx"] = int(testStepResults[0].get("sx")) + 1
-            if arg[0] == "sy":
-                info["sy"] = int(testStepResults[0].get("sy")) + 1
+            if len(arg) > 0:
+                if str(arg[0]) == "sx":
+                    info["sx"] = float(testStepResults[0].get("sx")) + 1
+                if str(arg[0]) == "sy":
+                    info["sy"] = float(testStepResults[0].get("sy")) + 1
+            else:
+                info["sx"] = float(testStepResults[0].get("sx")) + 1
+                info["sy"] = float(testStepResults[0].get("sy")) + 1
 
         #Display info plugin result parser steps
         elif tag == "display_info_get_supported_resolution_list":
@@ -1736,6 +1796,14 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             else:
                 info["discoverable"] = True
 
+        # Logging Preferences Plugin Response result parser steps
+        elif tag == "loggingpreferences_toggle_keystroke_mask_state":
+            testStepResults = testStepResults[0].values()[0]
+            status = testStepResults[0].get("keystrokeMaskEnabled")
+            if str(status).lower()== "false":
+                  info["keystrokeMaskEnabled"] = True
+            else:
+                  info["keystrokeMaskEnabled"] = False
 
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_name":
@@ -1862,6 +1930,8 @@ def generateComplexTestInputParam(methodTag,testParams):
 
         if tag == "get_same_param":
             userGeneratedParam = testParams
+        elif tag == "webkitbrowser_get_header_params":
+            userGeneratedParam = [testParams]
 
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)
@@ -1923,4 +1993,5 @@ def compareURLs(actualURL,expectedURL):
                 status = "FALSE"
 
     return status
+
 

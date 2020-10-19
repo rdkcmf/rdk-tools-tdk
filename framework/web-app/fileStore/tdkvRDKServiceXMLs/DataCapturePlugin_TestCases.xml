@@ -14,35 +14,34 @@
  limitations under the License.
 -->
 
-<testPlugin pluginName="FrameRate" pluginVersion="1">
+<testPlugin pluginName="DataCapture" pluginVersion="1">
         <pluginPreRequisite>
-          <prerequisite requisiteId="1" requisiteName="Activate_RDKShell_Plugin">
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
             <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
                 <params>
-                  <param tag="plugin" value="org.rdk.FrameRate" indexOnly="true" />
+                  <param tag="plugin" value="org.rdk.dataCapture" indexOnly="true" />
                 </params>
-                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.FrameRate" />
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.dataCapture" />
             </testStep>
             <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
-                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.FrameRate" />
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.dataCapture" />
                 <params>
-                  <param tag="callsign" value="org.rdk.FrameRate" />
+                  <param tag="callsign" value="org.rdk.dataCapture" />
                 </params>
             </testStep>
             <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
-                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.FrameRate" />
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.dataCapture" />
                 <params>
-                  <param tag="plugin" value="org.rdk.FrameRate" indexOnly="true" />
+                  <param tag="plugin" value="org.rdk.dataCapture" indexOnly="true" />
                 </params>
-                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.FrameRate" expectedValues="activated"/>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.dataCapture" />
             </testStep>
           </prerequisite>
-
           <prerequisite requisiteId="2" requisiteName="Deactivate_And_Activate_Plugins">
             <testStep testStepId="1" name="Check_And_Deactivate_Plugins" testStepType="loop">
               <subtestStep subtestStepId="1" name="Deactivate_Plugin" method="Deactivate_Plugin"  pluginName="Controller">
                 <params>
-                  <param tag="callsign"  iteration="true" useConfigFile="true" key="FRAMERATE_PREREQ_PLUGINS" />
+                  <param tag="callsign"  iteration="true" useConfigFile="true" key="DATACAPTURE_PREREQ_PLUGIN" />
                 </params>
               </subtestStep>
               <subtestStep subtestStepId="2" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller" >
@@ -68,7 +67,6 @@
               </subtestStep>
             </testStep>
           </prerequisite>
-
           <prerequisite requisiteId="3" requisiteName="Check_And_Resume_WebKitBrowser">
             <testStep testStepId="1" name="Is_WebKitBrowser_Resumed" method="Get_WebKitBrowser_State" pluginName="WebKitBrowser" saveResult="true" >
                 <resultGeneration useMethodTag="webkitbrowser_get_state" />
@@ -84,47 +82,49 @@
                 <resultGeneration useMethodTag="webkitbrowser_get_state" expectedValues="resumed" />
             </testStep>
           </prerequisite>
-
           <prerequisite requisiteId="4" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
-            <event pluginName="FrameRate"     eventName="Event_On_FPS" />
             <event pluginName="WebKitBrowser" eventName="Event_Load_Finished" />
+            <event pluginName="DataCapture" eventName="Event_On_AudioClip_Ready" />
           </prerequisite>
         </pluginPreRequisite>
-
-        <testCase testCaseId="FR_01" testCaseName="FrameRate_Collect_FPS" desc="Launches playback url using webkit browser and gets fps using onFpsEvent Event">
+        <testCase testCaseId="DATA_01" testCaseName="Enable_And_Get_Audio_Captured" desc="Gets the audio Captured">
             <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Set_Collection_Frequency_Default_10Sec" method="Set_Collection_Frequency_Default" >
-              <resultGeneration useMethodTag="framerate_check_set_operation" />
-            </testStep>
-            <testStep testStepId="2" name="Set_Browser_Test_URL" method="Set_Browser_URL" pluginName="WebKitBrowser">
+            <testStep testStepId="1" pluginName="WebKitBrowser" name="Set_Browser_Test_URL" method="Set_Browser_URL">
               <params>
-                <param tag="url" useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
+                <param tag="url" useConfigFile="true" key="WEBKIT_TEST_URL" />
               </params>
             </testStep>
-            <testStep testStepId="3" name="Check_Load_Finished_Event" event="Event_Load_Finished" action="eventListener" delay="10" pluginName="WebKitBrowser">
+            <testStep testStepId="2" pluginName="WebKitBrowser"  name="Check_Load_Finished_Event" event="Event_Load_Finished" action="eventListener" delay="10">
               <resultGeneration useMethodTag="webkitbrowser_check_load_finished_event" >
-                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
+                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_TEST_URL" />
               </resultGeneration>
             </testStep>
-            <testStep testStepId="4" name="Get_Browser_Test_URL" method="Get_Browser_URL" pluginName="WebKitBrowser">
+            <testStep testStepId="3" pluginName="WebKitBrowser" name="Get_Browser_Test_URL" method="Get_Browser_URL">
               <resultGeneration useMethodTag="webkitbrowser_check_url" >
-                <expectedValues useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
+                <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
               </resultGeneration>
             </testStep>
-            <testStep testStepId="5" name="Get_Browser_FPS_Value" method="Get_Browser_FPS" delay="20" pluginName="WebKitBrowser">
-              <resultGeneration useMethodTag="webkitbrowser_check_fps" >
-                <expectedValues useConfigFile="true" key="WEBKIT_EXPECTED_FPS" />
+            <testStep testStepId="4" name="Enable_Audio_Capture" method="Enable_Audio_Capture" delay="10" >
+              <params>
+                <param tag="bufferMaxDuration" useConfigFile="true" key="BUFFER_MAX_DURATION" />
+              </params>
+              <resultGeneration useMethodTag="datacapture_enable_audio_capture" />
+            </testStep>
+            <testStep testStepId="5" name="Get_Audio_Captured" method="Get_Audio_Clip" delay="30" >
+              <params>
+                <param tag="stream" useDefault="true" />
+                <param tag="url" useConfigFile="true" key="DATACAPTURE_UPLOAD_URL" />
+                <param tag="duration" useConfigFile="true" key="BUFFER_MAX_DURATION" />
+                <param tag="captureMode" useDefault="true" />
+              </params>
+              <resultGeneration useMethodTag="datacapture_get_audio_clip" />
+            </testStep>
+            <testStep testStepId="6"  name="Check_On_AudioClip_Ready_Event" event="Event_On_AudioClip_Ready" action="eventListener"  >
+              <resultGeneration useMethodTag="datacapture_check_on_audioclip_ready_event" >
+                <expectedValues>True</expectedValues>
               </resultGeneration>
-            </testStep>
-            <testStep testStepId="6" name="Start_FPS_Collection" method="Start_FPS_Collection" >
-              <resultGeneration useMethodTag="framerate_check_set_operation" />
-            </testStep>
-            <testStep testStepId="7" name="Stop_FPS_Collection" method="Stop_FPS_Collection" delay="30">
-              <resultGeneration useMethodTag="framerate_check_set_operation" />
-            </testStep>
-            <testStep testStepId="8" name="Check_On_FPS_Event" event="Event_On_FPS" action="eventListener">
-              <resultGeneration useMethodTag="framerate_check_fps_event" />
             </testStep>
         </testCase>
-
 </testPlugin>
+
+

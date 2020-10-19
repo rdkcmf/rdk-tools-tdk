@@ -54,8 +54,8 @@
           </prerequisite>
 
           <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
-            <event pluginName="Wifi" method="Event_On_WIFI_State_Changed" />
-            <event pluginName="Wifi" method="Event_On_Available_SSIDs" />
+            <event pluginName="Wifi" eventName="Event_On_WIFI_State_Changed" />
+            <event pluginName="Wifi" eventName="Event_On_Available_SSIDs" />
           </prerequisite>
 
         </pluginPreRequisite>
@@ -87,7 +87,7 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" />
             </testStep>
-            <testStep testStepId="2" name="Check_On_Available_SSIDs_Event" method="Event_On_Available_SSIDs" action="eventListener" delay="5">
+            <testStep testStepId="2" name="Check_On_Available_SSIDs_Event" event="Event_On_Available_SSIDs" action="eventListener" delay="5">
               <resultGeneration useMethodTag="wifi_check_available_ssids_event" arguments="get_ssid_names" />
             </testStep>
             <testStep testStepId="3" name="Stop_Scan" method="Stop_Scan" >
