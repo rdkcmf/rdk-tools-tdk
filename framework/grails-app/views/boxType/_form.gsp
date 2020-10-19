@@ -35,4 +35,11 @@
 	<g:select id="typeId" name="type" from="['Client','Stand-alone-Client','Gateway']" style="width : 150px;"/>
 	<%--<g:textField name="type" required="" value="${boxTypeInstance?.type}"/>--%>
 </div>
+
+<div class="fieldcontain ${hasErrors(bean: boxTypeInstance, field: 'subBoxTypeList', 'error')}">
+	<label for="subBoxTypeList">
+		<g:message code="boxType.subBoxTypeList.label" default="Sub BoxType List" />
+	</label>
+	<g:select id="subBoxTypeListId" name="subBoxTypeList" from="${com.comcast.rdk.BoxType.findAllByCategory(category)}" optionKey="id" style="width : 150px;" value= "" class="many-to-one selectCombo" multiple="true"/>
+</div>
 <g:hiddenField name="category" value="${category }"/>

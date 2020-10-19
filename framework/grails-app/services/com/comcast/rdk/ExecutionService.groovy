@@ -538,10 +538,12 @@ class ExecutionService {
 	public boolean validateScriptBoxTypes(final Map script, final Device deviceInstance){
 		boolean scriptStatus = true
 		def deviceInstance1 = Device.findById(deviceInstance?.id)
-		//For Test suite issue fixing 
-		if(!(script?.boxTypes?.find { it?.toString()?.equals(deviceInstance1?.boxType?.toString()) })){
-		//if(!(script?.boxTypes?.find { it?.id == deviceInstance1?.boxType?.id })){
-			scriptStatus = false
+		BoxType boxType = deviceInstance1?.boxType
+		List boxTypeList = []
+		boxTypeList.add(boxType)
+		boxTypeList.addAll(boxType?.subBoxTypeList)
+		if(!(script?.boxTypes?.find { element -> boxTypeList.contains(element) })){
+				scriptStatus = false
 		}
 		return scriptStatus
 	}
