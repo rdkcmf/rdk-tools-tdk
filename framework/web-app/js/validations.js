@@ -50,10 +50,20 @@ function populateBoxManufacturerField(that){
 
 
 function populateBoxTypeField(that){
+	var category = document.getElementById("category").value
 	$.get('getBoxType', {id:that.id}, function(data) {		
 		document.getElementById("boxTypeId").value = that.id;
 		document.getElementById("name").value = data[0];
 		document.getElementById("typeId").value = data[1];
+		$.get('getBoxTypeFromCategory', {category: category}, function(boxTypeList) {
+			$('#subBoxTypeListId').empty()
+			for (var i = 0; i < boxTypeList.length; i++) {
+				$("#subBoxTypeListId").append('<option value='+boxTypeList[i].id+'>'+boxTypeList[i].name+'</option>');
+			}
+			var selectbutton = document.getElementById("subBoxTypeListId")
+			$('#subBoxTypeListId').val(data[3]);
+			$("#subBoxTypeListId option[value="+data[2]+"]").remove();
+		});
 		$("#updateBtn").show(); 
 		$("#resetBtn").show(); 
 		$("#createBtn").hide(); 

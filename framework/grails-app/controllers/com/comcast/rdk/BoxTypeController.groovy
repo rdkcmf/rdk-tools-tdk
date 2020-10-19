@@ -73,6 +73,7 @@ class BoxTypeController {
 					boxTypeInstance = BoxType.get(idDb)
 					if (boxTypeInstance) {
 						try{
+							boxTypeInstance?.subBoxTypeList.clear()
 							 boxTypeInstance.delete(flush: true)
 							deleteCount++
 						  }
@@ -101,6 +102,8 @@ class BoxTypeController {
 		if(boxType){
 			boxTypeInstanceList.add(boxType.name)
 			boxTypeInstanceList.add(boxType.type)
+			boxTypeInstanceList.add(boxType.id)
+			boxTypeInstanceList.add(boxType?.subBoxTypeList?.id)
 		}
 		render boxTypeInstanceList as JSON
 	}
@@ -139,9 +142,8 @@ class BoxTypeController {
 				return
 			}
 		}
-
+		boxTypeInstance?.subBoxTypeList =  []
 		boxTypeInstance.properties = params
-
 		if (!boxTypeInstance.save(flush: true)) {
 			render(view: "create", model: [boxTypeInstance: boxTypeInstance, boxTypeInstanceList: boxTypeList, boxTypeInstanceTotal: boxTypeListCnt.size(), category : params?.category])
 			return
