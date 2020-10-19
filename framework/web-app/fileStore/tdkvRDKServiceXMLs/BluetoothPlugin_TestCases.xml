@@ -45,7 +45,7 @@
           </prerequisite>
 
           <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
-            <event pluginName="Bluetooth" method="Event_On_Discovered_Device" />
+            <event pluginName="Bluetooth" eventName="Event_On_Discovered_Device" />
           </prerequisite>
 
         </pluginPreRequisite>
@@ -93,7 +93,7 @@
                 </params>
                 <resultGeneration useMethodTag="bluetooth_set_operation" />
             </testStep>
-            <testStep testStepId="2" name="Check_On_Discovered_Device_Event" method="Event_On_Discovered_Device" action="eventListener" delay="10">
+            <testStep testStepId="2" name="Check_On_Discovered_Device_Event" event="Event_On_Discovered_Device" action="eventListener" delay="10">
               <resultGeneration useMethodTag="bluetooth_check_discovered_device_event" arguments="get_devices_info" />
             </testStep>
             <testStep testStepId="3" name="Get_Discovered_Devices" method="Get_Discovered_Devices" >

@@ -63,7 +63,9 @@
                   <params>
                     <param tag="plugin" useIterable="true" indexOnly="true" />
                   </params>
-                  <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status" useIterableArg="true" expectedValues="deactivated"/>
+                  <resultGeneration useMethodTag="controller_get_plugin_state"  expectedValues="deactivated">
+                    <arguments value="check_status" useIterableArg="true" />
+                  </resultGeneration>
               </subtestStep>
             </testStep>
           </prerequisite>

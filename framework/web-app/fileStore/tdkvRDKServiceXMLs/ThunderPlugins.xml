@@ -285,18 +285,25 @@
             </params>
             <expectedValues>null</expectedValues>
         </method>
-        <method name="Event_Load_Finished" api="loadfinished" eventId="client.events.1" type="event" desc="URL loaded event" >
-            <expectedValues>200</expectedValues>
-        </method>
-        <method name="Event_Load_Failed" api="loadfailed" eventId="client.events.1" type="event" desc="URL load failed event" />
-        <method name="Event_URL_Change" api="urlchange" eventId="client.events.1" type="event" desc="URL Change event" />
-        <method name="Event_Visibility_Change" api="visibilitychange" eventId="client.events.1" type="event" desc="Visibility Change event"/>
-        <method name="Event_Page_Closure" api="pageclosure" eventId="client.events.1" type="event" desc="Web page close event">
+        <method name="Get_Headers"  api="headers" type="method" desc="Gets browser headers to send on all requests" />
+        <method name="Set_Headers"  api="headers" type="method" desc="Sets browser headers to send on all requests" >
+            <params paramType="userGenerate" useMethodTag="webkitbrowser_get_header_params" >
+                <param tag="name" defaultValue="null" />
+                <param tag="value" defaultValue="null" />
+            </params>
             <expectedValues>null</expectedValues>
         </method>
-        <method name="Event_State_Change" api="statechange" eventId="client.events.1" type="event" desc="Service state change event" />
+        <event name="Event_Load_Finished" eventName="loadfinished" eventId="client.events.1" type="event" desc="URL loaded event" >
+            <expectedValues>200</expectedValues>
+        </event>
+        <event name="Event_Load_Failed" eventName="loadfailed" eventId="client.events.1" type="event" desc="URL load failed event" />
+        <event name="Event_URL_Change" eventName="urlchange" eventId="client.events.1" type="event" desc="URL Change event" />
+        <event name="Event_Visibility_Change" eventName="visibilitychange" eventId="client.events.1" type="event" desc="Visibility Change event"/>
+        <event name="Event_Page_Closure" eventName="pageclosure" eventId="client.events.1" type="event" desc="Web page close event">
+            <expectedValues>null</expectedValues>
+        </event>
+        <event name="Event_State_Change" eventName="statechange" eventId="client.events.1" type="event" desc="Service state change event" />
     </plugin>
-
 
     <!-- System Plugin Information -->
     <plugin pluginName="System" serviceName="org.rdk.System" serviceVersion="1">
@@ -373,9 +380,9 @@
                 <expectedValues>NORMAL,EAS,WAREHOUSE</expectedValues>
         </method>
         <method name="Set_Mode" api="setMode" type="method" desc="Set mode for specific duration">
-            <params>
-                <param tag="mode" defaultValue="null" />
-                <param tag="duration" defaultValue="null" type="int" />
+            <params paramKey="modeInfo">
+                <param tag="mode" defaultValue="NORMAL" />
+                <param tag="duration" defaultValue="10" type="int" />
             </params>
         </method>
         <method name="Get_Power_State" api="getPowerState" type="method" desc="Get power state" >
@@ -398,6 +405,18 @@
         <method name="Get_PreviousReboot_Info" api="getPreviousRebootInfo" type="method" desc="Retrieve basic information about a reboot" />
         <method name="Get_PreviousReboot_Info2" api="getPreviousRebootInfo2" type="method" desc="Retrieve detailed information about a reboot" />
         <method name="Get_PreviousReboot_Reason" api="getPreviousRebootReason" type="method" desc="Retrieve the last reboot reason." />
+
+        <method name="Get_MacAddress" api="getMacAddresses" type="method" desc="Retrieve the mac addresses." >
+            <params>
+                <param tag="GUID" defaultValue="61734787891723481" type="int" />
+            </params>
+
+            <expectedValues>true,false</expectedValues>
+        </method>
+
+        <event name="Event_MacAddresses_Retreived" eventName="onMacAddressesRetreived" eventId="client.events.1" type="event" desc="MacAddressesRetreived" />
+        <event name="Event_PowerState_Changed" eventName="onSystemPowerStateChanged" eventId="client.events.1" type="event" desc="power state changed event" />
+
     </plugin>
 
 
@@ -572,8 +591,8 @@
         <method name="SetScale" api="setScale" type="method" desc="Set Scale Params to an application" >
             <params>
                 <param tag="client" defaultValue="null"/>
-                <param tag="sx" defaultValue="1" type="int" />
-                <param tag="sy" defaultValue="1" type="int" />
+                <param tag="sx" defaultValue="1" type="float" />
+                <param tag="sy" defaultValue="1" type="float" />
             </params>
         </method>
 
@@ -589,20 +608,15 @@
             </params>
         </method>
 
-        <method name="LaunchApplication" api="launchApplication" type="method" desc="Launches an application"/>
+        <method name="LaunchApplication" api="launch" type="method" desc="Launches an application"/>
         <!-- need to add input params -->
 
-        <method name="SuspendApplication" api="suspendApplication" type="method" desc="Suspend an application" >
+        <method name="SuspendApplication" api="suspend" type="method" desc="Suspend an application" >
             <params>
-                <param tag="client" defaultValue="null"/>
+                <param tag="callsign" defaultValue="null"/>
             </params>
         </method>
 
-        <method name="ResumeApplication" api="resumeApplication" type="method" desc="Resumes an application" >
-            <params>
-                <param tag="client" defaultValue="null"/>
-            </params>
-        </method>
     </plugin>
 
 
@@ -699,7 +713,7 @@
         <method name="Set_Collection_Frequency_Default" api="setCollectionFrequency" type="method" desc="Set 10 milliseconds per collection interval"/>
         <method name="Start_FPS_Collection" api="startFpsCollection" type="method" desc="Starts the fps collection"/>
         <method name="Stop_FPS_Collection"  api="stopFpsCollection"  type="method" desc="Stops the fps collection"/>
-        <method name="Event_On_FPS" api="onFpsEvent" eventId="client.events.1" type="event" desc="Fired at given interval and after stopFpsCollection" />
+        <event name="Event_On_FPS" eventName="onFpsEvent" eventId="client.events.1" type="event" desc="Fired at given interval and after stopFpsCollection" />
     </plugin>
 
 
@@ -741,8 +755,8 @@
         <method name="Clear_SSID_Info" api="clearSSID" type="property" desc="Clears saved SSID information">
             <expectedValues>0</expectedValues>
         </method>
-        <method name="Event_On_WIFI_State_Changed" api="onWIFIStateChanged" eventId="client.events.1" type="event" desc="Indicates state change" />
-        <method name="Event_On_Available_SSIDs" api="onAvailableSSIDs" eventId="client.events.1" type="event" desc="Gives SSID after scan" />
+        <event name="Event_On_WIFI_State_Changed" eventName="onWIFIStateChanged" eventId="client.events.1" type="event" desc="Indicates state change" />
+        <event name="Event_On_Available_SSIDs" eventName="onAvailableSSIDs" eventId="client.events.1" type="event" desc="Gives SSID after scan" />
     </plugin>
 
 
@@ -769,7 +783,7 @@
         </method>
         <method name="Stop_Scan" api="stopScan" type="method" desc="Stops scanning for Bluetooth devices" />
         <method name="Get_Discovered_Devices" api="getDiscoveredDevices" type="method" desc="Gives discovered Bluetooth devices" />
-        <method name="Event_On_Discovered_Device" api="onDiscoveredDevice" eventId="client.events.1" type="event" desc="Gives discovered Bluetooth devices" />
+        <event name="Event_On_Discovered_Device" eventName="onDiscoveredDevice" eventId="client.events.1" type="event" desc="Gives discovered Bluetooth devices" />
     </plugin>
 
 
@@ -783,6 +797,39 @@
         </method>
         <method name="Light_Reset" api="lightReset" type="method" desc="Performs light reset"/>
         <method name="Is_clean" api="isClean" type="method" desc="Checks locations where customer data may be stored"/>
+    </plugin>
+
+
+    <!-- LoggingPreferences Plugin Information -->
+    <plugin pluginName="LoggingPreferences" serviceName="org.rdk.LoggingPreferences" serviceVersion="1">
+        <method name="Is_Keystroke_Mask_Enabled" api="isKeystrokeMaskEnabled" type="method" desc="Gets Keystroke mask status">
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Set_Keystroke_Mask_Enabled" api="setKeystrokeMaskEnabled" type="method" desc="Enable or disable Keystroke mask state">
+            <params>
+                <param tag="keystrokeMaskEnabled" defaultValue="true" type="bool" />
+            </params>
+        </method>
+        <event name="Event_OnKeystroke_Mask_Enabled_Change" eventName="onKeystrokeMaskEnabledChange" eventId="client.events.1" type="event" desc="Keystroke mask status  Change event"/>
+    </plugin>
+
+
+    <!-- DataCapture Plugin Information -->
+    <plugin pluginName="DataCapture" serviceName="org.rdk.dataCapture" serviceVersion="1">
+        <method name="Enable_Audio_Capture" api="enableAudioCapture" type="method" desc="Enables the audio capture" >
+            <params>
+                <param tag="bufferMaxDuration" defaultValue="null" type="int"/>
+            </params>
+        </method>
+        <method name="Get_Audio_Clip" api="getAudioClip" type="method" desc="Get the audio captured" >
+            <params paramKey="clipRequest">
+                <param tag="stream" defaultValue="primary" />
+                <param tag="url" defaultValue="null"  />
+                <param tag="duration" defaultValue="null" type="int" />
+                <param tag="captureMode" defaultValue="preCapture" />
+            </params>
+        </method>
+        <event name="Event_On_AudioClip_Ready" eventName="onAudioClipReady" eventId="client.events.1" type="event" desc="On audio clip ready event" />
     </plugin>
 
 
