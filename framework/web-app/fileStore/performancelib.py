@@ -125,7 +125,7 @@ def rdkservice_getReqValueFromResult(method,reqValue):
 #SET VALUE FOR A METHOD
 #------------------------------------------------------------------
 def rdkservice_setValue(method,value):
-    data = '"method": "'+method+'","params": "'+value+'"'
+    data = '"method": "'+method+'","params": '+value
     print data
     result = execute_step(data)
     return result
@@ -277,3 +277,34 @@ def getDeviceConfigKeyValue(deviceConfigFile,key):
         print "\nException Occurred: [%s] %s" %(inspect.stack()[0][3],e)
 
     return status,value
+#-------------------------------------------------------------------
+#GET THE CPU LOAD VALUE FROM DEVICEINFO PLUGIN
+#-------------------------------------------------------------------
+def rdkservice_getCPULoad():
+    data = '"method": "DeviceInfo.1.systeminfo"'
+    result = execute_step(data)
+    value = result["cpuload"]
+    return value 
+
+#-------------------------------------------------------------------
+#CHECK WHETHER CHANNEL CHANGE TEXT IS PRESENT IN THE CONSOLE LOG
+#-------------------------------------------------------------------
+def rdkservice_checkChannelChangeLog(log,text):
+    remarks = "proceed"
+    found = "FAILURE"
+    console_methods = ["Console.messagesCleared","Console.messageRepeatCountUpdated"]
+    channel_change_log = json.loads(log)
+    if (channel_change_log.get("method") not in console_methods):
+	text_from_message = channel_change_log.get("params").get("message").get("text")
+	if (text in text_from_message):
+	    found = "SUCCESS"
+    return found
+
+#-------------------------------------------------------------------
+#VALIDATE WHETHER THE CPU LOAD VALUE IS GREATER THAN THE THRESHOLD VALUE
+#-------------------------------------------------------------------
+def rdkservice_validateCPULoad(value,threshold):
+    if (value > threshold ):
+	return "YES"
+    else:
+	return "NO"
