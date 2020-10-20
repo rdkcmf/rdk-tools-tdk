@@ -16,9 +16,8 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-
 <?xml version="1.0" encoding="UTF-8"?><xml>
-  <module name="rdkservices" testGroup="Component">
+  <module testGroup="Component" name="rdkservices">
     <primitiveTests>
       <primitiveTest name="RdkService_Test" id=" " version="3">
         <function>TestMgr_RdkService_Test</function>
@@ -87,6 +86,24 @@
       <primitiveTest name="rdkservice_getBrowserScore_Octane" id="" version="1">
         <function>rdkservice_getBrowserScore_Octane</function>
         <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_getCPULoad" id="" version="1">
+        <function>rdkservice_getCPULoad</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_checkChannelChangeLog" id=" " version="1">
+        <function>rdkservice_checkChannelChangeLog</function>
+        <parameters>
+          <parameter name="log" value=""/>
+          <parameter name="text" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_validateCPULoad" id=" " version="1">
+        <function>rdkservice_validateCPULoad</function>
+        <parameters>
+          <parameter name="threshold" value=""/>
+          <parameter name="value" value=""/>
+        </parameters>
       </primitiveTest>
     </primitiveTests>
   </module>
