@@ -418,3 +418,66 @@ def rdkservice_getBrowserScore_SunSpider():
         browser_score = "FAILURE"
         driver.quit()
    return browser_score
+
+#-------------------------------------------------------------------
+#VALIDATE PROC ENTRY TO FIND WHETHER PLAYBACK IS HAPPENING
+#-------------------------------------------------------------------
+def rdkservice_validateProcEntry(sshmethod,credentials,procfile,mincdb):
+    result_val = "SUCCESS"
+    if sshmethod == "directSSH":
+        credentials_list = credentials.split(',')
+        host_name = credentials_list[0]
+        user_name = credentials_list[1]
+        password = credentials_list[2]
+    else:
+        #TODO
+        print "Secure ssh to CPE"
+        pass
+    command = "cat " +procfile
+    counter = 0
+    decoded_val_list =[]
+    while counter < 2 :
+        output = ssh_and_execute(sshmethod,host_name,user_name,password,command)
+        output_list =  output.split('\n')
+        cdb_data = ""
+        decoded = ""
+        started = ""
+        for item in output_list:
+            if "started:" in item:
+                started = item
+            elif "CDB:" in item:
+                cdb_data = item
+            elif "Decode:" in item:
+                decoded = item
+            else:
+                continue
+        if any(value == "" for value in [started,cdb_data,decoded]):
+            result_val = "FAILURE"
+            break
+        else:
+            decoded_val = ""
+            for item in decoded.split():
+                if "decoded" in item:
+                    decoded_val = int(item.split("=")[1])
+            if decoded_val == "":
+                print "decoded value is empty"
+                result_val = "FAILURE"
+                break
+            else:
+                decoded_val_list.append(decoded_val)
+                cdb_data = cdb_data.split(',')[0].split()[-2]
+                value_1 = cdb_data.split('/')[0]
+                value_2 = cdb_data.split('/')[1]
+                cdb_percent1 = float(value_1) / float(value_2)
+                cdb_percent = cdb_percent1*100
+                if cdb_percent < float(mincdb) :
+                    print "cdb_percent is {} which is less than min cdb:{}".format(cdb_percent,mincdb)
+                    result_val = "FAILURE"
+                    break
+                counter += 1
+                time.sleep(2)
+    if(counter == 2):
+        if decoded_val_list[0] >= decoded_val_list[1]:
+            print "decoded value is not increasing"
+            result_val = "FAILURE"
+    return result_val
