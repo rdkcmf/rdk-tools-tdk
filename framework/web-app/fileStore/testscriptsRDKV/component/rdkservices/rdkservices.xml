@@ -122,6 +122,15 @@
         <parameters>
           <parameter name="threshold" value=""/>
           <parameter name="value" value=""/>
+	</parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_validateProcEntry" id=" " version="1">
+        <function>rdkservice_validateProcEntry</function>
+        <parameters>
+          <parameter name="credentials" value=""/>
+          <parameter name="mincdb" value=""/>
+          <parameter name="procfile" value=""/>
+          <parameter name="sshmethod" value=""/>
         </parameters>
       </primitiveTest>
     </primitiveTests>
