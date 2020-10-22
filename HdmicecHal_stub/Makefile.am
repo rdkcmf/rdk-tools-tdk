@@ -22,7 +22,7 @@ ACLOCAL_AMFLAGS = -Im4 --install
 AM_CPPFLAGS = -g -Wall -std=c++0x -DGCC4_XXX \
               -fPIC ${COPTS}
 
-AM_CXXFLAGS = -I${PKG_CONFIG_SYSROOT_DIR}$(includedir) \
+AM_CXXFLAGS = ${HDMICECHAL_FLAGS} -I${PKG_CONFIG_SYSROOT_DIR}$(includedir) \
               -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/rdk/iarmbus \
               -I${PKG_CONFIG_SYSROOT_DIR}$(includedir)/ccec/drivers \
               -I${top_srcdir}/HdmicecHal_stub/include \
