@@ -234,6 +234,62 @@ static void clearCECFlagsAndFrameInfo()
     memset(cec_frame_rx, 0, sizeof(cec_frame_rx));
 }
 
+bool IARM_Bus_event_registration()
+{
+#ifndef NO_DEVICE_READY_EVENT
+    DEBUG_PRINT(DEBUG_TRACE, "Init IARMBUS lib ...\n");
+    IARM_Result_t retval;
+    retval = IARM_Bus_Init("agent");
+    if(retval == 0)
+        DEBUG_PRINT(DEBUG_TRACE, "IARM_Bus_Init call success\n");
+    else
+    {
+        DEBUG_PRINT(DEBUG_TRACE, "IARM_Bus_Init call failure\n");
+        return false;
+    }
+    retval = IARM_Bus_Connect();
+    if(retval == 0)
+        DEBUG_PRINT(DEBUG_TRACE, "IARM_Bus_Connect call success\n");
+    else
+    {
+        DEBUG_PRINT(DEBUG_TRACE, "IARM_Bus_Connect call failure\n");
+        return false;
+    }
+    DEBUG_PRINT(DEBUG_TRACE, "Agent connected with IARMBUS\n");
+    retval = IARM_Bus_RegisterEventHandler(IARM_BUS_CECMGR_NAME, IARM_BUS_CECMGR_EVENT_STATUS_UPDATED, cecEventHandler);
+    DEBUG_PRINT(DEBUG_TRACE, "Registered IARMBUS event handler fn:cecEventHandler\n");
+    if(retval == 0)
+    {
+        DEBUG_PRINT(DEBUG_TRACE, "Registered IARMBUS event handler fn:cecEventHandler\n");
+        return true;
+    }
+    else
+    {
+        DEBUG_PRINT(DEBUG_TRACE, "Registration failed for IARMBUS event handler fn:cecEventHandler\n");
+        return false;
+    }
+#endif
+    DEBUG_PRINT(DEBUG_TRACE, "Platform doesnot support IARMBUS event handler fn:cecEventHandler\n");
+    return true;
+}
+
+bool Event_Listener()
+{
+#ifndef NO_DEVICE_READY_EVENT
+    std::unique_lock<std::mutex> m(m_idle);
+    if (m_cv_init.wait_for(m, std::chrono::seconds(TIMEOUT), []{ return cec_device_ready == 1; })){
+        DEBUG_PRINT(DEBUG_TRACE, "Finished IARMBUS event waiting. DONE\n");
+        return true;
+    }
+    else{
+        DEBUG_PRINT(DEBUG_TRACE, "IARMBUS event waiting timeout\n");
+        DEBUG_PRINT(DEBUG_TRACE, "IARM_BUS_CECMGR_EVENT_STATUS_UPDATED device ready event not received\n");
+        return false;
+    }
+#endif
+    DEBUG_PRINT(DEBUG_TRACE, "Platform doesnot support IARM_BUS_CECMGR_EVENT_STATUS_UPDATED event\n");
+    return true;
+}
 
 /***************************************************************************
  *Function name : testmodulepre_requisites
@@ -245,37 +301,27 @@ std::string HdmicecHalAgent::testmodulepre_requisites()
 {
     DEBUG_PRINT(DEBUG_TRACE, "HdmicecHal testmodule pre_requisites --> Entry\n");
 
-    DEBUG_PRINT(DEBUG_TRACE, "Init IARMBUS lib ...\n");
-    IARM_Result_t retval;
-    retval = IARM_Bus_Init("agent");
-    if(retval == 0)
-        DEBUG_PRINT(DEBUG_TRACE, "IARM_Bus_Init call success\n");
-    else
-        DEBUG_PRINT(DEBUG_TRACE, "IARM_Bus_Init call failure\n");
-
-    IARM_Bus_Connect();
-    DEBUG_PRINT(DEBUG_TRACE, "Agent connected with IARMBUS\n");
-    IARM_Bus_RegisterEventHandler(IARM_BUS_CECMGR_NAME, IARM_BUS_CECMGR_EVENT_STATUS_UPDATED, cecEventHandler);
-    DEBUG_PRINT(DEBUG_TRACE, "Registered IARMBUS event handler fn:cecEventHandler\n");
+    if(!(IARM_Bus_event_registration()))
+    {
+        DEBUG_PRINT(DEBUG_TRACE, "HdmicecHal testmodule pre_requisites failed\n");
+        DEBUG_PRINT(DEBUG_TRACE, "HdmicecHal testmodule pre_requisites --> Exit\n");  
+        return "FAILURE";
+    }
 
     DEBUG_PRINT(DEBUG_TRACE, "HdmiCecOpen ...\n");
     int init = HdmiCecOpen(&driverHandle);
     if (init ==  HDMI_CEC_IO_SUCCESS){
-        std::unique_lock<std::mutex> m(m_idle);
-        if (m_cv_init.wait_for(m, std::chrono::seconds(TIMEOUT), []{ return cec_device_ready == 1; })){
-            DEBUG_PRINT(DEBUG_TRACE, "Finished IARMBUS event waiting. DONE\n");
+        if(Event_Listener())
+        {
             DEBUG_PRINT(DEBUG_TRACE, "HdmiCecOpen call success\n");
             DEBUG_PRINT(DEBUG_TRACE, "HdmicecHal testmodule pre_requisites --> Exit\n");
             return "SUCCESS";
         }
         else{
-            DEBUG_PRINT(DEBUG_TRACE, "IARMBUS event waiting timeout\n");
-            DEBUG_PRINT(DEBUG_TRACE, "IARM_BUS_CECMGR_EVENT_STATUS_UPDATED device ready event not received\n");
-            DEBUG_PRINT(DEBUG_TRACE, "HdmiCecOpen call failed\n");
+            DEBUG_PRINT(DEBUG_TRACE, "HdmicecHal testmodule pre_requisites failed\n");
             DEBUG_PRINT(DEBUG_TRACE, "HdmicecHal testmodule pre_requisites --> Exit\n");
             return "FAILURE";
         }
-
     }
     else{
         DEBUG_PRINT(DEBUG_TRACE, "HdmiCecOpen call failed\n");
