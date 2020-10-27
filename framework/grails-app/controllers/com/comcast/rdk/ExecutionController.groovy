@@ -516,6 +516,7 @@ class ExecutionController {
 	 */
 	def showDevices(){
 		def category = params?.category?.trim()
+		def rdkServiceCategory = Category.RDKV
 		def device = Device.get( params?.id )
 		def scripts = []
 		def scriptListRdkService = []
@@ -561,7 +562,7 @@ class ExecutionController {
 		}
 		DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT1)
 		Calendar cal = Calendar.getInstance()
-		[datetime :  dateFormat.format(cal.getTime()).toString(), device : device, scriptGrpList : scriptGrp, scriptList : sList, sRdkList : sRdkList, scriptGrpRdkService : scriptGrpRdkService, scriptListStorm: scriptListStorm, category:category, devices:devices, grailsUrl: getApplicationUrl()]
+		[datetime :  dateFormat.format(cal.getTime()).toString(), device : device, scriptGrpList : scriptGrp, scriptList : sList, sRdkList : sRdkList, scriptGrpRdkService : scriptGrpRdkService, scriptListStorm: scriptListStorm, category:category, devices:devices, grailsUrl: getApplicationUrl(), rdkServiceCategory : rdkServiceCategory]
 	}
 
 	def getDeviceList(def category){
@@ -1062,7 +1063,7 @@ class ExecutionController {
 	 */
 	def executeScriptMethod() {
 		boolean thunderPythonExecution = false
-		if(params?.thunderExecutionType == "python"){
+		if(params?.thunderExecutionType == "rdkservice"){
 			thunderPythonExecution = true
 		}
 		def scriptType
@@ -1075,8 +1076,7 @@ class ExecutionController {
 		}else{
 			scriptType = params?.myGroupThunder
 			paramsScripts = params?.scriptsThunderPython
-			def scriptGroupObjectForName = ScriptGroup.findById(params?.scriptGrpThunderPython,[lock: true])
-			paramsScriptGrp = scriptGroupObjectForName?.name
+			paramsScriptGrp = params?.scriptGrpThunderPython
 		}
 		boolean aborted = false
 		def exId
@@ -1100,17 +1100,15 @@ class ExecutionController {
 		ExecutionDevice executionDevice = new ExecutionDevice()
 		int  scriptCountMultipleSuite = 0
 		def scriptListMultipleSuite = []
-		if(!thunderPythonExecution){
-			if(!(paramsScriptGrp instanceof String)){
-				for(scrptGrp in paramsScriptGrp){
-					def scrptGroupInstance = ScriptGroup.findByName(scrptGrp,[fetch : [scriptList : "eager"]])
-					scrptGroupInstance?.scriptList?.each{scrpt->
-						scriptListMultipleSuite.add(scrpt?.scriptName)
-					}
+		if(!(paramsScriptGrp instanceof String)){
+			for(scrptGrp in paramsScriptGrp){
+				def scrptGroupInstance = ScriptGroup.findByName(scrptGrp,[fetch : [scriptList : "eager"]])
+				scrptGroupInstance?.scriptList?.each{scrpt->
+					scriptListMultipleSuite.add(scrpt?.scriptName)
 				}
-				def Set<ScriptFile> scriptFileObjectSet = new HashSet(scriptListMultipleSuite)
-				scriptCountMultipleSuite = scriptFileObjectSet?.size()
 			}
+			def Set<ScriptFile> scriptFileObjectSet = new HashSet(scriptListMultipleSuite)
+			scriptCountMultipleSuite = scriptFileObjectSet?.size()
 		}
 		if(params?.devices instanceof String){
 			deviceList << params?.devices

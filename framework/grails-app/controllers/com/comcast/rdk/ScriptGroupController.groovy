@@ -778,6 +778,16 @@ class ScriptGroupController {
 		int directoryListSizeRDKVThunder
 		
 		moduleListRDKV = Module.findAllByCategory(Category.RDKV)
+		boolean removed = false
+		Iterator<Module> iteratorModule = moduleListRDKV.iterator()
+		while(iteratorModule?.hasNext()){
+			def obj = iteratorModule.next()
+			def objName = obj.name
+			if(objName.equals(Constants.RDKSERVICES) || (objName.equals(Constants.RDKV_PERFORMANCE)) || (objName.equals(Constants.RDKV_STABILITY))){
+				iteratorModule.remove()
+				removed = true
+			}
+		}
 		moduleListRDKB = Module.findAllByCategory(Category.RDKB)
 		directoryListRDKVThunder = scriptService.scriptGroupMapThunder.keySet()
 		moduleListRDKB.remove(Module.findByName('tcl'))
@@ -1578,7 +1588,7 @@ class ScriptGroupController {
 				sObject.setScriptFile(script)
 				sObject.setLongDuration(longDuration)
 				sObject?.setTestProfile(testProfileList)
-				if(ptest?.module?.name != Constants.RDKSERVICES){
+				if((ptest?.module?.name != Constants.RDKSERVICES) && (ptest?.module?.name != Constants.RDKV_PERFORMANCE) && (ptest?.module?.name != Constants.RDKV_STABILITY)){
 					scriptService.updateScript(script, params?.category)
 					scriptgroupService.saveToScriptGroups(script,sObject, params?.category)
 					scriptgroupService.saveToDefaultGroups(script,sObject, boxTypes, params?.category)
@@ -1588,6 +1598,7 @@ class ScriptGroupController {
 					scriptService.updateAdvScriptMap(params?.name?.trim(), dirname, Utility.getCategory(params?.category), isAdvanced)
 				}else{
 					scriptService.updateScript(script,Category?.RDKV_RDKSERVICE.toString())
+					scriptService.updateRdkServiceScriptSuite(ptest?.module?.name,script,Category?.RDKV_RDKSERVICE.toString())
 				}
 				def sName = params?.name
 				render(message(code: 'default.created.message', args: [
@@ -1990,7 +2001,7 @@ class ScriptGroupController {
 				script = new ScriptFile()
 				script.setScriptName(newScriptName)
 				script.setModuleName(ptest?.module?.name)
-				if(ptest?.module?.name == Constants.RDKSERVICES){
+				if((ptest?.module?.name != Constants.RDKSERVICES) && (ptest?.module?.name != Constants.RDKV_PERFORMANCE) && (ptest?.module?.name != Constants.RDKV_STABILITY)){
 					script.category = Utility.getCategory(Category?.RDKV_RDKSERVICE.toString())
 				}else{
 					script.category = Utility.getCategory(params?.category)
@@ -2008,7 +2019,7 @@ class ScriptGroupController {
 			sObject.setScriptTags(scrptTags)
 			sObject.setLongDuration(longDuration)
 			sObject.setTestProfile(testProfileList)
-			if(ptest?.module?.name != Constants.RDKSERVICES){
+			if((ptest?.module?.name != Constants.RDKSERVICES) || (ptest?.module?.name != Constants.RDKV_PERFORMANCE) || (ptest?.module?.name != Constants.RDKV_STABILITY)){
 				if(boxTypes){
 					scriptgroupService.removeScriptsFromBoxScriptGroup(script,boxTypes,oldBoxTypes)
 					if(isLongDuration != longDuration){
@@ -3636,14 +3647,14 @@ class ScriptGroupController {
 								script = new ScriptFile()
 								script.setScriptName(scriptName?.trim())
 								script.setModuleName(ptest?.module?.name)
-								if(ptest?.module?.name == Constants.RDKSERVICES){
+								if(ptest?.module?.name == Constants.RDKSERVICES || ptest?.module?.name == Constants.RDKV_PERFORMANCE || ptest?.module?.name == Constants.RDKV_STABILITY){
 									script.category = Utility.getCategory(Category?.RDKV_RDKSERVICE.toString())
 								}else{
 									script.category = Utility.getCategory(category)
 								}
 								script.save(flush:true)
 							}
-							if(ptest?.module?.name != Constants.RDKSERVICES){
+							if((ptest?.module?.name != Constants.RDKSERVICES) && (ptest?.module?.name != Constants.RDKV_PERFORMANCE) && (ptest?.module?.name != Constants.RDKV_STABILITY)){
 								def scr = ScriptFile.findByScriptNameAndModuleName(scriptName?.trim(),ptest?.module?.name)
 								if(RDKV.equals(category)){
 									if(advanced.equals("true")){
@@ -3684,6 +3695,7 @@ class ScriptGroupController {
 								scriptService?.updateScriptsFromTestProfile(script,sObject,category)
 							}else{
 								scriptService.updateScript(script,Category?.RDKV_RDKSERVICE.toString())
+								scriptService.updateRdkServiceScriptSuite(ptest?.module?.name,script,Category?.RDKV_RDKSERVICE.toString())
 							}
 							flash.message =" Script uploaded successfully"
 						}catch(Exception e){
@@ -4485,7 +4497,6 @@ class ScriptGroupController {
 				def module = params.module
 				def category = params?.category
 				def realPath = request.getRealPath("/")
-				
 				if(module instanceof String){
 					try {
 						module = Long.parseLong(module)

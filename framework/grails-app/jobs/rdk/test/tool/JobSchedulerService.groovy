@@ -142,6 +142,7 @@ class JobSchedulerService implements Job{
 		boolean combinedTCL = false
 		boolean tclCombined =  false
 		def deviceInstance //= Device.findById(jobDetails?.device, [lock: true])
+		boolean rdkserviceExecution = false
 		try {
 			JobDetails jobDetails
 			ExecutionDevice executionDevice
@@ -159,6 +160,10 @@ class JobSchedulerService implements Job{
 				category = jobDetails?.category
 			}
 			//			ScriptService.getScriptNameFileList(realpath)
+			def deviceInstanceForCheck = Device.findById(jobDetails?.device)
+			if(deviceInstanceForCheck?.isThunderEnabled == 1){
+				rdkserviceExecution = true
+			}
 			def scriptInstance
 			def scriptGroupInstance
 			def deviceName
@@ -355,7 +360,7 @@ class JobSchedulerService implements Job{
 										executionDevice.execution = Execution.findByName(execName)
 										executionDevice.dateOfExecution = new Date()
 										executionDevice.device = deviceInstance?.stbName
-                                                                                executionDevice.boxType = deviceInstance?.boxType?.name
+										executionDevice.boxType = deviceInstance?.boxType?.name
 										executionDevice.deviceIp = deviceInstance?.stbIp
 										executionDevice.status = UNDEFINED_STATUS
 										executionDevice.category = category
@@ -371,7 +376,11 @@ class JobSchedulerService implements Job{
 									}
 
 								}
-								executeVersionTransferScript(realpath, filePath, executionName, executionDevice?.id, deviceInstance.stbName, deviceInstance?.logTransferPort,url)
+								if(rdkserviceExecution){
+									StormExecuter.createThunderVersionFile(realpath, execution?.id, executionDevice?.id, executionDevice?.deviceIp)
+								}else{
+									executeVersionTransferScript(realpath, filePath, executionName, executionDevice?.id, deviceInstance.stbName, deviceInstance?.logTransferPort,url)
+								}
 								int scriptGrpSize = 0
 								int scriptCounter = 0
 								def isMultiple = TRUE
@@ -385,7 +394,7 @@ class JobSchedulerService implements Job{
 
 									String rdkVersion = getRDKBuildVersion(deviceInstance);
 									scriptGroupInstance.scriptList.each { scrpt ->
-										if(category == jobDetails?.category){
+										if(category == jobDetails?.category && !rdkserviceExecution){
 											category = scrpt.category
 										}else{
 											category =   jobDetails?.category
@@ -408,8 +417,11 @@ class JobSchedulerService implements Job{
 														rdkVersionData = script?.rdkVersions
 
 														String reason = "RDK Version mismatch.<br>Device RDK Version : "+rdkVersion+", Script supported RDK Versions :"+rdkVersionData
-
-														saveNotApplicableStatus(Execution.findByName(execName), executionDevice, script, deviceInstance,reason,scrpt.category)
+														if(rdkserviceExecution){
+															saveNotApplicableStatus(Execution.findByName(execName), executionDevice, script, deviceInstance,reason,category)
+														}else{
+															saveNotApplicableStatus(Execution.findByName(execName), executionDevice, script, deviceInstance,reason,scrpt.category)
+														}
 
 													}
 
@@ -427,11 +439,19 @@ class JobSchedulerService implements Job{
 													//										}
 
 													String reason = "Box Type mismatch.<br>Device Box Type : "+deviceBoxType+", Script supported Box Types :"+boxTypeData
-													saveNotApplicableStatus(Execution.findByName(execName), executionDevice, script, deviceInstance, reason, scrpt.category)
+													if(rdkserviceExecution){
+														saveNotApplicableStatus(Execution.findByName(execName), executionDevice, script, deviceInstance, reason, category)
+													}else{
+														saveNotApplicableStatus(Execution.findByName(execName), executionDevice, script, deviceInstance, reason, scrpt.category)
+													}
 												}
 											}else{
 												String reason = "No script is available with name :"+scrpt?.scriptName+" in module :"+scrpt?.moduleName
-												saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, scrpt?.scriptName, deviceInstance,reason, scrpt.category)
+												if(rdkserviceExecution){
+													saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, scrpt?.scriptName, deviceInstance,reason, category)
+												}else{
+													saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, scrpt?.scriptName, deviceInstance,reason, scrpt.category)
+												}
 												notApplicable =true
 											}
 										}
@@ -464,14 +484,22 @@ class JobSchedulerService implements Job{
 												else{
 													notApplicable =true
 													String reason = "No config file is available with name : Config_"+deviceInstance?.stbName+".txt"
-													saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, scrpt?.scriptName, deviceInstance,reason, scrpt.category)
+													if(rdkserviceExecution){
+														saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, scrpt?.scriptName, deviceInstance,reason, category)
+													}else{
+														saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, scrpt?.scriptName, deviceInstance,reason, scrpt.category)
+													}
 
 												}
 											}
 											else{
 												notApplicable =true
 												String reason = "No script is available with name : "+scrpt?.scriptName+".tcl"
-												saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, scrpt?.scriptName, deviceInstance,reason, scrpt.category)
+												if(rdkserviceExecution){
+													saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, scrpt?.scriptName, deviceInstance,reason, category)
+												}else{
+													saveNoScriptAvailableStatus(Execution.findByName(execName), executionDevice, scrpt?.scriptName, deviceInstance,reason, scrpt.category)
+												}
 											}
 										}
 									}
@@ -489,7 +517,7 @@ class JobSchedulerService implements Job{
 									Properties props = new Properties()
 									try {
 										// rest call for log transfer starts
-										if(validScriptList.size() > 0){
+										if(validScriptList.size() > 0 && !rdkserviceExecution){
 											LogTransferService.transferLog(execName, deviceInstance)
 										}
 									} catch (Exception e) {
@@ -601,7 +629,7 @@ class JobSchedulerService implements Job{
 									}
 
 									try {
-										if(validScriptList.size() > 0){
+										if(validScriptList.size() > 0 && !rdkserviceExecution){
 											LogTransferService.closeLogTransfer(execName)
 										}
 									} catch (Exception e) {
@@ -913,7 +941,9 @@ class JobSchedulerService implements Job{
 
 								if(aborted){
 									abortedExecution = true
-									resetAgent(deviceInstance)
+									if(!rdkserviceExecution){
+										resetAgent(deviceInstance)
+									}
 								}
 
 							}
@@ -1146,7 +1176,11 @@ class JobSchedulerService implements Job{
 								executionDevice.buildName = getBuildName( deviceInstance?.stbName )
 								executionDevice.save(flush:true)
 							}
-							executeVersionTransferScript(realPath, filePath, newExecName, executionDevice?.id, deviceInstance.stbName, deviceInstance?.logTransferPort,url)
+							if(deviceInstance?.isThunderEnabled != 1){
+								executeVersionTransferScript(realPath, filePath, newExecName, executionDevice?.id, deviceInstance.stbName, deviceInstance?.logTransferPort,url)
+							}else{
+								StormExecuter.createThunderVersionFile(realpath, rerunExecutionInstance?.id, executionDevice?.id, executionDevice?.deviceIp)
+							}
 							def executionResultList = ExecutionResult.findAllByExecutionAndExecutionDeviceAndStatusNotEqual(executionInstance,execDeviceInstance,SUCCESS_STATUS)
 							def scriptInstance
 							def htmlData
@@ -1160,7 +1194,7 @@ class JobSchedulerService implements Job{
 							try {
 								props.load(grailsApplication.parentContext.getResource("/appConfig/logServer.properties").inputStream)
 								// initiating log transfer
-								if(executionResultList.size() > 0){
+								if(executionResultList.size() > 0 && (deviceInstance?.isThunderEnabled != 1)){
 									LogTransferService.transferLog(newExecName, deviceInstance)
 								}
 							} catch (Exception e) {
@@ -1298,7 +1332,7 @@ class JobSchedulerService implements Job{
 							//}
 							// stopping log transfer
 							try {
-								if(executionResultList.size() > 0){
+								if(executionResultList.size() > 0 && (deviceInstance?.isThunderEnabled != 1)){
 									LogTransferService.closeLogTransfer(newExecName)
 								}
 							} catch (Exception e) {
@@ -1570,7 +1604,9 @@ class JobSchedulerService implements Job{
 		def logTransferFilePath = "${realPath}/logs//consolelog//${executionId}//${executionDevice?.id}//${executionResultId}//"
 
 		//new File("${realPath}/logs//consolelog//${executionId}//${executionDevice?.id}//${executionResultId}").mkdirs()
-		logTransfer(deviceInstance,logTransferFilePath,logTransferFileName, realPath, executionId,executionDevice?.id,executionResultId,url  )
+		if(deviceInstance?.isThunderEnabled != 1){
+			logTransfer(deviceInstance,logTransferFilePath,logTransferFileName, realPath, executionId,executionDevice?.id,executionResultId,url  )
+		}
 
 		file.delete()
 		// TFTP transfer --->>>
@@ -1608,7 +1644,7 @@ class JobSchedulerService implements Job{
 		}
 		
 
-		if(ExecutionService.abortList.contains(executionInstance?.id?.toString())){
+		if(ExecutionService.abortList.contains(executionInstance?.id?.toString()) && (deviceInstance?.isThunderEnabled != 1)){
 			resetAgent(deviceInstance,TRUE)
 		}else if(htmlData.contains(TDK_ERROR)){
 			htmlData = htmlData.replaceAll(TDK_ERROR,"")
@@ -1628,7 +1664,9 @@ class JobSchedulerService implements Job{
 			]
 			ScriptExecutor scriptExecutor = new ScriptExecutor()
 			def resetExecutionData = scriptExecutor.executeScript(cmd,1)
-			callRebootOnAgentResetFailure(resetExecutionData, deviceInstance)
+			if(deviceInstance?.isThunderEnabled != 1){
+				callRebootOnAgentResetFailure(resetExecutionData, deviceInstance)
+			}
 			Thread.sleep(4000)
 		}else if(htmlData.contains("Pre-Condition not met")){
 			if(htmlData.contains(KEY_SCRIPTEND)){
@@ -1655,7 +1693,9 @@ class JobSchedulerService implements Job{
 					]
 					ScriptExecutor scriptExecutor = new ScriptExecutor(uniqueExecutionName)
 					def resetExecutionData = scriptExecutor.executeScript(cmd,1)
-					callRebootOnAgentResetFailure(resetExecutionData, deviceInstance)
+					if(deviceInstance?.isThunderEnabled != 1){
+						callRebootOnAgentResetFailure(resetExecutionData, deviceInstance)
+					}
 					htmlData = htmlData +"\nScript timeout\n"+ resetExecutionData
 					updateExecutionResultsTimeOut(htmlData,executionResultId,executionId,executionDevice?.id,timeDiff,singleScriptExecTime)
 					Thread.sleep(4000)
@@ -1674,7 +1714,9 @@ class JobSchedulerService implements Job{
 						]
 						ScriptExecutor scriptExecutor = new ScriptExecutor()
 						def resetExecutionData = scriptExecutor.executeScript(cmd,1)
-						callRebootOnAgentResetFailure(resetExecutionData, deviceInstance)
+						if(deviceInstance?.isThunderEnabled != 1){
+							callRebootOnAgentResetFailure(resetExecutionData, deviceInstance)
+						}
 						Thread.sleep(4000)
 					} catch (Exception e) {
 						e.printStackTrace()
@@ -1740,8 +1782,10 @@ class JobSchedulerService implements Job{
 		def logTransferFilePath1 = "${realPath}/logs//consolelog//${executionId}//${executionDevice?.id}//${executionResultId}//"
 
 		//new File("${realPath}/logs//consolelog//${executionId}//${executionDevice?.id}//${executionResultId}").mkdirs()
-		logTransfer1(deviceInstance,logTransferFilePath1,logTransferFileName1 ,realPath, executionId,executionDevice?.id, executionResultId,url)
-		if(isLogReqd?.toString()?.equals("true")){
+		if(deviceInstance?.isThunderEnabled != 1){
+			logTransfer1(deviceInstance,logTransferFilePath1,logTransferFileName1 ,realPath, executionId,executionDevice?.id, executionResultId,url)
+		}
+		if(isLogReqd?.toString()?.equals("true") && (deviceInstance?.isThunderEnabled != 1)){
 			
 		transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+executionDevice?.id,""+executionResultId,realPath,url)
 		}
@@ -2697,43 +2741,45 @@ class JobSchedulerService implements Job{
 		def absolutePath
 		def boxIp = device?.stbIp
 		def port = device?.agentMonitorPort
-
-		File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callGetRDKVersion.py").file
-		absolutePath = layoutFolder.absolutePath
-
-		if(boxIp != null && port != null ){
-			String[] cmd = [
-				PYTHON_COMMAND,
-				absolutePath,
-				boxIp,
-				port
-			]
-
-			ScriptExecutor scriptExecutor = new ScriptExecutor()
-			outputData = scriptExecutor.executeScript(cmd,1)
-		}
-
-		if(outputData){
-			outputData = outputData.trim()
-		}else{
-			outputData = ""
-		}
-
 		String rdkVersion = ""
-		if(outputData.equals("METHOD_NOT_FOUND") || outputData.equals("AGENT_NOT_FOUND") || outputData.equals("NOT_DEFINED")){
-			rdkVersion = "NOT_AVAILABLE"
-		}else if(outputData.contains("DOT")){
-			rdkVersion = outputData.replace("DOT",".")
-		}else if(!outputData.equals("") && !outputData.startsWith("RDK")){
-			rdkVersion = "RDK"+outputData.replace("DOT",".")
-		}else{
-			rdkVersion = outputData
-		}
+		boolean isThunderEnabled = device?.isThunderEnabled
+		if(!isThunderEnabled){
+			File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callGetRDKVersion.py").file
+			absolutePath = layoutFolder.absolutePath
 
-		if(rdkVersion && rdkVersion.contains(" ")){
-			rdkVersion.replaceAll(" ", "")
-		}
+			if(boxIp != null && port != null ){
+				String[] cmd = [
+					PYTHON_COMMAND,
+					absolutePath,
+					boxIp,
+					port
+				]
 
+				ScriptExecutor scriptExecutor = new ScriptExecutor()
+				outputData = scriptExecutor.executeScript(cmd,1)
+			}
+
+			if(outputData){
+				outputData = outputData.trim()
+			}else{
+				outputData = ""
+			}
+
+		
+			if(outputData.equals("METHOD_NOT_FOUND") || outputData.equals("AGENT_NOT_FOUND") || outputData.equals("NOT_DEFINED")){
+				rdkVersion = "NOT_AVAILABLE"
+			}else if(outputData.contains("DOT")){
+				rdkVersion = outputData.replace("DOT",".")
+			}else if(!outputData.equals("") && !outputData.startsWith("RDK")){
+				rdkVersion = "RDK"+outputData.replace("DOT",".")
+			}else{
+				rdkVersion = outputData
+			}
+
+			if(rdkVersion && rdkVersion.contains(" ")){
+				rdkVersion.replaceAll(" ", "")
+			}
+		}
 		return rdkVersion
 	}
 
