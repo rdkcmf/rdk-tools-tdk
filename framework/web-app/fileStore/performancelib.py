@@ -20,6 +20,8 @@ import requests
 import json
 import time
 import os
+import inspect
+import ConfigParser
 import BrowserPerformanceVariables
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
@@ -27,15 +29,22 @@ from selenium.common import exceptions
 
 deviceIP=""
 devicePort=""
+deviceName=""
+deviceType=""
 #METHODS
 #---------------------------------------------------------------
 #INITIALIZE THE MODULE
 #---------------------------------------------------------------
-def init_module(ip,port):
+def init_module(libobj,port,deviceInfo):
     global deviceIP
     global devicePort
-    deviceIP = ip;
+    global deviceName
+    global deviceType
+    deviceIP = libobj.ip;
     devicePort = port
+    deviceName = deviceInfo["devicename"]
+    deviceType = deviceInfo["boxtype"]
+
 #---------------------------------------------------------------
 #EXECUTE CURL REQUESTS
 #---------------------------------------------------------------
@@ -220,3 +229,51 @@ def rdkservice_getBrowserScore_Octane():
         browser_score = "Unable to get the browser score"
         driver.quit()
    return browser_score;
+
+#----------------------------------------------------------------------
+#GET THE NAME OF DEVICE CONFIG FILE
+#----------------------------------------------------------------------
+def getConfigFileName(basePath):
+    deviceConfigFile=""
+    status ="SUCCESS"
+    configPath = basePath + "/"   + "fileStore/tdkvRDKServiceConfig"
+    deviceNameConfigFile = configPath + "/" + deviceName + ".config"
+    deviceTypeConfigFile = configPath + "/" + deviceType + ".config"
+
+    # Check whether device / platform config files required for
+    # executing the test are present
+    if os.path.exists(deviceNameConfigFile) == True:
+        deviceConfigFile = deviceNameConfigFile
+        print "[INFO]: Using Device config file: %s" %(deviceNameConfigFile)
+    elif os.path.exists(deviceTypeConfigFile) == True:
+        deviceConfigFile = deviceTypeConfigFile
+        print "[INFO]: Using Device config file: %s" %(deviceTypeConfigFile)
+    else:
+        status = "FAILURE"
+        print "[ERROR]: No Device config file found : %s or %s" %(deviceNameConfigFile,deviceTypeConfigFile)
+    return deviceConfigFile,status;
+
+#-------------------------------------------------------------------------
+#GET THE VALUES FROM DEVICE CONFIG FILE
+#-------------------------------------------------------------------------
+def getDeviceConfigKeyValue(deviceConfigFile,key):
+    value  = ""
+    status = "SUCCESS"
+    deviceConfig  = "device.config"
+    try:
+        # If the key is none object or empty then exception
+        # will be thrown
+        if key is None or key == "":
+            status = "FAILURE"
+            print "\nException Occurred: [%s] key is None or empty" %(inspect.stack()[0][3])
+        # Parse the device configuration file and read the
+        # data. But if the data is empty it is taken as such
+        else:
+            config = ConfigParser.ConfigParser()
+            config.read(deviceConfigFile)
+            value = str(config.get(deviceConfig,key))
+    except Exception as e:
+        status = "FAILURE"
+        print "\nException Occurred: [%s] %s" %(inspect.stack()[0][3],e)
+
+    return status,value

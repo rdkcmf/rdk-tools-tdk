@@ -142,11 +142,25 @@ if expectedResult in result.upper():
                 tdkTestObj = obj.createTestStep('rdkservice_getBrowserScore_CSS3');
                 tdkTestObj.executeTestCase(expectedResult);
                 browser_score = tdkTestObj.getResultDetails();
-                print "The Browser score using CCS3 test is :",browser_score
                 if browser_score != "Unable to get the browser score":
                     tdkTestObj.setResultStatus("SUCCESS");
+		    print "The Browser score using CCS3 test is :",browser_score
+		    browser_score = browser_score.replace("%","")
+		    conf_file,result = getConfigFileName(tdkTestObj.realpath)
+                    result, css3_threshold_value = getDeviceConfigKeyValue(conf_file,"CSS3_THRESHOLD_VALUE")
+                    if result == "SUCCESS":
+                        if int(browser_score) > int(css3_threshold_value):
+                            tdkTestObj.setResultStatus("SUCCESS");
+                            print "The browser performance is high as expected"
+                        else:
+                            tdkTestObj.setResultStatus("FAILURE");
+                            print "The browser performance is lower than expected"
+                    else:
+                        tdkTestObj.setResultStatus("FAILURE");
+                        print "Failed to get the threshold value from config file"
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
+		    print "Failed to get the browser score"
             else:
                 print "Failed to load the URL",new_url
                 tdkTestObj.setResultStatus("FAILURE");

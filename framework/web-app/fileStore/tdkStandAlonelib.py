@@ -89,7 +89,7 @@ def executeTest (self) :
         """
         if "init_module" in dir(lib):
             init_module_method = getattr(lib,"init_module")
-            init_module_method(self.ip,thunderPort)
+            init_module_method(self,thunderPort,getDeviceDetails(self))
         """
         The variable "method" contains the name of the function we need to invoke from "lib".
         getattr is used to fetch the given method name from lib.
