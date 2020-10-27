@@ -180,12 +180,14 @@ function jsExecution(){
 		$('#scriptSpan').hide();
 		$('#testSuiteSpan').show();
 	}
+	checkRepeat();
+	scheduleToggle();
 }
 
 function pythonExecution(){
 	var testSuite = document.getElementById("testSuiteRadioThunder");
 	var singleTest = document.getElementById("singleTestRadioThunder");
-	document.getElementById("thunderExecutionType").value = "python";
+	document.getElementById("thunderExecutionType").value = "rdkservice";
 	var thunderJavascriptExecuteButtons = document.getElementById("thunderJavascriptExecuteButtons");
 	var thunderPythonExecuteButtons = document.getElementById("thunderPythonExecuteButtons");
 	thunderJavascriptExecuteButtons.style.display = "none";
@@ -206,6 +208,8 @@ function pythonExecution(){
 		$('#scriptSpan').hide();
 		$('#testSuiteSpan').show();
 	}
+	checkRepeat();
+	scheduleToggle();
 }
 
 function showfullRepeat(){
@@ -249,6 +253,8 @@ function showSuiteThunder(){
 		$('#scriptSpan').hide();
 		$('#testSuiteSpan').show();
 	}
+	checkRepeat();
+	scheduleToggle();
 }
 
 /**
@@ -272,6 +278,8 @@ function showSingleThunder(){
 		$('#scriptSpan').show();
 		$('#testSuiteSpan').hide();
 	}
+	checkRepeat();
+	scheduleToggle();
 }
 function pageLoadOnScriptType(category, id){
 	var isTestSuiteRadio = document.getElementById('testSuiteRadio').checked;
@@ -419,7 +427,71 @@ function executionStatus(id){
 	        } }, { onClose : function(dialog) {
 		  $.modal.close(); } });
 }
+
+/**
+ * RdkService schedule function
+ * @param id
+ * @param category
+ * @returns {Boolean}
+ */
+function showSchedulerRdkService(id, category){	
+	var scriptGroup = $("#scriptGrpThunderPython").val();
+	var scripts = $("#scriptsThunderPython").val();
+    var deviceList = $("#devices").val();
+	var repeatid = $("#repeatId").val();
+
+	 if ($('input[name=myGroupThunder]:checked').val()=='TestSuite'){     	
+	    	scripts = "";
+	 }
+	 else{     	
+	    	scriptGroup ="";
+	 }
+
+	var reRun = "";
+	var benchmark = "false";
+	var systemDiag = "false"
+	var isLogReqd =" false"
+    if ($("#rerunId").prop('checked')==true){     	
+    	reRun = "true";
+    }
 	
+	if( (deviceList =="" || deviceList == null ) ){
+		alert("Please select Device");
+		return false;
+	}
+	
+	if(deviceList.length > 1){	
+		alert("Scheduling is not currently allowed for multiple devices");
+		return false;
+	}
+	else{
+		id = deviceList.toString();		
+	}
+
+	if((scripts=="" || scripts == null )&& scriptGroup == "" ){
+		alert("Please select Script/ScriptGroup");
+		return false;
+	}
+	var scriptVals = ""
+	if(scripts){
+		scriptVals = scripts.toString();
+	} 
+	var scriptGroupVals = ""
+	if(scriptGroup){
+		scriptGroupVals = scriptGroup.toString()
+	}
+	$.get('showSchedular', {deviceId : id, devices : deviceList.toString(), scriptGroup : scriptGroupVals, scripts:scriptVals, repeatId:repeatid, rerun:reRun, systemDiagnostics : systemDiag , benchMarking : benchmark  ,isLogReqd :isLogReqd, category:category }, function(data) { $("#scheduleJobPopup").html(data); });		
+	$("#scheduleJobPopup").modal({ opacity : 40, overlayCss : {
+		  backgroundColor : "#c4c4c4" }, containerCss: {
+	            width: 800,
+	            height: 570	            
+	        } }, { onClose : function(dialog) {
+		  $.modal.close(); } });
+	$("#scheduletable").dataTable( {
+		"sPaginationType": "full_numbers",
+		 "bRetrieve": "true" 
+	} );	
+}
 
 function showScheduler(id, category){	
 	
@@ -539,9 +611,12 @@ function checkDeviceList(){
 function checkRepeat(){
 	 var IndividualRepeat = document.getElementById("individualRepeatRadio");
 	 var singleSelectedTdk = document.getElementById("singleTestRadio");
+	 var singleSelectedRdkService = document.getElementById("singleTestRadioThunder");
+	 var thunderExecutionType = document.getElementById("thunderExecutionType").value;
 	 var scriptList = $("#scripts").val();
+	 var scriptListRdkService = $("#scriptsThunderPython").val();
 	 var isThunderEnabled = document.getElementById("stbtype").value;
-	 if((isThunderEnabled != 1 && singleSelectedTdk.checked && IndividualRepeat.checked && scriptList!= null && scriptList.length <=1) || (isThunderEnabled == 1)){
+	 if((isThunderEnabled != 1 && singleSelectedTdk && singleSelectedTdk.checked && IndividualRepeat.checked && scriptList!= null && scriptList.length <=1) || (thunderExecutionType == "rdkservice" && isThunderEnabled == 1 && singleSelectedRdkService && singleSelectedRdkService.checked && IndividualRepeat.checked && scriptListRdkService != null && scriptListRdkService.length <=1)||(thunderExecutionType == "javascript" && isThunderEnabled == 1)){
 		 $("#individualRepeatId").val(1);
 		 $('#individualRepeatId').attr('readonly', true);
 	 }else{
@@ -551,14 +626,25 @@ function checkRepeat(){
 
 function scheduleToggle(){
 	 var isThunderEnabled = document.getElementById("stbtype").value;
+	 var IndividualRepeat = document.getElementById("individualRepeatRadio");
 	 if(isThunderEnabled != 1){
-		 var IndividualRepeat = document.getElementById("individualRepeatRadio");
 		 var suiteSelectedTdk = document.getElementById("testSuiteRadio");
 		 var scriptGroupListTdk = $("#scriptGrp").val();
 		 if((suiteSelectedTdk.checked && scriptGroupListTdk!= null && scriptGroupListTdk.length > 1) || (IndividualRepeat.checked)){ 
 			 document.getElementById("scheduleBtnID").disabled = true;
 		 }else{
 			 document.getElementById("scheduleBtnID").disabled = false;
+		 }
+	 }else{
+		 var thunderExecutionType = document.getElementById("thunderExecutionType").value;
+		 if(thunderExecutionType == "rdkservice"){
+			 var suiteSelectedRdkservice = document.getElementById("testSuiteRadioThunder");
+			 var scriptGroupListRdkservice = $("#scriptGrpThunderPython").val();
+			 if((suiteSelectedRdkservice.checked && scriptGroupListRdkservice!= null && scriptGroupListRdkservice.length > 1) || (IndividualRepeat.checked)){ 
+				 document.getElementById("scheduleBtnPythonID").disabled = true;
+			 }else{
+				 document.getElementById("scheduleBtnPythonID").disabled = false;
+			 }
 		 }
 	 }
 }
@@ -731,7 +817,7 @@ function changeStyles(){
 	var thunderExecutionType = document.getElementById("thunderExecutionType");
 	if(thunderExecutionType.value == "javascript"){
 		$("#executeBtn").show();
-	}else if(thunderExecutionType.value == "python"){
+	}else if(thunderExecutionType.value == "rdkservice"){
 		$("#executeBtnPython").show();
 	}
 }

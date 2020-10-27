@@ -27,6 +27,7 @@ $(document).ready(function() {
 	$("#scriptGrp").select2();
 	$("#scriptsThunder").select2();
 	$("#scriptsThunderPython").select2();
+	$("#scriptGrpThunderPython").select2();
 });
 
 </script>
@@ -76,8 +77,8 @@ $(document).ready(function() {
 			<tr>
 				<td>Select Execution Type</td>
 				<td>
-					<input onclick="jsExecution();" id="javaScriptThunderRadio" type="radio" name="myGroupExecutionTypeThunder" checked="checked" value="JavascriptThunder" />Javascript
-				    &emsp;<input onclick="pythonExecution();" id="pythonThunderRadio" type="radio" name="myGroupExecutionTypeThunder" value="PythonThunder" />Python
+					<input onclick="jsExecution();" id="javaScriptThunderRadio" type="radio" name="myGroupExecutionTypeThunder" checked="checked" value="JavascriptThunder" />Storm
+				    &emsp;<input onclick="pythonExecution();" id="pythonThunderRadio" type="radio" name="myGroupExecutionTypeThunder" value="PythonThunder" />RdkService
 				    
 				</td>
 			</tr>
@@ -135,7 +136,7 @@ $(document).ready(function() {
 				        <g:select id="scriptsThunder" name="scriptsThunder" multiple="true" style="height:200px;width:400px" onchange="showDateTime();" name="scriptsThunder"  from="${scriptListStorm}" value="" class="many-to-one selectCombo"/>
 				    </div>
 				    <div id="testSuiteThunderPython" style="display: none;">
-						<g:select id="scriptGrpThunderPython" onchange="showDateTime();" name="scriptGrpThunderPython" noSelection="['' : 'Please Select']" from="${scriptGrpRdkService}" optionKey="id" required="" value="" class="many-to-one selectCombo"/>
+						<g:select id="scriptGrpThunderPython" name="scriptGrpThunderPython" multiple="true" style="height:200px;width:400px" onchange="showDateTime();"  from="${scriptGrpRdkService}" value="" class="many-to-one selectCombo"/>
 				    </div>
 				    <div id="singletestThunderPython" style="display: none;">
 				        <g:select id="scriptsThunderPython" name="scriptsThunderPython" multiple="true" style="height:200px;width:400px" onchange="showDateTime();" from="${sRdkList}" value="" class="many-to-one selectCombo"/>
@@ -161,13 +162,15 @@ $(document).ready(function() {
 				    &emsp;&emsp;<g:checkBox id="rerunId" name="rerun" checked="false" />&nbsp;Re-Run on Failure
 			</td>
 		</tr>
-		<tr>
-			<td>Execution Options</td>
-			<td><g:checkBox id="benchmarkId" name="benchMarking" checked="false" />&nbsp;Timing Info 
-			&emsp;&emsp;<g:checkBox id="systemDiagId" name="systemDiagnostics" checked="false"  />&nbsp;Performance Data
-			&emsp;&emsp;<g:checkBox id="transferLogsId" name="transferLogs" checked="false"  />&nbsp;Transfer STB logs
-			</td>
-		</tr>	
+		<g:if test="${device?.isThunderEnabled != 1}">
+			<tr>
+				<td>Execution Options</td>
+				<td><g:checkBox id="benchmarkId" name="benchMarking" checked="false" />&nbsp;Timing Info 
+				&emsp;&emsp;<g:checkBox id="systemDiagId" name="systemDiagnostics" checked="false"  />&nbsp;Performance Data
+				&emsp;&emsp;<g:checkBox id="transferLogsId" name="transferLogs" checked="false"  />&nbsp;Transfer STB logs
+				</td>
+			</tr>	
+		</g:if>
 		<tr>
 			<td colspan="2" align="center">
 			    <g:if test="${device?.isThunderEnabled != 1 }">				
@@ -200,8 +203,8 @@ $(document).ready(function() {
 						</g:submitToRemote>&emsp;	
 						</span>
 						<span id="scheduleBtnPython" class="buttons">
-						<input id="scheduleBtnPythonID" type=button class="save"  onclick="showScheduler(${device?.id}, '${category}');return false;"
-						value="Schedule" disabled/>	
+						<input id="scheduleBtnPythonID" type=button class="save"  onclick="showSchedulerRdkService(${device?.id}, '${rdkServiceCategory}');return false;"
+						value="Schedule"/>	
 						</span>
 					</div>
 				</g:else>
