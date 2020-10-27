@@ -1184,8 +1184,7 @@ void DSHalAgent::DSHal_IsAudioMS12Decode(IN const Json::Value& req, OUT Json::Va
     dsError_t ret = dsERR_NONE;
     bool ms12Enabled;
 
-    //ret = dsIsAudioMS12Decode(apHandle, &ms12Enabled);
-    ret = dsIsAudioMS12Decode(&ms12Enabled);
+    ret = dsIsAudioMS12Decode(apHandle, &ms12Enabled);
 
     if (ret == dsERR_NONE)
     {
@@ -2214,8 +2213,6 @@ void DSHalAgent::DSHal_SetDolbyVolumeMode(IN const Json::Value& req, OUT Json::V
         return;
     }
 
-/*Commented due to RDK code change "Revert "RDK-27413: Dolby MS12 Audio Control Configuration""*/
-#if 0
     bool mode = req["mode"].asInt();
     dsError_t ret = dsERR_NONE;
 
@@ -2246,10 +2243,6 @@ void DSHalAgent::DSHal_SetDolbyVolumeMode(IN const Json::Value& req, OUT Json::V
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetDolbyVolumeMode -->Exit\n");
         return;
     }
-#endif
-    response["result"] = "FAILURE";
-    response["details"] = "SetDolbyVolumeMode API is not supported";
-    return;
 }
 /***************************************************************************
  *Function name : DSHal_GetDolbyVolumeMode
@@ -2259,8 +2252,6 @@ void DSHalAgent::DSHal_GetDolbyVolumeMode(IN const Json::Value& req, OUT Json::V
 {
     DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDolbyVolumeMode --->Entry\n");
 
-/*Commented due to RDK code change "Revert "RDK-27413: Dolby MS12 Audio Control Configuration""*/
-#if 0
     dsError_t ret = dsERR_NONE;
     bool mode;
 
@@ -2292,10 +2283,6 @@ void DSHalAgent::DSHal_GetDolbyVolumeMode(IN const Json::Value& req, OUT Json::V
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDolbyVolumeMode -->Exit\n");
         return;
     }
-#endif
-    response["result"] = "FAILURE";
-    response["details"] = "GetDolbyVolumeMode API is not supported";
-    return;
 }
 /***************************************************************************
  *Function name : DSHal_SetResolution
@@ -2381,7 +2368,7 @@ void DSHalAgent::DSHal_GetResolution(IN const Json::Value& req, OUT Json::Value&
 	checkERROR(ret,&error);
         response["result"] = "FAILURE";
         response["details"] = "GetResolution call failed"+error;
-	DEBUG_PRINT(DEBUG_TRACE1, "Resolutions : %s",resolution.name);
+	DEBUG_PRINT(DEBUG_TRACE1, "Resolutions : %s",resolution);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetResolution call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetResolution -->Exit\n");
         return;
@@ -2431,9 +2418,6 @@ void DSHalAgent::DSHal_SetIntelligentEqualizerMode(IN const Json::Value& req, OU
         return;
     }
 
-
-/*Commented due to RDK code change "Revert "RDK-27413: Dolby MS12 Audio Control Configuration""*/
-#if 0
     int mode = req["mode"].asInt();
     dsError_t ret = dsERR_NONE;
 
@@ -2464,10 +2448,6 @@ void DSHalAgent::DSHal_SetIntelligentEqualizerMode(IN const Json::Value& req, OU
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetIntelligentEqualizerMode -->Exit\n");
         return;
     }
-#endif
-    response["result"] = "FAILURE";
-    response["details"] = "dsSetIntelligentEqualizerMode API is not supported";
-    return;
 }
 /***************************************************************************
  *Function name : DSHal_GetIntelligentEqualizerMode
@@ -2477,9 +2457,6 @@ void DSHalAgent::DSHal_GetIntelligentEqualizerMode(IN const Json::Value& req, OU
 {
     DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetIntelligentEqualizerMode --->Entry\n");
 
-
-/*Commented due to RDK code change "Revert "RDK-27413: Dolby MS12 Audio Control Configuration""*/    
-#if 0
     dsError_t ret = dsERR_NONE;
     int mode;
 
@@ -2511,10 +2488,6 @@ void DSHalAgent::DSHal_GetIntelligentEqualizerMode(IN const Json::Value& req, OU
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetIntelligentEqualizerMode -->Exit\n");
         return;
     }
-#endif 
-    response["result"] = "FAILURE";
-    response["details"] = "dsGetIntelligentEqualizerMode API is not supported";
-    return;
 }
 /***************************************************************************
  *Function name : DSHal_SetDialogEnhancement
@@ -2528,9 +2501,7 @@ void DSHalAgent::DSHal_SetDialogEnhancement(IN const Json::Value& req, OUT Json:
         return;
     }
 
-
-#if 0
-    //Level is within the range 1 to 15
+	//Level is within the range 1 to 15
     int level = req["level"].asInt();
     dsError_t ret = dsERR_NONE;
 
@@ -2561,10 +2532,6 @@ void DSHalAgent::DSHal_SetDialogEnhancement(IN const Json::Value& req, OUT Json:
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetDialogEnhancement -->Exit\n");
         return;
     }
-#endif
-    response["result"] = "FAILURE";
-    response["details"] = "dsSetDialogEnhancement API is not supported";
-    return;
 }
 /***************************************************************************
  *Function name : DSHal_GetDialogEnhancement
@@ -2574,11 +2541,9 @@ void DSHalAgent::DSHal_GetDialogEnhancement(IN const Json::Value& req, OUT Json:
 {
     DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDialogEnhancement --->Entry\n");
 
-
-/*Commented due to RDK code change "Revert "RDK-27413: Dolby MS12 Audio Control Configuration""*/
-#if 0
     dsError_t ret = dsERR_NONE;
     int level;
+
     ret = dsGetDialogEnhancement(apHandle, &level);
 
     if (ret == dsERR_NONE)
@@ -2607,10 +2572,6 @@ void DSHalAgent::DSHal_GetDialogEnhancement(IN const Json::Value& req, OUT Json:
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetDialogEnhancement -->Exit\n");
         return;
     }
-#endif 
-    response["result"] = "FAILURE";
-    response["details"] = "dsGetDialogEnhancement API is not supported";
-    return;
 }
 /***************************************************************************
  *Function name : DSHal_HdmiInSelectZoomMode
@@ -2725,7 +2686,7 @@ void DSHalAgent::DSHal_GetEDIDBytes(IN const Json::Value& req, OUT Json::Value& 
                edid.insert(edid.begin(), memguard.edidBytes, memguard.edidBytes + length);
                DEBUG_PRINT(DEBUG_TRACE, "\t Display [%s] has %d bytes EDID\r\n", "HDMI",  edid.size());
                 /* Dump the bytes */
-                for (unsigned int i = 0; i < edid.size(); i++) {
+                for (int i = 0; i < edid.size(); i++) {
                    if (i % 16 == 0) {
                        printf("\r\n");
                    }
@@ -2969,8 +2930,7 @@ void DSHalAgent::DSHal_GetAudioCompression(IN const Json::Value& req, OUT Json::
     dsError_t ret = dsERR_NONE;
     int audioCompression;
 
-/*Commented due to RDK code change "Revert "RDK-27413: Dolby MS12 Audio Control Configuration""*/
-    ret = dsGetAudioCompression(apHandle, (dsAudioCompression_t *)&audioCompression);
+    ret = dsGetAudioCompression(apHandle, &audioCompression);
 
     if (ret == dsERR_NONE)
     {
@@ -3005,8 +2965,8 @@ void DSHalAgent::DSHal_SetAudioCompression(IN const Json::Value& req, OUT Json::
 
     int audioCompression = req["audioCompression"].asInt();
     dsError_t ret = dsERR_NONE;
-/*Commented due to RDK code change "Revert "RDK-27413: Dolby MS12 Audio Control Configuration""*/
-    ret = dsSetAudioCompression(apHandle, (dsAudioCompression_t)audioCompression);
+
+    ret = dsSetAudioCompression(apHandle, audioCompression);
 
     if (ret == dsERR_NONE)
     {
