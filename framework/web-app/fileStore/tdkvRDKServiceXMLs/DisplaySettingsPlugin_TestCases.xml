@@ -38,6 +38,9 @@
                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" expectedValues="activated"/>
             </testStep>
           </prerequisite>
+          <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" >
+            <event pluginName="DisplaySettings" eventName="Event_Zoom_Settings_Updated" />
+          </prerequisite>
         </pluginPreRequisite>
        
         <testCase testCaseId="DS_01" testCaseName= "Check_Settop_Supported_Resolutions" desc="Check whether settop displays all supported resoltions">
@@ -181,6 +184,11 @@
               </subtestStep>
               <subtestStep subtestStepId="2" name="Get_Zoom_Setting" method="Get_Zoom_Setting" revertFlag="yes" >
                   <resultGeneration useMethodTag="check_zoom_settings" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Check_Zoom_Settings_Updated_Change_Event" event="Event_Zoom_Settings_Updated" action="eventListener" delay="3" >
+                  <resultGeneration useMethodTag="displaysettings_check_zoom_settings_updated_event" >
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>

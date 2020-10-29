@@ -158,6 +158,7 @@
                 <param tag="secondarydns" defaultValue="null"/>
             </params>
         </method>
+        <event name="Event_Interface_Status_Changed" eventName="onInterfaceStatusChanged" eventId="client.events.1" type="event" desc="Interface status changed  event" />
     </plugin>
 
 
@@ -603,13 +604,25 @@
         </method>
 
         <method name="GenerateKey" api="generateKey" type="method" desc="Triggers key events like key press and release" >
-            <params>
-                <param tag="keys" defaultValue="null"/>
+            <params paramKey="keys" paramType="userGenerate" useMethodTag="rdkshell_set_keys_params">
+                <param tag="keyCode" defaultValue="0" type="int" />
+                <param tag="modifiers" defaultValue="" type="list" />
+                <param tag="delay" defaultValue="0.0" type="float"/>
             </params>
         </method>
 
-        <method name="LaunchApplication" api="launch" type="method" desc="Launches an application"/>
-        <!-- need to add input params -->
+
+        <method name="LaunchApplication" api="launch" type="method" desc="Launches an application" >
+            <params>
+                <param tag="callsign"  />
+                <param tag="type" defaultValue="HtmlApp" />
+                <param tag="uri" defaultValue="null" />
+                <param tag="x" defaultValue="0" type="int" />
+                <param tag="y" defaultValue="0" type="int" />
+                <param tag="w" defaultValue="0" type="int" />
+                <param tag="h" defaultValue="0" type="int" />
+            </params>
+        </method>
 
         <method name="SuspendApplication" api="suspend" type="method" desc="Suspend an application" >
             <params>
@@ -640,6 +653,15 @@
             <expectedValues>HdcpUnencrypted,Hdcp1X,Hdcp2X</expectedValues>
         </method>
         <method name="DisplayInfo_GetPortname" api="portname" type="property" desc="Get Video output port on the STB used for connection to TV"/>
+        <method name="DisplayInfo_GetHDRFormatsTV" api="tvcapabilities" type="property" desc="Gets HDR formats supported by TV" >
+            <expectedValues>HdrOff,Hdr10,Hdr10Plus,HdrHlg,HdrDolbyvision,HdrTechnicolor</expectedValues>
+        </method>
+        <method name="DisplayInfo_GetHDRFormatsSTB" api="stbcapabilities" type="property" desc="Gets HDR formats supported by STB" >
+            <expectedValues>HdrOff,Hdr10,Hdr10Plus,HdrHlg,HdrDolbyvision,HdrTechnicolor</expectedValues>
+        </method>
+        <method name="DisplayInfo_GetHDRFormatInUse" api="hdrsetting" type="property" desc="Gets HDR format in use" >
+            <expectedValues>HdrOff,Hdr10,Hdr10Plus,HdrHlg,HdrDolbyvision,HdrTechnicolor</expectedValues>
+        </method>
     </plugin>
 
 
@@ -1085,8 +1107,99 @@
                 <param tag="scartParameterData"  defaultValue="null" />
             </params>
         </method>
+        <event name="Event_Zoom_Settings_Updated" eventName="zoomSettingUpdated" eventId="client.events.1" type="event" desc="Zoom settings updated event "/>
     </plugin>
 
+    <!-- Messenger Plugin Information -->
+    <plugin pluginName="Messenger" serviceName="Messenger" serviceVersion="1">
+        <method name="Messenger_Join" api="join" type="method" desc="Used to join a room">
+            <params>
+                <param tag="user" type="string" />
+                <param tag="room" type="string" />
+            </params>
+        </method>
+        <method name="Messenger_Leave" api="leave" type="method" desc="Used to leave a messaging room">
+            <params>
+                <param tag="roomid" type="string" />
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Messenger_Send" api="send" type="method" desc="Sends a message to a room">
+            <params>
+                <param tag="roomid" type="string" />
+                <param tag="message" type="string" />
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+    </plugin>
+
+    <!-- Monitor Plugin Information -->
+    <plugin pluginName="Monitor" serviceName="Monitor" serviceVersion="1">
+        <method name="Reset_Statistics" api="resetstats" type="method" desc="Resets memory and process statistics for a single service watched by the Monitor">
+            <params>
+                <param tag="callsign" type="string" />
+            </params>
+        </method>
+        <method name="Restart_Limits"  api="restartlimits" type="method" desc="Sets new restart limits for a service" >
+            <params paramType="userGenerate" useMethodTag="monitor_get_restart_params" >
+                <param tag="callsign" defaultValue="null" type="string" />
+                <param tag="limit" defaultValue="null" type="int" />
+                <param tag="window" defaultValue="null" type="int" />
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Get_Status" api="status"  type="property" desc="Provides access to the service statistics" />
+    </plugin>
+
+    <!-- ScreenCapture Plugin Information -->
+    <plugin pluginName="ScreenCapture" serviceName="org.rdk.ScreenCapture" serviceVersion="1">
+        <method name="Upload_SCreen_Capture" api="uploadScreenCapture" type="method" desc="Takes screenshot and uploads it to the specified url">
+            <params>
+                <param tag="url" type="string" />
+            </params>
+        </method>
+        <event name="Event_Upload_Complete" eventName="uploadComplete" eventId="client.events.1" type="event" desc="Fired after an upload of screen capture" />
+    </plugin>
+ 
+    <!-- Timer Plugin Information -->
+    <plugin pluginName="Timer" serviceName="org.rdk.Timer" serviceVersion="1">
+        <method name="Start_Timer" api="startTimer" type="method" desc="Starts the timer" >
+            <params>
+                <param tag="interval" defaultValue="15" type="int"/>
+                <param tag="mode" defaultValue="GENERIC" />
+                <param tag="repeatInterval" defaultValue="0" type="int"/>
+                <param tag="remindBefore" defaultValue="0" type="int"/>
+            </params>
+        </method>
+        <method name="Get_Timer_Status" api="getTimerStatus" type="method" desc="Gets the timer status" >
+            <params>
+                <param tag="timerId" defaultValue="null" type="int" />
+            </params>
+        </method>
+        <method name="Cancel_Timer" api="cancel" type="method" desc="Cancels the timer" >
+            <params>
+                <param tag="timerId" defaultValue="null" type="int" />
+            </params>
+        </method>
+        <method name="Suspend_Timer" api="suspend" type="method" desc="suspends the timer" >
+            <params>
+                <param tag="timerId" defaultValue="null" type="int" />
+            </params>
+        </method>
+        <method name="Resume_Timer" api="resume" type="method" desc="Resumes the timer" >
+            <params>
+                <param tag="timerId" defaultValue="null" type="int" />
+            </params>
+        </method>
+        <method name="Get_Timers_Status" api="getTimers" type="method" desc="Gets all the timer status" >
+            <params>
+                <param tag="timerId" defaultValue="null" type="int" />
+            </params>
+        </method>
+        <event name="Event_Timer_Expired" eventName="timerExpired" eventId="client.events.1" type="event" desc="Timer expired event" />
+        <event name="Event_Timer_Expiry_Reminder" eventName="timerExpiryReminder" eventId="client.events.1" type="event" desc="Timer expiry reminder event" />
+    </plugin>
+    
 </thunderPlugins>
 
 

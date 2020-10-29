@@ -174,7 +174,7 @@
 
 
         <!-- Test case 09 -->
-       <testCase testCaseId="DISP_09" testCaseName="DisplayInfo_ActivateDeactivate_STRESS" desc="Activates and deactivates the plugin">
+        <testCase testCaseId="DISP_09" testCaseName="DisplayInfo_ActivateDeactivate_STRESS" desc="Activates and deactivates the plugin">
              <testCaseInfo testCaseType="stress" configurableRepeat="true" repeatKey="STRESS_TEST_REPEAT_COUNT" />
 
              <testCasePreRequisite>
@@ -222,8 +222,30 @@
                   <resultGeneration useMethodTag="deviceinfo_get_system_info" arguments="check_cpu_load" />
               </subtestStep>
             </testStep>
-    </testCase>
+        </testCase>
+       <!-- Test case 10 -->
+        <testCase testCaseId="DISP_10" testCaseName= "DisplayInfo_GET_HDR_Formats_TV" desc="Gets the HDR formats supported by TV">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="GetHDRFormatsTV" method="DisplayInfo_GetHDRFormatsTV">
+                <resultGeneration useMethodTag="displayinfo_validate_hdr_formats" />
+            </testStep>
+        </testCase>
+     <!-- Test case 11 -->
+        <testCase testCaseId="DISP_11" testCaseName= "DisplayInfo_GET_HDR_Formats_STB" desc="Gets the HDR formats supported by STB">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="GetHDRFormatsSTB" method="DisplayInfo_GetHDRFormatsSTB">
+                <resultGeneration useMethodTag="displayinfo_validate_hdr_formats" />
+            </testStep>
+        </testCase>
+     <!-- Test case 12 -->
+        <testCase testCaseId="DISP_12" testCaseName= "DisplayInfo_GET_HDR_Format_In_Use" desc="Gets the HDR formats in use">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="GetHDRFormatInUse" method="DisplayInfo_GetHDRFormatInUse">
+                <resultGeneration useMethodTag="displayinfo_validate_hdr_format_in_use" />
+            </testStep>
+        </testCase>
 
+    
 </testPlugin>
 
 
