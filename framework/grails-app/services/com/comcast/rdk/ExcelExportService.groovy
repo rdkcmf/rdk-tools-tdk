@@ -118,6 +118,27 @@ class ExcelExportService {
 		exporter.exportComparisonData(outputStream, dataMap)
 	}
 	
+	/**
+	 * Method to export consolidated excel report for RDK service executions
+	 * @param type
+	 * @param outputStream
+	 * @param dataMap
+	 * @param fields
+	 * @param labels
+	 * @param formatters
+	 * @param parameters
+	 * @throws ExportingException
+	 */
+	public void exportRDKService(String type, OutputStream outputStream, Map dataMap, List fields, Map labels, Map formatters, Map parameters) throws ExportingException {
+		ExcelExporter exporter = new ExcelExporter()
+		if(labels){
+			exporter.setLabels(labels)
+		}
+		if(parameters){
+			exporter.setParameters(parameters)
+		}
+		exporter.exportRDKServiceData(outputStream, dataMap)
+	}
 	
 	
 }

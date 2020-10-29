@@ -2174,15 +2174,40 @@ class ExecutionController {
 		Map fieldMap = [:]
 		Map parameters = [:]
 		List columnWidthList = [0.08,0.4,0.15,0.2,0.15,0.8,0.2,0.2,0.2,0.8]
-
+		boolean isRDKServiceExecution
+		boolean isPatternPresent = false
 		Execution executionInstance = Execution.findById(params.id)
 		String executionInstanceStatus ;
 		executionInstanceStatus =executedbService?.isValidExecutionAvailable(executionInstance)
 		if(executionInstanceStatus?.equals(Constants.SUCCESS_STATUS)){
 			if(executionInstance){
-				dataMap = executedbService.getDataForConsolidatedListExcelExport(executionInstance, getRealPath(),getApplicationUrl())
-				fieldMap = ["C1":" Sl.No ", "C2":" Script Name ","C3":"Executed","C4":" Status ", "C5":"Executed On ","C6":"Log Data","C7":"Jira #","C8":"Issue Type","C9":"Remarks","C10":" Agent Console Log"]
+				ExecutionDevice executionDevice  = ExecutionDevice.findByExecution(executionInstance)
+				List executionResultList =  ExecutionResult.findAllByExecutionAndExecutionDevice(executionInstance,executionDevice)
+				for(int i=0;i<executionResultList.size();i++){
+					ScriptFile scriptfile = ScriptFile.findByScriptName(executionResultList[i]?.script)
+					String executionResultOutput = executionResultList[i]?.executionOutput
+					if(scriptfile){
+						if(scriptfile?.category?.toString()?.equals(RDKV_RDKSERVICE?.toString())){
+							if(executionResultOutput.contains("[Pre-requisite Status]")) {
+								isPatternPresent = true
+							}
+							isRDKServiceExecution = true
+						}else{
+							isRDKServiceExecution = false
+							break;
+						}
+					}
+				}
+				if(isRDKServiceExecution && isPatternPresent){
+					columnWidthList = [0.08,0.4,0.15,0.9]
+					dataMap = executedbService.getDataForRDKServiceConsolidatedListExcelExport(executionInstance, getRealPath(),getApplicationUrl())
+					fieldMap = ["C1":" Sl.No ", "C2":" Test Case Name ","C3":"Status","C4":" Log Data ","C5":"Jira #","C6":"Issue Type","C7":"Remarks"]
+				}else{
+					dataMap = executedbService.getDataForConsolidatedListExcelExport(executionInstance, getRealPath(),getApplicationUrl())
+					fieldMap = ["C1":" Sl.No ", "C2":" Script Name ","C3":"Executed","C4":" Status ", "C5":"Executed On ","C6":"Log Data","C7":"Jira #","C8":"Issue Type","C9":"Remarks","C10":" Agent Console Log"]
+				}
 				parameters = [ title: EXPORT_SHEET_NAME, "column.widths": columnWidthList]
+
 			}
 			else{
 				log.error "Invalid excution instance......"
@@ -2194,7 +2219,11 @@ class ExecutionController {
 			def fileName = executionInstance.name
 			fileName = fileName?.replaceAll(" ","_")
 			response.setHeader("Content-disposition", "attachment; filename="+EXPORT_FILENAME+ fileName +".${params.extension}")
-			excelExportService.export(params.format, response.outputStream,dataMap, null,fieldMap,[:], parameters)
+			if(isRDKServiceExecution && isPatternPresent){
+				excelExportService.exportRDKService(params.format, response.outputStream,dataMap, null,fieldMap,[:], parameters)
+			}else{
+				excelExportService.export(params.format, response.outputStream,dataMap, null,fieldMap,[:], parameters)
+			}
 			log.info "Completed excel export............. "
 		}
 		else{
