@@ -24,6 +24,7 @@ import groovy.xml.MarkupBuilder
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Service class of ExecutionController 
@@ -1013,6 +1014,222 @@ class ExecutedbService {
 	}
 
 	/**
+	 * Method to generate the data for creating the consolidated report for RDK service
+	 * executions in excel format.
+	 */
+	def getDataForRDKServiceConsolidatedListExcelExport(Execution executionInstance, String realPath,String appUrl) {
+		List executionResultList = []
+		def detailDataMap = [:]
+		def coverPageMap = [:]
+		List fieldList = ["C1", "C2", "C3", "C4","C5","C6","C7"]
+		ExecutionDevice executionDevice  = ExecutionDevice.findByExecution(executionInstance)
+		executionResultList =  ExecutionResult.findAllByExecutionAndExecutionDevice(executionInstance,executionDevice)
+		Map detailsMap = [:]
+		String image = ""
+		detailsMap.put("Device", executionDevice?.device)
+		detailsMap.put("DeviceIP", executionDevice?.deviceIp)
+		def executionTime = executionInstance?.realExecutionTime
+		executionTime = executionTimeFormat (executionTime)
+		detailsMap.put("Execution Time (min)", executionTime)
+		if(executionDevice?.buildName){
+			image = executionDevice?.buildName
+		}else{
+			image = "Image name not available"
+		}
+		detailsMap.put("Image", image)
+		coverPageMap.put("Details",detailsMap)
+		detailDataMap.put("CoverPage", coverPageMap)
+		int counter = 1
+		int totalCount = 0;
+		int totalExecutedCount = 0;
+		int totalSuccessCount = 0;
+		int totalFailureCount = 0;
+		int totalNaCount = 0;
+		int totalTestCaseCount = 0;
+		int totalTestCaseSuccessCount = 0;
+		int totalTestCaseNaCount = 0;
+		int rate = 0;
+		int scriptCounter = 1
+		def scriptList = []
+		Map scriptMapList = [:]
+		executionResultList.each{ executionResult ->
+			def dataList = []
+			def preRequisiteList = []
+			def postRequisiteList = []
+			Map dataMapList = [:]
+			String executionResultOutput = executionResult?.executionOutput
+			if(executionResultOutput){
+				if(executionResultOutput.contains("Test Execution Name is:") && executionResultOutput.contains("Connected to Server!") && executionResultOutput.contains("[Pre-requisite Status]")) {
+					String pluginNameSummary = StringUtils.substringBetween(executionResultOutput, "PLUGIN NAME :", "Final Plugin Tests Status:");
+					String pluginName = StringUtils.substringBetween(executionResultOutput, "PLUGIN NAME :", "<br/>");
+					pluginName = pluginName?.trim()?.toLowerCase()
+					//For generating summary of plugin test cases in summary page
+					if(pluginNameSummary){
+						String totalTests = StringUtils.substringBetween(pluginNameSummary, "TOTAL TESTS    :", "<br/>");
+						if(totalTests){
+							totalTests = totalTests?.trim()
+							totalCount = totalCount + totalTests?.toInteger()
+						}else{
+							totalTests = 0
+						}
+						String executedTests = StringUtils.substringBetween(pluginNameSummary, "EXECUTED TESTS :", "<br/>");
+						if(executedTests){
+							executedTests = executedTests?.trim()
+							totalExecutedCount = totalExecutedCount + executedTests?.toInteger()
+						}else{
+							executedTests = 0
+						}
+						String passedTests = StringUtils.substringBetween(pluginNameSummary, "PASSED TESTS   :", "<br/>");
+						if(passedTests){
+							passedTests = passedTests?.trim()
+							totalSuccessCount = totalSuccessCount + passedTests?.toInteger()
+						}else{
+							passedTests = 0
+						}
+						String failedTests = StringUtils.substringBetween(pluginNameSummary, "FAILED TESTS   :", "<br/>");
+						if(failedTests){
+							failedTests = failedTests?.trim()
+							totalFailureCount = totalFailureCount + failedTests?.toInteger()
+						}else{
+							failedTests = 0
+						}
+						String naTests = StringUtils.substringBetween(pluginNameSummary, "N/A TESTS      :", "<br/>");
+						if(naTests){
+							naTests = naTests?.trim()
+							totalNaCount = totalNaCount + naTests?.toInteger()
+						}else{
+							naTests = 0
+						}
+						def pluginMap = [:]
+						pluginMap.put("Sl No", counter)
+						pluginMap.put("Plugins", pluginName)
+						pluginMap.put("Total Test Case", totalTests?.toInteger())
+						pluginMap.put("Executed", executedTests?.toInteger())
+						pluginMap.put(Constants.SUCCESS_STATUS, passedTests?.toInteger())
+						pluginMap.put(Constants.FAILURE_STATUS, failedTests?.toInteger())
+						pluginMap.put(Constants.NOT_APPLICABLE_STATUS, naTests?.toInteger())
+						coverPageMap.put(pluginName,pluginMap)
+						counter++
+					}else{
+						def pluginMap = [:]
+						pluginMap.put("Sl No", counter)
+						pluginMap.put("Plugins", pluginName)
+						pluginMap.put("Total Test Case", 0)
+						pluginMap.put("Executed", 0)
+						pluginMap.put(Constants.SUCCESS_STATUS, 0)
+						pluginMap.put(Constants.FAILURE_STATUS, 0)
+						pluginMap.put(Constants.NOT_APPLICABLE_STATUS, 0)
+						coverPageMap.put(pluginName,pluginMap)
+						counter++
+					}
+					//For getting plugin prerequisites
+					int c2Counter = 1
+					String preRequisiteBlock = StringUtils.substringBetween(executionResultOutput, "#---------------------------- Plugin Pre-requisite ----------------------------#", "Plugin Pre-requisite Status:")
+					if(preRequisiteBlock){
+						List preRequisiteNameList = StringUtils.substringsBetween(preRequisiteBlock, "Pre Requisite :", "<br/>")
+						if(preRequisiteNameList){
+							preRequisiteNameList.each{ preRequisiteName ->
+								preRequisiteName = preRequisiteName?.toString()?.trim()
+								String preRequisiteDetails = StringUtils.substringBetween(preRequisiteBlock, preRequisiteName, "----------#")
+								if(preRequisiteDetails){
+									String preRequisiteStatus = preRequisiteDetails.substring(preRequisiteDetails?.indexOf("[Pre-requisite Status] :") + 25 , preRequisiteDetails?.length());
+									String preRequisiteOutput = preRequisiteDetails?.replace(HTML_BR, NEW_LINE)
+									Map preRequisiteMap =["C1":c2Counter,"C2":preRequisiteName,"C3":preRequisiteStatus,"C4":preRequisiteOutput,"C5":"","C6":"","C7":""]
+									preRequisiteList.add(preRequisiteMap)
+									c2Counter++
+								}
+							}
+						}
+					}
+					
+					//For getting the test cases of each plugin
+					List testCaseNameList = StringUtils.substringsBetween(executionResultOutput, "TEST CASE NAME   :", "<br/>")
+					int c1Counter = 1
+					if(testCaseNameList){
+						testCaseNameList.each{ testCaseName ->
+							totalTestCaseCount++
+							testCaseName = testCaseName?.toString()?.trim()
+							String testCaseDetails = StringUtils.substringBetween(executionResultOutput, testCaseName, "----------##")
+							if(testCaseDetails){
+								String testCaseStatus = testCaseDetails.substring(testCaseDetails?.indexOf("[TEST EXECUTION STATUS] :") + 25 , testCaseDetails?.length());
+								testCaseStatus = testCaseStatus?.trim()
+								if(Constants.SUCCESS_STATUS.equals(testCaseStatus)){
+									totalTestCaseSuccessCount++
+								}else if(Constants.NOT_APPLICABLE_STATUS.equals(testCaseStatus)){
+									totalTestCaseNaCount++
+								}
+								String testCaseOutput = testCaseDetails?.replace(HTML_BR, NEW_LINE)
+								Map dataMap =["C1":c1Counter,"C2":testCaseName,"C3":testCaseStatus,"C4":testCaseOutput,"C5":"","C6":"","C7":""]
+								dataList.add(dataMap)
+								c1Counter++
+							}
+						}
+					}	
+					//For getting plugin post-requisites
+					int c3Counter = 1
+					String postRequisiteBlock = StringUtils.substringBetween(executionResultOutput, "#---------------------------- Plugin Post-requisite ----------------------------#", "Plugin Post-requisite Status:")
+					if(postRequisiteBlock){
+						List postRequisiteNameList = StringUtils.substringsBetween(postRequisiteBlock, "Post Requisite :", "<br/>")
+						if(postRequisiteNameList){
+							postRequisiteNameList.each{ postRequisiteName ->
+								postRequisiteName = postRequisiteName?.toString()?.trim()
+								String postRequisiteDetails = StringUtils.substringBetween(postRequisiteBlock, postRequisiteName, "----------#")
+								if(postRequisiteDetails){
+									String postRequisiteStatus = postRequisiteDetails.substring(postRequisiteDetails?.indexOf("[Post-requisite Status] :") + 26 , postRequisiteDetails?.length());
+									String postRequisiteOutput = postRequisiteDetails?.replace(HTML_BR, NEW_LINE)
+									Map postRequisiteMap =["C1":c3Counter,"C2":postRequisiteName,"C3":postRequisiteStatus,"C4":postRequisiteOutput,"C5":"","C6":"","C7":""]
+									postRequisiteList.add(postRequisiteMap)
+									c3Counter++
+								}
+							}
+						}
+					}
+					dataMapList.put("dataList",dataList)
+					dataMapList.put("preRequisiteList",preRequisiteList)
+					dataMapList.put("postRequisiteList",postRequisiteList)
+					String logLink = appUrl+"/execution/getExecutionOutput?execResId="+executionResult?.id
+					dataMapList.put("logLink",logLink)
+					dataMapList.put("fieldsList",fieldList)
+					detailDataMap.put(pluginName,dataMapList)
+				}else{
+					String output = executionResult?.executionOutput
+					String executionOutput
+					if(output){
+						executionOutput = output.replace(HTML_BR, NEW_LINE)
+						if(executionOutput && executionOutput.length() > 10000){
+							executionOutput = executionOutput.substring(0, 10000)
+						}
+					}
+					def countOfExecutionOutput = executionOutput?.size()
+					String executionLogData = executionOutput
+					if(countOfExecutionOutput >= 1000 ){
+						executionLogData = executionOutput+"\n More data use this link ....... \n " +appUrl+"/execution/getExecutionOutput?execResId="+executionResult?.id
+					}
+					Map scriptMap =["C1":scriptCounter,"C2":executionResult?.script,"C3":executionResult?.status,"C4":executionLogData,"C5":"","C6":"","C7":""]
+					scriptList.add(scriptMap)
+					scriptCounter++
+				}
+			}
+		}
+		scriptMapList.put("fieldsList",fieldList)
+		scriptMapList.put("rdkserviceScripts",scriptList)
+		detailDataMap.put("rdkservices",scriptMapList)
+		if(totalTestCaseCount!=totalTestCaseNaCount){
+			rate =totalTestCaseSuccessCount*100/(totalTestCaseCount-totalTestCaseNaCount)
+		}
+		Map totalMap = [:]
+		totalMap.put("Sl No", "")
+		totalMap.put("Plugins", "Total")
+		totalMap.put("Total Test Case", totalCount)
+		totalMap.put("Executed", totalExecutedCount)
+		totalMap.put(Constants.SUCCESS_STATUS, totalSuccessCount)
+		totalMap.put(Constants.FAILURE_STATUS, totalFailureCount)
+		totalMap.put(Constants.NOT_APPLICABLE_STATUS, totalNaCount)
+		coverPageMap.put("Total",totalMap)
+		coverPageMap.put(Constants.OVERALL_PASS_RATE, rate)
+		return detailDataMap
+	}
+	/**
 	 * Method to get the data for creating the consolidated report in excel format.
 	 */
 	def getDataForConsolidatedListExcelExport(Execution executionInstance, String realPath,String appUrl) {
@@ -1036,7 +1253,6 @@ class ExecutedbService {
 		Map summaryHead = [:]
 		Map statusValue = [:]
 		List fieldList = ["C1", "C2", "C3", "C4", "C5","C6","C7","C8","C9","C10"]
-
 
 		executionDeviceList = ExecutionDevice.findAllByExecution(executionInstance)
 		def detailDataMap = [:]
