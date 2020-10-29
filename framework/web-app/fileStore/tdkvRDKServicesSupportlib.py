@@ -710,6 +710,21 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "displayinfo_validate_hdr_formats":
+            info = checkAndGetAllResultInfo(result)
+            status = [ "FALSE" for form in result if form not in expectedValues ]
+            if "FALSE" not in status:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "displayinfo_validate_hdr_format_in_use":
+            info = checkAndGetAllResultInfo(result)
+            if str(result) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
         # Parser Code for ActivityMonitor plugin
         elif tag == "activitymonitor_check_applications_memory":
             info = checkAndGetAllResultInfo(result,result.get("success"))
@@ -1255,6 +1270,65 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
         elif tag == "datacapture_get_audio_clip":
             info = checkAndGetAllResultInfo (result,result.get("success"))
 
+        # Timer Plugin Response result parser steps
+        elif tag == "timer_check_results":
+            info = checkAndGetAllResultInfo (result,result.get("success"))
+
+        elif tag == "timer_check_timer_status":
+            info["state"] = result.get("state")
+            success = str(result.get("success")).lower() == "true"
+            if success and str(result.get("state")) in expectedValues:
+                 info["Test_Step_Status"] = "SUCCESS"
+            else:
+                 info["Test_Step_Status"] = "FAILURE"
+
+
+
+        # Messenger Plugin Response result parser steps
+        elif tag == "messenger_join_room":
+            info["roomid"] = result.get("roomid")
+            if not str(result.get("roomid")):
+                info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "SUCCESS"
+
+        elif tag == "Messenger_check_leave_response":
+            if result== None:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        # Monitor Plugin Response result parser steps
+        elif tag == "monitor_get_result_data":
+            measurement_keys = ["resident", "allocated", "shared", "process"]
+            measurements =  result.get("measurements")
+            status = []
+            measurement_detail = []
+            for key in measurement_keys:
+                detail = []
+                detail.append(key)
+                detail.append(measurements.get(key).get("min"))
+                detail.append(measurements.get(key).get("max"))
+                detail.append(measurements.get(key).get("average"))
+                detail.append(measurements.get(key).get("last"))
+                status.append(checkNonEmptyResultData(detail))
+                measurement_detail.append("Name:"+str(detail[0])+",Min:"+str(detail[1])+",Max:"+str(detail[2])+",Average:"+str(detail[3])+",Last:"+str(detail[3]))
+            info["measurements"] = measurement_detail
+            info["observable"] = result.get("observable")
+            info["restart_limit"] = result.get("restart").get("limit")
+            info["restart_window"] = result.get("restart").get("window")
+
+            if "FALSE" not in status:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        # ScreenCapture Plugin Response result parser steps
+        elif tag == "screencapture_upload_screen":
+            if str(result.get("success")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_state":
@@ -1805,6 +1879,17 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             else:
                   info["keystrokeMaskEnabled"] = False
 
+        #Timer Plugin Response result parser steps
+        elif tag == "timer_start_timer_result":
+            testStepResults = testStepResults[0].values()[0]
+            info["timerId"] = testStepResults[0].get("timerId")
+
+
+        # Messenger Plugin Response result parser steps
+        elif tag == "messenger_get_roomid":
+            testStepResults = testStepResults[0].values()[0]
+            info["roomid"] = testStepResults[0].get("roomid")
+
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_name":
             testStepResults = testStepResults[0].values()[0]
@@ -1932,6 +2017,8 @@ def generateComplexTestInputParam(methodTag,testParams):
             userGeneratedParam = testParams
         elif tag == "webkitbrowser_get_header_params":
             userGeneratedParam = [testParams]
+        elif tag == "monitor_get_restart_params":
+            userGeneratedParam = { "callsign": testParams.get("callsign"), "restart": { "limit": testParams.get("limit") ,  "window": testParams.get("window") }}
 
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)

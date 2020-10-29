@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<testPlugin pluginName="Monitor" pluginVersion="1">
+
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="Monitor" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,Monitor" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,Monitor" />
+                <params>
+                  <param tag="callsign" value="Monitor" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,Monitor" />
+                <params>
+                  <param tag="plugin" value="Monitor" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,Monitor" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+
+        </pluginPreRequisite>
+
+        <testCase testCaseId="MN_01" testCaseName= "Monitor_Reset_Statistics"  desc="Resets memory and process statistics for a single service">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Reset_Statistics" method="Reset_Statistics" saveResult="true">
+                <params>
+                  <param tag="callsign"  value="WebKitBrowser"/>
+                </params>
+              <resultGeneration useMethodTag="monitor_get_result_data" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="MN_02" testCaseName= "Monitor_Get_Status"  desc="Lists the service statistics">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Get_Status" method="Get_Status" saveResult="true">
+                <params>
+                  <param tag="plugin" value="WebKitBrowser" indexOnly="true" />
+                </params>
+              <resultGeneration useMethodTag="monitor_get_result_data" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="MN_03" testCaseName= "Monitor_Restart_Limits"  desc="Sets new restart limits for a service">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Restart_Limits" method="Restart_Limits" saveResult="true">
+                <params>
+                  <param tag="callsign"  value="WebKitBrowser"/>
+                  <param tag="limit"  value="3"/>
+                  <param tag="window"  value="60"/>
+                </params>
+            </testStep>
+        </testCase>
+
+</testPlugin>
+

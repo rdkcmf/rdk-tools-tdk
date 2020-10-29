@@ -120,9 +120,7 @@
               <resultGeneration useMethodTag="datacapture_get_audio_clip" />
             </testStep>
             <testStep testStepId="6"  name="Check_On_AudioClip_Ready_Event" event="Event_On_AudioClip_Ready" action="eventListener"  >
-              <resultGeneration useMethodTag="datacapture_check_on_audioclip_ready_event" >
-                <expectedValues>True</expectedValues>
-              </resultGeneration>
+              <resultGeneration useMethodTag="datacapture_check_on_audioclip_ready_event" expectedValues="True" />
             </testStep>
         </testCase>
 </testPlugin>

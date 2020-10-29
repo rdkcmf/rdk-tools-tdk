@@ -314,6 +314,42 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        # DisplaySettings Events response result parser steps
+        elif tag == "displaysettings_check_zoom_settings_updated_event":
+            result = result[0]
+            info = result
+            if str(result.get("zoomSetting")) in  expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+       
+        # Timer Events response result parser steps
+        elif tag == "timer_check_timer_expired_event":
+            result = result[0]
+            info = result
+            if int(result.get("status")) ==  int(expectedValues[0]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "timer_check_timer_expiry_reminder_event":
+            result = result[0]
+            info = result
+            if int(result.get("timeRemaining")) <= int(expectedValues[0]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        # Network Events response result parser steps
+        elif tag == "network_check_interface_status_change_event":
+            result = result[0]
+            info = result
+            if str(result.get("enabled")) in  expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+  
         # DataCapture Events response result parser steps
         elif tag == "datacapture_check_on_audioclip_ready_event":
             result = result[0]
