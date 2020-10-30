@@ -209,7 +209,7 @@ def executeTestCases(testCaseID="all"):
     # Get the testPlugin node information such as pluginName and PluginVersion
     testPluginInfo = getTestPluginInfo(testPlugin)
     print "\n####################################################################################"
-    print "                             %s PLUGIN   " %(testPluginInfo.get("pluginName").upper())
+    print "              PLUGIN NAME :  %s   " %(testPluginInfo.get("pluginName").upper())
     print "####################################################################################\n"
 
     global testStepJSONCmd
@@ -239,9 +239,11 @@ def executeTestCases(testCaseID="all"):
 
     if testPlugin.find("pluginPreRequisite") is not None:
         print "#---------------------------- Plugin Pre-requisite ----------------------------#"
-        pluginPreRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPreRequisite"))
+        pluginPreRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPreRequisite"),"Pre")
         if "FAILURE" in pluginPreRequisiteStatus:
             print "\nPlugin Pre-requisite Status: FAILURE"
+            totalTests = len(testPlugin.findall("testCase"))
+            dispTestSummary(testPluginInfo.get("pluginName").upper(),totalTests,0,0,0,0)
             return pluginPreRequisiteStatus
         else:
             print "\nPlugin Pre-requisite Status: SUCCESS"
@@ -283,6 +285,7 @@ def executeTestCases(testCaseID="all"):
                 if status == "SUCCESS" and testCaseApplicability == "FALSE":
                     print "\n This test case is N/A, proceeding to next test"
                     pluginTestsSummary.append({"testCaseName":testCaseInfo.get("testCaseName"), "testCaseId":testCaseInfo.get("testCaseId"), "status":"N/A"})
+                    print "\n##--------- [TEST EXECUTION STATUS] : N/A ----------##"
                     continue;
                 elif status == "FAILURE":
                     print "\nError Occurred while checking test case applicability\n"
@@ -291,6 +294,7 @@ def executeTestCases(testCaseID="all"):
 
             if status == "FAILURE":
                 pluginTestsSummary.append({"testCaseName":testCaseInfo.get("testCaseName"), "testCaseId":testCaseInfo.get("testCaseId"), "status":"FAILURE"})
+                print "\n##--------- [TEST EXECUTION STATUS] : FAILURE ----------##"
                 continue;
 
 
@@ -309,7 +313,7 @@ def executeTestCases(testCaseID="all"):
 
         if testCase.find("testCasePreRequisite") is not None:
             print "\n#-------------- Test Case Pre-Requisite ---------------#"
-            testCasePreRequisiteStatus = executePrePostRequisite(testCase.find("testCasePreRequisite"))
+            testCasePreRequisiteStatus = executePrePostRequisite(testCase.find("testCasePreRequisite"),"Pre")
             if "FAILURE" in testCasePreRequisiteStatus:
                 pluginTestsSummary.append({"testCaseName":testCaseInfo.get("testCaseName"), "testCaseId":testCaseInfo.get("testCaseId"), "status":"FAILURE"})
                 print "\nTest Case Pre-requisite Status: FAILURE\n"
@@ -454,9 +458,9 @@ def executeTestCases(testCaseID="all"):
                 allTestStepStatus.append("FAILURE")
 
         if "FAILURE" in allTestStepStatus:
-            print "\n#--------- [TEST EXECUTION STATUS] : FAILURE ----------#\n"
+            print "\n##--------- [TEST EXECUTION STATUS] : FAILURE ----------##\n"
         else:
-            print "\n#--------- [TEST EXECUTION STATUS] : SUCCESS ----------#\n"
+            print "\n##--------- [TEST EXECUTION STATUS] : SUCCESS ----------##\n"
 
 
         testStepResults = []
@@ -469,7 +473,7 @@ def executeTestCases(testCaseID="all"):
 
         if testCase.find("testCasePostRequisite") is not None:
             print "\n#-------------- Test Case Post-Requisite --------------#"
-            testCasePostRequisiteStatus = executePrePostRequisite(testCase.find("testCasePostRequisite"))
+            testCasePostRequisiteStatus = executePrePostRequisite(testCase.find("testCasePostRequisite"),"Post")
             if "FAILURE" in testCasePostRequisiteStatus:
                 print "\nTest Case Post-requisite Status: FAILURE\n"
             else:
@@ -505,18 +509,19 @@ def executeTestCases(testCaseID="all"):
     if testPlugin.find("pluginPostRequisite") is not None or eventListener is not None:
         print "\n#---------------------------- Plugin Post-requisite ----------------------------#"
         if testPlugin.find("pluginPostRequisite") is not None:
-            pluginPostRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPostRequisite"))
+            pluginPostRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPostRequisite"),"Post")
             postRequisiteCount = 0
             for requisite in testPlugin.find("pluginPostRequisite"):
                 postRequisiteCount += 1
         else:
             postRequisiteCount = 0
         if eventListener is not None:
-            print "\nPre/Post Requisite : UnRegister_Events"
-            print "Requisite No : %d" %(int(postRequisiteCount) + 1)
+            print "\nPost Requisite : UnRegister_Events"
+            print "Post Requisite No : %d" %(int(postRequisiteCount) + 1)
             print "------------- Event-Handling -------------"
             eventListener.disconnect()
             unRegisterStatus = getEventsUnRegistrationInfo()
+            print "\n#--------- [Post-requisite Status] : %s ----------#" %(unRegisterStatus[0])
             pluginPostRequisiteStatus.extend(unRegisterStatus)
 
         if "FAILURE" in pluginPostRequisiteStatus:
@@ -540,10 +545,11 @@ def executeTestCases(testCaseID="all"):
 # Syntax      : executePrePostRequisite(prepostrequisite)
 # Description : Method to execute the pre-post requisite steps
 # Parameter   : prepostrequisite - plugin pre/post requisite node
+#             : node - Pre/Post
 # Return Value: List of pre/post requisite step status (SUCCESS/FAILURE)
 #-----------------------------------------------------------------------------------------------
 
-def executePrePostRequisite(prepostrequisite):
+def executePrePostRequisite(prepostrequisite,node):
 
     # In test case XML, pluginPreRequisite / pluginPostRequisite node
     # or testCasePreRequisite / testCasePostRequisite node within testCase
@@ -558,13 +564,18 @@ def executePrePostRequisite(prepostrequisite):
         global testStepResults
         testStepResults = []
         requisiteInfo = requisite.attrib.copy()
-        print "\nPre/Post Requisite : %s" %(requisiteInfo.get("requisiteName"))
-        print "Requisite No : %s" %(requisiteInfo.get("requisiteId"))
+        print "\n%s Requisite : %s" %(node,requisiteInfo.get("requisiteName"))
+        print "%s Requisite No : %s" %(node,requisiteInfo.get("requisiteId"))
 
         if requisiteInfo.get("type") == "eventRegister" and eventListener is None:
             requisiteStepStatus = executeEventHandlerRequisite(requisite)
         else:
             requisiteStepStatus = executeRegularRequisite(requisite)
+
+        if "FAILURE" in requisiteStepStatus:
+            print "\n#--------- [%s-requisite Status] : FAILURE ----------#" %(node)
+        else:
+            print "\n#--------- [%s-requisite Status] : SUCCESS ----------#" %(node)
 
         # If any of the pre/post requisites fails, then
         # execution will be broken
@@ -2138,6 +2149,7 @@ def dispPluginTestsSummary(pluginName,pluginTestsSummary):
     totalTests = len(pluginTestsSummary)
     passedTests = 0
     failedTests = 0
+    executedTests = 0
     notApplicableTests = 0
     passedTestCases = []
     failedTestCases = []
@@ -2153,6 +2165,7 @@ def dispPluginTestsSummary(pluginName,pluginTestsSummary):
             notApplicableTests += 1
             notApplicableTestCases.append(test.get("testCaseName"))
 
+    executedTests = passedTests + failedTests
 
 
     #Commenting table format summary due to formatting issue in TM log
@@ -2173,12 +2186,17 @@ def dispPluginTestsSummary(pluginName,pluginTestsSummary):
         print "\n\n------------------- N/A TEST CASES LIST ----------------------"
         dispTestCaseList(notApplicableTestCases)
 
+    dispTestSummary(pluginName,totalTests,executedTests,passedTests,failedTests,notApplicableTests)
+
+
+def dispTestSummary(pluginName,totalTests,executedTests,passedTests,failedTests,notApplicableTests):
     print "\n\n======================== PLUGIN TEST SUMMARY ======================"
-    print "PLUGIN NAME : " ,pluginName
-    print "TOTAL TESTS : " ,totalTests
-    print "PASSED TESTS: " ,passedTests
-    print "FAILED TESTS: " ,failedTests
-    print "N/A TESTS   : " ,notApplicableTests
+    print "PLUGIN NAME    : " ,pluginName
+    print "TOTAL TESTS    : " ,totalTests
+    print "EXECUTED TESTS : " ,executedTests
+    print "PASSED TESTS   : " ,passedTests
+    print "FAILED TESTS   : " ,failedTests
+    print "N/A TESTS      : " ,notApplicableTests
 
 
 def dispTestCaseList(testCaseList):
