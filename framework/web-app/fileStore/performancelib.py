@@ -308,3 +308,93 @@ def rdkservice_validateCPULoad(value,threshold):
 	return "YES"
     else:
 	return "NO"
+
+#-------------------------------------------------------------------
+#GET THE BROWSER SCORE FROM HTML5 TEST
+#-------------------------------------------------------------------
+def rdkservice_getBrowserScore_HTML5():
+   try:
+        webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
+        print "url:",webinspectURL
+        driver = openChromeBrowser(webinspectURL);
+        time.sleep(10)
+        action = ActionChains(driver)
+        source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/li[2]/span/span[1]/span[1]')
+        action.move_to_element(source).context_click().perform()
+        time.sleep(10)
+        options = driver.find_elements_by_class_name('soft-context-menu')
+        try:
+            for option in options:
+                current_option = option.find_elements_by_class_name('item')
+                for item in current_option:
+                    if "Expand All" in item.text:
+                        item.click()
+        except exceptions.StaleElementReferenceException,e:
+            pass
+        time.sleep(10)
+        browser_score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol[3]/ol[1]/ol[1]/ol/li[2]/span/span[2]').text
+        max_browser_score_text = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[1]/ol[1]/ol/li[3]/span/span[2]').text
+        browser_score = browser_score + ' ' + max_browser_score_text
+        print "\n Browser score from HTML5 test: {}".format(browser_score)
+	print "\n Subcategory scores:\n"
+        print "===================================="
+        for i in range(1,3):
+            for j in range(1,5):
+                parent = driver.find_elements_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[2]/ol/ol['+str(i)+']/ol/ol['+str(j)+']/ol')
+                count = len(parent)
+                for k in range(2,count+1):
+                   sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[2]/ol/ol['+str(i)+']/ol/ol['+str(j)+']/ol['+str(k)+']/ol[1]/ol/ol/li[1]/span/span').text
+                   score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[2]/ol/ol['+str(i)+']/ol/ol['+str(j)+']/ol['+str(k)+']/ol[1]/ol/ol/ol/ol/li[1]/span/span[2]').text
+                   print "{}   :{}".format(sub_category,score)
+        time.sleep(5)
+        driver.quit()
+   except Exception as error:
+        print "Got exception while getting the browser score"
+        print error
+        browser_score = "Unable to get the browser score"
+        driver.quit()
+   return browser_score;
+
+#-------------------------------------------------------------------
+#GET THE BROWSER SCORE FROM SUNSPIDER TEST
+#-------------------------------------------------------------------
+def rdkservice_getBrowserScore_SunSpider():
+   try:
+        browser_score = ''
+        webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
+        driver = openChromeBrowser(webinspectURL);
+        time.sleep(60)
+        action = ActionChains(driver)
+        source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/li[6]/span/span[1]/span[1]')
+        action.move_to_element(source).context_click().perform()
+        time.sleep(10)
+        options = driver.find_elements_by_class_name('soft-context-menu')
+        try:
+            for option in options:
+                current_option = option.find_elements_by_class_name('item')
+                for item in current_option:
+                    if "Expand All" in item.text:
+                        item.click()
+        except exceptions.StaleElementReferenceException,e:
+            pass
+        time.sleep(10)
+        parent = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol')
+        children = parent.find_elements_by_tag_name("li")
+        text_values = ''
+        total_score_text = 'Total:'
+	for child in children:
+            text_values += child.text
+            if total_score_text in child.text:
+                browser_score = child.text
+        if browser_score == '':
+            browser_score = "FAILURE"
+        else:
+            browser_score = browser_score.replace("Total: ","")
+        driver.quit()
+        print "Details of SunSider Test:\n",text_values
+   except Exception as error:
+        print "Got exception while getting the browser score"
+        print error
+        browser_score = "FAILURE"
+        driver.quit()
+   return browser_score
