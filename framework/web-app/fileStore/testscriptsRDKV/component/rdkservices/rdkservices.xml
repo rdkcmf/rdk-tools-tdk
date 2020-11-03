@@ -105,6 +105,14 @@
           <parameter name="value" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkservice_getBrowserScore_HTML5" id="" version="1">
+        <function>rdkservice_getBrowserScore_HTML5</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_getBrowserScore_SunSpider" id="" version="1">
+        <function>rdkservice_getBrowserScore_SunSpider</function>
+        <parameters/>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
