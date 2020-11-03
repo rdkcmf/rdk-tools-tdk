@@ -42,7 +42,7 @@ class Module{
 	/**
 	 * Time required for executing script
 	 */
-	int executionTime
+	int executionTime = 1
     
 	/**
 	 * Indicates the group name which the device belongs
