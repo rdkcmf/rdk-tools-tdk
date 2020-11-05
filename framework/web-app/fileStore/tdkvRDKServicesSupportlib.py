@@ -1945,6 +1945,61 @@ def generateComplexTestInputParam(methodTag,testParams):
 
 
 #-----------------------------------------------------------------------------------------------
+# ExecExternalFnAndGenerateResult
+#-----------------------------------------------------------------------------------------------
+# Syntax      : ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths)
+# Description : Method to execute other user defined functions by the framework
+# Parameter   : methodTag - tag used to identify the function ti be called
+#             : arguments - arguments to be passed to the function
+#             : expectedValues - expected values to be checked
+#             : paths - list of paths
+# Return Value: Result Info Dictionary
+#-----------------------------------------------------------------------------------------------
+def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
+    tag  = methodTag
+    arg  = arguments
+    basePath = paths[0]
+    deviceConfigFile = paths[1]
+
+    # Input Variables:
+    # a. methodTag - string
+    # b. arguments - list
+    # c. expectedValues - list
+    # d. paths - list
+
+    # Output Variable:
+    # a.info - dictionary
+    #   1.info can have N different result key-value
+    #    pairs based on user's need
+    #   2.info must have "Test_Step_Status" key to
+    #   update the status. By default its SUCCESS
+
+    # USER MUST GENERATE THE TEST STEP RESULT FROM THE
+    # EXTERNAL FUNCTION TO BE INVOKED AND UPDATE INFO
+    # WITH THOSE RESULTS
+
+    info = {}
+    info["Test_Step_Status"] = "SUCCESS"
+
+    # USER CAN ADD N NUMBER OF FUNCTION CALL STEPS BELOW
+
+    try:
+        print "---------- Executing Function ------------"
+        print "FUNCTION TAG     :", tag
+        if tag == "executeBluetoothCtl":
+            info["Test_Step_Status"] = executeBluetoothCtl(arg,basePath)
+
+        else:
+            print "\nError Occurred: [%s] No function call available for %s" %(inspect.stack()[0][3],methodTag)
+            info["Test_Step_Status"] = "FAILURE"
+
+    except Exception as e:
+        print "\nException Occurred: [%s] %s" %(inspect.stack()[0][3],e)
+        info["Test_Step_Status"] = "FAILURE"
+    return info
+
+
+#-----------------------------------------------------------------------------------------------
 #                    ***  USER CAN ADD SUPPORTING FUNCTIONS BELOW ***
 #-----------------------------------------------------------------------------------------------
 def checkAndGetAllResultInfo(result,success="null"):
@@ -1994,4 +2049,56 @@ def compareURLs(actualURL,expectedURL):
 
     return status
 
+
+# Other External Functions can be added below
+
+def executeBluetoothCtl(commands,basePath):
+    try :
+        #Get Bluetooth configuration file
+        bluetoothConfigFile = basePath+'fileStore/bluetoothcredential.config'
+        configParser = ConfigParser.ConfigParser()
+        configParser.read(r'%s' % bluetoothConfigFile)
+        ip = configParser.get('bluetooth-config', 'ip')
+        username = configParser.get('bluetooth-config', 'username')
+        password = configParser.get('bluetooth-config', 'password')
+        deviceName = configParser.get('bluetooth-config','devicename')
+        BT_Mac =  configParser.get('bluetooth-config','DUT_BT_controller_mac')
+        #Executing the commands in device
+        print 'Number of commands:', len(commands)
+        print 'Commands List:', commands
+        print "Connecting to client device"
+        global session
+        session = pxssh.pxssh(options={
+                            "StrictHostKeyChecking": "no",
+                            "UserKnownHostsFile": "/dev/null"})
+        session.login(ip,username,password,sync_multiplier=3)
+        print "Executing the bluetoothctl commands"
+        for parameters in range(0,len(commands)):
+            if 'scan on' in commands[parameters]:
+                session.sendline(commands[parameters])
+                print "Scanning started"
+                sleep(20);
+            elif 'pair' in commands[parameters]:
+                commands[parameters] += ' '+ BT_Mac;
+                session.sendline(commands[parameters])
+                print "Paired with DUT"
+                sleep(3);
+            elif 'remove' in commands[parameters]:
+                commands[parameters] += ' '+ BT_Mac;
+                session.sendline(commands[parameters])
+                print "Un Paired with DUT"
+                sleep(3);
+            else:
+                session.sendline(commands[parameters])
+        session.prompt()
+        status=session.before
+        status=status.strip()
+        session.logout()
+        session.close()
+        print "Successfully Executed bluetoothctl commands in client device"
+    except Exception, e:
+        print e;
+        status = "FAILURE"
+
+    return status
 

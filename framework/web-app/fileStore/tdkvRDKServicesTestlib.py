@@ -112,6 +112,10 @@ def executePluginTests(deviceIPAddress, devicePort, testDeviceName, testDeviceTy
     deviceConfig  = "device"   + ".config"
     #deviceConfig = deviceName + ".config"
 
+    # TM base path
+    global basePathLoc
+    basePathLoc = basePath
+
     # Form the path of the plugin XMLs
     global pluginXML
     global pluginTestCaseXML
@@ -551,6 +555,8 @@ def executePrePostRequisite(prepostrequisite):
     # Executing all the pre/post requisites one by one and updating
     # the status
     for requisite in prepostrequisite:
+        global testStepResults
+        testStepResults = []
         requisiteInfo = requisite.attrib.copy()
         print "\nPre/Post Requisite : %s" %(requisiteInfo.get("requisiteName"))
         print "Requisite No : %s" %(requisiteInfo.get("requisiteId"))
@@ -1056,6 +1062,8 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
     if parseStatus != "FAILURE" and conditionalExecStatus != "FALSE" and methodNotFound is None and eventRegistration != "FAILURE":
         if testStepInfo.get("action") == "eventListener":
             execStatus,response = getListenedEvent(testMethod,testStepInfo.get("clear"))
+        elif testStepInfo.get("action") == "externalFnCall":
+            execStatus,response = "SUCCESS",None
         else:
             execStatus,response = executeCommand(testMethod,testParams)
 
@@ -1064,6 +1072,8 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
         if execStatus == "SUCCESS":
             if testStepInfo.get("action") == "eventListener":
                 result = testStepResultGeneration(response,testStepInfo.get("resultGeneration"),"eventListener")
+            elif testStepInfo.get("action") == "externalFnCall":
+                result = testStepResultGeneration(response,testStepInfo.get("resultGeneration"),"externalFnCall")
             else:
                 result = testStepResultGeneration(response,testStepInfo.get("resultGeneration"))
             testStepStatus = result.get("Test_Step_Status")
@@ -1300,6 +1310,10 @@ def getTestStepAPI(testStepInfo):
         testMethod = str(testStepInfo.get("eventId")) + "." + str(testStepInfo.get("eventName"))
         return testMethod
 
+    if testStepInfo.get("action") == "externalFnCall":
+        testMethod = None
+        return testMethod
+
     testMethod = str(testStepInfo.get("serviceName"))    + "." + \
                  str(testStepInfo.get("serviceVersion")) + "." + \
                  str(testStepInfo.get("api"))
@@ -1334,17 +1348,22 @@ def getTestStepInfo(testStep):
         testStepInfo["testStepType"] = "direct"
     if testStepInfo.get("action") == "eventListener":
         apiType = "event"
+    elif testStepInfo.get("action") == "externalFnCall":
+        apiType = None
     else:
         apiType = "method"
 
     # Check whether step step has plugin name and plugin version details
     # If not, use the default plugin info provide in testPlugin node
     # Based on the plugin details, get the test API details from template XML
-    if "pluginName" in testStepInfo.keys():
-        pluginAPIInfo = getTestPluginAPIInfo(testStepInfo.get("pluginName"),testStepInfo.get(apiType), apiType).copy()
+    if apiType != None:
+        if "pluginName" in testStepInfo.keys():
+            pluginAPIInfo = getTestPluginAPIInfo(testStepInfo.get("pluginName"),testStepInfo.get(apiType), apiType).copy()
+        else:
+            pluginAPIInfo = getTestPluginAPIInfo(testPlugin.attrib.get("pluginName"),testStepInfo.get(apiType), apiType).copy()
+            testStepInfo["pluginName"] = testPlugin.attrib.get("pluginName")
     else:
-        pluginAPIInfo = getTestPluginAPIInfo(testPlugin.attrib.get("pluginName"),testStepInfo.get(apiType), apiType).copy()
-        testStepInfo["pluginName"] = testPlugin.attrib.get("pluginName")
+        pluginAPIInfo = {}
 
     testStepInfo["serviceName"]   = pluginAPIInfo.get("serviceName")
     testStepInfo["serviceVersion"] = pluginAPIInfo.get("serviceVersion")
@@ -1358,7 +1377,7 @@ def getTestStepInfo(testStep):
 
     # If not able to get the test API info, capture the details under
     # methodNotFound tag
-    if testStepInfo.get("api") is None and testStepInfo.get("eventName") is None:
+    if testStepInfo.get("api") is None and testStepInfo.get("eventName") is None and testStepInfo.get("action") != "externalFnCall":
         methodInfo = {}
         methodInfo = {"method":testStepInfo.get(apiType),"plugin":testStepInfo.get("pluginName")}
         testStepInfo["methodNotFound"] = methodInfo.copy()
@@ -1506,7 +1525,7 @@ def getTestStepInfo(testStep):
                     status,result = getDeviceConfigKeyValue(expectedValInfo.get("key"))
                     testStepInfo["parseStatus"] = status if status == "FAILURE" else ""
                     if allexpectedValues != "":
-                        allexpectedValues = allexpectedValues + "," + str(result)
+                        allexpectedValues = str(allexpectedValues) + "," + str(result)
                     else:
                         allexpectedValues = result
 
@@ -1667,7 +1686,12 @@ def dispTestStepInfo(testStepInfo,testParams,result):
     testMethod = testStepInfo.get("pluginAPI")
     print "\nTEST STEP NAME   : ", testStepInfo.get("name")
     print "TEST STEP ID     : "  , testStepInfo.get("testStepId")
-    print "PLUGIN API NAME  : "  , testMethod
+    if testStepInfo.get("action") == "externalFnCall":
+        resultGenInfo = testStepInfo.get("resultGeneration")
+        testMethod = resultGenInfo.get("useMethodTag") if resultGenInfo != None else None
+        print "EXT METHOD NAME  : " , testMethod
+    else:
+        print "PLUGIN API NAME  : "  , testMethod
 
     paramType = testStepInfo.get("paramTypeInfo").get("type")
     if paramType == "userGenerate":
@@ -1738,7 +1762,7 @@ def testStepResultGeneration(testStepResponse,resultGenerationInfo, action="exec
         for response in testStepResponse:
             eventResult = response.get("param") if response.get("param") is not None else response.get("params")
             result.append(eventResult)
-    else:
+    elif action == "execution":
         result = testStepResponse.get("result")
         responseInfo = testStepResponse.copy()
         for responseKey in responseInfo.keys():
@@ -1756,9 +1780,12 @@ def testStepResultGeneration(testStepResponse,resultGenerationInfo, action="exec
         expectedValues = expectedValues.split(",") if expectedValues != "null" else []
         if action == "eventListener":
             info = CheckAndGenerateEventResult(result,tag,arg,expectedValues)
+        elif action == "externalFnCall":
+            paths = [ basePathLoc, deviceConfigFile ]
+            info = ExecExternalFnAndGenerateResult(tag,arg,expectedValues,paths)
         else:
             info = CheckAndGenerateTestStepResult(result,tag,arg,expectedValues,otherInfo)
-        if info["Test_Step_Status"] == "FAILURE" and action != "eventListener":
+        if info["Test_Step_Status"] == "FAILURE" and action != "eventListener" and action != "externalFnCall":
             print "\nJSON Cmd : ",testStepJSONCmd
             print "\nResponse : ",testStepResponse
 
