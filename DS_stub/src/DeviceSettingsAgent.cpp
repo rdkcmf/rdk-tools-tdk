@@ -3588,12 +3588,10 @@ void DeviceSettingsAgent::HOST_getAudioOutputPorts(IN const Json::Value& req, OU
                 {
 			device::AudioOutputPort &aPort = aPorts.at(i);
 
-                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Encoding [%s] StereoMode [%s] Gain [%f] DB [%f]\r\n",
+                        DEBUG_PRINT(DEBUG_TRACE, "Port Name [%s] Encoding [%s] StereoMode [%s] \r\n",
                                                 aPort.getName().c_str(),
 						aPort.getEncoding().getName().c_str(),
-						aPort.getStereoMode().getName().c_str(),
-						aPort.getGain(),
-						aPort.getDB());
+						aPort.getStereoMode().getName().c_str());
 
                         strcat(details, aPort.getName().c_str());
                         if( i < aPorts.size() - 1 )
