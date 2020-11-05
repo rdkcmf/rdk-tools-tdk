@@ -126,7 +126,10 @@ if expectedResult in result.upper():
     plugins_cur_status = get_plugins_status(obj,plugin_list)
     plugin_status_needed = {"DeviceInfo":"activated","org.rdk.ActivityMonitor":"activated"}
     activated_result = set_plugins_status(obj,plugin_status_needed)
-    if status == "SUCCESS" and activated_result == "SUCCESS":
+    conf_file,result = getConfigFileName(obj.realpath)
+    if result == "SUCCESS":
+	result,memory_limit = getDeviceConfigKeyValue(conf_file,"MAX_MEMORY_VALUE")
+    if status == "SUCCESS" and activated_result == "SUCCESS" and result == "SUCCESS":
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
@@ -156,6 +159,7 @@ if expectedResult in result.upper():
 		continue_count = 0
 		check_channel_tune = True
 		check_play_count = 0
+		error_msg = ""
 	        while True:
 	            result_dict = {}
 	            if (channel_change_count > max_channel_change_count) or (continue_count > 20):
@@ -203,24 +207,50 @@ if expectedResult in result.upper():
 			        tdkTestObj.executeTestCase(expectedResult)
 			        is_high_cpuload = tdkTestObj.getResultDetails()
       			        if is_high_cpuload == "YES" :
-			            print "\ncpu load is high :{} at channel change :{} times\nchannel_info:{}\n".format(cpuload,channel_change_count,remarks)
+			            error_msg = "\ncpu load is high :{} at channel change :{} times\nchannel_info:{}\n".format(cpuload,channel_change_count,remarks)
                                     tdkTestObj.setResultStatus("FAILURE")
 			            break
 			        else:
 			    	    tdkTestObj.setResultStatus("SUCCESS")
-			        print "\ncpu load after channel_change {} times is {}\n".format(channel_change_count,cpuload)
-                                result_dict["iteration"] = channel_change_count
-                                result_dict["remarks"] = remarks
-                                result_dict["cpu_load"] = cpuload
-			        result_dict_list.append(result_dict)
-			        channel_change_count += 1
+				    print "\ncpu load is:{}% at channel change: {} times\n".format(cpuload,channel_change_count)
 		            else:
 		   	        tdkTestObj.setResultStatus("FAILURE")
-			        print "\nUnable to get cpuload\n"
+			        error_msg = "\nUnable to get cpuload\n"
+				break
+			    tdkTestObj = obj.createTestStep('rdkservice_getMemoryUsage')
+                            tdkTestObj.executeTestCase(expectedResult)
+                            result = tdkTestObj.getResult()
+                            memory_usage = tdkTestObj.getResultDetails()
+			    if (result == "SUCCESS"):
+				tdkTestObj.setResultStatus("SUCCESS")
+				#validate memory usage
+				memory_usage = float(memory_usage)/(1024*1024)
+				tdkTestObj = obj.createTestStep('rdkservice_validateMemoryUsage')
+                                tdkTestObj.addParameter('value',memory_usage)
+                                tdkTestObj.addParameter('threshold',float(memory_limit))
+				tdkTestObj.executeTestCase(expectedResult)
+				is_high_memory_usage = tdkTestObj.getResultDetails()
+				if is_high_memory_usage == "YES":
+				    error_msg = "\nmemory usage is high :{} MB at channel change:{} times\nchannel_info:{}\n".format(memory_usage,channel_change_count,remarks)
+				    tdkTestObj.setResultStatus("FAILURE")
+                                    break
+                                else:
+                                    tdkTestObj.setResultStatus("SUCCESS")
+				    print "\nmemory usage is {} MB at channel change {} times\n".format(memory_usage,channel_change_count)
+			    else:
+				error_msg = "\n Unable to get the memory usage\n"
+				tdkTestObj.setResultStatus("FAILURE")
+				break
+			    result_dict["iteration"] = channel_change_count
+                            result_dict["remarks"] = remarks
+                            result_dict["cpu_load"] = int(cpuload)
+                            result_dict["memory_usage"] = memory_usage
+                            result_dict_list.append(result_dict)
+                            channel_change_count += 1
 		        else:
 			    check_play_count += 1
 			    if(check_play_count > 4):
-			        print "\nNot able to play the content after {} times channel change,remarks: {}\n".format(channel_change_count,remarks)
+			        error_msg = "\nNot able to play the content after {} times channel change,remarks: {}\n".format(channel_change_count,remarks)
 			        tdkTestObj.setResultStatus("FAILURE")
 			        break
                 if (validate):
@@ -229,10 +259,8 @@ if expectedResult in result.upper():
 		elif(continue_count > 20):
 		    print "\nchannel change didn't happen after {}channel changes\n".format(channel_change_count)
 		    tdkTestObj.setResultStatus("FAILURE")
-		elif (check_play_count > 3):
-		    print "\nError occured while playing\n"
 		else:
-		    print "\ncpu load should be less than 90\n"
+		    print error_msg
 		webkit_console_socket.disconnect()    
 	        cpu_mem_info_dict["channelChangeDetails"] = result_dict_list
 	        json.dump(cpu_mem_info_dict,json_file)
