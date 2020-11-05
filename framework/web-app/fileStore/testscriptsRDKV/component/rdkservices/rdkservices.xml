@@ -113,6 +113,17 @@
         <function>rdkservice_getBrowserScore_SunSpider</function>
         <parameters/>
       </primitiveTest>
+      <primitiveTest name="rdkservice_getMemoryUsage" id="" version="1">
+        <function>rdkservice_getMemoryUsage</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_validateMemoryUsage" id=" " version="1">
+        <function>rdkservice_validateMemoryUsage</function>
+        <parameters>
+          <parameter name="threshold" value=""/>
+          <parameter name="value" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>

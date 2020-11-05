@@ -287,6 +287,17 @@ def rdkservice_getCPULoad():
     return value 
 
 #-------------------------------------------------------------------
+#GET THE MEMORY USAGE VALUE IN BYTES FROM DEVICEINFO PLUGIN
+#-------------------------------------------------------------------
+def rdkservice_getMemoryUsage():
+    data = '"method": "DeviceInfo.1.systeminfo"'
+    result = execute_step(data)
+    totalram = result["totalram"]
+    freeram = result["freeram"]
+    value = totalram - freeram
+    return value
+
+#-------------------------------------------------------------------
 #CHECK WHETHER CHANNEL CHANGE TEXT IS PRESENT IN THE CONSOLE LOG
 #-------------------------------------------------------------------
 def rdkservice_checkChannelChangeLog(log,text):
@@ -308,6 +319,15 @@ def rdkservice_validateCPULoad(value,threshold):
 	return "YES"
     else:
 	return "NO"
+
+#-------------------------------------------------------------------
+#CHECK WHETHER THE MEMORY USAGE VALUE IS GREATER THAN THE THRESHOLD VALUE
+#-------------------------------------------------------------------
+def rdkservice_validateMemoryUsage(value,threshold):
+    if (value > threshold ):
+        return "YES"
+    else:
+        return "NO"
 
 #-------------------------------------------------------------------
 #GET THE BROWSER SCORE FROM HTML5 TEST
