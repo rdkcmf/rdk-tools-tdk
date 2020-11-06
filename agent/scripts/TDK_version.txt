@@ -19,4 +19,4 @@
 
 RDK Test Development Kit
 
-Version : M-81
+Version : M-82
