@@ -152,7 +152,7 @@ class BootStrap {
 		createTclModule()
 		//create thunder module if it doesn't exist
 		createThunderModule()
-		createRdkServiceModule()
+		createRdkServiceModules()
 		/*List<Script> scriptList = Script.list()
 		
 		scriptList.each{ scriptInstance ->
@@ -368,18 +368,20 @@ class BootStrap {
 	 * Method to create RdkService module if it is not already present
 	 * @return
 	 */
-	def createRdkServiceModule() {
-		def rdkServiceModule = Module.findByName(Constants.RDKSERVICES)
-		if(rdkServiceModule == null){
-			Module?.withTransaction{
-				def moduleInstance = new Module()
-				moduleInstance.name = Constants.RDKSERVICES
-				moduleInstance.testGroup = TestGroup.Component
-				moduleInstance.groups= null
-				moduleInstance.category= Category.RDKV
-				if(!moduleInstance.save(flush:true)){
-					moduleInstance.errors.each{
-						println it
+	def createRdkServiceModules() {
+		[Constants.RDKSERVICES, Constants.RDKV_PERFORMANCE,Constants.RDKV_STABILITY].each{element->
+			def module = Module.findByName(element)
+			if(module == null){
+				Module?.withTransaction{
+					def moduleInstance = new Module()
+					moduleInstance.name = element
+					moduleInstance.testGroup = TestGroup.Component
+					moduleInstance.groups= null
+					moduleInstance.category= Category.RDKV
+					if(!moduleInstance.save(flush:true)){
+						moduleInstance.errors.each{
+							println it
+						}
 					}
 				}
 			}
