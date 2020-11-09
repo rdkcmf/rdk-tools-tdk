@@ -121,12 +121,6 @@ if "SUCCESS" in loadmodulestatus.upper():
 			
 			for portName in portNameLst:
 		                tdkTestObj.addParameter("port_name",portName);
-                                if portName in ["IDLR0","HDMI0","SPDIF0"]:
-                                    expectedresult="FAILURE"
-                                    print "\n%s port gain is not supported by platform""%(portName);
-                                    print "Exception is expected";
-                                else:
-                                    expectedresult="SUCCESS"
 	        	        tdkTestObj.executeTestCase(expectedresult);
 		                actualresult = tdkTestObj.getResult();
         		        details = tdkTestObj.getResultDetails()
