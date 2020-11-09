@@ -60,7 +60,7 @@
   <test_cases>
     <test_case_id>CT_DS_HAL_28</test_case_id>
     <test_objective>To check if display handle is retrieved for COMPONENT</test_objective>
-    <test_type>Positive</test_type>
+    <test_type>Negative</test_type>
     <test_setup>XG1V3,XI3</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
@@ -75,7 +75,7 @@ handle - Video port handle</input_parameters>
 2 . DSHAL agent will invoke the api dsGetDisplay for COMPONENT0
 3. TM checks if the handle is retrieved and return SUCCESS/FAILURE status.</automation_approch>
     <expected_output>Checkpoint 1.Verify the API call is success
-Checkpoint 2 Verify that handle is retrieved</expected_output>
+Checkpoint 2 Verify that handle is not retrieved</expected_output>
     <priority>High</priority>
     <test_stub_interface>libdshalstub.so.0.0.0</test_stub_interface>
     <test_script>DSHal_GetDisplayHandle_COMPONENT</test_script>
@@ -106,7 +106,7 @@ print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
 
 if "SUCCESS" in dshalloadModuleStatus.upper():
-        expectedResult="SUCCESS";
+        expectedResult="FAILURE";
         #Prmitive test case which associated to this Script
         tdkTestObj = dshalObj.createTestStep('DSHal_GetDisplay');
         tdkTestObj.addParameter("portType", videoPortType["COMPONENT"]);
@@ -119,10 +119,10 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
             tdkTestObj.setResultStatus("SUCCESS");
             details = tdkTestObj.getResultDetails();
             print details;
-            print "Display handle retrieved for COMPONENT";
+            print "Display handle not retrieved for COMPONENT as expected";
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Display handle not retrieved for COMPONENT";
+            print "Display handle retrieved for COMPONENT which is unexpected as it is not supported";
 
         dshalObj.unloadModule("dshal");
 
