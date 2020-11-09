@@ -58,7 +58,7 @@
         </testCase>
 
         <testCase testCaseId="WH_03" testCaseName="WareHouse_Set_Front_Panel_State_Download_In_Progress" desc="Sets the front panel state to DOWNLOAD IN PROGRESS" >
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="WAREHOUSE_NA_TESTS" useMethodTag="warehouse_na_tests" arguments="frontpanel"/>
             <testStep testStepId="1" name="Set_FrontPanel_State" method="Set_FrontPanel_State">
                 <params>
                   <param tag="state"  value="1"/>
@@ -68,7 +68,7 @@
         </testCase>
 
         <testCase testCaseId="WH_04" testCaseName="WareHouse_Set_Front_Panel_State_Download_Failed" desc="Sets the front panel state to DOWNLOAD FAILED" >
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="WAREHOUSE_NA_TESTS" useMethodTag="warehouse_na_tests" arguments="frontpanel"/>
             <testStep testStepId="1" name="Set_FrontPanel_State" method="Set_FrontPanel_State">
                 <params>
                   <param tag="state"  value="3"/>
@@ -78,7 +78,7 @@
         </testCase>
 
         <testCase testCaseId="WH_05" testCaseName="WareHouse_Set_Front_Panel_State_Download_Invalid" desc="Sets the front panel state to invalid value" >
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="WAREHOUSE_NA_TESTS" useMethodTag="warehouse_na_tests" arguments="frontpanel"/>
             <testStep testStepId="1" name="Set_FrontPanel_State" method="Set_FrontPanel_State">
                 <params>
                   <param tag="state"  value="2"/>
@@ -98,6 +98,30 @@
             <testCaseInfo testCaseType="direct" />
             <testStep testStepId="1" name="Is_Clean" method="Is_clean" >
                 <resultGeneration useMethodTag="warehouse_check_isclean" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WH_08" testCaseName="WareHouse_Reset_Device" desc="Resets the STB to the warehouse state">
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="WAREHOUSE_NA_TESTS" useMethodTag="warehouse_na_tests" arguments="reset"/>
+            <testStep testStepId="1" name="Reset_Device" method="Reset_Device" >
+                <resultGeneration useMethodTag="warehouse_set_operation" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WH_09" testCaseName="WareHouse_Internal_Reset" desc="Resets the STB to the warehouse state">
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="WAREHOUSE_NA_TESTS" useMethodTag="warehouse_na_tests" arguments="reset"/>
+            <testStep testStepId="1" name="Internal_Reset" method="Internal_Reset" >
+                <resultGeneration useMethodTag="warehouse_set_operation" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WH_08" testCaseName="WareHouse_Check_Event_On_Device_Reset" desc="Checks if event is received on device reset">
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="WAREHOUSE_NA_TESTS" useMethodTag="warehouse_na_tests" arguments="reset"/>
+            <testStep testStepId="1" name="Reset_Device" method="Reset_Device" >
+                <resultGeneration useMethodTag="warehouse_set_operation" />
+            </testStep>
+            <testStep testStepId="2" name="Check_Event_Reset_Done" event="Event_Reset_Done" action="eventListener" delay="10">
+                <resultGeneration useMethodTag="warehouse_check_device_reset_event" expectedValues="True"/>
             </testStep>
         </testCase>
 

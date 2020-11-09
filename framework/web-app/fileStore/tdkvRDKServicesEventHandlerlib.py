@@ -359,6 +359,25 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        # ScreenCapture Events response result parser steps
+        elif tag == "screencapture_check_upload_complete_event":
+            result=result[0]
+            info = result
+            print str(result.get("status"))
+            if str(result.get("status")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        # Warehouse Events response result parser steps
+        elif tag == "warehouse_check_device_reset_event":
+            result=result[0]
+            info = result
+            print str(result.get("status"))
+            if str(result.get("status")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)

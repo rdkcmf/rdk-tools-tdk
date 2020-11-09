@@ -39,6 +39,10 @@
             </testStep>
           </prerequisite>
 
+          <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
+            <event pluginName="ScreenCapture" eventName="Event_Upload_Complete" />
+          </prerequisite>
+
         </pluginPreRequisite>
 
         <testCase testCaseId="SC_01" testCaseName="ScreenCapture_Check_Upload_Screen_Invalid_Url" desc="Check screen upload with invalid url">
@@ -47,6 +51,39 @@
                   <param tag="url" useConfigFile="true" key="SC_INVALID_UPLOAD_URL"/>
                 </params>
                 <resultGeneration useMethodTag="screencapture_upload_screen" expectedValues="False"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SC_02" testCaseName="ScreenCapture_Upload_Screen" desc="Uploads the screenshott">
+            <testStep testStepId="1" name="Upload_Screen_Capture" method="Upload_Screen_Capture" >
+                <params>
+                  <param tag="url" useConfigFile="true" key="SC_UPLOAD_URL"/>
+                </params>
+                <resultGeneration useMethodTag="screencapture_upload_screen" expectedValues="True"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SC_03" testCaseName="ScreenCapture_Check_Upload_Complete_Event" desc="Upload screen and receive uploadComplete Event">
+            <testStep testStepId="1" name="Upload_Screen_Capture" method="Upload_Screen_Capture" >
+                <params>
+                  <param tag="url" useConfigFile="true" key="SC_UPLOAD_URL"/>
+                </params>
+                <resultGeneration useMethodTag="screencapture_upload_screen" expectedValues="True"/>
+            </testStep>
+            <testStep testStepId="2" name="Check_Upload_Complete_Event" event="Event_Upload_Complete" action="eventListener" delay="10">
+              <resultGeneration useMethodTag="screencapture_check_upload_complete_event" expectedValues="True"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="SC_04" testCaseName="ScreenCapture_Check_Upload_Complete_Event_Invalid_Url" desc="Uploads screen and checks if uploadComplete Event is received for invalid url">
+            <testStep testStepId="1" name="Upload_Screen_Capture" method="Upload_Screen_Capture" >
+                <params>
+                  <param tag="url" useConfigFile="true" key="SC_INVALID_UPLOAD_URL"/>
+                </params>
+                <resultGeneration useMethodTag="screencapture_upload_screen" expectedValues="False"/>
+            </testStep>
+            <testStep testStepId="2" name="Check_Upload_Complete_Event" event="Event_Upload_Complete" action="eventListener" delay="10">
+              <resultGeneration useMethodTag="screencapture_check_upload_complete_event" expectedValues="False"/>
             </testStep>
         </testCase>
 

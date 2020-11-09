@@ -777,6 +777,15 @@
         <method name="Clear_SSID_Info" api="clearSSID" type="property" desc="Clears saved SSID information">
             <expectedValues>0</expectedValues>
         </method>
+        <method name="Set_Signal_Threshold_Change_Enabled" api="setSignalThresholdChangeEnabled" type="method" desc="Enables / disables signalThresholdChange events to be fired">
+            <params>
+                <param tag="enabled" defaultValue="null" type= "bool" />
+                <param tag="interval" defaultValue="null" type="int" />
+            </params>
+        </method>
+        <method name="Is_Signal_Threshold_Change_Enabled" api="isSignalThresholdChangeEnabled" type="method" desc="Returns true when threshold changes are enabled">
+            <expectedValues>0,1</expectedValues>
+        </method>
         <event name="Event_On_WIFI_State_Changed" eventName="onWIFIStateChanged" eventId="client.events.1" type="event" desc="Indicates state change" />
         <event name="Event_On_Available_SSIDs" eventName="onAvailableSSIDs" eventId="client.events.1" type="event" desc="Gives SSID after scan" />
     </plugin>
@@ -819,6 +828,17 @@
         </method>
         <method name="Light_Reset" api="lightReset" type="method" desc="Performs light reset"/>
         <method name="Is_clean" api="isClean" type="method" desc="Checks locations where customer data may be stored"/>
+        <method name="Reset_Device" api="resetDevice" type="method" desc="Resets the STB to the warehouse state">
+            <params>
+                <param tag="suppressReboot" defaultValue="true" type="bool" />
+            </params>
+        </method>
+        <method name="Internal_Reset" api="internalReset" type="method" desc="Invokes the internal reset script, which reboots the WarehouseService">
+            <params>
+                <param tag="passPhrase" defaultValue="true" type="string" />
+            </params>
+        </method>
+        <event name="Event_Reset_Done" eventName="resetDone" eventId="client.events.1" type="event" desc="Notifies about the status of the warehouse reset operation" />
     </plugin>
 
 
@@ -1198,6 +1218,11 @@
         </method>
         <event name="Event_Timer_Expired" eventName="timerExpired" eventId="client.events.1" type="event" desc="Timer expired event" />
         <event name="Event_Timer_Expiry_Reminder" eventName="timerExpiryReminder" eventId="client.events.1" type="event" desc="Timer expiry reminder event" />
+    </plugin>
+
+    <!-- DeviceIdentification Plugin Information -->
+    <plugin pluginName="DeviceIdentification" serviceName="DeviceIdentification" serviceVersion="1">
+        <method name="Get_Device_Platform_Info" api="deviceidentification" type="property" desc="Provides access to the device paltform specific information"/>
     </plugin>
     
 </thunderPlugins>
