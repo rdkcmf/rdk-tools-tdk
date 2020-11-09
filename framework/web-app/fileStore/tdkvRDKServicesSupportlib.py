@@ -154,6 +154,14 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 else:
                     info["Test_Step_Status"] = "FAILURE"
 
+        # DeviceIdentification Plugin Response result parser steps
+        elif tag == "deviceidentification_get_platform_info":
+            info = result.copy()
+            status = checkNonEmptyResultData(info.values())
+            if status == "TRUE":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # TraceControl Plugin Response result parser steps
         elif tag == "tracecontrol_get_state":
@@ -1147,7 +1155,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             info["state_name"] = state_names[state]
             info["enable"] = "True" if state not in [0,6,1] else "False"
             if str(result.get("state")) in expectedValues:
-                info["Test_Step_Status"] = "SUCCESS"
+                info["Test_Step_Status"] = "FAILURE"
                 if arg[0] == "check_state_valid" and state not in [0,6]:
                     info["Test_Step_Status"] = "SUCCESS"
                 elif arg[0] == "check_state_enabled" and state not in [0,6,1]:
@@ -1156,7 +1164,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "wifi_check_set_operation":
-            if str(result.get("success")).lower() == "true":
+            if str(result.get("success")).lower() == expectedValues[0]:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -1168,6 +1176,26 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "wifi_check_signal_threshold_change_status":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            if str(result.get("success")).lower() == "true" and str(result.get("result")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "wifi_get_connected_ssid":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+#            if str(result.get("success")).lower() == "true" and str(result.get("ssid")) in expectedValues:
+            if arg[0] == "check_ssid":
+                if str(result.get("success")).lower() == "true" and str(result.get("ssid")) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif arg[0] == "check_no_ssid":
+                if str(result.get("success")).lower() == "true" and str(result.get("ssid"))=="":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         # Bluetooth Plugin Response result parser steps
         elif tag == "bluetooth_set_operation":
@@ -1861,6 +1889,20 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 else:
                     info["enable"] = False
 
+        elif tag == "wifi_toggle_signal_threshold_status":
+            testStepResults = testStepResults[0].values()[0]
+            status = testStepResults[0].get("result")
+            if len(arg) and arg[0] == "get_toggle_value":
+                if int(status) == 1:
+                    info["enabled"] = False
+                else:
+                    info["enabled"] = True
+            else:
+                if int(status) == 1:
+                    info["result"] = 0
+                else:
+                    info["result"] = 1
+
         # Bluetooth Plugin Response result parser steps
         elif tag == "bluetooth_toggle_discoverable_status":
             testStepResults = testStepResults[0].values()[0]
@@ -1960,6 +2002,12 @@ def checkTestCaseApplicability(methodTag,configKeyData,arguments):
 
         elif tag == "is_led_supported":
             if arg[0] in keyData:
+                result = "TRUE"
+            else:
+                result = "FALSE"
+
+        elif tag == "warehouse_na_tests":
+            if arg[0] not in keyData:
                 result = "TRUE"
             else:
                 result = "FALSE"

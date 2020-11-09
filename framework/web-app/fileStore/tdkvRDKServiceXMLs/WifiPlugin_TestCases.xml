@@ -40,12 +40,12 @@
           </prerequisite>
 
           <prerequisite requisiteId="2" requisiteName="Check_WIFI_Adapter_State">
-            <testStep testStepId="1" name="Get_Current_State" method="Get_Current_State">
+            <testStep testStepId="1" name="Get_Current_State" method="Get_Current_State" saveResult="true" >
                 <resultGeneration useMethodTag="wifi_check_adapter_state" arguments="check_state_valid"/>
             </testStep>
             <testStep testStepId="2" name="Enable_WIFI_Adapter" method="Set_Enabled">
                 <conditionalExecution enable="true" Id="1" useMethodTag="wifi_check_adapter_state" arguments="isDisabled" />
-                <resultGeneration useMethodTag="wifi_check_set_operation" />
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
             <testStep testStepId="3" name="Get_Current_State" method="Get_Current_State">
                 <conditionalExecution enable="true" Id="1" useMethodTag="wifi_check_adapter_state" arguments="isDisabled" />
@@ -69,7 +69,7 @@
                 <params>
                   <param tag="enable" usePreviousResult="true" Id="1" useMethodTag="wifi_toggle_adapter_state" revertParam="yes" />
                 </params>
-                <resultGeneration useMethodTag="wifi_check_set_operation" />
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
             <testStep testStepId="3" name="Get_Current_State" method="Get_Current_State" revertFlag="yes">
                 <resultGeneration useMethodTag="wifi_check_adapter_state">
@@ -85,13 +85,13 @@
                   <param tag="incremental" useDefault="true" />
                   <param tag="frequency" value=""/>
                 </params>
-                <resultGeneration useMethodTag="wifi_check_set_operation" />
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
             <testStep testStepId="2" name="Check_On_Available_SSIDs_Event" event="Event_On_Available_SSIDs" action="eventListener" delay="5">
               <resultGeneration useMethodTag="wifi_check_available_ssids_event" arguments="get_ssid_names" />
             </testStep>
             <testStep testStepId="3" name="Stop_Scan" method="Stop_Scan" >
-                <resultGeneration useMethodTag="wifi_check_set_operation" />
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
        </testCase>
 
@@ -107,7 +107,167 @@
             <testStep testStepId="2" name="Clear_SSID_Info" method="Clear_SSID_Info" delay="3">
                 <resultGeneration useMethodTag="wifi_check_save_clear_ssid" />
             </testStep>
+       </testCase> 
+
+       <testCase testCaseId="WIFI_04" testCaseName="WIFI_Connect_Disconnect_SSIDs" desc="Connects to the given SSID and disconnects">
+            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value=""/>
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value=""/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Connect" method="Connect" >
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
+                  <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
+                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="3" name="Disconnect" method="Disconnect" delay="3">
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="4" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase> 
+       
+       <testCase testCaseId="WIFI_05" testCaseName="WIFI_Retrieve_Connected_SSID" desc="Retrieves connected SSID">
+            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value=""/>
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value=""/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Connect" method="Connect" delay="5">
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
+                  <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
+                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
+                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
+                    <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
+	        </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Disconnect" method="Disconnect" delay="3">
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="5" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
        </testCase>
+
+       <testCase testCaseId="WIFI_06" testCaseName="WIFI_Check_Connected_SSID_After_Disconnect" desc="Checks connected SSID after disconnect">
+            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value=""/>
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value=""/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Connect" method="Connect" delay="5">
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
+                  <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
+                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
+                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
+                    <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
+	        </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Disconnect" method="Disconnect" delay="3">
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="5" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
+		<resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_no_ssid"/>
+            </testStep>
+            <testStep testStepId="6" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase>
+
+       <testCase testCaseId="WIFI_07" testCaseName="WIFI_Connect_With_Invalid_Passphrase" desc="Check if Connects to the given SSID with invalid passphrase">
+            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value=""/>
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value=""/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Connect" method="Connect" >
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
+                  <param tag="passphrase" useConfigFile="true" key="WIFI_INVALID_PASSPHRASE"/>
+                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="false"/>
+            </testStep>
+            <testStep testStepId="4" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase> 
+
+       <testCase testCaseId="WIFI_08" testCaseName="WIFI_Connect_With_Invalid_SSID" desc="Check if Connects to the given invalid SSID">
+            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value=""/>
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value=""/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Connect" method="Connect" >
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_INVALID_SSID_NAME"/>
+                  <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
+                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="false"/>
+            </testStep>
+            <testStep testStepId="4" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="WIFI_09" testCaseName="WIFI_Initiate_And_Cancel_WPS_Pairing" desc="Checks initiate and cancel WPS pairing">
+            <testStep testStepId="1" name="Initiate_WPS_Pairing" method="Initiate_WPS_Pairing" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Cancel_WPS_Pairing" method="Cancel_WPS_Pairing" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+        </testCase>
+
+       <testCase testCaseId="WIFI_10" testCaseName="WIFI_Enable_Disable_Signal_Threshold_Change" desc="Toggles signal threshold change">
+           <testCaseInfo testCaseType="setandget" revert="true" />
+            <testStep testStepId="1" name="Is_Signal_Threshold_Change_Enabled" method="Is_Signal_Threshold_Change_Enabled" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="wifi_check_signal_threshold_change_status" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Signal_Threshold_Change_Enabled" method="Set_Signal_Threshold_Change_Enabled" revertSet="yes">
+                <params>
+                  <param tag="enabled" usePreviousResult="true" Id="1" useMethodTag="wifi_toggle_signal_threshold_status" arguments="get_toggle_value" revertParam="yes" />
+                 <param tag="interval" value="2000" />
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="3" name="Is_Signal_Threshold_Change_Enabled" method="Is_Signal_Threshold_Change_Enabled" revertFlag="yes">
+                <resultGeneration useMethodTag="wifi_check_signal_threshold_change_status">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="wifi_toggle_signal_threshold_status" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
 
 </testPlugin>
 
