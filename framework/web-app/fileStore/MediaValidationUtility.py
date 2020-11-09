@@ -19,6 +19,7 @@
 
 import json
 import sys
+import re
 
 # Global variable to store all the operations
 all_operations = ""
@@ -67,5 +68,14 @@ def getConsoleMessage(log):
     text_from_message = log_data.get("params").get("message").get("text")
     return text_from_message
 
+# Function to get the time string from the console message
+def getTimeFromMsg(message):
+    match = re.search(r"\[\s([0-9:]+)\s\]", message)
+    return match.group(1)
 
+# Function to get the time in milliseconds if the input is in HH:MM:SS:sss
+def getTimeInMilliSeconds(time_str):
+    hours, minutes, seconds, millisec = time_str.split(':')
+    time_in_millisec = int(hours) * 3600000 + int(minutes) * 60000 + int(seconds)*1000 + int(millisec)
+    return time_in_millisec
 
