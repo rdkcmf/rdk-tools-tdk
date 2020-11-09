@@ -30,7 +30,7 @@ Testcase ID: CT_XUPNP_19</synopsis>
   <groups_id/>
   <execution_time>3</execution_time>
   <long_duration>false</long_duration>
-  <remarks>basestreamingURL param is removed according to latest xupnp spec. so skipping the test<remarks/>
+  <remarks>basestreamingURL param is removed according to latest xupnp spec. so skipping the test</remarks>
   <skip>true</skip>
   <box_types>
    <!-- box types -->
