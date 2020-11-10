@@ -82,24 +82,28 @@ def launch_cobalt(obj):
             zorder = tdkTestObj.getResultDetails()
 	    result = tdkTestObj.getResult()
 	    if result == "SUCCESS":
-		tdkTestObj.setResultStatus("SUCCESS")
                 zorder = ast.literal_eval(zorder)["clients"]
-		eorder.append("cobalt")
-                if zorder[0] != "cobalt":
-                    param_val = '{"client": "Cobalt"}'
-                    tdkTestObj = obj.createTestStep('rdkservice_setValue')
-                    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.moveToFront")
-                    tdkTestObj.addParameter("value",param_val)
-                    tdkTestObj.executeTestCase(expectedResult)
-		    result = tdkTestObj.getResult()
-		    if result == "SUCCESS":
-	                tdkTestObj.setResultStatus("SUCCESS")
-		    else:
-			print "\n Unable to move Cobalt to foreground"
-			return_val = "FAILURE"
-			tdkTestObj.setResultStatus("FAILURE")
+		if len(zorder) == 0:
+		    print "org.rdk.RDKShell.1.getZOrder returned empty clients list"
+		    return_val = "FAILURE"
+                    tdkTestObj.setResultStatus("FAILURE")
 		else:
-		    print "\n Cobalt is playing in the foreground"
+		    tdkTestObj.setResultStatus("SUCCESS")
+                    if zorder[0] != "cobalt":
+                        param_val = '{"client": "Cobalt"}'
+                        tdkTestObj = obj.createTestStep('rdkservice_setValue')
+                        tdkTestObj.addParameter("method","org.rdk.RDKShell.1.moveToFront")
+                        tdkTestObj.addParameter("value",param_val)
+                        tdkTestObj.executeTestCase(expectedResult)
+		        result = tdkTestObj.getResult()
+		        if result == "SUCCESS":
+	                    tdkTestObj.setResultStatus("SUCCESS")
+		        else:
+			    print "\n Unable to move Cobalt to foreground"
+			    return_val = "FAILURE"
+			    tdkTestObj.setResultStatus("FAILURE")
+		    else:
+		        print "\n Cobalt is playing in the foreground"
 	    else:
  		print "\n Unable to get getZOrder value"
 		return_val = "FAILURE"
