@@ -48,6 +48,10 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
+    <box_type>RPI-Client</box_type>
+    <!--  -->
+    <box_type>RPI-HYB</box_type>
+    <!--  -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
