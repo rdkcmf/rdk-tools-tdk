@@ -47,6 +47,8 @@
       <function name='rdkservice_validateProcEntry' />
       <function name='rdkservice_getMemoryUsage' />
       <function name='rdkservice_validateMemoryUsage' />
+      <function name='rdkservice_getBrowserScore_SunSpider' />
+      <function name='rdkservice_getBrowserScore_HTML5' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
