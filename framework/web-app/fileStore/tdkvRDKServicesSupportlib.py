@@ -2067,6 +2067,8 @@ def generateComplexTestInputParam(methodTag,testParams):
             userGeneratedParam = [testParams]
         elif tag == "monitor_get_restart_params":
             userGeneratedParam = { "callsign": testParams.get("callsign"), "restart": { "limit": testParams.get("limit") ,  "window": testParams.get("window") }}
+        elif tag == "rdkshell_set_keys_params":
+            userGeneratedParam = {"keys":[testParams]}
 
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)

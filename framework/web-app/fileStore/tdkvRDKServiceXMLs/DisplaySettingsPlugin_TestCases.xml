@@ -726,7 +726,7 @@
         </testCase>
 
         <testCase testCaseId="DS_33" testCaseName= "Is_Connected_Device_Repeater" desc="Check whether connected device is a repeater" >
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="DeviceRepeater" />
             <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" >
                 <resultGeneration useMethodTag="display_connected_status"/>
             </testStep>

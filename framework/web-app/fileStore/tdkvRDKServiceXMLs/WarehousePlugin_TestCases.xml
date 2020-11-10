@@ -41,14 +41,14 @@
         </pluginPreRequisite>
 
         <testCase testCaseId="WH_01" testCaseName= "WareHouse_Get_STB_Device_Info"  desc="Gets all STB device info">
-            <testCaseInfo testCaseType="direct" />
+            <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_STB_DeviceInfo" method="Get_DeviceInfo" >
               <resultGeneration useMethodTag="warehouse_get_device_info" />
             </testStep>
         </testCase>
 
         <testCase testCaseId="WH_02" testCaseName="WareHouse_Set_Front_Panel_State_None" desc="Sets the front panel state to None" >
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="WAREHOUSE_NA_TESTS" useMethodTag="warehouse_na_tests" arguments="frontpanel"/>
             <testStep testStepId="1" name="Set_FrontPanel_State" method="Set_FrontPanel_State">
                 <params>
                   <param tag="state"  useDefault="true"/>

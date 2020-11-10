@@ -46,7 +46,7 @@
         </pluginPreRequisite>
 
         <testCase testCaseId="SC_01" testCaseName="ScreenCapture_Check_Upload_Screen_Invalid_Url" desc="Check screen upload with invalid url">
-            <testStep testStepId="1" name="Upload_SCreen_Capture" method="Upload_SCreen_Capture" >
+            <testStep testStepId="1" name="Upload_Screen_Capture" method="Upload_Screen_Capture" >
                 <params>
                   <param tag="url" useConfigFile="true" key="SC_INVALID_UPLOAD_URL"/>
                 </params>
