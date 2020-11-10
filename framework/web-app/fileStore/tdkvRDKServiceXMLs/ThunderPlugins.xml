@@ -1173,7 +1173,7 @@
 
     <!-- ScreenCapture Plugin Information -->
     <plugin pluginName="ScreenCapture" serviceName="org.rdk.ScreenCapture" serviceVersion="1">
-        <method name="Upload_SCreen_Capture" api="uploadScreenCapture" type="method" desc="Takes screenshot and uploads it to the specified url">
+        <method name="Upload_Screen_Capture" api="uploadScreenCapture" type="method" desc="Takes screenshot and uploads it to the specified url">
             <params>
                 <param tag="url" type="string" />
             </params>
