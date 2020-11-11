@@ -30,12 +30,9 @@ TestCase ID:53</synopsis>
   <groups_id/>
   <execution_time>3</execution_time>
   <long_duration>false</long_duration>
-  <remarks/>
-  <skip>false</skip>
+  <remarks>Volume test scripts are applicable only for TV</remarks>
+  <skip>true</skip>
   <box_types>
-    <box_type>IPClient-3</box_type>
-    <box_type>Hybrid-1</box_type>
-    <box_type>Terminal-RNG</box_type>
   </box_types>
   <rdk_versions>
     <rdk_version>RDK1.3</rdk_version>
