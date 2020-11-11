@@ -261,7 +261,7 @@
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
             <testStep testStepId="3" name="getscreenresolution" method="GetScreenResolution" revertFlag="yes">
-              <resultGeneration useMethodTag="rdkshell_check_for_resolution_set" />
+              <resultGeneration useMethodTag="rdkshell_check_for_resolution_set" expectedValues="1920,1080" />
             </testStep>
         </testCase>
 

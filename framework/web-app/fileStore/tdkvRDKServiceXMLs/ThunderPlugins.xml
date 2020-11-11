@@ -786,6 +786,8 @@
         <method name="Is_Signal_Threshold_Change_Enabled" api="isSignalThresholdChangeEnabled" type="method" desc="Returns true when threshold changes are enabled">
             <expectedValues>0,1</expectedValues>
         </method>
+        <method name="Initiate_WPS_Pairing" api="initiateWPSPairing" type="method" desc="Initiates the connection via WPS" />
+        <method name="Cancel_WPS_Pairing" api="cancelWPSPairing" type="method" desc="Cancels WPS pairing" />
         <event name="Event_On_WIFI_State_Changed" eventName="onWIFIStateChanged" eventId="client.events.1" type="event" desc="Indicates state change" />
         <event name="Event_On_Available_SSIDs" eventName="onAvailableSSIDs" eventId="client.events.1" type="event" desc="Gives SSID after scan" />
     </plugin>
