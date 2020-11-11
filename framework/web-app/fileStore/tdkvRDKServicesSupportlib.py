@@ -639,7 +639,11 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         # read previously set resolution and compare it
         elif tag == "rdkshell_check_for_resolution_set":
-            if str(result.get("w")) == "1080" and str(result.get("h")) == "720":
+            w = int(result.get("w"))
+            h = int(result.get("h"))
+            expectedw = int(expectedValues[0])
+            expectedh = int(expectedValues[1])
+            if w == expectedw and h == expectedh:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
