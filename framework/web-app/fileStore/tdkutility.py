@@ -299,7 +299,7 @@ def checkProcessRestarted(tdkTestObj_Sys_ExeCmd,processname):
     MAX_RETRY =5 ;
     expectedresult="SUCCESS";
     while retryCount < MAX_RETRY:
-          pid,actualresult = getPID(tdkTestObj_Sys_ExeCmd,processname);
+          actualresult,pid = getPID(tdkTestObj_Sys_ExeCmd,processname);
           if expectedresult in actualresult and pid != "":
              break;
           else:
@@ -309,7 +309,7 @@ def checkProcessRestarted(tdkTestObj_Sys_ExeCmd,processname):
        print "Retry Again: Check for every 5 mins whether the process is up"
        retryCount = 0;
        while retryCount < MAX_RETRY:
-             pid,actualresult = getPID(tdkTestObj_Sys_ExeCmd,processname);
+             actualresult,pid = getPID(tdkTestObj_Sys_ExeCmd,processname);
              if expectedresult in actualresult and pid != "":
                 break;
              else:
