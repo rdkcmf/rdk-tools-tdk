@@ -30,50 +30,10 @@
   <!-- Total functions corresponding module  -->
     <functions>
       <function name='TestMgr_RdkService_Test' />
-      <function name='rdkservice_getValue' />
-      <function name='rdkservice_getPluginStatus' />
-      <function name='rdkservice_getAllPluginStatus' />
-      <function name='rdkservice_setPluginStatus' />
-      <function name='rdkservice_setPluginState' />
-      <function name='rdkservice_setValue' />
-      <function name='rdkservice_getReqValueFromResult' />
-      <function name='rdkservice_getNoOfPlugins' />
-      <function name='rdkservice_rebootDevice' />
-      <function name='rdkservice_getBrowserScore_CSS3' />
-      <function name='rdkservice_getBrowserScore_Octane' />
-      <function name='rdkservice_getCPULoad' />
-      <function name='rdkservice_checkChannelChangeLog' />
-      <function name='rdkservice_validateCPULoad' />
-      <function name='rdkservice_validateProcEntry' />
-      <function name='rdkservice_getMemoryUsage' />
-      <function name='rdkservice_validateMemoryUsage' />
-      <function name='rdkservice_getBrowserScore_SunSpider' />
-      <function name='rdkservice_getBrowserScore_HTML5' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
       <parameter funName='TestMgr_RdkService_Test' parameterName='xml_name' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_getValue' parameterName='method' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_getPluginStatus' parameterName='plugin' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_setPluginStatus' parameterName='plugin' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_setPluginStatus' parameterName='status' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_setPluginState' parameterName='plugin' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_setPluginState' parameterName='state' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_setValue' parameterName='value' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_setValue' parameterName='method' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_getReqValueFromResult' parameterName='method' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_getReqValueFromResult' parameterName='reqValue' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_rebootDevice' parameterName='waitTime' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_checkChannelChangeLog' parameterName='log' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_checkChannelChangeLog' parameterName='text' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_validateCPULoad' parameterName='value' parameterType='INTEGER' range='0-1000' />
-      <parameter funName='rdkservice_validateCPULoad' parameterName='threshold' parameterType='INTEGER' range='0-1000' />
-      <parameter funName='rdkservice_validateProcEntry' parameterName='sshmethod' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_validateProcEntry' parameterName='credentials' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_validateProcEntry' parameterName='procfile' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_validateProcEntry' parameterName='mincdb' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_validateMemoryUsage' parameterName='value' parameterType='FLOAT' range='0-1000' />
-      <parameter funName='rdkservice_validateMemoryUsage' parameterName='threshold' parameterType='FLOAT' range='0-1000' />
     </parameters>
   </module>
 </xml>

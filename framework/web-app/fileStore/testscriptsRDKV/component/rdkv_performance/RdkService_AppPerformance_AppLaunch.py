@@ -21,23 +21,23 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>1</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_BrowserPerformance_Octane</name>
+  <name>RdkService_AppPerformance_AppLaunch</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
-  <primitive_test_id></primitive_test_id>
+  <primitive_test_id> </primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
-  <primitive_test_name>rdkservice_getBrowserScore_Octane</primitive_test_name>
+  <primitive_test_name>rdkservice_setValue</primitive_test_name>
   <!--  -->
   <primitive_test_version>1</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>To get the browser score using Octane test</synopsis>
+  <synopsis>This script is to get the time taken to launch the lightning application with webkit</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>10</execution_time>
+  <execution_time>4</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -48,9 +48,9 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
-    <box_type>RPI-Client</box_type>
-    <!--  -->
     <box_type>RPI-HYB</box_type>
+    <!--  -->
+    <box_type>RPI-Client</box_type>
     <!--  -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
@@ -76,33 +76,43 @@
     <release_version></release_version>
     <remarks></remarks>
   </test_cases>
-  <script_tags />
 </xml>
 '''
-# use tdklib library,which provides a wrapper for tdk testcase script
-import tdklib;
+# use tdklib library,which provides a wrapper for tdk testcase script 
+import tdklib; 
 from BrowserPerformanceUtility import *
 import BrowserPerformanceUtility
-from performancelib import *
-import performancelib
-import BrowserPerformanceVariables
+from rdkv_performancelib import *
+import rdkv_performancelib
+from web_socket_util import *
+import MediaValidationVariables
+from MediaValidationUtility import *
+import MediaValidationUtility
+from datetime import datetime
 
 #Test component to be tested
-obj = tdklib.TDKScriptingLibrary("rdkservices","1",standAlone=True);
+obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_BrowserPerformance_Octane');
+obj.configureTestCase(ip,port,'RdkService_AppPerformance_AppLaunch');
 
+webkit_console_socket = None
+
+#Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
-print "[LIB LOAD STATUS]  :  %s" %result.upper();
-obj.setLoadModuleStatus(result);
+print "[LIB LOAD STATUS]  :  %s" %result
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    browser_test_url=BrowserPerformanceVariables.octane_test_url;
+    appURL    = MediaValidationVariables.lightning_video_test_app_url
+    videoURL  = MediaValidationVariables.video_src_url
+
+    setOperation("close",5)
+    operations = getOperations()
+    video_test_url = getTestURL(appURL,videoURL,operations)
 
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -123,77 +133,81 @@ if expectedResult in result.upper():
         current_url = tdkTestObj.getResultDetails();
         if current_url != None:
             tdkTestObj.setResultStatus("SUCCESS");
+            webkit_console_socket = createEventListener(ip,MediaValidationVariables.webinspect_port,[],"/devtools/page/1",False)
+            time.sleep(10)
             print "Current URL:",current_url
-            print "\nSet Octane test URL"
-
+            print "\nSet Lightning Application URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
             tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.addParameter("value",browser_test_url);
+            tdkTestObj.addParameter("value",video_test_url);
+	    start_time = str(datetime.utcnow()).split()[1]
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
-            time.sleep(10)
-
             print "\nValidate if the URL is set successfully or not"
             tdkTestObj = obj.createTestStep('rdkservice_getValue');
             tdkTestObj.addParameter("method","WebKitBrowser.1.url");
             tdkTestObj.executeTestCase(expectedResult);
             new_url = tdkTestObj.getResultDetails();
-            if new_url == browser_test_url:
+            if new_url in video_test_url:
                 tdkTestObj.setResultStatus("SUCCESS");
                 print "URL(",new_url,") is set successfully"
-
-                time.sleep(300)
-                tdkTestObj = obj.createTestStep('rdkservice_getBrowserScore_Octane');
-                tdkTestObj.executeTestCase(expectedResult);
-                browser_score = tdkTestObj.getResultDetails();
-                if browser_score != "Unable to get the browser score":
+                continue_count = 0
+                test_result = ""
+                while True:
+                    if continue_count > 60:
+                        print "app not launched in 60 seconds"
+                        break
+                    if (len(webkit_console_socket.getEventsBuffer())== 0):
+                        time.sleep(1)
+                        continue_count += 1
+                        continue
+                    console_log = webkit_console_socket.getEventsBuffer().pop(0)
+                    if "URL Info:" in console_log or "Connection refused" in console_log:
+                        test_result = getConsoleMessage(console_log)
+                        break;
+                webkit_console_socket.disconnect()
+                if "URL Info:" in test_result:
+                    micosec_frm_start_time = int(start_time.split(".")[-1])
+                    start_time = start_time.replace(start_time.split(".")[-1],"")
+                    start_time = start_time.replace(".",":")
+                    start_time = start_time + str(micosec_frm_start_time/1000)
+                    print "\nApplication URL set in webkit browser at :{} (UTC)".format(start_time)
+                    start_time_millisec = getTimeInMilliSeconds(start_time)
+                    end_time = getTimeFromMsg(test_result)
+                    print "\nApplication launched at: {} (UTC)".format(end_time)
+                    end_time_millisec = getTimeInMilliSeconds(end_time)
+                    app_launch_time = end_time_millisec - start_time_millisec
+                    print "\nTime taken to launch the application: {} milliseconds".format(app_launch_time)
                     tdkTestObj.setResultStatus("SUCCESS");
-		    print "The Browser score using Octane test is :",browser_score
-                    browser_score = browser_score.replace("Octane Score: ","");
-                    conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                    result, octane_threshold_value = getDeviceConfigKeyValue(conf_file,"OCTANE_THRESHOLD_VALUE")
-                    if result == "SUCCESS":
-                        if int(browser_score) > int(octane_threshold_value):
-                            tdkTestObj.setResultStatus("SUCCESS");
-                            print "The browser performance is high as expected"
-                        else:
-                            tdkTestObj.setResultStatus("FAILURE");
-                            print "The browser performance is lower than expected"
-                    else:
-                        tdkTestObj.setResultStatus("FAILURE");
-                        print "Failed to get the threshold value from config file"
-                elif "Running Octane" in browser_score:
-                    tdkTestObj.setResultStatus("FAILURE");
-                    print "Octane test is not completed"
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
-		    print "Failed to get the browser score"
+                    print "error occured during application launch"
+                #Set the URL back to previous
+                tdkTestObj = obj.createTestStep('rdkservice_setValue');
+                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                tdkTestObj.addParameter("value",current_url);
+                tdkTestObj.executeTestCase(expectedResult);
+                result = tdkTestObj.getResult();
+                if result == "SUCCESS":
+                    print "URL is reverted successfully"
+                    tdkTestObj.setResultStatus("SUCCESS");
+                else:
+                    print "Failed to revert the URL"
+                    tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "Failed to load the URL",new_url
-                tdkTestObj.setResultStatus("FAILURE");
-            #Set the URL back to previous
-            tdkTestObj = obj.createTestStep('rdkservice_setValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.addParameter("value",current_url);
-            tdkTestObj.executeTestCase(expectedResult);
-            result = tdkTestObj.getResult();
-            if result == "SUCCESS":
-                print "URL is reverted successfully"
-                tdkTestObj.setResultStatus("SUCCESS");
-            else:
-                print "Failed to revert the URL"
+                print "Failed to load the URL %s" %(new_url)
                 tdkTestObj.setResultStatus("FAILURE");
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Failed to set URL to webkitbrowser"
+            print "Unable to get the current URL loaded in webkit"
     else:
         print "Pre conditions are not met"
-
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"
         status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
-    obj.unloadModule("rdkservices");
+    obj.unloadModule("rdkv_performance");
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"
+

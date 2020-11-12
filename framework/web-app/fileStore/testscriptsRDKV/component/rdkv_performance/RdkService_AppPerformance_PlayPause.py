@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>1</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_AppPerformance_AppLaunch</name>
+  <name>RdkService_AppPerformance_PlayPause</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id> </primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>This script is to get the time taken to launch the lightning application with webkit</synopsis>
+  <synopsis>This script is to get the performance of the Lightning application by calculating the time taken for play and pause operations.</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -48,9 +48,9 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
-    <box_type>RPI-HYB</box_type>
-    <!--  -->
     <box_type>RPI-Client</box_type>
+    <!--  -->
+    <box_type>RPI-HYB</box_type>
     <!--  -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
@@ -82,8 +82,8 @@
 import tdklib; 
 from BrowserPerformanceUtility import *
 import BrowserPerformanceUtility
-from performancelib import *
-import performancelib
+from rdkv_performancelib import *
+import rdkv_performancelib
 from web_socket_util import *
 import MediaValidationVariables
 from MediaValidationUtility import *
@@ -91,26 +91,27 @@ import MediaValidationUtility
 from datetime import datetime
 
 #Test component to be tested
-obj = tdklib.TDKScriptingLibrary("rdkservices","1",standAlone=True)
+obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_AppPerformance_AppLaunch');
+obj.configureTestCase(ip,port,'RdkService_AppPerformance_PlayPause');
 
 webkit_console_socket = None
 
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
-print "[LIB LOAD STATUS]  :  %s" %result
+print "[LIB LOAD STATUS]  :  %s" %result;
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     appURL    = MediaValidationVariables.lightning_video_test_app_url
     videoURL  = MediaValidationVariables.video_src_url
 
-    setOperation("close",5)
+    setOperation("pause",MediaValidationVariables.pause_interval)
+    setOperation("play",MediaValidationVariables.play_interval)
     operations = getOperations()
     video_test_url = getTestURL(appURL,videoURL,operations)
 
@@ -140,7 +141,6 @@ if expectedResult in result.upper():
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
             tdkTestObj.addParameter("method","WebKitBrowser.1.url");
             tdkTestObj.addParameter("value",video_test_url);
-	    start_time = str(datetime.utcnow()).split()[1]
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
             print "\nValidate if the URL is set successfully or not"
@@ -153,31 +153,54 @@ if expectedResult in result.upper():
                 print "URL(",new_url,") is set successfully"
                 continue_count = 0
                 test_result = ""
+                expected_play_evt = ""
+                observed_play_evt = ""
+                expected_pause_evt = ""
+                observed_pause_evt = ""
+                
                 while True:
                     if continue_count > 60:
-                        print "app not launched in 60 seconds"
+                        print "Application is not playing the content"
                         break
                     if (len(webkit_console_socket.getEventsBuffer())== 0):
                         time.sleep(1)
                         continue_count += 1
                         continue
+                    continue_count = 0
                     console_log = webkit_console_socket.getEventsBuffer().pop(0)
-                    if "URL Info:" in console_log or "Connection refused" in console_log:
+                    dispConsoleLog(console_log)
+                    if "Expected Event: paused" in console_log:
+                        expected_pause_evt = getConsoleMessage(console_log)
+                    elif "Observed Event: paused" in console_log:
+                        observed_pause_evt = getConsoleMessage(console_log)
+                    elif "Expected Event: play" in console_log:
+                        expected_play_evt = getConsoleMessage(console_log)
+                    elif "Observed Event: play" in console_log:
+                        observed_play_evt = getConsoleMessage(console_log)
+                    elif "TEST RESULT:" in console_log or "Connection refused" in console_log:
                         test_result = getConsoleMessage(console_log)
                         break;
+                    else:
+                        continue
                 webkit_console_socket.disconnect()
-                if "URL Info:" in test_result:
-                    micosec_frm_start_time = int(start_time.split(".")[-1])
-                    start_time = start_time.replace(start_time.split(".")[-1],"")
-                    start_time = start_time.replace(".",":")
-                    start_time = start_time + str(micosec_frm_start_time/1000)
-                    print "\nApplication URL set in webkit browser at :{} (UTC)".format(start_time)
-                    start_time_millisec = getTimeInMilliSeconds(start_time)
-                    end_time = getTimeFromMsg(test_result)
-                    print "\nApplication launched at: {} (UTC)".format(end_time)
-                    end_time_millisec = getTimeInMilliSeconds(end_time)
-                    app_launch_time = end_time_millisec - start_time_millisec
-                    print "\nTime taken to launch the application: {} milliseconds".format(app_launch_time)
+                evt_list = [expected_pause_evt,observed_pause_evt,expected_play_evt,observed_play_evt]
+                if ("SUCCESS" in test_result) and (not any(value == "" for value in evt_list)):
+                    pausing_time = getTimeFromMsg(expected_pause_evt)
+                    print "\n pause initiated at {} (UTC)".format(pausing_time)
+                    pausing_time_millisec = getTimeInMilliSeconds(pausing_time)
+                    paused_time = getTimeFromMsg(observed_pause_evt)
+                    print "\n pause happend at {} (UTC)".format(paused_time)
+                    paused_time_millisec = getTimeInMilliSeconds(paused_time)
+                    pause_opn_time = paused_time_millisec - pausing_time_millisec
+                    print "\nTime taken for pause operation: {} milleseconds".format(pause_opn_time)
+                    playing_time = getTimeFromMsg(expected_play_evt)
+                    print "\n play initiated at {} (UTC)".format(playing_time)
+                    playing_time_millisec = getTimeInMilliSeconds(playing_time)
+                    played_time = getTimeFromMsg(observed_play_evt)
+                    print "\n play happend at {} (UTC)".format(played_time)
+                    played_time_millisec = getTimeInMilliSeconds(played_time)
+                    play_opn_time = played_time_millisec - playing_time_millisec
+                    print "\nTime taken for play operation: {} milliseconds".format(play_opn_time)
                     tdkTestObj.setResultStatus("SUCCESS");
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
@@ -206,7 +229,7 @@ if expectedResult in result.upper():
     if revert=="YES":
         print "Revert the values before exiting"
         status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
-    obj.unloadModule("rdkservices");
+    obj.unloadModule("rdkv_performance");
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

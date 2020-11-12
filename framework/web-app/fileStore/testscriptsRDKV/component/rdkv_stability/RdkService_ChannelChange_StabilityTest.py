@@ -83,13 +83,13 @@
 import tdklib; 
 from BrowserPerformanceUtility import *
 import BrowserPerformanceUtility
-from performancelib import *
-import performancelib
+from rdkv_performancelib import *
+import rdkv_performancelib
 import StabilityTestVariables
 from web_socket_util import *
 from StabilityTestUtility import *
 
-obj = tdklib.TDKScriptingLibrary("rdkservices","1",standAlone=True) 
+obj = tdklib.TDKScriptingLibrary("rdkv_stability","1",standAlone=True) 
 
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
@@ -290,7 +290,7 @@ if expectedResult in result.upper():
         print "Revert the values before exiting"
         status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
     set_plugins_status(obj,plugins_cur_status)
-    obj.unloadModule("rdkservices");
+    obj.unloadModule("rdkv_stability");
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"
