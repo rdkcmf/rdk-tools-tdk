@@ -17,9 +17,9 @@
 # limitations under the License.
 ##########################################################################
 import urllib2
-import performancelib
-from performancelib import *
-from RebootTestVariables import *
+import rdkv_performancelib
+from rdkv_performancelib import *
+from StabilityTestVariables import *
 
 iter_no=0
 count=0
@@ -93,7 +93,7 @@ def validatePluginStatus(statusBeforeReboot,statusAfterReboot,validate):
 #GET THE STATUS OF CONTROLLER UI
 #------------------------------------------------------
 def getUIStatus(validate):
-    url = 'http://'+str(performancelib.deviceIP)+':'+str(performancelib.devicePort)+'/Service/Controller/UI'
+    url = 'http://'+str(rdkv_performancelib.deviceIP)+':'+str(rdkv_performancelib.devicePort)+'/Service/Controller/UI'
     statusCode = urllib2.urlopen(url,timeout=3).getcode()
     if statusCode == 200:
         return "ACCESSIBLE"

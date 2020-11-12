@@ -23,21 +23,21 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>2</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_BrowserPerformance_CSS3</name>
+  <name>RdkService_BrowserPerformance_Octane</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
-  <primitive_test_name>rdkservice_getBrowserScore_CSS3</primitive_test_name>
+  <primitive_test_name>rdkservice_getBrowserScore_Octane</primitive_test_name>
   <!--  -->
   <primitive_test_version>1</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>To get the browser performance score using CSS3 test</synopsis>
+  <synopsis>To get the browser score using Octane test</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>2</execution_time>
+  <execution_time>10</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -83,18 +83,18 @@
 import tdklib;
 from BrowserPerformanceUtility import *
 import BrowserPerformanceUtility
-from performancelib import *
-import performancelib
+from rdkv_performancelib import *
+import rdkv_performancelib
 import BrowserPerformanceVariables
 
 #Test component to be tested
-obj = tdklib.TDKScriptingLibrary("rdkservices","1",standAlone=True);
+obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_BrowserPerformance_CSS3');
+obj.configureTestCase(ip,port,'RdkService_BrowserPerformance_Octane');
 
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result.upper();
@@ -102,7 +102,7 @@ obj.setLoadModuleStatus(result);
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    browser_test_url=BrowserPerformanceVariables.css3_test_url;
+    browser_test_url=BrowserPerformanceVariables.octane_test_url;
 
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -124,7 +124,7 @@ if expectedResult in result.upper():
         if current_url != None:
             tdkTestObj.setResultStatus("SUCCESS");
             print "Current URL:",current_url
-            print "\nSet CSS3 test URL"
+            print "\nSet Octane test URL"
 
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
             tdkTestObj.addParameter("method","WebKitBrowser.1.url");
@@ -142,18 +142,18 @@ if expectedResult in result.upper():
                 tdkTestObj.setResultStatus("SUCCESS");
                 print "URL(",new_url,") is set successfully"
 
-                time.sleep(20)
-                tdkTestObj = obj.createTestStep('rdkservice_getBrowserScore_CSS3');
+                time.sleep(300)
+                tdkTestObj = obj.createTestStep('rdkservice_getBrowserScore_Octane');
                 tdkTestObj.executeTestCase(expectedResult);
                 browser_score = tdkTestObj.getResultDetails();
                 if browser_score != "Unable to get the browser score":
                     tdkTestObj.setResultStatus("SUCCESS");
-		    print "The Browser score using CCS3 test is :",browser_score
-		    browser_score = browser_score.replace("%","")
-		    conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                    result, css3_threshold_value = getDeviceConfigKeyValue(conf_file,"CSS3_THRESHOLD_VALUE")
+		    print "The Browser score using Octane test is :",browser_score
+                    browser_score = browser_score.replace("Octane Score: ","");
+                    conf_file,result = getConfigFileName(tdkTestObj.realpath)
+                    result, octane_threshold_value = getDeviceConfigKeyValue(conf_file,"OCTANE_THRESHOLD_VALUE")
                     if result == "SUCCESS":
-                        if int(browser_score) > int(css3_threshold_value):
+                        if int(browser_score) > int(octane_threshold_value):
                             tdkTestObj.setResultStatus("SUCCESS");
                             print "The browser performance is high as expected"
                         else:
@@ -162,6 +162,9 @@ if expectedResult in result.upper():
                     else:
                         tdkTestObj.setResultStatus("FAILURE");
                         print "Failed to get the threshold value from config file"
+                elif "Running Octane" in browser_score:
+                    tdkTestObj.setResultStatus("FAILURE");
+                    print "Octane test is not completed"
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
 		    print "Failed to get the browser score"
@@ -190,7 +193,7 @@ if expectedResult in result.upper():
     if revert=="YES":
         print "Revert the values before exiting"
         status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
-    obj.unloadModule("rdkservices");
+    obj.unloadModule("rdkv_performance");
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

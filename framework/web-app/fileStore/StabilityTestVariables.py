@@ -23,12 +23,26 @@ webinspect_port = ""
 channel_change_url = ""
 
 #no of channel changes to perform
-max_channel_change_count =
+max_channel_change_count = 1000
 
 ####Long duration test details:
 #The url used for testing cobalt
 cobalt_test_url = ""
 
 #test duration in minutes till test should be performed, it should be less than the duration of test video
-cobalt_test_duration =
+cobalt_test_duration = 300
 
+#Configure Variable for Reboot stress test:
+EthernetInterface ="eth0"
+#Count of how many times reboot should happen
+repeatCount = 100
+
+#Give "No" if the validation step is not mandatory
+#If "Yes", script will exit whenever a step fails
+ValidateUptime = "No"
+ValidateInterface = "No"
+ValidatePluginStatus = "No"
+ValidateControllerUI = "No"
+ValidateNoOfPlugins = "No"
+#Give the value in seconds to wait for device to come online after reboot.
+rebootwaitTime = 150

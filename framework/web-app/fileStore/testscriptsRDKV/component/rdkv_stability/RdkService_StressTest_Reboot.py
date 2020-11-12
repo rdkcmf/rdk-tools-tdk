@@ -77,12 +77,12 @@
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
-from RebootTestVariables import *
+from StabilityTestVariables import *
 import rebootTestUtility
 from rebootTestUtility import *
 
 #Test component to be tested
-obj = tdklib.TDKScriptingLibrary("rdkservices","1",standAlone=True);
+obj = tdklib.TDKScriptingLibrary("rdkv_stability","1",standAlone=True);
 
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
@@ -212,7 +212,7 @@ if expectedResult in result.upper():
     else:
         tdkTestObj.setResultStatus("FAILURE")
         print "Failed to reboot the device"
-    obj.unloadModule("rdkservices");
+    obj.unloadModule("rdkv_stability");
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

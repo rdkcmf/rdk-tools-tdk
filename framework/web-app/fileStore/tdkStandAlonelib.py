@@ -61,7 +61,8 @@ def getThunderPortDetails(self):
 def executeTest (self) :
     executeJson = json.loads(self.jsonMsgValue)
     params = executeJson["params"]
-    method = params["method"] 
+    method = params["method"]
+    componentName = params["module"] 
     thunderPortDetails = getThunderPortDetails(self)
     thunderPort = thunderPortDetails["thunderPort"]
 
@@ -75,10 +76,8 @@ def executeTest (self) :
         executePluginTests_method = getattr(lib,"executePluginTests")
         result =  executePluginTests_method(self.ip, thunderPort, deviceName, deviceType, self.realpath, testXMLName)
     else:
-        #This variable is hardcoded for now. This will be replaced by componentName in future.
-        performancecomponent="performance"
         #The library name will be componentName+lib. eg:rdkserviceslib
-        module=performancecomponent+"lib";
+        module=componentName+"lib";
         """
         This is to import the module which is stored in a variable.
         Now "lib" contains all the function definitions in the imported module.

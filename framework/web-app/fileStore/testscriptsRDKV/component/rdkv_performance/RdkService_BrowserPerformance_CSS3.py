@@ -23,21 +23,21 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>2</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_BrowserPerformance_SunSpider</name>
+  <name>RdkService_BrowserPerformance_CSS3</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
-  <primitive_test_name>rdkservice_getBrowserScore_SunSpider</primitive_test_name>
+  <primitive_test_name>rdkservice_getBrowserScore_CSS3</primitive_test_name>
   <!--  -->
   <primitive_test_version>1</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>To get the browser score using SunSpider test</synopsis>
+  <synopsis>To get the browser performance score using CSS3 test</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>6</execution_time>
+  <execution_time>2</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -79,31 +79,31 @@
   <script_tags />
 </xml>
 '''
-# use tdklib library,which provides a wrapper for tdk testcase script 
-import tdklib; 
+# use tdklib library,which provides a wrapper for tdk testcase script
+import tdklib;
 from BrowserPerformanceUtility import *
 import BrowserPerformanceUtility
-from performancelib import *
-import performancelib
+from rdkv_performancelib import *
+import rdkv_performancelib
 import BrowserPerformanceVariables
 
-
 #Test component to be tested
-obj = tdklib.TDKScriptingLibrary("rdkservices","1",standAlone=True);
+obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_BrowserPerformance_SunSpider');
+obj.configureTestCase(ip,port,'RdkService_BrowserPerformance_CSS3');
 
-#Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
-print "[LIB LOAD STATUS]  :  %s" %result;
+print "[LIB LOAD STATUS]  :  %s" %result.upper();
+obj.setLoadModuleStatus(result);
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    browser_test_url=BrowserPerformanceVariables.sunspider_url
+    browser_test_url=BrowserPerformanceVariables.css3_test_url;
+
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
@@ -124,13 +124,15 @@ if expectedResult in result.upper():
         if current_url != None:
             tdkTestObj.setResultStatus("SUCCESS");
             print "Current URL:",current_url
-            print "\nSet SunSider test URL"
+            print "\nSet CSS3 test URL"
+
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
             tdkTestObj.addParameter("method","WebKitBrowser.1.url");
             tdkTestObj.addParameter("value",browser_test_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
             time.sleep(10)
+
             print "\nValidate if the URL is set successfully or not"
             tdkTestObj = obj.createTestStep('rdkservice_getValue');
             tdkTestObj.addParameter("method","WebKitBrowser.1.url");
@@ -139,19 +141,19 @@ if expectedResult in result.upper():
             if new_url == browser_test_url:
                 tdkTestObj.setResultStatus("SUCCESS");
                 print "URL(",new_url,") is set successfully"
-                time.sleep(40)
-                tdkTestObj = obj.createTestStep('rdkservice_getBrowserScore_SunSpider')
-                tdkTestObj.executeTestCase(expectedResult)
-                browser_score = tdkTestObj.getResultDetails()
-               
-                if browser_score != "FAILURE":
-                    tdkTestObj.setResultStatus("SUCCESS")
-		    print "\nThe Browser performance value(in ms) using SunSpider test is :{}\n".format(browser_score)
-		    browser_score = browser_score.split()[0].replace("ms","")
+
+                time.sleep(20)
+                tdkTestObj = obj.createTestStep('rdkservice_getBrowserScore_CSS3');
+                tdkTestObj.executeTestCase(expectedResult);
+                browser_score = tdkTestObj.getResultDetails();
+                if browser_score != "Unable to get the browser score":
+                    tdkTestObj.setResultStatus("SUCCESS");
+		    print "The Browser score using CCS3 test is :",browser_score
+		    browser_score = browser_score.replace("%","")
 		    conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                    result, sunspider_threshold_value = getDeviceConfigKeyValue(conf_file,"SUNSPIDER_THRESHOLD_VALUE")
+                    result, css3_threshold_value = getDeviceConfigKeyValue(conf_file,"CSS3_THRESHOLD_VALUE")
                     if result == "SUCCESS":
-                        if float(browser_score) < float(sunspider_threshold_value):
+                        if int(browser_score) > int(css3_threshold_value):
                             tdkTestObj.setResultStatus("SUCCESS");
                             print "The browser performance is high as expected"
                         else:
@@ -161,8 +163,8 @@ if expectedResult in result.upper():
                         tdkTestObj.setResultStatus("FAILURE");
                         print "Failed to get the threshold value from config file"
                 else:
-                    tdkTestObj.setResultStatus("FAILURE")
-		    print "Failed to get the Browser performace using SunSpider Test"
+                    tdkTestObj.setResultStatus("FAILURE");
+		    print "Failed to get the browser score"
             else:
                 print "Failed to load the URL",new_url
                 tdkTestObj.setResultStatus("FAILURE");
@@ -180,14 +182,15 @@ if expectedResult in result.upper():
                 tdkTestObj.setResultStatus("FAILURE");
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Failed to get current URL from webkitbrowser"
+            print "Failed to set URL to webkitbrowser"
     else:
         print "Pre conditions are not met"
+
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"
         status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
-    obj.unloadModule("rdkservices");
+    obj.unloadModule("rdkv_performance");
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"
