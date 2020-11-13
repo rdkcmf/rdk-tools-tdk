@@ -182,7 +182,7 @@
               <params>
                 <param tag="plugin" value="Cobalt" indexOnly="true" />
               </params>
-              <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,cobalt" expectedValues="activated"/>
+              <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,cobalt" expectedValues="resumed"/>
             </testStep>
             <testStep testStepId="5" name="Resume_Cobalt" method="Set_Cobalt_State" pluginName="Cobalt" >
               <params>
@@ -328,7 +328,7 @@
               <params>
                 <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />
               </params>
-              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+              <resultGeneration useMethodTag="rdkshell_check_for_bounds" />
             </testStep>
             <testStep testStepId="3" name="setbounds" method="SetBounds" revertSet="yes">
               <params>
@@ -396,7 +396,7 @@
               </params>
               <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
-            <testStep testStepId="3" name="setbounds" method="SetBounds" revertSet="yes">
+            <testStep testStepId="3" name="setvisibility" method="SetVisibility" revertSet="yes">
               <params>
                 <param tag="visible" usePreviousResult="true" Id="2" useMethodTag="visibility_toggle_status" revertParam="yes" />
                 <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />

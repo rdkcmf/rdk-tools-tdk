@@ -630,12 +630,18 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "rdkshell_check_for_results":
             info = checkAndGetAllResultInfo(result,result.get("success"))
-
+            
         elif tag == "rdkshell_check_for_visibility_result":
-            if result.get("visible") in expectedValues:
+            if len(expectedValues) > 1 :
+                if str(result.get("visible")).lower() in str(expectedValues[0]).lower() or str(result.get("visible")).lower() in str(expectedValues[1]).lower():
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif str(result.get("visible")).lower() in str(expectedValues[0]).lower():
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+
 
         # read previously set resolution and compare it
         elif tag == "rdkshell_check_for_resolution_set":
@@ -649,20 +655,28 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "rdkshell_check_for_bounds":
-            x = str(result.get("x"))
-            y = str(result.get("y"))
-            w = str(result.get("w"))
-            h = str(result.get("h"))
-            expectedx = expectedValues[0]
-            expectedy = expectedValues[1]
-            expectedw = expectedValues[2]
-            expectedh = expectedValues[3]
-            if x == expectedx and  y == expectedy and  w == expectedw and  h == expectedh:
-                info["Test_Step_Status"] = "SUCCESS"
-            else:
-                info["Test_Step_Status"] = "FAILURE"
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            result=result.get("bounds")
+            info["x"]=str(result.get("x"))
+            info["y"]=str(result.get("y"))
+            info["w"]=str(result.get("w"))
+            info["h"]=str(result.get("h"))
+            if len(expectedValues)>0:
+                 x = str(result.get("x"))
+                 y = str(result.get("y"))
+                 w = str(result.get("w"))
+                 h = str(result.get("h"))
+                 expectedx = expectedValues[0]
+                 expectedy = expectedValues[1]
+                 expectedw = expectedValues[2]
+                 expectedh = expectedValues[3]
+                 if x == expectedx and  y == expectedy and  w == expectedw and  h == expectedh:
+                     info["Test_Step_Status"] = "SUCCESS"
+                 else:
+                     info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "rdkshell_validate_opacity":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
             status = result.get("opacity")
             if len(expectedValues)>0:
                 if int(expectedValues[0]) == int(status):
@@ -1785,7 +1799,7 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["target"] = ""
 
         elif tag =="visibility_toggle_status":
-            testStepResults = testStepResults[1].values()[0]
+            testStepResults = testStepResults[0].values()[0]
             status = testStepResults[0].get("visible")
             if str(status).lower() == "true":
                 info["visible"] = False
@@ -1794,7 +1808,7 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
 
         elif tag =="rdkshell_generate_new_opacity_value":
             testStepResults = testStepResults[0].values()[0]
-            opacity = testStepResults[0].get("opacity")
+            opacity = str(testStepResults[0].get("opacity"))
             #Check if the current opacity is set to 75 if not set it to 75 for testing.
             #If curretnt value is 75 then set to 50 for testing.
             if int(opacity) != 75:
