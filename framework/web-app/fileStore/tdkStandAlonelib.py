@@ -17,7 +17,6 @@
 # limitations under the License.
 ##########################################################################
 
-import tdkvRDKServicesTestlib
 import json
 import importlib
 import urllib
@@ -72,7 +71,9 @@ def executeTest (self) :
         deviceType = deviceInfo["boxtype"]
         testXMLName = params["params"]["xml_name"]
         details = "SUCCESS"
-        result =  tdkvRDKServicesTestlib.executePluginTests(self.ip, thunderPort, deviceName, deviceType, self.realpath, testXMLName) 
+        lib = importlib.import_module("tdkvRDKServicesTestlib")
+        executePluginTests_method = getattr(lib,"executePluginTests")
+        result =  executePluginTests_method(self.ip, thunderPort, deviceName, deviceType, self.realpath, testXMLName)
     else:
         #This variable is hardcoded for now. This will be replaced by componentName in future.
         performancecomponent="performance"
