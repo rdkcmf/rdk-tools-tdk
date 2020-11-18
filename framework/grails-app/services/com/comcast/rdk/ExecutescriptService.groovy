@@ -2231,7 +2231,7 @@ class ExecutescriptService {
 //							}
 
 							String reason = "RDK Version mismatch.<br>Device RDK Version : "+rdkVersion+", Script supported RDK Versions :"+rdkVersionData
-							executionService.saveNotApplicableStatus(Execution.findByName(execName), executionDevice, scriptInstance, deviceInstance,reason)
+							executionService.saveNotApplicableStatus(Execution.findByName(execName), executionDevice, scriptInstance, deviceInstance,reason,scriptInstance?.category?.toString())
 						}
 					}else{
 						notApplicable = true
@@ -2251,7 +2251,7 @@ class ExecutescriptService {
 //						}
 
 						String reason = "Box Type mismatch.<br>Device Box Type : "+deviceBoxType+", Script supported Box Types :"+boxTypeData
-						executionService.saveNotApplicableStatus(Execution.findByName(execName), executionDevice, scriptInstance, deviceInstance,reason)
+						executionService.saveNotApplicableStatus(Execution.findByName(execName), executionDevice, scriptInstance, deviceInstance,reason,scriptInstance?.category?.toString())
 					}
 					}else{
 					String reason = "No script is available with name :"+script?.scriptName+" in module :"+script?.moduleName

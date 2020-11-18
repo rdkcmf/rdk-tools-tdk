@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher
+
 import com.google.gson.JsonObject
 
 import groovy.sql.Sql
@@ -44,7 +45,6 @@ import static com.comcast.rdk.Constants.*
 import java.util.regex.Pattern
 
 import grails.util.Holders
-
 import rdk.test.tool.DeviceStatusJob
 
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -3184,12 +3184,18 @@ class JobSchedulerService implements Job{
 	}
 
 	public boolean validateScriptBoxTypes(final Map script, final Device deviceInstance){
-		boolean scriptStatus = true
-		Script.withTransaction { trns ->
-			def deviceInstance1 = Device.findById(deviceInstance?.id)
-			if(!(script?.boxTypes?.find { it?.toString()?.equals(deviceInstance1?.boxType?.toString()) })){
-				//if(!(script?.boxTypes?.find { it?.id == deviceInstance1?.boxType?.id })){
-				scriptStatus = false
+		boolean scriptStatus = false
+		def deviceInstance1 = Device.findById(deviceInstance?.id)
+		BoxType boxType = deviceInstance1?.boxType
+		List boxTypeList = []
+		boxTypeList.add(boxType)
+		boxTypeList.addAll(boxType?.subBoxTypeList)
+		for(BoxType boxTypeElement : script?.boxTypes){
+		    for (BoxType element : boxTypeList){
+				if(boxTypeElement?.toString().equals(element?.toString())){
+					scriptStatus = true
+					break
+				}
 			}
 		}
 		return scriptStatus
