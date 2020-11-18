@@ -1200,10 +1200,24 @@ class ScriptexecutionService {
 //	}
 	
 	public boolean validateBoxTypeOfScripts(final Map script, String boxType){
-		boolean scriptStatus = true
-			if(!(script?.boxTypes?.find { (it?.name)?.equalsIgnoreCase( boxType ) })){ 
-				scriptStatus = false
+		//boolean scriptStatus = true
+		//	if(!(script?.boxTypes?.find { (it?.name)?.equalsIgnoreCase( boxType ) })){ 
+		//		scriptStatus = false
+		//	}
+		//return scriptStatus
+		boolean scriptStatus = false
+		BoxType boxTypeInstance = BoxType.findByName(boxType,[fetch : [subBoxTypeList : "eager"]])
+		List boxTypeList = []
+		boxTypeList.add(boxTypeInstance)
+		boxTypeList.addAll(boxTypeInstance?.subBoxTypeList)
+		for(BoxType boxTypeElement : script?.boxTypes){
+			for (BoxType element : boxTypeList){
+				if(boxTypeElement?.toString().equals(element?.toString())){
+					scriptStatus = true
+					break
+				}
 			}
+		}
 		return scriptStatus
 	}
 	
