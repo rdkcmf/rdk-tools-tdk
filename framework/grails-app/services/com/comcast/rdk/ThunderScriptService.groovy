@@ -47,16 +47,24 @@ class ThunderScriptService {
 	
 	def saveRdkServiceThunderScriptFile(final String fileName, final String folder) {
 		ScriptFile.withTransaction {
-			def scriptFile  = ScriptFile.findByScriptNameAndCategory(fileName, Category.RDKV_RDKSERVICE)
-			 if(scriptFile == null) {
-				 def scriptFile1 = new ScriptFile()
-				 scriptFile1?.scriptName =fileName?.toString()
-				 scriptFile1?.category = Category.RDKV_RDKSERVICE
-				 scriptFile1?.moduleName = folder
-				 if(!(scriptFile1.save(flush:true))){
+			def scriptFile  = ScriptFile.findByScriptNameAndCategory(fileName,Category.RDKV_RDKSERVICE)
+			if(scriptFile){
+				if(!scriptFile?.moduleName.equals(folder)){
+					scriptFile?.moduleName = folder
+					if(!(scriptFile.save(flush:true))){
+						println("Error while saving rdkservice script file")
+					 }
+				}
+			}
+			if(scriptFile == null){
+				def scriptFile1 = new ScriptFile()
+				scriptFile1?.scriptName =fileName?.toString()
+				scriptFile1?.category = Category.RDKV_RDKSERVICE
+				scriptFile1?.moduleName = folder
+				if(!(scriptFile1.save(flush:true))){
 					println("Error while saving rdkservice script file")
-				 }
-			 }
+				}
+			}
 		 }
 	}
 	
