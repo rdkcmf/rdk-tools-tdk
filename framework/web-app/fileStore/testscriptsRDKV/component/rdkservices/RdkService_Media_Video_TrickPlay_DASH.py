@@ -83,8 +83,8 @@
 import tdklib;
 from BrowserPerformanceUtility import *
 import BrowserPerformanceUtility
-from performancelib import *
-import performancelib
+from rdkv_performancelib import *
+import rdkv_performancelib
 from web_socket_util import *
 import MediaValidationVariables
 from MediaValidationUtility import *
