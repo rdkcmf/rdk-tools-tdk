@@ -53,7 +53,9 @@ std::string DSHalAgent::testmodulepre_requisites()
         dsDisplayInit();
         dsVideoDeviceInit();
         dsFPInit();
+#ifndef NO_HDMI_INPUT
         dsHdmiInInit();
+#endif
 
         DEBUG_PRINT(DEBUG_TRACE, "DSHal testmodule pre_requisites --> Exit\n");
         return "SUCCESS";
@@ -83,7 +85,9 @@ bool DSHalAgent::testmodulepost_requisites()
     dsVideoDeviceTerm();
     /*Commented to address RDKTT-2015. Developed has suggested to comment since DS itself is not using this API*/
     //dsFPTerm();
+#ifndef NO_HDMI_INPUT
     dsHdmiInTerm();
+#endif
     vpHandle = 0;
     vdHandle = 0;
     apHandle = 0;
@@ -850,6 +854,7 @@ void DSHalAgent::DSHal_HdmiInGetNumberOfInputs(IN const Json::Value& req, OUT Js
 {
     DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetNumberOfInputs --->Entry\n");
 
+#ifndef NO_HDMI_INPUT
     dsError_t ret = dsERR_NONE;
     uint8_t noOfInputs;
 
@@ -873,6 +878,13 @@ void DSHalAgent::DSHal_HdmiInGetNumberOfInputs(IN const Json::Value& req, OUT Js
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetNumberOfInputs -->Exit\n");
         return;
     }
+#else
+    response["result"] = "FAILURE";
+    response["details"] = "Hdmi Input Port is not present in this device";
+    DEBUG_PRINT(DEBUG_LOG, "Hdmi Input Port is not present in this device");
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus -->Exit\n");
+    return;
+#endif
 }
 /***************************************************************************
  *Function name : DSHal_HdmiInGetStatus
@@ -881,7 +893,7 @@ void DSHalAgent::DSHal_HdmiInGetNumberOfInputs(IN const Json::Value& req, OUT Js
 void DSHalAgent::DSHal_HdmiInGetStatus(IN const Json::Value& req, OUT Json::Value& response)
 {
     DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus --->Entry\n");
-
+#ifndef NO_HDMI_INPUT
     dsError_t ret = dsERR_NONE;
     dsHdmiInStatus_t pStatus;
     char status[200]= {'\0'};
@@ -907,6 +919,13 @@ void DSHalAgent::DSHal_HdmiInGetStatus(IN const Json::Value& req, OUT Json::Valu
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus -->Exit\n");
         return;
     }
+#else
+    response["result"] = "FAILURE";
+    response["details"] = "Hdmi Input Port is not present in this device";
+    DEBUG_PRINT(DEBUG_LOG, "Hdmi Input Port is not present in this device");
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus -->Exit\n");
+    return;
+#endif
 }
 /***************************************************************************
  *Function name : DSHal_IsOutputHDR
@@ -1982,6 +2001,7 @@ void DSHalAgent::DSHal_GetVideoEOTF(IN const Json::Value& req, OUT Json::Value& 
 void DSHalAgent::DSHal_HdmiInScaleVideo(IN const Json::Value& req, OUT Json::Value& response)
 {
     DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInScaleVideo --->Entry\n");
+#ifndef NO_HDMI_INPUT
     if(&req["x"] == NULL || &req["y"] == NULL || &req["width"] == NULL || &req["height"] == NULL )
     {
         return;
@@ -2012,6 +2032,13 @@ void DSHalAgent::DSHal_HdmiInScaleVideo(IN const Json::Value& req, OUT Json::Val
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInScaleVideo -->Exit\n");
         return;
     }
+#else
+    response["result"] = "FAILURE";
+    response["details"] = "Hdmi Input Port is not present in this device";
+    DEBUG_PRINT(DEBUG_LOG, "Hdmi Input Port is not present in this device");
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus -->Exit\n");
+    return;
+#endif
 }
 /***************************************************************************
  *Function name : DSHal_IsHDCPEnabled
@@ -2580,6 +2607,7 @@ void DSHalAgent::DSHal_GetDialogEnhancement(IN const Json::Value& req, OUT Json:
 void DSHalAgent::DSHal_HdmiInSelectZoomMode(IN const Json::Value& req, OUT Json::Value& response)
 {
     DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInSelectZoomMode--->Entry\n");
+#ifndef NO_HDMI_INPUT
     if(&req["mode"] == NULL)
     {
         return;
@@ -2607,6 +2635,13 @@ void DSHalAgent::DSHal_HdmiInSelectZoomMode(IN const Json::Value& req, OUT Json:
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInSelectZoomMode -->Exit\n");
         return;
     }
+#else
+    response["result"] = "FAILURE";
+    response["details"] = "Hdmi Input Port is not present in this device";
+    DEBUG_PRINT(DEBUG_LOG, "Hdmi Input Port is not present in this device");
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus -->Exit\n");
+    return;
+#endif
 }
 /***************************************************************************
  *Function name : DSHal_GetEDID
@@ -2775,6 +2810,7 @@ void DSHalAgent::DSHal_GetCurrentOutputSettings(IN const Json::Value& req, OUT J
 void DSHalAgent::DSHal_HdmiInSelectPort(IN const Json::Value& req, OUT Json::Value& response)
 {
     DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInSelectPort--->Entry\n");
+#ifndef NO_HDMI_INPUT
     if(&req["port"] == NULL)
     {
         return;
@@ -2802,6 +2838,13 @@ void DSHalAgent::DSHal_HdmiInSelectPort(IN const Json::Value& req, OUT Json::Val
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInSelectPort -->Exit\n");
         return;
     }
+#else
+    response["result"] = "FAILURE";
+    response["details"] = "Hdmi Input Port is not present in this device";
+    DEBUG_PRINT(DEBUG_LOG, "Hdmi Input Port is not present in this device");
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus -->Exit\n");
+    return;
+#endif
 }
 /***************************************************************************
  *Function name : DSHal_GetHdmiInCurrentVideoMode
@@ -2810,6 +2853,7 @@ void DSHalAgent::DSHal_HdmiInSelectPort(IN const Json::Value& req, OUT Json::Val
 void DSHalAgent::DSHal_GetHdmiInCurrentVideoMode(IN const Json::Value& req, OUT Json::Value& response)
 {
     DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHdmiInCurrentVideoMode --->Entry\n");
+#ifndef NO_HDMI_INPUT
 
     dsError_t ret = dsERR_NONE;
     char output[100];
@@ -2835,6 +2879,13 @@ void DSHalAgent::DSHal_GetHdmiInCurrentVideoMode(IN const Json::Value& req, OUT 
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetHdmiInCurrentVideoMode -->Exit\n");
         return;
     }
+#else
+    response["result"] = "FAILURE";
+    response["details"] = "Hdmi Input Port is not present in this device";
+    DEBUG_PRINT(DEBUG_LOG, "Hdmi Input Port is not present in this device");
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_HdmiInGetStatus -->Exit\n");
+    return;
+#endif
 }
 /***************************************************************************
  *Function name : DSHal_GetSinkDeviceAtmosCapability
