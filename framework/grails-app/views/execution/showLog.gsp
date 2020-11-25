@@ -493,13 +493,18 @@ function hideScriptTrend(execResId){
 			</tbody>
 			</table>
 			<g:if test="${executionResultInstance.performance}">
-			<table>
-						<tr class="scripthead" style=" background:#DFDFDF;">
-							<td colspan="4" class="tdhead">Performance</td>					
-							<td>
-							<a href="#" id="expanderperf${k}_${i}" onclick="this.innerHTML='Hide';viewOnClickperf(this,${k},${i}); return false;">Show</a>
-						</tr>
+					<%
+					def cpuMemoryInfoPerformance = Performance.findAllByExecutionResultAndPerformanceType(executionResultInstance,"CPUMemoryInfo")
+					 %>
+					 <g:if test="${!cpuMemoryInfoPerformance}">
+						<table>
+							<tr class="scripthead" style=" background:#DFDFDF;">
+								<td colspan="4" class="tdhead">Performance</td>					
+								<td>
+									<a href="#" id="expanderperf${k}_${i}" onclick="this.innerHTML='Hide';viewOnClickperf(this,${k},${i}); return false;">Show</a>
+							</tr>
 						</table>
+					</g:if>
 						<span id="allmessagesperf${k}_${i}"  style="display: none;">
 						<section class="round-border">
 						

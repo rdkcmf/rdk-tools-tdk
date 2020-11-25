@@ -1641,4 +1641,101 @@ class TrendsController {
 		render(template: "baseExecutionExcelList", model: [executionInstanceList : executionList,executionIdList : executionIdList,checker:checker,messageDiv:messageDiv,validate:validate])
 	}
 	
+	/**
+	 * Method to return list of executions which are having all scripts with RDKV_RDKSERVICE category
+	 * @param fromDateParam
+	 * @param toDateParam
+	 * @return
+	 */
+	def filterRDKServiceExecutions(String fromDateParam, String toDateParam){
+		String fromDateString = fromDateParam?.trim()
+		def fromDateList = fromDateString.split("/")
+		def year = fromDateList[2]
+		def month = fromDateList[0]
+		def day = fromDateList[1]
+		String fromDate = year + "-" + month + "-" +day + " 00:00:00"
+		String toDateString = toDateParam?.trim()
+		def toDateList = toDateString.split("/")
+		year = toDateList[2]
+		month = toDateList[0]
+		day = toDateList[1]
+		String toDate = year + "-" + month + "-" +day + " 23:59:59"
+		boolean isRDKServiceExecution
+		List rdkServiceExecutionList = []
+		List fullExecutionList = Execution.findAll("from Execution as b where b.dateOfExecution between '${fromDate}' and '${toDate}' and b.category='RDKV' order by id desc ")
+		for(int i=0;i<fullExecutionList.size();i++){
+			Device dev = Device.findByStbName(fullExecutionList[i].device)
+			isRDKServiceExecution = false
+			if((dev == null) || dev?.isThunderEnabled){
+				ExecutionDevice executionDevice  = ExecutionDevice.findByExecution(fullExecutionList[i])
+				List executionResultList =  ExecutionResult.findAllByExecutionAndExecutionDevice(fullExecutionList[i],executionDevice)
+				for(int j=0;j<executionResultList.size();j++){
+					List performanceList = Performance.findAllByExecutionResult(executionResultList[j])
+					if(!(performanceList.isEmpty())){
+						isRDKServiceExecution = true
+						break
+					}
+				}
+				if(isRDKServiceExecution){
+					rdkServiceExecutionList.add(fullExecutionList[i]?.name)
+				}
+			}
+		}
+		render rdkServiceExecutionList as JSON
+	}
+	
+	/**
+	 * Method to return the data map for plotting CPU load and Memory usage data
+	 * @param rdkServiceExecutionName
+	 * @param rdkServiceScript
+	 * @return
+	 */
+	def getCpuMemoryInfoData(String rdkServiceExecutionName, String rdkServiceScript){
+		def execution = Execution.findByName(rdkServiceExecutionName)
+		List cpuLoadList = []
+		List memUsageList = []
+		def cpuListFloat =  []
+		def memUsageFloat =  []
+		def yMaxCpuLoad
+		def yMaxMemUsage
+		ExecutionDevice executionDevice  = ExecutionDevice.findByExecution(execution)
+		if(execution && executionDevice){
+			def executionResult =  ExecutionResult.findByExecutionAndExecutionDeviceAndScript(execution,executionDevice,rdkServiceScript)
+			if(executionResult){
+				List performanceList = Performance.findAllByExecutionResult(executionResult)
+				if(!(performanceList.isEmpty())){
+					performanceList.each{ performance ->
+						if(performance?.performanceType?.equals("CPUMemoryInfo") && performance?.processName?.equals("cpu_load")){
+							def processValueSplit = performance?.processValue.split(",")
+							processValueSplit.each{ processValue ->
+								cpuLoadList.add(processValue)
+							}
+						}else if(performance?.performanceType?.equals("CPUMemoryInfo") && performance?.processName?.equals("memory_usage")){
+							def processValueSplit = performance?.processValue.split(",")
+							processValueSplit.each{ processValue ->
+								memUsageList.add(processValue)
+							}
+						}
+	
+					}
+					cpuLoadList.each{resultString ->
+						def resultFloat = resultString as float
+						cpuListFloat.add(resultFloat)
+					}
+					memUsageList.each{resultString ->
+						def resultFloat = resultString as float
+						memUsageFloat.add(resultFloat)
+					}
+					yMaxCpuLoad =  cpuListFloat.max()
+					yMaxCpuLoad = yMaxCpuLoad + yMaxCpuLoad*0.5
+					yMaxCpuLoad = yMaxCpuLoad.round(2)
+					yMaxMemUsage =  memUsageFloat.max()
+					yMaxMemUsage = yMaxMemUsage + yMaxMemUsage*0.5
+					yMaxMemUsage = yMaxMemUsage.round(2)
+				}
+			}
+		}
+		def mapData = [cpuLoadList :cpuLoadList, memUsageList:memUsageList,yMaxCpuLoad:yMaxCpuLoad,yMaxMemUsage:yMaxMemUsage]
+		render mapData as JSON
+	}
 }

@@ -1001,3 +1001,7 @@ border-top: none;
 .oddForCombined {
 	background: #DFDFDF;
 }
+
+#chartdivAnalyzeExecution table.jqplot-table-legend {
+    width:auto;
+}

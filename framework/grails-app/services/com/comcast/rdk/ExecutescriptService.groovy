@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import java.util.concurrent.Executors
 import java.util.concurrent.FutureTask;
-
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
  * 
@@ -202,8 +202,7 @@ class ExecutescriptService {
 		
 		def logPath = "${realPath}/logs//${executionId}//${executionDevice?.id}//${executionResultId}//"
 		copyLogsIntoDir(realPath,logPath, executionId,executionDevice?.id, executionResultId)	
-		
-		
+		saveCpuMemoryInfo(logPath,executionId,executionResultId)
 		
 		outData?.eachLine { line ->
 			htmlData += (line + HTML_BR )
@@ -2554,6 +2553,92 @@ class ExecutescriptService {
 		return output
 	}
 	
+	/**
+	 * Method to parse and save the Cpu Load and Memory Usage details in performance table after script execution
+	 * @param logPath
+	 * @param executionId
+	 * @param executionResultId
+	 * @return
+	 */
+	def saveCpuMemoryInfo(def logPath,def executionId,def executionResultId){
+		def cpuMemoryInfoFile = new File(logPath+"${executionId}_CPUMemoryInfo.json")
+		if(cpuMemoryInfoFile.exists()){
+			def executionResult = ExecutionResult.findById(executionResultId)
+			def content = cpuMemoryInfoFile.readLines();
+			def eachLineContent = content[0]
+			if(eachLineContent){
+				JSONObject jsonObj = new JSONObject(eachLineContent);
+				if(jsonObj.has('cpuMemoryDetails')){
+					def cpuMemoryDetails = jsonObj.get('cpuMemoryDetails')
+					if(!(cpuMemoryDetails.isEmpty())){
+						String cpu_load_ValueList = ""
+						String memory_usage_ValueList = ""
+						int cpuCounter =1
+						def lastCpuMemory = cpuMemoryDetails[cpuMemoryDetails.size()-1]
+						def lastIterationNo = lastCpuMemory.get('iteration')
+						cpuMemoryDetails.each{ eachIteration ->
+							if(eachIteration.has('iteration') && eachIteration.has('cpu_load') && eachIteration.has('memory_usage')){
+								if(cpuCounter == 11){
+									cpuCounter = 1
+									def performanceInstance = new Performance()
+									performanceInstance.executionResult = executionResult
+									performanceInstance.performanceType = "CPUMemoryInfo"
+									performanceInstance.processName = "cpu_load"
+									performanceInstance.processValue = cpu_load_ValueList
+									performanceInstance.category = "RDKV"
+									performanceInstance.save(flush:true)
+									cpu_load_ValueList = ""
+									def performanceInstanceForMem = new Performance()
+									performanceInstanceForMem.executionResult = executionResult
+									performanceInstanceForMem.performanceType = "CPUMemoryInfo"
+									performanceInstanceForMem.processName = "memory_usage"
+									performanceInstanceForMem.processValue = memory_usage_ValueList
+									performanceInstanceForMem.category = "RDKV"
+									performanceInstanceForMem.save(flush:true)
+									memory_usage_ValueList = ""
+								}
+								def iterationNo = eachIteration.get('iteration')
+								def cpu_load = eachIteration.get('cpu_load')
+								if(cpu_load_ValueList.isEmpty()){
+									cpu_load_ValueList = cpu_load
+								}else{
+									cpu_load_ValueList = cpu_load_ValueList + "," +cpu_load
+								}
+								def memory_usage = eachIteration.get('memory_usage')
+								memory_usage = memory_usage.toFloat()
+								memory_usage = memory_usage.round(2)
+								memory_usage = memory_usage.toString()
+								if(memory_usage_ValueList.isEmpty()){
+									memory_usage_ValueList = memory_usage
+								}else{
+									memory_usage_ValueList = memory_usage_ValueList + "," +memory_usage
+								}
+								if(iterationNo == lastIterationNo){
+									def performanceInstance = new Performance()
+									performanceInstance.executionResult = executionResult
+									performanceInstance.performanceType = "CPUMemoryInfo"
+									performanceInstance.processName = "cpu_load"
+									performanceInstance.processValue = cpu_load_ValueList
+									performanceInstance.category = "RDKV"
+									performanceInstance.save(flush:true)
+									cpu_load_ValueList = ""
+									def performanceInstanceForMem = new Performance()
+									performanceInstanceForMem.executionResult = executionResult
+									performanceInstanceForMem.performanceType = "CPUMemoryInfo"
+									performanceInstanceForMem.processName = "memory_usage"
+									performanceInstanceForMem.processValue = memory_usage_ValueList
+									performanceInstanceForMem.category = "RDKV"
+									performanceInstanceForMem.save(flush:true)
+									memory_usage_ValueList = ""
+								}
+								cpuCounter ++
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	
 	/*def initiateLogTransfer(String executionName, String server, String logAppName, Device device){
 				int count = 3
