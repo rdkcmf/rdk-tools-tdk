@@ -4767,4 +4767,25 @@ class ExecutionController {
 			render "invalid"
 		}
 	}
+	
+	/**
+	 * Get the list of scripts of an execution
+	 * @param executionName
+	 * @return
+	 */
+	def getScriptsByExecution(String executionName){
+		def rdkScriptList = []
+		Execution execution = Execution.findByName(executionName)
+		if(execution){
+			ExecutionDevice executionDevice  = ExecutionDevice.findByExecution(execution)
+			List executionResultList =  ExecutionResult.findAllByExecutionAndExecutionDevice(execution,executionDevice)
+			for(int i=0;i<executionResultList.size();i++){
+				List performanceList = Performance.findAllByExecutionResult(executionResultList[i])
+				if(!(performanceList.isEmpty())){
+					rdkScriptList.add(executionResultList[i]?.script)
+				}
+			}
+		}
+		render rdkScriptList as JSON
+	}
 }

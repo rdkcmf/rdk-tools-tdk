@@ -49,6 +49,19 @@ $(document).ready(function() {
 			$("#boxTypeIdComparisonExec").html('<select><option value="">Please Select</option></select>');
 		}
 	});
+	
+	/**
+	 * Change the script name dropdown according to the execution selected for plotting cpu memory graph
+	 */
+	$("#rdkServiceExecutionId").live('change', function(){
+		var execution_name = $(this).val();
+		if(execution_name != '') {
+			getScriptsByExecution(execution_name)
+		}
+		else {
+			$("#rdkServiceScriptId").html('<select style="width:300px"><option value="">Please Select</option></select>');
+		}
+	});
 });
 
 /**
@@ -1399,6 +1412,7 @@ function showExecutionBased(){
 	$("#showComparisonReport").hide();
 	$("#categoryLabel").show();
 	$("#categoryId").show();
+	$("#analyzeExecution").hide();	
 }
 /**
  * Function display the device based chart 
@@ -1426,8 +1440,55 @@ function showDeviceBased(){
 	$("#showComparisonReport").hide();
 	$("#categoryLabel").show();
 	$("#categoryId").show();
+	$("#analyzeExecution").hide();	
 }
 
+/**
+ * Function to display the divs for plotting cpu memeory graph
+ */
+function showAnalyzeExecution(){
+	$("#normalexecutionsbased").hide();
+	$( ".chartdivBoxtypeclass" ).empty();
+	$( ".chartdivisionclass" ).empty();
+	$(".chartdivScriptclass").empty();
+	$(".chartdivBuildScriptclass").empty();
+	$(".chartdivisionbuildclass").empty();
+	$(".chartdivclass").empty();	
+	$("#executionbased").hide();	
+	$("#devicebased").hide();	
+	$("#scriptbased").hide();
+	$("#boxtypebased").hide();
+	$("#boxgroupbased").hide();
+	$("#boxscriptbased").hide();
+	$("#chartdiv").show();
+	$("#buildnamebased").hide();
+	$("#buildscriptbased").hide();
+	$("#buildgroupbased").hide();
+	$("#resultCategory").show();
+	$("#showComparisonReport").hide();
+	$("#categoryLabel").show();
+	$("#categoryId").show();
+	
+	$('.chartdivAnalyzeExecution').empty(); 
+	$("#rdkServiceDiv").hide(); 
+	$("#chartdivAnalyzeExecutionDiv3").hide(); 	
+	$("#analyzeExecution").show();	
+	$( "#fromDateFilterExecutions" ).datepicker();
+	$( "#toDateFilterExecutions" ).datepicker();
+	 var today = new Date();
+	 var priorDate = new Date();
+	 priorDate.setDate(today.getDate() - 7)
+	 var ddtoday = String(today.getDate()).padStart(2, '0');
+	 var mmtoday = String(today.getMonth() + 1).padStart(2, '0');
+	 var yyyytoday = today.getFullYear();
+	 today = mmtoday + '/' + ddtoday + '/' + yyyytoday;
+	 var ddprior = String(priorDate.getDate()).padStart(2, '0');
+	 var mmprior = String(priorDate.getMonth() + 1).padStart(2, '0');
+	 var yyyyprior = priorDate.getFullYear();
+	 priorDate = mmprior + '/' + ddprior + '/' + yyyyprior;
+	 document.getElementById("fromDateFilterExecutions").value = priorDate
+	 document.getElementById("toDateFilterExecutions").value = today
+}
 /**
  * Function display the boxtype based section 
  */
@@ -1460,6 +1521,7 @@ function showBoxTypeBased(){
 	$("#showComparisonReport").hide();
 	$("#categoryLabel").show();
 	$("#categoryId").show();
+	$("#analyzeExecution").hide();	
 }
 
 /**
@@ -1487,6 +1549,7 @@ function showScriptBased(){
 	$("#showComparisonReport").hide();
 	$("#categoryLabel").show();
 	$("#categoryId").show();
+	$("#analyzeExecution").hide();	
 }
 
 /**
@@ -1516,6 +1579,7 @@ function showComparisonReport(){
 	
 	$("#categoryLabel").hide();
 	$("#categoryId").hide();
+	$("#analyzeExecution").hide();	
 	
 }
 /**
@@ -1543,6 +1607,7 @@ function showNormalExecutionBased(){
 	$("#showComparisonReport").hide();
 	$("#categoryLabel").show();
 	$("#categoryId").show();
+	$("#analyzeExecution").hide();	
 	
 	var category = $('#category').val();
 	$.get('executionsForAnalysis', {category: category}, function(data) {
@@ -1587,6 +1652,7 @@ function showBoxScriptBased()
 	$("#showComparisonReport").hide();
 	$("#categoryLabel").show();
 	$("#categoryId").show();
+	$("#analyzeExecution").hide();	
 }
 /**
  * Function display the script based chart based on boxtype 
@@ -1613,6 +1679,7 @@ function showBoxGroupBased()
 	$("#showComparisonReport").hide();
 	$("#categoryLabel").show();
 	$("#categoryId").show();
+	$("#analyzeExecution").hide();	
 }
 
 /**
@@ -1645,6 +1712,7 @@ function showPerformanceBased(){
 	$("#showComparisonReport").hide();
 	$("#categoryLabel").show();
 	$("#categoryId").show();
+	$("#analyzeExecution").hide();	
 }
 
 /**
@@ -1683,6 +1751,7 @@ function showNormalBased(){
 	$("#showComparisonReport").hide();
 	$("#categoryLabel").show();
 	$("#categoryId").show();
+	$("#analyzeExecution").hide();	
 }
 
 /**
@@ -1727,6 +1796,7 @@ function showBuildNameBased(category){
 	$("#showComparisonReport").hide();
 	$("#categoryLabel").show();
 	$("#categoryId").show();
+	$("#analyzeExecution").hide();	
 	
 }
 
@@ -1764,6 +1834,7 @@ function showBuildScriptBased()
 	$("#showComparisonReport").hide();
 	$("#categoryLabel").show();
 	$("#categoryId").show();
+	$("#analyzeExecution").hide();	
 }
 
 /**
@@ -1792,6 +1863,7 @@ function showBuildGroupBased()
 	$("#showComparisonReport").hide();
 	$("#categoryLabel").show();
 	$("#categoryId").show();
+	$("#analyzeExecution").hide();	
 }
 
 /**
@@ -1839,6 +1911,9 @@ function submitPerformanceChartType()
 	else if (chartType == 'Compare Results by Device Details')
 	{
 		showDeviceBased();
+	}else if (chartType == 'Analyze RDK Certification Execution')
+	{
+		showAnalyzeExecution();
 	}
 	
 }
@@ -2601,4 +2676,149 @@ function fillDefectDetails(execId){
 	$("#defectType").val(document.getElementById("defectType_"+execId).value);
 	$("#ticketNo").val(document.getElementById("ticketNo_"+execId).value);
 	$("#remarks").val(document.getElementById("remarks_"+execId).value);
+}
+
+/**
+ * Function to fetch the Cpu memory data of a script and plot as a graph
+ */
+function showChartAnalyzeExecution(){
+	var rdkServiceExecutionName = $("#rdkServiceExecutionId").val();
+	var rdkServiceScript = $("#rdkServiceScript").val();
+	$('.chartdivAnalyzeExecution').empty();
+	document.getElementById("chartdivAnalyzeExecutionDiv1").style.width = "1200px";
+	$("#chartdivAnalyzeExecutionDiv3").show(); 	
+	$('#chartdivAnalyzeExecution').show();
+	if(rdkServiceScript != "" && rdkServiceExecutionName != ""){
+		$.get('getCpuMemoryInfoData', {rdkServiceExecutionName : rdkServiceExecutionName, rdkServiceScript : rdkServiceScript} , function(data) {	
+			if((data.cpuLoadList.length  == 0) || (data.memUsageList.length  == 0)){
+				alert(" No results to show");
+			}else{
+				if(data.cpuLoadList.length < 50){
+					document.getElementById("chartdivAnalyzeExecutionDiv1").style.width = "1200px";
+				}else if(data.cpuLoadList.length >= 50 && data.cpuLoadList.length < 100){
+					document.getElementById("chartdivAnalyzeExecutionDiv1").style.width = "1400px";
+				}else if(data.cpuLoadList.length >= 100 && data.cpuLoadList.length < 1000){
+					var counter = Math.ceil(data.cpuLoadList.length/100)
+					var pixelSize = (1500 * counter)+"px";
+					document.getElementById("chartdivAnalyzeExecutionDiv1").style.width = pixelSize;
+				}else{
+					document.getElementById("chartdivAnalyzeExecutionDiv1").style.width = "40000px";
+				}
+				var plot1 = $.jqplot('chartdivAnalyzeExecution', [data.cpuLoadList,data.memUsageList], {
+				      title: "<b> Cpu Load and Memory Usage Chart </b>", 
+				      seriesDefaults: { 
+				        showMarker:true,
+				        //pointLabels: { show:true } 
+				      },
+				      	axes:{
+				    	  	xaxis:{
+				            	renderer: $.jqplot.CategoryAxisRenderer,
+								label:rdkServiceScript,	
+								min:0,
+								max:150 ,
+								ticks: data.cpuLoadList.length,
+								tickOptions:{
+									angle: -60,
+									fontSize: '8pt'
+								},
+								tickRenderer:$.jqplot.CanvasAxisTickRenderer
+				            },
+				            yaxis: {
+								label:"cpu_load",
+								min:0,
+								max:data.yMaxCpuLoad
+							},
+							y2axis: {
+								label:"memory_usage",
+								min:0,
+								max:data.yMaxMemUsage
+							}
+				      },
+				        series : [{
+				            yaxis : 'yaxis'
+				        }, {
+				            yaxis : 'y2axis'
+				        }],
+				        highlighter: {
+				          show: true,
+				          tooltipAxes: 'y'
+				        },
+					    legend: {
+					    	show: true,
+					   		placement: 'outsideGrid',
+					   		location: 'n',
+					   		labels: ['cpu_load','memory_usage']
+					   }
+				 });
+			}
+		} );
+	}else{
+		alert("Execution name and script should not be empty")
+	}
+}
+
+/**
+ * Function to get the list of rdkservice executions and fill it in the execution dropdown to plot cpu memory graph 
+ */
+function showExecutionNames(){
+	$('.chartdivAnalyzeExecution').empty();
+	$("#rdkServiceDiv").hide(); 	
+	$("#chartdivAnalyzeExecutionDiv3").hide(); 	
+	var select = '<select style="width:300px" id="rdkServiceScript" name="rdkServiceScript"><option value="">Please Select</option>';
+	$("#rdkServiceScriptId").html(''); 
+	$("#rdkServiceScriptId").html(select); 
+	var category = $("#category").val();
+	var fromDate = $("#fromDateFilterExecutions").val();
+	var toDate = $("#toDateFilterExecutions").val();
+	if(fromDate != "" && toDate != ""){
+		var beforeDate = new Date(fromDate); 
+		var afterDate = new Date(toDate); 
+		var difference_In_Time = afterDate.getTime() - beforeDate.getTime(); 
+		var difference_In_Days = difference_In_Time / (1000 * 3600 * 24); 
+		if(difference_In_Days > 30){
+			alert("Maximum dates that can be selected is 30")
+		}else{
+			var today = new Date();
+			if((beforeDate > today) || (afterDate > today)){
+				alert("From or To dates cannot be greater than today's date")
+			}else if(beforeDate > afterDate){
+				alert("From cannot be greater than To date")
+			}else{
+			    $.get('filterRDKServiceExecutions', {fromDateParam: fromDate, toDateParam:toDate}, function(data) {
+			    	$('#rdkServiceExecutionId').empty()
+			    	$("#rdkServiceExecutionId").append(`<option value="">Please select</option>`);
+					for(i=0;i<data.length;i++){
+						$("#rdkServiceExecutionId").append(`<option value="${data[i]}">${data[i]}</option>`);
+					}
+			    	$("#rdkServiceDiv").show();
+			    });	
+			}
+		}
+	}else{
+		alert("Please select From and To dates")
+	}
+}
+
+
+/**
+ * Function to get the scripts of an execution and fill it in the script list dropdown to plot cpu memory graph
+ * @param category_id
+ */
+function getScriptsByExecution(execution_name) {
+	var url = $("#url").val();
+	var executionName = execution_name
+	if(execution_name != '') {
+	    $.get(url+'/execution/getScriptsByExecution', {executionName: executionName}, function(data) {
+			var select = '<select style="width:300px" id="rdkServiceScript" name="rdkServiceScript"><option value="">Please Select</option>';
+			for(var index = 0; index < data.length; index ++ ) {
+				select += '<option value="' + data[index] + '">' + data[index] + '</option>';
+			}
+			select += '</select>';
+			$("#rdkServiceScriptId").html(''); 
+			$("#rdkServiceScriptId").html(select); 
+	    });	
+	}
+	else {
+		$("#rdkServiceScriptId").html('');
+	}
 }

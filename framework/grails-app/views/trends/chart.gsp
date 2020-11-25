@@ -47,6 +47,7 @@
 <g:javascript library="chart/jqplot.canvasTextRenderer.min" />
 <g:javascript library="chart/jqplot.canvasAxisLabelRenderer.min" />
 <g:javascript library="chart/jqplot.canvasAxisTickRenderer.min" />
+<g:javascript library="chart/jqplot.highlighter.min" />
 <g:javascript library="jquery.more" />
 <g:javascript library="select2" />
 <g:javascript library="chartview" />
@@ -145,7 +146,7 @@
 						</div>
 						<div id = "performance" style="display: none;">
 						<div style="float: left;">&emsp;&emsp;&emsp;&emsp;Result Type &emsp; &emsp;</div>
-							&emsp;<g:select id = "chartOptions" name="chartOptions" from="['Compare Results by Execution Name','Compare Results by Device Details']"
+							&emsp;<g:select id = "chartOptions" name="chartOptions" from="['Compare Results by Execution Name','Compare Results by Device Details','Analyze RDK Certification Execution']"
 								onchange="submitPerformanceChartType();" value="${chartOptions}" />
 						</div>
 					
@@ -448,6 +449,47 @@
 				</table>
 				
 			</div>
+			<div id="analyzeExecution" style="display: none;">
+				<table class="noClass" style="border: 1; border-color: black;">
+					<tr>
+						<td valign="middle">&emsp;&emsp;&emsp;&emsp;From Date<span class="required-indicator">*</span></td>
+						<td valign="middle"><input type="text" style="width:290px" id="fromDateFilterExecutions" name="fromDateFilterExecutions" required/>
+						</td>
+						<td valign="middle">To Date<span class="required-indicator">*</span></td>
+						<td valign="middle"><input type="text" style="width:290px" id="toDateFilterExecutions" name="toDateFilterExecutions" required/>										
+						</td>
+						<td valign="middle">
+							<input type="button" class=" buttons" style="font-weight: bold;width:120px" name="filterRDKServiceExecutions" value="Filter Executions" onclick="showExecutionNames();">
+						</td>
+					</tr>
+					<tr><td><div></div></td></tr>
+					<tr id="rdkServiceDiv" style="display: none;">
+						<td style="vertical-align: top;">&emsp;&emsp;&emsp;&emsp;Select
+							Execution Name<span class="required-indicator">*</span></td>
+						<td id="rdkServiceExecutionNameList"><g:select id="rdkServiceExecutionId"
+								style="width:300px"
+								name="rdkServiceExecution" from="" optionKey="" value=""
+								 /></td>
+
+						<td style="vertical-align: top;">Select Script<span class="required-indicator">*</span></td>
+						<td id="rdkServiceScriptId">
+							<select name="rdkServiceScript" id = "rdkServiceScript" style="width:300px">
+								<option value="">Please Select</option>
+							</select>
+						</td>
+						<td><input type="button" class=" buttons" style="font-weight: bold;width:120px" value="Plot Graph" onclick="showChartAnalyzeExecution();"/>
+						</td>
+					</tr>
+
+				</table>
+				 <div id="chartdivAnalyzeExecutionDiv3" style="margin-left: 50px;margin-right: 50px;">
+					 <div id="chartdivAnalyzeExecutionDiv2" style="overflow:auto;">
+						<div id="chartdivAnalyzeExecutionDiv1" style="position:relative;">
+						      <div class="chartdivAnalyzeExecution" id="chartdivAnalyzeExecution" style=" height: 500px;"></div>
+						</div>
+					 </div>
+				 </div>
+			</div>			
 			<div id="buildnamebased" style="display: none;">
 				<table class="noClass" style="border: 1; border-color:black ;width:70%;  "   >
 					<tr >
