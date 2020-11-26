@@ -102,7 +102,7 @@
 
 </div>
 
-<div id="uploadButton" align="center"
+<div id="uploadButton" align="center" style="visibility: hidden;"
 	class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'Upload Buttons', 'error')} required">
 	<table>
 		<tr>
