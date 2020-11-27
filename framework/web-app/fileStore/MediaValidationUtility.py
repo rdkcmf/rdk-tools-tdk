@@ -37,10 +37,15 @@ def getOperations():
 
 # Function to form the complete test app url
 def getTestURL(appURL,videoURL,operations,autotest="true"):
-    url = appURL + "?" + "url=" + videoURL
-    if operations != "" or operations == None:
-        url = url + "&operations=" + operations
-    url = url + "&autotest=" + autotest
+    url = appURL
+    if videoURL != "" and videoURL != None:
+        url = url + "?" + "url=" + videoURL
+    connector = "&" if "?" in url else "?"
+    if operations != "" and operations != None:
+        url = url + connector + "operations=" + operations
+        connector = "&"
+    url = url + connector + "autotest=" + autotest
+
     url = "\"" + url + "\""
     return url
 
