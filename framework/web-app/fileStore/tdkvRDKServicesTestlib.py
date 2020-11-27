@@ -1788,11 +1788,14 @@ def testStepResultGeneration(testStepResponse,resultGenerationInfo, action="exec
         else:
             arg = []
         expectedValues = resultGenerationInfo.get("expectedValues")
-        expectedValues = expectedValues.split(",") if expectedValues != "null" else []
+        if expectedValues != None and expectedValues != "null":
+             expectedValues = expectedValues.split(",")
+        else:
+             expectedValues = []
         if action == "eventListener":
             info = CheckAndGenerateEventResult(result,tag,arg,expectedValues)
         elif action == "externalFnCall":
-            paths = [ basePathLoc, deviceConfigFile ]
+            paths = [ basePathLoc, deviceConfigFile, deviceIP ]
             info = ExecExternalFnAndGenerateResult(tag,arg,expectedValues,paths)
         else:
             info = CheckAndGenerateTestStepResult(result,tag,arg,expectedValues,otherInfo)
