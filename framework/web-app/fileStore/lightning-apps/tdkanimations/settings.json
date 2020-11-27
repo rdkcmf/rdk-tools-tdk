@@ -1,0 +1,32 @@
+{
+  "appSettings": {
+    "stage": {
+      "w" : "1920",
+      "h" : "1080",
+      "clearColor": "0x00000000",
+      "useImageWorker": false
+    },
+    "keys": {
+      "38": "Up",
+      "40": "Down",
+      "37": "Left",
+      "39": "Right",
+      "13": "Enter",
+      "16": "Shift",
+      "18": "Alt"
+    },
+    "debug": false
+  },
+  "platformSettings": {
+    "path": "./static/",
+    "log": true,
+    "showVersion": true,
+    "inspector" : true,
+    "showFps": true
+  },
+  "showFps": {
+    "interval": 60,
+    "log": true,
+    "threshold": 3
+  }
+}
