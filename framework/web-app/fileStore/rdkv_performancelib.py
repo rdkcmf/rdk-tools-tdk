@@ -26,6 +26,8 @@ import BrowserPerformanceVariables
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common import exceptions
+from SSHUtility import *
+import re
 
 deviceIP=""
 devicePort=""
@@ -356,3 +358,46 @@ def rdkservice_getBrowserScore_SunSpider():
         browser_score = "FAILURE"
         driver.quit()
    return browser_score
+
+#-------------------------------------------------------------------
+#GET THE TIMESTAMP FROM THE LOG STRING
+#-------------------------------------------------------------------
+def getTimeStampFromString(log_string):
+    match = re.search(r"(\d{2}:\d{2}:\d{2}\.\d{6})",log_string)
+    return match.group(1)
+
+#-------------------------------------------------------------------
+#GET THE TIME IN MILLISEC FROM THE STRING
+#-------------------------------------------------------------------
+def getTimeInMilliSec(time_string):
+    microsec_frm_time_string = int(time_string.split(".")[-1])
+    time_string = time_string.replace(time_string.split(".")[-1],"")
+    time_string = time_string.replace(".",":")
+    time_string = time_string + str(microsec_frm_time_string/1000)
+    hours, minutes, seconds, millisec = time_string.split(':')
+    time_in_millisec = int(hours) * 3600000 + int(minutes) * 60000 + int(seconds)*1000 + int(millisec)
+    return time_in_millisec
+
+#-------------------------------------------------------------------
+#GET THE OUTPUT OF A COMMAND EXECUTED
+#-------------------------------------------------------------------
+def rdkservice_getRequiredLog(ssh_method,credentials,command):
+    output = ""
+    if ssh_method == "directSSH":
+        credentials_list = credentials.split(',')
+        host_name = credentials_list[0]
+        user_name = credentials_list[1]
+        password = credentials_list[2]
+    else:
+        #TODO
+        print "Secure ssh to CPE"
+        pass
+    try:
+        output = ssh_and_execute(ssh_method,host_name,user_name,password,command)
+    except Exception as e:
+        print "Exception occured during ssh session"
+        print e
+    finally:
+        if output == "":
+            output = "EXCEPTION"
+        return output
