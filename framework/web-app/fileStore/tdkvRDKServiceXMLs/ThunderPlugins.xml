@@ -33,6 +33,25 @@
             </params>
             <expectedValues>null</expectedValues>
         </method>
+        <method name="Start_Discovery" api="startdiscovery" type="method" desc="Starts the network discovery" >
+            <params>
+                <param tag="ttl" defaultValue="0" type="int"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Discovery_Results" api="discoveryresults" type="method" desc="Gives discovery results"/>
+        <method name="Subsystems_Status" api="subsystems" type="property" desc="Provides access to the status of the subsystems" >
+            <expectedValues>Platform,Network,Security,Identifier,Internet,Location,Time,Provisioning,Decryption,Graphics,WebSource,Streaming</expectedValues>
+        </method>
+        <method name="Process_Info" api="processinfo" type="property" desc="Gives information about the framework process"/>
+        <method name="Environment_Variable" api="environment" type="property" desc="Gives value of an environment variable"/>
+        <method name="Get_Active_Connections_Info" api="links" type="property" desc="Gives information about active connections" >
+            <expectedValues>WebServer,WebSocket,RawSocket,Closed,Suspended</expectedValues>
+        </method>
+        <method name="Store_Configuration" api="storeconfig" type="method" desc="Saves the current configuration">
+            <expectedValues>null</expectedValues>
+        </method>
+
     </plugin>
 
 
@@ -159,6 +178,8 @@
             </params>
         </method>
         <event name="Event_Interface_Status_Changed" eventName="onInterfaceStatusChanged" eventId="client.events.1" type="event" desc="Interface status changed  event" />
+        <event name="Event_Connection_Status_Changed" eventName="onConnectionStatusChanged" eventId="client.events.1" type="event" desc="Connection status changed event" />
+        <event name="Event_IPAddress_Status_Changed" eventName="onIPAddressStatusChanged" eventId="client.events.1" type="event" desc="IPAddress status changed event" />
     </plugin>
 
 
@@ -788,6 +809,9 @@
         </method>
         <method name="Initiate_WPS_Pairing" api="initiateWPSPairing" type="method" desc="Initiates the connection via WPS" />
         <method name="Cancel_WPS_Pairing" api="cancelWPSPairing" type="method" desc="Cancels WPS pairing" />
+        <method name="Is_Paired" api="isPaired" type="method" desc="Determines if the device paired to an SSID" />
+        <method name="Get_Paired_SSID" api="getPairedSSID" type="method" desc="Returns the SSID the device is currently paired with" />
+        <method name="Get_Paired_SSID_Info" api="getPairedSSIDInfo" type="method" desc="Returns the SSID the device is currently paired with also including the BSSID" />
         <event name="Event_On_WIFI_State_Changed" eventName="onWIFIStateChanged" eventId="client.events.1" type="event" desc="Indicates state change" />
         <event name="Event_On_Available_SSIDs" eventName="onAvailableSSIDs" eventId="client.events.1" type="event" desc="Gives SSID after scan" />
     </plugin>

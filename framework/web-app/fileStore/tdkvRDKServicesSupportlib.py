@@ -25,6 +25,8 @@
 import inspect
 import json , ast
 import collections
+from pexpect import pxssh
+import ConfigParser
 
 
 #-----------------------------------------------------------------------------------------------
@@ -865,7 +867,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "display_connected_status":
             info["video_display"] = result.get('connectedVideoDisplays')
-            if json.dumps(result.get('success')) == "true" and result.get('connectedVideoDisplays'):
+            if json.dumps(result.get('success')) == "true" and str(expectedValues[0]) in  result.get('connectedVideoDisplays'):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -944,7 +946,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "check_connected_audio_ports":
             info["connected_audio_port"] = result.get('connectedAudioPorts')
-            if json.dumps(result.get('success')) == "true" and result.get('connectedAudioPorts'):
+            if json.dumps(result.get('success')) == "true" and str(expectedValues[0]) in result.get('connectedAudioPorts'):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -1203,7 +1205,6 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "wifi_get_connected_ssid":
             info = checkAndGetAllResultInfo(result,result.get("success"))
-#            if str(result.get("success")).lower() == "true" and str(result.get("ssid")) in expectedValues:
             if arg[0] == "check_ssid":
                 if str(result.get("success")).lower() == "true" and str(result.get("ssid")) in expectedValues:
                     info["Test_Step_Status"] = "SUCCESS"
@@ -1214,6 +1215,20 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "wifi_check_ssid_pairing":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            if int(result.get("result")) == int(expectedValues[0]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "wifi_get_paired_ssid":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+            if str(result.get("success")).lower() == "true" and str(result.get("ssid")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # Bluetooth Plugin Response result parser steps
         elif tag == "bluetooth_set_operation":
@@ -1393,6 +1408,33 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "controller_check_discovery_result":
+            info = checkAndGetAllResultInfo (result[0])
+
+        elif tag == "controller_check_environment_variable_value":
+            info = checkAndGetAllResultInfo (result)
+
+
+        elif tag == "controller_check_processinfo":
+            info = checkAndGetAllResultInfo (result)
+
+        elif tag == "controller_check_active_connection":
+            info = result[0]
+            status = checkNonEmptyResultData(result[0])
+            if status == "TRUE" and str(result[0].get("state")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "controller_check_subsystems_status":
+            info = result[0]
+            status = checkNonEmptyResultData(result[0])
+            if status == "TRUE" and str(result[0].get("subsystem")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
 
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)
@@ -1875,12 +1917,7 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             testStepResults = testStepResults[0].values()[0]
             video_display = testStepResults[0].get("video_display")       
             info["videoDisplay"] = video_display[0]
-            info["portName"] = video_display[0]
-
-        elif tag =="get_audio_port":
-            testStepResults = testStepResults[0].values()[0]
-            connected_audio_port = testStepResults[0].get("connected_audio_port")
-            info["audioPort"] = connected_audio_port[0]
+            info["portName"] = video_display[0] 
 
         elif tag =="get_supported_sound_modes":
             testStepResults = testStepResults[0].values()[0]
@@ -2115,6 +2152,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
     arg  = arguments
     basePath = paths[0]
     deviceConfigFile = paths[1]
+    deviceIP = paths[2]
 
     # Input Variables:
     # a. methodTag - string
@@ -2143,6 +2181,10 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
         print "FUNCTION TAG     :", tag
         if tag == "executeBluetoothCtl":
             info["Test_Step_Status"] = executeBluetoothCtl(arg,basePath)
+        elif tag == "broadcastIARMEventTuneReady":
+            command = "IARM_event_sender TuneReadyEvent 1"
+            info["details"] = executeCommand(deviceConfigFile, deviceIP, command)
+            info["Test_Step_Status"] = "SUCCESS"
 
         else:
             print "\nError Occurred: [%s] No function call available for %s" %(inspect.stack()[0][3],methodTag)
@@ -2256,4 +2298,27 @@ def executeBluetoothCtl(commands,basePath):
         status = "FAILURE"
 
     return status
+
+def executeCommand(deviceConfigFile, deviceIP, command):
+    configParser = ConfigParser.ConfigParser()
+    configParser.read(r'%s' % deviceConfigFile)
+    username = configParser.get('device-credentials', 'USER_NAME')
+    password = configParser.get('device-credentials', 'PASSWORD')
+
+    try:
+        session = pxssh.pxssh(options={
+                                "StrictHostKeyChecking": "no",
+                                "UserKnownHostsFile": "/dev/null"})
+        print "\nCreating ssh session"
+        session.login(deviceIP,username,password,sync_multiplier=3)
+        print "\nExecuting command"
+        session.sendline(command)
+        session.prompt()
+        output = session.before
+        print"\nClosing session"
+        session.logout()
+    except pxssh.ExceptionPxssh as e:
+        print "Login to device failed"
+        print e
+    return output
 

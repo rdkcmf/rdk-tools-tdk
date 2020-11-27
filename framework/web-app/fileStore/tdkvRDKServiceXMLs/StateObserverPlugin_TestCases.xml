@@ -77,5 +77,44 @@
           <resultGeneration useMethodTag="StateObserver_get_property_info" />
         </testStep>
     </testCase>
+
+    <!-- Test case 04 -->
+    <testCase testCaseId="StateObserver_04" testCaseName="StateObserver_Register_Unregister_Listeners" desc="Registers and unregisters listeners for properties">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="Register_Listeners" method="RegisterListeners">
+          <params>
+            <param tag="PropertyNames" useConfigFile="true" key="STATEOBSERVER_INPUT_PROPERTIES" />
+          </params>
+          <resultGeneration useMethodTag="StateObserver_get_property_info" />
+        </testStep>
+        <testStep testStepId="2" name="Unegister_Listeners" method="UnregisterListeners">
+          <params>
+            <param tag="PropertyNames" useConfigFile="true" key="STATEOBSERVER_INPUT_PROPERTIES" />
+          </params>
+          <resultGeneration useMethodTag="StateObserver_validate_result" />
+        </testStep>
+    </testCase>
+
+    <!-- Test case 05 -->
+    <testCase testCaseId="StateObserver_05" testCaseName="StateObserver_Get_Registered_Property_Names" desc="Returns an array of all properties, which has active listeners">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="Register_Listeners" method="RegisterListeners">
+          <params>
+            <param tag="PropertyNames" useConfigFile="true" key="STATEOBSERVER_INPUT_PROPERTIES" />
+          </params>
+          <resultGeneration useMethodTag="StateObserver_get_property_info" />
+        </testStep>
+        <testStep testStepId="2" name="GetRegisteredPropertyNames" method="GetRegisteredPropertyNames">
+            <resultGeneration useMethodTag="stateobserver_check_registered_property_names">
+                <expectedValues useConfigFile="true" key="STATEOBSERVER_INPUT_PROPERTIES" />
+            </resultGeneration>
+        </testStep>
+        <testStep testStepId="3" name="Unegister_Listeners" method="UnregisterListeners">
+          <params>
+            <param tag="PropertyNames" useConfigFile="true" key="STATEOBSERVER_INPUT_PROPERTIES" />
+          </params>
+          <resultGeneration useMethodTag="StateObserver_validate_result" />
+        </testStep>
+    </testCase>
 </testPlugin>
 
