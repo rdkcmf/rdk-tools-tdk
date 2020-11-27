@@ -343,36 +343,71 @@ class MigrationService {
 	 */
 	def migrateBoxType(){
 		def tempList = []
+		def boxTypeTempMap = [:]
 		BoxType.temp.withSession {session->
-			tempList = BoxType.temp.findAll();
-                        session.clear()
-		}
-
-		List migrationList = []
-		tempList.each {tempEntry ->
-			BoxType.withSession {session->
-				def newDbObject = BoxType.findByNameAndCategory(tempEntry?.name,tempEntry?.category)
-				if(!newDbObject){
-					migrationList.add(tempEntry)
-				}
-                                session.clear()
+			tempList = BoxType.temp.findAll([fetch : [name : "eager",subBoxTypeList : "eager"]]);
+			tempList.each{boxTypeTempEntry->
+					boxTypeTempMap.put(boxTypeTempEntry,boxTypeTempEntry?.subBoxTypeList)
 			}
+			session.clear()
 		}
-		migrationList.each{ migrateObj ->
+		boxTypeTempMap.each{
+			BoxType boxTypeObject
 			BoxType.withSession {session->
 				try{
-					BoxType newObject  = new BoxType(migrateObj.getProperties())
-					
-					if(!migrateObj?.category){
-						newObject.category = Category.RDKV
+					boxTypeObject = BoxType.findByNameAndCategory(it.key?.name,it.key?.category)
+					if(!boxTypeObject){
+						boxTypeObject  = new BoxType()
 					}
-					newObject.save(flush:true)
-				}catch(Exception e ){
+					boxTypeObject.properties = it.key?.getProperties()
+					if(!it.key?.category){
+						boxTypeObject.category = Category.RDKV
+					}
+					boxTypeObject.subBoxTypeList =  []
+					if(!boxTypeObject.save(flush:true)){
+						boxTypeObject?.errors.allErrors.each{error->
+							println" save error "+error
+						}
+					}
+				}catch(Exception e){
+					 e.printStackTrace()
 				}
-                                session.clear()
+				session.clear()
 			}
 		}
-
+		boxTypeTempMap.each{
+			BoxType boxTypeObject
+			BoxType.withSession {session->
+				try{
+					boxTypeObject = BoxType.findByNameAndCategory(it.key?.name,it.key?.category)
+					if(boxTypeObject){
+						def subBoxTypeList = it.key?.subBoxTypeList
+						subBoxTypeList.each { boxType ->
+							def bType
+							BoxType.withNewSession{boxTypeSession->
+								bType = BoxType.findByNameAndCategory(boxType?.name,boxType?.category)
+								if(bType){
+									if(!boxTypeObject?.subBoxTypeList?.contains(bType)){
+										boxTypeObject?.addToSubBoxTypeList(bType)
+									}
+									else{
+									}
+								}
+								boxTypeSession.clear()
+							}
+						}
+						if(!boxTypeObject.save(flush:true)){
+							boxTypeObject?.errors.allErrors.each{error->
+								println" save error "+error
+							}
+						}
+					}
+				}catch(Exception e){
+					 e.printStackTrace()
+				}
+				session.clear()
+			}
+		}
 	}
 	
 	/**
