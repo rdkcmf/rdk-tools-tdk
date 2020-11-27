@@ -348,6 +348,21 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+        elif tag == "network_connection_status_change_event":
+            result = result[0]
+            info = result
+            if str(result.get("status")) in  expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "network_ipaddress_status_change_event":
+            result = result[0]
+            info = result
+            if str(result.get("status")) in  expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
   
         # DataCapture Events response result parser steps

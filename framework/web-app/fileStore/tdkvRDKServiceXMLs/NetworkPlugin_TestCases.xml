@@ -40,6 +40,8 @@
           </prerequisite>
           <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
             <event pluginName="Network" eventName="Event_Interface_Status_Changed" />
+            <event pluginName="Network" eventName="Event_Connection_Status_Changed" />
+            <event pluginName="Network" eventName="Event_IPAddress_Status_Changed" />
           </prerequisite>
         </pluginPreRequisite>
 
@@ -199,5 +201,72 @@
                 </resultGeneration>
             </testStep>
         </testCase>
+        <testCase testCaseId="NW_11" testCaseName="Check_Connection_Status_Changed"  desc="Checks for the connection status change event" >
+            <testStep testStepId="1" pluginName="Wifi" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value=""/>
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value=""/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" pluginName="Wifi"  name="Connect" method="Connect" delay="5">
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
+                  <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
+                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="3" pluginName="Wifi"  name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
+                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
+                    <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Check_Connection_Status_Change_Event" event="Event_Connection_Status_Changed" action="eventListener" delay="3"  >
+                <resultGeneration useMethodTag="network_connection_status_change_event" expectedValues="CONNECTED" />
+            </testStep>
+            <testStep testStepId="5" pluginName="Wifi" name="Disconnect" method="Disconnect" delay="3">
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="6" name="Check_Connection_Status_Change_Event" event="Event_Connection_Status_Changed" action="eventListener" delay="3"  >
+                <resultGeneration useMethodTag="network_connection_status_change_event" expectedValues="DISCONNECTED" />
+            </testStep>
+            <testStep testStepId="7" pluginName="Wifi" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase>
+       <testCase testCaseId="NW_12" testCaseName="Check_IPAddress_Status_Changed"  desc="Checks for the ipaddress status change event" >
+            <testStep testStepId="1" pluginName="Wifi" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value=""/>
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value=""/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" pluginName="Wifi"  name="Connect" method="Connect" delay="5">
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
+                  <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
+                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="3" pluginName="Wifi"  name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
+                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
+                    <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Check_IPAddress_Status_Change_Event" event="Event_IPAddress_Status_Changed" action="eventListener" delay="3"  >
+                <resultGeneration useMethodTag="network_ipaddress_status_change_event" expectedValues="ACQUIRED" />
+            </testStep>
+            <testStep testStepId="5" pluginName="Wifi" name="Disconnect" method="Disconnect" delay="3">
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="6" pluginName="Wifi" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase>
 </testPlugin>
 
