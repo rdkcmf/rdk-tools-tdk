@@ -83,6 +83,14 @@
           <parameter name="state" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkservice_getRequiredLog" id=" " version="1">
+        <function>rdkservice_getRequiredLog</function>
+        <parameters>
+          <parameter name="command" value=""/>
+          <parameter name="credentials" value=""/>
+          <parameter name="ssh_method" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
