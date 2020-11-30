@@ -19,7 +19,7 @@
 #The port must be 9998 for thunder builds and 9224 for rdkservice builds
 webinspect_port = ""
 
-#channel change application url,application from metrological:"http://cdn.metrological.com/static/storm/cc_time_v2.html?test_duration=168"
+#channel change application url, sample application:"http://cdn.metrological.com/static/storm/cc_time_v2.html?test_duration=168"
 channel_change_url = ""
 
 #no of channel changes to perform
@@ -46,3 +46,24 @@ ValidateControllerUI = "No"
 ValidateNoOfPlugins = "No"
 #Give the value in seconds to wait for device to come online after reboot.
 rebootwaitTime = 150
+
+####Webkit stress test details
+#test duration in minutes till webkit stress test should be performed.
+stress_test_duration = 60
+
+#Stress test url, this will trigger the redirection of urls in webkit browser
+stress_test_url = "https://cdn.metrological.com/static/storm/app_redirect1.html"
+
+#The directed urls will follow the below pattern
+expected_url_pattern = "https://cdn.metrological.com/static/storm/app_redirect[1|2].html\?run=\d*&runs=-1&wait=200&requests=20&side=[A|B]"
+
+####Suspend and Resume tests details - used for both webkit test and cobalt test
+#The maximum number of times the test should repeat:
+suspend_resume_max_count = 30
+
+####Random key sending test details
+#The URL used to test cobalt to play while sending random keys
+cobalt_randomkey_test_url = ""
+
+#The time in minutes till random keys should be sent, this duration should be less than the duration of above configured video.
+cobalt_randomkey_test_duration = 60
