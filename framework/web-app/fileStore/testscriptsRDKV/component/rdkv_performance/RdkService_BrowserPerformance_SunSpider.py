@@ -17,67 +17,54 @@
 # limitations under the License.
 ##########################################################################
 '''
-<?xml version='1.0' encoding='utf-8'?>
-<xml>
-  <id></id>
-  <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
+<?xml version="1.0" encoding="UTF-8"?><xml>
+  <id/>
   <version>2</version>
-  <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RdkService_BrowserPerformance_SunSpider</name>
-  <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
-  <primitive_test_id></primitive_test_id>
-  <!-- Do not change primitive_test_id if you are editing an existing script. -->
+  <primitive_test_id/>
   <primitive_test_name>rdkservice_getBrowserScore_SunSpider</primitive_test_name>
-  <!--  -->
   <primitive_test_version>1</primitive_test_version>
-  <!--  -->
   <status>FREE</status>
-  <!--  -->
   <synopsis>To get the browser score using SunSpider test</synopsis>
-  <!--  -->
-  <groups_id />
-  <!--  -->
+  <groups_id/>
   <execution_time>6</execution_time>
-  <!--  -->
   <long_duration>false</long_duration>
-  <!--  -->
   <advanced_script>false</advanced_script>
-  <!-- execution_time is the time out time for test execution -->
-  <remarks></remarks>
-  <!-- Reason for skipping the tests if marked to skip -->
+  <remarks/>
   <skip>false</skip>
-  <!--  -->
   <box_types>
     <box_type>RPI-Client</box_type>
-    <!--  -->
     <box_type>RPI-HYB</box_type>
-    <!--  -->
     <box_type>Video_Accelerator</box_type>
-    <!--  -->
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>
-    <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id></test_case_id>
-    <test_objective></test_objective>
-    <test_type></test_type>
-    <test_setup></test_setup>
-    <pre_requisite></pre_requisite>
-    <api_or_interface_used></api_or_interface_used>
-    <input_parameters></input_parameters>
-    <automation_approch></automation_approch>
-    <expected_output></expected_output>
-    <priority></priority>
-    <test_stub_interface></test_stub_interface>
-    <test_script></test_script>
-    <skipped></skipped>
-    <release_version></release_version>
-    <remarks></remarks>
+    <test_case_id>RDKV_PERFORMANCE_06</test_case_id>
+    <test_objective>To get the browser score using SunSpider test</test_objective>
+    <test_type>Positive</test_type>
+    <test_setup>RPI, Accelerator</test_setup>
+    <pre_requisite>1. Wpeframework process should be up and running in the device.
+</pre_requisite>
+    <api_or_interface_used>None</api_or_interface_used>
+    <input_parameters>1. Threshold value of SunSpider score
+2. SunSpider test url</input_parameters>
+    <automation_approch>1. As a pre requisite disable all other plugins and enable webkitbrowser plugin.
+2. Load the SunSpider Browser test URL
+3. Get the final score and validate it
+4. Revert all values</automation_approch>
+    <expected_output>The browser score from SunSpider should be in the expected range</expected_output>
+    <priority>High</priority>
+    <test_stub_interface>rdkv_performance</test_stub_interface>
+    <test_script>RdkService_BrowserPerformance_SunSpider</test_script>
+    <skipped>No</skipped>
+    <release_version>M82</release_version>
+    <remarks/>
   </test_cases>
-  <script_tags />
+  <script_tags/>
 </xml>
+
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
@@ -100,6 +87,7 @@ obj.configureTestCase(ip,port,'RdkService_BrowserPerformance_SunSpider');
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
+obj.setLoadModuleStatus(result);
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
