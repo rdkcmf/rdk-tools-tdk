@@ -17,66 +17,53 @@
 # limitations under the License.
 ##########################################################################
 '''
-<?xml version='1.0' encoding='utf-8'?>
-<xml>
-  <id></id>
-  <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
+<?xml version="1.0" encoding="UTF-8"?><xml>
+  <id/>
   <version>1</version>
-  <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RdkService_AppPerformance_AppLaunch</name>
-  <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
-  <primitive_test_id> </primitive_test_id>
-  <!-- Do not change primitive_test_id if you are editing an existing script. -->
+  <primitive_test_id/>
   <primitive_test_name>rdkservice_setValue</primitive_test_name>
-  <!--  -->
   <primitive_test_version>1</primitive_test_version>
-  <!--  -->
   <status>FREE</status>
-  <!--  -->
   <synopsis>This script is to get the time taken to launch the lightning application with webkit</synopsis>
-  <!--  -->
-  <groups_id />
-  <!--  -->
+  <groups_id/>
   <execution_time>4</execution_time>
-  <!--  -->
   <long_duration>false</long_duration>
-  <!--  -->
   <advanced_script>false</advanced_script>
-  <!-- execution_time is the time out time for test execution -->
-  <remarks></remarks>
-  <!-- Reason for skipping the tests if marked to skip -->
+  <remarks/>
   <skip>false</skip>
-  <!--  -->
   <box_types>
     <box_type>RPI-HYB</box_type>
-    <!--  -->
     <box_type>RPI-Client</box_type>
-    <!--  -->
     <box_type>Video_Accelerator</box_type>
-    <!--  -->
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>
-    <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id></test_case_id>
-    <test_objective></test_objective>
-    <test_type></test_type>
-    <test_setup></test_setup>
-    <pre_requisite></pre_requisite>
-    <api_or_interface_used></api_or_interface_used>
-    <input_parameters></input_parameters>
-    <automation_approch></automation_approch>
-    <expected_output></expected_output>
-    <priority></priority>
-    <test_stub_interface></test_stub_interface>
-    <test_script></test_script>
-    <skipped></skipped>
-    <release_version></release_version>
-    <remarks></remarks>
+    <test_case_id>RDKV_PERFORMANCE_02</test_case_id>
+    <test_objective>This script is to get the time taken to launch the lightning application with webkit</test_objective>
+    <test_type>Positive</test_type>
+    <test_setup>RPI, Accelerator</test_setup>
+    <pre_requisite>1. Wpeframework process should be up and running in the device.
+2. Test Manager time should be in sync with UTC time.
+</pre_requisite>
+    <api_or_interface_used>None</api_or_interface_used>
+    <input_parameters>1. The URL of the application to be launched.
+</input_parameters>
+    <automation_approch>1. As a pre requisite disable all other plugins and enable webkitbrowser plugin.
+2. Set the application URL in webkitbrowser
+3. Get the time taken to load the application</automation_approch>
+    <expected_output>The application should launch within 60 seconds.</expected_output>
+    <priority>High</priority>
+    <test_stub_interface>rdkv_performance</test_stub_interface>
+    <test_script>RdkService_AppPerformance_AppLaunch</test_script>
+    <skipped>No</skipped>
+    <release_version>M82</release_version>
+    <remarks/>
   </test_cases>
 </xml>
+
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
@@ -104,6 +91,7 @@ webkit_console_socket = None
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result
+obj.setLoadModuleStatus(result);
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
