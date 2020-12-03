@@ -41,6 +41,7 @@
       <function name='rdkservice_setPluginStatus' />
       <function name='rdkservice_getBrowserScore_HTML5' />
       <function name='rdkservice_getBrowserScore_SunSpider' />
+      <function name='rdkservice_getRequiredLog' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -54,6 +55,9 @@
       <parameter funName='rdkservice_setPluginState' parameterName='plugin' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_setPluginStatus' parameterName='plugin' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_setPluginStatus' parameterName='status' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_getRequiredLog' parameterName='ssh_method' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_getRequiredLog' parameterName='command' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_getRequiredLog' parameterName='credentials' parameterType='STRING' range='a-z' />
     </parameters>
   </module>
 </xml>
