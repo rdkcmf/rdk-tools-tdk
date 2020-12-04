@@ -18,19 +18,23 @@
 #########################################################################
 
 #The port must be 9998 for thunder builds and 9224 for rdkservice builds
-webinspect_port=
+webinspect_port=""
+
+#Port used by ThunderJS in lightning app,port must be 9998 for rdkservice builds
+thunder_port=""
 
 #lightning application url
-lightning_video_test_app_url =
+lightning_video_test_app_url = ""
+lightning_animation_test_app_url = ""
 
 #Video URL
-video_src_url =
+video_src_url = ""
 
 #HLS Video URL
-video_src_url_hls =
+video_src_url_hls = ""
 
 #DASH Video URL
-video_src_url_dash =
+video_src_url_dash = ""
 
 # Time duration for operations
 # Provided time (seconds) is the duration after how much second the operation should take place
@@ -43,3 +47,6 @@ repeat_count_stress = 15
 
 operation_min_interval = 5
 operation_max_interval = 10
+
+#This FPS threshold level should be updated for each platform and it may differ
+expected_fps_threshold = 0
