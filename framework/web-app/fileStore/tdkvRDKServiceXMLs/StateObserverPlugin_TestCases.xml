@@ -116,5 +116,94 @@
           <resultGeneration useMethodTag="StateObserver_validate_result" />
         </testStep>
     </testCase>
+
+    <!-- Test case 06 -->
+    <testCase testCaseId="StateObserver_06" testCaseName="StateObserver_Get_Registered_Property_Name_Tune_Ready" desc="Registers listener for tune ready property and checks registered property name">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="Register_Listeners" method="RegisterListeners">
+          <params>
+            <param tag="PropertyNames" useConfigFile="true" key="STATEOBSERVER_TUNE_READY_PROPERTY" />
+          </params>
+          <resultGeneration useMethodTag="StateObserver_get_property_info" />
+        </testStep>
+        <testStep testStepId="2" name="GetRegisteredPropertyNames" method="GetRegisteredPropertyNames">
+            <resultGeneration useMethodTag="stateobserver_check_registered_property_names">
+                <expectedValues useConfigFile="true" key="STATEOBSERVER_TUNE_READY_PROPERTY" />
+            </resultGeneration>
+        </testStep>
+        <testStep testStepId="3" name="Unegister_Listeners" method="UnregisterListeners">
+          <params>
+            <param tag="PropertyNames" useConfigFile="true" key="STATEOBSERVER_TUNE_READY_PROPERTY" />
+          </params>
+          <resultGeneration useMethodTag="StateObserver_validate_result" />
+        </testStep>
+    </testCase>
+
+    <!-- Test case 07 -->
+    <testCase testCaseId="StateObserver_07" testCaseName="StateObserver_Get_Registered_Property_Name_Channel_Map" desc="Registers listener for channel map property and checks registered property name">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="Register_Listeners" method="RegisterListeners">
+          <params>
+            <param tag="PropertyNames" useConfigFile="true" key="STATEOBSERVER_CHANNEL_MAP_PROPERTY" />
+          </params>
+          <resultGeneration useMethodTag="StateObserver_get_property_info" />
+        </testStep>
+        <testStep testStepId="2" name="GetRegisteredPropertyNames" method="GetRegisteredPropertyNames">
+            <resultGeneration useMethodTag="stateobserver_check_registered_property_names">
+                <expectedValues useConfigFile="true" key="STATEOBSERVER_CHANNEL_MAP_PROPERTY" />
+            </resultGeneration>
+        </testStep>
+        <testStep testStepId="3" name="Unegister_Listeners" method="UnregisterListeners">
+          <params>
+            <param tag="PropertyNames" useConfigFile="true" key="STATEOBSERVER_CHANNEL_MAP_PROPERTY" />
+          </params>
+          <resultGeneration useMethodTag="StateObserver_validate_result" />
+        </testStep>
+    </testCase>
+
+    <!-- Test case 08 -->
+    <testCase testCaseId="StateObserver_08" testCaseName="Property_Changed_Event_For_Tune_Ready" desc="Fired whenever tune ready property's value changes">
+        <testStep testStepId="1" name="Register_Listeners" method="RegisterListeners">
+          <params>
+            <param tag="PropertyNames" useConfigFile="true" key="STATEOBSERVER_TUNE_READY_PROPERTY" />
+          </params>
+          <resultGeneration useMethodTag="StateObserver_get_property_info" />
+        </testStep>
+        <testStep testStepId="2" name="Execute_Command" action="externalFnCall" >
+            <resultGeneration useMethodTag="broadcastIARMEventTuneReady" />
+        </testStep>
+        <testStep testStepId="3" name="Check_Property_Changed_Event" event="Event_On_Property_Changed" action="eventListener" delay="10">
+            <resultGeneration useMethodTag="stateobserver_check_property_changed_event" expectedValues="1"/>
+        </testStep>
+        <testStep testStepId="4" name="Unegister_Listeners" method="UnregisterListeners">
+          <params>
+            <param tag="PropertyNames" useConfigFile="true" key="STATEOBSERVER_TUNE_READY_PROPERTY" />
+          </params>
+          <resultGeneration useMethodTag="StateObserver_validate_result" />
+        </testStep>
+    </testCase>
+
+    <!-- Test case 09 -->
+    <testCase testCaseId="StateObserver_09" testCaseName="Property_Changed_Event_For_Channel_Map" desc="Fired whenever tune ready property's value changes">
+        <testStep testStepId="1" name="Register_Listeners" method="RegisterListeners">
+          <params>
+            <param tag="PropertyNames" useConfigFile="true" key="STATEOBSERVER_CHANNEL_MAP_PROPERTY" />
+          </params>
+          <resultGeneration useMethodTag="StateObserver_get_property_info" />
+        </testStep>
+        <testStep testStepId="2" name="Execute_Command" action="externalFnCall" >
+            <resultGeneration useMethodTag="broadcastIARMEventChannelMap" />
+        </testStep>
+        <testStep testStepId="3" name="Check_Property_Changed_Event" event="Event_On_Property_Changed" action="eventListener" delay="10">
+            <resultGeneration useMethodTag="stateobserver_check_property_changed_event" expectedValues="1"/>
+        </testStep>
+        <testStep testStepId="4" name="Unegister_Listeners" method="UnregisterListeners">
+          <params>
+            <param tag="PropertyNames" useConfigFile="true" key="STATEOBSERVER_CHANNEL_MAP_PROPERTY" />
+          </params>
+          <resultGeneration useMethodTag="StateObserver_validate_result" />
+        </testStep>
+    </testCase>
+
 </testPlugin>
 

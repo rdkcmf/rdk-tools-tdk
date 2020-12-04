@@ -83,9 +83,16 @@
             <testStep testStepId="2" name="GetEnabled" method="GetEnabled" >
                 <resultGeneration useMethodTag="hdmicec_get_enabled_status" expectedValues="True" />
             </testStep>
+      </prerequisite> 
+   
+      <prerequisite requisiteId="4" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
+            <event pluginName="HdmiCec" eventName="Event_On_Message" />
+
       </prerequisite>
+
     </pluginPreRequisite>
 
+    
 
     <!-- Test case 01 -->
     <testCase testCaseId="HdmiCec_01" testCaseName= "Enable_Disable_HDMICEC" desc="Enable HDMICEC">
@@ -112,23 +119,50 @@
           </resultGeneration>
         </testStep>
     </testCase>
-
+    
 
     <!-- Test case 02 -->
     <testCase testCaseId="HdmiCec_02" testCaseName="Get_CEC_Logical_Address" desc="Get CEC Logical Address">
         <testCaseInfo testCaseType="direct"/>
         <!-- Get CEC Address -->
         <testStep testStepId="1" name="Get_CEC_Logical_Addresses" method="GetCECAddresses">
-          <resultGeneration useMethodTag="hdmicec_get_cec_addresses" arguments="get_logical_address" />
+          <resultGeneration useMethodTag="hdmicec_get_cec_addresses" arguments="get_logical_address" >
+            <expectedValues useConfigFile="true" key="HDMICEC_LOGICAL_ADDR_INFO"/>
+          </resultGeneration>
         </testStep>
     </testCase>
+
 
     <!-- Test case 03 -->
     <testCase testCaseId="HdmiCec_03" testCaseName="Get_CEC_Physical_Address" desc="Get CEC Physical Address">
         <testCaseInfo testCaseType="direct"/>
         <!-- Get CEC Address -->
-        <testStep testStepId="1" name="Get_CEC_Physical_Addresses" method="GetCECAddresses">
-          <resultGeneration useMethodTag="hdmicec_get_cec_addresses" arguments="get_physical_address" />
+        <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" pluginName="DisplaySettings" >
+          <resultGeneration useMethodTag="display_is_connected" />
+        </testStep>
+        <testStep testStepId="2" name="Get_CEC_Physical_Addresses" method="GetCECAddresses">
+          <resultGeneration useMethodTag="hdmicec_get_cec_addresses" arguments="get_physical_address" >
+            <expectedValues usePreviousResult="true" Id="1" useMethodTag="display_get_isconnected_status" />
+          </resultGeneration>
+        </testStep>
+    </testCase>
+    
+    <!-- Test case 04 -->
+    <testCase testCaseId="HdmiCec_04" testCaseName="Send_Message_Get_PowerStatus" desc="writes CEC frame to the driver">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="EncodeHexToBase64" action="externalFnCall" saveResult="true">
+          <resultGeneration useMethodTag="EncodeHexToBase64" >
+            <arguments value="8F" useConfigFile="true" key="HDMICEC_LOGICAL_ADDR_INFO" />
+          </resultGeneration>
+        </testStep>
+        <testStep testStepId="2" name="Send_Message" method="SendMessage">
+          <params>
+            <param tag="message" usePreviousResult="true" Id="1" useMethodTag="hdmicec_get_base64_data" />
+          </params>
+          <resultGeneration useMethodTag="hdmicec_check_result" />
+        </testStep>
+        <testStep testStepId="3"  name="Check_On_Message_Event" event="Event_On_Message" action="eventListener"  delay="3">
+          <resultGeneration useMethodTag="hdmicec_check_on_message_event" arguments="check_power_status"/>
         </testStep>
     </testCase>
 

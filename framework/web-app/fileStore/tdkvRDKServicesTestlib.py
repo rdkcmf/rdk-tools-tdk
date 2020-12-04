@@ -231,6 +231,8 @@ def executeTestCases(testCaseID="all"):
     eventListener = None
     global eventsInfo
     eventsInfo = {}
+    global eventResgisterTag
+    eventResgisterTag = None
 
     # ------------------------------- PLUGIN PRE-REQUISITES ----------------------------------
     # Perform plugin pre-requisite steps such as activate or deactivate plugins common for all
@@ -568,6 +570,8 @@ def executePrePostRequisite(prepostrequisite,node):
         print "%s Requisite No : %s" %(node,requisiteInfo.get("requisiteId"))
 
         if requisiteInfo.get("type") == "eventRegister" and eventListener is None:
+            global eventResgisterTag
+            eventResgisterTag = requisite
             requisiteStepStatus = executeEventHandlerRequisite(requisite)
         else:
             requisiteStepStatus = executeRegularRequisite(requisite)
@@ -1043,6 +1047,7 @@ def executeTestStepRepeat(testCaseInfo,testStep,repeatMax):
 def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
 
     result = {}
+    global eventListener
 
     # There are few parameters whose values should be added along
     # with the API e.g Controller.1.status@DeviceInfo , here param
@@ -1071,6 +1076,11 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
     # If the test step does not have any issues in forming the test API
     # and params & if the condition to execute satisfies, then test is initated
     if parseStatus != "FAILURE" and conditionalExecStatus != "FALSE" and methodNotFound is None and eventRegistration != "FAILURE":
+        if testStepInfo.get("rebootStep") == "yes" and eventListener is not None:
+            print "\nClosing websocket connection before reboot..."
+            eventListener.disconnect()
+            time.sleep(5)
+            eventListener = None
         if testStepInfo.get("action") == "eventListener":
             execStatus,response = getListenedEvent(testMethod,testStepInfo.get("clear"))
         elif testStepInfo.get("action") == "externalFnCall":
@@ -1225,6 +1235,13 @@ def getEventsUnRegistrationInfo():
     dispTestStepInfo(eventtestStepInfo,eventUnRegisterParams,result)
 
     return [unregisterStatus]
+
+
+def handleDeviceReboot():
+    #TODO Need to add complete reboot handling like restore websocket/plugin status 
+    print "\nSet Event Listener After Reboot..."
+    requisiteStepStatus = executeEventHandlerRequisite(eventResgisterTag)
+    return requisiteStepStatus 
 
 
 #-----------------------------------------------------------------------------------------------

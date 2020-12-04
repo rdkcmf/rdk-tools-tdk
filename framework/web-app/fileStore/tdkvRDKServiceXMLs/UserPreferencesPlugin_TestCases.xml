@@ -37,25 +37,20 @@
             </testStep>
           </prerequisite>
         </pluginPreRequisite>
-
-
-        <testCase testCaseId="UP_01" testCaseName="UserPreferences_SetAndGet_UI_Language" desc="Set and get ser preferred UI language" >
-           <testCaseInfo testCaseType="setandget" revert="true" />
-            <testStep testStepId="1" name="Get_UI_Language" method="Get_UI_Language" saveResult="true" revertGet="yes">
-                <resultGeneration useMethodTag="userpreferences_get_ui_language"/>
-            </testStep>
-            <testStep testStepId="2" name="Set_UI_Language" method="Set_UI_Language" revertSet="yes">
+        
+        <testCase testCaseId="UP_01" testCaseName="UserPreferences_SetAndGet_UI_Language" desc="Set and get user preferred UI language" >
+           <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Set_UI_Language" method="Set_UI_Language" >
                 <params>
-                  <param tag="language" usePreviousResult="true" Id="1" useMethodTag="userpreferences_switch_ui_language" revertParam="yes" />
+                  <param tag="ui_language" value="US_en" />
                 </params>
                 <resultGeneration useMethodTag="userpreferences_check_set_operation" />
             </testStep>
-            <testStep testStepId="3" name="Get_UI_Language" method="Get_UI_Language" revertFlag="yes">
-                <resultGeneration useMethodTag="userpreferences_get_ui_language" arguments="check_language" >
-                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="userpreferences_switch_ui_language" />
-                </resultGeneration>
+            <testStep testStepId="2" name="Get_UI_Language" method="Get_UI_Language" >
+                <resultGeneration useMethodTag="userpreferences_get_ui_language" arguments="check_language" expectedValues="US_en" />
             </testStep>
         </testCase>
+
 
 </testPlugin>
 

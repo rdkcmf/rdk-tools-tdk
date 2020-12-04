@@ -51,7 +51,12 @@
         <method name="Store_Configuration" api="storeconfig" type="method" desc="Saves the current configuration">
             <expectedValues>null</expectedValues>
         </method>
-
+        <method name="Delete_Directory_Contents" api="delete" type="method" desc="Removes contents of a directory from the persistent storage">
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Configuration" api="configuration" type="property" desc="Provides access to the configuration object of a service">
+            <expectedValues>null</expectedValues>
+        </method>
     </plugin>
 
 
@@ -483,7 +488,7 @@
         <method name="Get_UI_Language" api="getUILanguage" type="method" desc="Gets the user preferred UI language" />
         <method name="Set_UI_Language" api="setUILanguage" type="method" desc="Sets the user preferred UI language" >
             <params>
-                <param tag="language" defaultValue="null" />
+                <param tag="ui_language" defaultValue="null" />
             </params>
         </method>
     </plugin>
@@ -716,6 +721,7 @@
                 <param tag="message" defaultValue="null" />
             </params>
         </method>
+        <event name="Event_On_Message" eventName="onMessage" eventId="client.events.1" type="event" desc="Fired when a message is sent from an HDMI device" />
     </plugin>
 
 
@@ -744,6 +750,7 @@
             </params>
         </method>
         <method name="GetName" api="getName" type="method" desc="This API is used to get the plugin name"/>
+        <event name="Event_On_Property_Changed" eventName="propertyChanged" eventId="4f0a0e10-3667-44d2-a1b0-b671b8c119a3" type="event" desc="Fired whenever any device property's value changes" />
     </plugin>
 
     <!-- FrameRate Plugin Information -->
@@ -834,12 +841,41 @@
         </method>
         <method name="Start_Scan" api="startScan" type="method" desc="Searches for available Bluetooth devices">
             <params>
-                <param tag="timeout" defaultValue="10" type="int" />
+                <param tag="timeout" defaultValue="30" type="int" />
                 <param tag="profile" defaultValue="DEFAULT"/>
             </params>
         </method>
         <method name="Stop_Scan" api="stopScan" type="method" desc="Stops scanning for Bluetooth devices" />
         <method name="Get_Discovered_Devices" api="getDiscoveredDevices" type="method" desc="Gives discovered Bluetooth devices" />
+        <method name="Connect" api="connect" type="method" desc="Connects to the given Bluetooth device">
+            <params>
+                <param tag="deviceId" defaultValue="null"/>
+                <param tag="deviceType" defaultValue="null"/>
+                <param tag="Profile" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Disconnect" api="disconnect" type="method" desc="Disconnects the given device from this device">
+            <params>
+                <param tag="deviceID" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Pair" api="pair" type="method" desc="Pairs the given device with this device">
+            <params>
+                <param tag="deviceID" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Unpair" api="unpair" type="method" desc="Unpairs the given device with this device">
+            <params>
+                <param tag="deviceID" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Device_Info" api="getDeviceInfo" type="method" desc="Returns the device info of the given device ID">
+            <params>
+                <param tag="deviceID" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Connected_Devices" api="getConnectedDevices" type="method" desc="Returns a list of connected devices to this device" />
+        <method name="Get_Paired_Devices" api="getPairedDevices" type="method" desc="Returns a list of devices that have paired with this device" />
         <event name="Event_On_Discovered_Device" eventName="onDiscoveredDevice" eventId="client.events.1" type="event" desc="Gives discovered Bluetooth devices" />
     </plugin>
 
@@ -1249,6 +1285,23 @@
     <!-- DeviceIdentification Plugin Information -->
     <plugin pluginName="DeviceIdentification" serviceName="DeviceIdentification" serviceVersion="1">
         <method name="Get_Device_Platform_Info" api="deviceidentification" type="property" desc="Provides access to the device paltform specific information"/>
+    </plugin>
+    
+    <!-- FirmwareControl Plugin Information -->
+    <plugin pluginName="FirmwareControl" serviceName="FirmwareControl" serviceVersion="1">
+        <method name="Upgrade" api="upgrade" type="method" desc="Upgrade the device to the given firmware">
+            <params>
+                <param tag="name" defaultValue="null"/>
+                <param tag="location" defaultValue="null"/>
+                <param tag="type" defaultValue="CDL"/>
+                <param tag="progressinterval" defaultValue="10"/>
+                <param tag="hmac" defaultValue="null"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <method name="Get_Status" api="status"  type="property" desc="Provides access to the current status of a upgrade" />
+        <method name="Get_Download_Size" api="downloadsize"  type="property" desc="Provides access to the max free space available to download image" />
+        <event name="Upgrade_Progress_Event" eventName="upgradeprogress" eventId="client.events.1" type="event" desc="Notifies progress of upgrade" />
     </plugin>
     
 </thunderPlugins>
