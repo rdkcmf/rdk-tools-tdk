@@ -38,7 +38,7 @@
         <resultGeneration useMethodTag="controller_check_processinfo" />
       </testStep>
     </testCase>
-    <testCase testCaseId="Controller_04" testCaseName="Get_Environment_Variable"  desc="Gets the value of the environment variable">
+    <testCase testCaseId="Controller_04" testCaseName="Get_Environment_Variable_SHELL"  desc="Gets the value of the environment variable">
       <testCaseInfo testCaseType="direct"/>
       <testStep testStepId="1" name="Get_Environment_Variable" method="Environment_Variable">
         <params>
@@ -66,9 +66,69 @@
         </subtestStep>
       </testStep>
     </testCase>
-    <testCase testCaseId="Controller_07" testCaseName="Store_Configuration"  desc="Stores the configuration">
+    <testCase testCaseId="Controller_07" testCaseName="Set_and_Get_Configuration"  desc="Provides access to the configuration object of a service">
+      <testCaseInfo testCaseType="direct"/>
+      <testStep testStepId="1" name="Deactivate_Plugin" method="Deactivate_Plugin"  >
+        <params>
+          <param tag="callsign"  value="WebKitBrowser" />
+        </params>
+      </testStep>
+      <testStep testStepId="2" name="Check_PluginActive_Status" method="Get_Plugin_Status" >
+        <params>
+          <param tag="plugin" value="WebKitBrowser" indexOnly="true" />
+        </params>
+        <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,WebKitBrowser"  expectedValues="deactivated"/>
+      </testStep>
+      <testStep testStepId="3" name="Set_Configuration_url" method="Configuration">
+        <params>
+          <param tag="value" value="WebKitBrowser" indexOnly="true" />
+          <param tag="url"  useConfigFile="true" key="WEBKIT_TEST_URL"  />
+        </params>
+      </testStep>
+      <testStep testStepId="4" name="Get_Configuration_url" method="Configuration">
+        <params>
+          <param tag="value" value="WebKitBrowser" indexOnly="true" />
+        </params>
+        <resultGeneration useMethodTag="controller_get_configuration_url" >
+          <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
+        </resultGeneration>
+      </testStep>
+      <testStep testStepId="5" name="Activate_Plugin" method="Activate_Plugin" >
+        <params>
+          <param tag="callsign" value="WebKitBrowser" />
+        </params>
+      </testStep>
+      <testStep subtestStepId="6" name="Check_PluginActive_Status" method="Get_Plugin_Status" >
+        <params>
+          <param tag="plugin" value="WebKitBrowser" indexOnly="true" />
+        </params>
+        <resultGeneration useMethodTag="controller_get_plugin_state" arguments ="check_status,WebKitBrowser" expectedValues="activated,suspended,resumed" />
+      </testStep>
+      <testStep testStepId="7" pluginName="WebKitBrowser" name="Get_Browser_Test_URL" method="Get_Browser_URL">
+        <resultGeneration useMethodTag="webkitbrowser_check_url" >
+          <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
+        </resultGeneration>  
+      </testStep>
+    </testCase>
+    
+    <testCase testCaseId="Controller_08" testCaseName="Store_Configuration"  desc="Stores the configuration">
       <testCaseInfo testCaseType="direct"/>
       <testStep testStepId="1" name="Store_Configuration" method="Store_Configuration">
+      </testStep>
+    </testCase>
+
+    <testCase testCaseId="Controller_09" testCaseName="Delete_Directory_Contents"  desc="Removes contents of a directory from the persistent storage">
+      <testCaseInfo testCaseType="direct"/>
+      <testStep testStepId="1" name="Execute_Command" action="externalFnCall" >
+        <resultGeneration useMethodTag="Create_File" arguments="/tmp/Controller/TDK_Test_File.txt" />
+      </testStep>
+      <testStep testStepId="2" name="Delete_Directory_Contents" method="Delete_Directory_Contents">
+        <params>
+          <param tag="path" value="/tmp/Controller/TDK_Test_File.txt" />
+        </params>
+      </testStep>
+      <testStep testStepId="3" name="Execute_Command" action="externalFnCall" >
+        <resultGeneration useMethodTag="Check_If_File_Exists" arguments="/tmp/Controller/TDK_Test_File.txt" expectedValues="File does not exist" />
       </testStep>
     </testCase>
 </testPlugin>

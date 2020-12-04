@@ -32,6 +32,7 @@ import inspect
 from tdkvRDKServicesSupportlib import checkAndGetAllResultInfo
 from tdkvRDKServicesSupportlib import checkNonEmptyResultData
 from tdkvRDKServicesSupportlib import compareURLs
+from tdkvRDKServicesSupportlib import DecodeBase64ToHex
 #-----------------------------------------------------------------------------------------------
 #               ***  RDK SERVICES VALIDATION FRAMEWORK SUPPORTING FUNCTIONS ***
 #-----------------------------------------------------------------------------------------------
@@ -384,12 +385,57 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        # HdmiCec Events response result parser steps
+        elif tag == "hdmicec_check_on_message_event":
+            result = result[0]
+            info = result
+            Src_Dest_Address = {"0":"TV","1":"Recording Device 1","2":"Recording Device 2","3":"Tuner 1","4":"Playback Device 1","5":"Audio System","6":"Tuner 2","7":"Tuner 3","8":"Playback Device 2","9":"Recording Device 3","A":"Tuner 4","B":"Playback Device 3","C":"Reserved 12","D":"Reserved 13","E":"Specific Use","F":"Broadcast/Unregistered"}
+            if len(str(result.get("message"))) > 0:
+                hex_code = DecodeBase64ToHex(str(result.get("message")))
+                info["Hex_Code"] = hex_code
+                if arg[0] == "check_power_status":
+                   if "90" in str(hex_code):
+                      Power_Status = {"00":"On","01":"Standby","10":"In transition Standby to On","11":"In transition On to Standby"}
+                      Oprand  = hex_code[-2:]
+                      Address = hex_code[0:2]
+                      info["From"] = Src_Dest_Address[Address[0]]
+                      info["To"] =  Src_Dest_Address[Address[1]]
+                      info["Power_Status"] = Power_Status[Oprand]
+                      info["Test_Step_Status"] = "SUCCESS"
+                   else:
+                      info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
         # Warehouse Events response result parser steps
         elif tag == "warehouse_check_device_reset_event":
             result=result[0]
             info = result
             print str(result.get("status"))
             if str(result.get("status")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        # StateObserver Events response result parser steps
+        elif tag == "stateobserver_check_property_changed_event":
+            result=result[0]
+            info = result
+            if str(result.get("value")) in expectedValues and int(result.get("error"))==0:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        # FirmwareControl Events response result parser steps
+        elif tag == "fwc_check_upgrade_progress_event":
+            print "Events list :",result
+            expectedStatusList = ["none", "upgradestarted", "downloadstarted", "downloadaborted", "downloadcompleted", "installinitiated", "installnotstarted", "installaborted", "installstarted", "upgradecompleted", "upgradecancelled"]
+            status = True
+            for event in result:
+                info = event
+                if str(event.get("status")) not in expectedStatusList: 
+                    status = False
+            if status:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"

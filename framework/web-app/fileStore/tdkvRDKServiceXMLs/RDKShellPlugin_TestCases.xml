@@ -182,7 +182,7 @@
               <params>
                 <param tag="plugin" value="Cobalt" indexOnly="true" />
               </params>
-              <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,cobalt" expectedValues="resumed"/>
+              <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,Cobalt" expectedValues="resumed"/>
             </testStep>
             <testStep testStepId="5" name="Resume_Cobalt" method="Set_Cobalt_State" pluginName="Cobalt" >
               <params>
@@ -535,6 +535,7 @@
         </testCase>
 
         <!-- Test case 25 -->
+        <!-- #TODO For now added scenarios for webkitbrowser & cobalt applications and validating the method. later this will be made as generic case -->
         <testCase testCaseId="RDKShell_25" testCaseName= "RDKShell_Application_Suspend_25" desc="Suspend given application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
