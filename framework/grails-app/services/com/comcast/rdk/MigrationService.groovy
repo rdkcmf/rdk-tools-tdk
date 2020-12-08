@@ -534,7 +534,15 @@ class MigrationService {
 				println "  migrate "+migrateObj
 			ScriptFile.withSession {session->
 				try{
-					def sObject  = new ScriptFile()
+					def sObject
+					if(migrateObj?.moduleName?.equals(Constants.RDKV_PERFORMANCE) || migrateObj?.moduleName?.equals(Constants.RDKV_STABILITY)){
+						sObject = ScriptFile.findByScriptNameAndModuleNameAndCategory(migrateObj?.scriptName,Constants.RDKSERVICES,migrateObj?.category)
+						if(!sObject){
+							sObject  = new ScriptFile()
+						}
+					}else{
+						sObject  = new ScriptFile()
+					}
 					sObject.setScriptName(migrateObj?.scriptName)
 					sObject.setModuleName(migrateObj?.moduleName)
 					if(!migrateObj?.category){
@@ -1513,7 +1521,7 @@ class MigrationService {
                         functionTempList.each{functionTempEntry->
                                 Module.withNewSession{prodSession->
                                         Module mod = Module.findByName(functionTempEntry?.module?.name,[fetch : [module : "eager"]])
-                                        functionTempModuleProdMap.put(functionTempEntry,mod)
+										functionTempModuleProdMap.put(functionTempEntry,mod)
                                         prodSession.clear()
                                 }
                         }
@@ -1522,10 +1530,18 @@ class MigrationService {
                 functionTempModuleProdMap.each{
                         Function.withSession {prodSession->
                                 try{
-                                        Function ff = Function.findByNameAndModuleAndCategory(it.key?.name,it.value,it.key?.category)
-                                        if(ff == null){
-                                                ff  = new Function()
-                                        }
+	                                    Function ff = Function.findByNameAndModuleAndCategory(it.key?.name,it.value,it.key?.category)
+										if(ff == null){
+											if(it.value?.name?.equals(Constants.RDKV_PERFORMANCE) || it.value?.name?.equals(Constants.RDKV_STABILITY)){
+												def module = Module.findByName(Constants.RDKSERVICES)
+												ff = Function.findByNameAndModuleAndCategory(it.key?.name,module,it.key?.category)
+												if(ff == null){
+													ff  = new Function()
+												}
+											}else{
+	                                        	ff  = new Function()
+											}
+	                                    }
                                         ff.properties = it.key?.getProperties()
                                         ff.module = it.value
                                         if(!it.key?.category){
