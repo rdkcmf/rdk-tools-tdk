@@ -168,14 +168,18 @@ if expectedResult in result.upper():
                     console_log = webkit_console_socket.getEventsBuffer().pop(0)
                     dispConsoleLog(console_log)
                     if "Average FPS" in console_log:
-                        average_fps = float(getConsoleMessage(console_log).split("[DiagnosticInfo]:")[1].split(":")[1])
+                        average_fps = getConsoleMessage(console_log).split("[DiagnosticInfo]:")[1].split(":")[1]
                     if "TEST RESULT:" in console_log or "Connection refused" in console_log:
                         test_result = getConsoleMessage(console_log)
                         break;
                 webkit_console_socket.disconnect()
                 if "SUCCESS" in test_result:
                     print "Obtained Average FPS =",average_fps
-                    if average_fps >= float(MediaValidationVariables.expected_fps_threshold):
+                    if "NaN" in average_fps:
+                        print "Failed to get the average FPS Value"
+                        print "[TEST EXECUTION RESULT]: FAILURE"
+                        tdkTestObj.setResultStatus("FAILURE");
+                    elif float(average_fps) >= float(MediaValidationVariables.expected_fps_threshold):
                         print "Average FPS is >= ",MediaValidationVariables.expected_fps_threshold
                         print "Lightning Animation App is rendered for around 60 sec and average FPS is as expected"
                         print "[TEST EXECUTION RESULT]: SUCCESS"
