@@ -76,7 +76,7 @@ def SnmpExecuteCmd(snmpMethod,communityString,snmpVersion,OID,ipAddress):
         def timeoutHandler(signum, frame):
                 raise Timout
         signal.signal(signal.SIGALRM, timeoutHandler)
-        signal.alarm(20)
+        signal.alarm(60)
 
         # Executing request command
         try:

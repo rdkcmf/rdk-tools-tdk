@@ -442,6 +442,8 @@ def getParameterValue(tr181Obj, sysObj, setup_type, paramName, paramType, expect
         tdkTestObj.executeTestCase(expectedresult);
         actualresult = tdkTestObj.getResult();
         value = tdkTestObj.getResultDetails().replace("\\n", "")
+        value = value.strip();
+
     elif setup_type == "WEBPA" :
         # Modify the input parameter type to the format webpa is expecting
         param = {'name':paramName}
