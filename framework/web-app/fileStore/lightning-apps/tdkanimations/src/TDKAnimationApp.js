@@ -33,7 +33,7 @@ export default class App extends Lightning.Component {
       Background: {
         w: 1920,
         h: 1080,
-        src: Utils.asset('images/dark-2024127.png'),
+        src: Utils.asset('testimages/dark-2024127.png'),
       },
       TDKLogo: {
         mountX: 0.5,
@@ -57,7 +57,7 @@ export default class App extends Lightning.Component {
       Image:{
         x:100, y:700,
         w:200, h:200,
-        src:Utils.asset('images/bird-2028367.png'),
+        src:Utils.asset('testimages/bird-2028367.png'),
       },
       MsgBox1: {
         x: 80,
