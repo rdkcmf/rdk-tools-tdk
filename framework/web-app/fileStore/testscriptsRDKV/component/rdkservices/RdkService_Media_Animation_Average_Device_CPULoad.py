@@ -168,14 +168,18 @@ if expectedResult in result.upper():
                     console_log = webkit_console_socket.getEventsBuffer().pop(0)
                     dispConsoleLog(console_log)
                     if "Average Device CPU Load" in console_log:
-                        average_cpu = int(float(getConsoleMessage(console_log).split("[DiagnosticInfo]:")[1].split(":")[1]))
+                        average_cpu = getConsoleMessage(console_log).split("[DiagnosticInfo]:")[1].split(":")[1]
                     if "TEST RESULT:" in console_log or "Connection refused" in console_log:
                         test_result = getConsoleMessage(console_log)
                         break;
                 webkit_console_socket.disconnect()
                 if "SUCCESS" in test_result:
                     print "Obtained Average CPU Load: ",average_cpu
-                    if average_cpu < 90:
+                    if "NaN" in average_cpu:
+                        print "Failed to get the average device CPU Load"
+                        print "[TEST EXECUTION RESULT]: FAILURE"
+                        tdkTestObj.setResultStatus("FAILURE");
+                    elif int(float(average_cpu)) < 90:
                         print "Average device CPU Load is < 90"
                         print "Lightning Animation App is rendered for around 60 sec and average device CPU Load is as expected"
                         print "[TEST EXECUTION RESULT]: SUCCESS"
