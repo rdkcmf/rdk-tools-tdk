@@ -392,7 +392,7 @@
                <!--default value of the param after factory reset -->
                <defaultValue>g,n</defaultValue>
                <!--default value exepcted by snmp after factory reset -->
-               <snmpDefaultValue>160</snmpDefaultValue>
+               <snmpDefaultValue>32</snmpDefaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>g,n</expectedValues>
                 <!-- the range of values acceptable for snmp-->
@@ -416,7 +416,7 @@
                <!--default value of the param after factory reset -->
                <defaultValue>a,n,ac</defaultValue>
                <!--default value exepcted by snmp after factory reset -->
-               <snmpDefaultValue>448</snmpDefaultValue>
+               <snmpDefaultValue>256</snmpDefaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>a,n,ac</expectedValues>
                 <!-- the range of values acceptable for snmp-->
@@ -554,7 +554,7 @@
                 <!-- the range of values acceptable for snmp-->
                <snmpExpectedValues>6</snmpExpectedValues>
                <!--default value exepcted by snmp after factory reset -->
-               <snmpDefaultValue>0</snmpDefaultValue>
+               <snmpDefaultValue>6</snmpDefaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
@@ -578,7 +578,7 @@
                 <!-- the range of values acceptable for snmp-->
                <snmpExpectedValues>36</snmpExpectedValues>
                <!--default value exepcted by snmp after factory reset -->
-               <snmpDefaultValue>0</snmpDefaultValue>
+               <snmpDefaultValue>36</snmpDefaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
@@ -648,7 +648,7 @@
                <!--default value of the param after factory reset -->
                <defaultValue>20MHz</defaultValue>
                <!--default value exepcted by snmp after factory reset -->
-               <snmpDefaultValue>3</snmpDefaultValue>
+               <snmpDefaultValue>1</snmpDefaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -924,7 +924,7 @@
                <!--default value of the param after factory reset -->
                <defaultValue>COM</defaultValue>
                <!--default value exepcted by snmp after factory reset -->
-               <snmpDefaultValue>6</snmpDefaultValue>
+               <snmpDefaultValue>0</snmpDefaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -944,7 +944,7 @@
                <!--default value of the param after factory reset -->
                <defaultValue>COM</defaultValue>
                <!--default value exepcted by snmp after factory reset -->
-               <snmpDefaultValue>6</snmpDefaultValue>
+               <snmpDefaultValue>0</snmpDefaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -1258,7 +1258,7 @@
                <!--default value of the param after factory reset -->
                <defaultValue>true</defaultValue>
                <!--default value exepcted by snmp after factory reset -->
-               <snmpDefaultValue>1</snmpDefaultValue>
+               <snmpDefaultValue>2</snmpDefaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
                 <!-- the range of values acceptable for snmp-->
@@ -1762,7 +1762,7 @@
                <!--default value of the param after factory reset -->
                <defaultValue>AES+TKIP</defaultValue>
                <!--default value exepcted by snmp after factory reset -->
-               <snmpDefaultValue>1</snmpDefaultValue>
+               <snmpDefaultValue>2</snmpDefaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>TKIP,AES,AES+TKIP</expectedValues>
                <!-- the range of values acceptable for snmp-->
@@ -1786,7 +1786,7 @@
                <!--default value of the param after factory reset -->
                <defaultValue>AES+TKIP</defaultValue>
                <!--default value exepcted by snmp after factory reset -->
-               <snmpDefaultValue>1</snmpDefaultValue>
+               <snmpDefaultValue>2</snmpDefaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>TKIP,AES,AES+TKIP</expectedValues>
                <!-- the range of values acceptable for snmp-->
@@ -1904,7 +1904,7 @@
                <!--default value of the param after factory reset -->
                <defaultValue>true</defaultValue>
                <!--default value exepcted by snmp after factory reset -->
-               <snmpDefaultValue>2</snmpDefaultValue>
+               <snmpDefaultValue>1</snmpDefaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
                 <!-- the range of values acceptable for snmp-->
