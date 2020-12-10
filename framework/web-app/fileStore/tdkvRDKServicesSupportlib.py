@@ -897,7 +897,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "display_connected_status":
             info["video_display"] = result.get('connectedVideoDisplays')
-            if json.dumps(result.get('success')) == "true" and str(expectedValues[0]) in  result.get('connectedVideoDisplays'):
+            if json.dumps(result.get('success')) == "true" and  result.get('connectedVideoDisplays'):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
