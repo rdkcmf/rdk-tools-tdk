@@ -2019,7 +2019,7 @@ class ScriptGroupController {
 			sObject.setScriptTags(scrptTags)
 			sObject.setLongDuration(longDuration)
 			sObject.setTestProfile(testProfileList)
-			if((ptest?.module?.name != Constants.RDKSERVICES) || (ptest?.module?.name != Constants.RDKV_PERFORMANCE) || (ptest?.module?.name != Constants.RDKV_STABILITY)){
+			if((ptest?.module?.name != Constants.RDKSERVICES) && (ptest?.module?.name != Constants.RDKV_PERFORMANCE) && (ptest?.module?.name != Constants.RDKV_STABILITY)){
 				if(boxTypes){
 					scriptgroupService.removeScriptsFromBoxScriptGroup(script,boxTypes,oldBoxTypes)
 					if(isLongDuration != longDuration){

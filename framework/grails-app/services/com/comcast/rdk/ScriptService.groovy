@@ -930,14 +930,14 @@ class ScriptService {
 					sObject.setScriptFile(sFile)
 					sObject.setScriptTags(script?.scriptTags?.toSet())
 					sObject.setLongDuration(script?.longDuration)
-					if(category != Category.RDKV_RDKSERVICE.toString()){
+					if(moduleName == Constants.RDKSERVICES || moduleName == Constants.RDKV_PERFORMANCE || moduleName == Constants.RDKV_STABILITY){
+						updateRdkServiceScriptSuite(moduleName,sFile,Category.RDKV_RDKSERVICE.toString())
+					}else{
 						scriptgroupService.saveToScriptGroups(sFile,sObject, category)
 						scriptgroupService.saveToDefaultGroups(sFile,sObject, script?.boxTypes, category)
 						createDefaultGroupWithoutOS(sObject,sFile, category)
 						scriptgroupService.updateScriptsFromScriptTag(sFile,sObject,[],[], category)
 						updateSuiteWithTestProfileScript(sObject,sFile, category)
-					}else{
-						updateRdkServiceScriptSuite(moduleName,sFile,Category.RDKV_RDKSERVICE.toString())
 					}
 				}
 			}
