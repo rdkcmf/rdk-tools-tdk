@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>4</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RdkService_Media_Video_TrickPlay_DASH</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -29,11 +29,11 @@
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
   <primitive_test_name>RdkService_Test</primitive_test_name>
   <!--  -->
-  <primitive_test_version>3</primitive_test_version>
+  <primitive_test_version>4</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operations continuously for given number of times</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video trickplay operations of mpd content</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -48,9 +48,9 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
-    <box_type>RPI-HYB</box_type>
-    <!--  -->
     <box_type>RPI-Client</box_type>
+    <!--  -->
+    <box_type>RPI-HYB</box_type>
     <!--  -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
@@ -60,20 +60,31 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id></test_case_id>
-    <test_objective></test_objective>
-    <test_type></test_type>
-    <test_setup></test_setup>
-    <pre_requisite></pre_requisite>
-    <api_or_interface_used></api_or_interface_used>
-    <input_parameters></input_parameters>
-    <automation_approch></automation_approch>
-    <expected_output></expected_output>
-    <priority></priority>
-    <test_stub_interface></test_stub_interface>
-    <test_script></test_script>
-    <skipped></skipped>
-    <release_version></release_version>
+    <test_case_id>RDKV_Media_Validation_10</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video trickplay operations of mpd content</test_objective>
+    <test_type>Positive</test_type>
+    <test_setup>RPI, Accelerator</test_setup>
+    <pre_requisite>1. Wpeframework process should be up and running in the device.
+2.Lightning Player app should be hosted</pre_requisite>
+    <api_or_interface_used>None</api_or_interface_used>
+    <input_parameters>Lightning player App URL: string
+webinspect_port: string
+video_src_url_dash: string
+operation_min_interval: int
+operation_max_interval: int</input_parameters>
+    <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
+2. Get the current URL in webkitbrowser
+3. Load the player app url with the operations to be performed, play, pause, seek forward/backward and fast-forward with interval.
+4. App performs the provided operations and validates each operation using events and with position and rate value for seek and fast-forward operations
+5. If expected events occurs for each operation and expected position, rate values occurs for seek and fast-forward, then app gives the validation result as SUCCESS or else FAILURE
+6. Get the event validation result from the app and update the test script status
+7. Revert all values</automation_approch>
+    <expected_output>All the provided player operations and expected events should occur</expected_output>
+    <priority>High</priority>
+    <test_stub_interface>rdkservices</test_stub_interface>
+    <test_script>RdkService_Media_Video_TrickPlay_DASH</test_script>
+    <skipped>No</skipped>
+    <release_version>M82</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -118,6 +129,10 @@ if expectedResult in result.upper():
     setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
     operations = getOperations()
     video_test_url = getTestURL(appURL,videoURL,operations)
+
+    #Example video test url
+    #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
+    #url=<video_url>.mpd&operations=seekfwd(10),fastfwd(10),fastfwd(10),pause(10),play(5),seekbwd(10),fastfwd(10)&autotest=true
 
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
