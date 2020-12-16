@@ -17,28 +17,47 @@
 # limitations under the License.
 ##########################################################################
 '''
-<?xml version="1.0" encoding="UTF-8"?><xml>
-  <id/>
-  <version>2</version>
+<?xml version='1.0' encoding='utf-8'?>
+<xml>
+  <id></id>
+  <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
+  <version>5</version>
+  <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RdkService_BrowserPerformance_CSS3</name>
-  <primitive_test_id/>
+  <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
+  <primitive_test_id></primitive_test_id>
+  <!-- Do not change primitive_test_id if you are editing an existing script. -->
   <primitive_test_name>rdkservice_getBrowserScore_CSS3</primitive_test_name>
+  <!--  -->
   <primitive_test_version>1</primitive_test_version>
+  <!--  -->
   <status>FREE</status>
+  <!--  -->
   <synopsis>To get the browser performance score using CSS3 test</synopsis>
-  <groups_id/>
-  <execution_time>2</execution_time>
+  <!--  -->
+  <groups_id />
+  <!--  -->
+  <execution_time>5</execution_time>
+  <!--  -->
   <long_duration>false</long_duration>
+  <!--  -->
   <advanced_script>false</advanced_script>
-  <remarks/>
+  <!-- execution_time is the time out time for test execution -->
+  <remarks></remarks>
+  <!-- Reason for skipping the tests if marked to skip -->
   <skip>false</skip>
+  <!--  -->
   <box_types>
     <box_type>RPI-Client</box_type>
+    <!--  -->
     <box_type>RPI-HYB</box_type>
+    <!--  -->
     <box_type>Video_Accelerator</box_type>
+    <!--  -->
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>
+    <!--  -->
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_PERFORMANCE_04</test_case_id>
@@ -60,11 +79,10 @@
     <test_script>RdkService_BrowserPerformance_CSS3</test_script>
     <skipped>No</skipped>
     <release_version>M82</release_version>
-    <remarks/>
+    <remarks></remarks>
   </test_cases>
-  <script_tags/>
+  <script_tags />
 </xml>
-
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
@@ -135,17 +153,16 @@ if expectedResult in result.upper():
                 browser_score = tdkTestObj.getResultDetails();
                 if browser_score != "Unable to get the browser score":
                     tdkTestObj.setResultStatus("SUCCESS");
-		    print "The Browser score using CCS3 test is :",browser_score
 		    browser_score = browser_score.replace("%","")
 		    conf_file,result = getConfigFileName(tdkTestObj.realpath)
                     result, css3_threshold_value = getDeviceConfigKeyValue(conf_file,"CSS3_THRESHOLD_VALUE")
                     if result == "SUCCESS":
                         if int(browser_score) > int(css3_threshold_value):
                             tdkTestObj.setResultStatus("SUCCESS");
-                            print "The browser performance is high as expected"
+                            print "\n The browser performance is high as expected\n"
                         else:
                             tdkTestObj.setResultStatus("FAILURE");
-                            print "The browser performance is lower than expected"
+                            print "\n The browser performance is lower than expected \n"
                     else:
                         tdkTestObj.setResultStatus("FAILURE");
                         print "Failed to get the threshold value from config file"

@@ -135,17 +135,16 @@ if expectedResult in result.upper():
                 browser_score = tdkTestObj.getResultDetails();
                 if browser_score != "Unable to get the browser score":
                     tdkTestObj.setResultStatus("SUCCESS");
-		    print "The Browser score using Octane test is :",browser_score
                     browser_score = browser_score.replace("Octane Score: ","");
                     conf_file,result = getConfigFileName(tdkTestObj.realpath)
                     result, octane_threshold_value = getDeviceConfigKeyValue(conf_file,"OCTANE_THRESHOLD_VALUE")
                     if result == "SUCCESS":
                         if int(browser_score) > int(octane_threshold_value):
                             tdkTestObj.setResultStatus("SUCCESS");
-                            print "The browser performance is high as expected"
+                            print "\n The browser performance is high as expected \n"
                         else:
                             tdkTestObj.setResultStatus("FAILURE");
-                            print "The browser performance is lower than expected"
+                            print "\n The browser performance is lower than expected \n"
                     else:
                         tdkTestObj.setResultStatus("FAILURE");
                         print "Failed to get the threshold value from config file"

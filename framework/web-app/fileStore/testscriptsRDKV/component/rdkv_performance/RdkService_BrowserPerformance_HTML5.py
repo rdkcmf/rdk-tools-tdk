@@ -138,16 +138,16 @@ if expectedResult in result.upper():
                     if result == "SUCCESS":
                         if int(browser_score) > int(html5_threshold_value):
                             tdkTestObj.setResultStatus("SUCCESS");
-                            print "The browser performance is high as expected"
+                            print "\n The browser performance is high as expected \n"
                         else:
                             tdkTestObj.setResultStatus("FAILURE");
-                            print "The browser performance is lower than expected"
+                            print "\n The browser performance is lower than expected \n"
                     else:
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "Failed to get the threshold value from config file"
+                        print "\n Failed to get the threshold value from config file \n"
                 else:
                     tdkTestObj.setResultStatus("FAILURE")
-		    print "Failed to get the browser score"
+		    print "\n Failed to get the browser score \n"
             else:
                 print "Failed to load the URL",new_url
                 tdkTestObj.setResultStatus("FAILURE");

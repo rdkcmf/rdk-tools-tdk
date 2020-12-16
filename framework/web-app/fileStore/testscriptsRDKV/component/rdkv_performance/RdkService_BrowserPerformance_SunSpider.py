@@ -141,16 +141,16 @@ if expectedResult in result.upper():
                     if result == "SUCCESS":
                         if float(browser_score) < float(sunspider_threshold_value):
                             tdkTestObj.setResultStatus("SUCCESS");
-                            print "The browser performance is high as expected"
+                            print "\n The browser performance is high as expected\n"
                         else:
                             tdkTestObj.setResultStatus("FAILURE");
-                            print "The browser performance is lower than expected"
+                            print "\n The browser performance is lower than expected\n"
                     else:
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "Failed to get the threshold value from config file"
+                        print "\n Failed to get the threshold value from config file\n"
                 else:
                     tdkTestObj.setResultStatus("FAILURE")
-		    print "Failed to get the Browser performace using SunSpider Test"
+		    print "\n Failed to get the Browser performace using SunSpider Test\n"
             else:
                 print "Failed to load the URL",new_url
                 tdkTestObj.setResultStatus("FAILURE");
