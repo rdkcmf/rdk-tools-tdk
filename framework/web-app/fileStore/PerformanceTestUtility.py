@@ -25,7 +25,7 @@ def get_ssh_params(obj):
     if result == "SUCCESS":
         result,ssh_dict["ssh_method"] = getDeviceConfigKeyValue(conf_file,"SSH_METHOD")
         if ssh_dict["ssh_method"] == "directSSH":
-            result,ssh_dict["host_name"] = getDeviceConfigKeyValue(conf_file,"SSH_IP")
+            ssh_dict["host_name"] = obj.IP
             result,ssh_dict["user_name"] = getDeviceConfigKeyValue(conf_file,"SSH_USERNAME")
 	    result,ssh_dict["password"] = getDeviceConfigKeyValue(conf_file,"SSH_PASSWORD")
         else:

@@ -115,8 +115,9 @@ if expectedResult in result.upper():
 	cobal_launch_status = launch_cobalt(obj)
 	validation_dict = get_validation_params(obj)
 	if status == "SUCCESS" and cobal_launch_status == "SUCCESS" and validation_dict != {} :
+                time.sleep(30)
 		print "\nPre conditions for the test are set successfully"
-		print "\n Set the URL : {} usig Cobalt deeplink method".format(cobalt_test_url)
+		print "\n Set the URL : {} using Cobalt deeplink method".format(cobalt_test_url)
 		tdkTestObj = obj.createTestStep('rdkservice_setValue')
 		tdkTestObj.addParameter("method","Cobalt.1.deeplink")
 		tdkTestObj.addParameter("value",cobalt_test_url)
@@ -132,7 +133,15 @@ if expectedResult in result.upper():
                     tdkTestObj.addParameter("value",params)
                     tdkTestObj.executeTestCase(expectedResult)
                     result = tdkTestObj.getResult()
-		    time.sleep(60)
+		    time.sleep(50)
+                    #Clicking OK to skip Ad
+                    params = '{"keys":[ {"keyCode": 13,"modifiers": [],"delay":1.0}]}'
+                    tdkTestObj = obj.createTestStep('rdkservice_setValue')
+                    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
+                    tdkTestObj.addParameter("value",params)
+                    tdkTestObj.executeTestCase(expectedResult)
+                    result = tdkTestObj.getResult()
+                    time.sleep(30)
 		    if result == "SUCCESS":
 			tdkTestObj.setResultStatus("SUCCESS")
 			test_time_in_mins = int(StabilityTestVariables.cobalt_test_duration)
