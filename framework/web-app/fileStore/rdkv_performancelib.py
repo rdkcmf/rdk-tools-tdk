@@ -180,6 +180,17 @@ def rdkservice_getBrowserScore_CSS3():
             pass
         time.sleep(10)
         browser_score= driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol/ol/li[2]/span/span[2]').text
+        print "\nThe Browser score using CSS3 test is : ",browser_score
+        print "\n Subcategory scores:\n"
+        print "===================================="
+        for i in range(1,92):
+            sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li[1]/span/span').text
+
+            parent = driver.find_elements_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li')
+            count = len(parent)
+            score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li['+str(count-1)+']/span/span[2]').text
+            print sub_category + '  :  ' + score
+        print '\n'
         time.sleep(5)
         driver.quit()
    except Exception as error:
@@ -212,7 +223,18 @@ def rdkservice_getBrowserScore_Octane():
             pass
         time.sleep(10)
         browser_score= driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol/ol/li[1]/span/span[2]').text
-        time.sleep(5)
+        print "\nThe Browser score using Octane test is : ",browser_score
+        print "\n Subcategory scores:\n"
+        print "===================================="
+        for i in range(1,5):
+            for j in range(1,5):
+                sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol['+str(i)+']/ol['+str(j)+']/ol/li[1]/span/span[2]').text
+                score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol['+str(i)+']/ol['+str(j)+']/ol/li[2]/span/span[2]').text
+                print sub_category + '     :    ' + score
+        sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol[4]/ol[5]/ol/li[1]/span/span[2]').text
+        score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol[4]/ol[5]/ol/li[2]/span/span[2]').text
+        print sub_category + '     :    ' + score + '\n'
+        time.sleep(10)
         driver.quit()
    except Exception as error:
         print "Got exception while getting the browser score"
@@ -351,6 +373,7 @@ def rdkservice_getBrowserScore_SunSpider():
         else:
             browser_score = browser_score.replace("Total: ","")
         driver.quit()
+        text_values = text_values.replace('<br>','\n').replace('</pre>','\n')
         print "Details of SunSider Test:\n",text_values
    except Exception as error:
         print "Got exception while getting the browser score"
