@@ -106,7 +106,7 @@ if expectedResult in result.upper():
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
     status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
-    print "Current values \nUX:%s\nWebKitBrowser:%s\nCobalt:%s"%(curr_ux_status,curr_webkit_status,curr_cobalt_status);
+    print "Current values \nWebKitBrowser:%s\nCobalt:%s"%(curr_webkit_status,curr_cobalt_status);
     if status == "FAILURE":
         set_pre_requisites(obj)
         #Need to revert the values since we are changing plugin status
@@ -179,7 +179,19 @@ if expectedResult in result.upper():
                     print "\n pause happend at {} (UTC)".format(paused_time)
                     paused_time_millisec = getTimeInMilliSeconds(paused_time)
                     pause_opn_time = paused_time_millisec - pausing_time_millisec
-                    print "\nTime taken for pause operation: {} milleseconds".format(pause_opn_time)
+                    print "\n Time taken for pause operation: {} milleseconds \n".format(pause_opn_time)
+                    conf_file,result = getConfigFileName(tdkTestObj.realpath)
+                    result, pause_time_threshold_value = getDeviceConfigKeyValue(conf_file,"PAUSE_TIME_THRESHOLD_VALUE")
+                    if result == "SUCCESS":
+                        if int(pause_opn_time) < int(pause_time_threshold_value):
+                            pause_status = True 
+                            print "\n Time taken for pause operation is within the expected limit \n"
+                        else:
+                            pause_status = False
+                            print "\n Time taken for pause operation is greater than the expected limit \n"
+                    else:
+                        pause_status = False
+                        print "\n Failed to get the threshold value for pause operation time from config file \n"
                     playing_time = getTimeFromMsg(expected_play_evt)
                     print "\n play initiated at {} (UTC)".format(playing_time)
                     playing_time_millisec = getTimeInMilliSeconds(playing_time)
@@ -187,8 +199,23 @@ if expectedResult in result.upper():
                     print "\n play happend at {} (UTC)".format(played_time)
                     played_time_millisec = getTimeInMilliSeconds(played_time)
                     play_opn_time = played_time_millisec - playing_time_millisec
-                    print "\nTime taken for play operation: {} milliseconds".format(play_opn_time)
-                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "\n Time taken for play operation: {} milliseconds \n".format(play_opn_time)
+                    result, play_time_threshold_value = getDeviceConfigKeyValue(conf_file,"PLAY_TIME_THRESHOLD_VALUE")
+                    if result == "SUCCESS":
+                        if int(play_opn_time) < int(play_time_threshold_value):
+                            play_status = True
+                            print "\n Time taken for play operation is within the expected limit \n"
+                        else:
+                            play_status = False
+                            print "\n Time taken for play operation is greater than the expected limit \n"
+                    else:
+                        play_status = False
+                        print "Failed to get the threshold value for play operation time from config file"
+                    #Set the result status based on time taken for both pause and play operations.    
+                    if all(status for status in (pause_status,play_status)):
+                        tdkTestObj.setResultStatus("SUCCESS")
+                    else:
+                        tdkTestObj.setResultStatus("FAILURE")
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
                     print "error occured during application launch"

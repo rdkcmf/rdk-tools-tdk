@@ -206,6 +206,18 @@ if expectedResult in result.upper():
                     tdkTestObj.setResultStatus("SUCCESS")
                     avg_time = total_time/5
                     print "\nAverage time taken for channel change: {} ms\n".format(avg_time)
+                    conf_file,result = getConfigFileName(tdkTestObj.realpath)
+                    result, channelchange_time_threshold_value = getDeviceConfigKeyValue(conf_file,"CHANNEL_CHANGE_TIME_THRESHOLD_VALUE")
+                    if result == "SUCCESS":
+                        if int(avg_time) < int(channelchange_time_threshold_value):
+                            tdkTestObj.setResultStatus("SUCCESS");
+                            print "\n The channel change time is within the expected limit\n"
+                        else:
+                            tdkTestObj.setResultStatus("FAILURE");
+                            print "\n The channel change time is greater than the expected limit \n"
+                    else:
+                        tdkTestObj.setResultStatus("FAILURE");
+                        print "Failed to get the threshold value from config file"
                 elif(continue_count > 20):
                     print "\nchannel change didn't happen after {}channel changes\n".format(channel_change_count)
                     tdkTestObj.setResultStatus("FAILURE")
