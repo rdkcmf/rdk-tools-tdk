@@ -161,7 +161,18 @@ if expectedResult in result.upper():
                         loadfinished_time_millisec = getTimeInMilliSec(load_finished_time)
                         ui_uptime = loadfinished_time_millisec - start_time_millisec
                         print "Time taken for the UI to load after reboot : {} ms\n".format(ui_uptime)
-                        tdkTestObj.setResultStatus("SUCCESS")
+                        conf_file,result = getConfigFileName(tdkTestObj.realpath)
+                        result, ui_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"UI_LAUNCH_TIME_THRESHOLD_VALUE")
+                        if result == "SUCCESS":
+                            if int(ui_uptime) < int(ui_launch_threshold_value):
+                                tdkTestObj.setResultStatus("SUCCESS");
+                                print "\n The time taken for UI to load after reboot is within the expected limit\n"
+                            else:
+                                tdkTestObj.setResultStatus("FAILURE");
+                                print "\n The time taken for UI to load after reboot is greater than the expected limit \n"
+                        else:
+                            tdkTestObj.setResultStatus("FAILURE");
+                            print "Failed to get the threshold value from config file"
                     else:
                         print "ui app url is not loaded in DUT"
                         tdkTestObj.setResultStatus("FAILURE")

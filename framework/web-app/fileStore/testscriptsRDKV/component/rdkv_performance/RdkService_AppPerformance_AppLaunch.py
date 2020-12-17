@@ -106,7 +106,7 @@ if expectedResult in result.upper():
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
     status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
-    print "Current values \nUX:%s\nWebKitBrowser:%s\nCobalt:%s"%(curr_ux_status,curr_webkit_status,curr_cobalt_status);
+    print "Current values \nWebKitBrowser:%s\nCobalt:%s"%(curr_webkit_status,curr_cobalt_status);
     if status == "FAILURE":
         set_pre_requisites(obj)
         #Need to revert the values since we are changing plugin status
@@ -165,8 +165,19 @@ if expectedResult in result.upper():
                     print "\nApplication launched at: {} (UTC)".format(end_time)
                     end_time_millisec = getTimeInMilliSeconds(end_time)
                     app_launch_time = end_time_millisec - start_time_millisec
-                    print "\nTime taken to launch the application: {} milliseconds".format(app_launch_time)
-                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "\nTime taken to launch the application: {} milliseconds \n".format(app_launch_time)
+                    conf_file,result = getConfigFileName(tdkTestObj.realpath)
+                    result, app_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"APP_LAUNCH_THRESHOLD VALUE")
+                    if result == "SUCCESS":
+                        if int(app_launch_time) < int(app_launch_threshold_value):
+                            tdkTestObj.setResultStatus("SUCCESS");
+                            print "\n The time taken to launch the app is within the expected limit\n"
+                        else:
+                            tdkTestObj.setResultStatus("FAILURE");
+                            print "\n The time taken to launch the app is greater than the expected limit \n"
+                    else:
+                        tdkTestObj.setResultStatus("FAILURE");
+                        print "Failed to get the threshold value from config file"
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
                     print "error occured during application launch"
