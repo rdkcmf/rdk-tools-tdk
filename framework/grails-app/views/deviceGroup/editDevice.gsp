@@ -17,7 +17,30 @@
  limitations under the License.
 -->
 <%@ page import="com.comcast.rdk.Device" %>
-
+<script type="text/javascript">
+	window.onload = $(function(){
+		if($("#isThunderEnabledCheck").val() == "true"){
+			$("#recorderIdedit").hide();
+			$("#recorderId").hide();
+			$("#deviceTemplateDropdown").hide();
+			$("#streamdivEditDevice").hide();
+		}else{
+			var boxId = $("#boxType").find('option:selected').val();
+			$.get('getBoxType', {id: boxId }, function(data) {
+				if((data[0].type == 'gateway' || data[0].type == 'stand-alone-client') && data[0].category =='RDKV'){
+					$("#recorderIdedit").show();
+					$('#deviceTemplate').prop('selectedIndex',0);
+					$("#deviceTemplateDropdown").show();
+					$("#streamdivEditDevice").show();
+				}else{
+					$("#recorderIdedit").hide();
+					$("#deviceTemplateDropdown").hide();
+					$("#streamdivEditDevice").hide();
+				}
+			});
+		}
+	});
+</script>
 <g:set var="entityName" value="${message(code: 'device.label', default: 'Device')}" />
 
 	<g:if test= "${deviceInstance}">
@@ -29,12 +52,16 @@
 		<g:form method="post" controller="deviceGroup">
 			<g:hiddenField name="id" value="${deviceInstance?.id}" />
 			<g:hiddenField name="version" value="${deviceInstance?.version}" />
+			<g:hiddenField name="isThunderEnabledCheck" id="isThunderEnabledCheck" value="${isThunderEnabledCheck}" />
+			<g:hiddenField name="deviceStreamsSize" id="deviceStreamsSize" value="${deviceStreams?.size()}" />
 			<input type="hidden" name="url" id="url" value="${url}">
 			<fieldset class="form">
 				<g:render template="formDevice" />
 			</fieldset>
-			<div id="streamdiv">
-				<g:render template="streamlistedit" />
+			<div id="streamdivEditDevice" style="display: none;">
+			    <g:if test= "${deviceStreams?.size() > 0}">
+					<g:render template="streamlistedit" />
+				</g:if>
 			</div>
 			<br>
 			<div style="width: 90%; text-align: center;">

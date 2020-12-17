@@ -343,7 +343,7 @@ class DeviceGroupController {
 		BoxType boxType = BoxType.findById(params?.boxType?.id)	
 		String newBoxType = boxType?.type?.toLowerCase()
 		
-		if ((newBoxType.equals( BOXTYPE_GATEWAY ) || newBoxType.equals( BOXTYPE_STANDALONE_CLIENT )) && params.category == RDKV){
+		if ((newBoxType.equals( BOXTYPE_GATEWAY ) || newBoxType.equals( BOXTYPE_STANDALONE_CLIENT )) && params.category == RDKV && !params?.thunderEnabled){
 			String recId =  params?.recorderId
 			if(recId?.trim()?.length() ==  0 ){
 				flash.message = "Recorder id should not be blank"
@@ -370,7 +370,7 @@ class DeviceGroupController {
          * Check whether streams are present
          * and there is no duplicate OcapIds
          */
-		if((newBoxType.equals( BOXTYPE_GATEWAY ) || newBoxType.equals(BOXTYPE_STANDALONE_CLIENT)) && params.category == RDKV)
+		if((newBoxType.equals( BOXTYPE_GATEWAY ) || newBoxType.equals(BOXTYPE_STANDALONE_CLIENT)) && params.category == RDKV && !params?.thunderEnabled)
 		{
         if((params?.streamid)){
 			
@@ -397,7 +397,7 @@ class DeviceGroupController {
 		deviceInstance.category = Utility.getCategory(params?.category)
         if (deviceInstance.save(flush: true)) {
             devicegroupService.saveToDeviceGroup(deviceInstance)
-			if((newBoxType.equals( BOXTYPE_GATEWAY ) || newBoxType.equals(BOXTYPE_STANDALONE_CLIENT)) && deviceInstance.category == Category.RDKV){
+			if((newBoxType.equals( BOXTYPE_GATEWAY ) || newBoxType.equals(BOXTYPE_STANDALONE_CLIENT)) && deviceInstance.category == Category.RDKV && deviceInstance.isThunderEnabled == 0){
 				saveDeviceStream(params?.streamid, params?.ocapId, deviceInstance)
 			}
         }
@@ -440,7 +440,11 @@ class DeviceGroupController {
 				blankList.add(it)
 			}
 		}
-        [url : getApplicationUrl(),deviceInstance: deviceInstance, flag : flag, showBlankRadio:showBlankRadio,blankList:blankList,gateways : devices, deviceStreams : deviceStream,radiodeviceStreams:radiodeviceStream, editPage : true, uploadBinaryStatus: deviceInstance.uploadBinaryStatus, id: id, category:deviceInstance?.category, streamingDetailsInstanceTotal: StreamingDetails.count(),radioStreamingDetailsInstanceTotal: RadioStreamingDetails.count()]
+		def isThunderEnabledCheck = "false"
+		if(deviceInstance?.isThunderEnabled == 1){
+			isThunderEnabledCheck = "true"
+		}
+        [url : getApplicationUrl(),deviceInstance: deviceInstance, flag : flag, showBlankRadio:showBlankRadio,blankList:blankList,gateways : devices, deviceStreams : deviceStream,radiodeviceStreams:radiodeviceStream, editPage : true, uploadBinaryStatus: deviceInstance.uploadBinaryStatus, id: id, category:deviceInstance?.category, streamingDetailsInstanceTotal: StreamingDetails.count(),radioStreamingDetailsInstanceTotal: RadioStreamingDetails.count(),isThunderEnabledCheck: isThunderEnabledCheck]
     }
 
     /**
@@ -504,7 +508,7 @@ class DeviceGroupController {
 			
 			String newBoxType = boxType?.type?.toLowerCase()
 		   String recId=""
-			if ((newBoxType.equals( BOXTYPE_GATEWAY ) || newBoxType.equals(BOXTYPE_STANDALONE_CLIENT)) && deviceInstance.category==Category.RDKV)  {
+			if ((newBoxType.equals( BOXTYPE_GATEWAY ) || newBoxType.equals(BOXTYPE_STANDALONE_CLIENT)) && deviceInstance.category==Category.RDKV && !params?.thunderEnabled)  {
 				if(currentBoxType.equals( BOXTYPE_GATEWAY) || currentBoxType.equals( BOXTYPE_STANDALONE_CLIENT)){
 					recId =  params?.recorderIdedit
 				}else if(currentBoxType.equals(BOXTYPE_CLIENT) && newBoxType.equals( BOXTYPE_GATEWAY ) ){

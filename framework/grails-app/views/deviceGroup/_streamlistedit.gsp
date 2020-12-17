@@ -18,7 +18,6 @@
 -->
 <%@ page import="com.comcast.rdk.StreamingDetails" %>
 <%@ page import="com.comcast.rdk.RadioStreamingDetails" %>
-	<g:if  test="${deviceStreams?.size() > 0 }" >
 	
 	<div>
 		<table>		
@@ -97,4 +96,3 @@
 		</table>
 		
 	</div>
-	</g:if>
