@@ -36,6 +36,9 @@
             <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,com.comcast.StateObserver" expectedValues="activated"/>
         </testStep>
       </prerequisite>
+      <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
+          <event pluginName="StateObserver" eventName="Event_On_Property_Changed" />
+      </prerequisite>
     </pluginPreRequisite>
 
 
