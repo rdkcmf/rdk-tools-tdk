@@ -2459,6 +2459,8 @@ def executeCommand(deviceConfigFile, deviceIP, command):
     configParser.read(r'%s' % deviceConfigFile)
     username = configParser.get('device.config', 'SSH_USERNAME')
     password = configParser.get('device.config', 'SSH_PASSWORD')
+    if password == "None":
+        password = ''
 
     try:
         session = pxssh.pxssh(options={
