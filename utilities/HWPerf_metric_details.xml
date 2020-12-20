@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+============================================================================
+RDK MANAGEMENT, LLC CONFIDENTIAL AND PROPRIETARY
+============================================================================
+This file (and its contents) are the intellectual property of RDK Management, LLC.
+It may not be used, copied, distributed or otherwise  disclosed in whole or in
+part without the express written permission of RDK Management, LLC.
+============================================================================
+Copyright (c) 2020 RDK Management, LLC. All rights reserved.
+============================================================================
+-->
+<!DOCTYPE parserConfig [
+<!ENTITY TDK_LOC          "/opt/TDK/">
+<!ENTITY APP_LOG_FILE     "performance.log">
+<!ENTITY APP_LOG_PATH     "&TDK_LOC;logs/">
+<!ENTITY STRESSNG_REPORT "/tmp/stressng-report.txt">
+]>
+<parserConfig>
+    <tdkTestUtility name="TinymemBench">
+        <parser_section>
+            <log_file_path>&APP_LOG_PATH;&APP_LOG_FILE;</log_file_path>
+            <parser_info>
+                <tag>standard memcpy</tag>
+                <cmd>awk '/standard memcpy/{print}' &APP_LOG_PATH;&APP_LOG_FILE; | tr -s ' ' | cut -d ':' -f 2 | sed 's/^ //'</cmd>
+            </parser_info>
+            <parser_info>
+                <tag>standard memset</tag>
+                <cmd>awk '/standard memset/{print}' &APP_LOG_PATH;&APP_LOG_FILE; | tr -s ' ' | cut -d ':' -f 2 | sed 's/^ //'</cmd>
+            </parser_info>
+        </parser_section>
+    </tdkTestUtility>
+
+    <tdkTestUtility name="NBench">
+        <parser_section>
+            <log_file_path>&APP_LOG_PATH;&APP_LOG_FILE;</log_file_path>
+            <parser_info>
+                <tag>MEMORY INDEX</tag>
+                <cmd>awk '/LINUX DATA BELOW/,0' &APP_LOG_PATH;&APP_LOG_FILE; | awk '/^MEMORY INDEX/{print}' | tr -s ' ' | cut -d ':' -f 2 | sed 's/^ //'</cmd>
+            </parser_info>
+            <parser_info>
+                <tag>INTEGER INDEX</tag>
+                <cmd>awk '/LINUX DATA BELOW/,0' &APP_LOG_PATH;&APP_LOG_FILE; | awk '/^INTEGER INDEX/{print}' | tr -s ' ' | cut -d ':' -f 2 | sed 's/^ //'</cmd>
+            </parser_info>
+            <parser_info>
+                <tag>FLOATING-POINT INDEX</tag>
+                <cmd>awk '/LINUX DATA BELOW/,0' &APP_LOG_PATH;&APP_LOG_FILE; | awk '/^FLOATING-POINT INDEX/{print}' | tr -s ' ' | cut -d ':' -f 2 | sed 's/^ //'</cmd>
+            </parser_info>
+        </parser_section>
+    </tdkTestUtility>
+
+    <tdkTestUtility name="Iozone">
+        <parser_section>
+            <log_file_path>&APP_LOG_PATH;&APP_LOG_FILE;</log_file_path>
+            <parser_info>
+                <tag>64_64_write</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $3}'</cmd>
+            </parser_info>
+            <parser_info>
+                <tag>64_64_rewrite</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $4}'</cmd>
+            </parser_info>
+             <parser_info>
+                <tag>64_64_read</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $5}'</cmd>
+             </parser_info>
+             <parser_info>
+                <tag>64_64_reread</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $6}'</cmd>
+             </parser_info>
+             <parser_info>
+                <tag>64_64_randomread</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $7}'</cmd>
+             </parser_info>
+             <parser_info>
+                <tag>64_64_randomwrite</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $8}'</cmd>
+             </parser_info>
+             <parser_info>
+                <tag>64_64_bkwdread</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $9}'</cmd>
+             </parser_info>
+             <parser_info>
+                <tag>64_64_recordrewrite</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $10}'</cmd>
+             </parser_info>
+             <parser_info>
+                <tag>64_64_strideread</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $11}'</cmd>
+             </parser_info>
+             <parser_info>
+                <tag>64_64_fwrite</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $12}'</cmd>
+             </parser_info>
+             <parser_info>
+                <tag>64_64_frewrite</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $13}'</cmd>
+             </parser_info>
+             <parser_info>
+                <tag>64_64_fread</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $14}'</cmd>
+             </parser_info>
+             <parser_info>
+                <tag>64_64_freread</tag>
+                <cmd>cat &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | grep "64 64" | awk  '{print $15}'</cmd>
+             </parser_info>
+        </parser_section>
+    </tdkTestUtility>
+
+    <tdkTestUtility name="sysbench_memory_metric">
+        <parser_section>
+            <log_file_path>&APP_LOG_PATH;&APP_LOG_FILE;</log_file_path>
+            <parser_info>
+                <tag>Data transfered in second </tag>
+                <cmd>awk '/transferred / {print}' &APP_LOG_PATH;&APP_LOG_FILE; | cut -d "(" -f2 | cut -d " " -f1</cmd>
+            </parser_info>
+        </parser_section>
+    </tdkTestUtility>
+
+    <tdkTestUtility name="sysbench_cpu_metric">
+        <parser_section>
+            <log_file_path>&APP_LOG_PATH;&APP_LOG_FILE;</log_file_path>
+            <parser_info>
+                <tag>Total time</tag>
+                <cmd>awk '/total time:/ {print}' &APP_LOG_PATH;&APP_LOG_FILE; | tr -s " " | awk '{print $3}' | sed 's/[a-z]//'</cmd>
+            </parser_info>
+        </parser_section>
+    </tdkTestUtility>
+
+    <tdkTestUtility name="stress-ng_CPU_Stress">
+        <parser_section>
+            <log_file_path>&STRESSNG_REPORT;</log_file_path>
+            <parser_info>
+                <tag>CPU Stress in bogo ops/s</tag>
+                <cmd>cat  &STRESSNG_REPORT; | tr -s " " | awk '/info: \[.+\] cpu/' | awk  '{print $9}'</cmd>
+            </parser_info>
+        </parser_section>
+    </tdkTestUtility>
+
+    <tdkTestUtility name="stress-ng_Memory_Copying">
+        <parser_section>
+            <log_file_path>&STRESSNG_REPORT;</log_file_path>
+            <parser_info>
+                <tag>Memcpy Stress in bogo ops/s</tag>
+                <cmd>cat &STRESSNG_REPORT;| tr -s " " | awk '/info: \[.+\] memcpy/' | awk  '{print $9}'</cmd>
+            </parser_info>
+        </parser_section>
+    </tdkTestUtility>
+
+    <tdkTestUtility name="stress-ng_Context_Switching">
+        <parser_section>
+            <log_file_path>&STRESSNG_REPORT;</log_file_path>
+            <parser_info>
+                <tag>Context Switch Stress in bogo ops/s</tag>
+                <cmd>cat &STRESSNG_REPORT;| tr -s " " | awk '/info: \[.+\] switch/' | awk  '{print $9}'</cmd>
+            </parser_info>
+        </parser_section>
+    </tdkTestUtility>
+
+    <tdkTestUtility name="stress-ng_Malloc">
+        <parser_section>
+            <log_file_path>&STRESSNG_REPORT;</log_file_path>
+            <parser_info>
+                <tag>Malloc Stress in bogo ops/s</tag>
+                <cmd>cat &STRESSNG_REPORT;| tr -s " " | awk '/info: \[.+\] malloc/' | awk  '{print $9}'</cmd>
+            </parser_info>
+        </parser_section>
+    </tdkTestUtility>
+
+</parserConfig>
