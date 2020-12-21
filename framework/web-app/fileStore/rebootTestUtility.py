@@ -47,16 +47,28 @@ def validateUptime(TimeAfterReboot,validate):
 #FUNCTION TO GET THE INTERFACE STATUS
 #-------------------------------------------------------
 def getIFStatus(IF_name,validate):
-    method = "NetworkControl.1.up@"+IF_name;
-    status = rdkservice_getValue(method)
-    if status == True:
-        return "ENABLED"
-    elif validate == "Yes":
-        print "Ethernet Interface is not up after reboot. Exiting the script"
-        exitScript(StatusInterface,iter_no);
+    status = rdkservice_setPluginStatus("org.rdk.Network","activate")
+    output="FAILURE"
+    if status == None:
+        method = "org.rdk.Network.1.isInterfaceEnabled"
+        value='{"interface":"ETHERNET"}'
+        status = rdkservice_setValue(method,value)
+        status = status["enabled"]
+        rev_status = rdkservice_setPluginStatus("org.rdk.Network","deactivate")
+        if rev_status == None:
+            if status == True:
+                output= "ENABLED"
+            elif validate == "Yes":
+                print "Ethernet Interface is not up after reboot. Exiting the script"
+                exitScript(StatusInterface,iter_no);
+            else:
+                StatusInterface.append(iter_no)
+                output = "DISABLED";
+        else:
+            print "Unable to revert network plugin status"
     else:
-        StatusInterface.append(iter_no)
-        return "DISABLED";
+        print "Unable to enable network plugin"
+    return output;
 #------------------------------------------------------
 #VALIDATE THE NUMBER OF PLUGINS AFTER REBOOT
 #------------------------------------------------------
@@ -78,9 +90,30 @@ def validatePluginStatus(statusBeforeReboot,statusAfterReboot,validate):
         return "SUCCESS"
     else:
         print "Mismatch in status of plugins before and after reboot"
-        Diff_after_reboot = [item for item in statusAfterReboot if item not in statusBeforeReboot]
-        Initial_value = [item for item in statusBeforeReboot if item not in statusAfterReboot]
+	#To convert the plugin status from string to list.
+	#START
+	len_string = statusAfterReboot.count("]")-1;
+        status_after_reboot_list=[];
+        status_before_reboot_list=[];
+        for i in range(0,len_string):
+            sublist_after=[];
+            after_reboot=statusAfterReboot.split("[[")[1].split("]")[i];
+            if "[" in after_reboot:
+                after_reboot= after_reboot.split("[")[1];
+            sublist_after.append(after_reboot);
+            status_after_reboot_list.append(sublist_after);
+
+            sublist_before=[];
+            before_reboot=statusBeforeReboot.split("[[")[1].split("]")[i];
+            if "[" in before_reboot:
+                before_reboot= before_reboot.split("[")[1];
+            sublist_before.append(before_reboot);
+            status_before_reboot_list.append(sublist_before);
+	#END
+
+        Diff_after_reboot = [item for item in status_after_reboot_list if item not in status_before_reboot_list]
         print "The status after reboot:\n ", Diff_after_reboot;
+        Initial_value = [item for item in status_before_reboot_list if item not in status_after_reboot_list]
         print "The status before reboot: \n", Initial_value;
 
         if validate == "Yes":
