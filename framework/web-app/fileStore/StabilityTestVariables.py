@@ -30,7 +30,7 @@ max_channel_change_count = 1000
 cobalt_test_url = ""
 
 #test duration in minutes till test should be performed, it should be less than the duration of test video
-cobalt_test_duration = 300
+cobalt_test_duration = 330
 
 #Configure Variable for Reboot stress test:
 EthernetInterface ="eth0"
@@ -49,7 +49,7 @@ rebootwaitTime = 150
 
 ####Webkit stress test details
 #test duration in minutes till webkit stress test should be performed.
-stress_test_duration = 60
+stress_test_duration = 240
 
 #Stress test url, this will trigger the redirection of urls in webkit browser
 stress_test_url = "https://cdn.metrological.com/static/storm/app_redirect1.html"
@@ -59,7 +59,7 @@ expected_url_pattern = "https://cdn.metrological.com/static/storm/app_redirect[1
 
 ####Suspend and Resume tests details - used for both webkit test and cobalt test
 #The maximum number of times the test should repeat:
-suspend_resume_max_count = 30
+suspend_resume_max_count = 100
 
 ####Random key sending test details
 #The URL used to test cobalt to play while sending random keys
