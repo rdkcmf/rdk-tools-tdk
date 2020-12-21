@@ -1304,6 +1304,38 @@
         <event name="Upgrade_Progress_Event" eventName="upgradeprogress" eventId="client.events.1" type="event" desc="Notifies progress of upgrade" />
     </plugin>
     
+    <!-- AVInput Plugin Information -->
+    <plugin pluginName="AVInput" serviceName="org.rdk.AVInput" serviceVersion="1">
+        <method name="AVInput_NumberOfInputs" api="numberOfInputs" type="method" desc="Gets the available number of inputs" />
+        <method name="AVInput_CurrentVideoMode" api="currentVideoMode" type="method" desc="Gets the current video mode" />
+        <method name="AVInput_ContentProtected" api="contentProtected" type="method" desc="Checks for content protection" >
+            <expectedValues>True</expectedValues>
+        </method>
+    </plugin>
+
+    <!-- HdmiInput Plugin Information -->
+    <plugin pluginName="HdmiInput" serviceName="org.rdk.HdmiInput" serviceVersion="1">
+        <method name="Get_HdmiInput_Devices" api="getHDMIInputDevices" type="method" desc="Returns an array of hdmi input devices"/>
+        <method name="Start_HdmiInput" api="startHdmiInput" type="method" desc="Activates selected Hdmi In Port as primary video source">
+            <params>
+                <param tag="portId" type="int" />
+            </params>
+        </method>
+        <method name="Stop_HdmiInput" api="stopHdmiInput" type="method" desc="Deactivates current Hdmi In Port selected as primary video source">
+            <params>
+                <param tag="portId" type="int" />
+            </params>
+        </method>
+        <method name="Write_Edid" api="writeEDID" type="method" desc="Changes a current EDID value">
+            <params>
+                <param tag="deviceId" type="int" />
+                <param tag="message" type="string" defaultValue="EDID"/>
+            </params>
+        </method>
+        <method name="Read_Edid" api="readEDID" type="method" desc="Returns a current EDID value">
+            <expectedValues>EDID</expectedValues>
+        </method>
+    </plugin>
 </thunderPlugins>
 
 
