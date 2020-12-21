@@ -482,7 +482,7 @@
 					</tr>
 
 				</table>
-				 <div id="chartdivAnalyzeExecutionDiv3" style="margin-left: 50px;margin-right: 50px;">
+				 <div id="chartdivAnalyzeExecutionDiv3" style="margin-right: 50px;">
 					 <div id="chartdivAnalyzeExecutionDiv2" style="overflow:auto;">
 						<div id="chartdivAnalyzeExecutionDiv1" style="position:relative;">
 						      <div class="chartdivAnalyzeExecution" id="chartdivAnalyzeExecution" style=" height: 500px;"></div>
