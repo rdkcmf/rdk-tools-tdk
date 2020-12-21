@@ -2735,9 +2735,11 @@ function showChartAnalyzeExecution(){
 							}
 				      },
 				        series : [{
-				            yaxis : 'yaxis'
+				            yaxis : 'yaxis',
+				            label:"cpu_load"
 				        }, {
-				            yaxis : 'y2axis'
+				            yaxis : 'y2axis',
+				            label:"memory_usage"
 				        }],
 				        highlighter: {
 				          show: true,
@@ -2746,9 +2748,24 @@ function showChartAnalyzeExecution(){
 					    legend: {
 					    	show: true,
 					   		placement: 'outsideGrid',
-					   		location: 'n',
+					   		location: 'nw',
 					   		labels: ['cpu_load','memory_usage']
-					   }
+					   },
+				        highlighter: {
+				        	show: true,
+					        showTooltip: true,
+					        tooltipLocation:'ne',
+					        tooltipAxes: 'y',
+					        tooltipContentEditor: function (str, seriesIndex, pointIndex, plot) {
+					        	var val = plot.data[seriesIndex][pointIndex];
+					            var label = plot.series[seriesIndex]["label"]
+					            var html = "<div>";
+					            html += label;
+					            html += "  : ";
+					            html += val;
+					            return html;
+					          }
+				        }
 				 });
 			}
 		} );
