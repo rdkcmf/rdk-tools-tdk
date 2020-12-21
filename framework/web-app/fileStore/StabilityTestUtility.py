@@ -126,7 +126,7 @@ def get_validation_params(obj):
                 validation_dict["validation_required"] = True
                 result,validation_dict["ssh_method"] = getDeviceConfigKeyValue(conf_file,"SSH_METHOD")
                 if validation_dict["ssh_method"] == "directSSH":
-          	    result,validation_dict["host_name"] = getDeviceConfigKeyValue(conf_file,"SSH_IP")
+          	    validation_dict["host_name"] = obj.IP
                     result,validation_dict["user_name"] = getDeviceConfigKeyValue(conf_file,"SSH_USERNAME")
 		    result,validation_dict["password"] = getDeviceConfigKeyValue(conf_file,"SSH_PASSWORD")
                 else:
