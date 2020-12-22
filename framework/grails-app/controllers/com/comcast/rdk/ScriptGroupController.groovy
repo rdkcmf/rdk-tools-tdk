@@ -1572,7 +1572,7 @@ class ScriptGroupController {
 					script = new ScriptFile()
 					script.setScriptName(params?.name?.trim())
 					script.setModuleName(ptest?.module?.name)
-					if(ptest?.module?.name == Constants.RDKSERVICES){
+					if(ptest?.module?.name == Constants.RDKSERVICES || ptest?.module?.name == Constants.RDKV_PERFORMANCE || ptest?.module?.name == Constants.RDKV_STABILITY){
 						script.category = Utility.getCategory(Category?.RDKV_RDKSERVICE.toString())
 					}else{
 						script.category = Utility.getCategory(params?.category)
