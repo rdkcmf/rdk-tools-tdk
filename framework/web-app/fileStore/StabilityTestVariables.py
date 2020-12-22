@@ -35,7 +35,7 @@ cobalt_test_duration = 330
 #Configure Variable for Reboot stress test:
 EthernetInterface ="eth0"
 #Count of how many times reboot should happen
-repeatCount = 100
+repeatCount = 1000
 
 #Give "No" if the validation step is not mandatory
 #If "Yes", script will exit whenever a step fails
