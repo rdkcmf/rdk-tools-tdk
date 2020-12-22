@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2020 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<testPlugin pluginName="AVInput" pluginVersion="1">
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="org.rdk.AVInput" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.AVInput" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.AVInput" />
+                <params>
+                  <param tag="callsign" value="org.rdk.AVInput" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.AVInput" />
+                <params>
+                  <param tag="plugin" value="org.rdk.AVInput" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.AVInput" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+        </pluginPreRequisite>
+        <testCase testCaseId="AVIN_01" testCaseName= "AVInput_GET_NumberOfInputs" desc="Get the number of available inputs">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_NumberOfInputs" method="AVInput_NumberOfInputs">
+                <resultGeneration useMethodTag="avinput_check_inputs" >
+                  <expectedValues useConfigFile="true" key="AVInput_NUMBER_OF_INPUTS" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="AVIN_02" testCaseName= "AVInput_GET_CurrentVideoMode" desc="Get the current video mode">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_CurrentVideoMode" method="AVInput_CurrentVideoMode">
+                <resultGeneration useMethodTag="avinput_get_currentvideomode" />
+            </testStep>
+        </testCase>
+        <testCase testCaseId="AVIN_03" testCaseName= "AVInput_Is_ContentProtected" desc="Checks for content protection">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="IsContentProtected" method="AVInput_ContentProtected">
+                <resultGeneration useMethodTag="avinput_is_contentprotected"  />
+            </testStep>
+        </testCase>
+
+</testPlugin>
+

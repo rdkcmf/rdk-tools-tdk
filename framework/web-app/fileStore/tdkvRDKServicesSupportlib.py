@@ -30,7 +30,7 @@ import ConfigParser
 from base64 import b64encode, b64decode
 import codecs
 from time import sleep
-
+import re
 
 #-----------------------------------------------------------------------------------------------
 #               ***  RDK SERVICES VALIDATION FRAMEWORK SUPPORTING FUNCTIONS ***
@@ -1468,6 +1468,77 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+        
+        #AVInput Plugin Response result parser
+        elif tag == "avinput_check_inputs":
+            info["numberOfInputs"] = result.get("numberOfInputs")
+            success = str(result.get("success")).lower() == "true"
+            if success and int(result.get("numberOfInputs")) == int(expectedValues[0]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "avinput_get_currentvideomode":
+            info["currentVideoMode"] = result.get("currentVideoMode")
+            currentVideoMode =  result.get("currentVideoMode")
+            status = checkNonEmptyResultData(currentVideoMode)
+            VideoMode = re.split('(p|i)',currentVideoMode)
+            if status == "TRUE":
+                Resolution = VideoMode[0]
+                Framerate = VideoMode[2]
+                if Resolution == "unknown" and  len(Framerate) == 0 or Resolution in ["480", "576", "720", "1080", "3840x2160", "4096x2160"] and Framerate in ["24", "25", "30", "60", "23.98", "29.97", "50", "59.94"]:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "avinput_is_contentprotected":
+            info["isContentProtected"] = result.get("isContentProtected")
+            success = str(result.get("success")).lower() == "true"
+            if success and str(result.get("isContentProtected")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        # HdmiInput Response result parser steps
+        elif tag == "get_hdmiinput_devices":
+            success = str(result.get("success")).lower() == "true"
+            devices = result.get("devices")
+            status = []
+            device_details = []
+            if len(arg) and arg[0] == "get_data":
+                for device_info in devices:
+                    status.append(checkNonEmptyResultData(device_info))
+                    device_data = {}
+                    device_data["id"] = int(device_info.get("id"))
+                    device_data["locator"] = str(device_info.get("locator"))
+                    device_details.append(device_data)
+                info["devices"] = device_details
+            else:
+                port_id_list = []
+                for device_info in devices:
+                    status.append(checkNonEmptyResultData(device_info))
+                    port_id_list.append(str(device_info.get("id")))
+                info["portIds"] = port_id_list
+            if "FALSE" not in status and success:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "hdmiinput_check_set_operation":
+            if str(result.get("success")).lower() == "true":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "hdmiinput_read_edid_value":
+            info["name"]  = str(result.get("name"))
+            if str(result.get("success")).lower() == "true" and info["name"] in expectedValues[0]:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
 
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_state":
@@ -2090,6 +2161,15 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag == "messenger_get_roomid":
             testStepResults = testStepResults[0].values()[0]
             info["roomid"] = testStepResults[0].get("roomid")
+
+        # HdmiInput plugin result parser steps
+        elif tag == "hdmiinput_get_portids":
+            testStepResults = testStepResults[0].values()[0]
+            port_id_list = testStepResults[0].get("portIds")
+            portIds = []
+            for portId in port_id_list:
+                portIds.append(portId)
+            info["portId"] = ",".join(portIds)
 
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_name":
