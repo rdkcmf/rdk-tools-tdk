@@ -1111,12 +1111,12 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
         elif tag == "check_volume_level":
             info["volumeLevel"] = result.get('volumeLevel');
             if len(arg) and arg[0] == "check_volume_level_range":
-                if 0 <= int(result.get('volumeLevel')) <= 96 :
+                if 0 <= int(float(result.get('volumeLevel'))) <= 100 :
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             else:
-                if str(result.get("success")).lower() == "true" and str(result.get('volumeLevel')) in expectedValues:
+                if str(result.get("success")).lower() == "true" and str(int(float(result.get('volumeLevel')))) in expectedValues:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
