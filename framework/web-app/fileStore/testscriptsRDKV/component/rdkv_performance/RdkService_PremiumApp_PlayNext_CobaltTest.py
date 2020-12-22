@@ -146,7 +146,7 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("value",params)
             tdkTestObj.executeTestCase(expectedResult)
             result = tdkTestObj.getResult()
-            time.sleep(10)
+            time.sleep(50)
             if result == "SUCCESS":
                 tdkTestObj.setResultStatus("SUCCESS")
                 if validation_dict["validation_required"]:
