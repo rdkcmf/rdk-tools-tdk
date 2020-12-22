@@ -76,9 +76,10 @@ function deleteDevice(id){
 function showFields(){
 	var boxType = $("#boxType").find('option:selected').text();
 	var boxId = $("#boxType").find('option:selected').val();
+	var isThunderEnabled = $("#isThunderEnabled").prop('checked');
 	var url = $("#url").val();
 	$.get('getBoxType', {id: boxId }, function(data) {
-		if((data[0].type == 'gateway' || data[0].type == 'stand-alone-client') && data[0].category==='RDKV'){
+		if((data[0].type == 'gateway' || data[0].type == 'stand-alone-client') && data[0].category==='RDKV' && !isThunderEnabled){
 			var xmlhttp;	
 			if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
 				xmlhttp = new XMLHttpRequest();
@@ -87,7 +88,11 @@ function showFields(){
 			}
 			xmlhttp.onreadystatechange = function() {
 				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-					document.getElementById("streamdiv").innerHTML = xmlhttp.responseText;			
+					if($("#editFlag").val() == "true"){
+						document.getElementById("streamdivEditDevice").innerHTML = xmlhttp.responseText;
+					}else{
+						document.getElementById("streamdivCreateDevice").innerHTML = xmlhttp.responseText;
+					}
 				}
 			}			
 			xmlhttp.open("GET", url+"/deviceGroup/list?t="+Math.random()+"&max=10&offset=0&streamtable=true", true);
@@ -109,15 +114,15 @@ function showFields(){
 			}
 			$('#deviceTemplate').prop('selectedIndex',0);  
 			$("#deviceTemplateDropdown").show();
-			$("#streamdiv").show();
-			$("#recorderIdedit").hide();
 			
 			if($("#editFlag").val() == "true"){
 				$("#recorderId").hide();
 				$("#recorderIdedit").show();
+				$("#streamdivEditDevice").show();
 			}else{
 				$("#recorderIdedit").hide();
 				$("#recorderId").show();
+				$("#streamdivCreateDevice").show();
 			}
 			
 		}
@@ -125,7 +130,7 @@ function showFields(){
 			if($("#editFlag").val() == "true"){
 				$("#gatewayId").hide();
 				$("#gatewayIdedit").show();	
-				$("#streamdiv").hide();	
+				$("#streamdivEditDevice").hide();	
 				$("#deviceTemplateDropdown").hide();
 				$("#recorderIdedit").hide();
 				$("#recorderId").hide();
@@ -133,7 +138,7 @@ function showFields(){
 			else{
 				$("#recorderId").hide();
 				$("#gatewayId").show();
-				$("#streamdiv").hide();	
+				$("#streamdivCreateDevice").hide();	
 				$("#deviceTemplateDropdown").hide();
 				$("#gatewayIdedit").hide();		
 				$("#recorderIdedit").hide();
@@ -308,9 +313,82 @@ function showPortConfigDiv(){
  * Function to hide/show the thunder port div's while adding or editing a device
  */
 function showThunderPortDiv(){
+	var editPage = false
+	if($("#editFlag").val() == "true"){
+		editPage = true
+	}
 	if(document.getElementById('isThunderEnabled').checked) {
-		 $("#thunderPortConfigure").show();	
+		$("#thunderPortConfigure").show();
+		$("#deviceTemplateDropdown").hide();
+		if(editPage){
+			$("#recorderIdedit").hide();
+			$("#recorderId").hide();
+			$("#streamdivEditDevice").hide();
+		}else{
+			$("#recorderIdedit").hide();
+			$("#recorderId").hide();
+			$("#streamdivCreateDevice").hide();
+		}
 	}else{
-		$("#thunderPortConfigure").hide();	
+		$("#thunderPortConfigure").hide();
+		var boxId = $("#boxType").find('option:selected').val();
+		var url = $("#url").val();
+		$.get('getBoxType', {id: boxId }, function(data) {
+			if((data[0].type == 'gateway' || data[0].type == 'stand-alone-client') && data[0].category==='RDKV'){
+				$('#deviceTemplate').prop('selectedIndex',0);
+				$("#deviceTemplateDropdown").show();
+				if(editPage){
+					if($("#deviceStreamsSize").val() > 0){
+						$("#streamdivEditDevice").show();
+						$("#recorderIdedit").show();
+					}else{
+						$("#streamdivEditDevice").show();
+						$("#recorderIdedit").show();
+						var xmlhttp;	
+						if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+							xmlhttp = new XMLHttpRequest();
+						} else {// code for IE6, IE5
+							xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+						}
+						xmlhttp.onreadystatechange = function() {
+							if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+								document.getElementById("streamdivEditDevice").innerHTML = xmlhttp.responseText;
+							}
+						}			
+						xmlhttp.open("GET", url+"/deviceGroup/list?t="+Math.random()+"&max=10&offset=0&streamtable=true", true);
+						xmlhttp.send();
+						$("#recorderId").show();
+						if(data[0].type == 'gateway'){
+							$("#gatewayId").hide()
+							$("#gatewayIdedit").hide();
+						}else if(data[0].type == 'stand-alone-client'){
+							$("#gatewayId").hide();
+							$("#gatewayIdedit").show();	
+							$("#recorderId").hide();
+						}
+						$('#deviceTemplate').prop('selectedIndex',0);  
+						$("#deviceTemplateDropdown").show();
+						$("#recorderIdedit").hide();
+						if($("#editFlag").val() == "true"){
+							$("#recorderId").hide();
+							$("#recorderIdedit").show();
+							$("#streamdivEditDevice").show();
+						}
+					}
+				}else{
+					$("#recorderId").show();
+					$("#streamdivCreateDevice").show();
+				}
+			}else{
+				$("#deviceTemplateDropdown").hide();
+				if(editPage){
+					$("#recorderIdedit").hide();
+					$("#streamdivEditDevice").hide();
+				}else{
+					$("#recorderId").hide();
+					$("#streamdivCreateDevice").hide();
+				}
+			}
+		});
 	}
 }

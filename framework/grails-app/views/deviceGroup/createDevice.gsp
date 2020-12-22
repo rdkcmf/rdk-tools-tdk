@@ -46,7 +46,7 @@
 		<fieldset class="form">
 			<g:render template="formDevice" model="[category:category]" />
 		</fieldset>
-		<div id="streamdiv"></div>
+		<div id="streamdivCreateDevice" style="display: none;"></div>
 		<br>
 		<div style="width: 100%; text-align: center;">
 			<span id="createDevice" class="buttons"><g:submitToRemote
