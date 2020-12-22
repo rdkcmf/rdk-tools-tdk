@@ -128,7 +128,7 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("value",params)
             tdkTestObj.executeTestCase(expectedResult)
             result = tdkTestObj.getResult()
-            time.sleep(50)
+            time.sleep(40)
             #Click OK to skip Ad
             params = '{"keys":[ {"keyCode": 13,"modifiers": [],"delay":1.0}]}'
             tdkTestObj = obj.createTestStep('rdkservice_setValue')
@@ -136,7 +136,7 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("value",params)
             tdkTestObj.executeTestCase(expectedResult)
             result = tdkTestObj.getResult()
-            time.sleep(10)
+            time.sleep(50)
             if result == "SUCCESS":
                 tdkTestObj.setResultStatus("SUCCESS")
                 test_time_in_mins = int(StabilityTestVariables.cobalt_randomkey_test_duration)
