@@ -47,28 +47,37 @@ def validateUptime(TimeAfterReboot,validate):
 #FUNCTION TO GET THE INTERFACE STATUS
 #-------------------------------------------------------
 def getIFStatus(IF_name,validate):
-    status = rdkservice_setPluginStatus("org.rdk.Network","activate")
+    revert = True
+    curr_status = rdkservice_getPluginStatus('org.rdk.Network')
+    if curr_status == 'activated':
+        revert = False
+        status = None
+    else:
+        status = rdkservice_setPluginStatus("org.rdk.Network","activate")
     output="FAILURE"
     if status == None:
         method = "org.rdk.Network.1.isInterfaceEnabled"
         value='{"interface":"ETHERNET"}'
         status = rdkservice_setValue(method,value)
         status = status["enabled"]
-        rev_status = rdkservice_setPluginStatus("org.rdk.Network","deactivate")
-        if rev_status == None:
-            if status == True:
-                output= "ENABLED"
-            elif validate == "Yes":
-                print "Ethernet Interface is not up after reboot. Exiting the script"
-                exitScript(StatusInterface,iter_no);
-            else:
-                StatusInterface.append(iter_no)
-                output = "DISABLED";
+        if status == True:
+            output= "ENABLED"
+        elif validate == "Yes":
+            print "Ethernet Interface is not up after reboot. Exiting the script"
+            exitScript(StatusInterface,iter_no);
         else:
-            print "Unable to revert network plugin status"
+            StatusInterface.append(iter_no)
+            output = "DISABLED";
+        if revert:
+            rev_status = rdkservice_setPluginStatus("org.rdk.Network","deactivate")
+            if rev_status == None:
+                print "Reverted network plugin status"
+            else:
+                print "Unable to revert network plugin status"
     else:
         print "Unable to enable network plugin"
     return output;
+
 #------------------------------------------------------
 #VALIDATE THE NUMBER OF PLUGINS AFTER REBOOT
 #------------------------------------------------------
