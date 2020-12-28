@@ -145,20 +145,6 @@ if expectedResult in result.upper():
                         else:
                             tdkTestObj.setResultStatus("FAILURE")
 
-                        #GET THE STATUS OF ETHERNET INTERFACE
-                        if_status = getIFStatus(EthernetInterface,ValidateInterface)
-                        if if_status == "ENABLED":
-                            tdkTestObj.setResultStatus("SUCCESS")
-                        else:
-                            tdkTestObj.setResultStatus("FAILURE")
-
-                        #CHECK THE CONTROLLER UI STATUS
-                        ui_status = getUIStatus(ValidateControllerUI);
-                        if ui_status == "ACCESSIBLE":
-                            tdkTestObj.setResultStatus("SUCCESS")
-                        else:
-                            tdkTestObj.setResultStatus("FAILURE")
-
                         #GET THE NUMBER OF PLUGINS AFTER REBOOT
                         tdkTestObj = obj.createTestStep('rdkservice_getNoOfPlugins');
                         tdkTestObj.executeTestCase(expectedResult);
@@ -175,6 +161,20 @@ if expectedResult in result.upper():
                         PluginStatusAfterReboot = tdkTestObj.getResultDetails();
                         plugin_status = validatePluginStatus(PluginStatusBeforeReboot,PluginStatusAfterReboot,ValidatePluginStatus)
                         if plugin_status == "SUCCESS":
+                            tdkTestObj.setResultStatus("SUCCESS")
+                        else:
+                            tdkTestObj.setResultStatus("FAILURE")
+
+			#GET THE STATUS OF ETHERNET INTERFACE
+                        if_status = getIFStatus(EthernetInterface,ValidateInterface)
+                        if if_status == "ENABLED":
+                            tdkTestObj.setResultStatus("SUCCESS")
+                        else:
+                            tdkTestObj.setResultStatus("FAILURE")
+
+                        #CHECK THE CONTROLLER UI STATUS
+                        ui_status = getUIStatus(ValidateControllerUI);
+                        if ui_status == "ACCESSIBLE":
                             tdkTestObj.setResultStatus("SUCCESS")
                         else:
                             tdkTestObj.setResultStatus("FAILURE")
