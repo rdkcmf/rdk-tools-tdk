@@ -42,6 +42,7 @@
       <function name='rdkservice_getBrowserScore_HTML5' />
       <function name='rdkservice_getBrowserScore_SunSpider' />
       <function name='rdkservice_getRequiredLog' />
+      <function name='rdkservice_getSSHParams' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -58,6 +59,8 @@
       <parameter funName='rdkservice_getRequiredLog' parameterName='ssh_method' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getRequiredLog' parameterName='command' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getRequiredLog' parameterName='credentials' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_getSSHParams' parameterName='realpath' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_getSSHParams' parameterName='deviceIP' parameterType='STRING' range='a-z' />
     </parameters>
   </module>
 </xml>
