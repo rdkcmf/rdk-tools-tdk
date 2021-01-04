@@ -424,3 +424,28 @@ def rdkservice_getRequiredLog(ssh_method,credentials,command):
         if output == "":
             output = "EXCEPTION"
         return output
+
+#-------------------------------------------------------------------
+#GET THE SSH DETAILS FROM CONFIGURATION FILE
+#-------------------------------------------------------------------
+def rdkservice_getSSHParams(realpath,deviceIP):
+    ssh_dict = {}
+    print "\n getting ssh params from conf file"
+    conf_file,result = getConfigFileName(realpath)
+    if result == "SUCCESS":
+        result,ssh_dict["ssh_method"] = getDeviceConfigKeyValue(conf_file,"SSH_METHOD")
+        if ssh_dict["ssh_method"] == "directSSH":
+            ssh_dict["host_name"] = deviceIP
+            result,ssh_dict["user_name"] = getDeviceConfigKeyValue(conf_file,"SSH_USERNAME")
+            result,ssh_dict["password"] = getDeviceConfigKeyValue(conf_file,"SSH_PASSWORD")
+        else:
+            #TODO
+            print "selected ssh method is {}".format(ssh_dict["ssh_method"])
+            pass
+    else:
+        print "Failed to find the device specific config file"
+    if any(value == "" for value in ssh_dict.itervalues()):
+        print "please configure values before test"
+        ssh_dict = {}
+    ssh_dict = json.dumps(ssh_dict)
+    return ssh_dict

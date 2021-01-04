@@ -91,6 +91,13 @@
           <parameter name="ssh_method" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkservice_getSSHParams" id=" " version="3">
+        <function>rdkservice_getSSHParams</function>
+        <parameters>
+          <parameter name="realpath" value=""/>
+          <parameter name="deviceIP" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
