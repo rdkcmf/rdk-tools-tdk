@@ -26,6 +26,7 @@ thunder_port=""
 #lightning application url
 lightning_video_test_app_url = ""
 lightning_animation_test_app_url = ""
+lightning_multianimation_test_app_url = ""
 
 #Video URL
 video_src_url = ""
@@ -48,5 +49,5 @@ repeat_count_stress = 15
 operation_min_interval = 5
 operation_max_interval = 10
 
-#This FPS threshold level should be updated for each platform and it may differ
-expected_fps_threshold = 0
+# Min Time duration for the animation operation used by multianimations app (10 to 60 sec)
+animation_duration = 60
