@@ -78,6 +78,66 @@ class ScriptExecutor {
 	    return outputData
     }
 	
+	/**
+	 * Method to execute a script.
+	 * This method executes a particular command with specified arguments.
+	 * @param command
+	 * @return
+	 */
+	def executeRdkCertificationDiagnosisScript(def realPath, final String[] command, final int waittime, def executionId, def executionDeviceId, def executionResultId) {
+		Process process = Runtime.getRuntime().exec( command )
+		StreamReaderJob dataReader = new StreamReaderJob(process.getInputStream())
+		StreamReaderJob errorReader = new StreamReaderJob(process.getErrorStream())
+
+		FutureTask< String > dataReaderTask = new FutureTask< String > (dataReader)
+		FutureTask< String > errorReaderTask = new FutureTask< String > (errorReader)
+		executorService.execute(dataReaderTask)
+		executorService.execute(errorReaderTask)
+		if(waittime == 0){
+			int exitCode = process.waitFor()
+		}
+		else{
+			process.waitForOrKill(waittime*60000)
+		}
+		String outputData = dataReaderTask.get()
+		String errorData = errorReaderTask.get()
+		if(errorData && (errorData.length() > 0 )){
+			//println "errorData :: "+errorData
+		}
+		process.destroy()
+		boolean rdkCertificationDiagnosisLogFileCreationSuccess = false
+		try{
+			String folderPath = realPath+File.separator+"logs"
+			String executionInstanceDirPath = folderPath+File.separator+executionId
+			File executionInstanceDir = new File(executionInstanceDirPath)
+			if(!executionInstanceDir.exists()){
+				executionInstanceDir.mkdir()
+			}
+			String executionDeviceInstanceDirPath = executionInstanceDirPath+File.separator+executionDeviceId
+			File executionDeviceInstanceDir = new File(executionDeviceInstanceDirPath)
+			if(!executionDeviceInstanceDir.exists()){
+				executionDeviceInstanceDir.mkdir()
+			}
+			String executionResultInstanceDirPath = executionDeviceInstanceDirPath+File.separator+executionResultId
+			File executionResultInstanceDir = new File(executionResultInstanceDirPath)
+			if(!executionResultInstanceDir.exists()){
+				executionResultInstanceDir.mkdir()
+			}
+			String rdkCertificationDiagnosisLogFileName = executionId+"_RdkCertificationDiagnosisLog.txt"
+			String rdkCertificationDiagnosisLogFileAbsolutePath = executionResultInstanceDirPath +File.separator+rdkCertificationDiagnosisLogFileName
+			File rdkCertificationDiagnosisLogFile = new File(rdkCertificationDiagnosisLogFileAbsolutePath)
+			if(rdkCertificationDiagnosisLogFile.createNewFile()){
+				FileWriter fr = new FileWriter(rdkCertificationDiagnosisLogFile)
+				fr.write(outputData)
+				fr.close()
+				rdkCertificationDiagnosisLogFileCreationSuccess = true
+			}
+		}catch(Exception e){
+	    	e.printStackTrace()
+		}
+		return rdkCertificationDiagnosisLogFileCreationSuccess
+	}
+	
 	public String execute(final String executionScript, final int waittime,final String execName,final Map executionProcessMap) {
 		Process process = Runtime.getRuntime().exec( executionScript )
 		String outputData = null

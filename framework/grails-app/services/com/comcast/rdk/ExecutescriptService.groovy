@@ -229,7 +229,6 @@ class ExecutescriptService {
 			e.printStackTrace()
 		}
 		
-		
 		if(executionService.abortList.contains(executionInstance?.id?.toString())){
 			if(deviceInstance?.isThunderEnabled != 1){
 				resetAgent(deviceInstance,TRUE)
@@ -373,6 +372,8 @@ class ExecutescriptService {
 			
 			initiateDiagnosticsTest(deviceInstance, performanceFileName, tmUrl,uniqueExecutionName)
 			copyLogFileIntoDir(realPath, diagnosticsFilePath, executionId,executionDevice?.id, executionResultId,DEVICE_DIAGNOSTICS_LOG)
+		}else if(isSystemDiagnostics.equals(TRUE) && deviceInstance?.isThunderEnabled == 1){
+			initiateDiagnosticsTestRdkCertification(realPath, deviceInstance, executionId, executionDevice?.id, executionResultId, uniqueExecutionName)
 		}
 		//def logTransferFileName = "${executionId.toString()}${deviceInstance?.id.toString()}${scriptInstance?.id.toString()}${executionDevice?.id.toString()}"
 		def logTransferFilePath = "${realPath}/logs//consolelog//${executionId}//${executionDevice?.id}//${executionResultId}//"
@@ -1570,7 +1571,7 @@ class ExecutescriptService {
 							if(!aborted && !(devStatus.equals(Status.NOT_FOUND.toString()) || devStatus.equals(Status.HANG.toString()))){								
 							
 								try{
-									htmlData = executeScript(execName, executionDevice, script, deviceInstance, url, filePath, realPath, isBenchMark, isSystemDiagnostics,executionName,isMultiple,null,isLogReqd,category )
+									htmlData = executeScript(execName, executionDevice, script, deviceInstance, url, filePath, realPath, isBenchMark, isSystemDiagnostics,executionName,isMultiple,null,isLogReqd,category)
 								}catch(Exception e){
 									e.printStackTrace()
 								}
@@ -2551,6 +2552,27 @@ class ExecutescriptService {
 			e.printStackTrace()
 		}
 		return output
+	}
+	
+	/**
+	 * To initiate the diagnostics test for RdkCertification
+	 */
+	def initiateDiagnosticsTestRdkCertification(def realPath, def deviceInstance , def executionId, def executionDeviceId, def executionResultId, def uniqueExecutionName ){
+		try{
+			File scriptFolder = grailsApplication.parentContext.getResource("//fileStore//rdk_cerfiticate_diagnosis.py").file
+			def scriptFolderAbsolutePath = scriptFolder.absolutePath
+				
+			String[] rdkCertificationDiagnosisCmd = [
+				PYTHON_COMMAND,
+				scriptFolderAbsolutePath,
+				deviceInstance?.stbIp,
+			]
+				
+			ScriptExecutor scriptExecutorRdkCertification = new ScriptExecutor(uniqueExecutionName)
+			boolean diagnosisLogFilecreated = scriptExecutorRdkCertification.executeRdkCertificationDiagnosisScript(realPath,rdkCertificationDiagnosisCmd,1,executionId,executionDeviceId,executionResultId)
+		} catch (Exception e) {
+			e.printStackTrace()
+		}
 	}
 	
 	/**
