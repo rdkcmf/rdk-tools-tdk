@@ -38,7 +38,46 @@
                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Network" expectedValues="activated"/>
             </testStep>
           </prerequisite>
-          <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
+
+          <prerequisite requisiteId="2" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="org.rdk.Wifi" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Wifi" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Wifi" />
+                <params>
+                  <param tag="callsign" value="org.rdk.Wifi" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Wifi" />
+                <params>
+                  <param tag="plugin" value="org.rdk.Wifi" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Wifi" />
+            </testStep>
+          </prerequisite>
+
+          <!-- Only if You have not connected ethernet or you enabled the RFC for default interface -->
+          <!--
+          <prerequisite requisiteId="3" requisiteName="Check_WIFI_Adapter_State">
+            <testStep testStepId="1" pluginName="Wifi" name="Get_Current_State" method="Get_Current_State" saveResult="true" >
+                <resultGeneration useMethodTag="wifi_check_adapter_state" arguments="check_state_valid"/>
+            </testStep>
+            <testStep testStepId="2" pluginName="Wifi" name="Enable_WIFI_Adapter" method="Set_Enabled">
+                <conditionalExecution enable="true" Id="1" useMethodTag="wifi_check_adapter_state" arguments="isDisabled" />
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="3" pluginName="Wifi"  name="Get_Current_State" method="Get_Current_State">
+                <conditionalExecution enable="true" Id="1" useMethodTag="wifi_check_adapter_state" arguments="isDisabled" />
+                <resultGeneration useMethodTag="wifi_check_adapter_state" arguments="check_state_enabled"/>
+            </testStep>
+          </prerequisite> -->
+
+          <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
             <event pluginName="Network" eventName="Event_Interface_Status_Changed" />
             <event pluginName="Network" eventName="Event_Connection_Status_Changed" />
             <event pluginName="Network" eventName="Event_IPAddress_Status_Changed" />
@@ -170,7 +209,7 @@
                 </resultGeneration>
             </testStep>
         </testCase>
-       
+
         <testCase testCaseId="NW_10" testCaseName="Check_Interface_Status_Changed_Event" desc="Checks for the interface status change  event">
             <testCaseInfo testCaseType="setandget" revert="true" />
             <testStep testStepId="1" name="Is_WIFI_Interface_Enabled" method="Is_Interface_Enabled" saveResult="true" revertGet="yes">
@@ -201,6 +240,7 @@
                 </resultGeneration>
             </testStep>
         </testCase>
+
         <testCase testCaseId="NW_11" testCaseName="Check_Connection_Status_Changed"  desc="Checks for the connection status change event" >
             <testStep testStepId="1" pluginName="Wifi" name="Start_Scan" method="Start_Scan" >
                 <params>
@@ -223,13 +263,13 @@
                     <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="4" name="Check_Connection_Status_Change_Event" event="Event_Connection_Status_Changed" action="eventListener" delay="3"  >
+            <testStep testStepId="4" name="Check_Connection_Status_Change_Event" event="Event_Connection_Status_Changed" action="eventListener" delay="10"  >
                 <resultGeneration useMethodTag="network_connection_status_change_event" expectedValues="CONNECTED" />
             </testStep>
             <testStep testStepId="5" pluginName="Wifi" name="Disconnect" method="Disconnect" delay="3">
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="6" name="Check_Connection_Status_Change_Event" event="Event_Connection_Status_Changed" action="eventListener" delay="3"  >
+            <testStep testStepId="6" name="Check_Connection_Status_Change_Event" event="Event_Connection_Status_Changed" action="eventListener" delay="10"  >
                 <resultGeneration useMethodTag="network_connection_status_change_event" expectedValues="DISCONNECTED" />
             </testStep>
             <testStep testStepId="7" pluginName="Wifi" name="Stop_Scan" method="Stop_Scan" >
@@ -258,7 +298,7 @@
                     <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="4" name="Check_IPAddress_Status_Change_Event" event="Event_IPAddress_Status_Changed" action="eventListener" delay="3"  >
+            <testStep testStepId="4" name="Check_IPAddress_Status_Change_Event" event="Event_IPAddress_Status_Changed" action="eventListener" delay="10"  >
                 <resultGeneration useMethodTag="network_ipaddress_status_change_event" expectedValues="ACQUIRED" />
             </testStep>
             <testStep testStepId="5" pluginName="Wifi" name="Disconnect" method="Disconnect" delay="3">

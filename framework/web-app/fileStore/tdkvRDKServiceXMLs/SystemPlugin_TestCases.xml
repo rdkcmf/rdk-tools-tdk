@@ -158,25 +158,37 @@
 
         <testCase testCaseId="SYS_10" testCaseName="System_SetAndGet_Power_State" desc="Set and get device power state" >
            <testCaseInfo testCaseType="setandget" revert="true" />
-            <testStep testStepId="1" name="Get_Power_State" method="Get_Power_State" saveResult="true" revertGet="yes">
-                <resultGeneration useMethodTag="system_get_power_state"/>
+            <testStep testStepId="1" name="Get_Available_StandBy_Modes" method="Get_Available_StandBy_Modes" saveResult="true">
+                <resultGeneration useMethodTag="system_get_available_standby_modes" arguments="check_mode" expectedValues="LIGHT_SLEEP" />
             </testStep>
-            <testStep testStepId="2" name="Set_Power_State" method="Set_Power_State" revertSet="yes">
+            <testStep testStepId="2" name="Get_Preferred_StandBy_Mode" method="Get_Preferred_StandBy_Mode" saveResult="true">
+                <resultGeneration useMethodTag="system_get_preferred_standby_mode" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Preferred_StandBy_Mode" method="Set_Preferred_StandBy_Mode" revertSet="yes">
+                <conditionalExecution enable="true" Id="2" useMethodTag="system_check_preferred_standby_mode" arguments="isNotEqual,LIGHT_SLEEP" />
                 <params>
-                  <param tag="standbyReason"  useDefault="true" />
-                  <param tag="powerState"   usePreviousResult="true" Id="1" useMethodTag="system_switch_power_state" revertParam="yes" />
+                  <param tag="standbyMode" value="LIGHT_SLEEP" />
                 </params>
                 <resultGeneration useMethodTag="system_check_set_operation" />
             </testStep>
-            <testStep testStepId="3" name="Power_State_changed_Event" event="Event_PowerState_Changed" action="eventListener" delay="5">
+            <testStep testStepId="4" name="Get_Power_State" method="Get_Power_State" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="system_get_power_state"/>
+            </testStep>
+            <testStep testStepId="5" name="Set_Power_State" method="Set_Power_State" revertSet="yes">
+                <params>
+                  <param tag="standbyReason"  useDefault="true" />
+                  <param tag="powerState"   usePreviousResult="true" Id="4" useMethodTag="system_switch_power_state" revertParam="yes" />
+                </params>
+                <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Power_State_changed_Event" event="Event_PowerState_Changed" action="eventListener" delay="30">
               <resultGeneration useMethodTag="system_validate_power_mode" >
-                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_switch_power_state" />
+                  <expectedValues usePreviousResult="true" Id="4" useMethodTag="system_switch_power_state" />
               </resultGeneration>
             </testStep>
-
-            <testStep testStepId="4" name="Get_Power_State" method="Get_Power_State" revertFlag="yes">
+            <testStep testStepId="7" name="Get_Power_State" method="Get_Power_State" revertFlag="yes">
                 <resultGeneration useMethodTag="system_get_power_state">
-                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_switch_power_state" />
+                    <expectedValues usePreviousResult="true" Id="4" useMethodTag="system_switch_power_state" />
                 </resultGeneration>
             </testStep>
         </testCase>
@@ -349,6 +361,26 @@
             </testStep>
             <testStep testStepId="2" name="Check_Mac_Address" event="Event_MacAddresses_Retreived" action="eventListener" delay="2">
               <resultGeneration useMethodTag="system_check_macaddress_event" arguments="estb_mac"/>
+            </testStep>
+        </testCase>
+
+        <!-- Test case 26 -->
+        <testCase testCaseId="SYS_26" testCaseName= "System_SetAndGet_Temperature_Thresholds" desc="Set and get temperature thresholds">
+            <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="TempThresholdChange"/>
+            <testStep testStepId="1" name="Get_Temperature_Thresholds" method="Get_Temperature_Thresholds" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="system_get_state_info"  />
+            </testStep>
+            <testStep testStepId="2" name="Set_Temperature_Thresholds" method="Set_Temperature_Thresholds" revertSet="yes">
+                <params paramKey="thresholds">
+                  <param tag="WARN"   usePreviousResult="true" Id="1" useMethodTag="system_generate_new_temperature_thresholds" arguments="warn" revertParam="yes" />
+                  <param tag="MAX"   usePreviousResult="true" Id="1" useMethodTag="system_generate_new_temperature_thresholds" arguments="max" revertParam="yes" />
+                </params>
+                <resultGeneration useMethodTag="system_get_state_info"  />
+            </testStep>
+            <testStep testStepId="3" name="Get_Temperature_Thresholds" method="Get_Temperature_Thresholds"  revertFlag="yes" >
+                <resultGeneration useMethodTag="system_verify_thresholds_params"  >
+                  <expectedValues  usePreviousResult="true" Id="2" useMethodTag="system_generate_new_temperature_thresholds" />
+                </resultGeneration>
             </testStep>
         </testCase>
 

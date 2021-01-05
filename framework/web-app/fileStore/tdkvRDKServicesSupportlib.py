@@ -76,8 +76,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
     # USER CAN ADD N NUMBER OF RESPONSE RESULT PARSER
     # STES BELOW
     try:
+        # Check whether the response result is empty
+        if result == {} or result == [] or result == "":
+            print "\n[INFO]: Received empty JSON response result"
+            info["Test_Step_Status"] = "FAILURE"
+
         # DeviceInfo Plugin Response result parser steps
-        if tag == "deviceinfo_get_system_info":
+        elif tag == "deviceinfo_get_system_info":
 
             if arg[0] == "check_cpu_load":
                 info["cpu_load"] = result.get("cpuload")
@@ -552,10 +557,16 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             status = checkNonEmptyResultData(supportedStandbyModes)
             success = str(result.get("success")).lower() == "true"
             info["supportedStandbyModes"] = supportedStandbyModes
-            if success and status == "TRUE":
-                info["Test_Step_Status"] = "SUCCESS"
+            if len(arg) and arg[0] == "check_mode":
+                if success and status == "TRUE" and all( mode in supportedStandbyModes for mode in expectedValues ):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
-                info["Test_Step_Status"] = "FAILURE"
+                if success and status == "TRUE":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "system_get_preferred_standby_mode":
             preferredStandbyMode = result.get("preferredStandbyMode")
@@ -599,6 +610,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "system_verify_thresholds_params":
+            if float(result.get("WARN")) == float(expectedValues[0]) and float(result.get("MAX")) == float(expectedValues[1]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
 
         # User Preferces Plugin Response result parser steps
         elif tag == "userpreferences_get_ui_language":
@@ -706,6 +724,20 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "rdkshell_get_state":
+            success = str(result.get("success")).lower() == "true"
+            result = result.get("state")
+            for data in result:
+                if(data.get("callsign")) == str(arg[0]):
+                    break;
+            if success and data.get("callsign") ==  str(arg[0]) and str(data.get("state")) in expectedValues:
+                info["callsign"] = data.get("callsign")
+                info["state"] = data.get("state")
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+         
 
         # DisplayInfo Plugin Response result parser steps
         elif tag == "displayinfo_get_general_info":
@@ -1733,7 +1765,29 @@ def CheckAndGenerateConditionalExecStatus(testStepResults,methodTag,arguments):
                 else:
                     result = "FALSE"
 
+        # RDKShell Plugin Response result parser steps
+        elif tag == "rdkshell_check_app_launch_type1":
+            Type_one = ["Cobalt"]
+            if arg[0] in Type_one:
+                result = "TRUE"
+            else:
+                result = "FALSE"
+        elif tag == "rdkshell_check_app_launch_type2":
+            Type_two = ["WebKitBrowser"]
+            if arg[0] in Type_two:
+                result = "TRUE"
+            else:
+                result = "FALSE"
 
+        # System Plugin Response result parser steps
+        elif tag == "system_check_preferred_standby_mode":
+            testStepResults = testStepResults[0].values()[0]
+            mode = testStepResults[0].get("preferredStandbyMode")
+            if arg[0] == "isNotEqual":
+                if mode != arg[1]:
+                    result = "TRUE"
+                else:
+                    result = "FALSE"
 
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)
@@ -1967,6 +2021,16 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             else:
                 info["timeZone"] == "UTC-5"
 
+        elif tag == "system_generate_new_temperature_thresholds":
+            testStepResults = testStepResults[0].values()[0]
+            testStepResults[0] = testStepResults[0].get("temperatureThresholds")
+            if str(arg[0]) == "warn":
+                print testStepResults[0].get("WARN")
+                info["WARN"] = float(testStepResults[0].get("WARN")) + 10
+            if str(arg[0]) == "max":
+                print testStepResults[0].get("MAX")
+                info["MAX"] = float(testStepResults[0].get("MAX")) + 10
+
         # user Preferences result parser steps
         elif tag == "userpreferences_switch_ui_language":
             testStepResults = testStepResults[0].values()[0]
@@ -1992,6 +2056,11 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                             info["callsign"] = "WebKitBrowser"
                         elif (clients[index]).lower()=="cobalt":
                             info["callsign"] = "Cobalt"
+                        elif (clients[index]).lower()=="residentapp":
+                            info["callsign"] = "ResidentApp"
+                        elif (clients[index]).lower()=="htmlapp":
+                            info["callsign"] = "HtmlApp"
+
                         else:
                             info["callsign"] = clients[index]
                 else:
@@ -2257,6 +2326,12 @@ def checkTestCaseApplicability(methodTag,configKeyData,arguments):
             else:
                 result = "FALSE"
 
+        elif tag == "system_check_feature_applicability":
+            if arg[0] in keyData:
+                result = "TRUE"
+            else:
+                result = "FALSE"
+
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)
             status = "FAILURE"
@@ -2314,6 +2389,10 @@ def generateComplexTestInputParam(methodTag,testParams):
             userGeneratedParam = { "callsign": testParams.get("callsign"), "restart": { "limit": testParams.get("limit") ,  "window": testParams.get("window") }}
         elif tag == "rdkshell_set_keys_params":
             userGeneratedParam = {"keys":[testParams]}
+        elif tag == "rdkshell_set_animations_params":
+            userGeneratedParam = {"animations":[testParams]}
+        elif tag == "system_set_thresholds_params":
+            userGeneratedParam = {"thresholds":{testParams}}
 
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)
@@ -2493,6 +2572,9 @@ def compareURLs(actualURL,expectedURL):
     return status
 
 def DecodeBase64ToHex(base64):
+    if len(base64) % 4 != 0:
+        while len(base64) % 4 != 0:
+            base64 = base64 + "="
     decoded = b64decode(base64)
     hex_code = codecs.encode(decoded, 'hex').decode("utf-8")
     return hex_code
