@@ -80,7 +80,7 @@
                 <resultGeneration useMethodTag="executeRebootCmd"/>
             </testStep>
             <testStep testStepId="10" name="Get_Image_Version" action="externalFnCall" delay="30"  revertFlag="yes">
-                <resultGeneration useMethodTag="getImageVersion" arguments="get" >
+                <resultGeneration useMethodTag="getImageVersion" >
                   <expectedValues usePreviousResult="true" Id="1" useMethodTag="change_image_version" />
                 </resultGeneration>
             </testStep>

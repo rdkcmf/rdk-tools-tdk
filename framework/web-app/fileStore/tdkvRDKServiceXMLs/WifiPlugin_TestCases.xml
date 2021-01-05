@@ -320,7 +320,7 @@
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
             <testStep testStepId="3" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
-                <resultGeneration useMethodTag="wifi_get_connected_ssid" >
+                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
                     <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
                 </resultGeneration>
             </testStep>
