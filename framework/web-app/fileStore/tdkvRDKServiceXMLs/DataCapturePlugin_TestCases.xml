@@ -91,17 +91,17 @@
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" pluginName="WebKitBrowser" name="Set_Browser_Test_URL" method="Set_Browser_URL">
               <params>
-                <param tag="url" useConfigFile="true" key="WEBKIT_TEST_URL" />
+                <param tag="url" useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
               </params>
             </testStep>
             <testStep testStepId="2" pluginName="WebKitBrowser"  name="Check_Load_Finished_Event" event="Event_Load_Finished" action="eventListener" delay="10">
               <resultGeneration useMethodTag="webkitbrowser_check_load_finished_event" >
-                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_TEST_URL" />
+                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
               </resultGeneration>
             </testStep>
             <testStep testStepId="3" pluginName="WebKitBrowser" name="Get_Browser_Test_URL" method="Get_Browser_URL">
               <resultGeneration useMethodTag="webkitbrowser_check_url" >
-                <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
+                <expectedValues useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
               </resultGeneration>
             </testStep>
             <testStep testStepId="4" name="Enable_Audio_Capture" method="Enable_Audio_Capture" delay="10" >
