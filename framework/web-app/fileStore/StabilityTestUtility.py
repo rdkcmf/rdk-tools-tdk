@@ -117,7 +117,6 @@ def get_validation_params(obj):
         validation_dict = {}
         print "\n getting validation params from conf file"
         conf_file,result = getConfigFileName(obj.realpath)
-	result, validation_dict["memory_max_limit"] = getDeviceConfigKeyValue(conf_file,"MAX_MEMORY_VALUE")
         result, validation_required = getDeviceConfigKeyValue(conf_file,"VALIDATION_REQ")
         if result == "SUCCESS":
             if validation_required == "NO":
@@ -134,7 +133,7 @@ def get_validation_params(obj):
 		    print "selected ssh method is {}".format(validation_dict["ssh_method"])
                     pass
                 result,validation_dict["validation_method"] = getDeviceConfigKeyValue(conf_file,"VALIDATION_METHOD")
-                result,validation_dict["validation_file"] = getDeviceConfigKeyValue(conf_file,"VALIDATION_FILE")
+                result,validation_dict["validation_file"] = getDeviceConfigKeyValue(conf_file,"VIDEO_PROC_FILE")
 		result,validation_dict["min_cdb"] = getDeviceConfigKeyValue(conf_file,"MIN_CDB")
         else:
             print "Failed to get the validation required value from config file, please configure values before test"

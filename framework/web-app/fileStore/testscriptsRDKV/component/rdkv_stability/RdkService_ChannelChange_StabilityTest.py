@@ -73,10 +73,7 @@
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
-from BrowserPerformanceUtility import *
-import BrowserPerformanceUtility
 from rdkv_performancelib import *
-import rdkv_performancelib
 import StabilityTestVariables
 from web_socket_util import *
 from StabilityTestUtility import *
@@ -108,21 +105,14 @@ if expectedResult in result.upper():
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
-    print "Current values \nUX:%s\nWebKitBrowser:%s\nCobalt:%s"%(curr_ux_status,curr_webkit_status,curr_cobalt_status);
-    if status == "FAILURE":
-        set_pre_requisites(obj)
-        #Need to revert the values since we are changing plugin status
-        revert="YES"
-        status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
-    plugin_list = ["DeviceInfo","org.rdk.ActivityMonitor"]
-    plugins_cur_status = get_plugins_status(obj,plugin_list)
-    plugin_status_needed = {"DeviceInfo":"activated","org.rdk.ActivityMonitor":"activated"}
-    activated_result = set_plugins_status(obj,plugin_status_needed)
-    conf_file,result = getConfigFileName(obj.realpath)
-    if result == "SUCCESS":
-	result,memory_limit = getDeviceConfigKeyValue(conf_file,"MAX_MEMORY_VALUE")
-    if status == "SUCCESS" and activated_result == "SUCCESS" and result == "SUCCESS":
+    plugin_list = ["WebKitBrowser","Cobalt","DeviceInfo"]
+    plugins_cur_status_dict = get_plugins_status(obj,plugin_list)
+    status = "SUCCESS"
+    plugin_status_needed = {"WebKitBrowser":"resumed","Cobalt":"deactivated","DeviceInfo":"activated"}
+    if plugin_status_needed != plugins_cur_status_dict :
+        revert = "YES"
+        status = set_plugins_status(obj,plugin_status_needed)
+    if status == "SUCCESS":
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
@@ -184,6 +174,7 @@ if expectedResult in result.upper():
                         tdkTestObj.executeTestCase(expectedResult)
                         result_val = tdkTestObj.getResultDetails()
                         if result_val == "SUCCESS":
+                            tdkTestObj.setResultStatus("SUCCESS")
      		            check_channel_tune = True
      			    check_play_count = 0
      		 	    continue_count = 0
@@ -195,12 +186,12 @@ if expectedResult in result.upper():
 			        tdkTestObj.setResultStatus("SUCCESS")
 			        #validate the cpuload
 			        tdkTestObj = obj.createTestStep('rdkservice_validateCPULoad')
-			        tdkTestObj.addParameter('value',int(cpuload))
-			        tdkTestObj.addParameter('threshold',90)
+			        tdkTestObj.addParameter('value',float(cpuload))
+			        tdkTestObj.addParameter('threshold',90.0)
 			        tdkTestObj.executeTestCase(expectedResult)
 			        is_high_cpuload = tdkTestObj.getResultDetails()
       			        if is_high_cpuload == "YES" :
-			            error_msg = "\ncpu load is high :{} at channel change :{} times\nchannel_info:{}\n".format(cpuload,channel_change_count,remarks)
+			            error_msg = "\ncpu load is high :{}% at channel change :{} times\nchannel_info:{}\n".format(cpuload,channel_change_count,remarks)
                                     tdkTestObj.setResultStatus("FAILURE")
 			            break
 			        else:
@@ -217,27 +208,26 @@ if expectedResult in result.upper():
 			    if (result == "SUCCESS"):
 				tdkTestObj.setResultStatus("SUCCESS")
 				#validate memory usage
-				memory_usage = float(memory_usage)/(1024*1024)
 				tdkTestObj = obj.createTestStep('rdkservice_validateMemoryUsage')
-                                tdkTestObj.addParameter('value',memory_usage)
-                                tdkTestObj.addParameter('threshold',float(memory_limit))
+                                tdkTestObj.addParameter('value',float(memory_usage))
+                                tdkTestObj.addParameter('threshold',90.0)
 				tdkTestObj.executeTestCase(expectedResult)
 				is_high_memory_usage = tdkTestObj.getResultDetails()
 				if is_high_memory_usage == "YES":
-				    error_msg = "\nmemory usage is high :{} MB at channel change:{} times\nchannel_info:{}\n".format(memory_usage,channel_change_count,remarks)
+				    error_msg = "\nmemory usage is high :{} % at channel change:{} times\nchannel_info:{}\n".format(memory_usage,channel_change_count,remarks)
 				    tdkTestObj.setResultStatus("FAILURE")
                                     break
                                 else:
                                     tdkTestObj.setResultStatus("SUCCESS")
-				    print "\nmemory usage is {} MB at channel change {} times\n".format(memory_usage,channel_change_count)
+				    print "\nmemory usage is {}% at channel change {} times\n".format(memory_usage,channel_change_count)
 			    else:
 				error_msg = "\n Unable to get the memory usage\n"
 				tdkTestObj.setResultStatus("FAILURE")
 				break
 			    result_dict["iteration"] = channel_change_count
                             result_dict["remarks"] = remarks
-                            result_dict["cpu_load"] = int(cpuload)
-                            result_dict["memory_usage"] = memory_usage
+                            result_dict["cpu_load"] = float(cpuload)
+                            result_dict["memory_usage"] = float(memory_usage)
                             result_dict_list.append(result_dict)
                             channel_change_count += 1
 		        else:
@@ -271,20 +261,19 @@ if expectedResult in result.upper():
                     print "Failed to revert the URL"
                     tdkTestObj.setResultStatus("FAILURE");
             else:
-		print "Failed to load the URL:{}, Current URL:{}".format(browser_test_url,new_url)
+		print "Failed to load the URL:{}, Current URL:{}".format(channel_change_url,new_url)
 		tdkTestObj.setResultStatus("FAILURE");
 	else:
             tdkTestObj.setResultStatus("FAILURE");
             print "Unable to get the current URL loaded in webkit"
     else:
         print "Pre conditions are not met"
+        obj.setLoadModuleStatus("FAILURE")
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"
-        status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
-    set_plugins_status(obj,plugins_cur_status)
+        status = set_plugins_status(obj,plugins_cur_status_dict)
     obj.unloadModule("rdkv_stability");
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"
-

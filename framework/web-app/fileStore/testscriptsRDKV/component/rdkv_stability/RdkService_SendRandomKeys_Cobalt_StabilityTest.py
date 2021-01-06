@@ -196,18 +196,18 @@ if expectedResult in result.upper():
                         tdkTestObj.setResultStatus("SUCCESS")
                         #validate the cpuload
                         tdkTestObj = obj.createTestStep('rdkservice_validateCPULoad')
-                        tdkTestObj.addParameter('value',int(cpuload))
-                        tdkTestObj.addParameter('threshold',90)
+                        tdkTestObj.addParameter('value',float(cpuload))
+                        tdkTestObj.addParameter('threshold',90.0)
                         tdkTestObj.executeTestCase(expectedResult)
                         is_high_cpuload = tdkTestObj.getResultDetails()
                         if is_high_cpuload == "YES" :
-                            print "\ncpu load is high :{} after :{} times\n".format(cpuload,iteration)
+                            print "\ncpu load is high :{}% after :{} times\n".format(cpuload,iteration)
                             tdkTestObj.setResultStatus("FAILURE")
                             completed = False
                             break
                         else:
                             tdkTestObj.setResultStatus("SUCCESS")
-                            print "\ncpu load: {} after {} iterations\n".format(cpuload,iteration)
+                            print "\ncpu load: {}% after {} iterations\n".format(cpuload,iteration)
                     else:
                         print "Unable to get cpuload"
                         tdkTestObj.setResultStatus("FAILURE")
@@ -221,28 +221,27 @@ if expectedResult in result.upper():
                     if (result == "SUCCESS"):
                         tdkTestObj.setResultStatus("SUCCESS")
                         #validate memory usage
-                        memory_usage = float(memory_usage)/(1024*1024)
                         tdkTestObj = obj.createTestStep('rdkservice_validateMemoryUsage')
-                        tdkTestObj.addParameter('value',memory_usage)
-                        tdkTestObj.addParameter('threshold',float(validation_dict["memory_max_limit"]))
+                        tdkTestObj.addParameter('value',float(memory_usage))
+                        tdkTestObj.addParameter('threshold',90.0)
                         tdkTestObj.executeTestCase(expectedResult)
                         is_high_memory_usage = tdkTestObj.getResultDetails()
                         if is_high_memory_usage == "YES":
-                            print "\nmemory usage is high :{} MB after {} iterations\n".format(memory_usage,iteration)
+                            print "\nmemory usage is high :{}% after {} iterations\n".format(memory_usage,iteration)
                             tdkTestObj.setResultStatus("FAILURE")
                             completed = False
                             break
                         else:
                             tdkTestObj.setResultStatus("SUCCESS")
-                            print "\nmemory usage is {} MB after {} iterations".format(memory_usage,iteration)
+                            print "\nmemory usage is {}% after {} iterations".format(memory_usage,iteration)
                     else:
                         print "\n Unable to get the memory usage\n"
                         tdkTestObj.setResultStatus("FAILURE")
                         completed = False
                         break
                     result_dict["iteration"] = iteration
-                    result_dict["cpu_load"] = cpuload
-                    result_dict["memory_usage"] = memory_usage
+                    result_dict["cpu_load"] = float(cpuload)
+                    result_dict["memory_usage"] = float(memory_usage)
                     result_dict_list.append(result_dict)
                     time.sleep(test_interval)
                 if(completed):
