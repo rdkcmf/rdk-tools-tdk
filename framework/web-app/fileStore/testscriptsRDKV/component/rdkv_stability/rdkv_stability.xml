@@ -42,18 +42,18 @@
           <parameter name="waitTime" value=""/>
         </parameters>
       </primitiveTest>
-      <primitiveTest name="rdkservice_validateCPULoad" id=" " version="1">
+      <primitiveTest name="rdkservice_validateCPULoad" id=" " version="2">
         <function>rdkservice_validateCPULoad</function>
         <parameters>
-          <parameter name="threshold" value=""/>
           <parameter name="value" value=""/>
+          <parameter name="threshold" value=""/>
         </parameters>
       </primitiveTest>
-      <primitiveTest name="rdkservice_validateMemoryUsage" id=" " version="1">
+      <primitiveTest name="rdkservice_validateMemoryUsage" id=" " version="2">
         <function>rdkservice_validateMemoryUsage</function>
         <parameters>
-          <parameter name="threshold" value=""/>
           <parameter name="value" value=""/>
+          <parameter name="threshold" value=""/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="rdkservice_validateProcEntry" id=" " version="1">

@@ -42,10 +42,10 @@
       <parameter funName='rdkservice_checkChannelChangeLog' parameterName='text' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_checkChannelChangeLog' parameterName='log' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_rebootDevice' parameterName='waitTime' parameterType='INTEGER' range='0-300' />
-      <parameter funName='rdkservice_validateCPULoad' parameterName='value' parameterType='INTEGER' range='0-1000' />
-      <parameter funName='rdkservice_validateCPULoad' parameterName='threshold' parameterType='INTEGER' range='0-1000' />
-      <parameter funName='rdkservice_validateMemoryUsage' parameterName='value' parameterType='INTEGER' range='0-1000' />
-      <parameter funName='rdkservice_validateMemoryUsage' parameterName='threshold' parameterType='INTEGER' range='0-1000' />
+      <parameter funName='rdkservice_validateCPULoad' parameterName='value' parameterType='FLOAT' range='0-1000' />
+      <parameter funName='rdkservice_validateCPULoad' parameterName='threshold' parameterType='FLOAT' range='0-1000' />
+      <parameter funName='rdkservice_validateMemoryUsage' parameterName='value' parameterType='FLOAT' range='0-1000' />
+      <parameter funName='rdkservice_validateMemoryUsage' parameterName='threshold' parameterType='FLOAT' range='0-1000' />
       <parameter funName='rdkservice_validateProcEntry' parameterName='credentials' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_validateProcEntry' parameterName='procfile' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_validateProcEntry' parameterName='sshmethod' parameterType='STRING' range='a-z' />

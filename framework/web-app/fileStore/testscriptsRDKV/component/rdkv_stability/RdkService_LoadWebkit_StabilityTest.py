@@ -127,18 +127,9 @@ if expectedResult in result.upper():
     status = "SUCCESS"
     plugin_status_needed = {"WebKitBrowser":"resumed","Cobalt":"deactivated","DeviceInfo":"activated"}
     if curr_plugins_status_dict != plugin_status_needed:
-        status = "FAILURE"
         revert = "YES"
         status = set_plugins_status(obj,plugin_status_needed)
-        plugins_status_dict = get_plugins_status(obj,plugins_list)
-        if plugins_status_dict == plugin_status_needed:
-            status = "SUCCESS"
-    conf_file,result = getConfigFileName(obj.realpath)
-    if result == "SUCCESS":
-        mem_result, memory_max_limit = getDeviceConfigKeyValue(conf_file,"MAX_MEMORY_VALUE")
-        if memory_max_limit == "":
-            print "\n Configure MAX_MEMORY_VALUE in device specific configuration file"
-    if status == "SUCCESS" and result == "SUCCESS" and  memory_max_limit != "":
+    if status == "SUCCESS" :
         print "\nPre conditions for the test are set successfully"
         print "\nGet the URL in WebKitBrowser"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
@@ -200,8 +191,8 @@ if expectedResult in result.upper():
                                 tdkTestObj.setResultStatus("SUCCESS")
                                 #validate the cpuload
                                 tdkTestObj = obj.createTestStep('rdkservice_validateCPULoad')
-                                tdkTestObj.addParameter('value',int(cpuload))
-                                tdkTestObj.addParameter('threshold',90)
+                                tdkTestObj.addParameter('value',float(cpuload))
+                                tdkTestObj.addParameter('threshold',90.0)
                                 tdkTestObj.executeTestCase(expectedResult)
                                 is_high_cpuload = tdkTestObj.getResultDetails()
                                 if is_high_cpuload == "YES" :
@@ -225,28 +216,27 @@ if expectedResult in result.upper():
                             if (result == "SUCCESS"):
                                 tdkTestObj.setResultStatus("SUCCESS")
                                 #validate memory usage
-                                memory_usage = float(memory_usage)/(1024*1024)
                                 tdkTestObj = obj.createTestStep('rdkservice_validateMemoryUsage')
-                                tdkTestObj.addParameter('value',memory_usage)
-                                tdkTestObj.addParameter('threshold',float(memory_max_limit))
+                                tdkTestObj.addParameter('value',float(memory_usage))
+                                tdkTestObj.addParameter('threshold',90.0)
                                 tdkTestObj.executeTestCase(expectedResult)
                                 is_high_memory_usage = tdkTestObj.getResultDetails()
                                 if is_high_memory_usage == "YES":
-                                    print "\nmemory usage is high :{} MB after {} iterations\n".format(memory_usage,iteration)
+                                    print "\nmemory usage is high :{}% after {} iterations\n".format(memory_usage,iteration)
                                     tdkTestObj.setResultStatus("FAILURE")
                                     completed = False
                                     break
                                 else:
                                     tdkTestObj.setResultStatus("SUCCESS")
-                                    print "\nmemory usage is {} MB after {} iterations\n".format(memory_usage,iteration)
+                                    print "\nmemory usage is {}% after {} iterations\n".format(memory_usage,iteration)
                             else:
                                 print "\n Unable to get the memory usage\n"
                                 tdkTestObj.setResultStatus("FAILURE")
                                 completed = False
                                 break
                             result_dict["iteration"] = iteration
-                            result_dict["cpu_load"] = int(cpuload)
-                            result_dict["memory_usage"] = memory_usage
+                            result_dict["cpu_load"] = float(cpuload)
+                            result_dict["memory_usage"] = float(memory_usage)
                             result_dict_list.append(result_dict)
                             run_value1 = run_value2
                             time.sleep(test_interval)

@@ -82,8 +82,8 @@ def rdkservice_getMemoryUsage():
     result = execute_step(data)
     totalram = result["totalram"]
     freeram = result["freeram"]
-    value = totalram - freeram
-    return value
+    value = float(totalram-freeram)/float(totalram)* 100
+    return round(value,2)
 
 #-------------------------------------------------------------------
 #CHECK WHETHER CHANNEL CHANGE TEXT IS PRESENT IN THE CONSOLE LOG
