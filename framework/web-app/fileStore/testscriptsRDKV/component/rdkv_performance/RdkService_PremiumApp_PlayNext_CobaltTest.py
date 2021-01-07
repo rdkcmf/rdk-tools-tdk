@@ -179,8 +179,8 @@ if expectedResult in result.upper():
                         print "Validation method other than proc_entry is not supported now"
                         #TODO
                 else:
-                    print "validation required parameter value is not specified in device config file"
-                    tdkTestObj.setResultStatus("FAILURE")
+                    print "User opted for no validation, next video is played."
+                    tdkTestObj.setResultStatus("SUCCESS")
             else:
                 print "Unable to click OK"
                 tdkTestObj.setResultStatus("FAILURE")

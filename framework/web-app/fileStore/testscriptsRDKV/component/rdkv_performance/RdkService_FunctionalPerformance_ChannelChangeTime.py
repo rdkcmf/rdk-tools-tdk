@@ -160,6 +160,7 @@ if expectedResult in result.upper():
                         result_val = tdkTestObj.getResultDetails()
                         if result_val == "SUCCESS":
                             tdkTestObj.setResultStatus("SUCCESS")
+			    continue_count = 0
                             check_log_for = "play"
                     elif check_log_for == "play":
                         print "checking for playing event"
@@ -177,7 +178,7 @@ if expectedResult in result.upper():
                         else:
                             check_play_count += 1
                             if(check_play_count > 4):
-                                error_msg = "\nNot able to play the content after {} times channel change,remarks: {}\n".format(channel_change_count,remarks)
+                                error_msg = "\nNot able to play the content after {} times channel change\n".format(channel_change_count)
                                 tdkTestObj.setResultStatus("FAILURE")
                                 break
                     else:
