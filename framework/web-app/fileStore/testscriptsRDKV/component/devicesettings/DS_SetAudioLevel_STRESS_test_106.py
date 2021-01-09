@@ -31,8 +31,9 @@ Test case ID : CT_DS_106</synopsis>
   <execution_time>8</execution_time>
   <long_duration>false</long_duration>
   <remarks>Volume test scripts are applicable only for TV</remarks>
-  <skip>true</skip>
+  <skip>false</skip>
   <box_types>
+   <box_type>RDK-TV</box_type>
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>

@@ -109,7 +109,8 @@ if "SUCCESS" in loadmodulestatus.upper():
             print "TEST STEP 2 : To invoke wifi_lastConnected_Endpoint to get the Access point details";
             print "EXPECTED RESULT : Should return end point details";
             tdkTestObj = obj.createTestStep("WIFI_HAL_LastConnected_Endpoint");
-            expectedresult = "SUCCESS";
+            #Expected to get FIALURE since last cnnected ssid info is cleared.
+            expectedresult = "FAILURE";
             tdkTestObj.executeTestCase(expectedresult);
             actualresult = tdkTestObj.getResult();
             details = tdkTestObj.getResultDetails();
