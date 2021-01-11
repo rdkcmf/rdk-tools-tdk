@@ -72,6 +72,7 @@ from StabilityTestVariables import *
 import rebootTestUtility
 from rebootTestUtility import *
 
+
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_stability","1",standAlone=True);
 
@@ -82,31 +83,34 @@ port = <port>
 obj.configureTestCase(ip,port,'RdkService_StressTest_Reboot');
 
 result =obj.getLoadModuleResult();
-print "[LIB LOAD STATUS]  :  %s" %result.upper();
+
+logger = open_logfile(obj);
+
+logger.info("[LIB LOAD STATUS]  :  %s" %result.upper())
 obj.setLoadModuleStatus(result);
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
 
     #Reboot the device as a pre-requisite before starting the stress test
-    print "REBOOTING DEVICE AS A PRE_REQUISITE"
+    logger.info( "REBOOTING DEVICE AS A PRE_REQUISITE")
     tdkTestObj = obj.createTestStep('rdkservice_rebootDevice');
     tdkTestObj.addParameter("waitTime",rebootwaitTime);
     tdkTestObj.executeTestCase(expectedResult);
     result =tdkTestObj.getResultDetails();
     if expectedResult in result:
         tdkTestObj.setResultStatus("SUCCESS")
-        print "Rebooted device successfully"
+        logger.info("Rebooted device successfully")
 
-        print "STARTING THE SCRIPT TO DO REBOOT STRESS TEST\n"
+        logger.info("STARTING THE SCRIPT TO DO REBOOT STRESS TEST\n")
 
-        print "Get the count and status of plugins before starting the reboot test"
+        logger.info( "Get the count and status of plugins before starting the reboot test")
         tdkTestObj = obj.createTestStep('rdkservice_getNoOfPlugins');
         tdkTestObj.executeTestCase(expectedResult);
         NoofPluginsBeforeReboot = tdkTestObj.getResultDetails();
         if int(NoofPluginsBeforeReboot) > 0:
             tdkTestObj.setResultStatus("SUCCESS")
-            print "Number of plugin before starting the reboot test:",NoofPluginsBeforeReboot
+            logger.info( "Number of plugin before starting the reboot test:%s",NoofPluginsBeforeReboot)
 
             tdkTestObj = obj.createTestStep('rdkservice_getAllPluginStatus');
             tdkTestObj.executeTestCase(expectedResult);
@@ -114,15 +118,15 @@ if expectedResult in result.upper():
 
             if PluginStatusBeforeReboot:
                 tdkTestObj.setResultStatus("SUCCESS")
-                print "Status of plugins before reboot\n", PluginStatusBeforeReboot
+                logger.info( "Status of plugins before reboot\n %s", PluginStatusBeforeReboot)
 
                 for count in range(repeatCount):
                     iter_no = "ITER_No_%d"%(count+1)
                     rebootTestUtility.iter_no = iter_no
                     rebootTestUtility.count = count
-                    print "------------------------------------------------------------"
-                    print "ITER_No_%d"%(count+1)
-                    print "------------------------------------------------------------"
+                    logger.info( "------------------------------------------------------------")
+                    logger.info( "ITER_No_%d"%(count+1))
+                    logger.info("------------------------------------------------------------")
 
                     #REBOOT THE DEVICE
                     tdkTestObj = obj.createTestStep('rdkservice_rebootDevice');
@@ -131,7 +135,7 @@ if expectedResult in result.upper():
                     result =tdkTestObj.getResultDetails();
                     if expectedResult in result:
                         tdkTestObj.setResultStatus("SUCCESS")
-                        print "Rebooted device successfully"
+                        logger.info("Rebooted device successfully")
 
                         #GET THE UPTIME AFTER REBOOT"
                         tdkTestObj = obj.createTestStep('rdkservice_getReqValueFromResult');
@@ -165,7 +169,7 @@ if expectedResult in result.upper():
                         else:
                             tdkTestObj.setResultStatus("FAILURE")
 
-			#GET THE STATUS OF ETHERNET INTERFACE
+                        #GET THE STATUS OF ETHERNET INTERFACE
                         if_status = getIFStatus(EthernetInterface,ValidateInterface)
                         if if_status == "ENABLED":
                             tdkTestObj.setResultStatus("SUCCESS")
@@ -180,30 +184,30 @@ if expectedResult in result.upper():
                             tdkTestObj.setResultStatus("FAILURE")
 
                         if uptime_status == "SUCCESS":
-                            print "->UPTIME : SUCCESS, Current uptime is less than 200 seconds";
+                            logger.info("->UPTIME : SUCCESS, Current uptime is less than 200 seconds");
                         else:
-                            print "->UPTIME : FAILURE, Current uptime is greater than 200 seconds";
-                        print "->INTERFACE : " + if_status
-                        print "->CONTROLLER UI : "+ ui_status
-                        print "->No. OF PLUGINS : "+ no_of_plugins
-                        print "->PLUGIN STATUS : "+ plugin_status
+                            logger.info( "->UPTIME : FAILURE, Current uptime is greater than 200 seconds");
+                        logger.info( "->INTERFACE : %s" , if_status)
+                        logger.info( "->CONTROLLER UI : %s", ui_status)
+                        logger.info( "->No. OF PLUGINS : %s", no_of_plugins)
+                        logger.info( "->PLUGIN STATUS : %s", plugin_status)
 
                         time.sleep(10);
                         count = count +1
                     else:
                         tdkTestObj.setResultStatus("FAILURE")
-                        print "Failed to reboot the device"
+                        logger.info( "Failed to reboot the device")
                 getSummary(count);
             else:
                 tdkTestObj.setResultStatus("FAILURE")
-                print "Failed to get the plugin status before reboot"
+                logger.info( "Failed to get the plugin status before reboot")
         else:
             tdkTestObj.setResultStatus("FAILURE")
-            print "Failed to get the number of plugins before reboot"
+            logger.info( "Failed to get the number of plugins before reboot")
     else:
         tdkTestObj.setResultStatus("FAILURE")
-        print "Failed to reboot the device"
+        logger.info( "Failed to reboot the device")
     obj.unloadModule("rdkv_stability");
 else:
     obj.setLoadModuleStatus("FAILURE");
-    print "Failed to load module"
+    logger.info( "Failed to load module")
