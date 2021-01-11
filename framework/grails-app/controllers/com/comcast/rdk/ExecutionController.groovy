@@ -2188,7 +2188,7 @@ class ExecutionController {
 					String executionResultOutput = executionResultList[i]?.executionOutput
 					if(scriptfile){
 						if(scriptfile?.category?.toString()?.equals(RDKV_RDKSERVICE?.toString())){
-							if(executionResultOutput.contains("[Pre-requisite Status]")) {
+							if(executionResultOutput?.contains("[Pre-requisite Status]")) {
 								isPatternPresent = true
 							}
 							isRDKServiceExecution = true
