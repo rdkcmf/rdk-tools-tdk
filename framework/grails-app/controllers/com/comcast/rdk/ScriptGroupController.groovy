@@ -3068,13 +3068,23 @@ class ScriptGroupController {
 		}
 		render scriptGroup
 	}
-
-	def verifyScriptFile(String scriptName){
+	
+	/**
+	 * Method to check if script file is present in filestore and delete from db if not present
+	 * @param scriptId
+	 * @param scriptName
+	 * @return
+	 */
+	def verifyScriptFile(Long scriptId, String scriptName){
 		ScriptFile scriptFile
-		scriptFile = ScriptFile?.findByScriptName(scriptName)
+		if(scriptId){
+			scriptFile = ScriptFile?.findById(scriptId)
+		}else {
+			scriptFile = ScriptFile?.findByScriptName(scriptName)
+		}
 		try {
-                        def requestGetRealPath = request.getRealPath("/")
-			if(scriptFile && scriptService.getScriptFileObj(requestGetRealPath, scriptFile?.moduleName,scriptFile?.scriptName) == null){
+			def requestGetRealPath = request.getRealPath("/")
+			if(scriptFile && getScriptFileObj(requestGetRealPath, scriptFile?.moduleName,scriptFile?.scriptName,scriptFile?.category,scriptFile?.id ) == null){
 				def sgList = []
 				def scriptGroups = ScriptGroup.where {
 					scriptList { id == scriptFile?.id }
@@ -3089,39 +3099,27 @@ class ScriptGroupController {
 					sGroup?.save()
 				}
 				scriptFile?.delete()
-			}else{
 			}
 		} catch (Exception e) {
+			println "Error in verifyScriptFile - "+e.getMessage() + " scriptName "+scriptFile?.scriptName+" , id -"+scriptFile?.id
 			e.printStackTrace()
 		}
 	}
-
-
-	def getScriptFileObj(realPath,dirName,fileName){
+	
+	/**
+	 * Method to check if a script file is present in filestore , otherwise return null
+	 * @param realPath
+	 * @param dirName
+	 * @param fileName
+	 * @param category
+	 * @param scriptId
+	 * @return
+	 */
+	def getScriptFileObj(realPath,dirName,fileName, def category,scriptId){
 		dirName = dirName?.trim()
 		fileName = fileName?.trim()
 		Map script = [:]
 		try {
-
-			
-			boolean isAdvanced = Utility.isAdvancedScript(fileName, dirName)
-			def pathToDir = "${realPath}//fileStore"
-			if(RDKV.equals(category)){
-				if(isAdvanced){
-					pathToDir = pathToDir + Constants.FILE_SEPARATOR + TESTSCRIPTS_RDKV_ADV
-				}else{
-					pathToDir = pathToDir + Constants.FILE_SEPARATOR + TESTSCRIPTS_RDKV
-				}
-			}
-			else if(RDKB.equals(category)){
-				if(isAdvanced){
-					pathToDir = pathToDir + Constants.FILE_SEPARATOR + TESTSCRIPTS_RDKB_ADV
-				}else{
-					pathToDir = pathToDir + Constants.FILE_SEPARATOR + TESTSCRIPTS_RDKB
-				}
-			}
-			
-			
 			def moduleObj = Module.findByName(dirName)
 			def scriptDirName = Constants.COMPONENT
 			if(moduleObj){
@@ -3129,8 +3127,12 @@ class ScriptGroupController {
 					scriptDirName = Constants.INTEGRATION
 				}
 			}
-			File file = new File( pathToDir+"//"+scriptDirName+"//"+dirName+"//"+fileName+".py");
-
+			if(category.toString().equals("RDKV_RDKSERVICE")){
+				category = Category.RDKV
+			}
+			def path = getFileFromPath( realPath, scriptDirName, dirName,  fileName,  category, scriptId)
+			File file = new File(path)
+			
 			if(file.exists()){
 				return file;
 			}
@@ -3140,6 +3142,138 @@ class ScriptGroupController {
 		}
 		return null;
 	}
+	
+	/**
+	 * Method to get the path of a script according to the module , category etc
+	 * @param realPath
+	 * @param dirName
+	 * @param moduleName
+	 * @param fileName
+	 * @param category
+	 * @param scriptId
+	 * @return
+	 */
+	def getFileFromPath(def realPath, def dirName, def moduleName, def fileName, def category, def scriptId){
+		def path = new StringBuffer()
+		path = path?.append(realPath).append(FILE_SEPARATOR).append(FILESTORE)
+		boolean isAdvanced = checkIfAdvanced(scriptId)
+		String testDirName = ""
+		String extn = ".py"
+		switch(category){
+			case Category.RDKV:
+				testDirName =  FileStorePath.RDKV.value()
+				if(isAdvanced){
+					testDirName =  FileStorePath.RDKVADVANCED.value()
+				}
+				break;
+			case Category.RDKB:
+				testDirName =  FileStorePath.RDKB.value()
+				if(isAdvanced){
+					testDirName =  FileStorePath.RDKBADVANCED.value()
+				}
+				break;
+			case Category.RDKC:
+				testDirName =  FileStorePath.RDKC.value()
+				break;
+			case Category.RDKB_TCL:
+				testDirName = FileStorePath.RDKTCL.value()
+				extn = ".tcl"
+				break;
+			default: break;
+		}
+		path = path?.append(FILE_SEPARATOR).append(testDirName).append(FILE_SEPARATOR).append(dirName).append(FILE_SEPARATOR).append(moduleName).append(FILE_SEPARATOR).append(fileName).append(extn)
+		return path?.toString()
+	}
+	
+	/**
+	 * Method to check whether a script is part of advanced scripts.
+	 */
+	def checkIfAdvanced(scriptId){
+		boolean isAdv = false
+		try {
+			String filePath = ScriptService.scriptsListAdvanced.get(scriptId)
+			isAdv = (filePath?.equals(TESTSCRIPTS_RDKV_ADV) || filePath?.equals(TESTSCRIPTS_RDKB_ADV) )
+		} catch (Exception e) {
+			e.printStackTrace()
+		}
+		return isAdv
+	}
+	
+	/**
+	 * Method to delete duplicate entries of a script from database
+	 * @param modules
+	 * @return
+	 */
+	def deleteMultipleScriptFileEntries(String modules){
+		List moduleList = []
+		moduleList = modules?.split(",")
+		moduleList.each{ moduleName ->
+			List scriptFileList = ScriptFile?.findAllByModuleName(moduleName)
+			def sList = []
+			def deletedList = []
+			Map scriptNameIdMap = [:]
+			scriptFileList.each{ scriptFile ->
+				try{
+					if(!sList.contains(scriptFile?.scriptName)){
+						sList.add(scriptFile?.scriptName)
+						scriptNameIdMap.put(scriptFile?.scriptName, scriptFile?.id)
+						try {
+							def requestGetRealPath = request.getRealPath("/")
+							if(scriptFile && getScriptFileObj(requestGetRealPath, scriptFile?.moduleName,scriptFile?.scriptName,scriptFile?.category,scriptFile?.id ) == null){
+								def sgList = []
+								def scriptGroups = ScriptGroup.where {
+									scriptList { id == scriptFile?.id }
+								}
+								scriptGroups?.each{ scriptGrp ->
+									sgList.add(scriptGrp?.id)
+								}
+								sgList?.each{ sId ->
+									def sGroup = ScriptGroup.findById(sId)
+									sGroup?.scriptList?.removeAll(scriptFile)
+									sGroup?.save()
+								}
+								scriptFile?.delete()
+								deletedList.add(scriptFile?.id)
+							}
+						} catch (Exception e) {
+							println "Error  - "+e.getMessage() + " scriptName "+scriptFile?.scriptName+" , id -"+scriptFile?.id
+							e.printStackTrace()
+						}
+					}else{
+						def sgList = []
+						def scriptGroups = ScriptGroup.where {
+							scriptList { id == scriptFile?.id }
+						}
+						Long originalScriptId = scriptNameIdMap?.get(scriptFile?.scriptName)
+						ScriptFile originalScriptFile
+						if(!deletedList?.contains(originalScriptId)){
+							originalScriptFile = ScriptFile?.findById(originalScriptId)
+						}
+						scriptGroups?.each{ scriptGrp ->
+							sgList.add(scriptGrp?.id)
+						}
+						sgList?.each{ sId ->
+							def sGroup = ScriptGroup.findById(sId)
+							if(!deletedList?.contains(originalScriptId)){
+								if(!sGroup?.scriptList?.id?.contains(originalScriptId)){
+									def indexOfscriptFile = sGroup?.scriptList?.indexOf(scriptFile)
+									sGroup?.scriptList?.set(indexOfscriptFile, originalScriptFile);
+								}
+							}
+							sGroup?.scriptList?.removeAll(scriptFile)
+							sGroup?.save()
+						}
+						scriptFile?.delete()
+					}
+				}catch (Exception e) {
+					println "Error - "+e.getMessage() + " scriptName "+scriptFile?.scriptName+" , id -"+scriptFile?.id
+					e.printStackTrace()
+				}
+			}
+		}
+		render "deleted duplicates"
+	}
+	
 	/**
 	 * Function used to the newly added script automatically add the script list without stop and start the "apache-tomcat" server.
 	 * The refresh the script list, while calling the  initializeScriptsData() same as boot process.
@@ -3754,19 +3888,26 @@ class ScriptGroupController {
 		}
 		render  new Gson().toJson(value)
 	}
+	
+	/**
+	 * Method to clean the test suites and scripts from database
+	 * @return
+	 */
 	def verifyAllScriptGroups(){
 		long time1 = System.currentTimeMillis();
 		def sgList = ScriptGroup.findAll()
 		def map = [:]
 		def removeList = []
 		try{
-			//def scriptListRDKV = scriptService.getScriptNameList(getRealPath(),"RDKV")
-			//def scriptListRDKB=  scriptService.getScriptNameList(getRealPath(),"RDKB")
 			def scriptListRDKV = scriptService.getScriptNameList(request.getRealPath("/"),RDKV)
 			scriptListRDKV = scriptListRDKV?scriptListRDKV:[]
 			def scriptListRDKB=  scriptService.getScriptNameList(request.getRealPath("/"),RDKB)
 			scriptListRDKB = scriptListRDKB?scriptListRDKB:[]
+			def scriptListRDKC=  scriptService.getScriptNameList(request.getRealPath("/"),RDKC)
+			scriptListRDKC = scriptListRDKC?scriptListRDKC:[]
 			def tclScriptList = scriptService.getTCLNameList(request.getRealPath("/"))
+			def scriptgroupscriptfilesize = 0
+			def sgNames = []
 			sgList?.each { scriptGroup ->
 				def rPath = getRealPath()
 				scriptGroup?.scriptList?.each{ script->
@@ -3774,8 +3915,17 @@ class ScriptGroupController {
 						if(!(scriptListRDKV?.toString()?.contains(script?.toString()))){
 							removeList.add(script)
 						}
+					}else if(scriptGroup?.category?.toString().equals(RDKV_RDKSERVICE)){
+						if(!(scriptListRDKV?.toString()?.contains(script?.toString()))){
+							removeList.add(script)
+						}
 					}else if(scriptGroup?.category?.toString().equals(RDKB)){
 						if(!(scriptListRDKB?.toString()?.contains(script?.toString()))){
+							removeList.add(script)
+
+						}
+					}else if(scriptGroup?.category?.toString().equals(RDKC)){
+						if(!(scriptListRDKC?.toString()?.contains(script?.toString()))){
 							removeList.add(script)
 
 						}
@@ -3785,26 +3935,81 @@ class ScriptGroupController {
 						}
 					}
 				}
-				if(removeList?.size() > 0 ){
-					def sGroup = ScriptGroup.findByName(scriptGroup?.name)
-					//removeList.each{
-					//	sGroup.scriptList.remove(it)
-					//}
-					sGroup.scriptList.removeAll(removeList)
-					sGroup.category = Utility.getCategory(scriptGroup?.category?.toString())
-					sGroup.save(flush:true)
+				def sGroup = ScriptGroup.findByName(scriptGroup?.name)
+				def scriptList = sGroup?.scriptList
+				def scriptListAfterRemoval = []
+				scriptList.each { script ->
+					if(!scriptListAfterRemoval?.contains(script) && !removeList?.contains(script)){
+						scriptListAfterRemoval?.add(script)
+					}
+				}
+				sGroup.scriptList =  scriptListAfterRemoval
+				sGroup.category = Utility.getCategory(scriptGroup?.category?.toString())
+				if(!sGroup.save(flush:true)){
+					sGroup?.errors.allErrors.each{error->
+						println"Error saving test suite  - "+error
+					}
 				}
 				map.put(scriptGroup?.name, removeList)
 				removeList = []
+				if(scriptGroup?.scriptList?.size() == 0){
+					sgNames.add(scriptGroup?.name)
+				}
+			}	
+			sgNames?.each{ sg ->
+				def sGroup = ScriptGroup.findByName(sg)
+				if(sGroup?.scriptList?.size() == 0){
+					sGroup.delete(flush: true)
+				}
 			}
 		}
 		catch(Exception e){
 			println e.printStackTrace()
-			println " ERROR "+e.getMessage()
+			println " ERROR in verifyAllScriptGroups for scriptGroups - "+e.getMessage()
 		}
+		try{
+			def scriptFiles = ScriptFile.findAll();
+			def sList = []
+			scriptFiles.each { sFile ->
+				if(sFile.category != Category.RDKV_THUNDER){
+					if(!sList.contains(sFile?.scriptName)){
+						sList.add(sFile?.scriptName)
+						verifyScriptFile(sFile?.id, sFile?.scriptName)
+					}
+				}
+			}
+		}catch(Exception e){
+			println e.printStackTrace()
+			println " ERROR in verifyAllScriptGroups for scripts >>>"+e.getMessage()
+		}
+		println "End of verifyAllScriptGroups" + (System.currentTimeMillis() - time1 )
 		redirect( action :"list")
 	}
 
+	/**
+	 * Method to delete all empty test suites
+	 * @return
+	 */
+	def deleteAllEmptyScriptGroups(){
+		def deletedList = []
+		try {
+			def sgList = ScriptGroup.findAll()
+			sgList?.each{ sg ->
+				if(sg?.scriptList?.size() == 0){
+					deletedList.add(sg?.name)
+				}
+			}
+			deletedList?.each{ sg ->
+				def sGroup = ScriptGroup.findByName(sg)
+				if(sGroup?.scriptList?.size() == 0){
+					sGroup.delete(flush: true)
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace()
+		}
+		render deletedList as String
+	}
 	/**
 	 * function for saving the tcl script
 	 */
