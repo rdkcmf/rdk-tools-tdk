@@ -704,7 +704,7 @@
 					height="15px" width="15px" /> Upload script group XML</li>
 					<li id="refresh"><img src="../images/refresh.gif" height="15px"
 					width="15px" /> <g:submitToRemote class="test"
-						before="testSuitesCleanUp()" action="verifyAllScriptGroups;"
+						before="testSuitesCleanUp()" action="verifyAllScriptGroups"
 						value="Test Suites Clean Up" onFailure="testSuitesCleanUpFailure()"
 						onSuccess="testSuitesCleanUpSuccess()" /></li>
 					<li id="update_scriptgrp"><img src="../images/refresh.gif" height="15px" width="15px"/>Update Test Suite</li>
