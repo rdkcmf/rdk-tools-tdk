@@ -1178,7 +1178,7 @@ class ExecutionController {
 					def isSystemDiagnostics = FALSE
 					def isLogReqd = FALSE
 					def rerun = FALSE
-					if(params?.systemDiagnostics.equals(KEY_ON)){
+					if(params?.systemDiagnostics.equals(KEY_ON) || params?.rdkCertificationDiagnosis.equals(KEY_ON)){
 						isSystemDiagnostics = TRUE
 					}
 					if(params?.benchMarking.equals(KEY_ON)){
@@ -2188,7 +2188,7 @@ class ExecutionController {
 					String executionResultOutput = executionResultList[i]?.executionOutput
 					if(scriptfile){
 						if(scriptfile?.category?.toString()?.equals(RDKV_RDKSERVICE?.toString())){
-							if(executionResultOutput.contains("[Pre-requisite Status]")) {
+							if(executionResultOutput?.contains("[Pre-requisite Status]")) {
 								isPatternPresent = true
 							}
 							isRDKServiceExecution = true
