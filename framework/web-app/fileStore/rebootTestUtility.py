@@ -20,15 +20,34 @@ import urllib2
 import rdkv_performancelib
 from rdkv_performancelib import *
 from StabilityTestVariables import *
+import logging
 
 iter_no=0
 count=0
+logger = None
 #Status of each validation step
 StatusUptime= [];
 StatusInterface= [];
 StatusControllerUI= [];
 StatusNoOfPlugins= [];
 StatusPlugin= [];
+
+#--------------------------------------------------------
+# OPEN A LOG FILE TO REDIRECT THE LOGS
+#--------------------------------------------------------
+def open_logfile(obj):
+    global logger;
+    formatter = logging.Formatter('%(message)s')
+    logger = logging.getLogger()
+    for handler in logger.handlers:
+        if isinstance(handler, logging.StreamHandler):
+            handler.setFormatter(formatter)
+    output_file = '{}logs/logs/{}_{}_{}_RebootScriptLog.txt'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
+    logger.setLevel(logging.INFO)
+    fh = logging.FileHandler(output_file, mode='w')
+    logger.addHandler(fh)
+    return logger;
+
 
 #-------------------------------------------------------
 #VALIDATE UPTIME VALUE AFTER REBOOT
@@ -37,7 +56,7 @@ def validateUptime(TimeAfterReboot,validate):
     if 0 < int(TimeAfterReboot)<200:
         return "SUCCESS"
     elif validate == "Yes":
-        print "Failed to reboot the device. Exiting the Script"
+        logger.info("Failed to reboot the device. Exiting the Script")
         exitScript(StatusUptime,iter_no);
     else:
         StatusUptime.append(iter_no)
@@ -63,7 +82,7 @@ def getIFStatus(IF_name,validate):
         if status == True:
             output= "ENABLED"
         elif validate == "Yes":
-            print "Ethernet Interface is not up after reboot. Exiting the script"
+            logger.info( "Ethernet Interface is not up after reboot. Exiting the script")
             exitScript(StatusInterface,iter_no);
         else:
             StatusInterface.append(iter_no)
@@ -71,11 +90,11 @@ def getIFStatus(IF_name,validate):
         if revert:
             rev_status = rdkservice_setPluginStatus("org.rdk.Network","deactivate")
             if rev_status == None:
-                print "Reverted network plugin status"
+                logger.info( "Reverted network plugin status")
             else:
-                print "Unable to revert network plugin status"
+                logger.info("Unable to revert network plugin status")
     else:
-        print "Unable to enable network plugin"
+        logger.info("Unable to enable network plugin")
     return output;
 
 #------------------------------------------------------
@@ -85,7 +104,7 @@ def validateNoOfPlugins(NumberBeforeReboot, NumberAfterReboot, validate):
     if int(NumberBeforeReboot) == int(NumberAfterReboot):
         return "SUCCESS"
     elif validate == "Yes":
-        print "The number of plugins before and after reboot are not same"
+        logger.info( "The number of plugins before and after reboot are not same")
         exitScript(StatusNoOfPlugins,iter_no)
     else:
         StatusNoOfPlugins.append(iter_no)
@@ -98,10 +117,10 @@ def validatePluginStatus(statusBeforeReboot,statusAfterReboot,validate):
     if statusBeforeReboot == statusAfterReboot:
         return "SUCCESS"
     else:
-        print "Mismatch in status of plugins before and after reboot"
-	#To convert the plugin status from string to list.
-	#START
-	len_string = statusAfterReboot.count("]")-1;
+        logger.info( "Mismatch in status of plugins before and after reboot")
+        #To convert the plugin status from string to list.
+        #START
+        len_string = statusAfterReboot.count("]")-1;
         status_after_reboot_list=[];
         status_before_reboot_list=[];
         for i in range(0,len_string):
@@ -118,12 +137,12 @@ def validatePluginStatus(statusBeforeReboot,statusAfterReboot,validate):
                 before_reboot= before_reboot.split("[")[1];
             sublist_before.append(before_reboot);
             status_before_reboot_list.append(sublist_before);
-	#END
+        #END
 
         Diff_after_reboot = [item for item in status_after_reboot_list if item not in status_before_reboot_list]
-        print "The status after reboot:\n ", Diff_after_reboot;
+        logger.info("The status after reboot:\n%s", Diff_after_reboot);
         Initial_value = [item for item in status_before_reboot_list if item not in status_after_reboot_list]
-        print "The status before reboot: \n", Initial_value;
+        logger.info( "The status before reboot: \n%s", Initial_value);
 
         if validate == "Yes":
             exitScript(StatusPlugin,iter_no)
@@ -140,7 +159,7 @@ def getUIStatus(validate):
     if statusCode == 200:
         return "ACCESSIBLE"
     elif validate == "Yes":
-        print "The controller UI is not up after reboot"
+        logger.info( "The controller UI is not up after reboot")
         exitScript(StatusControllerUI,iter_no);
     else:
         StatusControllerUI.append(iter_no)
@@ -158,23 +177,23 @@ def exitScript(StatusList,status):
 #PRINT SUMMARY OF TEST BEFORE EXITING
 #-------------------------------------------------------
 def getSummary(count):
-    print "\n--------------------------------------------"
-    print "SUMMARY OF REBOOT SCRIPT"
-    print "----------------------------------------------"
+    logger.info( "\n--------------------------------------------")
+    logger.info("SUMMARY OF REBOOT SCRIPT")
+    logger.info( "----------------------------------------------")
     if len(StatusUptime) > 0:
-        print "Iterations where uptime failed :",StatusUptime;
+        logger.info("Iterations where uptime failed :%s",StatusUptime);
     if len(StatusInterface) > 0:
-        print "Iterations where interface is down :",StatusInterface;
+        logger.info("Iterations where interface is down :%s",StatusInterface);
     if len(StatusControllerUI) > 0:
-        print "Iterations where controller UI is not accessible", StatusControllerUI;
+        logger.info("Iterations where controller UI is not accessible : %s", StatusControllerUI);
     if len(StatusNoOfPlugins) > 0:
-        print "Iterations where there is mismatch in no of plugins",StatusNoOfPlugins;
+        logger.info("Iterations where there is mismatch in no of plugins: %s",StatusNoOfPlugins);
     if len(StatusPlugin) > 0:
-        print "Iterations where status of plugins are different", StatusPlugin;
+        logger.info( "Iterations where status of plugins are different: %s", StatusPlugin);
 
-    print "\nNumber of reboots:%d/%d"%(count,repeatCount)
-    print "Number of failures in Uptime status: ", ("NIL" if len(StatusUptime)== 0 else len(StatusUptime))
-    print "Number of failures in Interface status: ", ("NIL" if len(StatusInterface)== 0 else len(StatusInterface))
-    print "Number of failures in controller ui status: ", ("NIL" if len(StatusControllerUI)== 0 else len(StatusControllerUI))
-    print "Number of failures in plugin count: ", ("NIL" if len(StatusNoOfPlugins)== 0 else len(StatusNoOfPlugins))
-    print "Number of failures in plugin status: ", ("NIL" if len(StatusPlugin)== 0 else len(StatusPlugin))
+    logger.info( "\nNumber of reboots:%d/%d"%(count,repeatCount))
+    logger.info( "Number of failures in Uptime status: %s", ("NIL" if len(StatusUptime)== 0 else len(StatusUptime)))
+    logger.info( "Number of failures in Interface status: %s", ("NIL" if len(StatusInterface)== 0 else len(StatusInterface)))
+    logger.info( "Number of failures in controller ui status: %s", ("NIL" if len(StatusControllerUI)== 0 else len(StatusControllerUI)))
+    logger.info( "Number of failures in plugin count: %s", ("NIL" if len(StatusNoOfPlugins)== 0 else len(StatusNoOfPlugins)))
+    logger.info( "Number of failures in plugin status: %s", ("NIL" if len(StatusPlugin)== 0 else len(StatusPlugin)))
