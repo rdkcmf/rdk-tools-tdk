@@ -161,10 +161,12 @@ function jsExecution(){
 	var singleTest = document.getElementById("singleTestRadioThunder");
 	var thunderJavascriptExecuteButtons = document.getElementById("thunderJavascriptExecuteButtons");
 	var thunderPythonExecuteButtons = document.getElementById("thunderPythonExecuteButtons");
+	var thunderPythonDiagnosisCheckBox = document.getElementById("rdkCertificationDiagnosisId");
+	thunderPythonDiagnosisCheckBox.disabled = true;
 	thunderJavascriptExecuteButtons.style.display = "block";
 	thunderPythonExecuteButtons.style.display = "none";
 	document.getElementById("thunderExecutionType").value = "javascript";
-	document.getElementById("category").value = "RDKV_THUNDER"
+	document.getElementById("category").value = "RDKV_THUNDER";
 	if(singleTest.checked){
 		$('#testSuiteThunderPython').hide();
 		$('#singletestThunderPython').hide();
@@ -190,9 +192,11 @@ function pythonExecution(){
 	document.getElementById("thunderExecutionType").value = "rdkservice";
 	var thunderJavascriptExecuteButtons = document.getElementById("thunderJavascriptExecuteButtons");
 	var thunderPythonExecuteButtons = document.getElementById("thunderPythonExecuteButtons");
+	var thunderPythonDiagnosisCheckBox = document.getElementById("rdkCertificationDiagnosisId");
+	thunderPythonDiagnosisCheckBox.disabled = false;
 	thunderJavascriptExecuteButtons.style.display = "none";
 	thunderPythonExecuteButtons.style.display = "block";
-	document.getElementById("category").value = "RDKV"
+	document.getElementById("category").value = "RDKV";
 	if(singleTest.checked){
 		$('#testSuiteThunderPython').hide();
 		$('#singletestThunderPython').show();

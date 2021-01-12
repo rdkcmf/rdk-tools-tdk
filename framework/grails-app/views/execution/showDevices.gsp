@@ -28,6 +28,7 @@ $(document).ready(function() {
 	$("#scriptsThunder").select2();
 	$("#scriptsThunderPython").select2();
 	$("#scriptGrpThunderPython").select2();
+	document.getElementById("rdkCertificationDiagnosisId").disabled = true;
 });
 
 </script>
@@ -171,6 +172,12 @@ $(document).ready(function() {
 				</td>
 			</tr>	
 		</g:if>
+		<g:else>
+			<tr>
+				<td>Execution Options</td>
+				<td><g:checkBox id="rdkCertificationDiagnosisId" name="rdkCertificationDiagnosis" checked="false"  />&nbsp;Rdk Certification Diagnosis</td>
+			</tr>
+		</g:else>
 		<tr>
 			<td colspan="2" align="center">
 			    <g:if test="${device?.isThunderEnabled != 1 }">				

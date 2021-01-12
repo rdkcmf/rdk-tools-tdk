@@ -1178,7 +1178,7 @@ class ExecutionController {
 					def isSystemDiagnostics = FALSE
 					def isLogReqd = FALSE
 					def rerun = FALSE
-					if(params?.systemDiagnostics.equals(KEY_ON)){
+					if(params?.systemDiagnostics.equals(KEY_ON) || params?.rdkCertificationDiagnosis.equals(KEY_ON)){
 						isSystemDiagnostics = TRUE
 					}
 					if(params?.benchMarking.equals(KEY_ON)){
