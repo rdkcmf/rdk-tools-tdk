@@ -17,9 +17,6 @@
 # limitations under the License.
 #########################################################################
 
-#URL of main UI in the device on bootup 
-ui_app_url = ""
-
 #URL used for testing webkit browser
 browser_test_url = ""
 
