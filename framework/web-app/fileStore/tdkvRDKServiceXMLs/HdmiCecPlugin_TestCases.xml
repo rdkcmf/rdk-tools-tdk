@@ -165,5 +165,61 @@
           <resultGeneration useMethodTag="hdmicec_check_on_message_event" arguments="check_power_status"/>
         </testStep>
     </testCase>
+    
+    <!-- Test case 05 -->
+    <testCase testCaseId="HdmiCec_05" testCaseName="Send_Message_Get_CEC_Version" desc="Gets CEC version">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="EncodeHexToBase64" action="externalFnCall" saveResult="true">
+          <resultGeneration useMethodTag="EncodeHexToBase64" >
+            <arguments value="9F" useConfigFile="true" key="HDMICEC_LOGICAL_ADDR_INFO" />
+          </resultGeneration>
+        </testStep>
+        <testStep testStepId="2" name="Send_Message" method="SendMessage">
+          <params>
+            <param tag="message" usePreviousResult="true" Id="1" useMethodTag="hdmicec_get_base64_data" />
+          </params>
+          <resultGeneration useMethodTag="hdmicec_check_result" />
+        </testStep>
+        <testStep testStepId="3"  name="Check_On_Message_Event" event="Event_On_Message" action="eventListener"  delay="3">
+          <resultGeneration useMethodTag="hdmicec_check_on_message_event" arguments="check_cec_version"/>
+        </testStep>
+    </testCase>
 
+    <!-- Test case 06 -->
+    <testCase testCaseId="HdmiCec_06" testCaseName="Send_Message_Get_Menu_Language" desc="Gets Menu language">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="EncodeHexToBase64" action="externalFnCall" saveResult="true">
+          <resultGeneration useMethodTag="EncodeHexToBase64" >
+            <arguments value="91" useConfigFile="true" key="HDMICEC_LOGICAL_ADDR_INFO" />
+          </resultGeneration>
+        </testStep>
+        <testStep testStepId="2" name="Send_Message" method="SendMessage">
+          <params>
+            <param tag="message" usePreviousResult="true" Id="1" useMethodTag="hdmicec_get_base64_data" />
+          </params>
+          <resultGeneration useMethodTag="hdmicec_check_result" />
+        </testStep>
+        <testStep testStepId="3"  name="Check_On_Message_Event" event="Event_On_Message" action="eventListener"  delay="3">
+          <resultGeneration useMethodTag="hdmicec_check_on_message_event" arguments="check_menu_language"/>
+        </testStep>
+    </testCase>
+
+     <!-- Test case 07 -->
+    <testCase testCaseId="HdmiCec_07" testCaseName="Send_Message_Get_Device_Vendor_ID" desc="Gets device vendor ID">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="EncodeHexToBase64" action="externalFnCall" saveResult="true">
+          <resultGeneration useMethodTag="EncodeHexToBase64" >
+            <arguments value="8C" useConfigFile="true" key="HDMICEC_LOGICAL_ADDR_INFO" />
+          </resultGeneration>
+        </testStep>
+        <testStep testStepId="2" name="Send_Message" method="SendMessage">
+          <params>
+            <param tag="message" usePreviousResult="true" Id="1" useMethodTag="hdmicec_get_base64_data" />
+          </params>
+          <resultGeneration useMethodTag="hdmicec_check_result" />
+        </testStep>
+        <testStep testStepId="3"  name="Check_On_Message_Event" event="Event_On_Message" action="eventListener"  delay="3">
+          <resultGeneration useMethodTag="hdmicec_check_on_message_event" arguments="check_device_vendor_id"/>
+        </testStep>
+    </testCase>
 </testPlugin>

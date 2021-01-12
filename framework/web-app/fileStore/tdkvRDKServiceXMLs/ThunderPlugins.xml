@@ -355,8 +355,8 @@
             </params>
         </method>
         <method name="Get_Temperature_Thresholds" api="getTemperatureThresholds" type="method" desc="Gets temperature thresholds" />
-        <method name="Set_Temperature_Thresholds" api="setTemperatureThresholds" type="method" desc="Gets temperature thresholds">
-            <params>
+        <method name="Set_Temperature_Thresholds" api="setTemperatureThresholds" type="method" desc="Sets temperature thresholds">
+            <params paramKey="thresholds" paramType="userGenerate" useMethodTag="system_set_thresholds_params">
                 <param tag="WARN" defaultValue="null" />
                 <param tag="MAX"  defaultValue="null" />
             </params>
@@ -612,9 +612,6 @@
             </params>
         </method>
 
-        <method name="AnimateTo" api="animateTo" type="method" desc="Performs a set of animations"/>
-        <!-- need to add input params -->
-
         <method name="SetScale" api="setScale" type="method" desc="Set Scale Params to an application" >
             <params>
                 <param tag="client" defaultValue="null"/>
@@ -653,6 +650,28 @@
         <method name="SuspendApplication" api="suspend" type="method" desc="Suspend an application" >
             <params>
                 <param tag="callsign" defaultValue="null"/>
+            </params>
+        </method>
+       
+        <method name="DestroyApplication" api="destroy" type="method" desc="Destroys the applications" >
+            <params>
+                <param tag="callsign" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Available_Types" api="getAvailableTypes" type="method" desc="Gets the available types" />
+        <method name="Get_Application_State" api="getState" type="method" desc="Gets the state of the applications" />
+        <method name="Get_System_Resource_Info" api="getSystemResourceInfo" type="method" desc="Gets system resource information" />
+        <method name="Add_Animation" api="addAnimation" type="method" desc="Performs a set of animations">
+            <params paramKey="animations"  paramType="userGenerate" useMethodTag="rdkshell_set_animations_params">
+                <param tag="client"  />
+                <param tag="x" defaultValue="0" type="int" />
+                <param tag="y" defaultValue="0" type="int" />
+                <param tag="w" defaultValue="0" type="int" />
+                <param tag="h" defaultValue="0" type="int" />
+                <param tag="sx" defaultValue="0.0" type="float" />
+                <param tag="sy" defaultValue="0.0" type="float" />
+                <param tag="tween" />
+                <param tag="duration" defaultValue="0" type="int" />
             </params>
         </method>
 
@@ -877,6 +896,8 @@
         <method name="Get_Connected_Devices" api="getConnectedDevices" type="method" desc="Returns a list of connected devices to this device" />
         <method name="Get_Paired_Devices" api="getPairedDevices" type="method" desc="Returns a list of devices that have paired with this device" />
         <event name="Event_On_Discovered_Device" eventName="onDiscoveredDevice" eventId="client.events.1" type="event" desc="Gives discovered Bluetooth devices" />
+        <event name="Event_On_Status_Changed" eventName="onStatusChanged" eventId="client.events.1" type="event" desc="Gives status change information" />
+        <event name="Event_On_Request_Failed" eventName="onRequestFailed" eventId="client.events.1" type="event" desc="Indicates on request failed" />
     </plugin>
 
 

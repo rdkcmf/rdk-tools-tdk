@@ -37,7 +37,7 @@
             </testStep>
           </prerequisite>
 
-          <prerequisite requisiteId="2" requisiteName="Deactivate_And_Activate_Plugins">
+          <prerequisite requisiteId="2" requisiteName="Deactivate_Plugins">
             <testStep testStepId="1" name="Check_And_Deactivate_Plugins" testStepType="loop">
               <subtestStep subtestStepId="1" name="Deactivate_Plugin" method="Deactivate_Plugin"  pluginName="Controller">
                 <params>
@@ -52,57 +52,34 @@
                   <arguments value="check_status" useIterableArg="true" />
                 </resultGeneration>
               </subtestStep>
-              <subtestStep subtestStepId="3" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller">
-                <params>
-                  <param tag="callsign" useIterable="true" />
-                </params>
+            </testStep>
+          </prerequisite>
+
+          <prerequisite requisiteId="3" requisiteName="Launch_Applications">
+            <testStep testStepId="1" name="Check_And_Launch_Applications" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Launch_Application_Type1" method="LaunchApplication" >
+                  <conditionalExecution enable="true" useMethodTag="rdkshell_check_app_launch_type1" useIterableArg="true" />
+                  <params>
+                    <param tag="callsign" iteration="true" useConfigFile="true" key="RDKSHELL_PREREQ_PLUGINS"  />
+                  </params>
+                  <resultGeneration useMethodTag="rdkshell_check_for_results" />
               </subtestStep>
-              <subtestStep subtestStepId="4" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller">
-                <params>
-                  <param tag="plugin" useIterable="true" indexOnly="true" />
-                </params>
-                <resultGeneration useMethodTag="controller_get_plugin_state" expectedValues="activated,suspended,resumed">
-                  <arguments value="check_status" useIterableArg="true" />
-                </resultGeneration>
+              <subtestStep subtestStepId="2" name="Launch_Application_Type2" method="LaunchApplication" >
+                  <conditionalExecution enable="true" useMethodTag="rdkshell_check_app_launch_type2" useIterableArg="true" />
+                  <params>
+                    <param tag="callsign" iteration="true" useConfigFile="true" key="RDKSHELL_PREREQ_PLUGINS" />
+                    <param tag="type" value="HtmlApp"  />
+                    <param tag="uri"  useConfigFile="true" key="RDKSHELL_WEBKIT_LAUNCH_URL"  />
+                  </params>
+                  <resultGeneration useMethodTag="rdkshell_check_for_results" />
               </subtestStep>
             </testStep>
           </prerequisite>
 
-          <prerequisite requisiteId="3" requisiteName="Check_And_Resume_WebKitBrowser">
-            <testStep testStepId="1" name="Is_WebKitBrowser_Resumed" method="Get_WebKitBrowser_State" pluginName="WebKitBrowser" saveResult="true" >
-                <resultGeneration useMethodTag="webkitbrowser_get_state" />
-            </testStep>
-            <testStep testStepId="2" name="Resume_WebKitBrowser" method="Set_WebKitBrowser_State" pluginName="WebKitBrowser" >
-                <conditionalExecution enable="true" Id="1" useMethodTag="webkitbrowser_check_state" arguments="isSuspended" />
-                <params>
-                  <param tag="state" useDefault="true" />
-                </params>
-            </testStep>
-            <testStep testStepId="3" name="Is_WebKitBrowser_Resumed" method="Get_WebKitBrowser_State" pluginName="WebKitBrowser" delay="5">
-                <conditionalExecution enable="true" Id="1" useMethodTag="webkitbrowser_check_state" arguments="isSuspended" />
-                <resultGeneration useMethodTag="webkitbrowser_get_state" expectedValues="resumed" />
-            </testStep>
-          </prerequisite>
-
-          <prerequisite requisiteId="4" requisiteName="Check_And_Resume_Cobalt">
-            <testStep testStepId="1" name="Is_Cobalt_Resumed" method="Get_Cobalt_State" pluginName="Cobalt" saveResult="true" >
-                <resultGeneration useMethodTag="cobalt_get_state" />
-            </testStep>
-            <testStep testStepId="2" name="Resume_Cobalt" method="Set_Cobalt_State" pluginName="Cobalt" >
-                <conditionalExecution enable="true" Id="1" useMethodTag="cobalt_check_state" arguments="isSuspended" />
-                <params>
-                  <param tag="state" useDefault="true" />
-                </params>
-            </testStep>
-            <testStep testStepId="3" name="Is_Cobalt_Resumed" method="Get_Cobalt_State" pluginName="Cobalt" delay="5">
-                <conditionalExecution enable="true" Id="1" useMethodTag="cobalt_check_state" arguments="isSuspended" />
-                <resultGeneration useMethodTag="cobalt_get_state" expectedValues="resumed" />
-            </testStep>
-          </prerequisite>
         </pluginPreRequisite>
 
         <!-- Test case 01 -->
-        <testCase testCaseId="RDKShell_01" testCaseName= "RDKShell_Application_MoveToFront_01" desc="Move given client to the top or front of the Z order">
+        <testCase testCaseId="RDKShell_01" testCaseName= "RDKShell_Application_MoveToFront" desc="Move given client to the top or front of the Z order">
            <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -116,7 +93,7 @@
         </testCase>
 
         <!-- Test case 02 -->
-        <testCase testCaseId="RDKShell_02" testCaseName= "RDKShell_Application_MoveToBack_02" desc="Move given client to the back or bottom of the Z order">
+        <testCase testCaseId="RDKShell_02" testCaseName= "RDKShell_Application_MoveToBack" desc="Move given client to the back or bottom of the Z order">
            <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -131,7 +108,7 @@
 
 
         <!-- Test case 03 -->
-        <testCase testCaseId="RDKShell_03" testCaseName= "RDKShell_Application_MoveBehind_03" desc="Moves the client behind the specified target">
+        <testCase testCaseId="RDKShell_03" testCaseName= "RDKShell_Application_MoveBehind" desc="Moves the client behind the specified target">
            <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -146,7 +123,7 @@
         </testCase>
 
         <!-- Test case 04 -->
-        <testCase testCaseId="RDKShell_04" testCaseName= "RDKShell_Application_SetFocus_04" desc="Set focus to an application">
+        <testCase testCaseId="RDKShell_04" testCaseName= "RDKShell_Application_SetFocus" desc="Set focus to an application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -160,42 +137,7 @@
         </testCase>
 
         <!-- Test case 05 -->
-        <!-- For now killing "cobalt" application and validating the method. later this needs to be made as generic case -->
-        <testCase testCaseId="RDKShell_05" testCaseName= "RDKShell_Application_Kill_05" desc="Kill Application">
-            <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="killapp" method="Kill">
-              <params>
-                <param tag="client"  value="cobalt" />
-              </params>
-              <resultGeneration useMethodTag="rdkshell_get_result_status" />
-            </testStep>
-            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
-              <resultGeneration useMethodTag="rdkshell_check_if_application_killed" expectedValues= "cobalt" />
-            </testStep>
-            <!-- Starting Cobalt application again -->
-            <testStep testStepId="3" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
-              <params>
-                <param tag="callsign" value="Cobalt" />
-              </params>
-            </testStep>
-            <testStep testStepId="4" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
-              <params>
-                <param tag="plugin" value="Cobalt" indexOnly="true" />
-              </params>
-              <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,Cobalt" expectedValues="resumed"/>
-            </testStep>
-            <testStep testStepId="5" name="Resume_Cobalt" method="Set_Cobalt_State" pluginName="Cobalt" >
-              <params>
-                <param tag="state" useDefault="true" />
-              </params>
-            </testStep>
-            <testStep testStepId="6" name="Is_Cobalt_Resumed" method="Get_Cobalt_State" pluginName="Cobalt" delay="5">
-              <resultGeneration useMethodTag="cobalt_get_state" expectedValues="resumed" />
-            </testStep>
-        </testCase>
-
-        <!-- Test case 06 -->
-        <testCase testCaseId="RDKShell_06" testCaseName= "RDKShell_Application_AddKey_Intercept_06" desc="Add key intercept">
+        <testCase testCaseId="RDKShell_05" testCaseName= "RDKShell_Application_AddKey_Intercept" desc="Add key intercept">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -210,8 +152,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 07 -->
-        <testCase testCaseId="RDKShell_07" testCaseName= "RDKShell_Application_RemoveKey_Intercept_07" desc="Remove key intercept">
+        <!-- Test case 06 -->
+        <testCase testCaseId="RDKShell_06" testCaseName= "RDKShell_Application_RemoveKey_Intercept" desc="Remove key intercept">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -226,16 +168,16 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 08 -->
-        <testCase testCaseId="RDKShell_08" testCaseName= "RDKShell_GetScreen_Resolution_08" desc="Get Screen resolution">
+        <!-- Test case 07 -->
+        <testCase testCaseId="RDKShell_07" testCaseName= "RDKShell_GetScreen_Resolution" desc="Get Screen resolution">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="getscreenresolution" method="GetScreenResolution">
               <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
         </testCase>
 
-        <!-- Test case 09 -->
-        <testCase testCaseId="RDKShell_09" testCaseName= "RDKShell_SetScreen_Resolution_09" desc="Set Screen resolution">
+        <!-- Test case 08 -->
+        <testCase testCaseId="RDKShell_08" testCaseName= "RDKShell_SetScreen_Resolution" desc="Set Screen resolution">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="setscreenresolution" method="SetScreenResolution">
               <params>
@@ -246,8 +188,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 10 -->
-        <testCase testCaseId="RDKShell_10" testCaseName= "RDKShell_SetandGet_Screen_Resolution_10" desc="Set and Get Screen resolution">
+        <!-- Test case 09 -->
+        <testCase testCaseId="RDKShell_09" testCaseName= "RDKShell_SetandGet_Screen_Resolution" desc="Set and Get Screen resolution">
             <testCaseInfo testCaseType="setandget" revert="true" />
             <testStep testStepId="1" name="getscreenresolution" method="GetScreenResolution" saveResult="true" revertGet="yes">
               <resultGeneration useMethodTag="rdkshell_check_for_results"/>
@@ -260,23 +202,23 @@
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
-            <testStep testStepId="3" name="getscreenresolution" method="GetScreenResolution" revertFlag="yes">
+            <testStep testStepId="3" name="getscreenresolution" method="GetScreenResolution" revertFlag="yes" delay="1">
               <resultGeneration useMethodTag="rdkshell_check_for_resolution_set" expectedValues="1920,1080" />
             </testStep>
         </testCase>
 
 
-        <!-- Test case 11 -->
-        <testCase testCaseId="RDKShell_11" testCaseName= "RDKShell_GetClients_11" desc="Get connected client list">
+        <!-- Test case 10 -->
+        <testCase testCaseId="RDKShell_10" testCaseName= "RDKShell_GetClients" desc="Get connected client list">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_get_result_status"/>
             </testStep>
         </testCase>
 
-        <!-- Test case 12 -->
+        <!-- Test case 11 -->
         <!-- #TODO: Shall also include a test case to change z order using moveBehind method and check z order using getZOrder method -->
-        <testCase testCaseId="RDKShell_12" testCaseName= "RDKShell_GetZOrder_12" desc="list applications in Z order">
+        <testCase testCaseId="RDKShell_11" testCaseName= "RDKShell_GetZOrder" desc="list applications in Z order">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -286,8 +228,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 13 -->
-        <testCase testCaseId="RDKShell_13" testCaseName= "RDKShell_Application_Get_Bounds_13" desc="Get boundary of given client">
+        <!-- Test case 12 -->
+        <testCase testCaseId="RDKShell_12" testCaseName= "RDKShell_Application_Get_Bounds" desc="Get boundary of given client">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -300,8 +242,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 14 -->
-        <testCase testCaseId="RDKShell_14" testCaseName= "RDKShell_Application_Set_Bounds_14" desc="Set boundary of given client">
+        <!-- Test case 13 -->
+        <testCase testCaseId="RDKShell_13" testCaseName= "RDKShell_Application_Set_Bounds" desc="Set boundary of given client">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -318,8 +260,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 15 -->
-        <testCase testCaseId="RDKShell_15" testCaseName= "RDKShell_SetandGet_Bound_15" desc="Set and Get application boundary">
+        <!-- Test case 14 -->
+        <testCase testCaseId="RDKShell_14" testCaseName= "RDKShell_SetandGet_Bound" desc="Set and Get application boundary">
             <testCaseInfo testCaseType="setandget" revert="true" />
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -348,8 +290,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 16 -->
-        <testCase testCaseId="RDKShell_16" testCaseName= "RDKShell_Application_Get_Visibility_16" desc="Get visibility of given client">
+        <!-- Test case 15 -->
+        <testCase testCaseId="RDKShell_15" testCaseName= "RDKShell_Application_Get_Visibility" desc="Get visibility of given client">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -362,8 +304,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 17 -->
-        <testCase testCaseId="RDKShell_17" testCaseName= "RDKShell_Application_Set_Visibility_17" desc="Set visibility of given client">
+        <!-- Test case 16 -->
+        <testCase testCaseId="RDKShell_16" testCaseName= "RDKShell_Application_Set_Visibility" desc="Set visibility of given client">
         <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -384,8 +326,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 18 -->
-        <testCase testCaseId="RDKShell_18" testCaseName= "RDKShell_SetandGet_Visibility_18" desc="Set and Get application Visibility">
+        <!-- Test case 17 -->
+        <testCase testCaseId="RDKShell_17" testCaseName= "RDKShell_SetandGet_Visibility" desc="Set and Get application Visibility">
             <testCaseInfo testCaseType="setandget" revert="true" />
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -414,8 +356,8 @@
         </testCase>
 
 
-        <!-- Test case 19 -->
-        <testCase testCaseId="RDKShell_19" testCaseName= "RDKShell_Application_Get_Opacity_19" desc="Get opacity of given client">
+        <!-- Test case 18 -->
+        <testCase testCaseId="RDKShell_18" testCaseName= "RDKShell_Application_Get_Opacity" desc="Get opacity of given client">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -428,8 +370,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 20 -->
-        <testCase testCaseId="RDKShell_20" testCaseName= "RDKShell_Application_Set_Opacity_20" desc="Set opacity of given client">
+        <!-- Test case 19 -->
+        <testCase testCaseId="RDKShell_19" testCaseName= "RDKShell_Application_Set_Opacity" desc="Set opacity of given client">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -444,8 +386,8 @@
         </testCase>
 
 
-        <!-- Test case 21 -->
-        <testCase testCaseId="RDKShell_21" testCaseName= "RDKShell_SetandGet_Opacity_21" desc="Set and Get opacity Visibility">
+        <!-- Test case 20 -->
+        <testCase testCaseId="RDKShell_20" testCaseName= "RDKShell_SetandGet_Opacity" desc="Set and Get opacity Visibility">
             <testCaseInfo testCaseType="setandget" revert="true" />
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -473,8 +415,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 22 -->
-        <testCase testCaseId="RDKShell_22" testCaseName= "RDKShell_Application_GetScale_22" desc="Get scaling params of an application">
+        <!-- Test case 21 -->
+        <testCase testCaseId="RDKShell_21" testCaseName= "RDKShell_Application_GetScale" desc="Get scaling params of an application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -487,8 +429,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 23 -->
-        <testCase testCaseId="RDKShell_23" testCaseName= "RDKShell_Application_SetScale_23" desc="Scale an Application">
+        <!-- Test case 22 -->
+        <testCase testCaseId="RDKShell_22" testCaseName= "RDKShell_Application_SetScale" desc="Scale an Application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -503,8 +445,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 24 -->
-        <testCase testCaseId="RDKShell_24" testCaseName= "RDKShell_SetandGet_Application_Scale_24" desc="Set and Get application scaling params">
+        <!-- Test case 23 -->
+        <testCase testCaseId="RDKShell_23" testCaseName= "RDKShell_SetandGet_Application_Scale" desc="Set and Get application scaling params">
             <testCaseInfo testCaseType="setandget" revert="true" />
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
@@ -533,38 +475,218 @@
               </resultGeneration>
             </testStep>
         </testCase>
+         
+         <!-- Test case 24 -->
+        <testCase testCaseId="RDKShell_24" testCaseName= "RDKShell_Suspend_Resume_Cobalt" desc="Resume cobalt  application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Suspend_Application" method="SuspendApplication" >
+              <params>
+                <param tag="callsign"  value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_if_application_killed" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="3" name="Resume_Cobalt" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="4" name="Is_Cobalt_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
+            </testStep>
+
+        </testCase>
+
 
         <!-- Test case 25 -->
+        <testCase testCaseId="RDKShell_25" testCaseName= "RDKShell_Suspend_Resume_WebKitBrowser" desc="Resume WebKitBrowser  application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Suspend_Application" method="SuspendApplication" >
+              <params>
+                <param tag="callsign"  value="WebKitBrowser" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_if_application_killed" expectedValues= "webkitbrowser" />
+            </testStep>
+            <testStep testStepId="3" name="Resume_WebKitBrowser" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="WebKitBrowser" />
+                <param tag="type" value="HtmlApp"  />
+                <param tag="uri"  useConfigFile="true" key="RDKSHELL_WEBKIT_LAUNCH_URL"  />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="4" name="Is_WebKitBrowser_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="WebKitBrowser" expectedValues="resumed" />
+            </testStep>
+
+        </testCase>        
+        
+        <!-- Test case 26 -->
+        <testCase testCaseId="RDKShell_26" testCaseName= "RDKShell_Perform_Animation" desc="Performs animation">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
+              <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
+            </testStep>
+            <testStep testStepId="2" name="Add_Animation" method="Add_Animation">
+              <params paramKey="animations">
+                <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />
+                <param tag="x" value="0" />
+                <param tag="y" value="0" />
+                <param tag="w" value="1920" />
+                <param tag="h" value="1080" />
+                <param tag="sx" value="0.5" />
+                <param tag="sy" value="0.5" />
+                <param tag="tween" value="outbounce" />
+                <param tag="duration" value="3" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 27 -->
+        <testCase testCaseId="RDKShell_27" testCaseName= "RDKShell_Perform_multiple_Animation" desc="Performs multiple animation">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
+              <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
+            </testStep>
+            <testStep testStepId="2" name="Add_Animation" method="Add_Animation">
+              <params paramKey="animations">
+                <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />
+                <param tag="x" value="100" />
+                <param tag="y" value="200" />
+                <param tag="w" value="1920" />
+                <param tag="h" value="1080" />
+                <param tag="sx" value="0.5" />
+                <param tag="sy" value="0.5" />
+                <param tag="tween" value="outelastic" />
+                <param tag="duration" value="3" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+             <testStep testStepId="3" name="Add_Animation" method="Add_Animation">
+              <params paramKey="animations">
+                <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="1" />
+                <param tag="x" value="200" />
+                <param tag="y" value="100" />
+                <param tag="w" value="1920" />
+                <param tag="h" value="1080" />
+                <param tag="sx" value="0.5" />
+                <param tag="sy" value="0.5" />
+                <param tag="tween" value="outbounce" />
+                <param tag="duration" value="3" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 28 -->
+        <testCase testCaseId="RDKShell_28" testCaseName= "RDKShell_Application_Types" desc="Gets the application types">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Available_Types" method="Get_Available_Types" >
+              <resultGeneration useMethodTag="rdkshell_check_for_results"/>
+            </testStep>
+        </testCase>
+
+
+
+        <!-- Test case 29 -->
+        <testCase testCaseId="RDKShell_29" testCaseName= "RDKShell_Destroy_Resume_Cobalt" desc="Destroy and resumes Cobalt application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Destroy_Application" method="DestroyApplication" >
+              <params>
+                <param tag="callsign"  value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_if_application_killed" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="3" name="Resume_Cobalt" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="4" name="Is_Cobalt_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 30 -->
+        <testCase testCaseId="RDKShell_30" testCaseName= "RDKShell_Destroy_Resume_WebKitBrowser" desc="Destroy and resumes WebKitBrowser application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Destroy_Application" method="DestroyApplication" >
+              <params>
+                <param tag="callsign"  value="WebKitBrowser" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_if_application_killed" expectedValues= "webkitbrowser" />
+            </testStep>
+            <testStep testStepId="3" name="Resume_WebKitBrowser" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="WebKitBrowser" />
+                <param tag="type" value="HtmlApp"  />
+                <param tag="uri"  useConfigFile="true" key="RDKSHELL_WEBKIT_LAUNCH_URL"  />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="4" name="Is_WebKitBrowser_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="WebKitBrowser" expectedValues="resumed" />
+            </testStep>
+        </testCase>
+        <!-- Test case 31 -->
         <!-- #TODO For now added scenarios for webkitbrowser & cobalt applications and validating the method. later this will be made as generic case -->
-        <testCase testCaseId="RDKShell_25" testCaseName= "RDKShell_Application_Suspend_25" desc="Suspend given application">
+        <testCase testCaseId="RDKShell_31" testCaseName= "RDKShell_Application_Suspend" desc="Suspend given application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
             </testStep>
             <testStep testStepId="2" name="suspendapplication" method="SuspendApplication">
               <params>
-                <param tag="callsign"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0,callsign" />
+                <param tag="callsign" usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0,callsign"  />
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
-		    <!-- #TODO need to add test step for resuming the application with launch method -->
         </testCase>
 
-        <!-- Test case 26 -->
-	    <!-- resumeapplication method is depricated. This will be replaced by launch application -->
-	    <!--
-        <testCase testCaseId="RDKShell_26" testCaseName= "RDKShell_Application_Suspend_26" desc="Resume given application">
+
+        <!-- Test case 32 -->
+        <testCase testCaseId="RDKShell_32" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
             <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
-              <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
-            </testStep>
-            <testStep testStepId="2" name="resumeapplication" method="ResumeApplication">
+            <testStep testStepId="1" name="killapp" method="Kill">
               <params>
-                <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />
+                <param tag="client"  value="Cobalt" />
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
+            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_if_application_killed" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="3" name="Launch_Application_Cobalt" method="LaunchApplication" delay="5" >
+              <params>
+                <param tag="callsign" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="4" name="Is_Cobalt_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
+            </testStep>
         </testCase>
-		-->
+        <!-- Test case 33 -->
+        <testCase testCaseId="RDKShell_33" testCaseName= "RDKShell_System_Resource_Info" desc="Gets the system resource info">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_System_Resource_Info" method="Get_System_Resource_Info" >
+              <resultGeneration useMethodTag="rdkshell_check_for_results"/>
+            </testStep>
+        </testCase> 
+
 
 </testPlugin>

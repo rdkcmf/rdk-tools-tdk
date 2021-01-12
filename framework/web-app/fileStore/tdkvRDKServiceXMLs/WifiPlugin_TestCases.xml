@@ -39,6 +39,8 @@
             </testStep>
           </prerequisite>
 
+          <!-- Only if You have not connected ethernet or you enabled the RFC for default interface -->
+          <!--
           <prerequisite requisiteId="2" requisiteName="Check_WIFI_Adapter_State">
             <testStep testStepId="1" name="Get_Current_State" method="Get_Current_State" saveResult="true" >
                 <resultGeneration useMethodTag="wifi_check_adapter_state" arguments="check_state_valid"/>
@@ -51,15 +53,17 @@
                 <conditionalExecution enable="true" Id="1" useMethodTag="wifi_check_adapter_state" arguments="isDisabled" />
                 <resultGeneration useMethodTag="wifi_check_adapter_state" arguments="check_state_enabled"/>
             </testStep>
-          </prerequisite>
+          </prerequisite> -->
 
-          <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
+          <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
             <event pluginName="Wifi" eventName="Event_On_WIFI_State_Changed" />
             <event pluginName="Wifi" eventName="Event_On_Available_SSIDs" />
           </prerequisite>
 
         </pluginPreRequisite>
 
+        <!-- Only if You have not connected ethernet or you enabled the RFC for default interface -->
+        <!--
         <testCase testCaseId="WIFI_01" testCaseName="WIFI_Enable_Disable_Adapter" desc="Toggles WIFI Adapter state">
            <testCaseInfo testCaseType="setandget" revert="true" />
             <testStep testStepId="1" name="Get_Current_State" method="Get_Current_State" saveResult="true" revertGet="yes">
@@ -75,6 +79,22 @@
                 <resultGeneration useMethodTag="wifi_check_adapter_state">
                     <expectedValues usePreviousResult="true" Id="1" useMethodTag="wifi_toggle_adapter_state" arguments="get_state_no" />
                 </resultGeneration>
+            </testStep>
+        </testCase> -->
+
+        <testCase testCaseId="WIFI_01" testCaseName="WIFI_Enable_Disable_Adapter" desc="Toggles WIFI Adapter state">
+           <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Set_WIFI_Adapter_Disabled" method="Set_Enabled">
+                <params>
+                  <param tag="enable" value="false" />
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Set_WIFI_Adapter_Enabled" method="Set_Enabled">
+                <params>
+                  <param tag="enable" value="true" />
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
         </testCase>
 
@@ -107,7 +127,7 @@
             <testStep testStepId="2" name="Clear_SSID_Info" method="Clear_SSID_Info" delay="3">
                 <resultGeneration useMethodTag="wifi_check_save_clear_ssid" />
             </testStep>
-       </testCase> 
+       </testCase>
 
        <testCase testCaseId="WIFI_04" testCaseName="WIFI_Connect_Disconnect_SSIDs" desc="Connects to the given SSID and disconnects">
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
@@ -132,8 +152,8 @@
             <testStep testStepId="4" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-       </testCase> 
-       
+       </testCase>
+
        <testCase testCaseId="WIFI_05" testCaseName="WIFI_Retrieve_Connected_SSID" desc="Retrieves connected SSID">
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
@@ -154,7 +174,7 @@
             <testStep testStepId="3" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
                 <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
                     <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
-	        </resultGeneration>
+                </resultGeneration>
             </testStep>
             <testStep testStepId="4" name="Disconnect" method="Disconnect" delay="3">
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
@@ -184,13 +204,13 @@
             <testStep testStepId="3" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
                 <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
                     <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
-	        </resultGeneration>
+                </resultGeneration>
             </testStep>
             <testStep testStepId="4" name="Disconnect" method="Disconnect" delay="3">
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
             <testStep testStepId="5" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
-		<resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_no_ssid"/>
+                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_no_ssid"/>
             </testStep>
             <testStep testStepId="6" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
@@ -217,7 +237,7 @@
             <testStep testStepId="4" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-       </testCase> 
+       </testCase>
 
        <testCase testCaseId="WIFI_08" testCaseName="WIFI_Connect_With_Invalid_SSID" desc="Check if Connects to the given invalid SSID">
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
@@ -373,4 +393,3 @@
        </testCase>
 
 </testPlugin>
-

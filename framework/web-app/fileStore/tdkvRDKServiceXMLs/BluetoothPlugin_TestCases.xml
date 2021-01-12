@@ -45,7 +45,9 @@
           </prerequisite>
 
           <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
-            <event pluginName="Bluetooth" eventName="Event_On_Discovered_Device" />
+            <event pluginName="Bluetooth" eventName="Event_On_Discovered_Device" />  
+            <event pluginName="Bluetooth" eventName="Event_On_Status_Changed" />
+            <event pluginName="Bluetooth" eventName="Event_On_Request_Failed" />
           </prerequisite>
 
         </pluginPreRequisite>
@@ -86,20 +88,30 @@
         </testCase>
 
         <testCase testCaseId="BT_03" testCaseName="Bluetooth_Get_Discovered_Devices" desc="Scan and get discovered devices using onDiscoveredDevice Event">
-            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="BT_EMULATOR_SUPPORT" useMethodTag="bt_na_tests" arguments="no"/>
+            <testStep testStepId="1" name="Execute_BT_Ctrl" action="externalFnCall" >
+                <resultGeneration useMethodTag="executeBluetoothCtl" arguments="bluetoothctl,agent NoInputNoOutput,default-agent,discoverable on"/>
+            </testStep>
+            <testStep testStepId="2" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="timeout" useDefault="true" />
                   <param tag="profile" useDefault="true" />
                 </params>
                 <resultGeneration useMethodTag="bluetooth_set_operation" />
             </testStep>
-            <testStep testStepId="2" name="Check_On_Discovered_Device_Event" event="Event_On_Discovered_Device" action="eventListener" delay="10">
+            <testStep testStepId="3" name="Check_On_Status_Changed_Event" event="Event_On_Status_Changed" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="bluetooth_check_status_changed_event"  expectedValues="DISCOVERY_STARTED"/>
+            </testStep>
+            <testStep testStepId="4" name="Check_On_Discovered_Device_Event" event="Event_On_Discovered_Device" action="eventListener" delay="20">
                 <resultGeneration useMethodTag="bluetooth_check_discovered_device_event" arguments="get_devices_info" />
             </testStep>
-            <testStep testStepId="3" name="Get_Discovered_Devices" method="Get_Discovered_Devices" >
+            <testStep testStepId="5" name="Check_On_Status_Changed_Event" event="Event_On_Status_Changed" action="eventListener" delay="10">
+                <resultGeneration useMethodTag="bluetooth_check_status_changed_event"  expectedValues="DISCOVERY_COMPLETED"/>
+            </testStep>
+            <testStep testStepId="6" name="Get_Discovered_Devices" method="Get_Discovered_Devices" >
                 <resultGeneration useMethodTag="bluetooth_get_discovered_devices" arguments="get_devices_info" />
             </testStep>
-            <testStep testStepId="4" name="Stop_Scan" method="Stop_Scan" >
+            <testStep testStepId="7" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="bluetooth_set_operation" />
             </testStep>
         </testCase>
@@ -186,7 +198,39 @@
                 </params>
                 <resultGeneration useMethodTag="bluetooth_set_operation" expectedValues="true"/>
 	         </testStep> 
-       </testCase>
+        </testCase>
+        
+        <testCase testCaseId="BT_06" testCaseName="Bluetooth_On_Request_Failed" desc="Checks on request failed event">
+           <testCaseInfo testCaseType="direct" configurableTest="true" testKey="BT_EMULATOR_SUPPORT" useMethodTag="bt_na_tests" arguments="no"/>
+            <testStep testStepId="1" name="Execute_BT_Ctrl" action="externalFnCall" >
+                <resultGeneration useMethodTag="executeBluetoothCtl" arguments="bluetoothctl,agent NoInputNoOutput,default-agent,discoverable on"/>
+            </testStep>
+            <testStep testStepId="2" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="timeout" useDefault="true" />
+                  <param tag="profile" useDefault="true" />
+                </params>
+                <resultGeneration useMethodTag="bluetooth_set_operation" />
+            </testStep>
+            <testStep testStepId="3" name="Stop_Scan" method="Stop_Scan" delay="30">
+                <resultGeneration useMethodTag="bluetooth_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Discovered_Devices" method="Get_Discovered_Devices" saveResult="true">
+                <resultGeneration useMethodTag="bluetooth_get_discovered_devices" arguments="get_device_id" >
+                    <expectedValues useConfigFile="true" key="BT_EMU_DEVICE_NAME"/>
+                </resultGeneration>
+            </testStep>
+                <testStep testStepId="5" name="Pair" method="Pair" >
+                <params>
+                  <param tag="deviceID" value="20098665783765889" />
+                </params>
+                <resultGeneration useMethodTag="bluetooth_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="6" name="Check_On_Request_Failed_Event" event="Event_On_Request_Failed" action="eventListener" delay="5">
+                <resultGeneration useMethodTag="bluetooth_check_request_failed_event" expectedValues="PAIRING_FAILED"/>
+            </testStep>
+        </testCase>
+       
 
         <pluginPostRequisite>
           <postrequisite requisiteId="1" requisiteName="Bluetooth_Stack_Disable">
