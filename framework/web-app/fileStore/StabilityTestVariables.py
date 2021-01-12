@@ -16,14 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #########################################################################
+
 #The port must be 9998 for thunder builds and 9224 for rdkservice builds
 webinspect_port = ""
 
-#channel change application url, sample application:"http://cdn.metrological.com/static/storm/cc_time_v2.html?test_duration=168"
+#channel change application url, sample application:"http://cdn.metrological.com/static/storm/cc_time_v2.html?test_duration=730"
 channel_change_url = ""
 
 #no of channel changes to perform
 max_channel_change_count = 1000
+
+#channel change maximum duration value in minutes
+channel_change_duration = 720
 
 ####Long duration test details:
 #The url used for testing cobalt
@@ -67,3 +71,18 @@ cobalt_randomkey_test_url = ""
 
 #The time in minutes till random keys should be sent, this duration should be less than the duration of above configured video.
 cobalt_randomkey_test_duration = 60
+
+##Stress test by Setting URLs in loop test details
+#maximum number of URL set operation
+url_loop_count = 100
+
+#any valid URLs to be launched in webkit
+loop_test_url_1 = ""
+loop_test_url_2 = ""
+
+##Activate and Deactivate test details
+#name of plugins used for test(should be given as comma seperated. eg: "WebKitBrowser,Cobalt,org.rdk.Bluetooth")
+activate_deactivate_plugins = ""
+
+#maximum number of activate and deactivate operations
+activate_deactivate_max_count = 100
