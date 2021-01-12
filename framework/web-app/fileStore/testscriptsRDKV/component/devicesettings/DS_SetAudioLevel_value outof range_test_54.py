@@ -33,7 +33,6 @@ TestCase ID:54</synopsis>
   <remarks/>
   <skip>true</skip>
   <box_types>
-    <box_type>RDK-TV</box_type>
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>
