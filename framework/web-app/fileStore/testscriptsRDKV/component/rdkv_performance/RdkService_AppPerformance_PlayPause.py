@@ -66,15 +66,10 @@
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
-from BrowserPerformanceUtility import *
-import BrowserPerformanceUtility
-from rdkv_performancelib import *
-import rdkv_performancelib
 from web_socket_util import *
 import MediaValidationVariables
 from MediaValidationUtility import *
-import MediaValidationUtility
-from datetime import datetime
+from StabilityTestUtility import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
@@ -96,22 +91,28 @@ expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     appURL    = MediaValidationVariables.lightning_video_test_app_url
     videoURL  = MediaValidationVariables.video_src_url
-
-    setOperation("pause",MediaValidationVariables.pause_interval)
-    setOperation("play",MediaValidationVariables.play_interval)
+    
+    setOperation("pause",10)
+    setOperation("play",10)
     operations = getOperations()
-    video_test_url = getTestURL(appURL,videoURL,operations)
-
+    # Setting VideoPlayer test app URL arguments
+    setURLArgument("url",videoURL)
+    setURLArgument("operations",operations)
+    setURLArgument("autotest","true")
+    appArguments = getURLArguments()
+    # Getting the complete test app URL
+    video_test_url = getTestURL(appURL,appArguments)
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
-    print "Current values \nWebKitBrowser:%s\nCobalt:%s"%(curr_webkit_status,curr_cobalt_status);
-    if status == "FAILURE":
-        set_pre_requisites(obj)
-        #Need to revert the values since we are changing plugin status
-        revert="YES"
-        status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
+    plugins_list = ["WebKitBrowser","Cobalt"]
+    curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
+    status = "SUCCESS"
+    plugin_status_needed = {"WebKitBrowser":"resumed","Cobalt":"deactivated"}
+    if curr_plugins_status_dict != plugin_status_needed:
+        status = "FAILURE"
+        revert = "YES"
+        status = set_plugins_status(obj,plugin_status_needed)
     if status == "SUCCESS":
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
@@ -242,7 +243,7 @@ if expectedResult in result.upper():
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"
-        status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
+        status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
 else:
     obj.setLoadModuleStatus("FAILURE");
