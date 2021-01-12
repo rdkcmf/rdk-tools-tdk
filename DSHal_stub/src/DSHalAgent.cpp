@@ -2781,9 +2781,10 @@ void DSHalAgent::DSHal_GetCurrentOutputSettings(IN const Json::Value& req, OUT J
     dsDisplayMatrixCoefficients_t coefficients;
     dsDisplayColorSpace_t colorSpace;
     unsigned int colorDepth;
+    dsDisplayQuantizationRange_t quantizationRange = dsDISPLAY_QUANTIZATIONRANGE_UNKNOWN;
 
-    ret = dsGetCurrentOutputSettings(vpHandle, &eotf, &coefficients, &colorSpace, &colorDepth);
-    sprintf(output, "eotf:%d,coefficients:%d,colorSpace:%d,colorDepth:%d", eotf, coefficients, colorSpace, colorDepth);
+    ret = dsGetCurrentOutputSettings(vpHandle, &eotf, &coefficients, &colorSpace, &colorDepth, &quantizationRange);
+    sprintf(output, "eotf:%d,coefficients:%d,colorSpace:%d,colorDepth:%d, quantizationRange:%d", eotf, coefficients, colorSpace, colorDepth, quantizationRange);
 
     if (ret == dsERR_NONE)
     {
