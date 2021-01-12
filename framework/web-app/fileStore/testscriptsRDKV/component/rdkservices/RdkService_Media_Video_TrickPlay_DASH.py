@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>4</version>
+  <version>5</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RdkService_Media_Video_TrickPlay_DASH</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -77,9 +77,9 @@ operation_max_interval: int</input_parameters>
 3. Load the player app url with the operations to be performed, play, pause, seek forward/backward and fast-forward with interval.
 4. App performs the provided operations and validates each operation using events and with position and rate value for seek and fast-forward operations
 5. If expected events occurs for each operation and expected position, rate values occurs for seek and fast-forward, then app gives the validation result as SUCCESS or else FAILURE
-6. Get the event validation result from the app and update the test script status
+6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>All the provided player operations and expected events should occur</expected_output>
+    <expected_output>All the provided player operations and expected events should occur and if proc validation is applicable, then expected data should be available in proc file</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkservices</test_stub_interface>
     <test_script>RdkService_Media_Video_TrickPlay_DASH</test_script>
@@ -119,7 +119,7 @@ expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     appURL    = MediaValidationVariables.lightning_video_test_app_url
     videoURL  = MediaValidationVariables.video_src_url_dash
-
+    # Setting VideoPlayer Operations
     setOperation("seekfwd",MediaValidationVariables.operation_max_interval)
     setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
     setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
@@ -128,7 +128,13 @@ if expectedResult in result.upper():
     setOperation("seekbwd",MediaValidationVariables.operation_max_interval)
     setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
     operations = getOperations()
-    video_test_url = getTestURL(appURL,videoURL,operations)
+    # Setting VideoPlayer test app URL arguments
+    setURLArgument("url",videoURL)
+    setURLArgument("operations",operations)
+    setURLArgument("autotest","true")
+    appArguments = getURLArguments()
+    # Getting the complete test app URL
+    video_test_url = getTestURL(appURL,appArguments)
 
     #Example video test url
     #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
@@ -144,7 +150,10 @@ if expectedResult in result.upper():
         #Need to revert the values since we are changing plugin status
         revert="YES"
         status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
-    if status == "SUCCESS":
+    #Checking whether device supports proc entry validation. If supported, get
+    #device information to access and read the proc file
+    validation_dict = getProcValidationParams(obj,"VIDEO_PROC_FILE")
+    if status == "SUCCESS" and validation_dict != {}:
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
@@ -156,7 +165,7 @@ if expectedResult in result.upper():
             webkit_console_socket = createEventListener(ip,MediaValidationVariables.webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
             print "Current URL:",current_url
-            print "\nSet Channel change test URL"
+            print "\nSet Lightning video player test app URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
             tdkTestObj.addParameter("method","WebKitBrowser.1.url");
             tdkTestObj.addParameter("value",video_test_url);
@@ -170,20 +179,47 @@ if expectedResult in result.upper():
             if new_url in video_test_url:
                 tdkTestObj.setResultStatus("SUCCESS");
                 print "URL(",new_url,") is set successfully"
+                if validation_dict["proc_check"]:
+                    proc_file = validation_dict["proc_file"]
+                    if validation_dict["ssh_method"] == "directSSH":
+                        if validation_dict["password"] == "None":
+                            password = ""
+                        else:
+                            password = validation_dict["password"]
+                        credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+                    else:
+                        #TODO
+                        print "selected ssh method is {}".format(validation_dict["ssh_method"])
+                        pass
+                    print "\nProc entry validation for video player test is enabled\n"
+                else:
+                    print "\nProc entry validation for video player test is skipped\n"
                 test_result = ""
+                proc_check_list = []
                 while True:
                     if (len(webkit_console_socket.getEventsBuffer())== 0):
                         time.sleep(1)
                         continue
                     console_log = webkit_console_socket.getEventsBuffer().pop(0)
                     dispConsoleLog(console_log)
+                    if "Observed Event: " in console_log and validation_dict["proc_check"]:
+                        proc_check_list.append(checkProcEntry(validation_dict["ssh_method"],credentials,proc_file,"started"));
+                        time.sleep(1);
                     if "TEST RESULT:" in console_log or "Connection refused" in console_log:
                         test_result = getConsoleMessage(console_log)
                         break;
                 webkit_console_socket.disconnect()
-                if "SUCCESS" in test_result:
+                if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
+                    print "Video play is fine"
+                    print "[TEST EXECUTION RESULT]: SUCCESS"
                     tdkTestObj.setResultStatus("SUCCESS");
+                elif "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
+                    print "Decoder proc entry check returns failure.Video not playing fine"
+                    print "[TEST EXECUTION RESULT]: FAILURE"
+                    tdkTestObj.setResultStatus("FAILURE");
                 else:
+                    print "Video not playing fine"
+                    print "[TEST EXECUTION RESULT]: FAILURE"
                     tdkTestObj.setResultStatus("FAILURE");
                 #Set the URL back to previous
                 tdkTestObj = obj.createTestStep('rdkservice_setValue');
