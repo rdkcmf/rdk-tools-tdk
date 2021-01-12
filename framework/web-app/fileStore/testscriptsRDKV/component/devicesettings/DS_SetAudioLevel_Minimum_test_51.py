@@ -33,7 +33,6 @@ TestCase ID:51</synopsis>
   <remarks>Volume test scripts are applicable only for TV</remarks>
   <skip>false</skip>
   <box_types>
-   <box_type>RDK-TV</box_type>
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>
