@@ -21,11 +21,14 @@ import json
 import time
 import os
 from SSHUtility import *
+from os import path
+import rebootTestUtility;
 
 deviceIP=""
 devicePort=""
 deviceName=""
 deviceType=""
+libObj=""
 #METHODS
 #---------------------------------------------------------------
 #INITIALIZE THE MODULE
@@ -35,6 +38,8 @@ def init_module(libobj,port,deviceInfo):
     global devicePort
     global deviceName
     global deviceType
+    global libObj
+    libObj=libobj;
     deviceIP = libobj.ip;
     devicePort = port
     deviceName = deviceInfo["devicename"]
@@ -52,18 +57,39 @@ def execute_step(data):
         json_response = json.loads(response.content)
         return json_response.get("result");
     except requests.exceptions.RequestException as e:
-        raise SystemExit(e)
+        exceptionExit(e);
+
+#----------------------------------------------------------------
+#To exit the script gracefully, when an exception occurs
+#----------------------------------------------------------------
+def exceptionExit(error):
+    executeJson = json.loads(libObj.jsonMsgValue)
+    params = executeJson["params"]
+    method = params["method"]
+    output_file = '{}logs/logs/{}_{}_{}_RebootScriptLog.txt'.format(libObj.realpath,str(libObj.execID),str(libObj.execDevId),str(libObj.resultId))
+    if path.exists(output_file):
+        rebootTestUtility.logger.info("\n\n ERROR!!! Exception occured at %s",method)
+        rebootTestUtility.logger.info("\nError message recieved: \n\n%s", error)
+        rebootTestUtility.logger.info("\nEXITING SCRIPT!!!")
+    else:
+        print "\n\n ERROR!!! Exception occured at ",method
+        print "\nError message recieved: \n\n", error
+        print "\nEXITING SCRIPT!!!"
+    exit();
 
 #------------------------------------------------------------------
 #REBOOT THE DEVICE
 #------------------------------------------------------------------
 def rdkservice_rebootDevice(waitTime):
-    cmd = "curl --silent --data-binary '{\"jsonrpc\": \"2.0\", \"id\": 1234567890, \"method\": \"Controller.1.harakiri\" }' -H 'content-type:text/plain;' http://"+ str(deviceIP)+":"+str(devicePort)+ "/jsonrpc"
-    os.system(cmd)
+    try:
+        cmd = "curl --silent --data-binary '{\"jsonrpc\": \"2.0\", \"id\": 1234567890, \"method\": \"Controller.1.harakiri\" }' -H 'content-type:text/plain;' http://"+ str(deviceIP)+":"+str(devicePort)+ "/jsonrpc"
+        os.system(cmd)
 
-    print "WAIT TO COMPLETE THE REBOOT PROCESS"
-    time.sleep(waitTime)
-    return "SUCCESS"
+        print "WAIT TO COMPLETE THE REBOOT PROCESS"
+        time.sleep(waitTime)
+        return "SUCCESS"
+    except Exception as e:
+        exceptionExit(e);
 
 #-------------------------------------------------------------------
 #GET THE CPU LOAD VALUE FROM DEVICEINFO PLUGIN
