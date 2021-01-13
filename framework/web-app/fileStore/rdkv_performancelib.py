@@ -28,11 +28,14 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common import exceptions
 from SSHUtility import *
 import re
+from os import path
+import rebootTestUtility;
 
 deviceIP=""
 devicePort=""
 deviceName=""
 deviceType=""
+libObj=""
 #METHODS
 #---------------------------------------------------------------
 #INITIALIZE THE MODULE
@@ -42,6 +45,8 @@ def init_module(libobj,port,deviceInfo):
     global devicePort
     global deviceName
     global deviceType
+    global libObj
+    libObj=libobj;
     deviceIP = libobj.ip;
     devicePort = port
     deviceName = deviceInfo["devicename"]
@@ -59,8 +64,26 @@ def execute_step(data):
         json_response = json.loads(response.content)
         return json_response.get("result");
     except requests.exceptions.RequestException as e:
-        raise SystemExit(e)
+        exceptionExit(e);
 
+#----------------------------------------------------------------
+#Exit the script gracefull when exception occurs
+#----------------------------------------------------------------
+def exceptionExit(error):
+    executeJson = json.loads(libObj.jsonMsgValue)
+    params = executeJson["params"]
+    method = params["method"]
+    componentName = params["module"]
+    output_file = '{}logs/logs/{}_{}_{}_RebootScriptLog.txt'.format(libObj.realpath,str(libObj.execID),str(libObj.execDevId),str(libObj.resultId))
+    if path.exists(output_file):
+        rebootTestUtility.logger.info("\n\n ERROR!!! Exception occured at %s",method)
+        rebootTestUtility.logger.info("\nError message recieved: \n\n%s", error)
+        rebootTestUtility.logger.info("\nEXITING SCRIPT!!!")
+    else:
+        print "\n\n ERROR!!! Exception occured at ",method
+        print "\nError message recieved: \n\n", error
+        print "\nEXITING SCRIPT!!!"
+    exit();
 #-----------------------------------------------------------------
 #GET PLUGIN STATUS
 #-----------------------------------------------------------------
