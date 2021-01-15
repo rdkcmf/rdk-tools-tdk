@@ -62,7 +62,8 @@ def getStatus(deviceIP,managerIP,boxName,statusPort):
 
        		#jsonMsg = {'jsonrpc':'2.0','id':'2','method':'getHostStatus','params':{'managerIP':managerIP,'boxName':boxName}'\r\n'}
        		#jsonMsg = '{"jsonrpc":"2.0","id":"2","method":"getHostStatus","params":{"managerIP":"96.114.220.236","boxName":"RK04-PX1V3-6184"}\r\n}'
-       		jsonMsg = '{"jsonrpc":"2.0","id":"2","method":"getHostStatus","params":{"managerIP":"'+managerIP+'","boxName":"'+boxName+'"}\r\n}' #sarves
+       		#jsonMsg = '{"jsonrpc":"2.0","id":"2","method":"getHostStatus","params":{"managerIP":"'+managerIP+'","boxName":"'+boxName+'"}\r\n}' #sarves
+                jsonMsg = '{"jsonrpc":"2.0","id":"2","method":"getHostStatus","params":{"managerIP":"'+managerIP+'","boxName":"'+boxName+'"}}\r\n' #For JSONRPC1.3.0
 		#query = json.dumps(jsonMsg)
      		#query = jsonMsg
         	#tcpClient.send(query) #Sending json query
