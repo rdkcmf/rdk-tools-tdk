@@ -1059,6 +1059,8 @@ class TDKScriptingLibrary:
 			sys.stdout.flush()
                         if self.isStandAlone is False :
 			    self.result = self.tcpClient.recv(1048)
+                sys.stdout.flush()
+                self.tcpClient.close()
 		return
 
 	########## End of Function ##########
@@ -1515,7 +1517,7 @@ class TDKScriptingLibrary:
 				print "Details : " + details
 				sys.stdout.flush()
 				exit()
-
+                self.tcpClient.close()
 		return
 
 	########## End of Function ##########
@@ -1638,14 +1640,14 @@ class TDKScriptingLibrary:
         # Parameters   : none
         # Return Value : null
 
-                print "Resetting connection to device.."
-                portDetails = getPortDetails(self.url , self.IP)
-                AGENTPORT = portDetails["agentPort"]
-		if(self.portValue == AGENTPORT):
-                    self.tcpClient.close()
-                    time.sleep(5)
-                    self.tcpClient = self.getSocketInstance()
-                    self.tcpClient.connect((self.IP, self.portValue))
+                #print "Resetting connection to device.."
+                #portDetails = getPortDetails(self.url , self.IP)
+                #AGENTPORT = portDetails["agentPort"]
+		#if(self.portValue == AGENTPORT):
+                    #self.tcpClient.close()
+                    #time.sleep(5)
+                    #self.tcpClient = self.getSocketInstance()
+                    #self.tcpClient.connect((self.IP, self.portValue))
                 return
 
         ########## End of Function ##########
