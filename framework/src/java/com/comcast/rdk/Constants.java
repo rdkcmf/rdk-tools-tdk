@@ -197,6 +197,7 @@ public final class Constants
     
     public static final String COMPONENT ="component";
     public static final String INTEGRATION ="integration";
+    public static final String CERTIFICATION ="certification";
     public static final String NO_OS_SUITE = "_NO_OS";
     
     public static final String SYSTEMDIAGNOSTICS_CPU = "SYSTEMDIAGNOSTICS_CPU";
@@ -270,6 +271,7 @@ public final class Constants
     private static final String  RDKSERVICES="rdkservices";
     private static final String  RDKV_PERFORMANCE="rdkv_performance";
     private static final String  RDKV_STABILITY="rdkv_stability";    
+	private static final String  RDKV_MEDIA="rdkv_media";
     
 	private static final String SUCCESS ="SUCCESS";
 	private static final String FAILED ="FAILED";

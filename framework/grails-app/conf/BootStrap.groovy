@@ -152,7 +152,11 @@ class BootStrap {
 		createTclModule()
 		//create thunder module if it doesn't exist
 		createThunderModule()
-		createRdkServiceModules()
+		try{
+			createRdkServiceModules(rootFile.file.getAbsolutePath())
+		}catch(Exception e){
+			e.printStackTrace()
+		}
 		/*List<Script> scriptList = Script.list()
 		
 		scriptList.each{ scriptInstance ->
@@ -368,25 +372,56 @@ class BootStrap {
 	 * Method to create RdkService module if it is not already present
 	 * @return
 	 */
-	def createRdkServiceModules() {
-		[Constants.RDKSERVICES, Constants.RDKV_PERFORMANCE,Constants.RDKV_STABILITY].each{element->
-			def module = Module.findByName(element)
-			if(module == null){
-				Module?.withTransaction{
-					def moduleInstance = new Module()
-					moduleInstance.name = element
-					moduleInstance.testGroup = TestGroup.Component
-					moduleInstance.groups= null
-					moduleInstance.category= Category.RDKV
-					if(!moduleInstance.save(flush:true)){
-						moduleInstance.errors.each{
-							println it
-						}
+	def createRdkServiceModules(def realPath){
+		def rdkServiceModule = Module.findByName(Constants.RDKSERVICES)
+		if(rdkServiceModule == null){
+			Module?.withTransaction{
+				def moduleInstance = new Module()
+				moduleInstance.name = Constants.RDKSERVICES
+				moduleInstance.testGroup = TestGroup.Component
+				moduleInstance.groups= null
+				moduleInstance.category= Category.RDKV
+				if(!moduleInstance.save(flush:true)){
+					moduleInstance.errors.each{
+						println it
 					}
 				}
 			}
 		}
+		File certificationDirectory = new File( "${realPath}//fileStore//"+Constants.TESTSCRIPTS_RDKV+"//"+Constants.CERTIFICATION+"//")
+		if(certificationDirectory.exists()){
+			def folders = certificationDirectory.list()
+			folders.each{folder->
+				File folderDirectory = new File( "${realPath}//fileStore//"+Constants.TESTSCRIPTS_RDKV+"//"+Constants.CERTIFICATION+"//"+folder)
+				if(folderDirectory.exists()){
+					def module = Module.findByName(folder)
+					if(module){
+						if(!module?.testGroup.equals(TestGroup.Certification)){
+							module?.testGroup = TestGroup.Certification
+						}
+						if(!module.save(flush:true)){
+							module.errors.each{
+								println it
+							}
+						}
+					}
+					if(module == null){
+							Module?.withTransaction{
+								def certificationModuleInstance = new Module()
+								certificationModuleInstance.name = folder
+								certificationModuleInstance.testGroup = TestGroup.Certification
+								certificationModuleInstance.groups= null
+								certificationModuleInstance.category= Category.RDKV
+								if(!certificationModuleInstance.save(flush:true)){
+									certificationModuleInstance.errors.each{
+										println it
+									}
+								}
+							}
+						}
+				}
+			}
+		}
 	}
-}
 
-              
+}           

@@ -295,7 +295,7 @@ class ScriptService {
 
 						modules.each { module ->
 							String moduleNameString = module.toString()
-							if(!moduleNameString.contains(Constants.RDKSERVICES) && !moduleNameString.contains(Constants.RDKV_PERFORMANCE) && !moduleNameString.contains(Constants.RDKV_STABILITY)){
+							if(!moduleNameString.contains(Constants.RDKSERVICES)){
 								def category = null
 								if(Constants.TESTSCRIPTS_RDKV.equals(fileStorePath) || Constants.TESTSCRIPTS_RDKV_ADV.equals(fileStorePath)){
 									category = Constants.RDKV
@@ -333,55 +333,64 @@ class ScriptService {
 			if(realPathDir.exists()){
 				List scriptsListRdkServiceTemp = []
 				List scriptsFileListRdkServiceTemp = []
-				[Constants.RDKSERVICES, Constants.RDKV_PERFORMANCE,Constants.RDKV_STABILITY].each{folder->
-					File directory = new File( "${realPath}//fileStore//"+Constants.TESTSCRIPTS_RDKV+"//"+Constants.COMPONENT+"//"+folder+"//")
-						if(directory.exists()){
-							List sLstEmpty = []
-							scriptGroupMap.put(folder,sLstEmpty)
-							List sLst = []
-							File [] testscriptfiles = directory.listFiles(new FilenameFilter() {
-								@Override
-								public boolean accept(File dir, String name) {
-									return name.endsWith(".py");
-								}
-							});
-							testscriptfiles.each { testscriptfile ->
-								String fileName = ""+testscriptfile?.name?.trim()?.replace(".py", "")
-								if(scriptGroupMap.keySet().contains(folder)){
-									sLst = scriptGroupMap.get(folder)
-								}
-								if(!sLst.contains(fileName)){
-									sLst?.add(fileName)
-								}
-								def scriptNameListmap = scriptNameListMap.get(Constants.RDKV)
-								if(scriptNameListmap == null){
-									scriptNameListmap = []
-									scriptNameListMap.put(Constants.RDKV, scriptNameListmap)
-								}
-								if(!scriptNameListmap.contains(fileName)){
-									scriptNameListmap.add(fileName)
-								}
-								if(!scriptsListRdkServiceTemp.contains(fileName)){
-									scriptsListRdkServiceTemp.add(fileName)
-								}
-								thunderScriptService.saveRdkServiceThunderScriptFile(fileName,folder)
-								def scriptName =ScriptFile.findByScriptNameAndCategory(fileName, Category.RDKV_RDKSERVICE)
-								if(scriptName && !scriptsFileListRdkServiceTemp.contains(scriptName)){
-									scriptsFileListRdkServiceTemp.add(scriptName)
-								}
-								if(!scriptMapping.containsKey(fileName)){
-									scriptMapping.put(fileName, folder)
-								}
-								if(!scriptsListMap.get(Constants.RDKV_RDKSERVICE)?.contains(scriptName) && scriptName){
-									scriptsListMap.get(Constants.RDKV_RDKSERVICE)?.add(scriptName)
-								}
-								boolean updateReqd = isDefaultSGUpdateRequiredThunder()
-								if(scriptName && updateReqd){
-									updateRdkServiceScriptSuite(folder, scriptName , Category.RDKV_RDKSERVICE)
+				List testGroupList = [Constants.COMPONENT, Constants.CERTIFICATION]
+				testGroupList.each{testGroup->
+					File testGroupDirectory = new File( "${realPath}//fileStore//"+Constants.TESTSCRIPTS_RDKV+"//"+testGroup+"//")
+					if(testGroupDirectory.exists()){
+						def modules = testGroupDirectory.list()
+						modules.each{folder->
+							File moduleDirectory = new File( "${realPath}//fileStore//"+Constants.TESTSCRIPTS_RDKV+"//"+testGroup+"//"+folder)
+							if(moduleDirectory.exists()){
+								if((testGroup == Constants.COMPONENT && folder == Constants.RDKSERVICES) || (testGroup == Constants.CERTIFICATION)){
+									List sLstEmpty = []
+									scriptGroupMap.put(folder,sLstEmpty)
+									List sLst = []
+									File [] testscriptfiles = moduleDirectory.listFiles(new FilenameFilter() {
+										@Override
+										public boolean accept(File dir, String name) {
+											return name.endsWith(".py");
+										}
+									});
+									testscriptfiles.each { testscriptfile ->
+										String fileName = ""+testscriptfile?.name?.trim()?.replace(".py", "")
+										if(scriptGroupMap.keySet().contains(folder)){
+											sLst = scriptGroupMap.get(folder)
+										}
+										if(!sLst.contains(fileName)){
+											sLst?.add(fileName)
+										}
+										def scriptNameListmap = scriptNameListMap.get(Constants.RDKV)
+										if(scriptNameListmap == null){
+											scriptNameListmap = []
+											scriptNameListMap.put(Constants.RDKV, scriptNameListmap)
+										}
+										if(!scriptNameListmap.contains(fileName)){
+											scriptNameListmap.add(fileName)
+										}
+										if(!scriptsListRdkServiceTemp.contains(fileName)){
+											scriptsListRdkServiceTemp.add(fileName)
+										}
+										thunderScriptService.saveRdkServiceThunderScriptFile(fileName,folder)
+										def scriptName =ScriptFile.findByScriptNameAndCategory(fileName, Category.RDKV_RDKSERVICE)
+										if(scriptName && !scriptsFileListRdkServiceTemp.contains(scriptName)){
+											scriptsFileListRdkServiceTemp.add(scriptName)
+										}
+										if(!scriptMapping.containsKey(fileName)){
+											scriptMapping.put(fileName, folder)
+										}
+										if(!scriptsListMap.get(Constants.RDKV_RDKSERVICE)?.contains(scriptName) && scriptName){
+											scriptsListMap.get(Constants.RDKV_RDKSERVICE)?.add(scriptName)
+										}
+										boolean updateReqd = isDefaultSGUpdateRequiredThunder()
+										if(scriptName && updateReqd){
+											updateRdkServiceScriptSuite(folder, scriptName , Category.RDKV_RDKSERVICE)
+										}
+									}
+									scriptGroupMap.put(folder,sLst)
 								}
 							}
-							scriptGroupMap.put(folder,sLst)
 						}
+					}
 				}
 				if(scriptsListRdkServiceTemp?.size() >= 0){
 					scriptsListRdkService.clear()
@@ -921,6 +930,7 @@ class ScriptService {
 			sFile= ScriptFile.findByScriptNameAndModuleName(name,moduleName)
 			if(sFile){
 				def script = getMinimalScript(realPath,moduleName, name, category)
+				category = sFile?.category
 				if(script){
 					def sObject = new ScriptObject()
 					sObject.setBoxTypes(script?.boxTypes?.toSet())
@@ -930,7 +940,7 @@ class ScriptService {
 					sObject.setScriptFile(sFile)
 					sObject.setScriptTags(script?.scriptTags?.toSet())
 					sObject.setLongDuration(script?.longDuration)
-					if(moduleName == Constants.RDKSERVICES || moduleName == Constants.RDKV_PERFORMANCE || moduleName == Constants.RDKV_STABILITY){
+					if(category == Category.RDKV_RDKSERVICE){
 						updateRdkServiceScriptSuite(moduleName,sFile,Category.RDKV_RDKSERVICE.toString())
 					}else{
 						scriptgroupService.saveToScriptGroups(sFile,sObject, category)
@@ -1276,7 +1286,7 @@ class ScriptService {
 			def directories = ["testscriptsRDKV", "testscriptsRDKVAdvanced"]
 			directories.each { dirName ->
 				def path  = realPath+Constants.FILE_SEPARATOR+"fileStore"+Constants.FILE_SEPARATOR+dirName
-				["component", "integration"].each{ directory ->
+				["component", "integration", "certification"].each{ directory ->
 					dir.addAll(getDirectoryList(path+Constants.FILE_SEPARATOR+directory))
 				}
 			}
@@ -1395,6 +1405,8 @@ class ScriptService {
 			if(moduleObj){
 				if(moduleObj?.testGroup?.groupValue.equals(TestGroup.E2E.groupValue)){
 					scriptDirName = Constants.INTEGRATION
+				}else if(moduleObj?.testGroup?.groupValue.equals(TestGroup.Certification.groupValue)){
+					scriptDirName = Constants.CERTIFICATION
 				}
 			}
 			if(category == null){
@@ -1465,6 +1477,8 @@ class ScriptService {
 				if(moduleObj){
 					if(moduleObj?.testGroup?.groupValue.equals(TestGroup.E2E.groupValue)){
 						primitiveDirName = Constants.INTEGRATION
+					}else if(moduleObj?.testGroup?.groupValue.equals(TestGroup.Certification.groupValue)){
+						primitiveDirName = Constants.CERTIFICATION
 					}
 				}
 
@@ -1601,6 +1615,8 @@ class ScriptService {
 			if(moduleObj){
 				if(moduleObj?.testGroup?.groupValue.equals(TestGroup.E2E.groupValue)){
 					scriptDirName = Constants.INTEGRATION
+				}else if(moduleObj?.testGroup?.groupValue.equals(TestGroup.Certification.groupValue)){
+					scriptDirName = Constants.CERTIFICATION
 				}
 			}
 			File file = null
@@ -1807,7 +1823,7 @@ class ScriptService {
 						Arrays.sort(modules);
 						modules.each { module ->
 							String moduleNameString = module?.toString()
-							if(!moduleNameString.contains(Constants.RDKSERVICES) && !moduleNameString.contains(Constants.RDKV_PERFORMANCE) && !moduleNameString.contains(Constants.RDKV_STABILITY)){
+							if(!moduleNameString.contains(Constants.RDKSERVICES)){
 								def start1 =System.currentTimeMillis()
 								try {
 									File [] files = module.listFiles(new FilenameFilter() {
@@ -2287,6 +2303,8 @@ class ScriptService {
 			if(moduleObj){
 				if(moduleObj?.testGroup?.groupValue.equals(TestGroup.E2E.groupValue)){
 					scriptDirName = Constants.INTEGRATION
+				}else if(moduleObj?.testGroup?.groupValue.equals(TestGroup.Certification.groupValue)){
+					scriptDirName = Constants.CERTIFICATION
 				}
 			}
 			if(category?.equals(Category.RDKV.toString())){
