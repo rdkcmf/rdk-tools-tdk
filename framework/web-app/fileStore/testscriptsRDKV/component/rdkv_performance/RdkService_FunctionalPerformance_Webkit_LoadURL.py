@@ -95,10 +95,14 @@ if expectedResult in result.upper():
     status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
     print "Current values \nWebKitBrowser:%s\nCobalt:%s"%(curr_webkit_status,curr_cobalt_status);
     if status == "FAILURE":
-        set_pre_requisites(obj)
-        #Need to revert the values since we are changing plugin status
-        revert="YES"
-        status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
+        if "FAILURE" not in (curr_webkit_status,curr_cobalt_status):
+            set_status=set_pre_requisites(obj)
+            #Need to revert the values since we are changing plugin status
+            revert="YES"
+            if set_status == "SUCCESS":
+                status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
+            else:
+                status = "FAILURE"
     if status == "SUCCESS" and browser_test_url != "":
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
@@ -106,7 +110,8 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("method","WebKitBrowser.1.url");
         tdkTestObj.executeTestCase(expectedResult);
         current_url = tdkTestObj.getResultDetails();
-        if current_url != None:
+        result = tdkTestObj.getResult()
+        if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             print "Current URL:",current_url
             print "\nSet Browser test URL"
@@ -115,89 +120,95 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("value",browser_test_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
-            time.sleep(30)
-            print "\nValidate if the URL is set successfully or not"
-            tdkTestObj = obj.createTestStep('rdkservice_getValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.executeTestCase(expectedResult);
-            new_url = tdkTestObj.getResultDetails();
-            if browser_test_url in new_url:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "URL(",new_url,") is set successfully"
-                ssh_param_dict = get_ssh_params(obj)
-                if ssh_param_dict != {}:
-                    if ssh_param_dict["ssh_method"] == "directSSH":
-                        if ssh_param_dict["password"] == "None":
-                            password = ""
+            if expectedResult in result:
+                time.sleep(30)
+                print "\nValidate if the URL is set successfully or not"
+                tdkTestObj = obj.createTestStep('rdkservice_getValue');
+                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                tdkTestObj.executeTestCase(expectedResult);
+                new_url = tdkTestObj.getResultDetails();
+                result = tdkTestObj.getResult()
+                if browser_test_url in new_url and expectedResult in result:
+                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "URL(",new_url,") is set successfully"
+                    ssh_param_dict = get_ssh_params(obj)
+                    if ssh_param_dict != {}:
+                        if ssh_param_dict["ssh_method"] == "directSSH":
+                            if ssh_param_dict["password"] == "None":
+                                password = ""
+                            else:
+                                password = ssh_param_dict["password"]
+                            credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
                         else:
-                            password = ssh_param_dict["password"]
-                        credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
-                    else:
-                        #TODO
-                        print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
-                        pass
+                            #TODO
+                            print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
+                            pass
 
-                    print "\n checking the load time:"
-                    command = 'cat /opt/logs/wpeframework.log | grep -inr URLChange:.*url.*'+browser_test_url+'\\" | tail -2'
-                    tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
-                    tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
-                    tdkTestObj.addParameter("credentials",credentials)
-                    tdkTestObj.addParameter("command",command)
-                    tdkTestObj.executeTestCase(expectedResult)
-                    output = tdkTestObj.getResultDetails()
-                    if output != "EXCEPTION":
-                        if len(output.split('\n')) == 4 :
-                            url_triggered_log = output.split('\n')[1]
-                            url_changed_log = output.split('\n')[2]
-                            if '"loaded": "true"' in url_changed_log:
-                                url_triggered_time = getTimeStampFromString(url_triggered_log)
-                                print "\nURL triggered at: {} (UTC)".format(url_triggered_time)
-                                url_changed_time = getTimeStampFromString(url_changed_log)
-                                print "URL changed at: {} (UTC)".format(url_changed_time)
-                                url_triggered_timein_millisec = getTimeInMilliSec(url_triggered_time)
-                                url_changed_timin_millisec = getTimeInMilliSec(url_changed_time)
-                                url_loaded_time = url_changed_timin_millisec - url_triggered_timein_millisec
-                                print "Time taken to load the URL: {} ms\n".format(url_loaded_time)
-                                conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                                result, url_loadtime_threshold_value = getDeviceConfigKeyValue(conf_file,"URL_LOADTIME_THRESHOLD_VALUE")
-                                if result == "SUCCESS":
-                                    if int(url_loaded_time) < int(url_loadtime_threshold_value):
-                                        tdkTestObj.setResultStatus("SUCCESS");
-                                        print "\n The time taken to load the URL is within the expected limit\n"
+                        print "\n checking the load time:"
+                        command = 'cat /opt/logs/wpeframework.log | grep -inr URLChange:.*url.*'+browser_test_url+'\\" | tail -2'
+                        tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
+                        tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
+                        tdkTestObj.addParameter("credentials",credentials)
+                        tdkTestObj.addParameter("command",command)
+                        tdkTestObj.executeTestCase(expectedResult)
+                        output = tdkTestObj.getResultDetails()
+                        result = tdkTestObj.getResult()
+                        if output != "EXCEPTION" and expectedResult in result:
+                            if len(output.split('\n')) == 4 :
+                                url_triggered_log = output.split('\n')[1]
+                                url_changed_log = output.split('\n')[2]
+                                if '"loaded": "true"' in url_changed_log:
+                                    url_triggered_time = getTimeStampFromString(url_triggered_log)
+                                    print "\nURL triggered at: {} (UTC)".format(url_triggered_time)
+                                    url_changed_time = getTimeStampFromString(url_changed_log)
+                                    print "URL changed at: {} (UTC)".format(url_changed_time)
+                                    url_triggered_timein_millisec = getTimeInMilliSec(url_triggered_time)
+                                    url_changed_timin_millisec = getTimeInMilliSec(url_changed_time)
+                                    url_loaded_time = url_changed_timin_millisec - url_triggered_timein_millisec
+                                    print "Time taken to load the URL: {} ms\n".format(url_loaded_time)
+                                    conf_file,result = getConfigFileName(tdkTestObj.realpath)
+                                    result, url_loadtime_threshold_value = getDeviceConfigKeyValue(conf_file,"URL_LOADTIME_THRESHOLD_VALUE")
+                                    if result == "SUCCESS":
+                                        if int(url_loaded_time) < int(url_loadtime_threshold_value):
+                                            tdkTestObj.setResultStatus("SUCCESS");
+                                            print "\n The time taken to load the URL is within the expected limit\n"
+                                        else:
+                                            tdkTestObj.setResultStatus("FAILURE");
+                                            print "\n The time taken to load the URL is greater than the expected limit \n"
                                     else:
                                         tdkTestObj.setResultStatus("FAILURE");
-                                        print "\n The time taken to load the URL is greater than the expected limit \n"
+                                        print "Failed to get the threshold value from config file"
                                 else:
-                                    tdkTestObj.setResultStatus("FAILURE");
-                                    print "Failed to get the threshold value from config file"
+                                    print "\n Unable to load the url:",browser_test_url
+                                    tdkTestObj.setResultStatus("FAILURE")
                             else:
                                 print "\n Unable to load the url:",browser_test_url
                                 tdkTestObj.setResultStatus("FAILURE")
                         else:
-                            print "\n Unable to load the url:",browser_test_url
+                            print "\nError occurred while executing the command:{} in DUT,\n Please check the SSH details\n ".format(command)
                             tdkTestObj.setResultStatus("FAILURE")
                     else:
-                        print "\nError occurred while executing the command:{} in DUT,\n Please check the SSH details\n ".format(command)
+                        print "\nSSH parameters are not configured in Device Configuration file"
                         tdkTestObj.setResultStatus("FAILURE")
                 else:
-                    print "\nSSH parameters are not configured in Device Configuration file"
-                    tdkTestObj.setResultStatus("FAILURE")
+                    print "\nFailed to load the URL ",browser_test_url
+                    print "current url:",new_url
+                    tdkTestObj.setResultStatus("FAILURE");
+                #Set the URL back to previous
+                tdkTestObj = obj.createTestStep('rdkservice_setValue');
+                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                tdkTestObj.addParameter("value",current_url);
+                tdkTestObj.executeTestCase(expectedResult);
+                result = tdkTestObj.getResult();
+                if result == "SUCCESS":
+                    print "\nURL is reverted successfully"
+                    tdkTestObj.setResultStatus("SUCCESS");
+                else:
+                    print "\nFailed to revert the URL"
+                    tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "\nFailed to load the URL ",browser_test_url
-                print "current url:",new_url
                 tdkTestObj.setResultStatus("FAILURE");
-            #Set the URL back to previous
-            tdkTestObj = obj.createTestStep('rdkservice_setValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.addParameter("value",current_url);
-            tdkTestObj.executeTestCase(expectedResult);
-            result = tdkTestObj.getResult();
-            if result == "SUCCESS":
-                print "\nURL is reverted successfully"
-                tdkTestObj.setResultStatus("SUCCESS");
-            else:
-                print "\nFailed to revert the URL"
-                tdkTestObj.setResultStatus("FAILURE");
+                print "Failed to set the URL"
         else:
             tdkTestObj.setResultStatus("FAILURE");
             print "\nFailed to get current URL from webkitbrowser"

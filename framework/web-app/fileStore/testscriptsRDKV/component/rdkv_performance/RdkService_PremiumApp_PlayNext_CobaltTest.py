@@ -137,7 +137,7 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
             tdkTestObj.addParameter("value",params)
             tdkTestObj.executeTestCase(expectedResult)
-            result = tdkTestObj.getResult()
+            result1 = tdkTestObj.getResult()
             time.sleep(40)
             #Click OK to Skip Ad 
             params = '{"keys":[ {"keyCode": 13,"modifiers": [],"delay":1.0}]}'
@@ -145,9 +145,9 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
             tdkTestObj.addParameter("value",params)
             tdkTestObj.executeTestCase(expectedResult)
-            result = tdkTestObj.getResult()
+            result2 = tdkTestObj.getResult()
             time.sleep(50)
-            if result == "SUCCESS":
+            if "SUCCESS" == (result1 and result2):
                 tdkTestObj.setResultStatus("SUCCESS")
                 if validation_dict["validation_required"]:
                     if validation_dict["validation_method"] == "proc_entry":

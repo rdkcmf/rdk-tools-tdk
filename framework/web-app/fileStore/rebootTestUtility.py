@@ -66,37 +66,42 @@ def validateUptime(TimeAfterReboot,validate):
 #FUNCTION TO GET THE INTERFACE STATUS
 #-------------------------------------------------------
 def getIFStatus(IF_name,validate):
-    revert = True
+    output = "FAILURE";
     curr_status = rdkservice_getPluginStatus('org.rdk.Network')
-    if curr_status == 'activated':
-        revert = False
-        status = None
-    else:
-        status = rdkservice_setPluginStatus("org.rdk.Network","activate")
-    output="FAILURE"
-    if status == None:
-        method = "org.rdk.Network.1.isInterfaceEnabled"
-        value='{"interface":"ETHERNET"}'
-        status = rdkservice_setValue(method,value)
-        status = status["enabled"]
-        if status == True:
-            output= "ENABLED"
-        elif validate == "Yes":
-            logger.info( "Ethernet Interface is not up after reboot. Exiting the script")
-            exitScript(StatusInterface,iter_no);
+    if curr_status != "EXCEPTION OCCURRED":
+        if curr_status == "activated":
+            curr_status = "activate"
         else:
-            StatusInterface.append(iter_no)
-            output = "DISABLED";
-        if revert:
-            rev_status = rdkservice_setPluginStatus("org.rdk.Network","deactivate")
+            curr_status = "deactivate"
+
+        status = rdkservice_setPluginStatus("org.rdk.Network","activate")
+        if status == None:
+            method = "org.rdk.Network.1.isInterfaceEnabled"
+            value='{"interface":"ETHERNET"}'
+            status = rdkservice_setValue(method,value)
+            if status != "EXCEPTION OCCURRED":
+                status = status["enabled"]
+            else:
+                status = "EXCEPTION";
+
+            if status == True:
+                output= "ENABLED"
+            elif status == "EXCEPTION":
+                output = "FAILURE";
+            elif validate == "Yes":
+                logger.info("Ethernet Interface is not up after reboot. Exiting the script")
+                exitScript(StatusInterface,iter_no);
+            else:
+                StatusInterface.append(iter_no)
+                output = "DISABLED";
+            rev_status = rdkservice_setPluginStatus("org.rdk.Network",curr_status)
             if rev_status == None:
-                logger.info( "Reverted network plugin status")
+                logger.info("Reverted network plugin status")
             else:
                 logger.info("Unable to revert network plugin status")
-    else:
-        logger.info("Unable to enable network plugin")
+        else:
+            logger.info("Unable to enable network plugin")
     return output;
-
 #------------------------------------------------------
 #VALIDATE THE NUMBER OF PLUGINS AFTER REBOOT
 #------------------------------------------------------
@@ -154,16 +159,21 @@ def validatePluginStatus(statusBeforeReboot,statusAfterReboot,validate):
 #GET THE STATUS OF CONTROLLER UI
 #------------------------------------------------------
 def getUIStatus(validate):
-    url = 'http://'+str(rdkv_performancelib.deviceIP)+':'+str(rdkv_performancelib.devicePort)+'/Service/Controller/UI'
-    statusCode = urllib2.urlopen(url,timeout=3).getcode()
-    if statusCode == 200:
-        return "ACCESSIBLE"
-    elif validate == "Yes":
-        logger.info( "The controller UI is not up after reboot")
-        exitScript(StatusControllerUI,iter_no);
-    else:
-        StatusControllerUI.append(iter_no)
-        return "NOT ACCESSIBLE"
+    try:
+       url = 'http://'+str(rdkv_performancelib.deviceIP)+':'+str(rdkv_performancelib.devicePort)+'/Service/Controller/UI'
+       statusCode = urllib2.urlopen(url,timeout=3).getcode()
+       if statusCode == 200:
+           return "ACCESSIBLE"
+       elif validate == "Yes":
+           logger.info( "The controller UI is not up after reboot")
+           exitScript(StatusControllerUI,iter_no);
+       else:
+           StatusControllerUI.append(iter_no)
+           return "NOT ACCESSIBLE"
+    except Exception as e:
+        print "ERROR!! Exception occurred"
+        print "Error message received: \n",e
+        return "FAILURE"
 
 #------------------------------------------------------
 #EXITING THE SCRIPT IF VALIDATION FAILS

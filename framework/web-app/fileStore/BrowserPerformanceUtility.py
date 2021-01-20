@@ -27,30 +27,35 @@ def check_pre_requisites(obj):
     tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus');
     tdkTestObj.addParameter("plugin","WebKitBrowser");
     tdkTestObj.executeTestCase(expectedResult);
+    webkit_result = tdkTestObj.getResult();
     webkit_status = tdkTestObj.getResultDetails();
 
     tdkTestObj.addParameter("plugin","UX");
     tdkTestObj.executeTestCase(expectedResult);
+    ux_result = tdkTestObj.getResult()
     ux_status = tdkTestObj.getResultDetails();
 
     tdkTestObj.addParameter("plugin","Cobalt");
     tdkTestObj.executeTestCase(expectedResult);
+    cobalt_result = tdkTestObj.getResult()
     cobalt_status = tdkTestObj.getResultDetails();
 
     expected_status_list =["deactivated","suspended","None"]
     expected_webkit_status = "resumed"
     status_list = ["activated","deactivated","resumed","suspended","None"]
     #Check if all the status are valid or not.
-    if all(status in status_list for status in [webkit_status,ux_status,cobalt_status]):
-        tdkTestObj.setResultStatus("SUCCESS");
-    else:
-        tdkTestObj.setResultStatus("FAILURE");
+    if "FAILURE" not in (webkit_result,ux_result,cobalt_result):
+        if all(status in status_list for status in [webkit_status,ux_status,cobalt_status]):
+            tdkTestObj.setResultStatus("SUCCESS");
+        else:
+            tdkTestObj.setResultStatus("FAILURE");
 
-    if ux_status in expected_status_list and cobalt_status in expected_status_list and webkit_status == "resumed":
-        return ("SUCCESS",ux_status,webkit_status,cobalt_status)
+        if ux_status in expected_status_list and cobalt_status in expected_status_list and webkit_status == "resumed":
+            return ("SUCCESS",ux_status,webkit_status,cobalt_status)
+        else:
+            return ("FAILURE",ux_status,webkit_status,cobalt_status)
     else:
-        return ("FAILURE",ux_status,webkit_status,cobalt_status)
-
+        return ("FAILURE",ux_result,webkit_result,cobalt_result)
 #---------------------------------------------------------------------
 #SET PRE_REQUISITES
 #---------------------------------------------------------------------

@@ -125,8 +125,9 @@ if expectedResult in result.upper():
                 tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus')
                 tdkTestObj.addParameter("plugin","WebKitBrowser")
                 tdkTestObj.executeTestCase(expectedResult)
+                result = tdkTestObj.getResult()
                 webkit_status = tdkTestObj.getResultDetails()
-                if webkit_status == 'suspended':
+                if webkit_status == 'suspended' and expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS")
                     print "\nWebKitbrowser Suspended Successfully\n"
                     print "\nResume the WebkitBrowser plugin\n"
@@ -142,8 +143,9 @@ if expectedResult in result.upper():
                         tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus')
                         tdkTestObj.addParameter("plugin","WebKitBrowser")
                         tdkTestObj.executeTestCase(expectedResult)
+                        result = tdkTestObj.getResult()
                         webkit_status = tdkTestObj.getResultDetails()
-                        if webkit_status == 'resumed':
+                        if webkit_status == 'resumed' and expectedResult in result:
                             print "\nWebKitbrowser Resumed Successfully\n"
                             tdkTestObj.setResultStatus("SUCCESS")
                             result_dict = {}
@@ -160,8 +162,9 @@ if expectedResult in result.upper():
                                 tdkTestObj.addParameter('value',float(cpuload))
                                 tdkTestObj.addParameter('threshold',90.0)
                                 tdkTestObj.executeTestCase(expectedResult)
+                                result = tdkTestObj.getResult()
                                 is_high_cpuload = tdkTestObj.getResultDetails()
-                                if is_high_cpuload == "YES" :
+                                if is_high_cpuload == "YES" or expectedResult not in result:
                                     print "\ncpu load is high :{}% after :{} times\n".format(cpuload,iteration)
                                     tdkTestObj.setResultStatus("FAILURE")
                                     completed = False
@@ -186,8 +189,9 @@ if expectedResult in result.upper():
                                 tdkTestObj.addParameter('value',float(memory_usage))
                                 tdkTestObj.addParameter('threshold',90.0)
                                 tdkTestObj.executeTestCase(expectedResult)
+                                result = tdkTestObj.getResult()
                                 is_high_memory_usage = tdkTestObj.getResultDetails()
-                                if is_high_memory_usage == "YES":
+                                if is_high_memory_usage == "YES" or expectedResult not in result:
                                     print "\nmemory usage is high :{}% after {} iterations\n".format(memory_usage,iteration)
                                     tdkTestObj.setResultStatus("FAILURE")
                                     completed = False

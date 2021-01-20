@@ -120,8 +120,9 @@ if expectedResult in result.upper():
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
         tdkTestObj.addParameter("method","WebKitBrowser.1.url");
         tdkTestObj.executeTestCase(expectedResult);
+        result = tdkTestObj.getResult() 
         current_url = tdkTestObj.getResultDetails();
-        if current_url != None:
+        if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             webkit_console_socket = createEventListener(ip,MediaValidationVariables.webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
@@ -133,76 +134,82 @@ if expectedResult in result.upper():
 	    start_time = str(datetime.utcnow()).split()[1]
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
-            print "\nValidate if the URL is set successfully or not"
-            tdkTestObj = obj.createTestStep('rdkservice_getValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.executeTestCase(expectedResult);
-            new_url = tdkTestObj.getResultDetails();
-            if new_url in video_test_url:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "URL(",new_url,") is set successfully"
-                continue_count = 0
-                test_result = ""
-                while True:
-                    if continue_count > 60:
-                        print "app not launched in 60 seconds"
-                        break
-                    if (len(webkit_console_socket.getEventsBuffer())== 0):
-                        time.sleep(1)
-                        continue_count += 1
-                        continue
-                    console_log = webkit_console_socket.getEventsBuffer().pop(0)
-                    if "URL Info:" in console_log or "Connection refused" in console_log:
-                        test_result = getConsoleMessage(console_log)
-                        break;
-                webkit_console_socket.disconnect()
-                if "URL Info:" in test_result:
-                    micosec_frm_start_time = int(start_time.split(".")[-1])
-                    start_time = start_time.replace(start_time.split(".")[-1],"")
-                    start_time = start_time.replace(".",":")
-                    start_time = start_time + str(micosec_frm_start_time/1000)
-                    print "\nApplication URL set in webkit browser at :{} (UTC)".format(start_time)
-                    start_time_millisec = getTimeInMilliSeconds(start_time)
-                    end_time = getTimeFromMsg(test_result)
-                    print "\nApplication launched at: {} (UTC)".format(end_time)
-                    end_time_millisec = getTimeInMilliSeconds(end_time)
-                    app_launch_time = end_time_millisec - start_time_millisec
-                    print "\nTime taken to launch the application: {} milliseconds \n".format(app_launch_time)
-                    conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                    result, app_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"APP_LAUNCH_THRESHOLD VALUE")
-                    if result == "SUCCESS":
-                        if int(app_launch_time) < int(app_launch_threshold_value):
-                            tdkTestObj.setResultStatus("SUCCESS");
-                            print "\n The time taken to launch the app is within the expected limit\n"
+            if expectedResult in result:
+                print "\nValidate if the URL is set successfully or not"
+                tdkTestObj = obj.createTestStep('rdkservice_getValue');
+                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                tdkTestObj.executeTestCase(expectedResult);
+                result = tdkTestObj.getResult()
+                new_url = tdkTestObj.getResultDetails();
+                if new_url in video_test_url and expectedResult in result:
+                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "URL(",new_url,") is set successfully"
+                    continue_count = 0
+                    test_result = ""
+                    while True:
+                        if continue_count > 60:
+                            print "app not launched in 60 seconds"
+                            break
+                        if (len(webkit_console_socket.getEventsBuffer())== 0):
+                            time.sleep(1)
+                            continue_count += 1
+                            continue
+                        console_log = webkit_console_socket.getEventsBuffer().pop(0)
+                        if "URL Info:" in console_log or "Connection refused" in console_log:
+                            test_result = getConsoleMessage(console_log)
+                            break;
+                    webkit_console_socket.disconnect()
+                    if "URL Info:" in test_result:
+                        micosec_frm_start_time = int(start_time.split(".")[-1])
+                        start_time = start_time.replace(start_time.split(".")[-1],"")
+                        start_time = start_time.replace(".",":")
+                        start_time = start_time + str(micosec_frm_start_time/1000)
+                        print "\nApplication URL set in webkit browser at :{} (UTC)".format(start_time)
+                        start_time_millisec = getTimeInMilliSeconds(start_time)
+                        end_time = getTimeFromMsg(test_result)
+                        print "\nApplication launched at: {} (UTC)".format(end_time)
+                        end_time_millisec = getTimeInMilliSeconds(end_time)
+                        app_launch_time = end_time_millisec - start_time_millisec
+                        print "\nTime taken to launch the application: {} milliseconds \n".format(app_launch_time)
+                        conf_file,result = getConfigFileName(tdkTestObj.realpath)
+                        result, app_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"APP_LAUNCH_THRESHOLD VALUE")
+                        if result == "SUCCESS":
+                            if int(app_launch_time) < int(app_launch_threshold_value):
+                                tdkTestObj.setResultStatus("SUCCESS");
+                                print "\n The time taken to launch the app is within the expected limit\n"
+                            else:
+                                tdkTestObj.setResultStatus("FAILURE");
+                                print "\n The time taken to launch the app is greater than the expected limit \n"
                         else:
                             tdkTestObj.setResultStatus("FAILURE");
-                            print "\n The time taken to launch the app is greater than the expected limit \n"
+                            print "Failed to get the threshold value from config file"
                     else:
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "Failed to get the threshold value from config file"
+                        print "error occured during application launch"
+                    #Set the URL back to previous
+                    tdkTestObj = obj.createTestStep('rdkservice_setValue');
+                    tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                    tdkTestObj.addParameter("value",current_url);
+                    tdkTestObj.executeTestCase(expectedResult);
+                    result = tdkTestObj.getResult();
+                    if result == "SUCCESS":
+                        print "URL is reverted successfully"
+                        tdkTestObj.setResultStatus("SUCCESS");
+                    else:
+                        print "Failed to revert the URL"
+                        tdkTestObj.setResultStatus("FAILURE");
                 else:
-                    tdkTestObj.setResultStatus("FAILURE");
-                    print "error occured during application launch"
-                #Set the URL back to previous
-                tdkTestObj = obj.createTestStep('rdkservice_setValue');
-                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-                tdkTestObj.addParameter("value",current_url);
-                tdkTestObj.executeTestCase(expectedResult);
-                result = tdkTestObj.getResult();
-                if result == "SUCCESS":
-                    print "URL is reverted successfully"
-                    tdkTestObj.setResultStatus("SUCCESS");
-                else:
-                    print "Failed to revert the URL"
+                    print "Failed to load the URL %s" %(new_url)
                     tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "Failed to load the URL %s" %(new_url)
+                print "Failed to set the URL"
                 tdkTestObj.setResultStatus("FAILURE");
         else:
             tdkTestObj.setResultStatus("FAILURE");
             print "Unable to get the current URL loaded in webkit"
     else:
         print "Pre conditions are not met"
+        obj.setLoadModuleStatus("FAILURE");
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"

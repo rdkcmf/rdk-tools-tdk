@@ -133,7 +133,8 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("method","WebKitBrowser.1.url");
         tdkTestObj.executeTestCase(expectedResult);
         current_url = tdkTestObj.getResultDetails();
-        if current_url != None:
+        result = tdkTestObj.getResult()
+        if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             webkit_console_socket = createEventListener(ip,StabilityTestVariables.webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
@@ -144,142 +145,149 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("value",channel_change_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
-            print "\nValidate if the URL is set successfully or not"
-            tdkTestObj = obj.createTestStep('rdkservice_getValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.executeTestCase(expectedResult);
-            new_url = tdkTestObj.getResultDetails();
-            if new_url == channel_change_url:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "URL(",new_url,") is set successfully"
-                validate = False
-                continue_count = 0
-                check_channel_tune = True
-                check_play_count = 0
-                error_msg = ""
-                test_time_in_mins = StabilityTestVariables.channel_change_duration
-                test_time_in_millisec = test_time_in_mins * 60000
-                time_limit = int(round(time.time() * 1000)) + test_time_in_millisec
-                while True:
-                    result_dict = {}
-                    if (int(round(time.time() * 1000)) > time_limit ) or (continue_count > 20):
-                        validate = not(continue_count > 20)
-                        break
-                    if (len(webkit_console_socket.getEventsBuffer())== 0):
-                        continue_count += 1
-                        time.sleep(1)
-                        continue
-                    console_log = webkit_console_socket.getEventsBuffer().pop(0)
-                    if check_channel_tune == True:
-                        #checking whether Tuning print is coming
-                        tdkTestObj = obj.createTestStep('rdkservice_checkChannelChangeLog')
-                        tdkTestObj.addParameter('log',console_log)
-                        tdkTestObj.addParameter('text','Tuning to channel')
-                        tdkTestObj.executeTestCase(expectedResult)
-                        result_val = tdkTestObj.getResultDetails()
-                        if result_val == "SUCCESS":
-                            tdkTestObj.setResultStatus("SUCCESS")
-                            check_channel_tune = False
-                            channel_change_log = json.loads(console_log)
-                            remarks = channel_change_log.get("params").get("message").get("text")
-                            continue
-                    else:
-                        #checking for playing event
-                        tdkTestObj = obj.createTestStep('rdkservice_checkChannelChangeLog')
-                        tdkTestObj.addParameter('log',console_log)
-                        tdkTestObj.addParameter('text','Playing')
-                        tdkTestObj.executeTestCase(expectedResult)
-                        result_val = tdkTestObj.getResultDetails()
-                        if result_val == "SUCCESS":
-			    tdkTestObj.setResultStatus("SUCCESS")
-                            check_channel_tune = True
-                            check_play_count = 0
-                            continue_count = 0
-                            tdkTestObj = obj.createTestStep('rdkservice_getCPULoad')
-                            tdkTestObj.executeTestCase(expectedResult)
-                            result = tdkTestObj.getResult()
-                            cpuload = tdkTestObj.getResultDetails()
-                            if (result == "SUCCESS"):
-                                tdkTestObj.setResultStatus("SUCCESS")
-                                #validate the cpuload
-                                tdkTestObj = obj.createTestStep('rdkservice_validateCPULoad')
-                                tdkTestObj.addParameter('value',float(cpuload))
-                                tdkTestObj.addParameter('threshold',90.0)
-                                tdkTestObj.executeTestCase(expectedResult)
-                                is_high_cpuload = tdkTestObj.getResultDetails()
-                                if is_high_cpuload == "YES" :
-                                    error_msg = "\ncpu load is high :{} at channel change :{} times\nchannel_info:{}\n".format(cpuload,channel_change_count,remarks)
-                                    tdkTestObj.setResultStatus("FAILURE")
-                                    break
-                                else:
-                                    tdkTestObj.setResultStatus("SUCCESS")
-                                    print "\ncpu load is:{}% at channel change: {} times\n".format(cpuload,channel_change_count)
-                            else:
-                                tdkTestObj.setResultStatus("FAILURE")
-                                error_msg = "\nUnable to get cpuload\n"
-                                break
-                            tdkTestObj = obj.createTestStep('rdkservice_getMemoryUsage')
-                            tdkTestObj.executeTestCase(expectedResult)
-                            result = tdkTestObj.getResult()
-                            memory_usage = tdkTestObj.getResultDetails()
-                            if (result == "SUCCESS"):
-                                tdkTestObj.setResultStatus("SUCCESS")
-                                #validate memory usage
-                                tdkTestObj = obj.createTestStep('rdkservice_validateMemoryUsage')
-                                tdkTestObj.addParameter('value',float(memory_usage))
-                                tdkTestObj.addParameter('threshold',90.0)
-                                tdkTestObj.executeTestCase(expectedResult)
-                                is_high_memory_usage = tdkTestObj.getResultDetails()
-                                if is_high_memory_usage == "YES":
-                                    error_msg = "\nmemory usage is high :{}% at channel change:{} times\nchannel_info:{}\n".format(memory_usage,channel_change_count,remarks)
-                                    tdkTestObj.setResultStatus("FAILURE")
-                                    break
-                                else:
-                                    tdkTestObj.setResultStatus("SUCCESS")
-                                    print "\nmemory usage is {}% at channel change {} times\n".format(memory_usage,channel_change_count)
-                            else:
-                                error_msg = "\n Unable to get the memory usage\n"
-                                tdkTestObj.setResultStatus("FAILURE")
-                                break
-                            result_dict["iteration"] = channel_change_count
-                            result_dict["remarks"] = remarks
-                            result_dict["cpu_load"] = float(cpuload)
-                            result_dict["memory_usage"] = float(memory_usage)
-                            result_dict_list.append(result_dict)
-                            channel_change_count += 1
-                        else:
-                            check_play_count += 1
-                            if(check_play_count > 4):
-                                error_msg = "\nNot able to play the content after {} times channel change,remarks: {}\n".format(channel_change_count,remarks)
-                                tdkTestObj.setResultStatus("FAILURE")
-                                break
-                if (validate):
-                    print "\nSuccessfully completed {} channel changes in {} minutes\n".format(channel_change_count-1,test_time_in_mins)
-                    tdkTestObj.setResultStatus("SUCCESS")
-                elif(continue_count > 20):
-                    print "\nchannel change didn't happen after {}channel changes\n".format(channel_change_count)
-                    tdkTestObj.setResultStatus("FAILURE")
-                else:
-                    print error_msg
-                webkit_console_socket.disconnect()
-                cpu_mem_info_dict["cpuMemoryDetails"] = result_dict_list
-                json.dump(cpu_mem_info_dict,json_file)
-                json_file.close()
-                #Set the URL back to previous
-                tdkTestObj = obj.createTestStep('rdkservice_setValue');
+            if expectedResult in result:
+                print "\nValidate if the URL is set successfully or not"
+                tdkTestObj = obj.createTestStep('rdkservice_getValue');
                 tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-                tdkTestObj.addParameter("value",current_url);
                 tdkTestObj.executeTestCase(expectedResult);
-                result = tdkTestObj.getResult();
-                if result == "SUCCESS":
-                    print "URL is reverted successfully"
+                new_url = tdkTestObj.getResultDetails();
+                result = tdkTestObj.getResult()
+                if new_url == channel_change_url and expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS");
+                    print "URL(",new_url,") is set successfully"
+                    validate = False
+                    continue_count = 0
+                    check_channel_tune = True
+                    check_play_count = 0
+                    error_msg = ""
+                    test_time_in_mins = StabilityTestVariables.channel_change_duration
+                    test_time_in_millisec = test_time_in_mins * 60000
+                    time_limit = int(round(time.time() * 1000)) + test_time_in_millisec
+                    while True:
+                        result_dict = {}
+                        if (int(round(time.time() * 1000)) > time_limit ) or (continue_count > 20):
+                            validate = not(continue_count > 20)
+                            break
+                        if (len(webkit_console_socket.getEventsBuffer())== 0):
+                            continue_count += 1
+                            time.sleep(1)
+                            continue
+                        console_log = webkit_console_socket.getEventsBuffer().pop(0)
+                        if check_channel_tune == True:
+                            #checking whether Tuning print is coming
+                            tdkTestObj = obj.createTestStep('rdkservice_checkChannelChangeLog')
+                            tdkTestObj.addParameter('log',console_log)
+                            tdkTestObj.addParameter('text','Tuning to channel')
+                            tdkTestObj.executeTestCase(expectedResult)
+                            result_val = tdkTestObj.getResultDetails()
+                            if result_val == "SUCCESS":
+                                tdkTestObj.setResultStatus("SUCCESS")
+                                check_channel_tune = False
+                                channel_change_log = json.loads(console_log)
+                                remarks = channel_change_log.get("params").get("message").get("text")
+                                continue
+                        else:
+                            #checking for playing event
+                            tdkTestObj = obj.createTestStep('rdkservice_checkChannelChangeLog')
+                            tdkTestObj.addParameter('log',console_log)
+                            tdkTestObj.addParameter('text','Playing')
+                            tdkTestObj.executeTestCase(expectedResult)
+                            result_val = tdkTestObj.getResultDetails()
+                            if result_val == "SUCCESS":
+	            	        tdkTestObj.setResultStatus("SUCCESS")
+                                check_channel_tune = True
+                                check_play_count = 0
+                                continue_count = 0
+                                tdkTestObj = obj.createTestStep('rdkservice_getCPULoad')
+                                tdkTestObj.executeTestCase(expectedResult)
+                                result = tdkTestObj.getResult()
+                                cpuload = tdkTestObj.getResultDetails()
+                                if (result == "SUCCESS"):
+                                    tdkTestObj.setResultStatus("SUCCESS")
+                                    #validate the cpuload
+                                    tdkTestObj = obj.createTestStep('rdkservice_validateCPULoad')
+                                    tdkTestObj.addParameter('value',float(cpuload))
+                                    tdkTestObj.addParameter('threshold',90.0)
+                                    tdkTestObj.executeTestCase(expectedResult)
+                                    result = tdkTestObj.getResult()
+                                    is_high_cpuload = tdkTestObj.getResultDetails()
+                                    if is_high_cpuload == "YES" or expectedResult not in result:
+                                        error_msg = "\ncpu load is high :{} at channel change :{} times\nchannel_info:{}\n".format(cpuload,channel_change_count,remarks)
+                                        tdkTestObj.setResultStatus("FAILURE")
+                                        break
+                                    else:
+                                        tdkTestObj.setResultStatus("SUCCESS")
+                                        print "\ncpu load is:{}% at channel change: {} times\n".format(cpuload,channel_change_count)
+                                else:
+                                    tdkTestObj.setResultStatus("FAILURE")
+                                    error_msg = "\nUnable to get cpuload\n"
+                                    break
+                                tdkTestObj = obj.createTestStep('rdkservice_getMemoryUsage')
+                                tdkTestObj.executeTestCase(expectedResult)
+                                result = tdkTestObj.getResult()
+                                memory_usage = tdkTestObj.getResultDetails()
+                                if (result == "SUCCESS"):
+                                    tdkTestObj.setResultStatus("SUCCESS")
+                                    #validate memory usage
+                                    tdkTestObj = obj.createTestStep('rdkservice_validateMemoryUsage')
+                                    tdkTestObj.addParameter('value',float(memory_usage))
+                                    tdkTestObj.addParameter('threshold',90.0)
+                                    tdkTestObj.executeTestCase(expectedResult)
+                                    result = tdkTestObj.getResult()
+                                    is_high_memory_usage = tdkTestObj.getResultDetails()
+                                    if is_high_memory_usage == "YES" or expectedResult not in result:
+                                        error_msg = "\nmemory usage is high :{}% at channel change:{} times\nchannel_info:{}\n".format(memory_usage,channel_change_count,remarks)
+                                        tdkTestObj.setResultStatus("FAILURE")
+                                        break
+                                    else:
+                                        tdkTestObj.setResultStatus("SUCCESS")
+                                        print "\nmemory usage is {}% at channel change {} times\n".format(memory_usage,channel_change_count)
+                                else:
+                                    error_msg = "\n Unable to get the memory usage\n"
+                                    tdkTestObj.setResultStatus("FAILURE")
+                                    break
+                                result_dict["iteration"] = channel_change_count
+                                result_dict["remarks"] = remarks
+                                result_dict["cpu_load"] = float(cpuload)
+                                result_dict["memory_usage"] = float(memory_usage)
+                                result_dict_list.append(result_dict)
+                                channel_change_count += 1
+                            else:
+                                check_play_count += 1
+                                if(check_play_count > 4):
+                                    error_msg = "\nNot able to play the content after {} times channel change,remarks: {}\n".format(channel_change_count,remarks)
+                                    tdkTestObj.setResultStatus("FAILURE")
+                                    break
+                    if (validate):
+                        print "\nSuccessfully completed {} channel changes in {} minutes\n".format(channel_change_count-1,test_time_in_mins)
+                        tdkTestObj.setResultStatus("SUCCESS")
+                    elif(continue_count > 20):
+                        print "\nchannel change didn't happen after {}channel changes\n".format(channel_change_count)
+                        tdkTestObj.setResultStatus("FAILURE")
+                    else:
+                        print error_msg
+                    webkit_console_socket.disconnect()
+                    cpu_mem_info_dict["cpuMemoryDetails"] = result_dict_list
+                    json.dump(cpu_mem_info_dict,json_file)
+                    json_file.close()
+                    #Set the URL back to previous
+                    tdkTestObj = obj.createTestStep('rdkservice_setValue');
+                    tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                    tdkTestObj.addParameter("value",current_url);
+                    tdkTestObj.executeTestCase(expectedResult);
+                    result = tdkTestObj.getResult();
+                    if result == "SUCCESS":
+                        print "URL is reverted successfully"
+                        tdkTestObj.setResultStatus("SUCCESS");
+                    else:
+                        print "Failed to revert the URL"
+                        tdkTestObj.setResultStatus("FAILURE");
                 else:
-                    print "Failed to revert the URL"
+                    print "Failed to load the URL:{}, Current URL:{}".format(channel_change_url,new_url)
                     tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "Failed to load the URL:{}, Current URL:{}".format(channel_change_url,new_url)
-                tdkTestObj.setResultStatus("FAILURE");
+                tdkTestObj.setResultStatus("FAILURE")
+                print "Failed to set the URL"
         else:
             tdkTestObj.setResultStatus("FAILURE");
             print "Unable to get the current URL loaded in webkit"

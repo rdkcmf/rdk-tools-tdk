@@ -111,7 +111,8 @@ if expectedResult in result.upper():
     tdkTestObj.addParameter("deviceIP",obj.IP)
     tdkTestObj.executeTestCase(expectedResult)
     ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
-    if status == "SUCCESS" and ssh_param_dict != {}:
+    result = tdkTestObj.getResult()
+    if status == "SUCCESS" and ssh_param_dict != {} and expectedResult in result:
         print "\nPre conditions for the test are set successfully"
         print "\nSuspend the WebkitBrowser plugin :\n"
         params = '{"callsign":"WebKitBrowser"}'
@@ -127,8 +128,9 @@ if expectedResult in result.upper():
             tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus')
             tdkTestObj.addParameter("plugin","WebKitBrowser")
             tdkTestObj.executeTestCase(expectedResult)
+            result = tdkTestObj.getResult()
             webkit_status = tdkTestObj.getResultDetails()
-            if webkit_status == 'suspended':
+            if webkit_status == 'suspended' and expectedResult in result:
                 tdkTestObj.setResultStatus("SUCCESS")
                 time.sleep(10)
                 print "\nWebKitbrowser Suspended Successfully\n"
@@ -147,7 +149,8 @@ if expectedResult in result.upper():
                     tdkTestObj.addParameter("plugin","WebKitBrowser")
                     tdkTestObj.executeTestCase(expectedResult)
                     webkit_status = tdkTestObj.getResultDetails()
-                    if webkit_status == 'resumed':
+                    result = tdkTestObj.getResult()
+                    if webkit_status == 'resumed' and expectedResult in result:
                         print "\nWebKitbrowser Resumed Successfully\n"
                         tdkTestObj.setResultStatus("SUCCESS")
                         time.sleep(10)
@@ -169,7 +172,8 @@ if expectedResult in result.upper():
                         tdkTestObj.addParameter("command",command)
                         tdkTestObj.executeTestCase(expectedResult)
                         output = tdkTestObj.getResultDetails()
-                        if output != "EXCEPTION":
+                        result = tdkTestObj.getResult()
+                        if output != "EXCEPTION" and expectedResult in result:
                             if len(output.split('\n')) == 4 :
                                 suspended_log = output.split('\n')[1]
                                 resumed_log = output.split('\n')[2]

@@ -181,8 +181,9 @@ if expectedResult in result.upper():
                                             tdkTestObj.addParameter('value',float(cpuload))
                                             tdkTestObj.addParameter('threshold',90.0)
                                             tdkTestObj.executeTestCase(expectedResult)
+                                            result = tdkTestObj.getResult()
                                             is_high_cpuload = tdkTestObj.getResultDetails()
-                                            if is_high_cpuload == "YES" :
+                                            if is_high_cpuload == "YES"  or expectedResult not in result:
                                                 print "\n cpu load is high :{}%".format(cpuload)
                                                 tdkTestObj.setResultStatus("FAILURE")
                                             else:
@@ -203,8 +204,9 @@ if expectedResult in result.upper():
                                             tdkTestObj.addParameter('value',float(memory_usage))
                                             tdkTestObj.addParameter('threshold',90.0)
                                             tdkTestObj.executeTestCase(expectedResult)
+                                            result = tdkTestObj.getResult()
                                             is_high_memory_usage = tdkTestObj.getResultDetails()
-                                            if is_high_memory_usage == "YES":
+                                            if is_high_memory_usage == "YES" or expectedResult not in result:
                                                 print "\nmemory usage is high :{}%\n".format(memory_usage)
                                                 tdkTestObj.setResultStatus("FAILURE")
                                             else:

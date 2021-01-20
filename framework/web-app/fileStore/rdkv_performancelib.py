@@ -28,14 +28,11 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common import exceptions
 from SSHUtility import *
 import re
-from os import path
-import rebootTestUtility;
 
 deviceIP=""
 devicePort=""
 deviceName=""
 deviceType=""
-libObj=""
 #METHODS
 #---------------------------------------------------------------
 #INITIALIZE THE MODULE
@@ -45,8 +42,6 @@ def init_module(libobj,port,deviceInfo):
     global devicePort
     global deviceName
     global deviceType
-    global libObj
-    libObj=libobj;
     deviceIP = libobj.ip;
     devicePort = port
     deviceName = deviceInfo["devicename"]
@@ -64,38 +59,22 @@ def execute_step(data):
         json_response = json.loads(response.content)
         return json_response.get("result");
     except requests.exceptions.RequestException as e:
-        exceptionExit(e);
+        print "ERROR!! \nEXCEPTION OCCURRED WHILE EXECUTING CURL COMMANDS!!"
+        print "Error message received :\n",e;
+        return "EXCEPTION OCCURRED"
 
-#----------------------------------------------------------------
-#Exit the script gracefull when exception occurs
-#----------------------------------------------------------------
-def exceptionExit(error):
-    executeJson = json.loads(libObj.jsonMsgValue)
-    params = executeJson["params"]
-    method = params["method"]
-    componentName = params["module"]
-    output_file = '{}logs/logs/{}_{}_{}_RebootScriptLog.txt'.format(libObj.realpath,str(libObj.execID),str(libObj.execDevId),str(libObj.resultId))
-    if path.exists(output_file):
-        rebootTestUtility.logger.info("\n\n ERROR!!! Exception occured at %s",method)
-        rebootTestUtility.logger.info("\nError message recieved: \n\n%s", error)
-        rebootTestUtility.logger.info("\nEXITING SCRIPT!!!")
-    else:
-        print "\n\n ERROR!!! Exception occured at ",method
-        print "\nError message recieved: \n\n", error
-        print "\nEXITING SCRIPT!!!"
-    exit();
 #-----------------------------------------------------------------
 #GET PLUGIN STATUS
 #-----------------------------------------------------------------
 def rdkservice_getPluginStatus(plugin):
     data = '"method": "Controller.1.status@'+plugin+'"'
     result = execute_step(data)
-    if result != None:
+    if result != None and result != "EXCEPTION OCCURRED":
         for x in result:
             WebKitStatus=x["state"]
         return WebKitStatus
     else:
-        return "None"
+        return result;
 
 #-----------------------------------------------------------------
 #GET THE STATUS OF ALL PLUGIN
@@ -104,15 +83,18 @@ def rdkservice_getAllPluginStatus():
     statusofPlugin=[];
     data = '"method": "Controller.1.status"'
     result = execute_step(data)
-    for x in result:
-        plugin = x["callsign"]
-        state = x["state"]
-        if "autostart" in x.keys():
-            autostart = x["autostart"]
-        else:
-            autostart = "null"
-        statusofPlugin.append([plugin,state,autostart]);
-    return statusofPlugin;
+    if result != "EXCEPTION OCCURRED":
+        for x in result:
+            plugin = x["callsign"]
+            state = x["state"]
+            if "autostart" in x.keys():
+                autostart = x["autostart"]
+            else:
+                autostart = "null"
+            statusofPlugin.append([plugin,state,autostart]);
+        return statusofPlugin;
+    else:
+        return result;
 
 #------------------------------------------------------------------
 #SET PLUGIN STATUS
@@ -144,14 +126,16 @@ def rdkservice_getValue(method):
 def rdkservice_getReqValueFromResult(method,reqValue):
     data = '"method": "'+method+'"'
     result = execute_step(data)
-    value = result[reqValue]
-    return value
+    if result != "EXCEPTION OCCURRED":
+        value = result[reqValue]
+        return value
+    else:
+        return result
 #------------------------------------------------------------------
 #SET VALUE FOR A METHOD
 #------------------------------------------------------------------
 def rdkservice_setValue(method,value):
     data = '"method": "'+method+'","params": '+value
-    print data
     result = execute_step(data)
     return result
 
@@ -160,8 +144,11 @@ def rdkservice_setValue(method,value):
 #------------------------------------------------------------------
 def rdkservice_getNoOfPlugins():
     status = rdkservice_getAllPluginStatus();
-    NoofPlugins = len(status)
-    return  NoofPlugins;
+    if status != "EXCEPTION OCCURRED":
+        NoofPlugins = len(status)
+        return  NoofPlugins;
+    else:
+        return status;
 
 #-------------------------------------------------------------------
 #SET WEBDRIVER AND OPEN CHROME BROWSER
@@ -178,6 +165,7 @@ def openChromeBrowser(url):
    except Exception as error:
         print "Got exception while opening the browser"
         print error
+        driver = "EXCEPTION OCCURRED"
    return driver;
 
 #-------------------------------------------------------------------
@@ -187,35 +175,38 @@ def rdkservice_getBrowserScore_CSS3():
    try:
         webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
         driver = openChromeBrowser(webinspectURL);
-        time.sleep(10)
-        action = ActionChains(driver)
-        source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/li[2]/span/span[1]/span[2]/span[2]')
-        action.move_to_element(source).context_click().perform()
-        time.sleep(10)
-        options = driver.find_elements_by_class_name('soft-context-menu')
-        try:
-            for option in options:
-                current_option = option.find_elements_by_class_name('item')
-                for item in current_option:
-                    if "Expand All" in item.text:
-                        item.click()
-        except exceptions.StaleElementReferenceException,e:
-            pass
-        time.sleep(10)
-        browser_score= driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol/ol/li[2]/span/span[2]').text
-        print "\nThe Browser score using CSS3 test is : ",browser_score
-        print "\n Subcategory scores:\n"
-        print "===================================="
-        for i in range(1,92):
-            sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li[1]/span/span').text
+        if driver != "EXCEPTION OCCURRED":
+            time.sleep(10)
+            action = ActionChains(driver)
+            source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/li[2]/span/span[1]/span[2]/span[2]')
+            action.move_to_element(source).context_click().perform()
+            time.sleep(10)
+            options = driver.find_elements_by_class_name('soft-context-menu')
+            try:
+                for option in options:
+                    current_option = option.find_elements_by_class_name('item')
+                    for item in current_option:
+                        if "Expand All" in item.text:
+                            item.click()
+            except exceptions.StaleElementReferenceException,e:
+                pass
+            time.sleep(10)
+            browser_score= driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol/ol/li[2]/span/span[2]').text
+            print "\nThe Browser score using CSS3 test is : ",browser_score
+            print "\n Subcategory scores:\n"
+            print "===================================="
+            for i in range(1,92):
+                sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li[1]/span/span').text
 
-            parent = driver.find_elements_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li')
-            count = len(parent)
-            score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li['+str(count-1)+']/span/span[2]').text
-            print sub_category + '  :  ' + score
-        print '\n'
-        time.sleep(5)
-        driver.quit()
+                parent = driver.find_elements_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li')
+                count = len(parent)
+                score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li['+str(count-1)+']/span/span[2]').text
+                print sub_category + '  :  ' + score
+            print '\n'
+            time.sleep(5)
+            driver.quit()
+        else:
+            browser_score = "Unable to get the browser score"
    except Exception as error:
         print "Got exception while getting the browser score"
         print error
@@ -230,35 +221,38 @@ def rdkservice_getBrowserScore_Octane():
    try:
         webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
         driver = openChromeBrowser(webinspectURL);
-        time.sleep(10)
-        action = ActionChains(driver)
-        source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/li[2]')
-        action.move_to_element(source).context_click().perform()
-        time.sleep(10)
-        options = driver.find_elements_by_class_name('soft-context-menu')
-        try:
-            for option in options:
-                current_option = option.find_elements_by_class_name('item')
-                for item in current_option:
-                    if "Expand All" in item.text:
-                        item.click()
-        except exceptions.StaleElementReferenceException,e:
-            pass
-        time.sleep(10)
-        browser_score= driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol/ol/li[1]/span/span[2]').text
-        print "\nThe Browser score using Octane test is : ",browser_score
-        print "\n Subcategory scores:\n"
-        print "===================================="
-        for i in range(1,5):
-            for j in range(1,5):
-                sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol['+str(i)+']/ol['+str(j)+']/ol/li[1]/span/span[2]').text
-                score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol['+str(i)+']/ol['+str(j)+']/ol/li[2]/span/span[2]').text
-                print sub_category + '     :    ' + score
-        sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol[4]/ol[5]/ol/li[1]/span/span[2]').text
-        score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol[4]/ol[5]/ol/li[2]/span/span[2]').text
-        print sub_category + '     :    ' + score + '\n'
-        time.sleep(10)
-        driver.quit()
+        if driver != "EXCEPTION OCCURRED":
+            time.sleep(10)
+            action = ActionChains(driver)
+            source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/li[2]')
+            action.move_to_element(source).context_click().perform()
+            time.sleep(10)
+            options = driver.find_elements_by_class_name('soft-context-menu')
+            try:
+                for option in options:
+                    current_option = option.find_elements_by_class_name('item')
+                    for item in current_option:
+                        if "Expand All" in item.text:
+                            item.click()
+            except exceptions.StaleElementReferenceException,e:
+                pass
+            time.sleep(10)
+            browser_score= driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol/ol/li[1]/span/span[2]').text
+            print "\nThe Browser score using Octane test is : ",browser_score
+            print "\n Subcategory scores:\n"
+            print "===================================="
+            for i in range(1,5):
+                for j in range(1,5):
+                    sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol['+str(i)+']/ol['+str(j)+']/ol/li[1]/span/span[2]').text
+                    score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol['+str(i)+']/ol['+str(j)+']/ol/li[2]/span/span[2]').text
+                    print sub_category + '     :    ' + score
+            sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol[4]/ol[5]/ol/li[1]/span/span[2]').text
+            score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol[4]/ol[5]/ol/li[2]/span/span[2]').text
+            print sub_category + '     :    ' + score + '\n'
+            time.sleep(10)
+            driver.quit()
+        else:
+            browser_score = "Unable to get the browser score"
    except Exception as error:
         print "Got exception while getting the browser score"
         print error
@@ -322,37 +316,40 @@ def rdkservice_getBrowserScore_HTML5():
         webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
         print "url:",webinspectURL
         driver = openChromeBrowser(webinspectURL);
-        time.sleep(10)
-        action = ActionChains(driver)
-        source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/li[2]/span/span[1]/span[1]')
-        action.move_to_element(source).context_click().perform()
-        time.sleep(10)
-        options = driver.find_elements_by_class_name('soft-context-menu')
-        try:
-            for option in options:
-                current_option = option.find_elements_by_class_name('item')
-                for item in current_option:
-                    if "Expand All" in item.text:
-                        item.click()
-        except exceptions.StaleElementReferenceException,e:
-            pass
-        time.sleep(10)
-        browser_score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol[3]/ol[1]/ol[1]/ol/li[2]/span/span[2]').text
-        max_browser_score_text = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[1]/ol[1]/ol/li[3]/span/span[2]').text
-        browser_score = browser_score + ' ' + max_browser_score_text
-        print "\n Browser score from HTML5 test: {}".format(browser_score)
-	print "\n Subcategory scores:\n"
-        print "===================================="
-        for i in range(1,3):
-            for j in range(1,5):
-                parent = driver.find_elements_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[2]/ol/ol['+str(i)+']/ol/ol['+str(j)+']/ol')
-                count = len(parent)
-                for k in range(2,count+1):
-                   sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[2]/ol/ol['+str(i)+']/ol/ol['+str(j)+']/ol['+str(k)+']/ol[1]/ol/ol/li[1]/span/span').text
-                   score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[2]/ol/ol['+str(i)+']/ol/ol['+str(j)+']/ol['+str(k)+']/ol[1]/ol/ol/ol/ol/li[1]/span/span[2]').text
-                   print "{}   :{}".format(sub_category,score)
-        time.sleep(5)
-        driver.quit()
+        if driver != "EXCEPTION OCCURRED":
+            time.sleep(10)
+            action = ActionChains(driver)
+            source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/li[2]/span/span[1]/span[1]')
+            action.move_to_element(source).context_click().perform()
+            time.sleep(10)
+            options = driver.find_elements_by_class_name('soft-context-menu')
+            try:
+                for option in options:
+                    current_option = option.find_elements_by_class_name('item')
+                    for item in current_option:
+                        if "Expand All" in item.text:
+                            item.click()
+            except exceptions.StaleElementReferenceException,e:
+                pass
+            time.sleep(10)
+            browser_score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol[3]/ol[1]/ol[1]/ol/li[2]/span/span[2]').text
+            max_browser_score_text = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[1]/ol[1]/ol/li[3]/span/span[2]').text
+            browser_score = browser_score + ' ' + max_browser_score_text
+            print "\n Browser score from HTML5 test: {}".format(browser_score)
+	    print "\n Subcategory scores:\n"
+            print "===================================="
+            for i in range(1,3):
+                for j in range(1,5):
+                    parent = driver.find_elements_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[2]/ol/ol['+str(i)+']/ol/ol['+str(j)+']/ol')
+                    count = len(parent)
+                    for k in range(2,count+1):
+                       sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[2]/ol/ol['+str(i)+']/ol/ol['+str(j)+']/ol['+str(k)+']/ol[1]/ol/ol/li[1]/span/span').text
+                       score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[2]/ol/ol['+str(i)+']/ol/ol['+str(j)+']/ol['+str(k)+']/ol[1]/ol/ol/ol/ol/li[1]/span/span[2]').text
+                       print "{}   :{}".format(sub_category,score)
+            time.sleep(5)
+            driver.quit()
+        else:
+            browser_score = "Unable to get the browser score"
    except Exception as error:
         print "Got exception while getting the browser score"
         print error
@@ -368,36 +365,39 @@ def rdkservice_getBrowserScore_SunSpider():
         browser_score = ''
         webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
         driver = openChromeBrowser(webinspectURL);
-        time.sleep(60)
-        action = ActionChains(driver)
-        source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/li[6]/span/span[1]/span[1]')
-        action.move_to_element(source).context_click().perform()
-        time.sleep(10)
-        options = driver.find_elements_by_class_name('soft-context-menu')
-        try:
-            for option in options:
-                current_option = option.find_elements_by_class_name('item')
-                for item in current_option:
-                    if "Expand All" in item.text:
-                        item.click()
-        except exceptions.StaleElementReferenceException,e:
-            pass
-        time.sleep(10)
-        parent = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol')
-        children = parent.find_elements_by_tag_name("li")
-        text_values = ''
-        total_score_text = 'Total:'
-	for child in children:
-            text_values += child.text
-            if total_score_text in child.text:
-                browser_score = child.text
-        if browser_score == '':
-            browser_score = "FAILURE"
+        if driver != "EXCEPTION OCCURRED":
+            time.sleep(60)
+            action = ActionChains(driver)
+            source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/li[6]/span/span[1]/span[1]')
+            action.move_to_element(source).context_click().perform()
+            time.sleep(10)
+            options = driver.find_elements_by_class_name('soft-context-menu')
+            try:
+                for option in options:
+                    current_option = option.find_elements_by_class_name('item')
+                    for item in current_option:
+                        if "Expand All" in item.text:
+                            item.click()
+            except exceptions.StaleElementReferenceException,e:
+                pass
+            time.sleep(10)
+            parent = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol')
+            children = parent.find_elements_by_tag_name("li")
+            text_values = ''
+            total_score_text = 'Total:'
+	    for child in children:
+                text_values += child.text
+                if total_score_text in child.text:
+                    browser_score = child.text
+            if browser_score == '':
+                browser_score = "FAILURE"
+            else:
+                browser_score = browser_score.replace("Total: ","")
+            driver.quit()
+            text_values = text_values.replace('<br>','\n').replace('</pre>','\n')
+            print "Details of SunSider Test:\n",text_values
         else:
-            browser_score = browser_score.replace("Total: ","")
-        driver.quit()
-        text_values = text_values.replace('<br>','\n').replace('</pre>','\n')
-        print "Details of SunSider Test:\n",text_values
+            browser_score = "FAILURE"
    except Exception as error:
         print "Got exception while getting the browser score"
         print error

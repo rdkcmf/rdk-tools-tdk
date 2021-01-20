@@ -121,69 +121,75 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("method","DeviceInfo.1.systeminfo")
         tdkTestObj.addParameter("reqValue","uptime")
         tdkTestObj.executeTestCase(expectedResult);
-        uptime = int(tdkTestObj.getResultDetails())
-        if uptime < 240:
-            print "Device is rebooted and uptime is: {}".format(uptime)
-            ssh_param_dict = get_ssh_params(obj)
-            if ssh_param_dict != {}:
-                time.sleep(10)
-                if ssh_param_dict["ssh_method"] == "directSSH":
-                    if ssh_param_dict["password"] == "None":
-                        password = ""
+        result = tdkTestObj.getResult()
+        if expectedResult in result:
+            uptime = int(tdkTestObj.getResultDetails())
+            if uptime < 240:
+                print "Device is rebooted and uptime is: {}".format(uptime)
+                ssh_param_dict = get_ssh_params(obj)
+                if ssh_param_dict != {}:
+                    time.sleep(10)
+                    if ssh_param_dict["ssh_method"] == "directSSH":
+                        if ssh_param_dict["password"] == "None":
+                            password = ""
+                        else:
+                            password = ssh_param_dict["password"]
+                        credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
                     else:
-                        password = ssh_param_dict["password"]
-                    credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
-                else:
-                    #TODO
-                    print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
-                    pass
-                command = 'cat /opt/logs/nlmon.log | grep -inr "eth0 up"| head -n 1'
-                check_print = '/lib/rdk/networkLinkEvent.sh'
-                #get the log line containing the interface_up info from nlmon.log
-                tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
-                tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
-                tdkTestObj.addParameter("credentials",credentials)
-                tdkTestObj.addParameter("command",command)
-                tdkTestObj.executeTestCase(expectedResult)
-                output = tdkTestObj.getResultDetails()
-                if output != "EXCEPTION":
-                    interface_up_list = output.split('\n')
-                    interface_up_line = ""
-                    for item in interface_up_list:
-                         if check_print in item:
-                            interface_up_line = item
-                    if interface_up_line != "":
-                        interface_up_time = getTimeStampFromString(interface_up_line)
-                        print "\nDevice reboot initiated at :{} (UTC)".format(start_time)
-                        print "eth0 interface became up  at :{} (UTC)  ".format(interface_up_time)
-                        start_time_millisec = getTimeInMilliSec(start_time)
-                        interface_up_time_millisec = getTimeInMilliSec(interface_up_time)
-                        interface_uptime = interface_up_time_millisec - start_time_millisec
-                        print "Time taken for the eth0 interface to up after reboot : {} ms\n".format(interface_uptime)
-                        conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                        result, if_uptime_threshold_value = getDeviceConfigKeyValue(conf_file,"IF_UPTIME_THRESHOLD_VALUE")
-                        if result == "SUCCESS":
-                            if int(interface_uptime) < int(if_uptime_threshold_value):
-                                tdkTestObj.setResultStatus("SUCCESS");
-                                print "\n The time taken for eth0 interface to up after reboot is within the expected limit\n"
+                        #TODO
+                        print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
+                        pass
+                    command = 'cat /opt/logs/nlmon.log | grep -inr "eth0 up"| head -n 1'
+                    check_print = '/lib/rdk/networkLinkEvent.sh'
+                    #get the log line containing the interface_up info from nlmon.log
+                    tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
+                    tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
+                    tdkTestObj.addParameter("credentials",credentials)
+                    tdkTestObj.addParameter("command",command)
+                    tdkTestObj.executeTestCase(expectedResult)
+                    result = tdkTestObj.getResult()
+                    output = tdkTestObj.getResultDetails()
+                    if output != "EXCEPTION" and expectedResult in result:
+                        interface_up_list = output.split('\n')
+                        interface_up_line = ""
+                        for item in interface_up_list:
+                             if check_print in item:
+                                interface_up_line = item
+                        if interface_up_line != "":
+                            interface_up_time = getTimeStampFromString(interface_up_line)
+                            print "\nDevice reboot initiated at :{} (UTC)".format(start_time)
+                            print "eth0 interface became up  at :{} (UTC)  ".format(interface_up_time)
+                            start_time_millisec = getTimeInMilliSec(start_time)
+                            interface_up_time_millisec = getTimeInMilliSec(interface_up_time)
+                            interface_uptime = interface_up_time_millisec - start_time_millisec
+                            print "Time taken for the eth0 interface to up after reboot : {} ms\n".format(interface_uptime)
+                            conf_file,result = getConfigFileName(tdkTestObj.realpath)
+                            result, if_uptime_threshold_value = getDeviceConfigKeyValue(conf_file,"IF_UPTIME_THRESHOLD_VALUE")
+                            if result == "SUCCESS":
+                                if int(interface_uptime) < int(if_uptime_threshold_value):
+                                    tdkTestObj.setResultStatus("SUCCESS");
+                                    print "\n The time taken for eth0 interface to up after reboot is within the expected limit\n"
+                                else:
+                                    tdkTestObj.setResultStatus("FAILURE");
+                                    print "\n The time taken for eth0 interface to up after reboot is greater than the expected limit \n"
                             else:
                                 tdkTestObj.setResultStatus("FAILURE");
-                                print "\n The time taken for eth0 interface to up after reboot is greater than the expected limit \n"
+                                print "Failed to get the threshold value from config file"
                         else:
-                            tdkTestObj.setResultStatus("FAILURE");
-                            print "Failed to get the threshold value from config file"
+                            print "eth0 interface is not up in DUT"
+                            tdkTestObj.setResultStatus("FAILURE")
                     else:
-                        print "eth0 interface is not up in DUT"
+                        print "Error occurred while executing the command:{} in DUT, \n Please check the SSH details \n".format(command)
                         tdkTestObj.setResultStatus("FAILURE")
                 else:
-                    print "Error occurred while executing the command:{} in DUT, \n Please check the SSH details \n".format(command)
+                    print "please configure the details in device configuration file"
                     tdkTestObj.setResultStatus("FAILURE")
             else:
-                print "please configure the details in device configuration file"
+                print "Device is not rebooted, uptime:{}".format(uptime)
                 tdkTestObj.setResultStatus("FAILURE")
         else:
-            print "Device is not rebooted, uptime:{}".format(uptime)
             tdkTestObj.setResultStatus("FAILURE")
+            print "Failed to get the uptime"
     else:
         print "Error occurred during reboot"
         tdkTestObj.setResultStatus("FAILURE")

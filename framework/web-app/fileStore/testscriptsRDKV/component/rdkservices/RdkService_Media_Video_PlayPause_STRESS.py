@@ -157,7 +157,8 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("method","WebKitBrowser.1.url");
         tdkTestObj.executeTestCase(expectedResult);
         current_url = tdkTestObj.getResultDetails();
-        if current_url != None:
+        result = tdkTestObj.getResult()
+        if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             webkit_console_socket = createEventListener(ip,MediaValidationVariables.webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
@@ -168,76 +169,82 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("value",video_test_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
-            print "\nValidate if the URL is set successfully or not"
-            tdkTestObj = obj.createTestStep('rdkservice_getValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.executeTestCase(expectedResult);
-            new_url = tdkTestObj.getResultDetails();
-            if new_url in video_test_url:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "URL(",new_url,") is set successfully"
-                if validation_dict["proc_check"]:
-                    proc_file = validation_dict["proc_file"]
-                    if validation_dict["ssh_method"] == "directSSH":
-                        if validation_dict["password"] == "None":
-                            password = ""
-                        else:
-                            password = validation_dict["password"]
-                        credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
-                    else:
-                        #TODO
-                        print "selected ssh method is {}".format(validation_dict["ssh_method"])
-                        pass
-                    print "\nProc entry validation for video player test is enabled\n"
-                else:
-                    print "\nProc entry validation for video player test is skipped\n"
-                test_result = ""
-                proc_check_list = []
-                while True:
-                    if (len(webkit_console_socket.getEventsBuffer())== 0):
-                        time.sleep(1)
-                        continue
-                    console_log = webkit_console_socket.getEventsBuffer().pop(0)
-                    dispConsoleLog(console_log)
-                    if "Observed Event: play" in console_log and validation_dict["proc_check"]:
-                        proc_check_list.append(checkProcEntry(validation_dict["ssh_method"],credentials,proc_file,"started"));
-                        time.sleep(1);
-                    if "TEST RESULT:" in console_log or "Connection refused" in console_log:
-                        test_result = getConsoleMessage(console_log)
-                        break;
-                webkit_console_socket.disconnect()
-                if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
-                    print "Video play is fine"
-                    print "[TEST EXECUTION RESULT]: SUCCESS"
-                    tdkTestObj.setResultStatus("SUCCESS");
-                elif "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
-                    print "Decoder proc entry check returns failure.Video not playing fine"
-                    print "[TEST EXECUTION RESULT]: FAILURE"
-                    tdkTestObj.setResultStatus("FAILURE");
-                else:
-                    print "Video not playing fine"
-                    print "[TEST EXECUTION RESULT]: FAILURE"
-                    tdkTestObj.setResultStatus("FAILURE");
-                #Set the URL back to previous
-                tdkTestObj = obj.createTestStep('rdkservice_setValue');
+            if expectedResult in result:
+                print "\nValidate if the URL is set successfully or not"
+                tdkTestObj = obj.createTestStep('rdkservice_getValue');
                 tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-                tdkTestObj.addParameter("value",current_url);
                 tdkTestObj.executeTestCase(expectedResult);
-                result = tdkTestObj.getResult();
-                if result == "SUCCESS":
-                    print "URL is reverted successfully"
+                new_url = tdkTestObj.getResultDetails();
+                result = tdkTestObj.getResult()
+                if new_url in video_test_url and expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS");
+                    print "URL(",new_url,") is set successfully"
+                    if validation_dict["proc_check"]:
+                        proc_file = validation_dict["proc_file"]
+                        if validation_dict["ssh_method"] == "directSSH":
+                            if validation_dict["password"] == "None":
+                                password = ""
+                            else:
+                                password = validation_dict["password"]
+                            credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+                        else:
+                            #TODO
+                            print "selected ssh method is {}".format(validation_dict["ssh_method"])
+                            pass
+                        print "\nProc entry validation for video player test is enabled\n"
+                    else:
+                        print "\nProc entry validation for video player test is skipped\n"
+                    test_result = ""
+                    proc_check_list = []
+                    while True:
+                        if (len(webkit_console_socket.getEventsBuffer())== 0):
+                            time.sleep(1)
+                            continue
+                        console_log = webkit_console_socket.getEventsBuffer().pop(0)
+                        dispConsoleLog(console_log)
+                        if "Observed Event: play" in console_log and validation_dict["proc_check"]:
+                            proc_check_list.append(checkProcEntry(validation_dict["ssh_method"],credentials,proc_file,"started"));
+                            time.sleep(1);
+                        if "TEST RESULT:" in console_log or "Connection refused" in console_log:
+                            test_result = getConsoleMessage(console_log)
+                            break;
+                    webkit_console_socket.disconnect()
+                    if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
+                        print "Video play is fine"
+                        print "[TEST EXECUTION RESULT]: SUCCESS"
+                        tdkTestObj.setResultStatus("SUCCESS");
+                    elif "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
+                        print "Decoder proc entry check returns failure.Video not playing fine"
+                        print "[TEST EXECUTION RESULT]: FAILURE"
+                        tdkTestObj.setResultStatus("FAILURE");
+                    else:
+                        print "Video not playing fine"
+                        print "[TEST EXECUTION RESULT]: FAILURE"
+                        tdkTestObj.setResultStatus("FAILURE");
+                    #Set the URL back to previous
+                    tdkTestObj = obj.createTestStep('rdkservice_setValue');
+                    tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                    tdkTestObj.addParameter("value",current_url);
+                    tdkTestObj.executeTestCase(expectedResult);
+                    result = tdkTestObj.getResult();
+                    if result == "SUCCESS":
+                        print "URL is reverted successfully"
+                        tdkTestObj.setResultStatus("SUCCESS");
+                    else:
+                        print "Failed to revert the URL"
+                        tdkTestObj.setResultStatus("FAILURE");
                 else:
-                    print "Failed to revert the URL"
+                    print "Failed to load the URL %s" %(new_url)
                     tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "Failed to load the URL %s" %(new_url)
                 tdkTestObj.setResultStatus("FAILURE");
+                print "Failed to set the URL"
         else:
             tdkTestObj.setResultStatus("FAILURE");
             print "Unable to get the current URL loaded in webkit"
     else:
         print "Pre conditions are not met"
+        obj.setLoadModuleStatus("FAILURE");
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"

@@ -135,7 +135,8 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("method","WebKitBrowser.1.url");
         tdkTestObj.executeTestCase(expectedResult);
         current_url = tdkTestObj.getResultDetails();
-        if current_url != None:
+        result = tdkTestObj.getResult()
+        if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS")
 	    for count in range(0,max_count):
 		result_dict = {}
@@ -152,8 +153,9 @@ if expectedResult in result.upper():
                     tdkTestObj = obj.createTestStep('rdkservice_getValue');
                     tdkTestObj.addParameter("method","WebKitBrowser.1.url");
                     tdkTestObj.executeTestCase(expectedResult);
+                    result = tdkTestObj.getResult()
                     new_url = tdkTestObj.getResultDetails();
-                    if test_url_1 in new_url:
+                    if test_url_1 in new_url and expectedResult in result:
 			print "URL :{} is set in WebKitBrowser".format(test_url_1)
 		     	tdkTestObj.setResultStatus("SUCCESS");
 			print "\nSetting test URL 2"
@@ -169,8 +171,9 @@ if expectedResult in result.upper():
                             tdkTestObj = obj.createTestStep('rdkservice_getValue');
                             tdkTestObj.addParameter("method","WebKitBrowser.1.url");
                             tdkTestObj.executeTestCase(expectedResult);
+                            result = tdkTestObj.getResult()
                             new_url = tdkTestObj.getResultDetails();
-                            if test_url_2 in new_url:
+                            if test_url_2 in new_url and expectedResult in result:
 				print "URL :{} is set in WebKitBrowser".format(test_url_2)
                                 tdkTestObj.setResultStatus("SUCCESS")
                                 #Get the CPU Load
@@ -185,8 +188,9 @@ if expectedResult in result.upper():
                                     tdkTestObj.addParameter('value',float(cpuload))
                                     tdkTestObj.addParameter('threshold',90.0)
                                     tdkTestObj.executeTestCase(expectedResult)
+                                    result = tdkTestObj.getResult()
                                     is_high_cpuload = tdkTestObj.getResultDetails()
-                                    if is_high_cpuload == "YES" :
+                                    if is_high_cpuload == "YES"  or expectedResult not in result:
                                         print "\n cpu load is high :{}% during iteration:{}".format(cpuload,count+1)
                                         tdkTestObj.setResultStatus("FAILURE")
                                         break
@@ -209,7 +213,8 @@ if expectedResult in result.upper():
                                     tdkTestObj.addParameter('threshold',90.0)
                                     tdkTestObj.executeTestCase(expectedResult)
                                     is_high_memory_usage = tdkTestObj.getResultDetails()
-                                    if is_high_memory_usage == "YES":
+                                    result = tdkTestObj.getResult()
+                                    if is_high_memory_usage == "YES" or expectedResult not in result:
                                         print "\n memory usage is high :{}% during iteration: {}\n".format(memory_usage,count+1)
                                         tdkTestObj.setResultStatus("FAILURE")
                                         break

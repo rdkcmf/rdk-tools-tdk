@@ -88,8 +88,9 @@ if expectedResult in result.upper():
     tdkTestObj.addParameter("realpath",obj.realpath)
     tdkTestObj.addParameter("deviceIP",obj.IP)
     tdkTestObj.executeTestCase(expectedResult)
+    result = tdkTestObj.getResult()
     ssh_param_dict = json.loads(tdkTestObj.getResultDetails()) 
-    if ssh_param_dict != {}:
+    if ssh_param_dict != {} and expectedResult in result:
         tdkTestObj.setResultStatus("SUCCESS")
         if ssh_param_dict["ssh_method"] == "directSSH":
             if ssh_param_dict["password"] == "None":
@@ -108,8 +109,9 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("credentials",credentials)
         tdkTestObj.addParameter("command",command)
         tdkTestObj.executeTestCase(expectedResult)
+        result = tdkTestObj.getResult()
         output = tdkTestObj.getResultDetails()
-        if output != "EXCEPTION":
+        if output != "EXCEPTION" and expectedResult in result:
             print "Checking %CPU of processes\n"
             if output.split("\n")[1] == "" :
                 print "\n No process has CPU usage greater than 90% \n"
@@ -132,7 +134,8 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("command",command)
         tdkTestObj.executeTestCase(expectedResult)
         output = tdkTestObj.getResultDetails()
-        if output != "EXCEPTION":
+        result = tdkTestObj.getResult()
+        if output != "EXCEPTION" and expectedResult in result:
             print "\n Checking %MEM of processes:\n"
             if output.split("\n")[1] == "" :
                 print "\n No process has Memory usage greater than 90% \n"
