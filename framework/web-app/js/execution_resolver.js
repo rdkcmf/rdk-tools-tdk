@@ -941,6 +941,9 @@ function callFunc(select) {
 				'disable' : function(node) {
 					option = "disable"
 					deviceDisabledStatus(node.id,option,select);
+				},
+				'copyDeviceIp' : function(node) {
+					copyDeviceIp(select);
 				}
 			}
 		});
@@ -978,6 +981,19 @@ function deviceEnabledStatus(id,option,select){
 	$.get('getTDKDeviceStatus', {id:id,option:option, select:select}, function(data) {}); //{refreshDevices(data);});
 }
 
+/**
+ * Function for copying device IP to clipboard
+ * @param deviceId
+ */
+function copyDeviceIp(deviceId){		
+	$.get('copyDeviceIp', {deviceId:deviceId}, function(data) {
+		if(navigator.clipboard){
+			navigator.clipboard.writeText(data)
+		}else{
+			alert("Sorry! Unable to copy device IP to clipboard. Please copy from here : "+data);
+		}
+	});
+}
 
 /**
  * Ajax call to refresh only the list table when dynamic refresh is enabled
