@@ -304,6 +304,7 @@ $(document).ready(function() {
 										<ul>
 											<li id="enable"  >EnableTDK</li>
 	          								<li id="disable" >DisableTDK</li>
+	          								<li id="copyDeviceIp" >Copy Device IP</li>
 	        							</ul>
 	      			</div>									
 	  		</td> 

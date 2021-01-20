@@ -2780,6 +2780,22 @@ class ExecutionController {
 			e.printStackTrace()
 		}
 	}
+	
+	/**
+	 * Returns IP address of a device 
+	 * @return
+	 */
+	def copyDeviceIp()
+	{
+		String deviceIp
+		try{
+			Device device = Device.findById(params?.deviceId)
+			deviceIp = device?.stbIp
+		}catch(Exception e){
+			e.printStackTrace()
+		}
+		render deviceIp
+	}
 
 	/**
 	 * method to stop the execution through ui request
