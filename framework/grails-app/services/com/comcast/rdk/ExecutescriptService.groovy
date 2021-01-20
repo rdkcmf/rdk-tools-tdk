@@ -1892,7 +1892,7 @@ class ExecutescriptService {
 								}
 								scriptFile = ScriptFile?.findByScriptName(newScriptName) 								
 							}else{
-							    if(scriptFile?.moduleName && scriptFile?.moduleName == Constants.RDKSERVICES){
+							    if(scriptFile?.moduleName && scriptFile?.category == Category.RDKV_RDKSERVICE){
 									script1=scriptService.getScript(realPath,scriptFile?.moduleName,scriptFile?.scriptName, Category.RDKV.toString())
 								}else{
 									script1=scriptService.getScript(realPath,scriptFile?.moduleName,scriptFile?.scriptName, scriptFile?.category?.toString())

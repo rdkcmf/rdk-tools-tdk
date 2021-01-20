@@ -535,7 +535,7 @@ class MigrationService {
 			ScriptFile.withSession {session->
 				try{
 					def sObject
-					if(migrateObj?.moduleName?.equals(Constants.RDKV_PERFORMANCE) || migrateObj?.moduleName?.equals(Constants.RDKV_STABILITY)){
+					if(migrateObj?.moduleName?.equals(Constants.RDKV_PERFORMANCE) || migrateObj?.moduleName?.equals(Constants.RDKV_STABILITY) || migrateObj?.moduleName?.equals(Constants.RDKV_MEDIA)){
 						sObject = ScriptFile.findByScriptNameAndModuleNameAndCategory(migrateObj?.scriptName,Constants.RDKSERVICES,migrateObj?.category)
 						if(!sObject){
 							sObject  = new ScriptFile()

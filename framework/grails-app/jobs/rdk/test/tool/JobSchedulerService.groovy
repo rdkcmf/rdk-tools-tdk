@@ -3212,6 +3212,8 @@ class JobSchedulerService implements Job{
 		if(moduleObj){
 			if(moduleObj?.testGroup?.groupValue.equals(TestGroup.E2E.groupValue)){
 				scriptDirName = Constants.INTEGRATION
+			}else if(moduleObj?.testGroup?.groupValue.equals(TestGroup.Certification.groupValue)){
+				scriptDirName = Constants.CERTIFICATION
 			}
 		}
 		//File file = new File( "${realPath}//fileStore//testscripts//"+scriptDirName+"//"+dirName+"//"+fileName+".py");
@@ -3258,6 +3260,8 @@ class JobSchedulerService implements Job{
 			if(moduleObj1){
 				if(moduleObj1?.testGroup?.groupValue.equals(TestGroup.E2E.groupValue)){
 					scriptDirName1 = Constants.INTEGRATION
+				}else if(moduleObj1?.testGroup?.groupValue.equals(TestGroup.Certification.groupValue)){
+					scriptDirName1 = Constants.CERTIFICATION
 				}
 			}
 			def primitiveTest = getPrimitiveTest(primitiveFileStorePath+FILE_SEPARATOR+scriptDirName1+FILE_SEPARATOR+moduleName1+FILE_SEPARATOR+moduleName1+".xml",nodePrimitiveTestName)

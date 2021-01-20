@@ -783,7 +783,8 @@ class ScriptGroupController {
 		while(iteratorModule?.hasNext()){
 			def obj = iteratorModule.next()
 			def objName = obj.name
-			if(objName.equals(Constants.RDKSERVICES) || (objName.equals(Constants.RDKV_PERFORMANCE)) || (objName.equals(Constants.RDKV_STABILITY))){
+			def objTestGroup = obj.testGroup
+			if(objName.equals(Constants.RDKSERVICES) || (objTestGroup.equals(TestGroup.Certification))){
 				iteratorModule.remove()
 				removed = true
 			}
@@ -1572,7 +1573,7 @@ class ScriptGroupController {
 					script = new ScriptFile()
 					script.setScriptName(params?.name?.trim())
 					script.setModuleName(ptest?.module?.name)
-					if(ptest?.module?.name == Constants.RDKSERVICES || ptest?.module?.name == Constants.RDKV_PERFORMANCE || ptest?.module?.name == Constants.RDKV_STABILITY){
+					if(ptest?.module?.name == Constants.RDKSERVICES || (ptest?.module?.testGroup == TestGroup.Certification)){
 						script.category = Utility.getCategory(Category?.RDKV_RDKSERVICE.toString())
 					}else{
 						script.category = Utility.getCategory(params?.category)
@@ -1588,7 +1589,7 @@ class ScriptGroupController {
 				sObject.setScriptFile(script)
 				sObject.setLongDuration(longDuration)
 				sObject?.setTestProfile(testProfileList)
-				if((ptest?.module?.name != Constants.RDKSERVICES) && (ptest?.module?.name != Constants.RDKV_PERFORMANCE) && (ptest?.module?.name != Constants.RDKV_STABILITY)){
+				if((ptest?.module?.name != Constants.RDKSERVICES) && (ptest?.module?.testGroup != TestGroup.Certification)){
 					scriptService.updateScript(script, params?.category)
 					scriptgroupService.saveToScriptGroups(script,sObject, params?.category)
 					scriptgroupService.saveToDefaultGroups(script,sObject, boxTypes, params?.category)
@@ -2001,12 +2002,11 @@ class ScriptGroupController {
 				script = new ScriptFile()
 				script.setScriptName(newScriptName)
 				script.setModuleName(ptest?.module?.name)
-				if((ptest?.module?.name != Constants.RDKSERVICES) && (ptest?.module?.name != Constants.RDKV_PERFORMANCE) && (ptest?.module?.name != Constants.RDKV_STABILITY)){
+				if((ptest?.module?.name == Constants.RDKSERVICES) || (ptest?.module?.testGroup == TestGroup.Certification)){
 					script.category = Utility.getCategory(Category?.RDKV_RDKSERVICE.toString())
 				}else{
 					script.category = Utility.getCategory(params?.category)
 				}
-				script.setCategory(Utility.getCategory(params?.category))
 				script.save(flush:true)
 			}
 
@@ -2019,7 +2019,7 @@ class ScriptGroupController {
 			sObject.setScriptTags(scrptTags)
 			sObject.setLongDuration(longDuration)
 			sObject.setTestProfile(testProfileList)
-			if((ptest?.module?.name != Constants.RDKSERVICES) && (ptest?.module?.name != Constants.RDKV_PERFORMANCE) && (ptest?.module?.name != Constants.RDKV_STABILITY)){
+			if((ptest?.module?.name != Constants.RDKSERVICES) && (ptest?.module?.testGroup != TestGroup.Certification)){
 				if(boxTypes){
 					scriptgroupService.removeScriptsFromBoxScriptGroup(script,boxTypes,oldBoxTypes)
 					if(isLongDuration != longDuration){
@@ -3647,14 +3647,14 @@ class ScriptGroupController {
 								script = new ScriptFile()
 								script.setScriptName(scriptName?.trim())
 								script.setModuleName(ptest?.module?.name)
-								if(ptest?.module?.name == Constants.RDKSERVICES || ptest?.module?.name == Constants.RDKV_PERFORMANCE || ptest?.module?.name == Constants.RDKV_STABILITY){
+								if(ptest?.module?.name == Constants.RDKSERVICES || (ptest?.module?.testGroup == TestGroup.Certification)){
 									script.category = Utility.getCategory(Category?.RDKV_RDKSERVICE.toString())
 								}else{
 									script.category = Utility.getCategory(category)
 								}
 								script.save(flush:true)
 							}
-							if((ptest?.module?.name != Constants.RDKSERVICES) && (ptest?.module?.name != Constants.RDKV_PERFORMANCE) && (ptest?.module?.name != Constants.RDKV_STABILITY)){
+							if((ptest?.module?.name != Constants.RDKSERVICES) && (ptest?.module?.testGroup != TestGroup.Certification)){
 								def scr = ScriptFile.findByScriptNameAndModuleName(scriptName?.trim(),ptest?.module?.name)
 								if(RDKV.equals(category)){
 									if(advanced.equals("true")){

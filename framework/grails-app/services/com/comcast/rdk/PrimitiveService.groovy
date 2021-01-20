@@ -49,7 +49,7 @@ class PrimitiveService {
 
 		List primitiveTestList = []
 
-		List dirList = [Constants.COMPONENT, Constants.INTEGRATION]
+		List dirList = [Constants.COMPONENT, Constants.INTEGRATION, Constants.CERTIFICATION]
 
 		[TESTSCRIPTS_RDKB, TESTSCRIPTS_RDKV, TESTSCRIPTS_RDKC,TESTSCRIPTS_RDKV_ADV, TESTSCRIPTS_RDKB_ADV].each{ testScriptPath ->
 			def primitiveList = []
@@ -253,6 +253,8 @@ class PrimitiveService {
 		if(moduleObj){
 			if(moduleObj?.testGroup?.groupValue.equals(TestGroup.E2E.groupValue)){
 				scriptDirName = Constants.INTEGRATION
+			}else if(moduleObj?.testGroup?.groupValue.equals(TestGroup.Certification.groupValue)){
+				scriptDirName = Constants.CERTIFICATION
 			}
 		}
 		def category = moduleObj?.category.toString()
@@ -302,6 +304,8 @@ class PrimitiveService {
 		if(moduleObj){
 			if(moduleObj?.testGroup?.groupValue.equals(TestGroup.E2E.groupValue)){
 				scriptDirName = Constants.INTEGRATION
+			}else if(moduleObj?.testGroup?.groupValue.equals(TestGroup.Certification.groupValue)){
+				scriptDirName = Constants.CERTIFICATION
 			}
 		}
 		return scriptDirName

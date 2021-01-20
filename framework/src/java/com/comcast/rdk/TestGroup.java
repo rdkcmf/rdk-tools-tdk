@@ -26,7 +26,7 @@ package com.comcast.rdk;
 
 public enum TestGroup
 {
-    E2E( "E2E" ), Component("Component"), OpenSource("OpenSource");
+    E2E( "E2E" ), Component("Component"), OpenSource("OpenSource"), Certification("Certification");
     
     private final String groupValue;
 
