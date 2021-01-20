@@ -97,10 +97,14 @@ if expectedResult in result.upper():
     status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
     print "Current values \nUX:%s\nWebKitBrowser:%s\nCobalt:%s"%(curr_ux_status,curr_webkit_status,curr_cobalt_status);
     if status == "FAILURE":
-        set_pre_requisites(obj)
-        #Need to revert the values since we are changing plugin status
-        revert="YES"
-        status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
+        if "FAILURE" not in (curr_ux_status,curr_webkit_status,curr_cobalt_status):
+            set_status = set_pre_requisites(obj)
+            #Need to revert the values since we are changing plugin status
+            revert="YES"
+            if set_status == "SUCCESS":
+                status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
+            else:
+                status = "FAILURE";
     if status == "SUCCESS":
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
@@ -108,7 +112,8 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("method","WebKitBrowser.1.url");
         tdkTestObj.executeTestCase(expectedResult);
         current_url = tdkTestObj.getResultDetails();
-        if current_url != None:
+        result = tdkTestObj.getResult();
+        if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             print "Current URL:",current_url
             print "\nSet Octane test URL"
@@ -118,62 +123,69 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("value",browser_test_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
-            time.sleep(10)
+            if expectedResult in result:
+                time.sleep(10)
 
-            print "\nValidate if the URL is set successfully or not"
-            tdkTestObj = obj.createTestStep('rdkservice_getValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.executeTestCase(expectedResult);
-            new_url = tdkTestObj.getResultDetails();
-            if new_url == browser_test_url:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "URL(",new_url,") is set successfully"
-
-                time.sleep(300)
-                tdkTestObj = obj.createTestStep('rdkservice_getBrowserScore_Octane');
+                print "\nValidate if the URL is set successfully or not"
+                tdkTestObj = obj.createTestStep('rdkservice_getValue');
+                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
                 tdkTestObj.executeTestCase(expectedResult);
-                browser_score = tdkTestObj.getResultDetails();
-                if browser_score != "Unable to get the browser score":
+                new_url = tdkTestObj.getResultDetails();
+                result = tdkTestObj.getResult()
+                if new_url == browser_test_url and expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS");
-                    browser_score = browser_score.replace("Octane Score: ","");
-                    conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                    result, octane_threshold_value = getDeviceConfigKeyValue(conf_file,"OCTANE_THRESHOLD_VALUE")
-                    if result == "SUCCESS":
-                        if int(browser_score) > int(octane_threshold_value):
-                            tdkTestObj.setResultStatus("SUCCESS");
-                            print "\n The browser performance is high as expected \n"
+                    print "URL(",new_url,") is set successfully"
+
+                    time.sleep(300)
+                    tdkTestObj = obj.createTestStep('rdkservice_getBrowserScore_Octane');
+                    tdkTestObj.executeTestCase(expectedResult);
+                    browser_score = tdkTestObj.getResultDetails();
+                    result = tdkTestObj.getResult()
+                    if browser_score != "Unable to get the browser score" and expectedResult in result:
+                        tdkTestObj.setResultStatus("SUCCESS");
+                        browser_score = browser_score.replace("Octane Score: ","");
+                        conf_file,result = getConfigFileName(tdkTestObj.realpath)
+                        result, octane_threshold_value = getDeviceConfigKeyValue(conf_file,"OCTANE_THRESHOLD_VALUE")
+                        if result == "SUCCESS":
+                            if int(browser_score) > int(octane_threshold_value):
+                                tdkTestObj.setResultStatus("SUCCESS");
+                                print "\n The browser performance is high as expected \n"
+                            else:
+                                tdkTestObj.setResultStatus("FAILURE");
+                                print "\n The browser performance is lower than expected \n"
                         else:
                             tdkTestObj.setResultStatus("FAILURE");
-                            print "\n The browser performance is lower than expected \n"
+                            print "Failed to get the threshold value from config file"
+                    elif "Running Octane" in browser_score:
+                        tdkTestObj.setResultStatus("FAILURE");
+                        print "Octane test is not completed"
                     else:
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "Failed to get the threshold value from config file"
-                elif "Running Octane" in browser_score:
-                    tdkTestObj.setResultStatus("FAILURE");
-                    print "Octane test is not completed"
+	                print "Failed to get the browser score"
                 else:
+                    print "Failed to load the URL",new_url
                     tdkTestObj.setResultStatus("FAILURE");
-		    print "Failed to get the browser score"
+                #Set the URL back to previous
+                tdkTestObj = obj.createTestStep('rdkservice_setValue');
+                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                tdkTestObj.addParameter("value",current_url);
+                tdkTestObj.executeTestCase(expectedResult);
+                result = tdkTestObj.getResult();
+                if result == "SUCCESS":
+                    print "URL is reverted successfully"
+                    tdkTestObj.setResultStatus("SUCCESS");
+                else:
+                    print "Failed to revert the URL"
+                    tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "Failed to load the URL",new_url
                 tdkTestObj.setResultStatus("FAILURE");
-            #Set the URL back to previous
-            tdkTestObj = obj.createTestStep('rdkservice_setValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.addParameter("value",current_url);
-            tdkTestObj.executeTestCase(expectedResult);
-            result = tdkTestObj.getResult();
-            if result == "SUCCESS":
-                print "URL is reverted successfully"
-                tdkTestObj.setResultStatus("SUCCESS");
-            else:
-                print "Failed to revert the URL"
-                tdkTestObj.setResultStatus("FAILURE");
+                print "Failed to set URL"
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Failed to set URL to webkitbrowser"
+            print "Failed to get URL in webkitbrowser"
     else:
         print "Pre conditions are not met"
+        obj.setLoadModuleStatus("FAILURE");
 
     #Revert the values
     if revert=="YES":

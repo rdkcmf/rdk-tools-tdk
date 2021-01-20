@@ -28,7 +28,10 @@ def get_plugins_status(obj,plugins):
 		plugin_obj = obj.createTestStep('rdkservice_getPluginStatus')
                 plugin_obj.addParameter("plugin",plugin)
 		plugin_obj.executeTestCase(expectedResult)
-		cur_plugin_state_dict[plugin] = plugin_obj.getResultDetails()
+                if expectedResult in plugin_obj.getResult():
+		    cur_plugin_state_dict[plugin] = plugin_obj.getResultDetails()
+                else:
+                    cur_plugin_state_dict[plugin] = "FAILURE"; 
 	return cur_plugin_state_dict
 
 def set_plugins_status(obj,plugins_state_dict):

@@ -21,14 +21,11 @@ import json
 import time
 import os
 from SSHUtility import *
-from os import path
-import rebootTestUtility;
 
 deviceIP=""
 devicePort=""
 deviceName=""
 deviceType=""
-libObj=""
 #METHODS
 #---------------------------------------------------------------
 #INITIALIZE THE MODULE
@@ -38,8 +35,6 @@ def init_module(libobj,port,deviceInfo):
     global devicePort
     global deviceName
     global deviceType
-    global libObj
-    libObj=libobj;
     deviceIP = libobj.ip;
     devicePort = port
     deviceName = deviceInfo["devicename"]
@@ -57,25 +52,9 @@ def execute_step(data):
         json_response = json.loads(response.content)
         return json_response.get("result");
     except requests.exceptions.RequestException as e:
-        exceptionExit(e);
-
-#----------------------------------------------------------------
-#To exit the script gracefully, when an exception occurs
-#----------------------------------------------------------------
-def exceptionExit(error):
-    executeJson = json.loads(libObj.jsonMsgValue)
-    params = executeJson["params"]
-    method = params["method"]
-    output_file = '{}logs/logs/{}_{}_{}_RebootScriptLog.txt'.format(libObj.realpath,str(libObj.execID),str(libObj.execDevId),str(libObj.resultId))
-    if path.exists(output_file):
-        rebootTestUtility.logger.info("\n\n ERROR!!! Exception occured at %s",method)
-        rebootTestUtility.logger.info("\nError message recieved: \n\n%s", error)
-        rebootTestUtility.logger.info("\nEXITING SCRIPT!!!")
-    else:
-        print "\n\n ERROR!!! Exception occured at ",method
-        print "\nError message recieved: \n\n", error
-        print "\nEXITING SCRIPT!!!"
-    exit();
+        print "ERROR!! \nEXCEPTION OCCURRED WHILE EXECUTING CURL COMMANDS!!"
+        print "Error message received :\n",e;
+        return "EXCEPTION OCCURRED"
 
 #------------------------------------------------------------------
 #REBOOT THE DEVICE
@@ -89,7 +68,10 @@ def rdkservice_rebootDevice(waitTime):
         time.sleep(waitTime)
         return "SUCCESS"
     except Exception as e:
-        exceptionExit(e);
+        print "ERROR!! \nEXCEPTION OCCURRED WHILE REBOOTING DEVICE!!"
+        print "Error message received :\n",e;
+        return "EXCEPTION OCCURRED"
+
 
 #-------------------------------------------------------------------
 #GET THE CPU LOAD VALUE FROM DEVICEINFO PLUGIN
@@ -97,8 +79,11 @@ def rdkservice_rebootDevice(waitTime):
 def rdkservice_getCPULoad():
     data = '"method": "DeviceInfo.1.systeminfo"'
     result = execute_step(data)
-    value = result["cpuload"]
-    return value
+    if result != "EXCEPTION OCCURRED":
+        value = result["cpuload"]
+        return value
+    else:
+        return result 
 
 #-------------------------------------------------------------------
 #GET THE MEMORY USAGE VALUE IN BYTES FROM DEVICEINFO PLUGIN
@@ -106,10 +91,13 @@ def rdkservice_getCPULoad():
 def rdkservice_getMemoryUsage():
     data = '"method": "DeviceInfo.1.systeminfo"'
     result = execute_step(data)
-    totalram = result["totalram"]
-    freeram = result["freeram"]
-    value = float(totalram-freeram)/float(totalram)* 100
-    return round(value,2)
+    if result != "EXCEPTION OCCURRED":
+        totalram = result["totalram"]
+        freeram = result["freeram"]
+        value = float(totalram-freeram)/float(totalram)* 100
+        return round(value,2)
+    else:
+        return result
 
 #-------------------------------------------------------------------
 #CHECK WHETHER CHANNEL CHANGE TEXT IS PRESENT IN THE CONSOLE LOG

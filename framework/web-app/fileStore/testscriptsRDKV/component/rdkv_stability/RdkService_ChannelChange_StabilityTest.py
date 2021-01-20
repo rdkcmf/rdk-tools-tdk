@@ -118,8 +118,9 @@ if expectedResult in result.upper():
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
         tdkTestObj.addParameter("method","WebKitBrowser.1.url");
         tdkTestObj.executeTestCase(expectedResult);
+        result = tdkTestObj.getResult()
         current_url = tdkTestObj.getResultDetails();
-	if current_url != None:
+	if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
 	    webkit_console_socket = createEventListener(ip,StabilityTestVariables.webinspect_port,[],"/devtools/page/1",False)
 	    time.sleep(10)
@@ -134,8 +135,9 @@ if expectedResult in result.upper():
             tdkTestObj = obj.createTestStep('rdkservice_getValue');
             tdkTestObj.addParameter("method","WebKitBrowser.1.url");
             tdkTestObj.executeTestCase(expectedResult);
+            result1 = tdkTestObj.getResult()
             new_url = tdkTestObj.getResultDetails();
-	    if new_url == channel_change_url:
+	    if new_url == channel_change_url and expectedResult == (result and result1):
                 tdkTestObj.setResultStatus("SUCCESS");
                 print "URL(",new_url,") is set successfully"
 	        validate = False
@@ -189,8 +191,9 @@ if expectedResult in result.upper():
 			        tdkTestObj.addParameter('value',float(cpuload))
 			        tdkTestObj.addParameter('threshold',90.0)
 			        tdkTestObj.executeTestCase(expectedResult)
+                                result = tdkTestObj.getResult();
 			        is_high_cpuload = tdkTestObj.getResultDetails()
-      			        if is_high_cpuload == "YES" :
+      			        if is_high_cpuload == "YES" or  expectedResult not in result:
 			            error_msg = "\ncpu load is high :{}% at channel change :{} times\nchannel_info:{}\n".format(cpuload,channel_change_count,remarks)
                                     tdkTestObj.setResultStatus("FAILURE")
 			            break
@@ -213,7 +216,8 @@ if expectedResult in result.upper():
                                 tdkTestObj.addParameter('threshold',90.0)
 				tdkTestObj.executeTestCase(expectedResult)
 				is_high_memory_usage = tdkTestObj.getResultDetails()
-				if is_high_memory_usage == "YES":
+                                result  =  tdkTestObj.getResult()
+				if is_high_memory_usage == "YES" or expectedResult not in result:
 				    error_msg = "\nmemory usage is high :{} % at channel change:{} times\nchannel_info:{}\n".format(memory_usage,channel_change_count,remarks)
 				    tdkTestObj.setResultStatus("FAILURE")
                                     break

@@ -158,8 +158,9 @@ if expectedResult in result.upper():
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
         tdkTestObj.addParameter("method","WebKitBrowser.1.url");
         tdkTestObj.executeTestCase(expectedResult);
+        result = tdkTestObj.getResult()
         current_url = tdkTestObj.getResultDetails();
-        if current_url != None:
+        if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             webkit_console_socket = createEventListener(ip,MediaValidationVariables.webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
@@ -170,67 +171,73 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("value",animation_test_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
-            print "\nValidate if the URL is set successfully or not"
-            tdkTestObj = obj.createTestStep('rdkservice_getValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.executeTestCase(expectedResult);
-            new_url = tdkTestObj.getResultDetails();
-            if new_url in animation_test_url:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "URL(",new_url,") is set successfully"
-                test_result = ""
-                average_fps = 0
-                minfps = float(int(expected_fps) - int(threshold))
-                while True:
-                    if (len(webkit_console_socket.getEventsBuffer())== 0):
-                        time.sleep(1)
-                        continue
-                    console_log = webkit_console_socket.getEventsBuffer().pop(0)
-                    dispConsoleLog(console_log)
-                    if "Average FPS" in console_log:
-                        average_fps = getConsoleMessage(console_log).split("[DiagnosticInfo]:")[1].split(":")[1]
-                    if "TEST RESULT:" in console_log or "Connection refused" in console_log:
-                        test_result = getConsoleMessage(console_log)
-                        break;
-                webkit_console_socket.disconnect()
-                if "SUCCESS" in test_result:
-                    print "Obtained Average FPS =",average_fps
-                    if "NaN" in average_fps:
-                        print "Failed to get the average FPS Value"
-                        print "[TEST EXECUTION RESULT]: FAILURE"
+            if expectedResult in result:
+                print "\nValidate if the URL is set successfully or not"
+                tdkTestObj = obj.createTestStep('rdkservice_getValue');
+                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                tdkTestObj.executeTestCase(expectedResult);
+                result= tdkTestObj.getResult()
+                new_url = tdkTestObj.getResultDetails();
+                if new_url in animation_test_url and expectedResult in result:
+                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "URL(",new_url,") is set successfully"
+                    test_result = ""
+                    average_fps = 0
+                    minfps = float(int(expected_fps) - int(threshold))
+                    while True:
+                        if (len(webkit_console_socket.getEventsBuffer())== 0):
+                            time.sleep(1)
+                            continue
+                        console_log = webkit_console_socket.getEventsBuffer().pop(0)
+                        dispConsoleLog(console_log)
+                        if "Average FPS" in console_log:
+                            average_fps = getConsoleMessage(console_log).split("[DiagnosticInfo]:")[1].split(":")[1]
+                        if "TEST RESULT:" in console_log or "Connection refused" in console_log:
+                            test_result = getConsoleMessage(console_log)
+                            break;
+                    webkit_console_socket.disconnect()
+                    if "SUCCESS" in test_result:
+                        print "Obtained Average FPS =",average_fps
+                        if "NaN" in average_fps:
+                            print "Failed to get the average FPS Value"
+                            print "[TEST EXECUTION RESULT]: FAILURE"
+                            tdkTestObj.setResultStatus("FAILURE");
+                        elif float(average_fps) >= minfps:
+                            print "Average FPS is >= %f" %(minfps)
+                            print "Lightning Animation App is rendered for around 60 sec and average FPS is as expected"
+                            print "[TEST EXECUTION RESULT]: SUCCESS"
+                            tdkTestObj.setResultStatus("SUCCESS");
+                        else:
+                            print "Average FPS is < %f" %(minfps)
+                            print "Lightning Animation App is rendered for around 60 sec and average FPS is not as expected"
+                            print "[TEST EXECUTION RESULT]: FAILURE"
+                            tdkTestObj.setResultStatus("FAILURE");
+                    else:
                         tdkTestObj.setResultStatus("FAILURE");
-                    elif float(average_fps) >= minfps:
-                        print "Average FPS is >= %f" %(minfps)
-                        print "Lightning Animation App is rendered for around 60 sec and average FPS is as expected"
-                        print "[TEST EXECUTION RESULT]: SUCCESS"
+                    #Set the URL back to previous
+                    tdkTestObj = obj.createTestStep('rdkservice_setValue');
+                    tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                    tdkTestObj.addParameter("value",current_url);
+                    tdkTestObj.executeTestCase(expectedResult);
+                    result = tdkTestObj.getResult();
+                    if result == "SUCCESS":
+                        print "URL is reverted successfully"
                         tdkTestObj.setResultStatus("SUCCESS");
                     else:
-                        print "Average FPS is < %f" %(minfps)
-                        print "Lightning Animation App is rendered for around 60 sec and average FPS is not as expected"
-                        print "[TEST EXECUTION RESULT]: FAILURE"
+                        print "Failed to revert the URL"
                         tdkTestObj.setResultStatus("FAILURE");
                 else:
-                    tdkTestObj.setResultStatus("FAILURE");
-                #Set the URL back to previous
-                tdkTestObj = obj.createTestStep('rdkservice_setValue');
-                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-                tdkTestObj.addParameter("value",current_url);
-                tdkTestObj.executeTestCase(expectedResult);
-                result = tdkTestObj.getResult();
-                if result == "SUCCESS":
-                    print "URL is reverted successfully"
-                    tdkTestObj.setResultStatus("SUCCESS");
-                else:
-                    print "Failed to revert the URL"
+                    print "Failed to load the URL %s" %(new_url)
                     tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "Failed to load the URL %s" %(new_url)
                 tdkTestObj.setResultStatus("FAILURE");
+                print "Failed to set the URL"
         else:
             tdkTestObj.setResultStatus("FAILURE");
             print "Unable to get the current URL loaded in webkit"
     else:
         print "Pre conditions are not met"
+        obj.setLoadModuleStatus("FAILURE");
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"

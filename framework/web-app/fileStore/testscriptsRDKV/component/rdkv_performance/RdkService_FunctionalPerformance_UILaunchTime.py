@@ -121,83 +121,90 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("method","DeviceInfo.1.systeminfo")
         tdkTestObj.addParameter("reqValue","uptime")
         tdkTestObj.executeTestCase(expectedResult);
-        uptime = int(tdkTestObj.getResultDetails())
-        if uptime < 240:
-            print "Device is rebooted and uptime is: {}".format(uptime)
-            time.sleep(60)
-            tdkTestObj.setResultStatus("SUCCESS")
-            tdkTestObj = obj.createTestStep('rdkservice_getValue');
-            tdkTestObj.addParameter("method","ResidentApp.1.url");
-            tdkTestObj.executeTestCase(expectedResult);
-            ui_app_url = tdkTestObj.getResultDetails();
-            result = tdkTestObj.getResult()
-            if ui_app_url != "" and  result == "SUCCESS" :
+        result = tdkTestObj.getResult()
+        if expectedResult in result:
+            uptime = int(tdkTestObj.getResultDetails())
+            if uptime < 240:
+                print "Device is rebooted and uptime is: {}".format(uptime)
+                time.sleep(60)
                 tdkTestObj.setResultStatus("SUCCESS")
-                tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
-                tdkTestObj.addParameter("realpath",obj.realpath)
-                tdkTestObj.addParameter("deviceIP",obj.IP)
-                tdkTestObj.executeTestCase(expectedResult)
-                ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
-                if ssh_param_dict != {}:
+                tdkTestObj = obj.createTestStep('rdkservice_getValue');
+                tdkTestObj.addParameter("method","ResidentApp.1.url");
+                tdkTestObj.executeTestCase(expectedResult);
+                ui_app_url = tdkTestObj.getResultDetails();
+                result = tdkTestObj.getResult()
+                if ui_app_url != "" and  result == "SUCCESS" :
                     tdkTestObj.setResultStatus("SUCCESS")
-                    if ssh_param_dict["ssh_method"] == "directSSH":
-                        if ssh_param_dict["password"] == "None":
-                            password = ""
-                        else:
-                            password = ssh_param_dict["password"]
-                        credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
-                    else:
-                        #TODO
-                        print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
-                        pass
-                    command = 'cat /opt/logs/wpeframework.log | grep -inr LoadFinished.*url.*'+ui_app_url
-                    #get the log line containing the loadfinished info from wpeframework log
-                    tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
-                    tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
-                    tdkTestObj.addParameter("credentials",credentials)
-                    tdkTestObj.addParameter("command",command)
+                    tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
+                    tdkTestObj.addParameter("realpath",obj.realpath)
+                    tdkTestObj.addParameter("deviceIP",obj.IP)
                     tdkTestObj.executeTestCase(expectedResult)
-                    output = tdkTestObj.getResultDetails()
-                    if output != "EXCEPTION":
-                        load_finished_list = output.split('\n')
-                        load_finished_line = ""
-                        for item in load_finished_list:
-                            if "LoadFinished:" in item:
-                                load_finished_line = item
-                        if load_finished_line != "":
-                            load_finished_time = getTimeStampFromString(load_finished_line)
-                            print "\nDevice reboot initiated at :{} (UTC)".format(start_time)
-                            print "UI load finished at :{} (UTC)  ".format(load_finished_time)
-                            start_time_millisec = getTimeInMilliSec(start_time)
-                            loadfinished_time_millisec = getTimeInMilliSec(load_finished_time)
-                            ui_uptime = loadfinished_time_millisec - start_time_millisec
-                            print "Time taken for the UI to load after reboot : {} ms\n".format(ui_uptime)
-                            conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                            result, ui_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"UI_LAUNCH_TIME_THRESHOLD_VALUE")
-                            if result == "SUCCESS":
-                                if 0 < int(ui_uptime) < int(ui_launch_threshold_value):
-                                    tdkTestObj.setResultStatus("SUCCESS");
-                                    print "\n The time taken for UI to load after reboot is within the expected limit\n"
+                    result = tdkTestObj.getResult()
+                    ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
+                    if ssh_param_dict != {} and expectedResult in result:
+                        tdkTestObj.setResultStatus("SUCCESS")
+                        if ssh_param_dict["ssh_method"] == "directSSH":
+                            if ssh_param_dict["password"] == "None":
+                                password = ""
+                            else:
+                                password = ssh_param_dict["password"]
+                            credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
+                        else:
+                            #TODO
+                            print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
+                            pass
+                        command = 'cat /opt/logs/wpeframework.log | grep -inr LoadFinished.*url.*'+ui_app_url
+                        #get the log line containing the loadfinished info from wpeframework log
+                        tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
+                        tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
+                        tdkTestObj.addParameter("credentials",credentials)
+                        tdkTestObj.addParameter("command",command)
+                        tdkTestObj.executeTestCase(expectedResult)
+                        result = tdkTestObj.getResult()
+                        output = tdkTestObj.getResultDetails()
+                        if output != "EXCEPTION" and expectedResult in result:
+                            load_finished_list = output.split('\n')
+                            load_finished_line = ""
+                            for item in load_finished_list:
+                                if "LoadFinished:" in item:
+                                    load_finished_line = item
+                            if load_finished_line != "":
+                                load_finished_time = getTimeStampFromString(load_finished_line)
+                                print "\nDevice reboot initiated at :{} (UTC)".format(start_time)
+                                print "UI load finished at :{} (UTC)  ".format(load_finished_time)
+                                start_time_millisec = getTimeInMilliSec(start_time)
+                                loadfinished_time_millisec = getTimeInMilliSec(load_finished_time)
+                                ui_uptime = loadfinished_time_millisec - start_time_millisec
+                                print "Time taken for the UI to load after reboot : {} ms\n".format(ui_uptime)
+                                conf_file,result = getConfigFileName(tdkTestObj.realpath)
+                                result, ui_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"UI_LAUNCH_TIME_THRESHOLD_VALUE")
+                                if result == "SUCCESS":
+                                    if 0 < int(ui_uptime) < int(ui_launch_threshold_value):
+                                        tdkTestObj.setResultStatus("SUCCESS");
+                                        print "\n The time taken for UI to load after reboot is within the expected limit\n"
+                                    else:
+                                        tdkTestObj.setResultStatus("FAILURE");
+                                        print "\n The time taken for UI to load after reboot is greater than the expected limit \n"
                                 else:
                                     tdkTestObj.setResultStatus("FAILURE");
-                                    print "\n The time taken for UI to load after reboot is greater than the expected limit \n"
+                                    print "Failed to get the threshold value from config file"
                             else:
-                                tdkTestObj.setResultStatus("FAILURE");
-                                print "Failed to get the threshold value from config file"
+                                print "ui app url is not loaded in DUT"
+                                tdkTestObj.setResultStatus("FAILURE")
                         else:
-                            print "ui app url is not loaded in DUT"
+                            print "Error occurred while executing the command:{} in DUT,\n Please check the SSH details \n".format(command)
                             tdkTestObj.setResultStatus("FAILURE")
                     else:
-                        print "Error occurred while executing the command:{} in DUT,\n Please check the SSH details \n".format(command)
+                        print "please configure the details in device config file"
                         tdkTestObj.setResultStatus("FAILURE")
                 else:
-                    print "please configure the details in device config file"
+                    print "Error while executing ResidentApp.1.url method"
                     tdkTestObj.setResultStatus("FAILURE")
             else:
-                print "Error while executing ResidentApp.1.url method"
                 tdkTestObj.setResultStatus("FAILURE")
+                print "device is not rebooted, device uptime:{}".format(uptime)
         else:
-            print "device is not rebooted, device uptime:{}".format(uptime)
+            print "Failed to get the uptime";
             tdkTestObj.setResultStatus("FAILURE")
     else:
         print "Error occurred during reboot"

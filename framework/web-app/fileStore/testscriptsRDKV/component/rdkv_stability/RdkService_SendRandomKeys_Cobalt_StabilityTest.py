@@ -127,7 +127,7 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
             tdkTestObj.addParameter("value",params)
             tdkTestObj.executeTestCase(expectedResult)
-            result = tdkTestObj.getResult()
+            result1 = tdkTestObj.getResult()
             time.sleep(40)
             #Click OK to skip Ad
             params = '{"keys":[ {"keyCode": 13,"modifiers": [],"delay":1.0}]}'
@@ -135,9 +135,9 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
             tdkTestObj.addParameter("value",params)
             tdkTestObj.executeTestCase(expectedResult)
-            result = tdkTestObj.getResult()
+            result2 = tdkTestObj.getResult()
             time.sleep(50)
-            if result == "SUCCESS":
+            if "SUCCESS" == (result1 and result2):
                 tdkTestObj.setResultStatus("SUCCESS")
                 test_time_in_mins = int(StabilityTestVariables.cobalt_randomkey_test_duration)
                 test_time_in_millisec = test_time_in_mins * 60 * 1000
@@ -200,7 +200,8 @@ if expectedResult in result.upper():
                         tdkTestObj.addParameter('threshold',90.0)
                         tdkTestObj.executeTestCase(expectedResult)
                         is_high_cpuload = tdkTestObj.getResultDetails()
-                        if is_high_cpuload == "YES" :
+                        result = tdkTestObj.getResult()
+                        if is_high_cpuload == "YES" or  expectedResult not in result:
                             print "\ncpu load is high :{}% after :{} times\n".format(cpuload,iteration)
                             tdkTestObj.setResultStatus("FAILURE")
                             completed = False
@@ -226,7 +227,8 @@ if expectedResult in result.upper():
                         tdkTestObj.addParameter('threshold',90.0)
                         tdkTestObj.executeTestCase(expectedResult)
                         is_high_memory_usage = tdkTestObj.getResultDetails()
-                        if is_high_memory_usage == "YES":
+                        result = tdkTestObj.getResult()
+                        if is_high_memory_usage == "YES" or expectedResult not in result:
                             print "\nmemory usage is high :{}% after {} iterations\n".format(memory_usage,iteration)
                             tdkTestObj.setResultStatus("FAILURE")
                             completed = False

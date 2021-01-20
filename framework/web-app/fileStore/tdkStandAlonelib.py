@@ -76,6 +76,7 @@ def executeTest (self) :
         executePluginTests_method = getattr(lib,"executePluginTests")
         result =  executePluginTests_method(self.ip, thunderPort, deviceName, deviceType, self.realpath, testXMLName)
     else:
+        result = "FAILURE";
         #The library name will be componentName+lib. eg:rdkserviceslib
         module=componentName+"lib";
         """
@@ -105,7 +106,7 @@ def executeTest (self) :
         if "params" in params:
             args = params["params"]
         details = method_to_call(**args)
-        if details or details == None:
+        if (details or details == None) and details != "EXCEPTION OCCURRED":
             result = "SUCCESS"
     return result,details; 
      

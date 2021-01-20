@@ -151,7 +151,8 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("method","WebKitBrowser.1.url");
         tdkTestObj.executeTestCase(expectedResult);
         current_url = tdkTestObj.getResultDetails();
-        if current_url != None:
+        result = tdkTestObj.getResult()
+        if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             webkit_console_socket = createEventListener(ip,MediaValidationVariables.webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
@@ -162,53 +163,59 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("value",animation_test_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
-            print "\nValidate if the URL is set successfully or not"
-            tdkTestObj = obj.createTestStep('rdkservice_getValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.executeTestCase(expectedResult);
-            new_url = tdkTestObj.getResultDetails();
-            if new_url in animation_test_url:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "URL(",new_url,") is set successfully"
-                test_result = ""
-                while True:
-                    if (len(webkit_console_socket.getEventsBuffer())== 0):
-                        time.sleep(1)
-                        continue
-                    console_log = webkit_console_socket.getEventsBuffer().pop(0)
-                    dispConsoleLog(console_log)
-                    if "TEST RESULT:" in console_log or "Connection refused" in console_log:
-                        test_result = getConsoleMessage(console_log)
-                        break;
-                webkit_console_socket.disconnect()
-                if "SUCCESS" in test_result:
-                    print "Animation using Lightning app works fine"
-                    print "[TEST EXECUTION RESULT]: SUCCESS"
-                    tdkTestObj.setResultStatus("SUCCESS");
-                else:
-                    print "Animation using Lightning app not working fine"
-                    print "[TEST EXECUTION RESULT]: FAILURE"
-                    tdkTestObj.setResultStatus("FAILURE");
-                #Set the URL back to previous
-                tdkTestObj = obj.createTestStep('rdkservice_setValue');
+            if expectedResult in result:
+                print "\nValidate if the URL is set successfully or not"
+                tdkTestObj = obj.createTestStep('rdkservice_getValue');
                 tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-                tdkTestObj.addParameter("value",current_url);
                 tdkTestObj.executeTestCase(expectedResult);
-                result = tdkTestObj.getResult();
-                if result == "SUCCESS":
-                    print "URL is reverted successfully"
+                new_url = tdkTestObj.getResultDetails();
+                result = tdkTestObj.getResult()
+                if new_url in animation_test_url and expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS");
+                    print "URL(",new_url,") is set successfully"
+                    test_result = ""
+                    while True:
+                        if (len(webkit_console_socket.getEventsBuffer())== 0):
+                            time.sleep(1)
+                            continue
+                        console_log = webkit_console_socket.getEventsBuffer().pop(0)
+                        dispConsoleLog(console_log)
+                        if "TEST RESULT:" in console_log or "Connection refused" in console_log:
+                            test_result = getConsoleMessage(console_log)
+                            break;
+                    webkit_console_socket.disconnect()
+                    if "SUCCESS" in test_result:
+                        print "Animation using Lightning app works fine"
+                        print "[TEST EXECUTION RESULT]: SUCCESS"
+                        tdkTestObj.setResultStatus("SUCCESS");
+                    else:
+                        print "Animation using Lightning app not working fine"
+                        print "[TEST EXECUTION RESULT]: FAILURE"
+                        tdkTestObj.setResultStatus("FAILURE");
+                    #Set the URL back to previous
+                    tdkTestObj = obj.createTestStep('rdkservice_setValue');
+                    tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                    tdkTestObj.addParameter("value",current_url);
+                    tdkTestObj.executeTestCase(expectedResult);
+                    result = tdkTestObj.getResult();
+                    if result == "SUCCESS":
+                        print "URL is reverted successfully"
+                        tdkTestObj.setResultStatus("SUCCESS");
+                    else:
+                        print "Failed to revert the URL"
+                        tdkTestObj.setResultStatus("FAILURE");
                 else:
-                    print "Failed to revert the URL"
+                    print "Failed to load the URL %s" %(new_url)
                     tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "Failed to load the URL %s" %(new_url)
                 tdkTestObj.setResultStatus("FAILURE");
+                print "Failed to set the URL"
         else:
             tdkTestObj.setResultStatus("FAILURE");
             print "Unable to get the current URL loaded in webkit"
     else:
         print "Pre conditions are not met"
+        obj.setLoadModuleStatus("FAILURE");
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"

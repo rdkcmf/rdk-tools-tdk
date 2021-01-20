@@ -98,10 +98,11 @@ if expectedResult in result.upper():
     tdkTestObj.addParameter("realpath",obj.realpath)
     tdkTestObj.addParameter("deviceIP",obj.IP)
     tdkTestObj.executeTestCase(expectedResult)
+    result = tdkTestObj.getResult()
     ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
     plugin = "WebKitBrowser"
     status_dict = get_plugins_status(obj,[plugin])
-    if ssh_param_dict != {}:
+    if ssh_param_dict != {} and expectedResult in result:
         completed = True
         for count in range(0,2):
             if status_dict[plugin] == "deactivated":
@@ -171,8 +172,9 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("credentials",credentials)
             tdkTestObj.addParameter("command",command)
             tdkTestObj.executeTestCase(expectedResult)
+            result = tdkTestObj.getResult()
             output = tdkTestObj.getResultDetails()
-            if output != "EXCEPTION":
+            if output != "EXCEPTION" and expectedResult in result:
                 if len(output.split('\n')) == 4 :
                     if new_status == "deactivate":
                         activated_log = output.split('\n')[1]

@@ -120,7 +120,8 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("method","WebKitBrowser.1.url");
         tdkTestObj.executeTestCase(expectedResult);
         current_url = tdkTestObj.getResultDetails();
-        if current_url != None:
+        result = tdkTestObj.getResult();
+        if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             webkit_console_socket = createEventListener(ip,MediaValidationVariables.webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
@@ -131,98 +132,106 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("value",video_test_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
-            print "\nValidate if the URL is set successfully or not"
-            tdkTestObj = obj.createTestStep('rdkservice_getValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.executeTestCase(expectedResult);
-            new_url = tdkTestObj.getResultDetails();
-            if new_url in video_test_url:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "\n URL(",new_url,") is set successfully \n"
-                continue_count = 0
-                test_result = ""
-                while True:
-                    if continue_count > 60:
-                        print "app not launched in 60 seconds"
-                        break
-                    if (len(webkit_console_socket.getEventsBuffer())== 0):
-                        time.sleep(1)
-                        continue_count += 1
-                        continue
-                    console_log = webkit_console_socket.getEventsBuffer().pop(0)
-                    if "URL Info:" in console_log or "Connection refused" in console_log:
-                        test_result = getConsoleMessage(console_log)
-                        break;
-                webkit_console_socket.disconnect()
-                if "URL Info:" in test_result:
-                    #get the cpu load
-                    print "\n Application launched successfully \n "
-                    tdkTestObj = obj.createTestStep('rdkservice_getCPULoad')
-                    tdkTestObj.executeTestCase(expectedResult)
-                    result = tdkTestObj.getResult()
-                    cpuload = tdkTestObj.getResultDetails()
-                    if result == "SUCCESS":
-                        tdkTestObj.setResultStatus("SUCCESS")
-                        #validate the cpuload
-                        tdkTestObj = obj.createTestStep('rdkservice_validateCPULoad')
-                        tdkTestObj.addParameter('value',float(cpuload))
-                        tdkTestObj.addParameter('threshold',90.0)
-                        tdkTestObj.executeTestCase(expectedResult)
-                        is_high_cpuload = tdkTestObj.getResultDetails()
-                        if is_high_cpuload == "YES" :
-                            print "\n cpu load is high :{}%".format(cpuload)
-                            tdkTestObj.setResultStatus("FAILURE")
-                        else:
-                            tdkTestObj.setResultStatus("SUCCESS")
-                            print "\n cpu load : {}%\n".format(cpuload)
-                    else:
-                        print "Unable to get cpuload"
-                        tdkTestObj.setResultStatus("FAILURE")
-                    #get the memory usage
-                    tdkTestObj = obj.createTestStep('rdkservice_getMemoryUsage')
-                    tdkTestObj.executeTestCase(expectedResult)
-                    result = tdkTestObj.getResult()
-                    memory_usage = tdkTestObj.getResultDetails()
-                    if (result == "SUCCESS"):
-                        tdkTestObj.setResultStatus("SUCCESS")
-                        #validate memory usage
-                        tdkTestObj = obj.createTestStep('rdkservice_validateMemoryUsage')
-                        tdkTestObj.addParameter('value',float(memory_usage))
-                        tdkTestObj.addParameter('threshold',90.0)
-                        tdkTestObj.executeTestCase(expectedResult)
-                        is_high_memory_usage = tdkTestObj.getResultDetails()
-                        if is_high_memory_usage == "YES":
-                            print "\nmemory usage is high :{}%\n".format(memory_usage)
-                            tdkTestObj.setResultStatus("FAILURE")
-                        else:
-                            print "\nmemory usage :{}%\n".format(memory_usage)
-                            tdkTestObj.setResultStatus("SUCCESS")
-                    else:
-                        print "\n Unable to get the memory usage\n"
-                        tdkTestObj.setResultStatus("FAILURE")
-                else:
-                    tdkTestObj.setResultStatus("FAILURE");
-                    print "error occured during application launch"
-                #Set the URL back to previous
-                tdkTestObj = obj.createTestStep('rdkservice_setValue');
+            if expectedResult in result:
+                print "\nValidate if the URL is set successfully or not"
+                tdkTestObj = obj.createTestStep('rdkservice_getValue');
                 tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-                tdkTestObj.addParameter("value",current_url);
                 tdkTestObj.executeTestCase(expectedResult);
+                new_url = tdkTestObj.getResultDetails();
                 result = tdkTestObj.getResult();
-                if result == "SUCCESS":
-                    print "URL is reverted successfully \n"
+                if new_url in video_test_url and expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS");
+                    print "\n URL(",new_url,") is set successfully \n"
+                    continue_count = 0
+                    test_result = ""
+                    while True:
+                        if continue_count > 60:
+                            print "app not launched in 60 seconds"
+                            break
+                        if (len(webkit_console_socket.getEventsBuffer())== 0):
+                            time.sleep(1)
+                            continue_count += 1
+                            continue
+                        console_log = webkit_console_socket.getEventsBuffer().pop(0)
+                        if "URL Info:" in console_log or "Connection refused" in console_log:
+                            test_result = getConsoleMessage(console_log)
+                            break;
+                    webkit_console_socket.disconnect()
+                    if "URL Info:" in test_result:
+                        #get the cpu load
+                        print "\n Application launched successfully \n "
+                        tdkTestObj = obj.createTestStep('rdkservice_getCPULoad')
+                        tdkTestObj.executeTestCase(expectedResult)
+                        result = tdkTestObj.getResult()
+                        cpuload = tdkTestObj.getResultDetails()
+                        if result == "SUCCESS":
+                            tdkTestObj.setResultStatus("SUCCESS")
+                            #validate the cpuload
+                            tdkTestObj = obj.createTestStep('rdkservice_validateCPULoad')
+                            tdkTestObj.addParameter('value',float(cpuload))
+                            tdkTestObj.addParameter('threshold',90.0)
+                            tdkTestObj.executeTestCase(expectedResult)
+                            is_high_cpuload = tdkTestObj.getResultDetails()
+                            result = tdkTestObj.getResult()
+                            if is_high_cpuload == "YES" or expectedResult not in result:
+                                print "\n cpu load is high :{}%".format(cpuload)
+                                tdkTestObj.setResultStatus("FAILURE")
+                            else:
+                                tdkTestObj.setResultStatus("SUCCESS")
+                                print "\n cpu load : {}%\n".format(cpuload)
+                        else:
+                            print "Unable to get cpuload"
+                            tdkTestObj.setResultStatus("FAILURE")
+                        #get the memory usage
+                        tdkTestObj = obj.createTestStep('rdkservice_getMemoryUsage')
+                        tdkTestObj.executeTestCase(expectedResult)
+                        result = tdkTestObj.getResult()
+                        memory_usage = tdkTestObj.getResultDetails()
+                        if (result == "SUCCESS"):
+                            tdkTestObj.setResultStatus("SUCCESS")
+                            #validate memory usage
+                            tdkTestObj = obj.createTestStep('rdkservice_validateMemoryUsage')
+                            tdkTestObj.addParameter('value',float(memory_usage))
+                            tdkTestObj.addParameter('threshold',90.0)
+                            tdkTestObj.executeTestCase(expectedResult)
+                            result = tdkTestObj.getResult();
+                            is_high_memory_usage = tdkTestObj.getResultDetails()
+                            if is_high_memory_usage == "YES" or expectedResult not in result:
+                                print "\nmemory usage is high :{}%\n".format(memory_usage)
+                                tdkTestObj.setResultStatus("FAILURE")
+                            else:
+                                print "\nmemory usage :{}%\n".format(memory_usage)
+                                tdkTestObj.setResultStatus("SUCCESS")
+                        else:
+                            print "\n Unable to get the memory usage\n"
+                            tdkTestObj.setResultStatus("FAILURE")
+                    else:
+                        tdkTestObj.setResultStatus("FAILURE");
+                        print "error occured during application launch"
+                    #Set the URL back to previous
+                    tdkTestObj = obj.createTestStep('rdkservice_setValue');
+                    tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                    tdkTestObj.addParameter("value",current_url);
+                    tdkTestObj.executeTestCase(expectedResult);
+                    result = tdkTestObj.getResult();
+                    if result == "SUCCESS":
+                        print "URL is reverted successfully \n"
+                        tdkTestObj.setResultStatus("SUCCESS");
+                    else:
+                        print "Failed to revert the URL"
+                        tdkTestObj.setResultStatus("FAILURE");
                 else:
-                    print "Failed to revert the URL"
+                    print "Failed to load the URL %s" %(new_url)
                     tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "Failed to load the URL %s" %(new_url)
+                print "Failed to set the URL"
                 tdkTestObj.setResultStatus("FAILURE");
         else:
             tdkTestObj.setResultStatus("FAILURE");
             print "Unable to get the current URL loaded in webkit"
     else:
         print "Pre conditions are not met"
+        obj.setLoadModuleStatus("FAILURE");
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"

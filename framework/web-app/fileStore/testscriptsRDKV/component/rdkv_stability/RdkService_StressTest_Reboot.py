@@ -107,100 +107,135 @@ if expectedResult in result.upper():
         logger.info( "Get the count and status of plugins before starting the reboot test")
         tdkTestObj = obj.createTestStep('rdkservice_getNoOfPlugins');
         tdkTestObj.executeTestCase(expectedResult);
-        NoofPluginsBeforeReboot = tdkTestObj.getResultDetails();
-        if int(NoofPluginsBeforeReboot) > 0:
-            tdkTestObj.setResultStatus("SUCCESS")
-            logger.info( "Number of plugin before starting the reboot test:%s",NoofPluginsBeforeReboot)
-
-            tdkTestObj = obj.createTestStep('rdkservice_getAllPluginStatus');
-            tdkTestObj.executeTestCase(expectedResult);
-            PluginStatusBeforeReboot = tdkTestObj.getResultDetails();
-
-            if PluginStatusBeforeReboot:
+        result = tdkTestObj.getResult()
+        if expectedResult in result:
+            NoofPluginsBeforeReboot = tdkTestObj.getResultDetails();
+            if int(NoofPluginsBeforeReboot) > 0:
                 tdkTestObj.setResultStatus("SUCCESS")
-                logger.info( "Status of plugins before reboot\n %s", PluginStatusBeforeReboot)
+                logger.info( "Number of plugin before starting the reboot test:%s",NoofPluginsBeforeReboot)
 
-                for count in range(repeatCount):
-                    iter_no = "ITER_No_%d"%(count+1)
-                    rebootTestUtility.iter_no = iter_no
-                    rebootTestUtility.count = count
-                    logger.info( "------------------------------------------------------------")
-                    logger.info( "ITER_No_%d"%(count+1))
-                    logger.info("------------------------------------------------------------")
+                tdkTestObj = obj.createTestStep('rdkservice_getAllPluginStatus');
+                tdkTestObj.executeTestCase(expectedResult);
+                PluginStatusBeforeReboot = tdkTestObj.getResultDetails();
+                result = tdkTestObj.getResult()
 
-                    #REBOOT THE DEVICE
-                    tdkTestObj = obj.createTestStep('rdkservice_rebootDevice');
-                    tdkTestObj.addParameter("waitTime",rebootwaitTime);
-                    tdkTestObj.executeTestCase(expectedResult);
-                    result =tdkTestObj.getResultDetails();
-                    if expectedResult in result:
-                        tdkTestObj.setResultStatus("SUCCESS")
-                        logger.info("Rebooted device successfully")
+                if PluginStatusBeforeReboot and expectedResult in result:
+                    tdkTestObj.setResultStatus("SUCCESS")
+                    logger.info( "Status of plugins before reboot\n %s", PluginStatusBeforeReboot)
 
-                        #GET THE UPTIME AFTER REBOOT"
-                        tdkTestObj = obj.createTestStep('rdkservice_getReqValueFromResult');
-                        tdkTestObj.addParameter("method","DeviceInfo.1.systeminfo");
-                        tdkTestObj.addParameter("reqValue","uptime");
+                    for count in range(repeatCount):
+                        iter_no = "ITER_No_%d"%(count+1)
+                        rebootTestUtility.iter_no = iter_no
+                        rebootTestUtility.count = count
+                        logger.info( "------------------------------------------------------------")
+                        logger.info( "ITER_No_%d"%(count+1))
+                        logger.info("------------------------------------------------------------")
+
+                        #REBOOT THE DEVICE
+                        tdkTestObj = obj.createTestStep('rdkservice_rebootDevice');
+                        tdkTestObj.addParameter("waitTime",rebootwaitTime);
                         tdkTestObj.executeTestCase(expectedResult);
-                        uptime_after = tdkTestObj.getResultDetails();
-                        uptime_status = validateUptime(uptime_after,ValidateUptime)
-                        if uptime_status == "SUCCESS":
+                        result =tdkTestObj.getResultDetails();
+                        if expectedResult in result:
                             tdkTestObj.setResultStatus("SUCCESS")
+                            logger.info("Rebooted device successfully")
+
+                            #GET THE UPTIME AFTER REBOOT"
+                            tdkTestObj = obj.createTestStep('rdkservice_getReqValueFromResult');
+                            tdkTestObj.addParameter("method","DeviceInfo.1.systeminfo");
+                            tdkTestObj.addParameter("reqValue","uptime");
+                            tdkTestObj.executeTestCase(expectedResult);
+                            result = tdkTestObj.getResult()
+                            if expectedResult in result:
+                                uptime_after = tdkTestObj.getResultDetails();
+                                uptime_status = validateUptime(uptime_after,ValidateUptime)
+                                if uptime_status == "SUCCESS":
+                                    tdkTestObj.setResultStatus("SUCCESS")
+                                else:
+                                    tdkTestObj.setResultStatus("FAILURE")
+
+                                #GET THE NUMBER OF PLUGINS AFTER REBOOT
+                                tdkTestObj = obj.createTestStep('rdkservice_getNoOfPlugins');
+                                tdkTestObj.executeTestCase(expectedResult);
+                                result = tdkTestObj.getResult()
+                                if expectedResult in result:
+                                    NoofPluginsAfterReboot = tdkTestObj.getResultDetails();
+                                    no_of_plugins = validateNoOfPlugins(NoofPluginsBeforeReboot,NoofPluginsAfterReboot,ValidateNoOfPlugins);
+                                    if no_of_plugins == "SUCCESS":
+                                        tdkTestObj.setResultStatus("SUCCESS")
+                                    else:
+                                        tdkTestObj.setResultStatus("FAILURE")
+
+                                    #GET THE STATUS OF PLUGINS AFTER REBOOT
+                                    tdkTestObj = obj.createTestStep('rdkservice_getAllPluginStatus');
+                                    tdkTestObj.executeTestCase(expectedResult);
+                                    PluginStatusAfterReboot = tdkTestObj.getResultDetails();
+                                    result = tdkTestObj.getResult()
+                                    if expectedResult in result:
+                                        plugin_status = validatePluginStatus(PluginStatusBeforeReboot,PluginStatusAfterReboot,ValidatePluginStatus)
+                                        if plugin_status == "SUCCESS":
+                                            tdkTestObj.setResultStatus("SUCCESS")
+                                        else:
+                                            tdkTestObj.setResultStatus("FAILURE")
+
+                                        #GET THE STATUS OF ETHERNET INTERFACE
+                                        if_status = getIFStatus(EthernetInterface,ValidateInterface)
+                                        if if_status != "FAILURE":
+                                            if if_status == "ENABLED":
+                                                tdkTestObj.setResultStatus("SUCCESS")
+                                            else:
+                                                tdkTestObj.setResultStatus("FAILURE")
+
+                                            #CHECK THE CONTROLLER UI STATUS
+                                            ui_status = getUIStatus(ValidateControllerUI);
+                                            if ui_status != "FAILURE":
+                                                if ui_status == "ACCESSIBLE":
+                                                    tdkTestObj.setResultStatus("SUCCESS")
+                                                else:
+                                                    tdkTestObj.setResultStatus("FAILURE")
+
+                                                if uptime_status == "SUCCESS":
+                                                    logger.info("->UPTIME : SUCCESS, Current uptime is less than 200 seconds");
+                                                else:
+                                                    logger.info( "->UPTIME : FAILURE, Current uptime is greater than 200 seconds");
+                                                logger.info( "->INTERFACE : %s" , if_status)
+                                                logger.info( "->CONTROLLER UI : %s", ui_status)
+                                                logger.info( "->No. OF PLUGINS : %s", no_of_plugins)
+                                                logger.info( "->PLUGIN STATUS : %s", plugin_status)
+
+                                                time.sleep(10);
+                                                count = count +1
+                                            else:
+                                                tdkTestObj.setResultStatus("FAILURE")
+                                                print "Failed to get the UI status"
+                                                break
+                                        else:
+                                            tdkTestObj.setResultStatus("FAILURE")
+                                            print "Failed to get the interface status"
+                                            break
+                                    else:
+                                        tdkTestObj.setResultStatus("FAILURE")
+                                        print "Failed to get the plugin status"
+                                        break
+                                else:
+                                    tdkTestObj.setResultStatus("FAILURE")
+                                    print "Failed to get the number of plugins"
+                                    break
+                            else:
+                                tdkTestObj.setResultStatus("FAILURE")
+                                print "Failed to get the Uptime"
+                                break
                         else:
                             tdkTestObj.setResultStatus("FAILURE")
-
-                        #GET THE NUMBER OF PLUGINS AFTER REBOOT
-                        tdkTestObj = obj.createTestStep('rdkservice_getNoOfPlugins');
-                        tdkTestObj.executeTestCase(expectedResult);
-                        NoofPluginsAfterReboot = tdkTestObj.getResultDetails();
-                        no_of_plugins = validateNoOfPlugins(NoofPluginsBeforeReboot,NoofPluginsAfterReboot,ValidateNoOfPlugins);
-                        if no_of_plugins == "SUCCESS":
-                            tdkTestObj.setResultStatus("SUCCESS")
-                        else:
-                            tdkTestObj.setResultStatus("FAILURE")
-
-                        #GET THE STATUS OF PLUGINS AFTER REBOOT
-                        tdkTestObj = obj.createTestStep('rdkservice_getAllPluginStatus');
-                        tdkTestObj.executeTestCase(expectedResult);
-                        PluginStatusAfterReboot = tdkTestObj.getResultDetails();
-                        plugin_status = validatePluginStatus(PluginStatusBeforeReboot,PluginStatusAfterReboot,ValidatePluginStatus)
-                        if plugin_status == "SUCCESS":
-                            tdkTestObj.setResultStatus("SUCCESS")
-                        else:
-                            tdkTestObj.setResultStatus("FAILURE")
-
-                        #GET THE STATUS OF ETHERNET INTERFACE
-                        if_status = getIFStatus(EthernetInterface,ValidateInterface)
-                        if if_status == "ENABLED":
-                            tdkTestObj.setResultStatus("SUCCESS")
-                        else:
-                            tdkTestObj.setResultStatus("FAILURE")
-
-                        #CHECK THE CONTROLLER UI STATUS
-                        ui_status = getUIStatus(ValidateControllerUI);
-                        if ui_status == "ACCESSIBLE":
-                            tdkTestObj.setResultStatus("SUCCESS")
-                        else:
-                            tdkTestObj.setResultStatus("FAILURE")
-
-                        if uptime_status == "SUCCESS":
-                            logger.info("->UPTIME : SUCCESS, Current uptime is less than 200 seconds");
-                        else:
-                            logger.info( "->UPTIME : FAILURE, Current uptime is greater than 200 seconds");
-                        logger.info( "->INTERFACE : %s" , if_status)
-                        logger.info( "->CONTROLLER UI : %s", ui_status)
-                        logger.info( "->No. OF PLUGINS : %s", no_of_plugins)
-                        logger.info( "->PLUGIN STATUS : %s", plugin_status)
-
-                        time.sleep(10);
-                        count = count +1
-                    else:
-                        tdkTestObj.setResultStatus("FAILURE")
-                        logger.info( "Failed to reboot the device")
-                getSummary(count);
+                            logger.info( "Failed to reboot the device")
+                            break
+                    getSummary(count);
+                else:
+                    tdkTestObj.setResultStatus("FAILURE")
+                    logger.info( "Failed to get the plugin status before reboot")
             else:
                 tdkTestObj.setResultStatus("FAILURE")
-                logger.info( "Failed to get the plugin status before reboot")
+                logger.info( "Number of plugins is not greater than zero")
         else:
             tdkTestObj.setResultStatus("FAILURE")
             logger.info( "Failed to get the number of plugins before reboot")
