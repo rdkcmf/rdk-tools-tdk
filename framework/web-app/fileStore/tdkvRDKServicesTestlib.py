@@ -25,6 +25,7 @@
 import os
 import sys
 import time
+import urllib2
 import requests
 import json,ast
 import ConfigParser
@@ -39,7 +40,7 @@ from tdkvRDKServicesEventHandlerlib import *
 # Syntax      : getDeviceConfigKeyValue(key)
 # Description : Method to get the value of the provided key from the device config file
 # Parameter   : key - Tag configured in the device config file
-# Return Value: SFunction execution status (SUCCESS/FAILURE) & Key Value
+# Return Value: Function execution status (SUCCESS/FAILURE) & Key Value
 #-----------------------------------------------------------------------------------------------
 
 def getDeviceConfigKeyValue(key):
@@ -61,6 +62,38 @@ def getDeviceConfigKeyValue(key):
     except Exception as e:
         status = "FAILURE"
         print "\nException Occurred: [%s] %s" %(inspect.stack()[0][3],e)
+
+    return status,value
+
+
+#-----------------------------------------------------------------------------------------------
+# readDeviceConfigKeys
+#-----------------------------------------------------------------------------------------------
+# Syntax      : readDeviceConfigKeys(keys)
+# Description : Method to get the value of the all the given keys from the device config file
+# Parameter   : keys - List of tags configured in the device config file
+# Return Value: Overall key read status (SUCCESS/FAILURE) & Key Values
+#-----------------------------------------------------------------------------------------------
+def readDeviceConfigKeys(keys):
+    value  = ""
+    allstatus = []
+    allvalues = []
+    # If the keys are none object or empty then exception
+    # will be thrown
+    if keys is None or keys == "":
+        status = "FAILURE"
+        print "\nException Occurred: [%s] key is None or empty" %(inspect.stack()[0][3])
+    else:
+        keys = keys.split(",")
+        for key in keys:
+            status,result = getDeviceConfigKeyValue(key)
+            allstatus.append(status)
+            allvalues.append(result)
+        value = ",".join(allvalues)
+        if "FAILURE" in allstatus:
+            status = "FAILURE"
+        else:
+            status = "SUCCESS"
 
     return status,value
 
@@ -231,8 +264,8 @@ def executeTestCases(testCaseID="all"):
     eventListener = None
     global eventsInfo
     eventsInfo = {}
-    global eventResgisterTag
-    eventResgisterTag = None
+    global logDisplay
+    logDisplay = True
 
     # ------------------------------- PLUGIN PRE-REQUISITES ----------------------------------
     # Perform plugin pre-requisite steps such as activate or deactivate plugins common for all
@@ -275,7 +308,7 @@ def executeTestCases(testCaseID="all"):
         # is configurable, then check its applicability for the current test device by checking the device
         # config file. If the test case is not applicable then mark it as N/A and proceed to the next one
         if testCaseInfo.get("configurableTest") == "true":
-            status,keyData = getDeviceConfigKeyValue(testCaseInfo.get("testKey"))
+            status,keyData = readDeviceConfigKeys(testCaseInfo.get("testKey"))
             keyData = keyData.split(",") if keyData != "" else keyData
 
             if testCaseInfo.get("arguments") is not None and testCaseInfo.get("arguments") != "":
@@ -566,20 +599,20 @@ def executePrePostRequisite(prepostrequisite,node):
         global testStepResults
         testStepResults = []
         requisiteInfo = requisite.attrib.copy()
-        print "\n%s Requisite : %s" %(node,requisiteInfo.get("requisiteName"))
-        print "%s Requisite No : %s" %(node,requisiteInfo.get("requisiteId"))
+        if logDisplay:
+            print "\n%s Requisite : %s" %(node,requisiteInfo.get("requisiteName"))
+            print "%s Requisite No : %s" %(node,requisiteInfo.get("requisiteId"))
 
         if requisiteInfo.get("type") == "eventRegister" and eventListener is None:
-            global eventResgisterTag
-            eventResgisterTag = requisite
             requisiteStepStatus = executeEventHandlerRequisite(requisite)
         else:
             requisiteStepStatus = executeRegularRequisite(requisite)
 
-        if "FAILURE" in requisiteStepStatus:
-            print "\n#--------- [%s-requisite Status] : FAILURE ----------#" %(node)
-        else:
-            print "\n#--------- [%s-requisite Status] : SUCCESS ----------#" %(node)
+        if logDisplay:
+            if "FAILURE" in requisiteStepStatus:
+                print "\n#--------- [%s-requisite Status] : FAILURE ----------#" %(node)
+            else:
+                print "\n#--------- [%s-requisite Status] : SUCCESS ----------#" %(node)
 
         # If any of the pre/post requisites fails, then
         # execution will be broken
@@ -672,7 +705,8 @@ def executeEventHandlerRequisite(requisite):
     eventtestStepInfo["resultGeneration"] = {"expectedValues":"null"}
     eventRegisterParams = ",".join(eventAPIs)
     result = {"Test_Step_Status":registerStatus}
-    dispTestStepInfo(eventtestStepInfo,eventRegisterParams,result)
+    if logDisplay:
+        dispTestStepInfo(eventtestStepInfo,eventRegisterParams,result)
 
     return [registerStatus]
 
@@ -1098,7 +1132,8 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
             else:
                 result = testStepResultGeneration(response,testStepInfo.get("resultGeneration"))
             testStepStatus = result.get("Test_Step_Status")
-            dispTestStepInfo(testStepInfo,testParams,result)
+            if logDisplay:
+                dispTestStepInfo(testStepInfo,testParams,result)
 
             # Test step results are saved for other test steps to use
             # If Id is something like 1.2, then the suffix ( iteration/repeatation)
@@ -1109,6 +1144,12 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
                 saveResult = saveResultInfo.copy()
                 saveResult["result"] = result.copy()
                 saveTestStepResult(testStepId,saveResult.copy())
+
+            # Invoking reboot handler to restore the device status
+            if testStepInfo.get("rebootStep") == "yes":
+               setUpAfterReboot = handleDeviceReboot()
+               if setUpAfterReboot == "FAILURE":
+                   testStepStatus = "FAILURE"
 
             return testStepStatus,result
         else:
@@ -1238,10 +1279,49 @@ def getEventsUnRegistrationInfo():
 
 
 def handleDeviceReboot():
-    #TODO Need to add complete reboot handling like restore websocket/plugin status 
-    print "\nSet Event Listener After Reboot..."
-    requisiteStepStatus = executeEventHandlerRequisite(eventResgisterTag)
-    return requisiteStepStatus 
+    #Reboot handling restore websocket & plugin status
+    timeout = time.time() + 60*5   # 5 minutes from now
+    print "\nWaiting for the device to come up..."
+    time.sleep(30)
+    deviceStatus = "DOWN"
+    while True:
+        status = getTestDeviceStatus()
+        if status == "FREE":
+            deviceStatus = "UP"
+            break;
+        elif time.time() > timeout:
+            deviceStatus = "DOWN"
+            print "Device is not coming up event after 5 mins"
+            break;
+        time.sleep(5)
+
+    if deviceStatus == "UP":
+        print "Device is UP. Setting back pre-requisites..."
+        global logDisplay
+        logDisplay = False
+        setPreRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPreRequisite"),"Pre")
+        logDisplay = True
+        if "FAILURE" in setPreRequisiteStatus:
+            print "Plugin pre-requisites are not set back properly"
+            return "FAILURE"
+        else:
+            print "Plugin pre-requisites are set back properly"
+            return "SUCCESS"
+    else:
+        return "FAILURE"
+
+
+def getTestDeviceStatus():
+    try:
+        url = 'http://' + deviceIP + ':' + portNo + '/jsonrpc'
+        statusCode = urllib2.urlopen(url,timeout=3).getcode()
+        if statusCode == 200:
+            return "FREE"
+        else:
+            return "NOT_FOUND"
+    except:
+        e = sys.exc_info()
+        return "NOT_FOUND"
 
 
 #-----------------------------------------------------------------------------------------------
@@ -1440,7 +1520,7 @@ def getTestStepInfo(testStep):
                     dynamicParamInfo.append(parserInfo)
                     testParams[param.attrib.get("tag")] = None
             elif param.attrib.get("useConfigFile") == "true":
-                status,result = getDeviceConfigKeyValue(param.attrib.get("key"))
+                status,result = readDeviceConfigKeys(param.attrib.get("key"))
                 testStepInfo["parseStatus"] = status if status == "FAILURE" else ""
                 testParams[param.attrib.get("tag")] = result
             else:
@@ -1518,7 +1598,7 @@ def getTestStepInfo(testStep):
                     allarguments = argumentInfo.get("value")
 
                 if argumentInfo.get("useConfigFile") == "true":
-                    status,result = getDeviceConfigKeyValue(argumentInfo.get("key"))
+                    status,result = readDeviceConfigKeys(argumentInfo.get("key"))
                     testStepInfo["parseStatus"] = status if status == "FAILURE" else ""
                     if allarguments != "":
                         allarguments = allarguments + "," + str(result)
@@ -1550,7 +1630,7 @@ def getTestStepInfo(testStep):
                     allexpectedValues = pluginAPIInfo.get("expectedValues")
 
                 if expectedValInfo.get("useConfigFile") == "true":
-                    status,result = getDeviceConfigKeyValue(expectedValInfo.get("key"))
+                    status,result = readDeviceConfigKeys(expectedValInfo.get("key"))
                     testStepInfo["parseStatus"] = status if status == "FAILURE" else ""
                     if allexpectedValues != "":
                         allexpectedValues = str(allexpectedValues) + "," + str(result)
