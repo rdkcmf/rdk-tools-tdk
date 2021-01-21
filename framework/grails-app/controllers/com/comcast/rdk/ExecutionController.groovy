@@ -2816,7 +2816,51 @@ class ExecutionController {
 
 		render listdate as JSON
 	}
-
+	
+/**
+ * REST API to change device IP dynamically
+ * @param deviceName
+ * @param newDeviceIP
+ * @return
+ */
+	def changeDeviceIP(final String deviceName, final String newDeviceIP){
+		JsonObject result = new JsonObject()
+		if(deviceName && newDeviceIP && deviceName!=null && newDeviceIP!=null){
+			try{
+				Device?.withTransaction{
+					Device deviceInstance = Device.findByStbName(deviceName)
+					if(deviceInstance){
+						def stbIps = Device.findAllByStbIp(newDeviceIP)
+						if(stbIps){
+							result.addProperty("Status", "FAILURE")
+							result.addProperty("Remarks", "Device IP already exists")
+						}else{
+							deviceInstance.stbIp = newDeviceIP
+							if(!deviceInstance.save(flush:true)){
+								result.addProperty("Status", "FAILURE")
+								result.addProperty("Remarks", "Unable to change device IP")
+								deviceInstance.errors.each{
+									println it
+								}
+							}else{
+								result.addProperty("Status", "SUCCESS")
+								result.addProperty("Remarks", "Changed device IP")
+							}
+						}
+					}else{
+						result.addProperty("Status", "FAILURE")
+						result.addProperty("Remarks", "Device not found")
+					}
+				}
+			}catch(Exception e){
+				e.printStackTrace()
+			}
+		}else{
+			result.addProperty("Status", "FAILURE")
+			result.addProperty("Remarks", "Device name or IP empty")
+		}
+		render result
+	}
 
 	/**
 	 * REST API to request for stopping the test execution 
