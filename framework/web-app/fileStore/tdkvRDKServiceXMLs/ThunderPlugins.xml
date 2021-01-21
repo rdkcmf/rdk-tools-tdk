@@ -440,6 +440,7 @@
 
             <expectedValues>true,false</expectedValues>
         </method>
+        <method name="Reboot" api="reboot" type="method" desc="system perform a reboot of the set-top box" />
 
         <event name="Event_MacAddresses_Retreived" eventName="onMacAddressesRetreived" eventId="client.events.1" type="event" desc="MacAddressesRetreived" />
         <event name="Event_PowerState_Changed" eventName="onSystemPowerStateChanged" eventId="client.events.1" type="event" desc="power state changed event" />

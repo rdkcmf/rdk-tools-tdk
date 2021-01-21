@@ -170,7 +170,7 @@
         </testCase>
 
         <testCase testCaseId="NW_08" testCaseName="Network_Get_Default_Interface_IP_Settings" desc="Gets IP settings of default interface" >
-           <testCaseInfo testCaseType="direct"/>
+           <testCaseInfo testCaseType="direct" configurableTest="true" testKey="NETWORK_SUPPORTED_FEATURES" useMethodTag="network_check_feature_applicability" arguments="InterfaceIPSettings" />
             <testStep testStepId="1" name="Get_Default_Interface" method="Get_Default_Interface" saveResult="true">
                 <resultGeneration useMethodTag="network_get_default_interface"/>
             </testStep>

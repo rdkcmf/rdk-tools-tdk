@@ -38,14 +38,16 @@
         <resultGeneration useMethodTag="controller_check_processinfo" />
       </testStep>
     </testCase>
-    <testCase testCaseId="Controller_04" testCaseName="Get_Environment_Variable_SHELL"  desc="Gets the value of the environment variable">
-      <testCaseInfo testCaseType="direct"/>
-      <testStep testStepId="1" name="Get_Environment_Variable" method="Environment_Variable">
-        <params>
-          <param tag="value" value="SHELL" indexOnly="true" />
-        </params>
-        <resultGeneration useMethodTag="controller_check_environment_variable_value"  />
-      </testStep>
+    <testCase testCaseId="Controller_04" testCaseName="Get_Environment_Variables"  desc="Gets the value of the environment variables">
+      <testCaseInfo testCaseType="loop"/>
+       <testStep testStepId="1" name="Check_Environment_Variables" testStepType="loop" >
+         <subtestStep subtestStepId="1" name="Get_Environment_Variable" method="Environment_Variable" >
+           <params>
+             <param tag="value"  iteration="true" useConfigFile="true" key="CONTROLLER_ENVIRONMENT_VARIABLES"  indexOnly="true"/>
+           </params>
+           <resultGeneration useMethodTag="controller_check_environment_variable_value"  />
+         </subtestStep>
+       </testStep>
     </testCase>
     <testCase testCaseId="Controller_05" testCaseName="Get_Active_Connections_Info"  desc="Gives information about the framework process">
       <testCaseInfo testCaseType="direct"/>

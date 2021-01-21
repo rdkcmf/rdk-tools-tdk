@@ -215,22 +215,16 @@
               </subtestStep>
             </testStep>
         </testCase>
-
         <testCase testCaseId="SYS_12" testCaseName="System_SetAndGet_TimeZone_DST" desc="Set and get DST time zone" >
-           <testCaseInfo testCaseType="setandget" revert="true" />
-            <testStep testStepId="1" name="Get_TimeZone_DST" method="Get_TimeZone_DST" saveResult="true" revertGet="yes">
-                <resultGeneration useMethodTag="system_get_timezone_dst" />
-            </testStep>
-            <testStep testStepId="2" name="Set_TimeZone_DST" method="Set_TimeZone_DST" revertSet="yes">
+           <testCaseInfo testCaseType="direct"  />
+            <testStep testStepId="1" name="Set_TimeZone_DST" method="Set_TimeZone_DST" >
                 <params>
-                  <param tag="timeZone" usePreviousResult="true" Id="1" useMethodTag="system_switct_timezone_dst" revertParam="yes" />
+                  <param tag="timeZone" value="UTC-5" />
                 </params>
                 <resultGeneration useMethodTag="system_check_set_operation" />
             </testStep>
-            <testStep testStepId="3" name="Get_TimeZone_DST" method="Get_TimeZone_DST" revertFlag="yes">
-                <resultGeneration useMethodTag="system_get_timezone_dst" arguments="check_timezone" >
-                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_switch_timezone_dst" />
-                </resultGeneration>
+            <testStep testStepId="2" name="Get_TimeZone_DST" method="Get_TimeZone_DST" >
+                <resultGeneration useMethodTag="system_get_timezone_dst" arguments="check_timezone" expectedValues="UTC-5" />
             </testStep>
         </testCase>
 
@@ -246,7 +240,7 @@
 
         <!-- Test case 14 -->
         <testCase testCaseId="SYS_14" testCaseName= "System_Clear_Last_DeepSleep_Reason" desc="Clear the last deep sleep reason.">
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="DeepSleep" />
             <testStep testStepId="1" name="Clear_Last_DeepSleep_Reason" method="Clear_Last_DeepSleep_Reason" >
               <resultGeneration useMethodTag="system_get_state_info"/>
             </testStep>
@@ -262,7 +256,7 @@
 
         <!-- Test case 16 -->
         <testCase testCaseId="SYS_16" testCaseName= "System_Get_Last_DeepSleep_Reason" desc="Retrieve the last deep sleep reason.">
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="DeepSleep" />
             <testStep testStepId="1" name="Get_Last_DeepSleep_Reason" method="Get_Last_DeepSleep_Reason" >
               <resultGeneration useMethodTag="system_get_state_info"/>
             </testStep>
@@ -281,7 +275,10 @@
         <!-- Test case 18 -->
         <testCase testCaseId="SYS_18" testCaseName= "System_Get_PreviousReboot_Info" desc="Retrieve basic information about a reboot">
             <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Get_PreviousReboot_Info" method="Get_PreviousReboot_Info" >
+            <testStep testStepId="1" name="System_reboot" method="Reboot" rebootStep="yes" >
+              <resultGeneration useMethodTag="system_check_set_operation"  />
+            </testStep>
+            <testStep testStepId="2" name="Get_PreviousReboot_Info" method="Get_PreviousReboot_Info" >
               <resultGeneration useMethodTag="system_get_state_info"  />
             </testStep>
         </testCase>
@@ -289,15 +286,21 @@
         <!-- Test case 19 -->
         <testCase testCaseId="SYS_19" testCaseName= "System_Get_PreviousReboot_Info2" desc="Retrieve detailed information about a reboot">
             <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Get_PreviousReboot_Info2" method="Get_PreviousReboot_Info2" >
-              <resultGeneration useMethodTag="system_get_state_info"  />
+            <testStep testStepId="1" name="System_reboot" method="Reboot" rebootStep="yes" >
+              <resultGeneration useMethodTag="system_check_set_operation"  />
+            </testStep>
+            <testStep testStepId="2" name="Get_PreviousReboot_Info2" method="Get_PreviousReboot_Info2" >
+              <resultGeneration useMethodTag="system_get_state_info" arguments="rebootInfo" />
             </testStep>
         </testCase>
 
         <!-- Test case 20 -->
         <testCase testCaseId="SYS_20" testCaseName= "System_Get_PreviousReboot_Reason" desc="Retrieve the last reboot reason.">
             <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Get_PreviousReboot_Reason" method="Get_PreviousReboot_Reason" >
+            <testStep testStepId="1" name="System_reboot" method="Reboot" rebootStep="yes" >
+              <resultGeneration useMethodTag="system_check_set_operation"  />
+            </testStep>
+            <testStep testStepId="2" name="Get_PreviousReboot_Reason" method="Get_PreviousReboot_Reason" >
               <resultGeneration useMethodTag="system_get_state_info"  />
             </testStep>
         </testCase>
@@ -306,7 +309,7 @@
         <testCase testCaseId="SYS_21" testCaseName= "System_Get_Temperature_Thresholds" desc="Retrieves temperature threshold values.">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Temperature_Thresholds" method="Get_Temperature_Thresholds" >
-              <resultGeneration useMethodTag="system_get_state_info"  />
+              <resultGeneration useMethodTag="system_get_state_info"  arguments="temperatureThresholds" />
             </testStep>
         </testCase>
 
@@ -385,4 +388,3 @@
         </testCase>
 
 </testPlugin>
-
