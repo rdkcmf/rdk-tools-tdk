@@ -44,7 +44,7 @@
 /* External Variables */
 extern 	     std::fstream go_ConfigFile;
 extern 	     std::fstream go_PortforwardFile;
-extern TcpSocketServer go_Server;
+extern TcpSocketServer *go_Server_ptr;
 extern RDKTestAgent o_Agent;
 bool   	     bBenchmarkEnabled;
 std::string GetSubString (std::string strLine, std::string strDelimiter);
@@ -87,15 +87,16 @@ std::string GetSubString (std::string strLine, std::string strDelimiter);
 #define TCP_PORT_2 18087
 #define TCP_PORT_3 18088
 #define TCP_PORT_4 18089
+#define TCP_PORT_DUMMY 18090
 
 #ifndef RDKVERSION
 #define RDKVERSION "NOT_DEFINED"       
 #endif
 
-TcpSocketServer o_StubStatus_obj1 (LOCAL_SERVER_ADDR, TCP_PORT_1);
-TcpSocketServer o_StubStatus_obj2 (LOCAL_SERVER_ADDR, TCP_PORT_2);
-TcpSocketServer o_StubStatus_obj3 (LOCAL_SERVER_ADDR, TCP_PORT_3);
-TcpSocketServer o_StubStatus_obj4 (LOCAL_SERVER_ADDR, TCP_PORT_4);
+TcpSocketServer *o_StubStatus_obj1;
+TcpSocketServer *o_StubStatus_obj2;
+TcpSocketServer *o_StubStatus_obj3;
+TcpSocketServer *o_StubStatus_obj4;
 
 /* Structure to hold module details */
 struct sModuleDetails 
@@ -145,6 +146,22 @@ std::string RpcMethods::sm_strResultId = "0000";
 int RpcMethods::sm_nDeviceStatusFlag = DEVICE_FREE;        // Setting status of device as FREE by default
 std::string RpcMethods::sm_strConsoleLogPath = "";
 static volatile bool b_stubServerFlag =false;
+static bool stub_servers_initialized=false;
+
+
+void InitStubServers()
+{
+    DEBUG_PRINT (DEBUG_LOG,"Initializing all four stub servers for first time\n");
+    static TcpSocketServer o_StubStatus_obj1_local (LOCAL_SERVER_ADDR, TCP_PORT_1);
+    static TcpSocketServer o_StubStatus_obj2_local (LOCAL_SERVER_ADDR, TCP_PORT_2);
+    static TcpSocketServer o_StubStatus_obj3_local (LOCAL_SERVER_ADDR, TCP_PORT_3);
+    static TcpSocketServer o_StubStatus_obj4_local (LOCAL_SERVER_ADDR, TCP_PORT_4);
+    o_StubStatus_obj1=&o_StubStatus_obj1_local;
+    o_StubStatus_obj2=&o_StubStatus_obj2_local;
+    o_StubStatus_obj3=&o_StubStatus_obj3_local;
+    o_StubStatus_obj4=&o_StubStatus_obj4_local;
+    stub_servers_initialized=true;
+}
 
 void *Createstubserver (void* modulename)
 {
@@ -168,7 +185,7 @@ void *Createstubserver (void* modulename)
                 {    
                      DEBUG_PRINT (DEBUG_TRACE, "\n Reserved Port  %d \n",assignedPort);
 		     
-                     if (!o_StubStatus_obj1.StartListening())
+                     if (!o_StubStatus_obj1->StartListening())
                         {
                                DEBUG_PRINT (DEBUG_ERROR, "Alert!!! Device Status Monitoring Listen failed \n");
                         }
@@ -176,7 +193,7 @@ void *Createstubserver (void* modulename)
                 }
                 else if (o_gTcpPortMapIter ->first == TCP_PORT_2)
                 {
-                      if (!o_StubStatus_obj2.StartListening())
+                      if (!o_StubStatus_obj2->StartListening())
                       {
                                DEBUG_PRINT (DEBUG_ERROR, "Alert!!! Device Status Monitoring Listen failed \n");
                       }
@@ -184,7 +201,7 @@ void *Createstubserver (void* modulename)
                 }
 		else if (o_gTcpPortMapIter ->first == TCP_PORT_3)
 		{
-		      if (!o_StubStatus_obj3.StartListening())
+		      if (!o_StubStatus_obj3->StartListening())
                       {
                                DEBUG_PRINT (DEBUG_ERROR, "Alert!!! Device Status Monitoring Listen failed \n");
                       }
@@ -192,7 +209,7 @@ void *Createstubserver (void* modulename)
 		}
 		else
 		{
-		      if (!o_StubStatus_obj4.StartListening())
+		      if (!o_StubStatus_obj4->StartListening())
                       {
                                DEBUG_PRINT (DEBUG_ERROR, "Alert!!! Device Status Monitoring Listen failed \n");
                       }
@@ -438,6 +455,19 @@ std::string RpcMethods::LoadLibrary (char* pszLibName)
     RDKTestStubInterface* pRDKTestStubInterface;
     std::map <int, std::string>::iterator o_gTcpPortMapIter;
 
+    /* There are four stub servers initialized at the beginning of test execution.
+     * Will be initilized only once.
+     */
+    if(!stub_servers_initialized)
+    {	   
+        DEBUG_PRINT (DEBUG_LOG,"Initializing all four stub servers for first time\n");
+        InitStubServers();
+    }
+    else
+    {
+        DEBUG_PRINT (DEBUG_LOG,"All four stub servers are already initialized \n");
+    }
+
     do
     {   
         /* Dynamically loading library */
@@ -480,7 +510,7 @@ std::string RpcMethods::LoadLibrary (char* pszLibName)
                      o_gTcpPortMapIter->second=pszLibName;
 		     *reservedPort = 18086;
 		     DEBUG_PRINT (DEBUG_LOG, "Identified  PORT %d \n", *reservedPort);
-                     pRDKTestStubInterface = pfnCreateObject(o_StubStatus_obj1);
+                     pRDKTestStubInterface = pfnCreateObject(*o_StubStatus_obj1);
                      break;
                 }
                 else if(o_gTcpPortMapIter ->first == TCP_PORT_2)
@@ -489,7 +519,7 @@ std::string RpcMethods::LoadLibrary (char* pszLibName)
                      o_gTcpPortMapIter->second=pszLibName;
 		     *reservedPort = 18087;
 		     DEBUG_PRINT (DEBUG_LOG, "Identified  PORT %d \n", *reservedPort);
-                     pRDKTestStubInterface = pfnCreateObject(o_StubStatus_obj2);
+                     pRDKTestStubInterface = pfnCreateObject(*o_StubStatus_obj2);
                      break;
                 }
 		else if(o_gTcpPortMapIter ->first == TCP_PORT_3)
@@ -498,7 +528,7 @@ std::string RpcMethods::LoadLibrary (char* pszLibName)
                      o_gTcpPortMapIter->second=pszLibName;
 		     *reservedPort = 18088;
 		     DEBUG_PRINT (DEBUG_LOG, "Identified  PORT %d \n", *reservedPort);
-                     pRDKTestStubInterface = pfnCreateObject(o_StubStatus_obj3);
+                     pRDKTestStubInterface = pfnCreateObject(*o_StubStatus_obj3);
                      break;
 		}
 		else
@@ -507,7 +537,7 @@ std::string RpcMethods::LoadLibrary (char* pszLibName)
                      o_gTcpPortMapIter->second=pszLibName;
 		     *reservedPort = 18089;
 		     DEBUG_PRINT (DEBUG_LOG, "Identified  PORT %d \n", *reservedPort);
-                     pRDKTestStubInterface = pfnCreateObject(o_StubStatus_obj4);
+                     pRDKTestStubInterface = pfnCreateObject(*o_StubStatus_obj4);
                      break;
 		}
             }
@@ -1542,7 +1572,7 @@ void RpcMethods::RPCGetHostStatus (const Json::Value& request, Json::Value& resp
           (strcmp ( (request["managerIP"].asCString()), "NULL") != 0) )
     {	
         /* Fetching the connected box IP address */
-          RpcMethods::sm_strBoxIP = go_Server.GetIP();
+        RpcMethods::sm_strBoxIP = go_Server_ptr->GetIP();
 
         /* Getting corresponding network interface */
         pszInterface = GetHostIPInterface (RpcMethods::sm_strBoxIP.c_str());
@@ -1755,6 +1785,7 @@ void RpcMethods::RPCResetAgent (const Json::Value& request, Json::Value& respons
     {
         while (getline (o_ModuleListFile, strLineInFile))
         {	
+            TcpSocketServer o_StubReset (LOCAL_SERVER_ADDR, TCP_PORT_DUMMY);
             sprintf (szLibName, "%s", strLineInFile.c_str());
             bRet = DeleteModuleFromFile (strLineInFile);
             DEBUG_PRINT (DEBUG_TRACE, "\nRPCResetAgent --> Module %s \n",szLibName);
@@ -1773,9 +1804,9 @@ void RpcMethods::RPCResetAgent (const Json::Value& request, Json::Value& respons
             if ( (pszError = dlerror()) != NULL)
             {
                 DEBUG_PRINT (DEBUG_ERROR, "%s \n", pszError);
-		  break;
+                break;
             }	
-            pRDKTestStubInterface = pfnCreateObject(o_StubStatus_obj1);
+            pRDKTestStubInterface = pfnCreateObject(o_StubReset);
 
             /* Calling Post requisites for module */
             DEBUG_PRINT (DEBUG_LOG, "Executing Post requisites for %s \n", szLibName);
