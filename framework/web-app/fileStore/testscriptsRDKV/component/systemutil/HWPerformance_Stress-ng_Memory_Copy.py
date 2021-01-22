@@ -30,8 +30,8 @@
   <execution_time>1</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
-  <remarks>Stress-ng tool will be available in the later release for executions</remarks>
-  <skip>true</skip>
+  <remarks/>
+  <skip>false</skip>
   <box_types>
     <box_type>Hybrid-1</box_type>
     <box_type>Video_Accelerator</box_type>
