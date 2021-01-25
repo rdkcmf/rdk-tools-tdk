@@ -1564,7 +1564,6 @@ class TDKScriptingLibrary:
                                  print "Deatils : " + details
                                  sys.stdout.flush()
                                  exit()
-                self.tcpClient.close()
                 return
         ########## End of Function ##########
 
@@ -1627,7 +1626,7 @@ class TDKScriptingLibrary:
                                 print result
                                 sys.stdout.flush()
                                 exit()
-                self.tcpClient.close()
+
                 return
         ########## End of Function ##########
 
