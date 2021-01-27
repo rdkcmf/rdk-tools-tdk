@@ -20,14 +20,14 @@
 <?xml version="1.0" encoding="UTF-8"?><xml>
   <id/>
   <version>2</version>
-  <name>RdkService_LongDuration_StabilityTest</name>
+  <name>RDKService_Cobalt_LongDuration_StabilityTest</name>
   <primitive_test_id/>
   <primitive_test_name>rdkservice_validateProcEntry</primitive_test_name>
   <primitive_test_version>1</primitive_test_version>
   <status>FREE</status>
   <synopsis>The objective of this test is to do the stability testing by playing a video from Cobalt for a given amount of time and get the cpu load in every 5 mins.</synopsis>
   <groups_id/>
-  <execution_time>700</execution_time>
+  <execution_time>740</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -61,7 +61,7 @@
     <expected_output>The video should play without interruption for the given time.</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_stability</test_stub_interface>
-    <test_script>RdkService_LongDuration_StabilityTest</test_script>
+    <test_script>RDKService_Cobalt_LongDuration_StabilityTest</test_script>
     <skipped>No</skipped>
     <release_version>M82</release_version>
     <remarks/>
@@ -87,7 +87,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_stability","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_LongDuration_StabilityTest');
+obj.configureTestCase(ip,port,'RDKService_Cobalt_LongDuration_StabilityTest');
 
 output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
@@ -237,6 +237,21 @@ if expectedResult in result.upper():
                     result_dict["memory_usage"] = float(memory_usage)
                     result_dict_list.append(result_dict)
                     time.sleep(test_interval)
+                    #Press OK key in every 1 hour
+                    if ((iteration % 12) == 0):
+                        print "\n ##### sending OK #####\n"
+                        tdkTestObj = obj.createTestStep('rdkservice_setValue')
+                        tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
+                        tdkTestObj.addParameter("value",params)
+                        tdkTestObj.executeTestCase(expectedResult)
+                        result = tdkTestObj.getResult()
+                        if result == "SUCCESS":
+                            tdkTestObj.setResultStatus("SUCCESS")
+                        else:
+                            print "Unable to press OK button"
+                            tdkTestObj.setResultStatus("FAILURE")
+                            completed = False
+                            break
                 if(completed):
                     print "\nsuccessfully completed the {} times in {} minutes".format(iteration,test_time_in_mins)
                 cpu_mem_info_dict["cpuMemoryDetails"] = result_dict_list
