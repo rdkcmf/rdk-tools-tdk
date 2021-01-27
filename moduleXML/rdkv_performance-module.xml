@@ -22,7 +22,7 @@
   <!-- Excecution time out of module -->
     <executionTimeOut>1</executionTimeOut>
   <!-- Excecution time out of module -->
-    <testGroup>Component</testGroup>
+    <testGroup>Certification</testGroup>
   <!-- Logs File Names of module -->
     <logFileNames>[]</logFileNames>
   <!-- Crash File Names of the module -->
@@ -57,8 +57,8 @@
       <parameter funName='rdkservice_setPluginStatus' parameterName='plugin' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_setPluginStatus' parameterName='status' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getRequiredLog' parameterName='ssh_method' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_getRequiredLog' parameterName='command' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getRequiredLog' parameterName='credentials' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_getRequiredLog' parameterName='command' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getSSHParams' parameterName='realpath' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getSSHParams' parameterName='deviceIP' parameterType='STRING' range='a-z' />
     </parameters>

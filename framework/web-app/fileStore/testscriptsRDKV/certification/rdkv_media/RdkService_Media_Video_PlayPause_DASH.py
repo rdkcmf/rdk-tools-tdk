@@ -21,19 +21,19 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>3</version>
+  <version>5</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_Media_Animation_Operations</name>
+  <name>RdkService_Media_Video_PlayPause_DASH</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id> </primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
-  <primitive_test_name>RdkService_Test</primitive_test_name>
+  <primitive_test_name>rdkv_media_test</primitive_test_name>
   <!--  -->
   <primitive_test_version>4</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Animation application and perform some operations to change the animation state</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operation of mpd content</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -60,29 +60,31 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_01</test_case_id>
-    <test_objective>Test Script to launch a lightning Animation application and perform some operations to change the animation state</test_objective>
+    <test_case_id>RDKV_Media_Validation_07</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operation of mpd content</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
-2.Lightning Animation app should be hosted</pre_requisite>
+2.Lightning Player app should be hosted</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
-    <input_parameters>Lightning Animation App URL: string
+    <input_parameters>Lightning player App URL: string
 webinspect_port: string
-thunder_port :string</input_parameters>
+video_src_url_dash: string
+play_interval: int
+pause_interval:int</input_parameters>
     <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
 2. Get the current URL in webkitbrowser
-3. Load the Animation app url with the operations to be performed like play, pause, stop, replay and stopNow with interval.
+3. Load the player app url with the operations to be performed, play and pause with given interval.
 4. App performs the provided operations and validates each operation using events
 5. If expected events occurs for each operation, then app gives the validation result as SUCCESS or else FAILURE
-6. Get the event validation result from the app and update the test script status
+6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>For all the animation operations, expected events should occur</expected_output>
+    <expected_output>Player pause and play should happen, expected events should occur and if proc validation is applicable, then expected data should be available in proc file</expected_output>
     <priority>High</priority>
-    <test_stub_interface>rdkservices</test_stub_interface>
-    <test_script>RdkService_Media_Animation_Operations</test_script>
+    <test_stub_interface>rdkv_media</test_stub_interface>
+    <test_script>RdkService_Media_Video_PlayPause_DASH</test_script>
     <skipped>No</skipped>
-    <release_version>M83</release_version>
+    <release_version>M82</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -100,12 +102,12 @@ from MediaValidationUtility import *
 import MediaValidationUtility
 
 
-obj = tdklib.TDKScriptingLibrary("rdkservices","1",standAlone=True)
+obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_Media_Animation_Operations')
+obj.configureTestCase(ip,port,'RdkService_Media_Video_PlayPause_DASH')
 
 webkit_console_socket = None
 
@@ -115,36 +117,38 @@ print "[LIB LOAD STATUS]  :  %s" %result;
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    appURL    = MediaValidationVariables.lightning_animation_test_app_url
-    # Setting Animation Operations
-    setOperation("pause",MediaValidationVariables.operation_max_interval)
-    setOperation("play",MediaValidationVariables.operation_max_interval)
-    setOperation("stop",MediaValidationVariables.operation_max_interval)
-    setOperation("replay",MediaValidationVariables.operation_max_interval)
-    setOperation("stopNow",MediaValidationVariables.operation_max_interval)
-    setOperation("start",MediaValidationVariables.operation_max_interval)
-    setOperation("stop",MediaValidationVariables.operation_max_interval)
+    appURL    = MediaValidationVariables.lightning_video_test_app_url
+    videoURL  = MediaValidationVariables.video_src_url_dash
+    # Setting VideoPlayer Operations
+    setOperation("pause",MediaValidationVariables.pause_interval)
+    setOperation("play",MediaValidationVariables.play_interval)
     operations = getOperations()
-    # Setting Animation test app URL arguments
-    setURLArgument("ip",ip)
-    setURLArgument("port",MediaValidationVariables.thunder_port)
+    # Setting VideoPlayer test app URL arguments
+    setURLArgument("url",videoURL)
     setURLArgument("operations",operations)
     setURLArgument("autotest","true")
     appArguments = getURLArguments()
     # Getting the complete test app URL
-    animation_test_url = getTestURL(appURL,appArguments)
+    video_test_url = getTestURL(appURL,appArguments)
+
+    #Example video test url
+    #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
+    #url=<video_url>.mpd&operations=pause(30),play(10)&autotest=true
 
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
     status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
-    print "Current values \nWebKitBrowser:%s\nCobalt:%s"%(curr_webkit_status,curr_cobalt_status);
+    print "Current values \nUX:%s\nWebKitBrowser:%s\nCobalt:%s"%(curr_ux_status,curr_webkit_status,curr_cobalt_status);
     if status == "FAILURE":
         set_pre_requisites(obj)
         #Need to revert the values since we are changing plugin status
         revert="YES"
         status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
-    if status == "SUCCESS":
+    #Checking whether device supports proc entry validation. If supported, get
+    #device information to access and read the proc file
+    validation_dict = getProcValidationParams(obj,"VIDEO_PROC_FILE")
+    if status == "SUCCESS" and validation_dict != {}:
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
@@ -157,10 +161,10 @@ if expectedResult in result.upper():
             webkit_console_socket = createEventListener(ip,MediaValidationVariables.webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
             print "Current URL:",current_url
-            print "\nSet Lightning Animation test app URL"
+            print "\nSet Lightning video player test app URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
             tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.addParameter("value",animation_test_url);
+            tdkTestObj.addParameter("value",video_test_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
             if expectedResult in result:
@@ -170,26 +174,49 @@ if expectedResult in result.upper():
                 tdkTestObj.executeTestCase(expectedResult);
                 new_url = tdkTestObj.getResultDetails();
                 result = tdkTestObj.getResult()
-                if new_url in animation_test_url and expectedResult in result:
+                if new_url in video_test_url and expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS");
                     print "URL(",new_url,") is set successfully"
+                    if validation_dict["proc_check"]:
+                        proc_file = validation_dict["proc_file"]
+                        if validation_dict["ssh_method"] == "directSSH":
+                            if validation_dict["password"] == "None":
+                                password = ""
+                            else:
+                                password = validation_dict["password"]
+                            credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+                        else:
+                            #TODO
+                            print "selected ssh method is {}".format(validation_dict["ssh_method"])
+                            pass
+                        print "\nProc entry validation for video player test is enabled\n"
+                    else:
+                        print "\nProc entry validation for video player test is skipped\n"
                     test_result = ""
+                    proc_check_list = []
                     while True:
                         if (len(webkit_console_socket.getEventsBuffer())== 0):
                             time.sleep(1)
                             continue
                         console_log = webkit_console_socket.getEventsBuffer().pop(0)
                         dispConsoleLog(console_log)
+                        if "Observed Event: play" in console_log and validation_dict["proc_check"]:
+                            proc_check_list.append(checkProcEntry(validation_dict["ssh_method"],credentials,proc_file,"started"));
+                            time.sleep(1);
                         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
                             test_result = getConsoleMessage(console_log)
                             break;
                     webkit_console_socket.disconnect()
-                    if "SUCCESS" in test_result:
-                        print "Animation using Lightning app works fine"
+                    if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
+                        print "Video play is fine"
                         print "[TEST EXECUTION RESULT]: SUCCESS"
                         tdkTestObj.setResultStatus("SUCCESS");
+                    elif "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
+                        print "Decoder proc entry check returns failure.Video not playing fine"
+                        print "[TEST EXECUTION RESULT]: FAILURE"
+                        tdkTestObj.setResultStatus("FAILURE");
                     else:
-                        print "Animation using Lightning app not working fine"
+                        print "Video not playing fine"
                         print "[TEST EXECUTION RESULT]: FAILURE"
                         tdkTestObj.setResultStatus("FAILURE");
                     #Set the URL back to previous
@@ -220,7 +247,7 @@ if expectedResult in result.upper():
     if revert=="YES":
         print "Revert the values before exiting"
         status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
-    obj.unloadModule("rdkservices");
+    obj.unloadModule("rdkv_media");
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

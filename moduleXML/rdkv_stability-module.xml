@@ -22,7 +22,7 @@
   <!-- Excecution time out of module -->
     <executionTimeOut>1</executionTimeOut>
   <!-- Excecution time out of module -->
-    <testGroup>Component</testGroup>
+    <testGroup>Certification</testGroup>
   <!-- Logs File Names of module -->
     <logFileNames>[]</logFileNames>
   <!-- Crash File Names of the module -->

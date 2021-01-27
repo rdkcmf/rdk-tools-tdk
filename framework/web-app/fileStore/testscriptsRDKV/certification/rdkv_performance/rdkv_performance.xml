@@ -17,7 +17,7 @@
  limitations under the License.
 -->
 <?xml version="1.0" encoding="UTF-8"?><xml>
-  <module testGroup="Component" name="rdkv_performance">
+  <module testGroup="Certification" name="rdkv_performance">
     <primitiveTests>
       <primitiveTest name="rdkservice_getAllPluginStatus" id="" version="1">
         <function>rdkservice_getAllPluginStatus</function>

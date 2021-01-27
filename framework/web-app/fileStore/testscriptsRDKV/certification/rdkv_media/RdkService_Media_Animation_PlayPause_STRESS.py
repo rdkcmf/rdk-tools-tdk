@@ -21,19 +21,19 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>4</version>
+  <version>3</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_Media_Animation_StartStop_STRESS</name>
+  <name>RdkService_Media_Animation_PlayPause_STRESS</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id> </primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
-  <primitive_test_name>RdkService_Test</primitive_test_name>
+  <primitive_test_name>rdkv_media_test</primitive_test_name>
   <!--  -->
   <primitive_test_version>4</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Animation application and perform animation start and stop operation repeatedly for given number of times</synopsis>
+  <synopsis>Test Script to launch a lightning Animation application and perform animation play and pause operation repeatedly for given number of times</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -60,8 +60,8 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_02</test_case_id>
-    <test_objective>Test Script to launch a lightning Animation application and perform animation start and stop operation repeatedly for given number of times</test_objective>
+    <test_case_id>RDKV_Media_Validation_03</test_case_id>
+    <test_objective>Test Script to launch a lightning Animation application and perform animation play and pause operation repeatedly for given number of times</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -74,15 +74,15 @@ interval: int
 stress_repeat_count: int</input_parameters>
     <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
 2. Get the current URL in webkitbrowser
-3. Load the Animation app url with the operations stop, start and repeat info.
-4. App performs the stop and start operation repeatedly and validates using events
-5. If expected events occurs for start and stop in all the repetition, then app gives the validation result as SUCCESS or else FAILURE
+3. Load the Animation app url with the operations play, pause and repeat info.
+4. App performs the pause and play operation repeatedly and validates using events
+5. If expected events occurs for pause and play in all the repetition, then app gives the validation result as SUCCESS or else FAILURE
 6. Get the event validation result from the app and update the test script status
 7. Revert all values</automation_approch>
-    <expected_output>Animation start and stop should happen for all the repetition</expected_output>
+    <expected_output>Animation pause and play should happen for all the repetition</expected_output>
     <priority>High</priority>
-    <test_stub_interface>rdkservices</test_stub_interface>
-    <test_script>RdkService_Media_Animation_StartStop_STRESS</test_script>
+    <test_stub_interface>rdkv_media</test_stub_interface>
+    <test_script>RdkService_Media_Animation_PlayPause_STRESS</test_script>
     <skipped>No</skipped>
     <release_version>M83</release_version>
     <remarks></remarks>
@@ -102,12 +102,12 @@ from MediaValidationUtility import *
 import MediaValidationUtility
 
 
-obj = tdklib.TDKScriptingLibrary("rdkservices","1",standAlone=True)
+obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_Media_Animation_StartStop_STRESS')
+obj.configureTestCase(ip,port,'RdkService_Media_Animation_PlayPause_STRESS')
 
 webkit_console_socket = None
 
@@ -119,8 +119,8 @@ expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     appURL    = MediaValidationVariables.lightning_animation_test_app_url
     # Setting Animation Operations
-    setOperation("stop",MediaValidationVariables.pause_interval_stress)
-    setOperation("start",MediaValidationVariables.play_interval_stress)
+    setOperation("pause",MediaValidationVariables.pause_interval_stress)
+    setOperation("play",MediaValidationVariables.play_interval_stress)
     setOperation("repeat",MediaValidationVariables.repeat_count_stress)
     operations = getOperations()
     # Setting Animation test app URL arguments
@@ -218,7 +218,7 @@ if expectedResult in result.upper():
     if revert=="YES":
         print "Revert the values before exiting"
         status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
-    obj.unloadModule("rdkservices");
+    obj.unloadModule("rdkv_media");
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

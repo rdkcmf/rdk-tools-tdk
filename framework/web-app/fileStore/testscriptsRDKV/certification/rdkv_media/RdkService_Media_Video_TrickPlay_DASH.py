@@ -21,23 +21,23 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>6</version>
+  <version>5</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_Media_Video_PlayPause_HLS</name>
+  <name>RdkService_Media_Video_TrickPlay_DASH</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id> </primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
-  <primitive_test_name>RdkService_Test</primitive_test_name>
+  <primitive_test_name>rdkv_media_test</primitive_test_name>
   <!--  -->
   <primitive_test_version>4</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operation of hls content</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video trickplay operations of mpd content</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>5</execution_time>
+  <execution_time>10</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -60,8 +60,8 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_06</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operation of hls content</test_objective>
+    <test_case_id>RDKV_Media_Validation_10</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video trickplay operations of mpd content</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -69,20 +69,20 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Lightning player App URL: string
 webinspect_port: string
-video_src_url_hls: string
-play_interval: int
-pause_interval:int</input_parameters>
+video_src_url_dash: string
+operation_min_interval: int
+operation_max_interval: int</input_parameters>
     <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
 2. Get the current URL in webkitbrowser
-3. Load the player app url with the operations to be performed, play and pause with given interval.
-4. App performs the provided operations and validates each operation using events
-5. If expected events occurs for each operation, then app gives the validation result as SUCCESS or else FAILURE
+3. Load the player app url with the operations to be performed, play, pause, seek forward/backward and fast-forward with interval.
+4. App performs the provided operations and validates each operation using events and with position and rate value for seek and fast-forward operations
+5. If expected events occurs for each operation and expected position, rate values occurs for seek and fast-forward, then app gives the validation result as SUCCESS or else FAILURE
 6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>Player pause and play should happen, expected events should occur and if proc validation is applicable, then expected data should be available in proc file</expected_output>
+    <expected_output>All the provided player operations and expected events should occur and if proc validation is applicable, then expected data should be available in proc file</expected_output>
     <priority>High</priority>
-    <test_stub_interface>rdkservices</test_stub_interface>
-    <test_script>RdkService_Media_Video_PlayPause_HLS</test_script>
+    <test_stub_interface>rdkv_media</test_stub_interface>
+    <test_script>RdkService_Media_Video_TrickPlay_DASH</test_script>
     <skipped>No</skipped>
     <release_version>M82</release_version>
     <remarks></remarks>
@@ -102,12 +102,12 @@ from MediaValidationUtility import *
 import MediaValidationUtility
 
 
-obj = tdklib.TDKScriptingLibrary("rdkservices","1",standAlone=True)
+obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_Media_Video_PlayPause_HLS')
+obj.configureTestCase(ip,port,'RdkService_Media_Video_TrickPlay_DASH')
 
 webkit_console_socket = None
 
@@ -118,10 +118,15 @@ print "[LIB LOAD STATUS]  :  %s" %result;
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     appURL    = MediaValidationVariables.lightning_video_test_app_url
-    videoURL  = MediaValidationVariables.video_src_url_hls
+    videoURL  = MediaValidationVariables.video_src_url_dash
     # Setting VideoPlayer Operations
-    setOperation("pause",MediaValidationVariables.pause_interval)
-    setOperation("play",MediaValidationVariables.play_interval)
+    setOperation("seekfwd",MediaValidationVariables.operation_max_interval)
+    setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
+    setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
+    setOperation("pause",MediaValidationVariables.operation_max_interval)
+    setOperation("play",MediaValidationVariables.operation_min_interval)
+    setOperation("seekbwd",MediaValidationVariables.operation_max_interval)
+    setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
     operations = getOperations()
     # Setting VideoPlayer test app URL arguments
     setURLArgument("url",videoURL)
@@ -133,7 +138,7 @@ if expectedResult in result.upper():
 
     #Example video test url
     #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
-    #url=<video_url>.m3u8&operations=pause(30),play(10)&autotest=true
+    #url=<video_url>.mpd&operations=seekfwd(10),fastfwd(10),fastfwd(10),pause(10),play(5),seekbwd(10),fastfwd(10)&autotest=true
 
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -200,7 +205,7 @@ if expectedResult in result.upper():
                             continue
                         console_log = webkit_console_socket.getEventsBuffer().pop(0)
                         dispConsoleLog(console_log)
-                        if "Observed Event: play" in console_log and validation_dict["proc_check"]:
+                        if "Observed Event: " in console_log and validation_dict["proc_check"]:
                             proc_check_list.append(checkProcEntry(validation_dict["ssh_method"],credentials,proc_file,"started"));
                             time.sleep(1);
                         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
@@ -247,7 +252,7 @@ if expectedResult in result.upper():
     if revert=="YES":
         print "Revert the values before exiting"
         status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
-    obj.unloadModule("rdkservices");
+    obj.unloadModule("rdkv_media");
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"
