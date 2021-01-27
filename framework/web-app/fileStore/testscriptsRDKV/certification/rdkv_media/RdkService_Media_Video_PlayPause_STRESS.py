@@ -27,7 +27,7 @@
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id> </primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
-  <primitive_test_name>RdkService_Test</primitive_test_name>
+  <primitive_test_name>rdkv_media_test</primitive_test_name>
   <!--  -->
   <primitive_test_version>4</primitive_test_version>
   <!--  -->
@@ -82,7 +82,7 @@ repeat_count_stress:int</input_parameters>
 7. Revert all values</automation_approch>
     <expected_output>Player pause and play should happen and expected events should occur for all the repetition and if proc validation is applicable, then expected data should be available in proc file </expected_output>
     <priority>High</priority>
-    <test_stub_interface>rdkservices</test_stub_interface>
+    <test_stub_interface>rdkv_media</test_stub_interface>
     <test_script>RdkService_Media_Video_PlayPause_STRESS</test_script>
     <skipped>No</skipped>
     <release_version>M82</release_version>
@@ -103,7 +103,7 @@ from MediaValidationUtility import *
 import MediaValidationUtility
 
 
-obj = tdklib.TDKScriptingLibrary("rdkservices","1",standAlone=True)
+obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
@@ -249,7 +249,7 @@ if expectedResult in result.upper():
     if revert=="YES":
         print "Revert the values before exiting"
         status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
-    obj.unloadModule("rdkservices");
+    obj.unloadModule("rdkv_media");
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

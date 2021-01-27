@@ -17,7 +17,7 @@
  limitations under the License.
 -->
 <?xml version="1.0" encoding="UTF-8"?><xml>
-  <module name="rdkv_stability" testGroup="Component">
+  <module name="rdkv_stability" testGroup="Certification">
     <primitiveTests>
       <primitiveTest name="rdkservice_checkChannelChangeLog" id="" version="1">
         <function>rdkservice_checkChannelChangeLog</function>
