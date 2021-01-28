@@ -38,13 +38,13 @@
                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,FirmwareControl" expectedValues="activated"/>
             </testStep>
           </prerequisite>
-          <prerequisite requisiteId="1" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
+          <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
             <event pluginName="FirmwareControl" eventName="Upgrade_Progress_Event" />
           </prerequisite>
         </pluginPreRequisite>
 
         <testCase testCaseId="FWC_01" testCaseName="Upgrade_Firmware" desc="Upgrade the device to the given firmware">
-            <testStep testStepId="1" name="GetCurrentImageVersion" action="externalFnCall" saveResult="true" revertGet="yes">
+            <testStep testStepId="1" name="GetCurrentImageVersion" action="externalFnCall" saveResult="true" >
                 <resultGeneration useMethodTag="getImageVersion" arguments="get"/>
             </testStep>
             <testStep testStepId="2" name="Get_Download_Size" method="Get_Download_Size">
@@ -68,7 +68,7 @@
             <testStep testStepId="6" name="Execute_Reboot_Command" action="externalFnCall" rebootStep="yes">
                 <resultGeneration useMethodTag="executeRebootCmd"/>
             </testStep>
-            <testStep testStepId="7" name="Get_Image_Version" action="externalFnCall" delay="30" >
+            <testStep testStepId="7" name="Get_Image_Version" action="externalFnCall" delay="10" >
                 <resultGeneration useMethodTag="getImageVersion">
                     <expectedValues useConfigFile="true" key="FWC_FIRMWARE_VERSION"/>
                 </resultGeneration>
@@ -79,7 +79,7 @@
             <testStep testStepId="9" name="Execute_Reboot_Command" action="externalFnCall" delay="30" rebootStep="yes">
                 <resultGeneration useMethodTag="executeRebootCmd"/>
             </testStep>
-            <testStep testStepId="10" name="Get_Image_Version" action="externalFnCall" delay="30"  revertFlag="yes">
+            <testStep testStepId="10" name="Get_Image_Version" action="externalFnCall" delay="10" >
                 <resultGeneration useMethodTag="getImageVersion" >
                   <expectedValues usePreviousResult="true" Id="1" useMethodTag="change_image_version" />
                 </resultGeneration>

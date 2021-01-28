@@ -481,6 +481,39 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        # RDKShell Events response result parser steps
+        elif tag == "rdkshell_check_on_launched_event":
+            result=result[0]
+            info = result
+            if str(result.get("client")) ==  str(expectedValues[0]) and str(result.get("launchType"))== str(expectedValues[1]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "rdkshell_check_application_state_event":
+            result=result[0]
+            info = result
+            if str(result.get("client")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "rdkshell_check_on_userinactivity_event":
+            if arg[0] == "check_user_inactive":
+                result1=result[0]
+                result2=result[1]
+                difference = int(float(result2.get("minutes"))) - int(float(result1.get("minutes")))
+                if difference == int(expectedValues[0]):
+                    info["User_Inactivity_Minutes"] = difference
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif arg[0] == "check_user_active":
+                if result == "null":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
         # FirmwareControl Events response result parser steps
         elif tag == "fwc_check_upgrade_progress_event":
             print "Events list :",result

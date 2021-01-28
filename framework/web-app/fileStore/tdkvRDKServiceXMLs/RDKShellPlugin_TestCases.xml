@@ -75,6 +75,12 @@
               </subtestStep>
             </testStep>
           </prerequisite>
+          <prerequisite requisiteId="4" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
+            <event pluginName="RDKShell" eventName="Event_On_Launched" />
+            <event pluginName="RDKShell" eventName="Event_On_Suspended" />
+            <event pluginName="RDKShell" eventName="Event_On_Destroyed" />
+            <event pluginName="RDKShell" eventName="Event_On_UserInactivity" />
+          </prerequisite>
 
         </pluginPreRequisite>
 
@@ -476,17 +482,17 @@
             </testStep>
         </testCase>
          
-         <!-- Test case 24 -->
+          <!-- Test case 24 -->
         <testCase testCaseId="RDKShell_24" testCaseName= "RDKShell_Suspend_Resume_Cobalt" desc="Resume cobalt  application">
             <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Suspend_Application" method="SuspendApplication" >
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_if_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="2" name="Suspend_Application" method="SuspendApplication" >
               <params>
                 <param tag="callsign"  value="Cobalt" />
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
-            </testStep>
-            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
-              <resultGeneration useMethodTag="rdkshell_check_if_application_killed" expectedValues= "cobalt" />
             </testStep>
             <testStep testStepId="3" name="Resume_Cobalt" method="LaunchApplication" delay="3" >
               <params>
@@ -504,14 +510,14 @@
         <!-- Test case 25 -->
         <testCase testCaseId="RDKShell_25" testCaseName= "RDKShell_Suspend_Resume_WebKitBrowser" desc="Resume WebKitBrowser  application">
             <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Suspend_Application" method="SuspendApplication" >
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_if_exists" expectedValues= "webkitbrowser" />
+            </testStep>
+            <testStep testStepId="2" name="Suspend_Application" method="SuspendApplication" >
               <params>
                 <param tag="callsign"  value="WebKitBrowser" />
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
-            </testStep>
-            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
-              <resultGeneration useMethodTag="rdkshell_check_if_application_killed" expectedValues= "webkitbrowser" />
             </testStep>
             <testStep testStepId="3" name="Resume_WebKitBrowser" method="LaunchApplication" delay="3" >
               <params>
@@ -525,8 +531,8 @@
               <resultGeneration useMethodTag="rdkshell_get_state" arguments="WebKitBrowser" expectedValues="resumed" />
             </testStep>
 
-        </testCase>        
-        
+        </testCase>
+
         <!-- Test case 26 -->
         <testCase testCaseId="RDKShell_26" testCaseName= "RDKShell_Perform_Animation" desc="Performs animation">
             <testCaseInfo testCaseType="direct"/>
@@ -598,22 +604,25 @@
         <!-- Test case 29 -->
         <testCase testCaseId="RDKShell_29" testCaseName= "RDKShell_Destroy_Resume_Cobalt" desc="Destroy and resumes Cobalt application">
             <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Destroy_Application" method="DestroyApplication" >
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="2" name="Destroy_Application" method="DestroyApplication" >
               <params>
                 <param tag="callsign"  value="Cobalt" />
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
-            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
-              <resultGeneration useMethodTag="rdkshell_check_if_application_killed" expectedValues= "cobalt" />
+            <testStep testStepId="3" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application"  arguments= "check_not_exists" expectedValues= "cobalt" />
             </testStep>
-            <testStep testStepId="3" name="Resume_Cobalt" method="LaunchApplication" delay="3" >
+            <testStep testStepId="4" name="Resume_Cobalt" method="LaunchApplication" delay="3" >
               <params>
                 <param tag="callsign" value="Cobalt" />
               </params>
               <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
-            <testStep testStepId="4" name="Is_Cobalt_Resumed" method="Get_Application_State" delay="2">
+            <testStep testStepId="5" name="Is_Cobalt_Resumed" method="Get_Application_State" delay="2">
               <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
             </testStep>
         </testCase>
@@ -621,16 +630,19 @@
         <!-- Test case 30 -->
         <testCase testCaseId="RDKShell_30" testCaseName= "RDKShell_Destroy_Resume_WebKitBrowser" desc="Destroy and resumes WebKitBrowser application">
             <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Destroy_Application" method="DestroyApplication" >
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "webkitbrowser" />
+            </testStep>
+            <testStep testStepId="2" name="Destroy_Application" method="DestroyApplication" >
               <params>
                 <param tag="callsign"  value="WebKitBrowser" />
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
-            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
-              <resultGeneration useMethodTag="rdkshell_check_if_application_killed" expectedValues= "webkitbrowser" />
+            <testStep testStepId="3" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application"  arguments= "check_not_exists" expectedValues= "webkitbrowser" />
             </testStep>
-            <testStep testStepId="3" name="Resume_WebKitBrowser" method="LaunchApplication" delay="3" >
+            <testStep testStepId="4" name="Resume_WebKitBrowser" method="LaunchApplication" delay="3" >
               <params>
                 <param tag="callsign" value="WebKitBrowser" />
                 <param tag="type" value="HtmlApp"  />
@@ -638,55 +650,248 @@
               </params>
               <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
-            <testStep testStepId="4" name="Is_WebKitBrowser_Resumed" method="Get_Application_State" delay="2">
+            <testStep testStepId="5" name="Is_WebKitBrowser_Resumed" method="Get_Application_State" delay="2">
               <resultGeneration useMethodTag="rdkshell_get_state" arguments="WebKitBrowser" expectedValues="resumed" />
             </testStep>
         </testCase>
+
         <!-- Test case 31 -->
-        <!-- #TODO For now added scenarios for webkitbrowser & cobalt applications and validating the method. later this will be made as generic case -->
-        <testCase testCaseId="RDKShell_31" testCaseName= "RDKShell_Application_Suspend" desc="Suspend given application">
+        <testCase testCaseId="RDKShell_31" testCaseName="RDKShell_Check_On_Launched_Event_Cobalt" desc="Checks on launched event" >
             <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
-              <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
             </testStep>
-            <testStep testStepId="2" name="suspendapplication" method="SuspendApplication">
-              <params>
-                <param tag="callsign" usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0,callsign"  />
-              </params>
-              <resultGeneration useMethodTag="rdkshell_get_result_status" />
-            </testStep>
-        </testCase>
-
-
-        <!-- Test case 32 -->
-        <testCase testCaseId="RDKShell_32" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
-            <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="killapp" method="Kill">
-              <params>
-                <param tag="client"  value="Cobalt" />
-              </params>
-              <resultGeneration useMethodTag="rdkshell_get_result_status" />
-            </testStep>
-            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
-              <resultGeneration useMethodTag="rdkshell_check_if_application_killed" expectedValues= "cobalt" />
-            </testStep>
-            <testStep testStepId="3" name="Launch_Application_Cobalt" method="LaunchApplication" delay="5" >
+            <testStep testStepId="2" name="Launch_Application" method="LaunchApplication">
               <params>
                 <param tag="callsign" value="Cobalt" />
               </params>
               <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
-            <testStep testStepId="4" name="Is_Cobalt_Resumed" method="Get_Application_State" delay="2">
+            <testStep testStepId="3" name="Check_On_Launched_Event" event="Event_On_Launched" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_on_launched_event" expectedValues="Cobalt,resume"/>
+            </testStep>
+            <testStep testStepId="4" name="Is_Cobalt_Resumed" method="Get_Application_State"  >
               <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
             </testStep>
         </testCase>
+
+        <!-- Test case 32 -->
+        <testCase testCaseId="RDKShell_32" testCaseName="RDKShell_Check_On_Suspended_Event_Cobalt" desc="Checks on suspended event">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="2" name="Suspend_Application" method="SuspendApplication" >
+              <params>
+                <param tag="callsign"  value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_Suspended_Event" event="Event_On_Suspended" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+            </testStep>
+            <testStep testStepId="4" name="Resume_Cobalt" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Is_Cobalt_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
+            </testStep>
+        </testCase>
+
         <!-- Test case 33 -->
-        <testCase testCaseId="RDKShell_33" testCaseName= "RDKShell_System_Resource_Info" desc="Gets the system resource info">
+        <testCase testCaseId="RDKShell_33" testCaseName= "RDKShell_Check_On_Destroyed_Event_Cobalt" desc="Checks on destroyed events">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="2" name="Destroy_Application" method="DestroyApplication" >
+              <params>
+                <param tag="callsign"  value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_Destroyed_Event" event="Event_On_Destroyed" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+            </testStep>
+            <testStep testStepId="4" name="Resume_Cobalt" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Is_Cobalt_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 34 -->
+
+        <testCase testCaseId="RDKShell_34" testCaseName= "RDKShell_User_Inactivity_Reporting" desc="Checks user inactivity interval">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Enable_Inactivity_Reporting" method="Enable_Inactivity_Reporting">
+              <params>
+                <param tag="enable"  value="true" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Inactivity_Interval" method="Set_Inactivity_Interval" >
+              <params>
+                <param tag="interval"  value="1" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status"  />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_UserInactivity_Event" event="Event_On_UserInactivity" action="eventListener" delay="120">
+              <resultGeneration useMethodTag="rdkshell_check_on_userinactivity_event"  arguments="Check_user_inactive" expectedValues="1"  />
+            </testStep>
+            <testStep testStepId="4" name="Disable_Inactivity_Reporting" method="Enable_Inactivity_Reporting" >
+              <params>
+                <param tag="enable"  value="false" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+        </testCase>
+        <!-- Test case 35 -->
+
+        <testCase testCaseId="RDKShell_35" testCaseName= "RDKShell_Check_User_Active" desc="Checks whether user active">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Enable_Inactivity_Reporting" method="Enable_Inactivity_Reporting">
+              <params>
+                <param tag="enable"  value="true" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Inactivity_Interval" method="Set_Inactivity_Interval" >
+              <params>
+                <param tag="interval"  value="1" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status"  />
+            </testStep>
+            <testStep testStepId="3"   name="Generate_Key" method="GenerateKey" delay="30" >
+              <params paramKey="keys">
+                <param tag="keyCode" value="13" />
+                <param tag="modifiers" useDefault="true" />
+                <param tag="delay" value="1.0"/>
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+
+            <testStep testStepId="3" name="Check_On_UserInactivity_Event" event="Event_On_UserInactivity" action="eventListener" delay="30">
+              <resultGeneration useMethodTag="rdkshell_check_on_userinactivity_event" arguments="Check_user_active"  />
+            </testStep>
+            <testStep testStepId="4" name="Disable_Inactivity_Reporting" method="Enable_Inactivity_Reporting" >
+              <params>
+                <param tag="enable"  value="false" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 36 -->
+        <testCase testCaseId="RDKShell_36" testCaseName= "RDKShell_Suspend_Resume_WebKitBrowser_Check_State" desc="Checks webkitbrowser suspend resume states">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "webkitbrowser" />
+            </testStep>
+            <testStep testStepId="2" name="Suspend_Application" method="SuspendApplication" >
+              <params>
+                <param tag="callsign"  value="WebKitBrowser" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Is_WebKitBrowser_Suspended" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="WebKitBrowser" expectedValues="suspended" />
+            </testStep>
+            <testStep testStepId="4" name="Resume_WebKitBrowser" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="WebKitBrowser" />
+                <param tag="type" value="HtmlApp"  />
+                <param tag="uri"  useConfigFile="true" key="RDKSHELL_WEBKIT_LAUNCH_URL"  />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Is_WebKitBrowser_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="WebKitBrowser" expectedValues="resumed" />
+            </testStep>
+        </testCase>
+
+
+        <!-- Test case 37 -->
+        <testCase testCaseId="RDKShell_37" testCaseName= "RDKShell_Suspend_Resume_Cobalt_Check_State" desc="Checks cobalt suspend resume states">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="2" name="Suspend_Application" method="SuspendApplication" >
+              <params>
+                <param tag="callsign"  value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Is_Cobalt_Suspended" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="suspended" />
+            </testStep>
+            <testStep testStepId="4" name="Resume_Cobalt" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Is_Cobalt_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
+            </testStep>
+        </testCase>
+
+
+        <!-- Test case 38 -->
+        <testCase testCaseId="RDKShell_38" testCaseName= "RDKShell_Application_Suspend" desc="Suspend given application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Applications" method="Get_Application_State" saveResult="true">
+              <resultGeneration useMethodTag="rdkshell_check_for_results"/>
+            </testStep>
+            <testStep testStepId="2" name="suspendapplication" method="SuspendApplication" >
+              <params>
+                <param tag="callsign" usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_clients_state" arguments="0"  />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+        </testCase>
+
+
+        <!-- Test case 39 -->
+        
+        <testCase testCaseId="RDKShell_39" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="2" name="killapp" method="Kill">
+              <params>
+                <param tag="client"  value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_not_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="4" name="Launch_Application_Cobalt" method="LaunchApplication" delay="5" >
+              <params>
+                <param tag="callsign" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Is_Cobalt_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
+            </testStep>
+        </testCase> 
+        <!-- Test case 40 -->
+        
+        <testCase testCaseId="RDKShell_40" testCaseName= "RDKShell_System_Resource_Info" desc="Gets the system resource info">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_System_Resource_Info" method="Get_System_Resource_Info" >
               <resultGeneration useMethodTag="rdkshell_check_for_results"/>
             </testStep>
         </testCase> 
-
-
 </testPlugin>
