@@ -28,6 +28,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common import exceptions
 from SSHUtility import *
 import re
+from datetime import datetime
 
 deviceIP=""
 devicePort=""
@@ -472,3 +473,47 @@ def rdkservice_getSSHParams(realpath,deviceIP):
         ssh_dict = {}
     ssh_dict = json.dumps(ssh_dict)
     return ssh_dict
+
+#-------------------------------------------------------------------
+#SUSPEND A GIVEN PLUGIN USING RDKSHELL
+#-------------------------------------------------------------------
+def suspend_plugin(obj,plugin):
+    status = expectedResult = "SUCCESS"
+    print "\n Suspending {} \n".format(plugin)
+    params = '{"callsign":"'+plugin+'"}'
+    tdkTestObj = obj.createTestStep('rdkservice_setValue')
+    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.suspend")
+    tdkTestObj.addParameter("value",params)
+    start_suspend = str(datetime.utcnow()).split()[1]
+    tdkTestObj.executeTestCase(expectedResult);
+    result = tdkTestObj.getResult();
+    if result == "SUCCESS":
+        print "\n Suspended {} plugin \n".format(plugin)
+        tdkTestObj.setResultStatus("SUCCESS")
+    else:
+        print "\n Unable to Suspend {} plugin \n".format(plugin)
+        tdkTestObj.setResultStatus("FAILURE")
+        status = "FAILURE"
+    return status,start_suspend
+
+#-------------------------------------------------------------------
+#LAUNCH A GIVEN PLUGIN USING RDKSHELL
+#-------------------------------------------------------------------
+def launch_plugin(obj,plugin):
+    status = expectedResult = "SUCCESS"
+    print "\n Resuming {} \n".format(plugin)
+    params = '{"callsign":"'+plugin+'", "type":"", "uri":"", "x":0, "y":0, "w":1920, "h":1080}'
+    tdkTestObj = obj.createTestStep('rdkservice_setValue')
+    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.launch")
+    tdkTestObj.addParameter("value",params)
+    start_lauch = str(datetime.utcnow()).split()[1] 
+    tdkTestObj.executeTestCase(expectedResult);
+    result = tdkTestObj.getResult();
+    if result == "SUCCESS":
+        print "\n Resumed {} plugin \n".format(plugin)
+        tdkTestObj.setResultStatus("SUCCESS")
+    else:
+        print "\n Unable to Resume {} plugin \n".format(plugin)
+        tdkTestObj.setResultStatus("FAILURE")
+        status = "FAILURE"
+    return status,start_lauch
