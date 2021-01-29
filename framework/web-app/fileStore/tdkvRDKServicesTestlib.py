@@ -248,6 +248,8 @@ def executeTestCases(testCaseID="all"):
     global testStepJSONCmd
     global testStepResults
     testStepResults = []
+    global bktestStepResults
+    bktestStepResults = []
     global revertTestInfo
     revertTestInfo = {}
     global pluginPreRequisiteStatus
@@ -1297,10 +1299,14 @@ def handleDeviceReboot():
 
     if deviceStatus == "UP":
         print "Device is UP. Setting back pre-requisites..."
+        global testStepResults
+        global bktestStepResults
+        bktestStepResults = testStepResults
         global logDisplay
         logDisplay = False
         setPreRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPreRequisite"),"Pre")
         logDisplay = True
+        testStepResults = bktestStepResults
         if "FAILURE" in setPreRequisiteStatus:
             print "Plugin pre-requisites are not set back properly"
             return "FAILURE"
