@@ -50,7 +50,7 @@ class LogZipService {
 			exResultList.each { executionResult ->
 				
 				try {
-					if( (type == ALL_LOGS && (executionResult?.status?.equals(SUCCESS) || executionResult?.status?.equals(FAILURE))) || (type == FAILURE_LOGS && executionResult?.status?.equals(FAILURE)) ){
+					if( (type == ALL_LOGS && (executionResult?.status?.equals(SUCCESS) || executionResult?.status?.equals(FAILURE) || (executionResult?.status?.equals(SCRIPT_TIME_OUT)))) || (type == FAILURE_LOGS && executionResult?.status?.equals(FAILURE)) ){
 						/*preparing the script name and the module name to make the file structure for ZIP */
 						String scriptName = executionResult?.script
 						String moduleName = getModuleName(realPath,scriptName)
