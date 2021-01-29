@@ -50,7 +50,7 @@
                 <params>
                   <param tag="url" useConfigFile="true" key="SC_INVALID_UPLOAD_URL"/>
                 </params>
-                <resultGeneration useMethodTag="screencapture_upload_screen" expectedValues="False"/>
+                <resultGeneration useMethodTag="screencapture_upload_screen" expectedValues="True"/>
             </testStep>
         </testCase>
 
@@ -80,7 +80,7 @@
                 <params>
                   <param tag="url" useConfigFile="true" key="SC_INVALID_UPLOAD_URL"/>
                 </params>
-                <resultGeneration useMethodTag="screencapture_upload_screen" expectedValues="False"/>
+                <resultGeneration useMethodTag="screencapture_upload_screen" expectedValues="True"/>
             </testStep>
             <testStep testStepId="2" name="Check_Upload_Complete_Event" event="Event_Upload_Complete" action="eventListener" delay="10">
               <resultGeneration useMethodTag="screencapture_check_upload_complete_event" expectedValues="False"/>

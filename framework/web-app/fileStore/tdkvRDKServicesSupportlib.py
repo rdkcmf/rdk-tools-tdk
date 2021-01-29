@@ -586,7 +586,10 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "system_get_state_info":
-            info = checkAndGetAllResultInfo(result,result.get("success"))
+            if len(arg):
+                info = checkAndGetAllResultInfo(result.get(arg[0]),result.get("success"))
+            else:
+                info = checkAndGetAllResultInfo(result,result.get("success"))
 
         elif tag == "system_validate_core_temperature":
             info = checkAndGetAllResultInfo(result,result.get("success"))
@@ -1594,7 +1597,12 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             info = checkAndGetAllResultInfo (result[0])
 
         elif tag == "controller_check_environment_variable_value":
-            info = checkAndGetAllResultInfo (result)
+            status = checkNonEmptyResultData(result)
+            info["RESULT"] = result
+            if status == "TRUE":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "controller_get_configuration_url":
             info["url"] = result.get("url")
@@ -2013,14 +2021,7 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag == "system_get_available_standby_modes":
             testStepResults = testStepResults[0].values()[0]
             info["standbyMode"] = testStepResults[0].get("supportedStandbyModes")
-        elif tag == "system_switct_timezone_dst":
-            testStepResults = testStepResults[0].values()[0]
-            timeZone = testStepResults[0].get("timeZone")
-            if timeZone == "UTC-5":
-                info["timeZone"] == "UTC-7"
-            else:
-                info["timeZone"] == "UTC-5"
-
+  
         elif tag == "system_generate_new_temperature_thresholds":
             testStepResults = testStepResults[0].values()[0]
             testStepResults[0] = testStepResults[0].get("temperatureThresholds")
@@ -2302,11 +2303,11 @@ def checkTestCaseApplicability(methodTag,configKeyData,arguments):
             else:
                 result = "FALSE"
 
-	elif tag == "displaysetting_check_feature_applicability":
-    	    if arg[0] in keyData:
-        	result = "TRUE"
+        elif tag == "displaysetting_check_feature_applicability":
+            if all(item in keyData for item in arg):
+                result = "TRUE"
             else:
-        	result = "FALSE"
+                result = "FALSE"
 
         elif tag == "is_led_supported":
             if arg[0] in keyData:
@@ -2321,7 +2322,13 @@ def checkTestCaseApplicability(methodTag,configKeyData,arguments):
                 result = "FALSE"
 
         elif tag == "bt_na_tests":
-            if arg[0] not in keyData:
+            if arg[0] not in str(keyData).lower():
+                result = "TRUE"
+            else:
+                result = "FALSE"
+
+        elif tag == "network_check_feature_applicability":
+            if arg[0] in keyData:
                 result = "TRUE"
             else:
                 result = "FALSE"
