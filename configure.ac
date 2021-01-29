@@ -220,6 +220,23 @@ AC_ARG_ENABLE([bluetooth],
            [echo "bluetooth component is not enabled"])
 AM_CONDITIONAL([BLUETOOTH], [test x$BLUETOOTH = xtrue])
 
+AC_ARG_ENABLE([bluetoothhal],
+         AS_HELP_STRING([--enable-bluetoothhal],[enable bluetoothhal (default is no)]),
+         [
+           case "${enableval}" in
+              yes) BLUETOOTHHAL=true
+                   AS_IF([test x$HYBRID = xtrue], [SUBDIR_HYBRID+=" BluetoothHal_stub "],
+                          [echo BluetoothHal enabled in Hybrid])
+                   AS_IF([test x$CLIENT = xtrue], [SUBDIR_CLIENT+=" BluetoothHal_stub "],
+                          [echo BluetoothHal enabled in Client]) ;;
+             no) BLUETOOTHHAL=false ;;
+            *) AC_MSG_ERROR([bad value ${enableval} for --enable-bluetoothhal ]) ;;
+             esac
+            ],
+           [echo "bluetoothhal component is not enabled"])
+AM_CONDITIONAL([BLUETOOTHHAL], [test x$BLUETOOTHHAL = xtrue])
+
+
 AC_ARG_ENABLE([deepsleephal],
          AS_HELP_STRING([--enable-deepsleephal],[enable deepsleephal (default is no)]),
          [
@@ -331,6 +348,7 @@ AC_CONFIG_FILES([Makefile
          SNMP_stub/Makefile
          MocaHal_stub/Makefile
          Bluetooth_stub/Makefile
+         BluetoothHal_stub/Makefile
 	 AudioCaptureMgr_stub/Makefile
 	 USBCtrl_stub/Makefile
 	 SystemUtil_stub/Makefile
