@@ -33,3 +33,12 @@ if file_not_present in output:
     print "version.txt file is missing"
 else:
     print "version.txt file is available"
+#Get the number of files in / 
+StopPrint()
+output2 = ssh_and_execute("directSSH",dev_ip,"root","","ls /;ls / | wc -l")
+StartPrint()
+output2 = output2.replace(output2.split("\n")[0],"")
+no_of_files = output2.split("\n")[-2]
+output2 = output2.replace(output2.split("\n")[-2],"")
+print "Files present in / :", output2
+print "Number of files present in / :",no_of_files
