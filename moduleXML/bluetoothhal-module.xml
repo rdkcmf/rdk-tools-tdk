@@ -30,8 +30,33 @@
   <!-- Total functions corresponding module  -->
     <functions>
       <function name='TestMgr_BluetoothHal_GetListOfAdapters' />
+      <function name='TestMgr_BluetoothHal_RegisterAgent' />
+      <function name='TestMgr_BluetoothHal_UnregisterAgent' />
+      <function name='TestMgr_BluetoothHal_GetAdapter' />
+      <function name='TestMgr_BluetoothHal_GetAdapters' />
+      <function name='TestMgr_BluetoothHal_GetAdapterPower' />
+      <function name='TestMgr_BluetoothHal_SetAdapterPower' />
+      <function name='TestMgr_BluetoothHal_SetAdapter' />
+      <function name='TestMgr_BluetoothHal_EnableAdapter' />
+      <function name='TestMgr_BluetoothHal_DisableAdapter' />
+      <function name='TestMgr_BluetoothHal_SetAdapterDiscoverable' />
+      <function name='TestMgr_BluetoothHal_SetAdapterDiscoverableTimeout' />
+      <function name='TestMgr_BluetoothHal_GetAdapterDiscoverableStatus' />
+      <function name='TestMgr_BluetoothHal_GetAdapterAddr' />
     </functions>
   <!-- Total parameters corresponding module  -->
-    <parameters />
+    <parameters>
+      <parameter funName='TestMgr_BluetoothHal_RegisterAgent' parameterName='capabilities' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_GetAdapterPower' parameterName='adapter_path' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_SetAdapterPower' parameterName='power_status' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_SetAdapterPower' parameterName='adapter_path' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_SetAdapter' parameterName='adapter_number' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_SetAdapterDiscoverable' parameterName='adapter_path' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_SetAdapterDiscoverable' parameterName='discoverable_status' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_SetAdapterDiscoverableTimeout' parameterName='adapter_path' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_SetAdapterDiscoverableTimeout' parameterName='timeout' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_GetAdapterDiscoverableStatus' parameterName='adapter_path' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_GetAdapterAddr' parameterName='adapter_number' parameterType='INTEGER' range='0-9' />
+    </parameters>
   </module>
 </xml>

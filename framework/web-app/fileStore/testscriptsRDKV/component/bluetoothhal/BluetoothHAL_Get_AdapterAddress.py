@@ -21,19 +21,19 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>6</version>
+  <version>2</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>BluetoothHAL_Get_ListOf_Adapters</name>
+  <name>BluetoothHAL_Get_AdapterAddress</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
-  <primitive_test_id></primitive_test_id>
+  <primitive_test_id> </primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
-  <primitive_test_name>BluetoothHal_GetListOfAdapters</primitive_test_name>
+  <primitive_test_name>BluetoothHal_GetAdapterAddr</primitive_test_name>
   <!--  -->
   <primitive_test_version>1</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Get the list of bluetooth adapters in the device</synopsis>
+  <synopsis>To get the address of bluetooth adapter</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -56,21 +56,21 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>CT_BLUETOOTH_HAL_01</test_case_id>
-    <test_objective>To get the list of bluetooth adapters available in the device</test_objective>
+    <test_case_id>CT_BLUETOOTH_HAL_08</test_case_id>
+    <test_objective>To get the address of bluetooth adapter</test_objective>
     <test_type>Positive</test_type>
     <test_setup>Accelerator</test_setup>
     <pre_requisite>1. Initialize the BTRCore module using BTRCore_Init()</pre_requisite>
-    <api_or_interface_used>enBTRCoreRet BTRCore_GetListOfAdapters (tBTRCoreHandle hBTRCore, stBTRCoreListAdapters* pstListAdapters);</api_or_interface_used>
-    <input_parameters>None</input_parameters>
+    <api_or_interface_used>enBTRCoreRet BTRCore_GetAdapterAddr (tBTRCoreHandle hBTRCore, unsigned char aui8adapterIdx, char* apui8adapterAddr);</api_or_interface_used>
+    <input_parameters>adapter_number - using the default adapter 0</input_parameters>
     <automation_approch>1. TM loads the BluetoothHal agent via the test agent.
-2 . BluetoothHal agent will invoke the api BTRCore_GetListOfAdapters to get the list of bluetooth adapters available in the DUT.
-3. TM checks if the API call is success and checks if there is atleast one bluetooth adapter available in the DUT and return SUCCESS/FAILURE status.</automation_approch>
+2 . BluetoothHal agent will invoke the api BTRCore_GetAdapterAddr to get the address of bluetooth adapter specified using the adapter number 0(for default adapter).
+3. TM checks if the API call is success and checks if the bluetooth adapter address retrieved is not empty and return SUCCESS/FAILURE status.</automation_approch>
     <expected_output>Checkpoint 1. Verify the API call is success
-Checkpoint 2. Verify that atleast one bluetooth adapter is available in the DUT.</expected_output>
+Checkpoint 2. Verify that the bluetooth adapter address retrieved is not empty </expected_output>
     <priority>High</priority>
     <test_stub_interface>libbluetoothhalstub.so.0</test_stub_interface>
-    <test_script>BluetoothHAL_Get_ListOf_Adapters</test_script>
+    <test_script>BluetoothHAL_Get_AdapterAddress</test_script>
     <skipped>No</skipped>
     <release_version>M85</release_version>
     <remarks></remarks>
@@ -88,7 +88,7 @@ bluetoothhalObj = tdklib.TDKScriptingLibrary("bluetoothhal","1");
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-bluetoothhalObj.configureTestCase(ip,port,'BluetoothHAL_Get_ListOf_Adapters');
+bluetoothhalObj.configureTestCase(ip,port,'BluetoothHAL_Get_AdapterAddress');
 
 #Get the result of connection with test component and DUT
 result =bluetoothhalObj.getLoadModuleResult();
@@ -98,7 +98,9 @@ bluetoothhalObj.setLoadModuleStatus(result.upper());
 if "SUCCESS" in result.upper():
     expectedresult="SUCCESS"
     #Primitive test case which associated to this Script
-    tdkTestObj = bluetoothhalObj.createTestStep('BluetoothHal_GetListOfAdapters');
+    tdkTestObj = bluetoothhalObj.createTestStep('BluetoothHal_GetAdapterAddr');
+    #Set the adapter number to '0' the default adapter number
+    tdkTestObj.addParameter("adapter_number", 0)
 
     #Execute the test case in DUT
     tdkTestObj.executeTestCase(expectedresult);
@@ -106,23 +108,22 @@ if "SUCCESS" in result.upper():
     #Get the result of execution
     actualresult = tdkTestObj.getResult();
 
-    #Set the result status of execution
-    if (actualresult == expectedresult):
-        print "Successfully executed BluetoothHal_GetListOfAdapters"
-        numOfAdapters = tdkTestObj.getResultDetails();
-        print "BluetoothHal_GetListOfAdapters: Number of adapters : ", numOfAdapters
-        if (0 < numOfAdapters):
+    if (actualresult == expectedresult) :
+        print "BluetoothHal_GetAdapterAddr executed succesfully"
+        adapterAddress = tdkTestObj.getResultDetails();
+	if (adapterAddress):
+            print "Deafult adapter address : ", adapterAddress
             tdkTestObj.setResultStatus("SUCCESS");
         else:
-            print "Atleast default adapter should be present in the device"
+            print "Adapter address should not be empty"
             tdkTestObj.setResultStatus("FAILURE");
     else:
-        print "Failed to execute BluetoothHal_GetListOfAdapters"
+        print "BluetoothHal_GetAdapterAddr : failed"
         tdkTestObj.setResultStatus("FAILURE");
-
+	        
     #Unload the module
     bluetoothhalObj.unloadModule("bluetoothhal");
-
+	
 else:
     print "Failed to load bluetoothhal module\n";
     #Set the module loading status
