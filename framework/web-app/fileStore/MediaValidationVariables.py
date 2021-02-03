@@ -33,9 +33,13 @@ video_src_url = ""
 
 #HLS Video URL
 video_src_url_hls = ""
+video_src_url_4k_hls = ""
+video_src_url_live_hls = ""
 
 #DASH Video URL
 video_src_url_dash = ""
+video_src_url_4k_dash = ""
+video_src_url_live_dash = ""
 
 # Time duration for operations
 # Provided time (seconds) is the duration after how much second the operation should take place
@@ -48,6 +52,13 @@ repeat_count_stress = 15
 
 operation_min_interval = 5
 operation_max_interval = 10
+
+fastfwd_max_interval = 60
+
+seekfwd_interval = 10
+seekbwd_interval = 20
+seekfwd_check_interval = 3
+seekbwd_check_interval = 7
 
 # Min Time duration for the animation operation used by multianimations app (10 to 60 sec)
 animation_duration = 60

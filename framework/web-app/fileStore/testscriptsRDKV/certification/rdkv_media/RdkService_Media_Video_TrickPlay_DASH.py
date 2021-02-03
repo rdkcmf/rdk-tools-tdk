@@ -131,14 +131,13 @@ if expectedResult in result.upper():
     # Setting VideoPlayer test app URL arguments
     setURLArgument("url",videoURL)
     setURLArgument("operations",operations)
+    #setURLArgument("options","useDashlib")
     setURLArgument("autotest","true")
-    appArguments = getURLArguments()
-    # Getting the complete test app URL
-    video_test_url = getTestURL(appURL,appArguments)
+    setURLArgument("type","dash")
 
     #Example video test url
     #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
-    #url=<video_url>.mpd&operations=seekfwd(10),fastfwd(10),fastfwd(10),pause(10),play(5),seekbwd(10),fastfwd(10)&autotest=true
+    #url=<video_url>.mpd&operations=seekfwd(10),fastfwd(10),fastfwd(10),pause(10),play(5),seekbwd(10),fastfwd(10)&autotest=true&type=dash
 
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -150,10 +149,21 @@ if expectedResult in result.upper():
         #Need to revert the values since we are changing plugin status
         revert="YES"
         status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
+    #Check residentApp status and deactivate if its activated
+    check_status,resapp_status,resapp_revert,resapp_url = checkAndDeactivateResidentApp(obj)
+
+    #Reading video load config the from the device config file
+    conf_file,result = getConfigFileName(obj.realpath)
+    result,usedashlib = getDeviceConfigKeyValue(conf_file,"LOAD_USING_DASHLIB")
+    setURLArgument("options","useDashlib("+str(usedashlib)+")")
+    appArguments = getURLArguments()
+    # Getting the complete test app URL
+    video_test_url = getTestURL(appURL,appArguments)
+
     #Checking whether device supports proc entry validation. If supported, get
     #device information to access and read the proc file
     validation_dict = getProcValidationParams(obj,"VIDEO_PROC_FILE")
-    if status == "SUCCESS" and validation_dict != {}:
+    if status == "SUCCESS" and validation_dict != {} and check_status == "SUCCESS":
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
@@ -197,12 +207,19 @@ if expectedResult in result.upper():
                         print "\nProc entry validation for video player test is enabled\n"
                     else:
                         print "\nProc entry validation for video player test is skipped\n"
+                    continue_count = 0
                     test_result = ""
                     proc_check_list = []
                     while True:
+                        if continue_count > 60:
+                            print "\nApp not proceeding for 1 min. Exiting..."
+                            break
                         if (len(webkit_console_socket.getEventsBuffer())== 0):
                             time.sleep(1)
+                            continue_count += 1
                             continue
+                        else:
+                            continue_count = 0
                         console_log = webkit_console_socket.getEventsBuffer().pop(0)
                         dispConsoleLog(console_log)
                         if "Observed Event: " in console_log and validation_dict["proc_check"]:
@@ -252,6 +269,9 @@ if expectedResult in result.upper():
     if revert=="YES":
         print "Revert the values before exiting"
         status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
+    if resapp_revert=="YES":
+        setURLAndActivateResidentApp(obj,resapp_url)
+        time.sleep(10)
     obj.unloadModule("rdkv_media");
 else:
     obj.setLoadModuleStatus("FAILURE");
