@@ -151,3 +151,81 @@ def checkProcEntry(sshmethod,credentials,procfile,pattern):
 
     return result_val
 
+# Function to activate/deactivte ResidentApp for executing media tests
+def checkAndDeactivateResidentApp(obj):
+    print "\nChecking ResidentApp"
+    tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus');
+    tdkTestObj.addParameter("plugin","ResidentApp");
+    tdkTestObj.executeTestCase("SUCCESS");
+    resapp_result = tdkTestObj.getResult();
+    resapp_status = tdkTestObj.getResultDetails();
+    expected_status_list =["deactivated","suspended","None"]
+    status_list = ["activated","deactivated","resumed","suspended","None"]
+    print "Current values\nResidentApp:",resapp_status
+    if "FAILURE" not in resapp_result:
+        if resapp_status in status_list:
+            tdkTestObj.setResultStatus("SUCCESS");
+            if resapp_status in expected_status_list:
+                return ("SUCCESS",resapp_status,"NO","")
+            else:
+                status,url = getURLAndDeactivateResidentApp(obj)
+                revert = "YES" if status == "SUCCESS" else "NO"
+                return (status,resapp_status,revert,url)
+        else:
+            tdkTestObj.setResultStatus("FAILURE");
+            return ("FAILURE",resapp_status,"","")
+    else:
+        status,url = getURLAndDeactivateResidentApp(obj)
+        revert = "YES" if status == "SUCCESS" else "NO"
+        return (status,resapp_status,revert,url)
+
+def getURLAndDeactivateResidentApp(obj):
+    tdkTestObj = obj.createTestStep('rdkservice_getValue');
+    tdkTestObj.addParameter("method","ResidentApp.1.url");
+    tdkTestObj.executeTestCase("SUCCESS");
+    current_url = tdkTestObj.getResultDetails();
+    result = tdkTestObj.getResult()
+    if current_url != None and "SUCCESS" in result:
+        tdkTestObj.setResultStatus("SUCCESS");
+        print "ResidentApp url:",current_url
+        print "Deactivating ResidentApp"
+        tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus');
+        tdkTestObj.addParameter("plugin","ResidentApp");
+        tdkTestObj.addParameter("status","deactivate");
+        tdkTestObj.executeTestCase("SUCESS");
+        result = tdkTestObj.getResult();
+        if "SUCCESS" in result:
+            tdkTestObj.setResultStatus("SUCCESS");
+            return ("SUCCESS",current_url)
+        else:
+            return ("FAILURE",current_url)
+            tdkTestObj.setResultStatus("FAILURE");
+    else:
+        tdkTestObj.setResultStatus("FAILURE");
+        print "Unable to get the current URL loaded in residentApp"
+        return ("FAILURE","")
+
+def setURLAndActivateResidentApp(obj,url):
+    print "\nActivating ResidentApp"
+    tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus');
+    tdkTestObj.addParameter("plugin","ResidentApp");
+    tdkTestObj.addParameter("status","activate");
+    tdkTestObj.executeTestCase("SUCCESS");
+    result = tdkTestObj.getResult();
+    if "SUCCESS" in result:
+        tdkTestObj.setResultStatus("SUCCESS");
+        tdkTestObj = obj.createTestStep('rdkservice_setValue');
+        tdkTestObj.addParameter("method","ResidentApp.1.url");
+        tdkTestObj.addParameter("value",url);
+        tdkTestObj.executeTestCase("SUCCESS");
+        result = tdkTestObj.getResult();
+        if "SUCCESS" in result:
+            print "ResidentApp activated success\n"
+            tdkTestObj.setResultStatus("SUCCESS");
+        else:
+            print "ResidentApp activation failed\n"
+            tdkTestObj.setResultStatus("FAILUE");
+    else:
+        print "ResidentApp activation failed\n"
+        tdkTestObj.setResultStatus("FAILURE");
+

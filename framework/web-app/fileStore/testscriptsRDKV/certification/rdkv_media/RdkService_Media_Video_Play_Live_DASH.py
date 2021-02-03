@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2020 RDK Management
+# Copyright 2021 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,23 +21,23 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>5</version>
+  <version>4</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_Media_Video_PlayPause_STRESS</name>
+  <name>RdkService_Media_Video_Play_Live_DASH</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
-  <primitive_test_id> </primitive_test_id>
+  <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
   <primitive_test_name>rdkv_media_test</primitive_test_name>
   <!--  -->
-  <primitive_test_version>4</primitive_test_version>
+  <primitive_test_version>1</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operations continuously for given number of times</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operation of dash live content</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>10</execution_time>
+  <execution_time>5</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -60,8 +60,8 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_08</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operations continuously for given number of times</test_objective>
+    <test_case_id>RDKV_Media_Validation_21</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operation of dash live content</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -69,23 +69,21 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Lightning player App URL: string
 webinspect_port: string
-video_src_url : string
-pause_interval_stress:int
-play_interval_stress:int
-repeat_count_stress:int</input_parameters>
+video_src_url_live_dash: string
+</input_parameters>
     <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
 2. Get the current URL in webkitbrowser
-3. Load the player app url with the operations play, pause and repeat info.
-4. App performs the pause and play operation repeatedly and validates using events
-5. If expected events occurs for pause and play in all the repetition, then app gives the validation result as SUCCESS or else FAILURE
+3. Load the player app with the live dash url.
+4. App should play the live dash content and event video playing should occur
+5. If expected event occurs, then app gives the validation result as SUCCESS or else FAILURE
 6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>Player pause and play should happen and expected events should occur for all the repetition and if proc validation is applicable, then expected data should be available in proc file </expected_output>
+    <expected_output>Live dash video should be played for provided duration and expected event video playing should occur</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RdkService_Media_Video_PlayPause_STRESS</test_script>
+    <test_script>RdkService_Media_Video_Play_Live_DASH</test_script>
     <skipped>No</skipped>
-    <release_version>M82</release_version>
+    <release_version>M85</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -108,7 +106,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_Media_Video_PlayPause_STRESS')
+obj.configureTestCase(ip,port,'RdkService_Media_Video_Play_Live_DASH')
 
 webkit_console_socket = None
 
@@ -119,23 +117,19 @@ print "[LIB LOAD STATUS]  :  %s" %result;
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     appURL    = MediaValidationVariables.lightning_video_test_app_url
-    videoURL  = MediaValidationVariables.video_src_url
+    videoURL  = MediaValidationVariables.video_src_url_live_dash
     # Setting VideoPlayer Operations
-    setOperation("pause",MediaValidationVariables.pause_interval_stress)
-    setOperation("play",MediaValidationVariables.play_interval_stress)
-    setOperation("repeat",MediaValidationVariables.repeat_count_stress)
+    setOperation("close","60")
     operations = getOperations()
     # Setting VideoPlayer test app URL arguments
     setURLArgument("url",videoURL)
     setURLArgument("operations",operations)
     setURLArgument("autotest","true")
-    appArguments = getURLArguments()
-    # Getting the complete test app URL
-    video_test_url = getTestURL(appURL,appArguments)
+    setURLArgument("type","dash")
 
     #Example video test url
     #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
-    #url=<video_url>&operations=pause(5),play(5),repeat(15)&autotest=true
+    #url=<video_url>.mpd&operations=close(60)&autotest=true&type=dash
 
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -147,10 +141,21 @@ if expectedResult in result.upper():
         #Need to revert the values since we are changing plugin status
         revert="YES"
         status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
+    #Check residentApp status and deactivate if its activated
+    check_status,resapp_status,resapp_revert,resapp_url = checkAndDeactivateResidentApp(obj)
+
+    #Reading video load config the from the device config file
+    conf_file,result = getConfigFileName(obj.realpath)
+    result,usedashlib = getDeviceConfigKeyValue(conf_file,"LOAD_USING_DASHLIB")
+    setURLArgument("options","useDashlib("+str(usedashlib)+")")
+    appArguments = getURLArguments()
+    # Getting the complete test app URL
+    video_test_url = getTestURL(appURL,appArguments)
+
     #Checking whether device supports proc entry validation. If supported, get
     #device information to access and read the proc file
     validation_dict = getProcValidationParams(obj,"VIDEO_PROC_FILE")
-    if status == "SUCCESS" and validation_dict != {}:
+    if status == "SUCCESS" and validation_dict != {} and check_status == "SUCCESS":
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
@@ -194,22 +199,32 @@ if expectedResult in result.upper():
                         print "\nProc entry validation for video player test is enabled\n"
                     else:
                         print "\nProc entry validation for video player test is skipped\n"
+                    continue_count = 0
                     test_result = ""
                     proc_check_list = []
+                    play_status = "FAILURE"
                     while True:
+                        if continue_count > 180:
+                            print "\nApp not proceeding for 3 mins. Exiting..."
+                            break
                         if (len(webkit_console_socket.getEventsBuffer())== 0):
                             time.sleep(1)
+                            continue_count += 1
                             continue
+                        else:
+                            continue_count = 0
                         console_log = webkit_console_socket.getEventsBuffer().pop(0)
                         dispConsoleLog(console_log)
-                        if "Observed Event: play" in console_log and validation_dict["proc_check"]:
+                        if "Video Player Playing" in console_log:
+                            play_status = "SUCCESS"
+                        if "Video Player Playing" in console_log and validation_dict["proc_check"]:
                             proc_check_list.append(checkProcEntry(validation_dict["ssh_method"],credentials,proc_file,"started"));
                             time.sleep(1);
                         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
                             test_result = getConsoleMessage(console_log)
                             break;
                     webkit_console_socket.disconnect()
-                    if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
+                    if "SUCCESS" in test_result and "SUCCESS" in play_status and "FAILURE" not in proc_check_list:
                         print "Video play is fine"
                         print "[TEST EXECUTION RESULT]: SUCCESS"
                         tdkTestObj.setResultStatus("SUCCESS");
@@ -249,6 +264,9 @@ if expectedResult in result.upper():
     if revert=="YES":
         print "Revert the values before exiting"
         status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
+    if resapp_revert=="YES":
+        setURLAndActivateResidentApp(obj,resapp_url)
+        time.sleep(10)
     obj.unloadModule("rdkv_media");
 else:
     obj.setLoadModuleStatus("FAILURE");

@@ -140,6 +140,8 @@ if expectedResult in result.upper():
         #Need to revert the values since we are changing plugin status
         revert="YES"
         status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
+    #Check residentApp status and deactivate if its activated
+    check_status,resapp_status,resapp_revert,resapp_url = checkAndDeactivateResidentApp(obj)
     #Reading the FPS and threshold for FPS from the device config file
     config_status = "SUCCESS"
     conf_file,result = getConfigFileName(obj.realpath)
@@ -152,7 +154,7 @@ if expectedResult in result.upper():
     else:
         config_status = "FAILURE"
         print "Failed to get the FPS value & threshold value from device config file"
-    if status == "SUCCESS" and config_status == "SUCCESS":
+    if status == "SUCCESS" and config_status == "SUCCESS" and check_status == "SUCCESS":
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
@@ -181,13 +183,20 @@ if expectedResult in result.upper():
                 if new_url in animation_test_url and expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS");
                     print "URL(",new_url,") is set successfully"
+                    continue_count = 0
                     test_result = ""
                     average_fps = 0
                     minfps = float(int(expected_fps) - int(threshold))
                     while True:
+                        if continue_count > 60:
+                            print "\nApp not proceeding for 1 min. Exiting..."
+                            break
                         if (len(webkit_console_socket.getEventsBuffer())== 0):
                             time.sleep(1)
+                            continue_count += 1
                             continue
+                        else:
+                            continue_count = 0
                         console_log = webkit_console_socket.getEventsBuffer().pop(0)
                         dispConsoleLog(console_log)
                         if "Average FPS" in console_log:
@@ -242,6 +251,9 @@ if expectedResult in result.upper():
     if revert=="YES":
         print "Revert the values before exiting"
         status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
+    if resapp_revert=="YES":
+        setURLAndActivateResidentApp(obj,resapp_url)
+        time.sleep(10)
     obj.unloadModule("rdkv_media");
 else:
     obj.setLoadModuleStatus("FAILURE");
