@@ -13,13 +13,83 @@
  limitations under the License.
 -->
 
-<?xml version='1.0' encoding='utf-8'?>
-<xml>
-  <module name='bluetoothhal' testGroup='Component'>
+<?xml version="1.0" encoding="UTF-8"?><xml>
+  <module testGroup="Component" name="bluetoothhal">
     <primitiveTests>
-      <primitiveTest name='BluetoothHal_GetListOfAdapters' id='' version='1'>
+      <primitiveTest name="BluetoothHal_GetListOfAdapters" id="" version="1">
         <function>TestMgr_BluetoothHal_GetListOfAdapters</function>
-        <parameters />
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_RegisterAgent" id=" " version="1">
+        <function>TestMgr_BluetoothHal_RegisterAgent</function>
+        <parameters>
+          <parameter name="capabilities" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_UnregisterAgent" id="" version="1">
+        <function>TestMgr_BluetoothHal_UnregisterAgent</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetAdapter" id="" version="1">
+        <function>TestMgr_BluetoothHal_GetAdapter</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_SetAdapter" id=" " version="1">
+        <function>TestMgr_BluetoothHal_SetAdapter</function>
+        <parameters>
+          <parameter name="adapter_number" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetAdapters" id="" version="1">
+        <function>TestMgr_BluetoothHal_GetAdapters</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetAdapterPower" id=" " version="1">
+        <function>TestMgr_BluetoothHal_GetAdapterPower</function>
+        <parameters>
+          <parameter name="adapter_path" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_SetAdapterPower" id=" " version="1">
+        <function>TestMgr_BluetoothHal_SetAdapterPower</function>
+        <parameters>
+          <parameter name="adapter_path" value=""/>
+          <parameter name="power_status" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_EnableAdapter" id="" version="1">
+        <function>TestMgr_BluetoothHal_EnableAdapter</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_DisableAdapter" id="" version="1">
+        <function>TestMgr_BluetoothHal_DisableAdapter</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetAdapterAddr" id=" " version="1">
+        <function>TestMgr_BluetoothHal_GetAdapterAddr</function>
+        <parameters>
+          <parameter name="adapter_number" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_SetAdapterDiscoverable" id=" " version="1">
+        <function>TestMgr_BluetoothHal_SetAdapterDiscoverable</function>
+        <parameters>
+          <parameter name="adapter_path" value=""/>
+          <parameter name="discoverable_status" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_SetAdapterDiscoverableTimeout" id=" " version="1">
+        <function>TestMgr_BluetoothHal_SetAdapterDiscoverableTimeout</function>
+        <parameters>
+          <parameter name="adapter_path" value=""/>
+          <parameter name="timeout" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetAdapterDiscoverableStatus" id=" " version="1">
+        <function>TestMgr_BluetoothHal_GetAdapterDiscoverableStatus</function>
+        <parameters>
+          <parameter name="adapter_path" value=""/>
+        </parameters>
       </primitiveTest>
     </primitiveTests>
   </module>

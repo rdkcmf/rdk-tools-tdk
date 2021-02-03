@@ -21,23 +21,23 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>6</version>
+  <version>9</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>BluetoothHAL_Get_ListOf_Adapters</name>
+  <name>BluetoothHAL_Register_Unregister_DefaultAgent</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
-  <primitive_test_id></primitive_test_id>
+  <primitive_test_id> </primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
-  <primitive_test_name>BluetoothHal_GetListOfAdapters</primitive_test_name>
+  <primitive_test_name>BluetoothHal_RegisterAgent</primitive_test_name>
   <!--  -->
   <primitive_test_version>1</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Get the list of bluetooth adapters in the device</synopsis>
+  <synopsis>To register/unregister a bluetooth agent with capabilities 0 ("NoInputNoOutput") which is the default agent capabilities.</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>1</execution_time>
+  <execution_time>5</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -56,21 +56,22 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>CT_BLUETOOTH_HAL_01</test_case_id>
-    <test_objective>To get the list of bluetooth adapters available in the device</test_objective>
+    <test_case_id>CT_BLUETOOTH_HAL_03</test_case_id>
+    <test_objective>To register/unregister a bluetooth agent with capabilities 0 ("NoInputNoOutput") which is the default agent capabilities.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>Accelerator</test_setup>
     <pre_requisite>1. Initialize the BTRCore module using BTRCore_Init()</pre_requisite>
-    <api_or_interface_used>enBTRCoreRet BTRCore_GetListOfAdapters (tBTRCoreHandle hBTRCore, stBTRCoreListAdapters* pstListAdapters);</api_or_interface_used>
-    <input_parameters>None</input_parameters>
+    <api_or_interface_used>1. enBTRCoreRet BTRCore_RegisterAgent (tBTRCoreHandle hBTRCore, int iBTRCapMode);
+2. enBTRCoreRet BTRCore_UnregisterAgent (tBTRCoreHandle hBTRCore);</api_or_interface_used>
+    <input_parameters>capabilities = 0 ("NoInputNoOutput") .</input_parameters>
     <automation_approch>1. TM loads the BluetoothHal agent via the test agent.
-2 . BluetoothHal agent will invoke the api BTRCore_GetListOfAdapters to get the list of bluetooth adapters available in the DUT.
-3. TM checks if the API call is success and checks if there is atleast one bluetooth adapter available in the DUT and return SUCCESS/FAILURE status.</automation_approch>
-    <expected_output>Checkpoint 1. Verify the API call is success
-Checkpoint 2. Verify that atleast one bluetooth adapter is available in the DUT.</expected_output>
+2 . BluetoothHal agent will invoke the api BTRCore_RegisterAgent() with input as 1 to register a bluetooth agent with capabilities "NoInputNoOutput"
+3.  TM checks if the API call is success and if yes, unregisters the agent using the API BTRCore_UnregisterAgent()
+4. TM checks if the API call is success</automation_approch>
+    <expected_output>Checkpoint 1. Verify the API call is success</expected_output>
     <priority>High</priority>
     <test_stub_interface>libbluetoothhalstub.so.0</test_stub_interface>
-    <test_script>BluetoothHAL_Get_ListOf_Adapters</test_script>
+    <test_script>BluetoothHAL_Register_Unregister_DefaultAgent</test_script>
     <skipped>No</skipped>
     <release_version>M85</release_version>
     <remarks></remarks>
@@ -88,7 +89,7 @@ bluetoothhalObj = tdklib.TDKScriptingLibrary("bluetoothhal","1");
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-bluetoothhalObj.configureTestCase(ip,port,'BluetoothHAL_Get_ListOf_Adapters');
+bluetoothhalObj.configureTestCase(ip,port,'BluetoothHAL_Register_Unregister_DefaultAgent');
 
 #Get the result of connection with test component and DUT
 result =bluetoothhalObj.getLoadModuleResult();
@@ -98,29 +99,41 @@ bluetoothhalObj.setLoadModuleStatus(result.upper());
 if "SUCCESS" in result.upper():
     expectedresult="SUCCESS"
     #Primitive test case which associated to this Script
-    tdkTestObj = bluetoothhalObj.createTestStep('BluetoothHal_GetListOfAdapters');
+    tdkTestObj = bluetoothhalObj.createTestStep('BluetoothHal_RegisterAgent');
+    #Set the capabilities of Agent to 0("NoInputNoOutput") which is the default agent capabilities
+    tdkTestObj.addParameter("capabilities", 0)
 
     #Execute the test case in DUT
     tdkTestObj.executeTestCase(expectedresult);
 
     #Get the result of execution
     actualresult = tdkTestObj.getResult();
+    print "BluetoothHal_RegisterAgent : ", actualresult
 
-    #Set the result status of execution
     if (actualresult == expectedresult):
-        print "Successfully executed BluetoothHal_GetListOfAdapters"
-        numOfAdapters = tdkTestObj.getResultDetails();
-        print "BluetoothHal_GetListOfAdapters: Number of adapters : ", numOfAdapters
-        if (0 < numOfAdapters):
+        print "Bluetooth Agent registered successfully"
+        tdkTestObj.setResultStatus("SUCCESS");
+        #Primitive to unregister the agent
+        tdkTestObj = bluetoothhalObj.createTestStep('BluetoothHal_UnregisterAgent');
+        
+        #Execute the test case in DUT
+        tdkTestObj.executeTestCase(expectedresult);
+
+        #Get the result of execution
+        actualresult = tdkTestObj.getResult();
+        print "BluetoothHal_UnregisterAgent : ", actualresult
+
+        if (actualresult == expectedresult):
+            print "Bluetooth Agent unregistered successfully"
             tdkTestObj.setResultStatus("SUCCESS");
         else:
-            print "Atleast default adapter should be present in the device"
+            print "Failed to unregister bluetooth agent"
             tdkTestObj.setResultStatus("FAILURE");
     else:
-        print "Failed to execute BluetoothHal_GetListOfAdapters"
+        print "Failed to register bluetooth agent"
         tdkTestObj.setResultStatus("FAILURE");
 
-    #Unload the module
+    #Unload the module   
     bluetoothhalObj.unloadModule("bluetoothhal");
 
 else:
