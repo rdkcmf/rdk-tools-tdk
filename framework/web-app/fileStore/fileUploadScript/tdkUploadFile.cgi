@@ -16,18 +16,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #########################################################################
-#!/usr/bin/perl -wT
+#!/usr/bin/perl -w
 
 use strict;
 use warnings;
 use CGI;
 use diagnostics;
 use CGI qw(:standard);
+
 use CGI::Carp qw ( fatalsToBrowser );
 use File::Basename;
 
 #The size of the file must be within this value.
 $CGI::POST_MAX = 1024 * 5000;
+
+#By default the image will get uploaded as TDKScreenShot.png. If you want to upload with your own name,
+#provide the name at the end of URL like "?filename=Test.png"
+my @values = split(/&/,$ENV{QUERY_STRING});
+my($fieldname, $data);
+$data = "TDKScreenShot.png";
+foreach my $i (@values) {
+    ($fieldname, $data) = split(/=/, $i);
+}
 
 ########USER SHOULD CONFIGURE THIS##########
 #Give the path where the file should get uploaded
@@ -35,8 +45,8 @@ my $path_to_upload = "";
 
 my $query = new CGI;
 my $file_to_upload = $query->param("image");
-#Your file will get uploaded as UploadedFile.png. 
-$file_to_upload = "UploadedFile.png";
+
+$file_to_upload = $data;
 my $file = $query->param('POSTDATA');
 open ( FILEUPLOAD, ">$path_to_upload/$file_to_upload" ) or die "$!";
 binmode FILEUPLOAD;
