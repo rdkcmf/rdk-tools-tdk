@@ -220,12 +220,12 @@ if expectedResult in result.upper():
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
                         result, channelchange_time_threshold_value = getDeviceConfigKeyValue(conf_file,"CHANNEL_CHANGE_TIME_THRESHOLD_VALUE")
                         if result == "SUCCESS":
-                            if int(avg_time) < int(channelchange_time_threshold_value):
+                            if 0 < int(avg_time) < int(channelchange_time_threshold_value):
                                 tdkTestObj.setResultStatus("SUCCESS");
                                 print "\n The channel change time is within the expected limit\n"
                             else:
                                 tdkTestObj.setResultStatus("FAILURE");
-                                print "\n The channel change time is greater than the expected limit \n"
+                                print "\n The channel change time is not within the expected limit \n"
                         else:
                             tdkTestObj.setResultStatus("FAILURE");
                             print "Failed to get the threshold value from config file"
@@ -248,7 +248,7 @@ if expectedResult in result.upper():
                         print "Failed to revert the URL"
                         tdkTestObj.setResultStatus("FAILURE");
                 else:
-                    print "Failed to load the URL:{}, Current URL:{}".format(browser_test_url,new_url)
+                    print "Failed to load the URL:{}, Current URL:{}".format(channel_change_url,new_url)
                     tdkTestObj.setResultStatus("FAILURE");
             else:
                 tdkTestObj.setResultStatus("FAILURE");
