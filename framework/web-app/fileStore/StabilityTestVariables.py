@@ -90,3 +90,14 @@ activate_deactivate_plugins = ""
 
 #maximum number of activate and deactivate operations
 activate_deactivate_max_count = 100
+
+##Screen resolution change test details
+#Maximum number of resolution set and get operations
+change_resolution_max_count = 400
+
+#The directory to which CGI server will upload the images,same as given in the CGI script
+image_upload_dir = ""
+
+#List of resolution which are being used for the test
+resolutions_list = [{"w":320,"h":240},{"w":640,"h":480},{"w":1280,"h":720},{"w":1920, "h":1080}]
+

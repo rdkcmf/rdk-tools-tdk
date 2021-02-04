@@ -21,6 +21,9 @@ import json
 import time
 import os
 from SSHUtility import *
+from PIL import Image
+import numpy as np
+from itertools import combinations
 
 deviceIP=""
 devicePort=""
@@ -193,3 +196,23 @@ def rdkservice_validateProcEntry(sshmethod,credentials,procfile,mincdb):
             print "decoded value is not increasing"
             result_val = "FAILURE"
     return result_val
+
+#-------------------------------------------------------------------------
+#COMPARE IMAGES IN THE GIVEN LIST AND CHECK ANY TWO IMAGES IN THE LIST ARE SAME
+#------------------------------------------------------------------------
+def compare_images(images_list):
+    images = []
+    status = "SAME"
+    result_list = []
+    for image in images_list:
+        images.append(np.array(Image.open(image)))
+    for image_a,image_b in combinations(images, 2):
+        difference = image_a - image_b
+        if np.all(difference == 0):
+            result_list.append("same")
+        else:
+            result_list.append("different")
+    if all(result == "different" for result in result_list):
+        status = "DIFFERENT"
+    return status
+
