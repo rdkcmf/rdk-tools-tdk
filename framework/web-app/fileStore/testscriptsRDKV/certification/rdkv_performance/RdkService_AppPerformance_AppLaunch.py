@@ -174,12 +174,12 @@ if expectedResult in result.upper():
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
                         result, app_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"APP_LAUNCH_THRESHOLD VALUE")
                         if result == "SUCCESS":
-                            if int(app_launch_time) < int(app_launch_threshold_value):
+                            if 0 < int(app_launch_time) < int(app_launch_threshold_value):
                                 tdkTestObj.setResultStatus("SUCCESS");
                                 print "\n The time taken to launch the app is within the expected limit\n"
                             else:
                                 tdkTestObj.setResultStatus("FAILURE");
-                                print "\n The time taken to launch the app is greater than the expected limit \n"
+                                print "\n The time taken to launch the app is not within the expected limit \n"
                         else:
                             tdkTestObj.setResultStatus("FAILURE");
                             print "Failed to get the threshold value from config file"

@@ -169,12 +169,12 @@ if expectedResult in result.upper():
                                     conf_file,result = getConfigFileName(tdkTestObj.realpath)
                                     result, url_loadtime_threshold_value = getDeviceConfigKeyValue(conf_file,"URL_LOADTIME_THRESHOLD_VALUE")
                                     if result == "SUCCESS":
-                                        if int(url_loaded_time) < int(url_loadtime_threshold_value):
+                                        if 0 < int(url_loaded_time) < int(url_loadtime_threshold_value):
                                             tdkTestObj.setResultStatus("SUCCESS");
                                             print "\n The time taken to load the URL is within the expected limit\n"
                                         else:
                                             tdkTestObj.setResultStatus("FAILURE");
-                                            print "\n The time taken to load the URL is greater than the expected limit \n"
+                                            print "\n The time taken to load the URL is not within the expected limit \n"
                                     else:
                                         tdkTestObj.setResultStatus("FAILURE");
                                         print "Failed to get the threshold value from config file"
