@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>3</version>
+  <version>4</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RdkService_PremiumApp_PlayNext_CobaltTest</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -29,7 +29,7 @@
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
   <primitive_test_name>rdkservice_setValue</primitive_test_name>
   <!--  -->
-  <primitive_test_version>2</primitive_test_version>
+  <primitive_test_version>1</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
@@ -48,6 +48,10 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
+    <box_type>RPI-Client</box_type>
+    <!--  -->
+    <box_type>RPI-HYB</box_type>
+    <!--  -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
@@ -112,7 +116,7 @@ if expectedResult in result.upper():
     plugins_list = ["WebKitBrowser","Cobalt"]
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
     status = "SUCCESS"
-    plugin_status_needed = {"WebKitBrowser":"deactivated","Cobalt":"activated"}
+    plugin_status_needed = {"WebKitBrowser":"deactivated","Cobalt":"deactivated"}
     if curr_plugins_status_dict != plugin_status_needed:
         revert = "YES"
         status = set_plugins_status(obj,plugin_status_needed)
@@ -179,13 +183,25 @@ if expectedResult in result.upper():
                         print "Validation method other than proc_entry is not supported now"
                         #TODO
                 else:
-                    print "User opted for no validation, next video is played."
+                    print "\n User opted for no validation, next video is played Successfully\n"
                     tdkTestObj.setResultStatus("SUCCESS")
             else:
                 print "Unable to click OK"
                 tdkTestObj.setResultStatus("FAILURE")
         else:
             print "Unable to load the cobalt_test_url"
+            tdkTestObj.setResultStatus("FAILURE")
+        #Close Cobalt
+        print "\n Exiting from Cobalt \n"
+        tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
+        tdkTestObj.addParameter("plugin","Cobalt")
+        tdkTestObj.addParameter("status","deactivate")
+        tdkTestObj.executeTestCase(expectedResult)
+        result = tdkTestObj.getResult()
+        if result == "SUCCESS":
+            tdkTestObj.setResultStatus("SUCCESS")
+        else:
+            print "Unable to deactivate Cobalt"
             tdkTestObj.setResultStatus("FAILURE")
     else:
         print "Preconditions are not met"
