@@ -186,12 +186,12 @@ if expectedResult in result.upper():
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
                         result, pause_time_threshold_value = getDeviceConfigKeyValue(conf_file,"PAUSE_TIME_THRESHOLD_VALUE")
                         if result == "SUCCESS":
-                            if int(pause_opn_time) < int(pause_time_threshold_value):
+                            if 0 < int(pause_opn_time) < int(pause_time_threshold_value):
                                 pause_status = True 
                                 print "\n Time taken for pause operation is within the expected limit \n"
                             else:
                                 pause_status = False
-                                print "\n Time taken for pause operation is greater than the expected limit \n"
+                                print "\n Time taken for pause operation is not within the expected limit \n"
                         else:
                             pause_status = False
                             print "\n Failed to get the threshold value for pause operation time from config file \n"
@@ -205,12 +205,12 @@ if expectedResult in result.upper():
                         print "\n Time taken for play operation: {} milliseconds \n".format(play_opn_time)
                         result, play_time_threshold_value = getDeviceConfigKeyValue(conf_file,"PLAY_TIME_THRESHOLD_VALUE")
                         if result == "SUCCESS":
-                            if int(play_opn_time) < int(play_time_threshold_value):
+                            if 0 < int(play_opn_time) < int(play_time_threshold_value):
                                 play_status = True
                                 print "\n Time taken for play operation is within the expected limit \n"
                             else:
                                 play_status = False
-                                print "\n Time taken for play operation is greater than the expected limit \n"
+                                print "\n Time taken for play operation is not within the expected limit \n"
                         else:
                             play_status = False
                             print "Failed to get the threshold value for play operation time from config file"
