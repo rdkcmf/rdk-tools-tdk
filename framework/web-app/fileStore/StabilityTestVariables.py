@@ -33,8 +33,12 @@ channel_change_duration = 720
 #The url used for testing cobalt
 cobalt_test_url = ""
 
-#test duration in minutes till test should be performed, it should be less than the duration of test video
-cobalt_test_duration = 330
+#Test duration in minutes till test should be performed, it should be less than the duration of test video
+cobalt_test_duration = 720
+
+####Cobalt play and exit test details
+#Test duration in minutes till test should be performed
+cobalt_play_and_exit_testtime = 1440
 
 #Configure Variable for Reboot stress test:
 EthernetInterface ="eth0"

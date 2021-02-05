@@ -78,7 +78,7 @@ def launch_cobalt(obj):
         result = tdkTestObj.getResult()
         if result == "SUCCESS":
             tdkTestObj.setResultStatus("SUCCESS")
-	    print "\n checking playback is happening in forground"
+	    print "\n checking playback is happening in foreground"
             tdkTestObj = obj.createTestStep('rdkservice_getValue')
             tdkTestObj.addParameter("method","org.rdk.RDKShell.1.getZOrder")
             tdkTestObj.executeTestCase(expectedResult)
@@ -86,13 +86,11 @@ def launch_cobalt(obj):
 	    result = tdkTestObj.getResult()
 	    if result == "SUCCESS":
                 zorder = ast.literal_eval(zorder)["clients"]
-		if len(zorder) == 0:
-		    print "org.rdk.RDKShell.1.getZOrder returned empty clients list"
-		    return_val = "FAILURE"
-                    tdkTestObj.setResultStatus("FAILURE")
-		else:
+		if len(zorder) != 0:
 		    tdkTestObj.setResultStatus("SUCCESS")
-                    if zorder[0] != "cobalt":
+                    if zorder[0] == "cobalt":
+		        print "\n Cobalt is playing in the foreground"
+		    else:
                         param_val = '{"client": "Cobalt"}'
                         tdkTestObj = obj.createTestStep('rdkservice_setValue')
                         tdkTestObj.addParameter("method","org.rdk.RDKShell.1.moveToFront")
@@ -105,8 +103,10 @@ def launch_cobalt(obj):
 			    print "\n Unable to move Cobalt to foreground"
 			    return_val = "FAILURE"
 			    tdkTestObj.setResultStatus("FAILURE")
-		    else:
-		        print "\n Cobalt is playing in the foreground"
+                else:
+		    print "org.rdk.RDKShell.1.getZOrder returned empty clients list"
+		    return_val = "FAILURE"
+                    tdkTestObj.setResultStatus("FAILURE")
 	    else:
  		print "\n Unable to get getZOrder value"
 		return_val = "FAILURE"
