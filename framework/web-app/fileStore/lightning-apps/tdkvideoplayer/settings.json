@@ -1,0 +1,23 @@
+{
+  "appSettings": {
+    "stage": {
+      "clearColor": "0x00000000",
+      "useImageWorker": true
+    },
+    "keys": {
+      "38": "Up",
+      "40": "Down",
+      "37": "Left",
+      "39": "Right",
+      "13": "Enter",
+      "16": "Shift",
+      "18": "Alt"
+    },
+    "debug": false
+  },
+  "platformSettings": {
+    "path": "./static",
+    "log": true,
+    "showVersion": true
+  }
+}
