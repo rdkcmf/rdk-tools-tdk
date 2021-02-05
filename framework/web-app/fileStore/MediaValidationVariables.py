@@ -27,6 +27,7 @@ thunder_port=""
 lightning_video_test_app_url = ""
 lightning_animation_test_app_url = ""
 lightning_multianimation_test_app_url = ""
+lightning_objects_animation_test_app_url = ""
 
 #Video URL
 video_src_url = ""
@@ -51,3 +52,5 @@ operation_max_interval = 10
 
 # Min Time duration for the animation operation used by multianimations app (10 to 60 sec)
 animation_duration = 60
+# No of objects to be animated by objects(rectangles/texts) animation app
+objects_count = 500

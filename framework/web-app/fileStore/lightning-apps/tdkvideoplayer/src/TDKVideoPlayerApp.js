@@ -667,6 +667,7 @@ export default class App extends Lightning.Component {
     this.playbackRateIndex = this.playbackSpeeds.indexOf(1)
     this.progressEventMsg  = ""
     this.progressLogger    = null
+    logMsg("URL Info: " + this.videoURL + " - " + this.urlType)
 
     this.vidElementEvents = {
         "loadstart":"Load Start", "loadeddata":"Loaded Data", "loadedmetadata":"Loaded MetaData",
