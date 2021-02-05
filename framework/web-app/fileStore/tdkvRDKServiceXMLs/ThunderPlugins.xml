@@ -675,7 +675,21 @@
                 <param tag="duration" defaultValue="0" type="int" />
             </params>
         </method>
+        <method name="Enable_Inactivity_Reporting" api="enableInactivityReporting" type="method" desc="Enables inactivity reporting" >
+            <params>
+                <param tag="enable" type="bool"/>
+            </params>
+        </method>
+        <method name="Set_Inactivity_Interval" api="setInactivityInterval" type="method" desc="Sets inactivity interval" >
+            <params>
+                <param tag="interval" type="int"/>
+            </params>
+        </method>
 
+        <event name="Event_On_Launched" eventName="onLaunched" eventId="client.events.1" type="event" desc="Fired on launching the client" />
+        <event name="Event_On_Suspended" eventName="onSuspended" eventId="client.events.1" type="event" desc="Fired on Suspending the client" />
+        <event name="Event_On_Destroyed" eventName="onDestroyed" eventId="client.events.1" type="event" desc="Fired on destroying the client"/>
+        <event name="Event_On_UserInactivity" eventName="onUserInactivity" eventId="client.events.1" type="event" desc="Fired on user inactive"/>
     </plugin>
 
 

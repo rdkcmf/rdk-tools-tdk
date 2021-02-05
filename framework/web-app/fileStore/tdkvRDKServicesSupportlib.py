@@ -720,13 +720,20 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
-        elif tag == "rdkshell_check_if_application_killed":
+        elif tag == "rdkshell_check_application":
             result = result.get("clients")
             clients = [ str(name) for name in result if str(name).strip() ]
-            if expectedValues not in clients:
-                info["Test_Step_Status"] = "SUCCESS"
-            else:
-                info["Test_Step_Status"] = "FAILURE"
+            if arg[0] == "check_not_exists":
+                if expectedValues[0] not in clients:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+            elif arg[0] == "check_if_exists":
+                if expectedValues[0] in clients:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "rdkshell_get_state":
             success = str(result.get("success")).lower() == "true"
@@ -2052,23 +2059,17 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 if len(arg) > 1:
                     if arg[1] == "target":
                         info["target"] = clients[index]
-                    elif arg[1] == "callsign":
-                        if (clients[index]).lower()=="webkitbrowser":
-                            info["callsign"] = "WebKitBrowser"
-                        elif (clients[index]).lower()=="cobalt":
-                            info["callsign"] = "Cobalt"
-                        elif (clients[index]).lower()=="residentapp":
-                            info["callsign"] = "ResidentApp"
-                        elif (clients[index]).lower()=="htmlapp":
-                            info["callsign"] = "HtmlApp"
-
-                        else:
-                            info["callsign"] = clients[index]
+                
                 else:
                     info["client"] = clients[index]
             else:
                 info["client"] = ""
                 info["target"] = ""
+        elif tag == "rdkshell_get_clients_state":
+            testStepResults = testStepResults[0].values()[0]
+            result = testStepResults[0].get("state")
+            print result
+            info["callsign"] = result[int(arg[0])].get("callsign")
 
         elif tag =="visibility_toggle_status":
             testStepResults = testStepResults[0].values()[0]
@@ -2190,9 +2191,9 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             status = testStepResults[0].get("result")
             if len(arg) and arg[0] == "get_toggle_value":
                 if int(status) == 1:
-                    info["enabled"] = False
-                else:
                     info["enabled"] = True
+                else:
+                    info["enabled"] = False
             else:
                 if int(status) == 1:
                     info["result"] = 0
@@ -2631,18 +2632,24 @@ def executeCommand(deviceConfigFile, deviceIP, command):
     if password == "None":
         password = ''
 
+    output = ""
     try:
         session = pxssh.pxssh(options={
                                 "StrictHostKeyChecking": "no",
                                 "UserKnownHostsFile": "/dev/null"})
         print "\nCreating ssh session"
-        session.login(deviceIP,username,password,sync_multiplier=3)
+        session.login(deviceIP,username,password,sync_multiplier=5)
+        sleep(2)
         print "Executing command: ",command
         session.sendline(command)
-        session.prompt()
-        output = session.before
-        print"Closing session"
-        session.logout()
+        if command == "reboot":
+            sleep(2);
+            output = "reboot"
+        else:
+            session.prompt()
+            output = session.before
+            print"Closing session"
+            session.logout()
     except pxssh.ExceptionPxssh as e:
         print "Login to device failed"
         print e
