@@ -116,6 +116,7 @@ if expectedResult in result.upper():
     if status == "SUCCESS":
         #Get DeviceInfo Plugin status
         plugin = "DeviceInfo"
+        device_info_activated = False
         tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus');
         tdkTestObj.addParameter("plugin",plugin);
         tdkTestObj.executeTestCase(expectedResult);
@@ -123,7 +124,6 @@ if expectedResult in result.upper():
         device_info_status = tdkTestObj.getResultDetails();
         if expectedResult in device_info_result:
             tdkTestObj.setResultStatus("SUCCESS")
-            device_info_activated = True
             if device_info_status not in "activated":
                 revert_plugins_dict["DeviceInfo"] = "deactivated"
                 tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus');
@@ -134,12 +134,13 @@ if expectedResult in result.upper():
                 if expectedResult in result1:
                     print "\n Deviceinfo is activated \n"
                     tdkTestObj.setResultStatus("SUCCESS")
+                    device_info_activated = True
                 else:
-                    device_info_activated = False
                     print "\n Error while activating DeviceInfo\n"
                     tdkTestObj.setResultStatus("FAILURE")
             else:
                print"Device info is in activated state"
+               device_info_activated = True
         else:
             print "\n Error while getting DeviceInfo status"
             tdkTestObj.setResultStatus("FAILURE")
