@@ -1101,6 +1101,7 @@ class TDKScriptingLibrary:
                         self.uiLogData = self.uiLogData+"<br/> Connected to Server!";#print "Connected to Server!\n";
                         sys.stdout.flush()
                         self.result = self.tcpClient.recv(1048)
+                        self.tcpClient.close()
 		return
 
 	########## End of Function ##########
