@@ -3125,6 +3125,8 @@ class ScriptGroupController {
 			if(moduleObj){
 				if(moduleObj?.testGroup?.groupValue.equals(TestGroup.E2E.groupValue)){
 					scriptDirName = Constants.INTEGRATION
+				}else if(moduleObj?.testGroup?.groupValue.equals(TestGroup.Certification.groupValue)){
+					scriptDirName = Constants.CERTIFICATION
 				}
 			}
 			if(category.toString().equals("RDKV_RDKSERVICE")){
