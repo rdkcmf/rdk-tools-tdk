@@ -930,7 +930,10 @@ class ScriptService {
 			sFile= ScriptFile.findByScriptNameAndModuleName(name,moduleName)
 			if(sFile){
 				def script = getMinimalScript(realPath,moduleName, name, category)
-				category = sFile?.category
+				if(sFile?.category){
+					category = sFile?.category
+					category = category.toString()
+				}
 				if(script){
 					def sObject = new ScriptObject()
 					sObject.setBoxTypes(script?.boxTypes?.toSet())
@@ -940,9 +943,9 @@ class ScriptService {
 					sObject.setScriptFile(sFile)
 					sObject.setScriptTags(script?.scriptTags?.toSet())
 					sObject.setLongDuration(script?.longDuration)
-					if(category == Category.RDKV_RDKSERVICE){
+					if(category && category == Category.RDKV_RDKSERVICE.toString()){
 						updateRdkServiceScriptSuite(moduleName,sFile,Category.RDKV_RDKSERVICE.toString())
-					}else{
+					}else if(category && category != Category.RDKV_RDKSERVICE.toString()){
 						scriptgroupService.saveToScriptGroups(sFile,sObject, category)
 						scriptgroupService.saveToDefaultGroups(sFile,sObject, script?.boxTypes, category)
 						createDefaultGroupWithoutOS(sObject,sFile, category)
