@@ -358,6 +358,7 @@
        </testCase>
 
        <testCase testCaseId="WIFI_13" testCaseName="WIFI_Get_Paired_SSID_Info" desc="Gets the SSID to which the device is paired with including the BSSID">
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="WIFI_SUPPORTED_FEATURES" useMethodTag="wifi_check_feature_applicability" arguments="PairedSSIDInfo" />
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>

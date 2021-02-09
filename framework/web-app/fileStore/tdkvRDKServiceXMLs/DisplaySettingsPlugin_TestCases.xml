@@ -540,28 +540,22 @@
               </subtestStep>
             </testStep>
         </testCase>
-
+ 
         <testCase testCaseId="DS_25" testCaseName= "Set_And_Get_Volume_Level_HDMI0" desc="Check whether volume level values are able to set and get for HDMI0 port" >
-            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="HDMI0" />
+            <testCaseInfo testCaseType="loop"   configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="HDMI0" />
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
                 <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="HDMI0">
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="2" name="Get_Volume_Level" method="Get_Volume_Level" saveResult="true" revertGet="yes" >
-                  <params>
-                    <param tag="audioPort" value="HDMI0" />
-                  </params>
-              <resultGeneration useMethodTag="check_volume_level" arguments="check_volume_level_range" />
-            </testStep>
-            <testStep testStepId="3" name="Set_Volume_Level" testStepType="loop" >
-              <subtestStep subtestStepId="1" name="Set_Volume_Level"  method="Set_Volume_Level" revertSet="yes">
+            <testStep testStepId="2" name="Set_Volume_Level" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Volume_Level"  method="Set_Volume_Level" >
                   <params>
                     <param tag="audioPort"  value="HDMI0" />
-                    <param tag="volumeLevel" value="0,25,50,100" iteration="true" revertParam="yes" />
+                    <param tag="volumeLevel" value="0,25,50,100" iteration="true"  />
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
-              <subtestStep subtestStepId="2" name="Get_Volume_Level" method="Get_Volume_Level" revertFlag="yes" >
+              <subtestStep subtestStepId="2" name="Get_Volume_Level" method="Get_Volume_Level"  >
                   <params>
                     <param tag="audioPort"  value="HDMI0" />
                   </params>
@@ -570,8 +564,8 @@
                   </resultGeneration>
               </subtestStep>
             </testStep>
-        </testCase>
-
+        </testCase>    
+     
         <testCase testCaseId="DS_26" testCaseName= "Set_And_Get_Gain_HDMI0" desc="Check whether audio port gain values are able to set and get for HDMI0 port" >
             <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="HDMI0" />
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
@@ -1428,26 +1422,20 @@
         </testCase>
 
         <testCase testCaseId="DS_56" testCaseName= "Set_And_Get_Volume_Level_SPDIF0" desc="Check whether volume level values are able to set and get for SPDIF0 port" >
-            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="SPDIF0"/>
+            <testCaseInfo testCaseType="loop"   configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="SPDIF0"/>
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
                 <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPDIF0">
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="2" name="Get_Volume_Level" method="Get_Volume_Level" saveResult="true" revertGet="yes" >
+            <testStep testStepId="2" name="Set_Volume_Level" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Volume_Level"  method="Set_Volume_Level" >
                   <params>
                     <param tag="audioPort"  value="SPDIF0"  />
-                  </params>
-              <resultGeneration useMethodTag="check_volume_level" arguments="check_volume_level_range" />
-            </testStep>
-            <testStep testStepId="3" name="Set_Volume_Level" testStepType="loop" >
-              <subtestStep subtestStepId="1" name="Set_Volume_Level"  method="Set_Volume_Level" revertSet="yes">
-                  <params>
-                    <param tag="audioPort"  value="SPDIF0"  />
-                    <param tag="volumeLevel" value="0,25,50,100" iteration="true" revertParam="yes" />
+                    <param tag="volumeLevel" value="0,25,50,100" iteration="true"  />
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
-              <subtestStep subtestStepId="2" name="Get_Volume_Level" method="Get_Volume_Level" revertFlag="yes" >
+              <subtestStep subtestStepId="2" name="Get_Volume_Level" method="Get_Volume_Level" >
                   <params>
                     <param tag="audioPort"  value="SPDIF0"  />
                   </params>
@@ -1456,29 +1444,23 @@
                   </resultGeneration>
               </subtestStep>
             </testStep>
-        </testCase>
+        </testCase>     
 
         <testCase testCaseId="DS_57" testCaseName= "Set_And_Get_Volume_Level_IDLR0" desc="Check whether volume level values are able to set and get for IDLR0 port" >
-            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="IDLR0"/>
+            <testCaseInfo testCaseType="loop"  configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="IDLR0"/>
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
                 <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="IDLR0">
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="2" name="Get_Volume_Level" method="Get_Volume_Level" saveResult="true" revertGet="yes" >
+            <testStep testStepId="2" name="Set_Volume_Level" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Volume_Level"  method="Set_Volume_Level"  >
                   <params>
                     <param tag="audioPort"  value="IDLR0"  />
-                  </params>
-              <resultGeneration useMethodTag="check_volume_level" arguments="check_volume_level_range" />
-            </testStep>
-            <testStep testStepId="3" name="Set_Volume_Level" testStepType="loop" >
-              <subtestStep subtestStepId="1" name="Set_Volume_Level"  method="Set_Volume_Level" revertSet="yes">
-                  <params>
-                    <param tag="audioPort"  value="IDLR0"  />
-                    <param tag="volumeLevel" value="0,25,50,100" iteration="true" revertParam="yes" />
+                    <param tag="volumeLevel" value="0,25,50,100" iteration="true"  />
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
-              <subtestStep subtestStepId="2" name="Get_Volume_Level" method="Get_Volume_Level" revertFlag="yes" >
+              <subtestStep subtestStepId="2" name="Get_Volume_Level" method="Get_Volume_Level" >
                   <params>
                     <param tag="audioPort"  value="IDLR0"  />
                   </params>
@@ -1488,28 +1470,22 @@
               </subtestStep>
             </testStep>
         </testCase>
-
+        
         <testCase testCaseId="DS_58" testCaseName= "Set_And_Get_Volume_Level_SPEAKER0" desc="Check whether volume level values are able to set and get for SPEAKER0 port" >
-            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="SPEAKER0"/>
+            <testCaseInfo testCaseType="loop"   configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="SPEAKER0"/>
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
                 <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPEAKER0">
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="2" name="Get_Volume_Level" method="Get_Volume_Level" saveResult="true" revertGet="yes" >
+            <testStep testStepId="2" name="Set_Volume_Level" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Volume_Level"  method="Set_Volume_Level">
                   <params>
                     <param tag="audioPort"  value="SPEAKER0"  />
-                  </params>
-              <resultGeneration useMethodTag="check_volume_level" arguments="check_volume_level_range" />
-            </testStep>
-            <testStep testStepId="3" name="Set_Volume_Level" testStepType="loop" >
-              <subtestStep subtestStepId="1" name="Set_Volume_Level"  method="Set_Volume_Level" revertSet="yes">
-                  <params>
-                    <param tag="audioPort"  value="SPEAKER0"  />
-                    <param tag="volumeLevel" value="0,25,50,100" iteration="true" revertParam="yes" />
+                    <param tag="volumeLevel" value="0,25,50,100" iteration="true" />
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
-              <subtestStep subtestStepId="2" name="Get_Volume_Level" method="Get_Volume_Level" revertFlag="yes" >
+              <subtestStep subtestStepId="2" name="Get_Volume_Level" method="Get_Volume_Level"  >
                   <params>
                     <param tag="audioPort"  value="SPEAKER0"  />
                   </params>
