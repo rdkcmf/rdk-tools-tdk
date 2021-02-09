@@ -25,17 +25,17 @@ if [ -e $tst_file ]; then
 	APPLN_HOME_PATH=$APP_MOUNT_PATH
 	rm $tst_file
 fi
-rdm_tdk_stop_script=$APPLN_HOME_PATH/tdk-dl/var/TDK/StopTDK.sh
+rdm_tdk_stop_script=$APPLN_HOME_PATH/TDK/var/TDK/StopTDK.sh
 tdk_stop_script=/opt/TDK/StopTDK.sh
 
 is_tdk_as_rdm()
 {
   package=`cat /etc/rdm/rdm-manifest.json | grep "app_name" | grep -i tdk | cut -d "\"" -f4`
-  if [[ "$package" == "tdk-dl" ]]; then
-    echo "tdk-dl is RDM package in this build"
+  if [[ "$package" == "TDK" ]]; then
+    echo "TDK is RDM package in this build"
     return 1
   else
-    echo "tdk-dl RDM package is not available.. it is traditional TDK build"
+    echo "TDK RDM package is not available.. it is traditional TDK build"
     return 0
   fi
 }
