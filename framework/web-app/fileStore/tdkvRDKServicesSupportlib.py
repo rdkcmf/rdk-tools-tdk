@@ -221,14 +221,12 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "network_get_named_endpoints":
             result = result.get("endpoints")
-            endpoints = [ name.get("endpoint") for name in result ]
-            endpoints = [ str(name) for name in endpoints if str(name).strip() ]
+            endpoints = [ str(name) for name in result if str(name).strip() ]
             info["endpoints"] = endpoints
             if len(endpoints):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
 
         elif tag == "network_get_ping_response":
             info = result.copy()
@@ -2329,6 +2327,11 @@ def checkTestCaseApplicability(methodTag,configKeyData,arguments):
                 result = "FALSE"
 
         elif tag == "network_check_feature_applicability":
+            if arg[0] in keyData:
+                result = "TRUE"
+            else:
+                result = "FALSE"
+        elif tag == "wifi_check_feature_applicability":
             if arg[0] in keyData:
                 result = "TRUE"
             else:
