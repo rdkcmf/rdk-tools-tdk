@@ -133,18 +133,18 @@ if expectedResult in result.upper():
     revert="NO"
     plugin_list = ["WebKitBrowser","Cobalt","DeviceInfo"]
     plugins_cur_status_dict = get_plugins_status(obj,plugin_list)
-    status = "SUCCESS"
+    plugin_required_status = "SUCCESS"
     plugin_status_needed = {"WebKitBrowser":"resumed","Cobalt":"deactivated","DeviceInfo":"activated"}
     if plugin_status_needed != plugins_cur_status_dict :
         revert = "YES"
-        status = set_plugins_status(obj,plugin_status_needed)
+        plugin_required_status = set_plugins_status(obj,plugin_status_needed)
         plugins_status_after_set = get_plugins_status(obj,plugin_list)
         if plugin_status_after_set == plugin_status_needed:
-            status = "SUCCESS"
+            plugin_required_status = "SUCCESS"
         else:
-            status = "FAILURE"
+            plugin_required_status = "FAILURE"
         revert_plugins_dict.update(plugins_cur_status_dict)
-    if status == "SUCCESS":
+    if status == "SUCCESS" and plugin_required_status == "SUCCESS":
         if revert_if == "YES":
             closed_status = close_lightning_app(obj)
             time.sleep(10)
