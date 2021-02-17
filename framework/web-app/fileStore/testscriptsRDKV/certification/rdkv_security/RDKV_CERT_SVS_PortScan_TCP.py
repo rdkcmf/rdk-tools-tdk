@@ -21,11 +21,11 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>8</version>
+  <version>15</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkvSecurity_PortScan_UDP</name>
+  <name>RDKV_CERT_SVS_PortScan_TCP</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
-  <primitive_test_id></primitive_test_id>
+  <primitive_test_id> </primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
   <primitive_test_name>rdkvsecurity_executeInTM</primitive_test_name>
   <!--  -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Scanning the UDP ports of the device to find out if additional ports are open other than the  expected list of open ports</synopsis>
+  <synopsis>Scanning the TCP ports of the device to find out if additional ports are open other than the  expected list of open ports</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -60,22 +60,22 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_SECURITY_02</test_case_id>
-    <test_objective>Scanning the UDP ports of the device to find out if additional ports are open other than the expected list of open ports</test_objective>
+    <test_case_id>RDKV_SECURITY_01</test_case_id>
+    <test_objective>Scanning the TCP ports of the device to find out if additional ports are open other than the expected list of open ports</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI,Accelerator</test_setup>
     <pre_requisite>1. nmap tool should be installed in the TM machine
-2. Open ports list corresponding to the device should be added in the device configuration file (variable $UDP_PORTS) available in fileStore/tdkvRDKServiceConfig/device.config file</pre_requisite>
+2. Open ports list corresponding to the device should be added in the device configuration file (variable $TCP_PORTS) available in fileStore/tdkvRDKServiceConfig/device.config file</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>None</input_parameters>
-    <automation_approch>1. Execute the nmap with parameters to scan all UDP ports of the DUT
+    <automation_approch>1. Execute the nmap with parameters to scan all TCP ports of the DUT
 2. From the output returned by nmap, create a list of open ports.
-3. Get the expected open ports list from the device.config file (variable $UDP_PORTS) and compare it with the nmap output
+3. Get the expected open ports list from the device.config file (variable $TCP_PORTS) and compare it with the nmap output
 4. Pass/fail the test based on the absence/presence of additional open ports</automation_approch>
-    <expected_output>The open ports list generated from nmap output should not have any additional ports other than the expected open ports from the list (variable $UDP_PORTS) in the device.config</expected_output>
+    <expected_output>The open ports list generated from nmap output should not have any additional ports other than the expected open ports from the list (variable $TCP_PORTS) in the device.config</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_security</test_stub_interface>
-    <test_script>RdkvSecurity_PortScan_UDP</test_script>
+    <test_script>RdkvSecurity_PortScan_TCP</test_script>
     <skipped>No</skipped>
     <release_version>M85</release_version>
     <remarks></remarks>
@@ -95,7 +95,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_security","1",standAlone=True);
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkvSecurity_PortScan_UDP');
+obj.configureTestCase(ip,port,'RDKV_CERT_SVS_PortScan_TCP');
 
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
@@ -106,8 +106,8 @@ expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     #Prmitive test case which associated to this Script
     tdkTestObj = obj.createTestStep('rdkvsecurity_executeInTM');
-    #command to be executed for scanning udp ports
-    command = "nmap -sU -F --open " + obj.IP
+    #command to be executed for scanning tcp ports
+    command = "nmap -sT -p- --open " + obj.IP
     tdkTestObj.addParameter("command", command);
 
     #Execute the test case in DUT
@@ -120,14 +120,14 @@ if expectedResult in result.upper():
         portList = []
         #The output of port scan is a multiline string from which the open port numbers needs to b saved to a list
         for line in scanResult.splitlines():
-             #Port numbers are followed by "/udp" substring
-             if "/udp" in line:
+             #Port numbers are followed by "/tcp" substring
+             if "/tcp" in line:
                  portList.append (line.split("/")[0])
         print "Open ports are: %s" %(portList)
         #Get the list of expected open ports from device config file
         tdkTestObj = obj.createTestStep('rdkvsecurity_getDeviceConfig')
         tdkTestObj.addParameter("basePath",obj.realpath)
-        tdkTestObj.addParameter("configKey","UDP_PORTS")
+        tdkTestObj.addParameter("configKey","TCP_PORTS")
         tdkTestObj.executeTestCase(expectedResult)
         expected_portList = tdkTestObj.getResultDetails()
         if "FAILURE" not in expected_portList:
@@ -137,10 +137,10 @@ if expectedResult in result.upper():
                     additional_portList.append (port)
             if not additional_portList:
                 tdkTestObj.setResultStatus("SUCCESS");
-                print "No additional UDP open ports detected"
+                print "No additional TCP open ports detected"
             else:
                 tdkTestObj.setResultStatus("FAILURE");
-                print "Additional UDP open ports detected!!!\nPorts: %s" %(additional_portList)
+                print "Additional TCP open ports detected!!!\nPorts: %s" %(additional_portList)
         else:
             tdkTestObj.setResultStatus("FAILURE");
             print "Failed to retrieve expected open ports list"
@@ -154,4 +154,3 @@ if expectedResult in result.upper():
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"
-
