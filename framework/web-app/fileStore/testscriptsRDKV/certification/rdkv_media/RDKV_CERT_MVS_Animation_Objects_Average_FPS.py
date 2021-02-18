@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>3</version>
+  <version>4</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_Media_Animation_Objects_Average_FPS</name>
+  <name>RDKV_CERT_MVS_Animation_Objects_Average_FPS</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -48,9 +48,9 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
-    <box_type>RPI-HYB</box_type>
-    <!--  -->
     <box_type>RPI-Client</box_type>
+    <!--  -->
+    <box_type>RPI-HYB</box_type>
     <!--  -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
@@ -109,7 +109,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_Media_Animation_Objects_Average_FPS')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Animation_Objects_Average_FPS')
 
 webkit_console_socket = None
 
@@ -188,9 +188,11 @@ if expectedResult in result.upper():
                     continue_count = 0
                     test_result = ""
                     average_fps = 0
+                    app_progress = 1
                     minfps = float(int(expected_fps) - int(threshold))
                     while True:
                         if continue_count > 60:
+                            app_progress = 0
                             print "\nApp not proceeding for 1 min. Exiting..."
                             break
                         if (len(webkit_console_socket.getEventsBuffer())== 0):
@@ -208,7 +210,7 @@ if expectedResult in result.upper():
                             break;
                     webkit_console_socket.disconnect()
                     print "Obtained Average FPS =",average_fps
-                    if "NaN" in average_fps:
+                    if "NaN" in str(average_fps) or app_progress == 0:
                         print "Failed to get the average FPS Value"
                         print "[TEST EXECUTION RESULT]: FAILURE"
                         tdkTestObj.setResultStatus("FAILURE");

@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>5</version>
+  <version>4</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_Media_Video_FF_STRESS_HLS</name>
+  <name>RDKV_CERT_MVS_Animation_Texts_Average_FPS</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video fast forward operation of hls content repeatedly for given number of times</synopsis>
+  <synopsis>Test Script to launch a lightning Texts Animation application to render given number of text strings and check whether the average FPS calculated for 60 sec duration value is as expected</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>5</execution_time>
+  <execution_time>3</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -60,28 +60,31 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_17</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video fast forward operation of hls content repeatedly for given number of times</test_objective>
+    <test_case_id>RDKV_Media_Validation_23</test_case_id>
+    <test_objective>Test Script to launch a lightning Texts Animation application to render given number of text strings and check whether the average FPS calculated for 60 sec duration value is as expected</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
-2.Lightning Player app should be hosted</pre_requisite>
+2.Lightning Animation app should be hosted</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
-    <input_parameters>Lightning player App URL: string
+    <input_parameters>Lightning Objects Animation App URL: string
 webinspect_port: string
-video_src_url_hls: string
-operation_max_interval: int</input_parameters>
+thunder_port :string
+expected_fps:int
+threshold:int
+object_count:int
+animation_duration:int</input_parameters>
     <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
 2. Get the current URL in webkitbrowser
-3. Load the player app with the src url, operations to be performed, fastforward and playnow with given interval and repeat count. 
-4. App performs the provided operations and validates each operation using events
-5. If expected event ratechange occurs for each  fastforward operation, then app gives the validation result as SUCCESS or else FAILURE
-6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
+3. Load the Objects Animation app url with the duration 60 sec
+4. App performs objects animation by rendering given number of text strings for 60 sec and stops after that.
+5. App gives average FPS value after duration of 60 sec
+6. Get the average FPS value from the app and check whether FPS obtained is greater than or equal to expected fps value (i.e) expected_fps - threshold.
 7. Revert all values</automation_approch>
-    <expected_output>Video should be fastfoward repeatedly in 2x,4x,16x,1x speed twice and expected event ratechange should occur for all the repetition and if proc validation is applicable, then expected data should be available in proc file</expected_output>
+    <expected_output>Object Animation should happen for 60 sec and average FPS should be grater than or equal to expected fps value.</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RdkService_Media_Video_FF_STRESS_HLS</test_script>
+    <test_script>RdkService_Media_Texts_Animation_Average_FPS</test_script>
     <skipped>No</skipped>
     <release_version>M85</release_version>
     <remarks></remarks>
@@ -106,7 +109,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_Media_Video_FF_STRESS_HLS')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Animation_Texts_Average_FPS')
 
 webkit_console_socket = None
 
@@ -116,35 +119,25 @@ print "[LIB LOAD STATUS]  :  %s" %result;
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    appURL    = MediaValidationVariables.lightning_video_test_app_url
-    videoURL  = MediaValidationVariables.video_src_url_hls
-    # Setting VideoPlayer Operations
-    setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
-    setOperation("repeat","3")
-    setOperation("playnow",MediaValidationVariables.operation_max_interval)
-    setOperation("repeat","1")
-    setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
-    setOperation("repeat","3")
-    setOperation("playnow",MediaValidationVariables.operation_max_interval)
-    operations = getOperations()
-    # Setting VideoPlayer test app URL arguments
-    setURLArgument("url",videoURL)
-    setURLArgument("operations",operations)
+    appURL    = MediaValidationVariables.lightning_objects_animation_test_app_url
+    # Setting Animation test app URL arguments
+    setURLArgument("ip",ip)
+    setURLArgument("port",MediaValidationVariables.thunder_port)
+    setURLArgument("object","Text")
+    setURLArgument("text","demo")
+    setURLArgument("showfps","true")
+    setURLArgument("count",MediaValidationVariables.objects_count)
+    setURLArgument("duration",MediaValidationVariables.animation_duration)
     setURLArgument("autotest","true")
-    setURLArgument("type","hls")
     appArguments = getURLArguments()
     # Getting the complete test app URL
-    video_test_url = getTestURL(appURL,appArguments)
-
-    #Example video test url
-    #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
-    #url=<video_url>.m3u8&operations=fastfwd(10),repeat(3),playnow(10),repeat(1),fastfwd(10),repeat(3),playnow(10)&autotest=true&type=hls
+    animation_test_url = getTestURL(appURL,appArguments)
 
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
     status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
-    print "Current values \nUX:%s\nWebKitBrowser:%s\nCobalt:%s"%(curr_ux_status,curr_webkit_status,curr_cobalt_status);
+    print "Current values \nWebKitBrowser:%s\nCobalt:%s"%(curr_webkit_status,curr_cobalt_status);
     if status == "FAILURE":
         set_pre_requisites(obj)
         #Need to revert the values since we are changing plugin status
@@ -152,26 +145,35 @@ if expectedResult in result.upper():
         status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
     #Check residentApp status and deactivate if its activated
     check_status,resapp_status,resapp_revert,resapp_url = checkAndDeactivateResidentApp(obj)
-    #Checking whether device supports proc entry validation. If supported, get
-    #device information to access and read the proc file
-    validation_dict = getProcValidationParams(obj,"VIDEO_PROC_FILE")
-    if status == "SUCCESS" and validation_dict != {} and check_status == "SUCCESS":
+    #Reading the FPS and threshold for FPS from the device config file
+    config_status = "SUCCESS"
+    conf_file,result = getConfigFileName(obj.realpath)
+    result1, expected_fps  = getDeviceConfigKeyValue(conf_file,"EXPECTED_FPS")
+    result2, threshold     = getDeviceConfigKeyValue(conf_file,"FPS_THRESHOLD")
+    if "SUCCESS" in result1 and "SUCCESS" in result2:
+        if expected_fps == "" and threshold == "":
+            config_status = "FAILURE"
+            print "Please set expected_fps and threshold values in device config file"
+    else:
+        config_status = "FAILURE"
+        print "Failed to get the FPS value & threshold value from device config file"
+    if status == "SUCCESS" and config_status == "SUCCESS" and check_status == "SUCCESS":
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
         tdkTestObj.addParameter("method","WebKitBrowser.1.url");
         tdkTestObj.executeTestCase(expectedResult);
-        current_url = tdkTestObj.getResultDetails();
         result = tdkTestObj.getResult()
+        current_url = tdkTestObj.getResultDetails();
         if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             webkit_console_socket = createEventListener(ip,MediaValidationVariables.webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
             print "Current URL:",current_url
-            print "\nSet Lightning video player test app URL"
+            print "\nSet Lightning Objects Animation test app URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
             tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.addParameter("value",video_test_url);
+            tdkTestObj.addParameter("value",animation_test_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
             if expectedResult in result:
@@ -179,31 +181,19 @@ if expectedResult in result.upper():
                 tdkTestObj = obj.createTestStep('rdkservice_getValue');
                 tdkTestObj.addParameter("method","WebKitBrowser.1.url");
                 tdkTestObj.executeTestCase(expectedResult);
+                result= tdkTestObj.getResult()
                 new_url = tdkTestObj.getResultDetails();
-                result = tdkTestObj.getResult()
-                if new_url in video_test_url and expectedResult in result:
+                if new_url in animation_test_url and expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS");
                     print "URL(",new_url,") is set successfully"
-                    if validation_dict["proc_check"]:
-                        proc_file = validation_dict["proc_file"]
-                        if validation_dict["ssh_method"] == "directSSH":
-                            if validation_dict["password"] == "None":
-                                password = ""
-                            else:
-                                password = validation_dict["password"]
-                            credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
-                        else:
-                            #TODO
-                            print "selected ssh method is {}".format(validation_dict["ssh_method"])
-                            pass
-                        print "\nProc entry validation for video player test is enabled\n"
-                    else:
-                        print "\nProc entry validation for video player test is skipped\n"
                     continue_count = 0
                     test_result = ""
-                    proc_check_list = []
+                    average_fps = 0
+                    app_progress = 1
+                    minfps = float(int(expected_fps) - int(threshold))
                     while True:
                         if continue_count > 60:
+                            app_progress = 0
                             print "\nApp not proceeding for 1 min. Exiting..."
                             break
                         if (len(webkit_console_socket.getEventsBuffer())== 0):
@@ -214,23 +204,25 @@ if expectedResult in result.upper():
                             continue_count = 0
                         console_log = webkit_console_socket.getEventsBuffer().pop(0)
                         dispConsoleLog(console_log)
-                        if "Observed Event: ratechange" in console_log and validation_dict["proc_check"]:
-                            proc_check_list.append(checkProcEntry(validation_dict["ssh_method"],credentials,proc_file,"started"));
-                            time.sleep(1);
-                        if "TEST RESULT:" in console_log or "Connection refused" in console_log:
+                        if "Average FPS" in console_log:
+                            average_fps = getConsoleMessage(console_log).split("[DiagnosticInfo]:")[1].split(":")[1]
+                        if "TEST COMPLETED" in console_log or "Connection refused" in console_log:
                             test_result = getConsoleMessage(console_log)
                             break;
                     webkit_console_socket.disconnect()
-                    if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
-                        print "Video play is fine"
-                        print "[TEST EXECUTION RESULT]: SUCCESS"
-                        tdkTestObj.setResultStatus("SUCCESS");
-                    elif "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
-                        print "Decoder proc entry check returns failure.Video not playing fine"
+                    print "Obtained Average FPS =",average_fps
+                    if "NaN" in str(average_fps) or app_progress == 0:
+                        print "Failed to get the average FPS Value"
                         print "[TEST EXECUTION RESULT]: FAILURE"
                         tdkTestObj.setResultStatus("FAILURE");
+                    elif float(average_fps) >= minfps:
+                        print "Average FPS is >= %f" %(minfps)
+                        print "%d Text Strings are rendered for around 60 sec and average FPS is as expected" %(MediaValidationVariables.objects_count)
+                        print "[TEST EXECUTION RESULT]: SUCCESS"
+                        tdkTestObj.setResultStatus("SUCCESS");
                     else:
-                        print "Video not playing fine"
+                        print "Average FPS is < %f" %(minfps)
+                        print "%d Text Strings rendered for around 60 sec and average FPS is not as expected" %(MediaValidationVariables.objects_count)
                         print "[TEST EXECUTION RESULT]: FAILURE"
                         tdkTestObj.setResultStatus("FAILURE");
                     #Set the URL back to previous
@@ -268,4 +260,3 @@ if expectedResult in result.upper():
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"
-

@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2021 RDK Management
+# Copyright 2020 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>6</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_Media_Video_PlayPause_STRESS_DASH</name>
+  <name>RDKV_CERT_MVS_Video_PlayPause_DASH</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operations of dash content continuously for given number of times</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operation of mpd content</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -60,8 +60,8 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_12</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operations of dash content continuously for given number of times</test_objective>
+    <test_case_id>RDKV_Media_Validation_07</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operation of mpd content</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -70,22 +70,21 @@
     <input_parameters>Lightning player App URL: string
 webinspect_port: string
 video_src_url_dash: string
-pause_interval_stress:int
-play_interval_stress:int
-repeat_count_stress:int</input_parameters>
+play_interval: int
+pause_interval:int</input_parameters>
     <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
 2. Get the current URL in webkitbrowser
-3. Load the player app url with the operations play, pause and repeat info.
-4. App performs the pause and play operation repeatedly and validates using events
-5. If expected events occurs for pause and play in all the repetition, then app gives the validation result as SUCCESS or else FAILURE
+3. Load the player app url with the operations to be performed, play and pause with given interval.
+4. App performs the provided operations and validates each operation using events
+5. If expected events occurs for each operation, then app gives the validation result as SUCCESS or else FAILURE
 6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>Player pause and play should happen and expected events should occur for all the repetition and if proc validation is applicable, then expected data should be available in proc file </expected_output>
+    <expected_output>Player pause and play should happen, expected events should occur and if proc validation is applicable, then expected data should be available in proc file</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RdkService_Media_Video_PlayPause_STRESS_DASH</test_script>
+    <test_script>RdkService_Media_Video_PlayPause_DASH</test_script>
     <skipped>No</skipped>
-    <release_version>M85</release_version>
+    <release_version>M82</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -108,7 +107,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_Media_Video_PlayPause_STRESS_DASH')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_PlayPause_DASH')
 
 webkit_console_socket = None
 
@@ -121,9 +120,8 @@ if expectedResult in result.upper():
     appURL    = MediaValidationVariables.lightning_video_test_app_url
     videoURL  = MediaValidationVariables.video_src_url_dash
     # Setting VideoPlayer Operations
-    setOperation("pause",MediaValidationVariables.pause_interval_stress)
-    setOperation("play",MediaValidationVariables.play_interval_stress)
-    setOperation("repeat",MediaValidationVariables.repeat_count_stress)
+    setOperation("pause",MediaValidationVariables.pause_interval)
+    setOperation("play",MediaValidationVariables.play_interval)
     operations = getOperations()
     # Setting VideoPlayer test app URL arguments
     setURLArgument("url",videoURL)
@@ -133,7 +131,7 @@ if expectedResult in result.upper():
 
     #Example video test url
     #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
-    #url=<video_url>.mpd&operations=pause(5),play(5),repeat(15)&autotest=true&type=dash
+    #url=<video_url>.mpd&operations=pause(30),play(10)&autotest=true&type=dash
 
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.

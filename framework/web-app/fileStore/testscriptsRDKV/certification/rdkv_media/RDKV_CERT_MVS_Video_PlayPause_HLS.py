@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2021 RDK Management
+# Copyright 2020 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>6</version>
+  <version>7</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_Media_Video_Play_Full_HLS</name>
+  <name>RDKV_CERT_MVS_Video_PlayPause_HLS</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operations of hls content till the end</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operation of hls content</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>65</execution_time>
+  <execution_time>5</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -60,8 +60,8 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_15</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operations of hls content till the end</test_objective>
+    <test_case_id>RDKV_Media_Validation_06</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operation of hls content</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -74,17 +74,17 @@ play_interval: int
 pause_interval:int</input_parameters>
     <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
 2. Get the current URL in webkitbrowser
-3. Load the player app with the src url, operations to be performed i.e playtillend.
-4. App plays the entire video and validates using video events play and ended.
-5. After playing the video till the end, if the expected events play and ended are captured, then app gives the validation result as SUCCESS or else FAILURE
+3. Load the player app url with the operations to be performed, play and pause with given interval.
+4. App performs the provided operations and validates each operation using events
+5. If expected events occurs for each operation, then app gives the validation result as SUCCESS or else FAILURE
 6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>Video should be played till the end, play and ended events should occur and if proc validation is applicable, then expected data should be available in proc file</expected_output>
+    <expected_output>Player pause and play should happen, expected events should occur and if proc validation is applicable, then expected data should be available in proc file</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RdkService_Media_Video_Play_Full_HLS</test_script>
+    <test_script>RdkService_Media_Video_PlayPause_HLS</test_script>
     <skipped>No</skipped>
-    <release_version>M85</release_version>
+    <release_version>M82</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -107,7 +107,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_Media_Video_Play_Full_HLS')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_PlayPause_HLS')
 
 webkit_console_socket = None
 
@@ -120,7 +120,8 @@ if expectedResult in result.upper():
     appURL    = MediaValidationVariables.lightning_video_test_app_url
     videoURL  = MediaValidationVariables.video_src_url_hls
     # Setting VideoPlayer Operations
-    setOperation("playtillend","0")
+    setOperation("pause",MediaValidationVariables.pause_interval)
+    setOperation("play",MediaValidationVariables.play_interval)
     operations = getOperations()
     # Setting VideoPlayer test app URL arguments
     setURLArgument("url",videoURL)
@@ -133,7 +134,7 @@ if expectedResult in result.upper():
 
     #Example video test url
     #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
-    #url=<video_url>.m3u8&operations=playtillend(0)&autotest=true&type=hls
+    #url=<video_url>.m3u8&operations=pause(30),play(10)&autotest=true&type=hls
 
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -198,8 +199,8 @@ if expectedResult in result.upper():
                     test_result = ""
                     proc_check_list = []
                     while True:
-                        if continue_count > 180:
-                            print "\nApp not proceeding for 3 mins. Exiting..."
+                        if continue_count > 60:
+                            print "\nApp not proceeding for 1 min. Exiting..."
                             break
                         if (len(webkit_console_socket.getEventsBuffer())== 0):
                             time.sleep(1)
@@ -209,7 +210,7 @@ if expectedResult in result.upper():
                             continue_count = 0
                         console_log = webkit_console_socket.getEventsBuffer().pop(0)
                         dispConsoleLog(console_log)
-                        if "Video Player Playing" in console_log and validation_dict["proc_check"]:
+                        if "Observed Event: play" in console_log and validation_dict["proc_check"]:
                             proc_check_list.append(checkProcEntry(validation_dict["ssh_method"],credentials,proc_file,"started"));
                             time.sleep(1);
                         if "TEST RESULT:" in console_log or "Connection refused" in console_log:

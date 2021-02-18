@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>4</version>
+  <version>6</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_Media_Video_Play_Live_DASH</name>
+  <name>RDKV_CERT_MVS_Video_FF_STRESS_HLS</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operation of dash live content</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video fast forward operation of hls content repeatedly for given number of times</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -60,8 +60,8 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_21</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operation of dash live content</test_objective>
+    <test_case_id>RDKV_Media_Validation_17</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video fast forward operation of hls content repeatedly for given number of times</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -69,19 +69,19 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Lightning player App URL: string
 webinspect_port: string
-video_src_url_live_dash: string
-</input_parameters>
+video_src_url_hls: string
+operation_max_interval: int</input_parameters>
     <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
 2. Get the current URL in webkitbrowser
-3. Load the player app with the live dash url.
-4. App should play the live dash content and event video playing should occur
-5. If expected event occurs, then app gives the validation result as SUCCESS or else FAILURE
+3. Load the player app with the src url, operations to be performed, fastforward and playnow with given interval and repeat count. 
+4. App performs the provided operations and validates each operation using events
+5. If expected event ratechange occurs for each  fastforward operation, then app gives the validation result as SUCCESS or else FAILURE
 6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>Live dash video should be played for provided duration and expected event video playing should occur</expected_output>
+    <expected_output>Video should be fastfoward repeatedly in 2x,4x,16x,1x speed twice and expected event ratechange should occur for all the repetition and if proc validation is applicable, then expected data should be available in proc file</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RdkService_Media_Video_Play_Live_DASH</test_script>
+    <test_script>RdkService_Media_Video_FF_STRESS_HLS</test_script>
     <skipped>No</skipped>
     <release_version>M85</release_version>
     <remarks></remarks>
@@ -106,7 +106,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_Media_Video_Play_Live_DASH')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_FF_STRESS_HLS')
 
 webkit_console_socket = None
 
@@ -117,19 +117,28 @@ print "[LIB LOAD STATUS]  :  %s" %result;
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     appURL    = MediaValidationVariables.lightning_video_test_app_url
-    videoURL  = MediaValidationVariables.video_src_url_live_dash
+    videoURL  = MediaValidationVariables.video_src_url_hls
     # Setting VideoPlayer Operations
-    setOperation("close","60")
+    setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
+    setOperation("repeat","3")
+    setOperation("playnow",MediaValidationVariables.operation_max_interval)
+    setOperation("repeat","1")
+    setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
+    setOperation("repeat","3")
+    setOperation("playnow",MediaValidationVariables.operation_max_interval)
     operations = getOperations()
     # Setting VideoPlayer test app URL arguments
     setURLArgument("url",videoURL)
     setURLArgument("operations",operations)
     setURLArgument("autotest","true")
-    setURLArgument("type","dash")
+    setURLArgument("type","hls")
+    appArguments = getURLArguments()
+    # Getting the complete test app URL
+    video_test_url = getTestURL(appURL,appArguments)
 
     #Example video test url
     #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
-    #url=<video_url>.mpd&operations=close(60)&autotest=true&type=dash
+    #url=<video_url>.m3u8&operations=fastfwd(10),repeat(3),playnow(10),repeat(1),fastfwd(10),repeat(3),playnow(10)&autotest=true&type=hls
 
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -143,15 +152,6 @@ if expectedResult in result.upper():
         status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
     #Check residentApp status and deactivate if its activated
     check_status,resapp_status,resapp_revert,resapp_url = checkAndDeactivateResidentApp(obj)
-
-    #Reading video load config the from the device config file
-    conf_file,result = getConfigFileName(obj.realpath)
-    result,usedashlib = getDeviceConfigKeyValue(conf_file,"LOAD_USING_DASHLIB")
-    setURLArgument("options","useDashlib("+str(usedashlib)+")")
-    appArguments = getURLArguments()
-    # Getting the complete test app URL
-    video_test_url = getTestURL(appURL,appArguments)
-
     #Checking whether device supports proc entry validation. If supported, get
     #device information to access and read the proc file
     validation_dict = getProcValidationParams(obj,"VIDEO_PROC_FILE")
@@ -202,10 +202,9 @@ if expectedResult in result.upper():
                     continue_count = 0
                     test_result = ""
                     proc_check_list = []
-                    play_status = "FAILURE"
                     while True:
-                        if continue_count > 180:
-                            print "\nApp not proceeding for 3 mins. Exiting..."
+                        if continue_count > 60:
+                            print "\nApp not proceeding for 1 min. Exiting..."
                             break
                         if (len(webkit_console_socket.getEventsBuffer())== 0):
                             time.sleep(1)
@@ -215,16 +214,14 @@ if expectedResult in result.upper():
                             continue_count = 0
                         console_log = webkit_console_socket.getEventsBuffer().pop(0)
                         dispConsoleLog(console_log)
-                        if "Video Player Playing" in console_log:
-                            play_status = "SUCCESS"
-                        if "Video Player Playing" in console_log and validation_dict["proc_check"]:
+                        if "Observed Event: ratechange" in console_log and validation_dict["proc_check"]:
                             proc_check_list.append(checkProcEntry(validation_dict["ssh_method"],credentials,proc_file,"started"));
                             time.sleep(1);
                         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
                             test_result = getConsoleMessage(console_log)
                             break;
                     webkit_console_socket.disconnect()
-                    if "SUCCESS" in test_result and "SUCCESS" in play_status and "FAILURE" not in proc_check_list:
+                    if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
                         print "Video play is fine"
                         print "[TEST EXECUTION RESULT]: SUCCESS"
                         tdkTestObj.setResultStatus("SUCCESS");
