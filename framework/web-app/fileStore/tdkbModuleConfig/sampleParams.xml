@@ -28,6 +28,8 @@
                <snmpType></snmpType>
                <!--whether set is applicable or not -->
                <writable></writable>
+               <!--whether snmp set is applicable or not. This tag is required only if snmp set validation should be skipped for an OID -->
+               <snmpWritable>false</snmpWritable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet></persistentSet>
                <!--default value of the param after factory reset -->
@@ -44,6 +46,8 @@
                <webpaExpectedValues></webpaExpectedValues>
 	       <!--to be specified only if expectedValues is not available. -->
 	       <setValue></setValue>
+               <!--to be specified as true if the parameter's value WILL NOT persist on reboot. This tag is required only if the parameter is not persistent on reboot-->
+               <RFCEnabled></RFCEnabled>
         </parameter>
 
 	<!-- a sample parameter data from PAM module is shown below -->

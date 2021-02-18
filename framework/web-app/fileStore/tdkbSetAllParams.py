@@ -159,6 +159,12 @@ def setAllParams(module, setup_type, tr181Obj, sysObj, rebootTest = "false"):
 
 	#get and save the original value before doing set
         if writable == "true":
+            if setup_type == "SNMP":
+                if param.find('snmpWritable')is not None:
+                    snmpWritable = param.find('snmpWritable').text
+                    if snmpWritable == "false":
+                        print "Skipping set validation of parameter %s via SNMP" %paramName
+                        continue;
 	    print "*************Start validation of %s **************" %paramName
             value,actualresult = getParameterValue(tr181Obj, sysObj, setup_type, paramName, paramType, expectedValues)
 
