@@ -268,18 +268,27 @@ public class DeviceStatusUpdater {
 	}
 	
 	public static getDefaultNetworkInterface(File configFile){
+		InputStream is
 		try {
-		Properties prop = new Properties();
-		if(configFile.exists()){
-			InputStream is = new FileInputStream(configFile);
-			prop.load(is);
-			def value = prop.getProperty("interface");
-			if(value){
-				return value
+			Properties prop = new Properties();
+			if(configFile.exists()){
+				is = new FileInputStream(configFile);
+				prop.load(is);
+				def value = prop.getProperty("interface");
+				if(value){
+					return value
+				}
 			}
-		}
 		} catch (Exception e) {
 			e.printStackTrace()
+		}finally{
+			if(is){
+				try{
+					is.close()
+				}catch(Exception e){
+				    e.printStackTrace()
+				}
+			}
 		}
 		return null
 	}
