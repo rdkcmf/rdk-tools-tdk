@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>4</version>
+  <version>3</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RdkService_Media_Video_Seek_BWD_STRESS_HLS</name>
+  <name>RDKV_CERT_MVS_Video_PlayPause_STRESS_DASH</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video seek backward operation of hls content continuously for given number of times in provided interval</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operations of dash content continuously for given number of times</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>10</execution_time>
+  <execution_time>5</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -60,8 +60,8 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_20</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video seek backward operation of hls content continuously for given number of times in provided interval</test_objective>
+    <test_case_id>RDKV_Media_Validation_12</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play pause operations of dash content continuously for given number of times</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -69,20 +69,21 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Lightning player App URL: string
 webinspect_port: string
-video_src_url_hls: string
-seekbwd_interval: int
-seekbwd_check_interval:int</input_parameters>
+video_src_url_dash: string
+pause_interval_stress:int
+play_interval_stress:int
+repeat_count_stress:int</input_parameters>
     <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
 2. Get the current URL in webkitbrowser
-3. Load the player app with the src url, operations to be performed, seekbwd with given interval and repeat count. 
-4. App performs the provided operations and validates each operation using events
-5. If expected event seeking and seeked occurs for each  seekbwd operation, then app gives the validation result as SUCCESS or else FAILURE
+3. Load the player app url with the operations play, pause and repeat info.
+4. App performs the pause and play operation repeatedly and validates using events
+5. If expected events occurs for pause and play in all the repetition, then app gives the validation result as SUCCESS or else FAILURE
 6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>Video should be seeked backward repeatedly and expected events seeking and seeked should occur for all the repetition and if proc validation is applicable, then expected data should be available in proc file</expected_output>
+    <expected_output>Player pause and play should happen and expected events should occur for all the repetition and if proc validation is applicable, then expected data should be available in proc file </expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RdkService_Media_Video_Seek_BWD_STRESS_HLS</test_script>
+    <test_script>RdkService_Media_Video_PlayPause_STRESS_DASH</test_script>
     <skipped>No</skipped>
     <release_version>M85</release_version>
     <remarks></remarks>
@@ -107,7 +108,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RdkService_Media_Video_Seek_BWD_STRESS_HLS')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_PlayPause_STRESS_DASH')
 
 webkit_console_socket = None
 
@@ -118,29 +119,21 @@ print "[LIB LOAD STATUS]  :  %s" %result;
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     appURL    = MediaValidationVariables.lightning_video_test_app_url
-    videoURL  = MediaValidationVariables.video_src_url_hls
-    seekInterval  = str(MediaValidationVariables.seekbwd_interval)
-    checkInterval = str(MediaValidationVariables.seekbwd_check_interval)
+    videoURL  = MediaValidationVariables.video_src_url_dash
     # Setting VideoPlayer Operations
-    # play for some duration and start seek backward
-    setOperation("seekbwd","300")
-    setOperation("repeat","1")
-    setOperation("seekbwd",MediaValidationVariables.operation_max_interval)
+    setOperation("pause",MediaValidationVariables.pause_interval_stress)
+    setOperation("play",MediaValidationVariables.play_interval_stress)
     setOperation("repeat",MediaValidationVariables.repeat_count_stress)
     operations = getOperations()
     # Setting VideoPlayer test app URL arguments
     setURLArgument("url",videoURL)
-    setURLArgument("options","seekInterval("+seekInterval+"),checkInterval("+checkInterval+")")
     setURLArgument("operations",operations)
     setURLArgument("autotest","true")
-    setURLArgument("type","hls")
-    appArguments = getURLArguments()
-    # Getting the complete test app URL
-    video_test_url = getTestURL(appURL,appArguments)
+    setURLArgument("type","dash")
 
     #Example video test url
     #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
-    #url=<video_url>.m3u8&operations=seekbwd(180),repeat(1),seekbwd(10),repat(15)&options=seekInterval(20)&autotest=true&type=hls
+    #url=<video_url>.mpd&operations=pause(5),play(5),repeat(15)&autotest=true&type=dash
 
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -154,6 +147,15 @@ if expectedResult in result.upper():
         status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
     #Check residentApp status and deactivate if its activated
     check_status,resapp_status,resapp_revert,resapp_url = checkAndDeactivateResidentApp(obj)
+
+    #Reading video load config the from the device config file
+    conf_file,result = getConfigFileName(obj.realpath)
+    result,usedashlib = getDeviceConfigKeyValue(conf_file,"LOAD_USING_DASHLIB")
+    setURLArgument("options","useDashlib("+str(usedashlib)+")")
+    appArguments = getURLArguments()
+    # Getting the complete test app URL
+    video_test_url = getTestURL(appURL,appArguments)
+
     #Checking whether device supports proc entry validation. If supported, get
     #device information to access and read the proc file
     validation_dict = getProcValidationParams(obj,"VIDEO_PROC_FILE")
@@ -216,7 +218,7 @@ if expectedResult in result.upper():
                             continue_count = 0
                         console_log = webkit_console_socket.getEventsBuffer().pop(0)
                         dispConsoleLog(console_log)
-                        if "Video Player Playing" in console_log and validation_dict["proc_check"]:
+                        if "Observed Event: play" in console_log and validation_dict["proc_check"]:
                             proc_check_list.append(checkProcEntry(validation_dict["ssh_method"],credentials,proc_file,"started"));
                             time.sleep(1);
                         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
