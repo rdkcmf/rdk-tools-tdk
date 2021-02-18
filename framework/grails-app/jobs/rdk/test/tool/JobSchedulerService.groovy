@@ -2629,15 +2629,28 @@ class JobSchedulerService implements Job{
 	def getTMUrlFromConfigFile(){
 		File configFile = grailsApplication.parentContext.getResource("/fileStore/tm.config").file
 		Properties prop = new Properties();
-		if (configFile.exists()) {
-			InputStream is = new FileInputStream(configFile);
-			prop.load(is);
-			String value = prop.getProperty("tmURL");
-			if (value != null && !value.isEmpty()) {
-				return value;
+		InputStream is
+		try{
+			if (configFile.exists()) {
+				is = new FileInputStream(configFile);
+				prop.load(is);
+				String value = prop.getProperty("tmURL");
+				if (value != null && !value.isEmpty()) {
+					return value;
+				}
+			}
+			return null;
+		}catch(Exception e){
+			e.printStackTrace()
+		}finally{
+			if(is){
+				try{
+					is.close()
+				}catch(Exception e){
+					e.printStackTrace()
+				}
 			}
 		}
-		return null;
 	}
 
 	/**
@@ -3684,10 +3697,11 @@ class JobSchedulerService implements Job{
 	}
 	
 	public static String getConfigProperty(File configFile, String key) {
+		InputStream is
 		try {
 			Properties prop = new Properties();
 			if (configFile.exists()) {
-				InputStream is = new FileInputStream(configFile);
+				is = new FileInputStream(configFile);
 				prop.load(is);
 				String value = prop.getProperty(key);
 				if (value != null && !value.isEmpty()) {
@@ -3698,6 +3712,14 @@ class JobSchedulerService implements Job{
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}finally{
+			if(is){
+				try{
+				    is.close()	
+				}catch(Exception e){
+				    e.printStackTrace()
+				}
+			}
 		}
 		return null;
 	}

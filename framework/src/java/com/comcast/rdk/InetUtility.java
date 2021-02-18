@@ -49,10 +49,11 @@ public class InetUtility {
 	 }
 	 
 	public static String getDefaultNetworkInterface(File configFile, String type) {
+		InputStream is = null;
 		try {
 			Properties prop = new Properties();
 			if (configFile.exists()) {
-				InputStream is = new FileInputStream(configFile);
+				is = new FileInputStream(configFile);
 				prop.load(is);
 				String value = prop.getProperty(type);
 				if (value != null && !value.isEmpty()) {
@@ -63,6 +64,14 @@ public class InetUtility {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}finally{
+			if(is != null){
+				try{
+					is.close();
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
 		}
 		return null;
 	}
