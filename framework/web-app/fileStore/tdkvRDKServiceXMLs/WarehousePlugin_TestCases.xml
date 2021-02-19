@@ -46,7 +46,9 @@
         <testCase testCaseId="WH_01" testCaseName= "WareHouse_Get_STB_Device_Info"  desc="Gets all STB device info">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_STB_DeviceInfo" method="Get_DeviceInfo" >
-              <resultGeneration useMethodTag="warehouse_get_device_info" />
+              <resultGeneration useMethodTag="warehouse_get_device_info" >
+                <arguments useConfigFile="true" key="RF4CE_MAC"/>
+              </resultGeneration>
             </testStep>
         </testCase>
 

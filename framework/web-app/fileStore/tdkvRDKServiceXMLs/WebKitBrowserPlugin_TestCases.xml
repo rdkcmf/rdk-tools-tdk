@@ -137,9 +137,8 @@
                 </resultGeneration>
             </testStep>
         </testCase>
-
         <testCase testCaseId="WEB_03" testCaseName="WebkitBrowser_Check_FPS" desc="Launches playback URL &amp; checks fps">
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="stress" configurableRepeat="true" repeatKey="WEBKIT_FPS_REPEAT_COUNT" />
             <testStep testStepId="1" name="Set_Browser_Test_URL" method="Set_Browser_URL">
               <params>
                 <param tag="url" useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
@@ -155,12 +154,20 @@
                 <expectedValues useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
               </resultGeneration>
             </testStep>
-            <testStep testStepId="4" name="Get_Browser_FPS_Value" method="Get_Browser_FPS" delay="15">
-              <resultGeneration useMethodTag="webkitbrowser_check_fps" >
-                <expectedValues useConfigFile="true" key="WEBKIT_EXPECTED_FPS" />
+            <testStep testStepId="4" name="Get_Browser_FPS_Value" delay="60" testStepType="repeat">
+              <subtestStep subtestStepId="1" name="Get_Browser_FPS_Value" method="Get_Browser_FPS" saveResult="true" delay="2">
+                <resultGeneration useMethodTag="webkitbrowser_check_fps" >
+                </resultGeneration>
+              </subtestStep>
+            </testStep>
+            <testStep testStepId="5" name="Get_Browser_FPS_Average_Value"  action="externalFnCall"  >
+              <resultGeneration useMethodTag="check_fps_value" >
+                <arguments usePreviousResult="true" Id="4" useMethodTag="webkitbrowser_check_average_fps" />
+                <expectedValues useConfigFile="true" key="WEBKIT_EXPECTED_FPS,WEBKIT_THRESHOLD_FPS" />
               </resultGeneration>
             </testStep>
         </testCase>
+
 
         <testCase testCaseId="WEB_04" testCaseName="WebkitBrowser_Change_Cookie_Accept_Policy" desc="Change http cookie accept policy" >
            <testCaseInfo testCaseType="setandget" revert="true" />

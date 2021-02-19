@@ -255,13 +255,14 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
 
         # Wifi Events response result parser steps
         elif tag == "wifi_check_state_change_event":
-            result = result[0]
-            info = result
-            if int(result.get(state)) == int(expectedValues[0]):
-                info["Test_Step_Status"] = "SUCCESS"
-            else:
-                info["Test_Step_Status"] = "FAILURE"
+            info["Test_Step_Status"] = "FAILURE"
+            for eventResult in result:
+                if str(eventResult.get("state")) in str(expectedValues[0]):
+                    info = eventResult
+                    info["Test_Step_Status"] = "SUCCESS"
+                    break;
 
+        
         elif tag == "wifi_check_available_ssids_event":
             ssids = []
             for ssid_info in result:
@@ -272,6 +273,13 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 info["ssids"] = ssids
                 info["Test_Step_Status"] = "SUCCESS"
 
+        elif tag == "wifi_check_on_error_event":
+            result = result[0]
+            info = result
+            if int(result.get("code")) == int(expectedValues[0]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # FrameRate Events response result parser steps
         elif tag == "framerate_check_fps_event":
