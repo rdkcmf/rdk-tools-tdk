@@ -58,8 +58,15 @@
           <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
             <event pluginName="Wifi" eventName="Event_On_WIFI_State_Changed" />
             <event pluginName="Wifi" eventName="Event_On_Available_SSIDs" />
+            <event pluginName="Wifi" eventName="Event_On_Error" /> 
           </prerequisite>
-
+          <prerequisite requisiteId="3" requisiteName="Enable_Preferred_network_parameter" >
+            <testStep testStepId="1" name="Enable_Preferred_Network_Parameter"  action="externalFnCall"  >
+                <resultGeneration useMethodTag="Enable_TR181_Parameter" >
+                  <arguments useConfigFile="true" key="PREFERRED_NETWORK_PARAMETER"/>
+                </resultGeneration>
+            </testStep>
+          </prerequisite>
         </pluginPreRequisite>
 
         <!-- Only if You have not connected ethernet or you enabled the RFC for default interface -->
@@ -82,23 +89,8 @@
             </testStep>
         </testCase> -->
 
-        <testCase testCaseId="WIFI_01" testCaseName="WIFI_Enable_Disable_Adapter" desc="Toggles WIFI Adapter state">
-           <testCaseInfo testCaseType="direct" />
-            <testStep testStepId="1" name="Set_WIFI_Adapter_Disabled" method="Set_Enabled">
-                <params>
-                  <param tag="enable" value="false" />
-                </params>
-                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
-            </testStep>
-            <testStep testStepId="2" name="Set_WIFI_Adapter_Enabled" method="Set_Enabled">
-                <params>
-                  <param tag="enable" value="true" />
-                </params>
-                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
-            </testStep>
-        </testCase>
 
-       <testCase testCaseId="WIFI_02" testCaseName="WIFI_Get_Available_SSIDs" desc="Scan and get available SSID using onAvailableSSIDs Event">
+       <testCase testCaseId="WIFI_01" testCaseName="WIFI_Get_Available_SSIDs" desc="Scan and get available SSID using onAvailableSSIDs Event">
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -115,7 +107,7 @@
             </testStep>
        </testCase>
 
-       <testCase testCaseId="WIFI_03" testCaseName="WIFI_Save_And_Clear_SSIDs" desc="Saves and Clears the SSID Info">
+       <testCase testCaseId="WIFI_02" testCaseName="WIFI_Save_And_Clear_SSIDs" desc="Saves and Clears the SSID Info">
             <testStep testStepId="1" name="Save_SSID_Info" method="Save_SSID_Info" >
                 <params>
                   <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
@@ -129,7 +121,7 @@
             </testStep>
        </testCase>
 
-       <testCase testCaseId="WIFI_04" testCaseName="WIFI_Connect_Disconnect_SSIDs" desc="Connects to the given SSID and disconnects">
+       <testCase testCaseId="WIFI_03" testCaseName="WIFI_Connect_Disconnect_SSIDs" desc="Connects to the given SSID and disconnects">
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -138,7 +130,15 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="2" name="Connect" method="Connect" >
+            <testStep testStepId="2" name="Set_WIFI_Interface_Enabled" method="Set_Interface_Enabled" pluginName="Network">
+                <params>
+                  <param tag="interface"  value="WIFI" />
+                  <param tag="enabled"   value="true" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
+            </testStep>
+            <testStep testStepId="3" name="Connect" method="Connect" >
                 <params>
                   <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
                   <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
@@ -146,15 +146,39 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="3" name="Disconnect" method="Disconnect" delay="3">
-                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            <testStep testStepId="4" name="Set_Default_Interface_WiFi" method="Set_Default_Interface" pluginName="Network" ipChangeStep="yes">
+                <params>
+                  <param tag="interface" value="WIFI" />
+                  <param tag="persist"   useDefault= "true"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
             </testStep>
-            <testStep testStepId="4" name="Stop_Scan" method="Stop_Scan" >
+            <testStep testStepId="5" name="Get_Default_Interface" method="Get_Default_Interface"  pluginName="Network" delay="50" >
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="WIFI" />
+            </testStep>
+            <testStep testStepId="6" name="Set_Ethernet_Interface_Enabled" method="Set_Interface_Enabled" pluginName="Network" >
+                <params>
+                  <param tag="interface"  value="ETHERNET" />
+                  <param tag="enabled"   value="true" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
+            </testStep>
+            <testStep testStepId="7" name="Set_Default_Interface_Ethernet" method="Set_Default_Interface" pluginName="Network" ipChangeStep="yes" >
+                <params>
+                  <param tag="interface" value="ETHERNET" />
+                  <param tag="persist"   useDefault= "true"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
+            </testStep>
+            <testStep testStepId="8" name="Get_Default_Interface" method="Get_Default_Interface"  pluginName="Network" delay="50">
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="ETHERNET" />
+            </testStep>
+            <testStep testStepId="9" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
        </testCase>
-
-       <testCase testCaseId="WIFI_05" testCaseName="WIFI_Retrieve_Connected_SSID" desc="Retrieves connected SSID">
+       <testCase testCaseId="WIFI_04" testCaseName="WIFI_Retrieve_Connected_SSID" desc="Retrieves connected SSID">
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -171,53 +195,88 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="3" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
+            <testStep testStepId="3" name="Check_On_WIFI_State_Changed_Connected_Event" event="Event_On_WIFI_State_Changed" action="eventListener" delay="3">
+              <resultGeneration useMethodTag="wifi_check_state_change_event" expectedValues="5"/>
+            </testStep>
+            <testStep testStepId="4" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="3">
                 <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
                     <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="4" name="Disconnect" method="Disconnect" delay="3">
+            <testStep testStepId="5" name="Disconnect" method="Disconnect" delay="3">
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
-            </testStep>
-            <testStep testStepId="5" name="Stop_Scan" method="Stop_Scan" >
-                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
-            </testStep>
-       </testCase>
-
-       <testCase testCaseId="WIFI_06" testCaseName="WIFI_Check_Connected_SSID_After_Disconnect" desc="Checks connected SSID after disconnect">
-            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
-                <params>
-                  <param tag="ssid" value=""/>
-                  <param tag="incremental" useDefault="true" />
-                  <param tag="frequency" value=""/>
-                </params>
-                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
-            </testStep>
-            <testStep testStepId="2" name="Connect" method="Connect" delay="5">
-                <params>
-                  <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
-                  <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
-                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
-                </params>
-                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
-            </testStep>
-            <testStep testStepId="3" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
-                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
-                    <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
-                </resultGeneration>
-            </testStep>
-            <testStep testStepId="4" name="Disconnect" method="Disconnect" delay="3">
-                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
-            </testStep>
-            <testStep testStepId="5" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
-                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_no_ssid"/>
             </testStep>
             <testStep testStepId="6" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
        </testCase>
-
-       <testCase testCaseId="WIFI_07" testCaseName="WIFI_Connect_With_Invalid_Passphrase" desc="Check if Connects to the given SSID with invalid passphrase">
+        
+       <testCase testCaseId="WIFI_05" testCaseName="WIFI_Check_Connected_SSID_After_Disconnect" desc="Checks connected SSID after disconnect">
+            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value=""/>
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value=""/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Set_WIFI_Interface_Enabled" method="Set_Interface_Enabled" pluginName="Network">
+                <params>
+                  <param tag="interface"  value="WIFI" />
+                  <param tag="enabled"   value="true" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
+            </testStep>
+            <testStep testStepId="3" name="Connect" method="Connect" delay="5">
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
+                  <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
+                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="4" name="Set_Default_Interface_WiFi" method="Set_Default_Interface" pluginName="Network" ipChangeStep="yes">
+                <params>
+                  <param tag="interface" value="WIFI" />
+                  <param tag="persist"   useDefault= "true"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
+            </testStep>
+            <testStep testStepId="5" name="Get_Default_Interface" method="Get_Default_Interface"  pluginName="Network" delay="50" >
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="WIFI" />
+            </testStep>
+            <testStep testStepId="6" name="Get_Connected_SSID" method="Get_Connect_SSID" >
+                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
+                    <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Set_Ethernet_Interface_Enabled" method="Set_Interface_Enabled" pluginName="Network" >
+                <params>
+                  <param tag="interface"  value="ETHERNET" />
+                  <param tag="enabled"   value="true" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
+            </testStep>
+            <testStep testStepId="8" name="Set_Default_Interface_Ethernet" method="Set_Default_Interface" pluginName="Network" ipChangeStep="yes" >
+                <params>
+                  <param tag="interface" value="ETHERNET" />
+                  <param tag="persist"   useDefault= "true"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
+            </testStep>
+            <testStep testStepId="9" name="Get_Default_Interface" method="Get_Default_Interface"  pluginName="Network" delay="50">
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="ETHERNET" />
+            </testStep>
+            <testStep testStepId="10" name="Get_Connected_SSID" method="Get_Connect_SSID" >
+                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_no_ssid"/>
+            </testStep>
+            <testStep testStepId="11" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase>
+       <testCase testCaseId="WIFI_06" testCaseName="WIFI_Connect_With_Invalid_Passphrase" desc="Check if Connects to the given SSID with invalid passphrase">
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -232,14 +291,17 @@
                   <param tag="passphrase" useConfigFile="true" key="WIFI_INVALID_PASSPHRASE"/>
                   <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
                 </params>
-                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="false"/>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="3" name="Check_On_Error_Event" event="Event_On_Error" action="eventListener" delay="10">
+              <resultGeneration useMethodTag="wifi_check_on_error_event" expectedValues="4" />
             </testStep>
             <testStep testStepId="4" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
        </testCase>
 
-       <testCase testCaseId="WIFI_08" testCaseName="WIFI_Connect_With_Invalid_SSID" desc="Check if Connects to the given invalid SSID">
+       <testCase testCaseId="WIFI_07" testCaseName="WIFI_Connect_With_Invalid_SSID" desc="Check if Connects to the given invalid SSID">
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -254,14 +316,17 @@
                   <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
                   <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
                 </params>
-                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="false"/>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="3" name="Check_On_Error_Event" event="Event_On_Error" action="eventListener" delay="15">
+              <resultGeneration useMethodTag="wifi_check_on_error_event" expectedValues="5" />
             </testStep>
             <testStep testStepId="4" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
        </testCase>
 
-       <testCase testCaseId="WIFI_09" testCaseName="WIFI_Initiate_And_Cancel_WPS_Pairing" desc="Checks initiate and cancel WPS pairing">
+       <testCase testCaseId="WIFI_08" testCaseName="WIFI_Initiate_And_Cancel_WPS_Pairing" desc="Checks initiate and cancel WPS pairing">
             <testStep testStepId="1" name="Initiate_WPS_Pairing" method="Initiate_WPS_Pairing" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
@@ -270,7 +335,7 @@
             </testStep>
        </testCase>
 
-       <testCase testCaseId="WIFI_10" testCaseName="WIFI_Enable_Disable_Signal_Threshold_Change" desc="Toggles signal threshold change">
+       <testCase testCaseId="WIFI_09" testCaseName="WIFI_Enable_Disable_Signal_Threshold_Change" desc="Toggles signal threshold change">
            <testCaseInfo testCaseType="setandget" revert="true" />
             <testStep testStepId="1" name="Is_Signal_Threshold_Change_Enabled" method="Is_Signal_Threshold_Change_Enabled" saveResult="true" revertGet="yes">
                 <resultGeneration useMethodTag="wifi_check_signal_threshold_change_status" />
@@ -289,7 +354,7 @@
             </testStep>
        </testCase>
 
-       <testCase testCaseId="WIFI_11" testCaseName="WIFI_Check_SSID_Paired" desc="Checks if the device is paired to an SSID">
+       <testCase testCaseId="WIFI_10" testCaseName="WIFI_Check_SSID_Paired" desc="Checks if the device is paired to an SSID">
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -298,7 +363,15 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="2" name="Connect" method="Connect" delay="5">
+            <testStep testStepId="2" name="Set_WIFI_Interface_Enabled" method="Set_Interface_Enabled" pluginName="Network">
+                <params>
+                  <param tag="interface"  value="WIFI" />
+                  <param tag="enabled"   value="true" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
+            </testStep>
+            <testStep testStepId="3" name="Connect" method="Connect" delay="5">
                 <params>
                   <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
                   <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
@@ -306,23 +379,47 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="3" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
+            <testStep testStepId="4" name="Set_Default_Interface_WiFi" method="Set_Default_Interface" pluginName="Network" ipChangeStep="yes">
+                <params>
+                  <param tag="interface" value="WIFI" />
+                  <param tag="persist"   useDefault= "true"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
+            </testStep>
+            <testStep testStepId="5" name="Get_Default_Interface" method="Get_Default_Interface" pluginName="Network" delay="50">
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="WIFI" />
+            </testStep>
+            <testStep testStepId="6" name="Get_Connected_SSID" method="Get_Connect_SSID" >
                 <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
                     <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="4" name="Is_Paired" method="Is_Paired" >
+            <testStep testStepId="7" name="Is_Paired" method="Is_Paired" >
                  <resultGeneration useMethodTag="wifi_check_ssid_pairing" expectedValues="0"/>
             </testStep>
-            <testStep testStepId="5" name="Disconnect" method="Disconnect" delay="3">
-                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            <testStep testStepId="8" name="Set_Ethernet_Interface_Enabled" method="Set_Interface_Enabled" pluginName="Network" >
+                <params>
+                  <param tag="interface"  value="ETHERNET" />
+                  <param tag="enabled"   value="true" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
             </testStep>
-            <testStep testStepId="6" name="Stop_Scan" method="Stop_Scan" >
+            <testStep testStepId="9" name="Set_Default_Interface_Ethernet" method="Set_Default_Interface" pluginName="Network" ipChangeStep="yes" >
+                <params>
+                  <param tag="interface" value="ETHERNET" />
+                  <param tag="persist"   useDefault= "true"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
+            </testStep>
+            <testStep testStepId="10" name="Get_Default_Interface" method="Get_Default_Interface" pluginName="Network" delay="50">
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="ETHERNET" />
+            </testStep>
+            <testStep testStepId="11" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
        </testCase>
-
-       <testCase testCaseId="WIFI_12" testCaseName="WIFI_Get_Paired_SSID" desc="Gets the SSID to which the device is paired with">
+       <testCase testCaseId="WIFI_11" testCaseName="WIFI_Get_Paired_SSID" desc="Gets the SSID to which the device is paired with">
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -331,7 +428,15 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="2" name="Connect" method="Connect" delay="5">
+            <testStep testStepId="2" name="Set_WIFI_Interface_Enabled" method="Set_Interface_Enabled" pluginName="Network">
+                <params>
+                  <param tag="interface"  value="WIFI" />
+                  <param tag="enabled"   value="true" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
+            </testStep>
+            <testStep testStepId="3" name="Connect" method="Connect" delay="5">
                 <params>
                   <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
                   <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
@@ -339,25 +444,49 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="3" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
+            <testStep testStepId="4" name="Set_Default_Interface_WiFi" method="Set_Default_Interface" pluginName="Network" ipChangeStep="yes">
+                <params>
+                  <param tag="interface" value="WIFI" />
+                  <param tag="persist"   useDefault= "true"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
+            </testStep>
+            <testStep testStepId="5" name="Get_Default_Interface" method="Get_Default_Interface"  pluginName="Network" delay="50">
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="WIFI" />
+            </testStep>
+            <testStep testStepId="6" name="Get_Connected_SSID" method="Get_Connect_SSID" >
                 <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
                     <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="4" name="Get_Paired_SSID" method="Get_Paired_SSID" >
+            <testStep testStepId="7" name="Get_Paired_SSID" method="Get_Paired_SSID" >
                 <resultGeneration useMethodTag="wifi_get_paired_ssid" arguments="check_ssid">
                     <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="5" name="Disconnect" method="Disconnect" delay="3">
-                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            <testStep testStepId="8" name="Set_Ethernet_Interface_Enabled" method="Set_Interface_Enabled" pluginName="Network" >
+                <params>
+                  <param tag="interface"  value="ETHERNET" />
+                  <param tag="enabled"   value="true" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
             </testStep>
-            <testStep testStepId="6" name="Stop_Scan" method="Stop_Scan" >
+            <testStep testStepId="9" name="Set_Default_Interface_Ethernet" method="Set_Default_Interface" pluginName="Network" ipChangeStep="yes" >
+                <params>
+                  <param tag="interface" value="ETHERNET" />
+                  <param tag="persist"   useDefault= "true"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
+            </testStep>
+            <testStep testStepId="10" name="Get_Default_Interface" method="Get_Default_Interface"  pluginName="Network" delay="50">
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="ETHERNET" />
+            </testStep>
+            <testStep testStepId="11" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
        </testCase>
-
-       <testCase testCaseId="WIFI_13" testCaseName="WIFI_Get_Paired_SSID_Info" desc="Gets the SSID to which the device is paired with including the BSSID">
+       <testCase testCaseId="WIFI_12" testCaseName="WIFI_Get_Paired_SSID_Info" desc="Gets the SSID to which the device is paired with including the BSSID">
             <testCaseInfo testCaseType="direct" configurableTest="true" testKey="WIFI_SUPPORTED_FEATURES" useMethodTag="wifi_check_feature_applicability" arguments="PairedSSIDInfo" />
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
@@ -367,7 +496,15 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="2" name="Connect" method="Connect" delay="5">
+            <testStep testStepId="2" name="Set_WIFI_Interface_Enabled" method="Set_Interface_Enabled" pluginName="Network">
+                <params>
+                  <param tag="interface"  value="WIFI" />
+                  <param tag="enabled"   value="true" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
+            </testStep>
+            <testStep testStepId="3" name="Connect" method="Connect" delay="5">
                 <params>
                   <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
                   <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
@@ -375,22 +512,62 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="3" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
+            <testStep testStepId="4" name="Set_Default_Interface_WiFi" method="Set_Default_Interface" pluginName="Network" ipChangeStep="yes">
+                <params>
+                  <param tag="interface" value="WIFI" />
+                  <param tag="persist"   useDefault= "true"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
+            </testStep>
+            <testStep testStepId="5" name="Get_Default_Interface" method="Get_Default_Interface"  pluginName="Network" delay="50" >
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="WIFI" />
+            </testStep>
+            <testStep testStepId="6" name="Get_Connected_SSID" method="Get_Connect_SSID" >
                 <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
                     <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="4" name="Get_Paired_SSID_Info" method="Get_Paired_SSID_Info" >
+            <testStep testStepId="7" name="Get_Paired_SSID_Info" method="Get_Paired_SSID_Info" >
                 <resultGeneration useMethodTag="wifi_get_paired_ssid" >
                     <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="5" name="Disconnect" method="Disconnect" delay="3">
+            <testStep testStepId="8" name="Set_Ethernet_Interface_Enabled" method="Set_Interface_Enabled" pluginName="Network" >
+                <params>
+                  <param tag="interface"  value="ETHERNET" />
+                  <param tag="enabled"   value="true" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
+            </testStep>
+            <testStep testStepId="9" name="Set_Default_Interface_Ethernet" method="Set_Default_Interface" pluginName="Network" ipChangeStep="yes" >
+                <params>
+                  <param tag="interface" value="ETHERNET" />
+                  <param tag="persist"   useDefault= "true"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
+            </testStep>
+            <testStep testStepId="10" name="Get_Default_Interface" method="Get_Default_Interface"  pluginName="Network" delay="50">
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="ETHERNET" />
+            </testStep>
+            <testStep testStepId="11" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="6" name="Stop_Scan" method="Stop_Scan" >
+       </testCase>       
+       
+       <testCase testCaseId="WIFI_13" testCaseName="WIFI_Enable_Disable_Adapter" desc="Toggles WIFI Adapter state">
+           <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Set_WIFI_Adapter_Disabled" method="Set_Enabled">
+                <params>
+                  <param tag="enable" value="false" />
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Set_WIFI_Adapter_Enabled" method="Set_Enabled">
+                <params>
+                  <param tag="enable" value="true" />
+                </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
        </testCase>
-
 </testPlugin>

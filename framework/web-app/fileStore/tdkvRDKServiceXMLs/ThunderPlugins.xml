@@ -182,6 +182,13 @@
                 <param tag="secondarydns" defaultValue="null"/>
             </params>
         </method>
+        <method name="Set_Connectivity_Test_Endpoints" api="setConnectivityTestEndpoints" type="method" desc="sets the list of endpoints">
+            <params>
+                <param tag="endpoints"  defaultValue="null" type="list"/>
+            </params>
+        </method>
+        <method name="Is_ConnectedTo_Internet" api="isConnectedToInternet" type="method" desc="Checks internet connectivity"/>
+
         <event name="Event_Interface_Status_Changed" eventName="onInterfaceStatusChanged" eventId="client.events.1" type="event" desc="Interface status changed  event" />
         <event name="Event_Connection_Status_Changed" eventName="onConnectionStatusChanged" eventId="client.events.1" type="event" desc="Connection status changed event" />
         <event name="Event_IPAddress_Status_Changed" eventName="onIPAddressStatusChanged" eventId="client.events.1" type="event" desc="IPAddress status changed event" />
@@ -855,6 +862,7 @@
         <method name="Get_Paired_SSID_Info" api="getPairedSSIDInfo" type="method" desc="Returns the SSID the device is currently paired with also including the BSSID" />
         <event name="Event_On_WIFI_State_Changed" eventName="onWIFIStateChanged" eventId="client.events.1" type="event" desc="Indicates state change" />
         <event name="Event_On_Available_SSIDs" eventName="onAvailableSSIDs" eventId="client.events.1" type="event" desc="Gives SSID after scan" />
+        <event name="Event_On_Error" eventName="onError" eventId="client.events.1" type="event" desc="Indicates unexpected Wifi error occurs" />
     </plugin>
 
 
@@ -883,9 +891,9 @@
         <method name="Get_Discovered_Devices" api="getDiscoveredDevices" type="method" desc="Gives discovered Bluetooth devices" />
         <method name="Connect" api="connect" type="method" desc="Connects to the given Bluetooth device">
             <params>
-                <param tag="deviceId" defaultValue="null"/>
+                <param tag="deviceID" defaultValue="null"/>
                 <param tag="deviceType" defaultValue="null"/>
-                <param tag="Profile" defaultValue="null"/>
+                <param tag="Profile" defaultValue="DEFAULT"/>
             </params>
         </method>
         <method name="Disconnect" api="disconnect" type="method" desc="Disconnects the given device from this device">

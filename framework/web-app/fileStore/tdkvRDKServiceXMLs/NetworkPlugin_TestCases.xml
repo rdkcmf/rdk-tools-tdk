@@ -107,7 +107,7 @@
         <testCase testCaseId="NW_03" testCaseName="Network_Get_STB_IP" desc="Gets IP address of the default interface" >
            <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_STB_IP" method="Get_STB_IP">
-                <resultGeneration useMethodTag="network_get_stb_ip" />
+                <resultGeneration useMethodTag="network_check_results" />
             </testStep>
         </testCase>
 
@@ -169,20 +169,27 @@
             </testStep>
         </testCase>
 
+        
         <testCase testCaseId="NW_08" testCaseName="Network_Get_Default_Interface_IP_Settings" desc="Gets IP settings of default interface" >
            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="NETWORK_SUPPORTED_FEATURES" useMethodTag="network_check_feature_applicability" arguments="InterfaceIPSettings" />
-            <testStep testStepId="1" name="Get_Default_Interface" method="Get_Default_Interface" saveResult="true">
-                <resultGeneration useMethodTag="network_get_default_interface"/>
+            <testStep testStepId="1" name="Enable_Manual_IPSettings"  action="externalFnCall"  >
+                <resultGeneration useMethodTag="Enable_TR181_Parameter" >
+                  <arguments useConfigFile="true" key="MANUAL_IPSETTINGS_PARAMETER"/>
+                </resultGeneration>
             </testStep>
-            <testStep testStepId="2" name="Get_IP_Settings" method="Get_IP_Settings">
+            <testStep testStepId="2" name="Get_Default_Interface" method="Get_Default_Interface" saveResult="true">
+                <resultGeneration useMethodTag="network_get_default_interface" />
+            </testStep>
+            <testStep testStepId="3" name="Get_IP_Settings" method="Get_IP_Settings">
                 <params>
-                  <param tag="interface"  usePreviousResult="true" Id="1" useMethodTag="network_get_default_interface_name" />
+                  <param tag="interface"  usePreviousResult="true" Id="2" useMethodTag="network_get_default_interface_name" />
                 </params>
                 <resultGeneration useMethodTag="network_get_ip_settings" >
-                    <expectedValues  usePreviousResult="true" Id="1" useMethodTag="network_get_default_interface_name" />
+                    <expectedValues  usePreviousResult="true" Id="2" useMethodTag="network_get_default_interface_name" />
                 </resultGeneration>
             </testStep>
         </testCase>
+
 
         <testCase testCaseId="NW_09" testCaseName="Network_Toggle_WIFI_Interface_Status" desc="Toggle wifi interface enabled status" >
            <testCaseInfo testCaseType="setandget" revert="true" />
@@ -307,6 +314,19 @@
             <testStep testStepId="6" pluginName="Wifi" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
+       </testCase>  
+       <testCase testCaseId="NW_13" testCaseName="Check_Internet_Connectivity" desc="Checks the internet connectivity">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Set_Connectivity_Endpoints" method="Set_Connectivity_Test_Endpoints">
+                <params>
+                  <param tag="endpoints"  useConfigFile="true" key="CONNECTIVITY_TEST_ENDPOINTS" />
+                </params>
+                <resultGeneration useMethodTag="network_check_results"/>
+            </testStep>
+            <testStep testStepId="2" name="Check_ConnectedTo_Internet" method="Is_ConnectedTo_Internet" >
+                <resultGeneration useMethodTag="network_check_connectedto_internet" expectedValues="true"/>
+            </testStep>
        </testCase>
+
 </testPlugin>
 

@@ -16,7 +16,7 @@
 
 <testPlugin pluginName="Controller" pluginVersion="1">
     <testCase testCaseId="Controller_01" testCaseName="Start_Discovery"  desc="Starts the network discovery">
-      <testCaseInfo testCaseType="direct"/>
+      <testCaseInfo testCaseType="direct" configurableTest="true" testKey="CONTROLLER_SUPPORTED_FEATURES" useMethodTag="controller_check_feature_applicability" arguments="networkdiscovery"/>
       <testStep testStepId="1" name="Start_Discovery" method="Start_Discovery" >
         <params>
           <param tag="ttl" value="2"/>
