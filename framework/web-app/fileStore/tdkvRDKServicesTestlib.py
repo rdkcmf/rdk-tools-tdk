@@ -115,7 +115,7 @@ def readDeviceConfigKeys(keys):
 # Return Value: SUCCESS/FAILURE
 #-----------------------------------------------------------------------------------------------
 
-def executePluginTests(deviceIPAddress, devicePort, testDeviceName, testDeviceType, basePath, pluginName, testCaseID="all"):
+def executePluginTests(deviceIPAddress, devicePort, testDeviceName, testDeviceType, basePath, TMUrl, pluginName, testCaseID="all"):
 
     # This method is the entry-point to the RDK Services Testing
     # framework. API should be invoked from external lib/script
@@ -148,6 +148,10 @@ def executePluginTests(deviceIPAddress, devicePort, testDeviceName, testDeviceTy
     # TM base path
     global basePathLoc
     basePathLoc = basePath
+
+    # TM Url
+    global tmURL
+    tmURL = TMUrl
 
     # Form the path of the plugin XMLs
     global pluginXML
@@ -268,6 +272,9 @@ def executeTestCases(testCaseID="all"):
     eventsInfo = {}
     global logDisplay
     logDisplay = True
+
+    global eventResgisterTag
+    eventResgisterTag = None
 
     # ------------------------------- PLUGIN PRE-REQUISITES ----------------------------------
     # Perform plugin pre-requisite steps such as activate or deactivate plugins common for all
@@ -606,6 +613,8 @@ def executePrePostRequisite(prepostrequisite,node):
             print "%s Requisite No : %s" %(node,requisiteInfo.get("requisiteId"))
 
         if requisiteInfo.get("type") == "eventRegister" and eventListener is None:
+            global eventResgisterTag
+            eventResgisterTag = requisite
             requisiteStepStatus = executeEventHandlerRequisite(requisite)
         else:
             requisiteStepStatus = executeRegularRequisite(requisite)
@@ -930,9 +939,27 @@ def executeTestStepLoop(testCaseInfo,testStep):
             # generation functions
             if subTestStepInfo.get("dynamicResultGenArg") == "true":
                 resultGenArguments = subTestStepInfo.get("resultGeneration").get("arguments")
-                resultGenArguments = resultGenArguments + "," + iterable
+                if resultGenArguments != None:
+                    resultGenArguments = resultGenArguments + "," + str(iterable)
+                else:
+                    resultGenArguments = str(iterable)
                 resultGenArgInfo = subTestStepInfo.get("resultGeneration").copy()
                 resultGenArgInfo["arguments"] = resultGenArguments
+                subTestStepInfo["resultGeneration"] = resultGenArgInfo.copy()
+
+            if subTestStepInfo.get("dynamicArgumentInfo") is not None:
+                parserInfo = subTestStepInfo.get("dynamicArgumentInfo").copy()
+                parserInfo = updatePreviousResultParserInfo(parserInfo,iterable).copy()
+                status,result = getPreviousTestStepResult(testStepResults,parserInfo)
+                subTestStepInfo["parseStatus"] = status if status == "FAILURE" else ""
+                resultGenArgInfo = subTestStepInfo.get("resultGeneration").copy()
+                allarguments = subTestStepInfo.get("resultGeneration").get("arguments")
+                result = [ str(data) for data in result.values() ]
+                if allarguments != None:
+                    allarguments =  allarguments + "," + ",".join(result)
+                    resultGenArgInfo["arguments"] = allarguments
+                else:
+                    resultGenArgInfo["arguments"] = ",".join(result)
                 subTestStepInfo["resultGeneration"] = resultGenArgInfo.copy()
 
 
@@ -1112,8 +1139,13 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
     # If the test step does not have any issues in forming the test API
     # and params & if the condition to execute satisfies, then test is initated
     if parseStatus != "FAILURE" and conditionalExecStatus != "FALSE" and methodNotFound is None and eventRegistration != "FAILURE":
-        if testStepInfo.get("rebootStep") == "yes" and eventListener is not None:
-            print "\nClosing websocket connection before reboot..."
+        rebootStep = testStepInfo.get("rebootStep")
+        IPChangeStep = testStepInfo.get("ipChangeStep")
+        if (rebootStep == "yes" or IPChangeStep == "yes") and eventListener is not None:
+            if rebootStep == "yes":
+                print "\nClosing websocket connection before reboot..."
+            elif IPChangeStep == "yes":
+                print "\nClosing websocket connection before IP Change..."
             eventListener.disconnect()
             time.sleep(5)
             eventListener = None
@@ -1151,6 +1183,10 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
             if testStepInfo.get("rebootStep") == "yes":
                setUpAfterReboot = handleDeviceReboot()
                if setUpAfterReboot == "FAILURE":
+                   testStepStatus = "FAILURE"
+            elif testStepInfo.get("ipChangeStep") == "yes":
+               newIPUpdateStatus = handleDeviceIPChange()
+               if newIPUpdateStatus == "FAILURE":
                    testStepStatus = "FAILURE"
 
             return testStepStatus,result
@@ -1199,8 +1235,8 @@ def executeCommand(testMethod,testParams):
     jsonResponse = {}
     try:
         if execMethod.upper() == "CURL":
-            req_post = requests.post(requestURL,data=jsonCmd)
-            jsonResponse = json.loads(req_post.content)
+            req_post = requests.post(requestURL,data=jsonCmd,timeout=30)
+            jsonResponse = json.loads(req_post.content,strict=False)
         else:
             executeStatus = "FAILURE"
             print "\nError Occurred: Unknown method type for sending JSON Request"
@@ -1304,6 +1340,7 @@ def handleDeviceReboot():
         bktestStepResults = testStepResults
         global logDisplay
         logDisplay = False
+        time.sleep(10)
         setPreRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPreRequisite"),"Pre")
         logDisplay = True
         testStepResults = bktestStepResults
@@ -1328,6 +1365,39 @@ def getTestDeviceStatus():
     except:
         e = sys.exc_info()
         return "NOT_FOUND"
+
+def handleDeviceIPChange():
+    #IP change handling, get the latest IP from TM and update here
+    print "\nWaiting for the device IP change..."
+    time.sleep(90)
+    url = tmURL + '/deviceGroup/getDeviceDetails?deviceName=' + deviceName
+    newIP = ""
+    try:
+        response = urllib2.urlopen(url,timeout=5)
+        deviceDetails = json.load(response)
+        newIP = str(deviceDetails.get("deviceip"))
+        global deviceIP
+        deviceIP = newIP
+        print "NewIP is %s. Updated new device IP" %(newIP)
+        time.sleep(5)
+        if eventResgisterTag != None:
+            global logDisplay
+            logDisplay = False
+            requisiteStepStatus = executeEventHandlerRequisite(eventResgisterTag)
+            logDisplay = True
+            if "FAILURE" in requisiteStepStatus:
+                print "Event listener thread not started with new IP"
+                return "FAILURE"
+            else:
+                print "Event listener thread started with new IP properly"
+                return "SUCCESS"
+        else:
+            return "SUCCESS"
+    except:
+        print "Unable to get Device Details from REST !!!"
+        sys.stdout.flush()
+        return "FAILURE"
+
 
 
 #-----------------------------------------------------------------------------------------------
@@ -1595,6 +1665,7 @@ def getTestStepInfo(testStep):
         # a. Get the from device config file if useConfigFile="true"
         # b. Use the provided expected value
         # c. Get iterable as expectedValue
+        # d. Use previous result as argument
         if "arguments" not in testStepInfo.get("resultGeneration").keys():
             arguments = testStep.find("resultGeneration").find("arguments")
             if arguments is not None:
@@ -1610,6 +1681,26 @@ def getTestStepInfo(testStep):
                         allarguments = allarguments + "," + str(result)
                     else:
                         allarguments = result
+
+                if argumentInfo.get("usePreviousResult") == "true":
+                    parserInfo = getPreviousResultParserInfo(arguments).copy()
+                    # If getting previous test result does not involve any dynamic
+                    # values like iterable or result of sub-test-step (understood
+                    # its executed already) then invoke the parser function and
+                    # update the arguments
+                    if argumentInfo.get("useIterableArg") != "true" and argumentInfo.get("subId") is None:
+                        status,result = getPreviousTestStepResult(testStepResults,parserInfo)
+                        testStepInfo["parseStatus"] = status if status == "FAILURE" else ""
+                        result = [ str(data) for data in result.values() ]
+                        if allarguments != "":
+                            allarguments = allarguments + "," + ",".join(result)
+                        elif result is not None:
+                            allarguments = ",".join(result)
+                    # If not, expected value will be obtained dynamically during the
+                    # iteration or repeatation
+                    else:
+                        testStepInfo["dynamicArgumentInfo"] = parserInfo.copy()
+                        testStepInfo.get("dynamicArgumentInfo")["useIterableArg"] = argumentInfo.get("useIterableArg")
 
                 # Check whether iterable value should be passed as argument for result
                 # generation for a loop test step type
