@@ -62,7 +62,7 @@ def executeTest (self) :
     executeJson = json.loads(self.jsonMsgValue)
     params = executeJson["params"]
     method = params["method"]
-    componentName = params["module"] 
+    componentName = params["module"]
     thunderPortDetails = getThunderPortDetails(self)
     thunderPort = thunderPortDetails["thunderPort"]
 
@@ -74,7 +74,7 @@ def executeTest (self) :
         details = "SUCCESS"
         lib = importlib.import_module("tdkvRDKServicesTestlib")
         executePluginTests_method = getattr(lib,"executePluginTests")
-        result =  executePluginTests_method(self.ip, thunderPort, deviceName, deviceType, self.realpath, testXMLName)
+        result =  executePluginTests_method(self.ip, thunderPort, deviceName, deviceType, self.realpath, self.url, testXMLName)
     else:
         result = "FAILURE";
         #The library name will be componentName+lib. eg:rdkserviceslib
@@ -99,7 +99,7 @@ def executeTest (self) :
         method_to_call = getattr(lib, method)
         """
         The variable "args" contains all the arguments we need to pass to the method.
-        This will be in the form of a dictionary(key:value pair). 
+        This will be in the form of a dictionary(key:value pair).
         Keys are the argument name, values are the argument value.
         """
         args = {}
@@ -108,5 +108,5 @@ def executeTest (self) :
         details = method_to_call(**args)
         if (details or details == None) and details != "EXCEPTION OCCURRED":
             result = "SUCCESS"
-    return result,details; 
-     
+    return result,details;
+
