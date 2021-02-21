@@ -101,3 +101,10 @@ image_upload_dir = ""
 #List of resolution which are being used for the test
 resolutions_list = [{"w":320,"h":240},{"w":640,"h":480},{"w":1280,"h":720},{"w":1920, "h":1080}]
 
+##Power state toggle test
+#maximum number of power state changes required
+max_power_state_changes = 1000
+
+##Interface toggle test
+#maximum number of network interface changes required
+max_interface_changes = 1000
