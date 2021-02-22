@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>The objective of the test is to stress load the system with redirects and see if the WPEWebkit process continues to operate nominally.</synopsis>
   <groups_id/>
-  <execution_time>300</execution_time>
+  <execution_time>620</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>

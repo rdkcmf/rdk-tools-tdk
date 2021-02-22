@@ -25,9 +25,9 @@
   <primitive_test_name>rdkservice_validateCPULoad</primitive_test_name>
   <primitive_test_version>2</primitive_test_version>
   <status>FREE</status>
-  <synopsis>The objective of this script is to activate and deactivate 3 plugins for 100 times and get the status of Controller and validate CPU load and memory usage.</synopsis>
+  <synopsis>The objective of this script is to activate and deactivate 3 plugins for 1000 times and get the status of Controller and validate CPU load and memory usage.</synopsis>
   <groups_id/>
-  <execution_time>120</execution_time>
+  <execution_time>720</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -42,7 +42,7 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_STABILITY_10</test_case_id>
-    <test_objective>The objective of this script is to activate and deactivate 3 plugins for 100 times and get the status of Controller and validate CPU load and memory usage.</test_objective>
+    <test_objective>The objective of this script is to activate and deactivate 3 plugins for 1000 times and get the status of Controller and validate CPU load and memory usage.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI,Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.</pre_requisite>
