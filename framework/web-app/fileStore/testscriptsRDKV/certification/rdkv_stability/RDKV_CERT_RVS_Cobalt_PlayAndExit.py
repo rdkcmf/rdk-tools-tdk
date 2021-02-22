@@ -141,7 +141,7 @@ if expectedResult in result.upper():
             tdkTestObj.executeTestCase(expectedResult)
             cobalt_result = tdkTestObj.getResult()
             time.sleep(10)
-            if(cobalt_result == expectedResult):
+            if(cobalt_result == cobal_launch_status == expectedResult):
                 tdkTestObj.setResultStatus("SUCCESS")
                 print "Clicking OK to play video"
                 params = '{"keys":[ {"keyCode": 13,"modifiers": [],"delay":1.0}]}'
@@ -264,6 +264,17 @@ if expectedResult in result.upper():
         cpu_mem_info_dict["cpuMemoryDetails"] = result_dict_list
         json.dump(cpu_mem_info_dict,json_file)
         json_file.close()
+        #Deactivate cobalt if any error happend
+        tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
+        tdkTestObj.addParameter("plugin","Cobalt")
+        tdkTestObj.addParameter("status","deactivate")
+        tdkTestObj.executeTestCase(expectedResult)
+        result = tdkTestObj.getResult()
+        if result == "SUCCESS":
+            tdkTestObj.setResultStatus("SUCCESS")
+        else:
+            print "Unable to deactivate Cobalt"
+            tdkTestObj.setResultStatus("FAILURE")
     else:
         print "Pre conditions are not met"
         obj.setLoadModuleStatus("FAILURE")

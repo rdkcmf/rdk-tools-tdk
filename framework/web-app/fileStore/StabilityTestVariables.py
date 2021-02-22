@@ -57,7 +57,7 @@ rebootwaitTime = 150
 
 ####Webkit stress test details
 #test duration in minutes till webkit stress test should be performed.
-stress_test_duration = 240
+stress_test_duration = 600
 
 #Stress test url, this will trigger the redirection of urls in webkit browser
 stress_test_url = "https://cdn.metrological.com/static/storm/app_redirect1.html"
@@ -67,18 +67,18 @@ expected_url_pattern = "https://cdn.metrological.com/static/storm/app_redirect[1
 
 ####Suspend and Resume tests details - used for both webkit test and cobalt test
 #The maximum number of times the test should repeat:
-suspend_resume_max_count = 100
+suspend_resume_max_count = 1000
 
 ####Random key sending test details
 #The URL used to test cobalt to play while sending random keys
 cobalt_randomkey_test_url = ""
 
 #The time in minutes till random keys should be sent, this duration should be less than the duration of above configured video.
-cobalt_randomkey_test_duration = 60
+cobalt_randomkey_test_duration = 600
 
 ##Stress test by Setting URLs in loop test details
 #maximum number of URL set operation
-url_loop_count = 100
+url_loop_count = 500
 
 #any valid URLs to be launched in webkit
 loop_test_url_1 = ""
@@ -89,7 +89,7 @@ loop_test_url_2 = ""
 activate_deactivate_plugins = ""
 
 #maximum number of activate and deactivate operations
-activate_deactivate_max_count = 100
+activate_deactivate_max_count = 1000
 
 ##Screen resolution change test details
 #Maximum number of resolution set and get operations

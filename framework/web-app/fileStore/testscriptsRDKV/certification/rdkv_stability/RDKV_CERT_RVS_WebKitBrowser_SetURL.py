@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>The objective of this test is to stress load the system by setting the URL in a loop and validating CPU load and memory usage.</synopsis>
   <groups_id/>
-  <execution_time>120</execution_time>
+  <execution_time>360</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
