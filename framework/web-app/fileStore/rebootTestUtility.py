@@ -67,41 +67,59 @@ def validateUptime(TimeAfterReboot,validate):
 #-------------------------------------------------------
 def getIFStatus(IF_name,validate):
     output = "FAILURE";
-    curr_status = rdkservice_getPluginStatus('org.rdk.Network')
-    if curr_status != "EXCEPTION OCCURRED":
-        if curr_status == "activated":
-            curr_status = "activate"
-        else:
-            curr_status = "deactivate"
+    if rdkv_performancelib.devicePort == 80:
+        output = getIFStatus_thunder(IF_name);
+    else:
+        curr_status = rdkservice_getPluginStatus('org.rdk.Network')
+        if curr_status != "EXCEPTION OCCURRED":
+            if curr_status == "activated":
+                curr_status = "activate"
+            else:
+                curr_status = "deactivate"
 
-        status = rdkservice_setPluginStatus("org.rdk.Network","activate")
-        if status == None:
-            method = "org.rdk.Network.1.isInterfaceEnabled"
-            value='{"interface":"ETHERNET"}'
-            status = rdkservice_setValue(method,value)
-            if status != "EXCEPTION OCCURRED":
-                status = status["enabled"]
-            else:
-                status = "EXCEPTION";
+            status = rdkservice_setPluginStatus("org.rdk.Network","activate")
+            if status == None:
+                method = "org.rdk.Network.1.isInterfaceEnabled"
+                value='{"interface":"ETHERNET"}'
+                status = rdkservice_setValue(method,value)
+                if status != "EXCEPTION OCCURRED":
+                    status = status["enabled"]
+                else:
+                    status = "EXCEPTION";
 
-            if status == True:
-                output= "ENABLED"
-            elif status == "EXCEPTION":
-                output = "FAILURE";
-            elif validate == "Yes":
-                logger.info("Ethernet Interface is not up after reboot. Exiting the script")
-                exitScript(StatusInterface,iter_no);
+                if status == True:
+                    output= "ENABLED"
+                elif status == "EXCEPTION":
+                    output = "FAILURE";
+                rev_status = rdkservice_setPluginStatus("org.rdk.Network",curr_status)
+                if rev_status == None:
+                    logger.info("Reverted network plugin status")
+                else:
+                    logger.info("Unable to revert network plugin status")
             else:
-                StatusInterface.append(iter_no)
-                output = "DISABLED";
-            rev_status = rdkservice_setPluginStatus("org.rdk.Network",curr_status)
-            if rev_status == None:
-                logger.info("Reverted network plugin status")
-            else:
-                logger.info("Unable to revert network plugin status")
+                logger.info("Unable to enable network plugin")
         else:
-            logger.info("Unable to enable network plugin")
+            logger.info("Unable to get the current status of network plugin")
+
+
+    if output == "FAILURE" and validate == "Yes":
+        logger.info("Ethernet Interface is not up after reboot. Exiting the script")
+        exitScript(StatusInterface,iter_no);
+    elif output == "FAILURE":
+        StatusInterface.append(iter_no)
+        output = "DISABLED";
     return output;
+
+#-------------------------------------------------------
+#FUNCTION TO GET THE INTERFACE STATUS FROM THUNDER BUILD
+#-------------------------------------------------------
+def getIFStatus_thunder(IF_name):
+    method = "NetworkControl.1.up@"+IF_name;
+    status = rdkservice_getValue(method)
+    if status == True:
+        return "ENABLED"
+    else:
+        return "FAILURE";
 #------------------------------------------------------
 #VALIDATE THE NUMBER OF PLUGINS AFTER REBOOT
 #------------------------------------------------------
