@@ -1621,6 +1621,22 @@ class ExecutionController {
 		render(template: "crashLogFileList", model: [execId : params?.execId, execDeviceId : params?.execDeviceId, execResId : params?.execResId, logFileNames : crashlogFileNames])
 	}
 
+    /**
+     * Method to fetch the result of an execution
+     * @param execResId
+     * @return
+     */
+	def showMethodResult(){
+		def execResId = params?.execResId
+		ExecutionResult executionResult
+		try{
+			executionResult = ExecutionResult.findById(execResId)
+		}catch(Exception e){
+			e.printStackTrace()
+		}
+		render(template: "methodResults", model: [executionResultInstance : executionResult])
+	}
+
 	/**
 	 * Method to fetch the result of 5 previous executions having the same box type
 	 * @param execResId

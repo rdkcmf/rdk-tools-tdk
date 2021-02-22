@@ -32,33 +32,16 @@
 	<td class="tdhead">TimeTaken(min)</td>
 	<td colspan="4">${executionResultInstance?.executionTime}</td>
 </tr>
-<g:each in="${executionResultInstance.executemethodresults}"
-	var="executionResultMthdsInstance">
-	<tr class="fnhead">
-		<td>Function Name</td>
-		<td colspan="4">
-			${executionResultMthdsInstance?.functionName}
-		</td>
-	</tr>
-	<tr>
-		<td>ExpectedResult</td>
-		<td colspan="4">
-			${executionResultMthdsInstance?.expectedResult}
-		</td>
-	</tr>
-	<tr>
-		<td>ActualResult</td>
-		<td colspan="4">
-			${executionResultMthdsInstance?.actualResult}
-		</td>
-	</tr>
-	<tr>
-		<td>Status</td>
-		<td colspan="4">
-			${executionResultMthdsInstance?.status}
-		</td>
-	</tr>
-</g:each>
+<tr>
+	<td class="tdhead">Method Results</td>
+	<td colspan="4">
+		&emsp;<span id="showMethodResultLink${executionResultInstance?.id}">
+			<g:remoteLink action="showMethodResult" update="MethodResult${executionResultInstance?.id}" onSuccess="showMethodResults(${executionResultInstance?.id});" params="[execResId : "${executionResultInstance?.id}"]"><b><i>Show</i></b></g:remoteLink>
+		</span>
+		<span id="hideMethodResultLink${executionResultInstance?.id}" style="display:none;"><a style="color:#7E2217;" href="#" onclick="hideMethodResults(${executionResultInstance?.id})">Hide</a></span>
+		<div id="MethodResult${executionResultInstance?.id}" style="display:none;"></div>
+	</td>
+</tr>
 <tr>
 	<td>Log Data <br> <g:link action="showExecutionResult" params="[execResult : "${executionResultInstance?.id}"]" target="_blank"> Log link </g:link>
 	</td>
