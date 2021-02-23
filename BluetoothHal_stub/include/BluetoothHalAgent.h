@@ -61,6 +61,23 @@ class BluetoothHalAgent : public RDKTestStubInterface , public AbstractServer<Bl
                     this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_SetAdapterDiscoverable", PARAMS_BY_NAME, JSON_STRING, "adapter_path", JSON_STRING, "discoverable_status", JSON_INTEGER, NULL), &BluetoothHalAgent::BluetoothHal_SetAdapterDiscoverable);
                     this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_SetAdapterDiscoverableTimeout", PARAMS_BY_NAME, JSON_STRING, "adapter_path", JSON_STRING, "timeout", JSON_INTEGER, NULL), &BluetoothHalAgent::BluetoothHal_SetAdapterDiscoverableTimeout);
                     this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_GetAdapterDiscoverableStatus", PARAMS_BY_NAME, JSON_STRING, "adapter_path", JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_GetAdapterDiscoverableStatus);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_GetAdapterName", PARAMS_BY_NAME, JSON_STRING, "adapter_path", JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_GetAdapterName);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_SetAdapterName", PARAMS_BY_NAME, JSON_STRING, "adapter_path", JSON_STRING, "adapter_name", JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_SetAdapterName);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_GetVersionInfo", PARAMS_BY_NAME, JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_GetVersionInfo);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_StartDiscovery", PARAMS_BY_NAME, JSON_STRING, "adapter_path", JSON_STRING, "timeout", JSON_INTEGER, "device_type", JSON_INTEGER, NULL), &BluetoothHalAgent::BluetoothHal_StartDiscovery);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_StopDiscovery", PARAMS_BY_NAME, JSON_STRING, "adapter_path", JSON_STRING, "device_type", JSON_INTEGER, NULL), &BluetoothHalAgent::BluetoothHal_StopDiscovery);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_GetListOfScannedDevices", PARAMS_BY_NAME, JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_GetListOfScannedDevices);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_PairDevice", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_PairDevice);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_UnPairDevice", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_UnPairDevice);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_GetListOfPairedDevices", PARAMS_BY_NAME, JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_GetListOfPairedDevices);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_IsDeviceConnectable", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_IsDeviceConnectable);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_ConnectDevice", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, "device_type", JSON_INTEGER, NULL), &BluetoothHalAgent::BluetoothHal_ConnectDevice);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_DisconnectDevice", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, "device_type", JSON_INTEGER, NULL), &BluetoothHalAgent::BluetoothHal_DisconnectDevice);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_GetDeviceConnected", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, "device_type", JSON_INTEGER, NULL), &BluetoothHalAgent::BluetoothHal_GetDeviceConnected);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_GetDeviceDisconnected", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, "device_type", JSON_INTEGER, NULL), &BluetoothHalAgent::BluetoothHal_GetDeviceDisconnected);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_FindDevice", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_FindDevice);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_FindService", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, "uuid", JSON_STRING, "xml_data", JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_FindService);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_GetSupportedServices", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_GetSupportedServices);
                 }
 
                 //Inherited functions
@@ -85,6 +102,23 @@ class BluetoothHalAgent : public RDKTestStubInterface , public AbstractServer<Bl
                 void BluetoothHal_SetAdapterDiscoverable (IN const Json::Value& req, OUT Json::Value& response);
                 void BluetoothHal_SetAdapterDiscoverableTimeout (IN const Json::Value& req, OUT Json::Value& response);
                 void BluetoothHal_GetAdapterDiscoverableStatus (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_GetAdapterName (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_SetAdapterName (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_GetVersionInfo (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_StartDiscovery (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_StopDiscovery (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_GetListOfScannedDevices (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_PairDevice (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_UnPairDevice (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_GetListOfPairedDevices (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_IsDeviceConnectable (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_ConnectDevice (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_DisconnectDevice (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_GetDeviceConnected (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_GetDeviceDisconnected (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_FindDevice (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_FindService (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_GetSupportedServices (IN const Json::Value& req, OUT Json::Value& response);
 };
 #endif //__BLUETOOTHHAL_STUB_H__
 

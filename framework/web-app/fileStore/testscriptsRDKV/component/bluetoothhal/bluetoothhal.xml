@@ -14,7 +14,7 @@
 -->
 
 <?xml version="1.0" encoding="UTF-8"?><xml>
-  <module testGroup="Component" name="bluetoothhal">
+  <module name="bluetoothhal" testGroup="Component">
     <primitiveTests>
       <primitiveTest name="BluetoothHal_GetListOfAdapters" id="" version="1">
         <function>TestMgr_BluetoothHal_GetListOfAdapters</function>
@@ -89,6 +89,112 @@
         <function>TestMgr_BluetoothHal_GetAdapterDiscoverableStatus</function>
         <parameters>
           <parameter name="adapter_path" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetAdapterName" id=" " version="1">
+        <function>TestMgr_BluetoothHal_GetAdapterName</function>
+        <parameters>
+          <parameter name="adapter_path" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_SetAdapterName" id=" " version="1">
+        <function>TestMgr_BluetoothHal_SetAdapterName</function>
+        <parameters>
+          <parameter name="adapter_name" value=""/>
+          <parameter name="adapter_path" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetVersionInfo" id="" version="1">
+        <function>TestMgr_BluetoothHal_GetVersionInfo</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_StartDiscovery" id=" " version="1">
+        <function>TestMgr_BluetoothHal_StartDiscovery</function>
+        <parameters>
+          <parameter name="adapter_path" value=""/>
+          <parameter name="device_type" value=""/>
+          <parameter name="timeout" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_StopDiscovery" id=" " version="1">
+        <function>TestMgr_BluetoothHal_StopDiscovery</function>
+        <parameters>
+          <parameter name="adapter_path" value=""/>
+          <parameter name="device_type" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetListOfScannedDevices" id="" version="1">
+        <function>TestMgr_BluetoothHal_GetListOfScannedDevices</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_PairDevice" id=" " version="1">
+        <function>TestMgr_BluetoothHal_PairDevice</function>
+        <parameters>
+          <parameter name="device_id" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_UnPairDevice" id=" " version="1">
+        <function>TestMgr_BluetoothHal_UnPairDevice</function>
+        <parameters>
+          <parameter name="device_id" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetListOfPairedDevices" id="" version="1">
+        <function>TestMgr_BluetoothHal_GetListOfPairedDevices</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_IsDeviceConnectable" id=" " version="1">
+        <function>TestMgr_BluetoothHal_IsDeviceConnectable</function>
+        <parameters>
+          <parameter name="device_id" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_ConnectDevice" id=" " version="1">
+        <function>TestMgr_BluetoothHal_ConnectDevice</function>
+        <parameters>
+          <parameter name="device_id" value=""/>
+          <parameter name="device_type" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_DisconnectDevice" id=" " version="1">
+        <function>TestMgr_BluetoothHal_DisconnectDevice</function>
+        <parameters>
+          <parameter name="device_id" value=""/>
+          <parameter name="device_type" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetDeviceConnected" id=" " version="1">
+        <function>TestMgr_BluetoothHal_GetDeviceConnected</function>
+        <parameters>
+          <parameter name="device_id" value=""/>
+          <parameter name="device_type" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetDeviceDisconnected" id=" " version="1">
+        <function>TestMgr_BluetoothHal_GetDeviceDisconnected</function>
+        <parameters>
+          <parameter name="device_id" value=""/>
+          <parameter name="device_type" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_FindDevice" id=" " version="1">
+        <function>TestMgr_BluetoothHal_FindDevice</function>
+        <parameters>
+          <parameter name="device_id" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_FindService" id=" " version="1">
+        <function>TestMgr_BluetoothHal_FindService</function>
+        <parameters>
+          <parameter name="device_id" value=""/>
+          <parameter name="uuid" value=""/>
+          <parameter name="xml_data" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetSupportedServices" id=" " version="1">
+        <function>TestMgr_BluetoothHal_GetSupportedServices</function>
+        <parameters>
+          <parameter name="device_id" value=""/>
         </parameters>
       </primitiveTest>
     </primitiveTests>
