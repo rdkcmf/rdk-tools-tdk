@@ -42,6 +42,9 @@ video_src_url_dash = ""
 video_src_url_4k_dash = ""
 video_src_url_live_dash = ""
 
+#MP4 Video URL
+video_src_url_mp4 = ""
+
 # Time duration for operations
 # Provided time (seconds) is the duration after how much second the operation should take place
 pause_interval = 30
@@ -60,6 +63,9 @@ seekfwd_interval = 10
 seekbwd_interval = 20
 seekfwd_check_interval = 3
 seekbwd_check_interval = 7
+
+# Provided time (seconds) is the duration after how much second, the player should be closed
+close_interval = 180
 
 # Min Time duration for the animation operation used by multianimations app (10 to 60 sec)
 animation_duration = 60
