@@ -28,7 +28,7 @@
   <synopsis>To broadcast channel map event and check if xcal-device process receives it.
 Testcase ID: CT_XUPNP_35</synopsis>
   <groups_id/>
-  <execution_time>5</execution_time>
+  <execution_time>10</execution_time>
   <long_duration>false</long_duration>
   <remarks/>
   <skip>false</skip>
