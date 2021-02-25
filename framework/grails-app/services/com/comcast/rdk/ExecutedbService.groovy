@@ -715,7 +715,7 @@ class ExecutedbService {
 			executionResultList.each {executionResult ->
 				scriptNameList.add(executionResult.script)
 				def executionResultId = executionResult.id.toString()
-				executionResultIdScriptNameMap.put(executionResultId, executionResult.script)
+				executionResultIdScriptNameMap.put(executionResult.id, executionResult.script)
 			}
 			scriptNameList.each {scriptName ->
 				def scriptNameListForMap = []
@@ -748,7 +748,8 @@ class ExecutedbService {
 		}
 		//For generating a second map with key as script names that is executed in the executions we selected and
 		//value as latest execution result id of that script.
-		executionResultIdScriptNameMap.each{
+		TreeMap<Long, String> executionResultIdScriptNameMapAfterSorting = new TreeMap<Long, String>(executionResultIdScriptNameMap) 
+		executionResultIdScriptNameMapAfterSorting.each{
 			executionResultId, scriptName ->
 			if(scriptNameExecutionResultIdMap.containsKey(scriptName)){
 				def idForScript = scriptNameExecutionResultIdMap.get(scriptName)
