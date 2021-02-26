@@ -30,8 +30,13 @@
   <!-- Total functions corresponding module  -->
     <functions>
       <function name='rdkv_media_test' />
+      <function name='rdkv_media_readUIData' />
     </functions>
   <!-- Total parameters corresponding module  -->
-    <parameters />
+    <parameters>
+      <parameter funName='rdkv_media_readUIData' parameterName='elementExpandXpath' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_media_readUIData' parameterName='dataXpath' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_media_readUIData' parameterName='count' parameterType='INTEGER' range='0-60' />
+    </parameters>
   </module>
 </xml>
