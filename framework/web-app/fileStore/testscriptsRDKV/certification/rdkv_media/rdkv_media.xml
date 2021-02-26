@@ -15,11 +15,19 @@
 
 <?xml version='1.0' encoding='utf-8'?>
 <xml>
-  <module name='rdkv_media' testGroup='Certification'>
+  <module testGroup="Certification" name="rdkv_media">
     <primitiveTests>
-      <primitiveTest name='rdkv_media_test' id='' version='1'>
+      <primitiveTest name="rdkv_media_test" id="" version="1">
         <function>rdkv_media_test</function>
-        <parameters />
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkv_media_readUIData" id=" " version="1">
+        <function>rdkv_media_readUIData</function>
+        <parameters>
+          <parameter name="count" value=""/>
+          <parameter name="dataXpath" value=""/>
+          <parameter name="elementExpandXpath" value=""/>
+        </parameters>
       </primitiveTest>
     </primitiveTests>
   </module>

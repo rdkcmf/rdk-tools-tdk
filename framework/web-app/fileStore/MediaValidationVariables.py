@@ -71,3 +71,17 @@ close_interval = 180
 animation_duration = 60
 # No of objects to be animated by objects(rectangles/texts) animation app
 objects_count = 500
+
+# Already Existing Sample Animation App URL
+sample_animation_test_url = ""
+# XPath of the element to expand
+element_expand_xpath = ""
+# XPath of the element from where actual data to be read from UI
+ui_data_xpath = ""
+
+display_variable = ""
+#Give the path where the chromedriver executable is available
+path_of_browser_executable = ""
+
+#The directory to which CGI server will upload the images,same as given in the CGI script
+image_upload_dir = ""
