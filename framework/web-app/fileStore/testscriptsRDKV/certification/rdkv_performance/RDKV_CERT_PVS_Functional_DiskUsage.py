@@ -65,6 +65,7 @@
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
 import json
+from rdkv_performancelib import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
@@ -89,7 +90,10 @@ if expectedResult in result.upper():
     tdkTestObj.executeTestCase(expectedResult)
     result = tdkTestObj.getResult()
     ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
-    if ssh_param_dict != {} and expectedResult in result:
+    print "\n Get the partition name from Device Config file \n"
+    conf_file,result = getConfigFileName(obj.realpath)
+    partition_result, partition = getDeviceConfigKeyValue(conf_file,"DISK_PARTITION")
+    if ssh_param_dict != {} and expectedResult in result and partition != "" :
         tdkTestObj.setResultStatus("SUCCESS")
         if ssh_param_dict["ssh_method"] == "directSSH":
             if ssh_param_dict["password"] == "None":
@@ -102,7 +106,7 @@ if expectedResult in result.upper():
             print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
             pass
         #command to get the disk usage  output
-        command = "df -h | grep \"/dev/root\" | awk '{print $5}'"
+        command = 'df -h | grep "'+ partition +'" | awk' + " '{print $5}'"
         tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
         tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
         tdkTestObj.addParameter("credentials",credentials)
@@ -111,7 +115,6 @@ if expectedResult in result.upper():
         result = tdkTestObj.getResult()
         output = tdkTestObj.getResultDetails()
         if output != "EXCEPTION" and expectedResult in result:
-            partition = '/dev/root'
             print "Checking DiskUsage of {} \n".format(partition)
             disk_space_usage = float(output.split('\n')[1].replace("%",""))
             if disk_space_usage >= max_mem_limit :
