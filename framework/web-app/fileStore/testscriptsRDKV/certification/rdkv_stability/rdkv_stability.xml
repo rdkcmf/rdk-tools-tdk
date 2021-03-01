@@ -65,6 +65,12 @@
           <parameter name="sshmethod" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkservice_setDefaultInterface" id=" " version="2">
+        <function>rdkservice_setDefaultInterface</function>
+        <parameters>
+          <parameter name="new_interface" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
