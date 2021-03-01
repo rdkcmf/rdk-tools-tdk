@@ -95,13 +95,10 @@ animation_duration:int</input_parameters>
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
 from BrowserPerformanceUtility import *
-import BrowserPerformanceUtility
 from rdkv_performancelib import *
-import rdkv_performancelib
 from web_socket_util import *
 import MediaValidationVariables
 from MediaValidationUtility import *
-import MediaValidationUtility
 
 
 obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
