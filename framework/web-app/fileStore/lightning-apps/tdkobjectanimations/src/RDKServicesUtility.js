@@ -30,15 +30,14 @@ export class RDKServicesInterface extends Lightning.Component {
     this.diagnosticsInfo = {}
     this.cpuList = []
     this.fpsList = []
-    this.fpsIndex = 0;
     this.thunderJS = "";
     logMsg("RDKServicesInterface  _constructer Called")
   }
-  
+
   _init() {
     logMsg("RDKServicesInterface _init Called");
   }
-  
+
   rdkservicesInterfaceInit() {
       logMsg("RDKServicesInterface Init")
       try {
@@ -48,7 +47,7 @@ export class RDKServicesInterface extends Lightning.Component {
         logMsg(err);
       }
   }
-  
+
   updateSettings(config={},settings={}){
       this.config = config
       this.settings = settings
@@ -68,14 +67,13 @@ export class RDKServicesInterface extends Lightning.Component {
       })
       this.thunderJS.WebKitBrowser.fps()
       .then((result) => { tag = this
+          tag.settings.consumer.tag(tag.settings.fpsholder).text.text = "FPS : " + result
           tag.diagnosticsInfo["fps"] = result
           tag.fpsList.push(result)
       })
       .catch(function(error) {
           console.log(error)
       })
-      if(this.settings.showfps == "true")
-      this.settings.consumer.tag(this.settings.fpsholder).text.text = "FPS : " + this.diagnosticsInfo.fps
       logMsg("[DiagnosticInfo]: CPU Load: "     + this.diagnosticsInfo.cpu + " , "
                                  + "FPS: "      + this.diagnosticsInfo.fps + " , "
                                  + "MEM Used: " + this.diagnosticsInfo.mem)
