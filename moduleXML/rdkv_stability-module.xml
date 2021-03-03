@@ -36,6 +36,7 @@
       <function name='rdkservice_validateCPULoad' />
       <function name='rdkservice_validateMemoryUsage' />
       <function name='rdkservice_validateProcEntry' />
+      <function name='rdkservice_setDefaultInterface' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -50,6 +51,7 @@
       <parameter funName='rdkservice_validateProcEntry' parameterName='procfile' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_validateProcEntry' parameterName='sshmethod' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_validateProcEntry' parameterName='mincdb' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_setDefaultInterface' parameterName='new_interface' parameterType='STRING' range='a-z' />
     </parameters>
   </module>
 </xml>
