@@ -146,9 +146,10 @@ if expectedResult in result.upper():
                             interface_uptime = interface_up_time_millisec - start_time_millisec
                             print "Time taken for the eth0 interface to up after reboot : {} ms\n".format(interface_uptime)
                             conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                            result, if_uptime_threshold_value = getDeviceConfigKeyValue(conf_file,"IF_UPTIME_THRESHOLD_VALUE")
-                            if result == "SUCCESS":
-                                if 0 < int(interface_uptime) < int(if_uptime_threshold_value):
+                            result1, if_uptime_threshold_value = getDeviceConfigKeyValue(conf_file,"IF_UPTIME_THRESHOLD_VALUE")
+                            result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                            if all(value != "" for value in (if_uptime_threshold_value,offset)):
+                                if 0 < int(interface_uptime) < (int(if_uptime_threshold_value) + int(offset)) :
                                     tdkTestObj.setResultStatus("SUCCESS");
                                     print "\n The time taken for eth0 interface to up after reboot is within the expected limit\n"
                                 else:

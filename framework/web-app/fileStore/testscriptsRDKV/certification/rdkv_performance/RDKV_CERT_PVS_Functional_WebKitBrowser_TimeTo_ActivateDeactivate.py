@@ -187,7 +187,8 @@ if expectedResult in result.upper():
                         conf_file,file_status = getConfigFileName(obj.realpath)
                         activate_config_status,activate_threshold = getDeviceConfigKeyValue(conf_file,"ACTIVATE_TIME_THRESHOLD_VALUE")
                         deactivate_config_status,deactivate_threshold = getDeviceConfigKeyValue(conf_file,"DEACTIVATE_TIME_THRESHOLD_VALUE")
-                        if all(status != "" for status in (activate_threshold,deactivate_threshold)):
+                        offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                        if all(value != "" for value in (activate_threshold,deactivate_threshold,offset)):
                             start_activate_in_millisec = getTimeInMilliSec(start_activate)
                             activated_time = getTimeStampFromString(activated_log)
                             activated_time_in_millisec = getTimeInMilliSec(activated_time)
@@ -196,7 +197,7 @@ if expectedResult in result.upper():
                             time_taken_for_activate = activated_time_in_millisec - start_activate_in_millisec
                             print "\n Time taken to Activate {} Plugin: {} (ms)".format(plugin,time_taken_for_activate)
                             print "\n Validate the time taken for activation \n"
-                            if 0 < time_taken_for_activate < int(activate_threshold) :
+                            if 0 < time_taken_for_activate < (int(activate_threshold) + int(offset)) :
                                 activate_status = True
                                 print "\n Time taken for activating {} plugin is within the expected range \n".format(plugin)
                             else:
@@ -210,7 +211,7 @@ if expectedResult in result.upper():
                             time_taken_for_deactivate = deactivated_time_in_millisec - start_deactivate_in_millisec
                             print "\n Time taken to Deactivate {} Plugin: {} (ms) \n".format(plugin,time_taken_for_deactivate)
                             print "\n Validate the time taken for deactivation: \n"
-                            if 0 < time_taken_for_deactivate < int(deactivate_threshold) :
+                            if 0 < time_taken_for_deactivate < (int(deactivate_threshold)+int(offset)) :
                                 deactivate_status = True
                                 print "\n Time taken for deactivating {} plugin is within the expected range \n".format(plugin)
                             else:

@@ -185,9 +185,10 @@ if expectedResult in result.upper():
                         pause_opn_time = paused_time_millisec - pausing_time_millisec
                         print "\n Time taken for pause operation: {} milleseconds \n".format(pause_opn_time)
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                        result, pause_time_threshold_value = getDeviceConfigKeyValue(conf_file,"PAUSE_TIME_THRESHOLD_VALUE")
-                        if result == "SUCCESS":
-                            if 0 < int(pause_opn_time) < int(pause_time_threshold_value):
+                        result1, pause_time_threshold_value = getDeviceConfigKeyValue(conf_file,"PAUSE_TIME_THRESHOLD_VALUE")
+                        result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                        if all(value != "" for value in (pause_time_threshold_value,offset)):
+                            if 0 < int(pause_opn_time) < (int(pause_time_threshold_value) + int(offset)):
                                 pause_status = True 
                                 print "\n Time taken for pause operation is within the expected limit \n"
                             else:
@@ -205,8 +206,8 @@ if expectedResult in result.upper():
                         play_opn_time = played_time_millisec - playing_time_millisec
                         print "\n Time taken for play operation: {} milliseconds \n".format(play_opn_time)
                         result, play_time_threshold_value = getDeviceConfigKeyValue(conf_file,"PLAY_TIME_THRESHOLD_VALUE")
-                        if result == "SUCCESS":
-                            if 0 < int(play_opn_time) < int(play_time_threshold_value):
+                        if play_time_threshold_value != "":
+                            if 0 < int(play_opn_time) < (int(play_time_threshold_value) + int(offset)):
                                 play_status = True
                                 print "\n Time taken for play operation is within the expected limit \n"
                             else:
