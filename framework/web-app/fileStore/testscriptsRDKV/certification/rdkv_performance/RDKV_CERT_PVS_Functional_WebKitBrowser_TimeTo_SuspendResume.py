@@ -182,7 +182,8 @@ if expectedResult in result.upper():
                                     conf_file,file_status = getConfigFileName(obj.realpath)
                                     suspend_config_status,suspend_threshold = getDeviceConfigKeyValue(conf_file,"SUSPEND_TIME_THRESHOLD_VALUE")
                                     resume_config_status,resume_threshold = getDeviceConfigKeyValue(conf_file,"RESUME_TIME_THRESHOLD_VALUE")
-                                    if all(status != "" for status in (suspend_threshold,resume_threshold)):
+                                    offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                    if all(value != "" for value in (suspend_threshold,resume_threshold,offset)):
                                         start_suspend_in_millisec = getTimeInMilliSec(start_suspend)
                                         suspended_time = getTimeStampFromString(suspended_log)
                                         suspended_time_in_millisec = getTimeInMilliSec(suspended_time)
@@ -191,7 +192,7 @@ if expectedResult in result.upper():
                                         time_taken_for_suspend = suspended_time_in_millisec - start_suspend_in_millisec
                                         print "\n Time taken to Suspend WebKitBrowser Plugin: " + str(time_taken_for_suspend) + "(ms)"
                                         print "\n Validate the time taken for suspending the plugin \n"
-                                        if 0 < time_taken_for_suspend < int(suspend_threshold) :
+                                        if 0 < time_taken_for_suspend < (int(suspend_threshold) + int(offset)) :
                                             suspend_status = True
                                             print "\n Time taken for suspending WebKitBrowser plugin is within the expected range \n"
                                         else:
@@ -205,7 +206,7 @@ if expectedResult in result.upper():
                                         time_taken_for_resume = resumed_time_in_millisec - start_resume_in_millisec
                                         print "\n Time taken to Resume WebKitBrowser Plugin: " + str(time_taken_for_resume) + "(ms)"
                                         print "\n Validate the time taken for resuming the plugin \n"
-                                        if 0 < time_taken_for_resume < int(resume_threshold) :
+                                        if 0 < time_taken_for_resume < (int(resume_threshold) + int(offset)) :
                                             resume_status = True
                                             print "\n Time taken for resuming WebKitBrowser plugin is within the expected range \n"
                                         else:
