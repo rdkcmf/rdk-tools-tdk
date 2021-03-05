@@ -113,8 +113,8 @@ if expectedResult in result.upper():
     ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
     result = tdkTestObj.getResult()
     if status == "SUCCESS" and ssh_param_dict != {} and expectedResult in result:
-        print "\nPre conditions for the test are set successfully"
         time.sleep(10)
+        print "\nPre conditions for the test are set successfully"
         suspend_status,start_suspend = suspend_plugin(obj,"Cobalt")
         if suspend_status == expectedResult:
             time.sleep(5)
@@ -125,10 +125,11 @@ if expectedResult in result.upper():
             cobalt_status = tdkTestObj.getResultDetails()
             if cobalt_status == 'suspended' and expectedResult in result:
                 tdkTestObj.setResultStatus("SUCCESS")
-                time.sleep(20)
+                time.sleep(10)
                 print "\nCobalt Suspended Successfully\n"
                 resume_status,start_resume = launch_plugin(obj,"Cobalt")
                 if resume_status == expectedResult:
+                    time.sleep(5)
                     tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus')
                     tdkTestObj.addParameter("plugin","Cobalt")
                     tdkTestObj.executeTestCase(expectedResult)
@@ -149,7 +150,7 @@ if expectedResult in result.upper():
                             print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
                             pass
                         #command to get the event logs
-                        command = 'cat /opt/logs/wpeframework.log | grep -e RDKShell.*onSuspended.*Cobalt -e RDKShell.*onLaunched.*Cobalt | tail -4'
+                        command = 'cat /opt/logs/wpeframework.log | grep -e "RDKShell onSuspended event received for Cobalt" -e "RDKShell onLaunched event received for Cobalt" |tail -2'
                         suspended_event = 'RDKShell onSuspended event received for Cobalt'
                         resumed_event = 'RDKShell onLaunched event received for Cobalt'
                         tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
@@ -160,15 +161,16 @@ if expectedResult in result.upper():
                         output = tdkTestObj.getResultDetails()
                         result = tdkTestObj.getResult()
                         if output != "EXCEPTION" and expectedResult in result:
-                            if len(output.split('\n')) == 6 :
+                            if len(output.split('\n')) == 4 :
                                 suspended_log = output.split('\n')[1]
-                                resumed_log = output.split('\n')[3]
+                                resumed_log = output.split('\n')[2]
                                 print suspended_log + '\n' +  resumed_log + '\n'
                                 if suspended_event in suspended_log and resumed_event in resumed_log:
                                     conf_file,file_status = getConfigFileName(obj.realpath)
                                     suspend_config_status,suspend_threshold = getDeviceConfigKeyValue(conf_file,"COBALT_SUSPEND_TIME_THRESHOLD_VALUE")
                                     resume_config_status,resume_threshold = getDeviceConfigKeyValue(conf_file,"COBALT_RESUME_TIME_THRESHOLD_VALUE")
-                                    if all(status != "" for status in (suspend_threshold,resume_threshold)):
+                                    offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                    if all(value != "" for value in (suspend_threshold,resume_threshold,offset)):
                                         start_suspend_in_millisec = getTimeInMilliSec(start_suspend)
                                         suspended_time = getTimeStampFromString(suspended_log)
                                         suspended_time_in_millisec = getTimeInMilliSec(suspended_time)
@@ -177,7 +179,7 @@ if expectedResult in result.upper():
                                         time_taken_for_suspend = suspended_time_in_millisec - start_suspend_in_millisec
                                         print "\n Time taken to Suspend Cobalt Plugin: " + str(time_taken_for_suspend) + "(ms)"
                                         print "\n Validate the time taken for suspending the plugin \n"
-                                        if 0 < time_taken_for_suspend < int(suspend_threshold) :
+                                        if 0 < time_taken_for_suspend < (int(suspend_threshold) + int(offset)) :
                                             suspend_status = True
                                             print "\n Time taken for suspending Cobalt plugin is within the expected range \n"
                                         else:
@@ -191,7 +193,7 @@ if expectedResult in result.upper():
                                         time_taken_for_resume = resumed_time_in_millisec - start_resume_in_millisec
                                         print "\n Time taken to Resume Cobalt Plugin: " + str(time_taken_for_resume) + "(ms)"
                                         print "\n Validate the time taken for resuming the plugin \n"
-                                        if 0 < time_taken_for_resume < int(resume_threshold) :
+                                        if 0 < time_taken_for_resume < (int(resume_threshold) + int(offset)) :
                                             resume_status = True
                                             print "\n Time taken for resuming Cobalt plugin is within the expected range \n"
                                         else:
@@ -234,4 +236,3 @@ if expectedResult in result.upper():
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"
-

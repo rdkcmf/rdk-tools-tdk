@@ -164,7 +164,7 @@ if expectedResult in result.upper():
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
                         result1, ui_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"MAIN_UI_SWITCH_TIME_THRESHOLD_VALUE")
                         result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
-                        if result1 == result2 == "SUCCESS":
+                        if all(value != "" for value in (ui_launch_threshold_value,offset)):
                             if 0 < int(ui_launchtime) < (int(ui_launch_threshold_value) + int(offset)):
                                 tdkTestObj.setResultStatus("SUCCESS");
                                 print "\n The time taken for launching Main UI from another window is within the expected limit\n"

@@ -168,9 +168,10 @@ if expectedResult in result.upper():
                                     url_loaded_time = url_changed_timin_millisec - url_triggered_timein_millisec
                                     print "Time taken to load the URL: {} ms\n".format(url_loaded_time)
                                     conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                                    result, url_loadtime_threshold_value = getDeviceConfigKeyValue(conf_file,"URL_LOADTIME_THRESHOLD_VALUE")
-                                    if result == "SUCCESS":
-                                        if 0 < int(url_loaded_time) < int(url_loadtime_threshold_value):
+                                    result1, url_loadtime_threshold_value = getDeviceConfigKeyValue(conf_file,"URL_LOADTIME_THRESHOLD_VALUE")
+                                    result2,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                    if all(value != "" for value in (url_loadtime_threshold_value,offset)):
+                                        if 0 < int(url_loaded_time) < (int(url_loadtime_threshold_value) + int(offset)):
                                             tdkTestObj.setResultStatus("SUCCESS");
                                             print "\n The time taken to load the URL is within the expected limit\n"
                                         else:

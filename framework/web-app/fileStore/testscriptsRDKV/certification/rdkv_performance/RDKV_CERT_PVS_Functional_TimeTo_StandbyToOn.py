@@ -210,7 +210,8 @@ if expectedResult in result.upper():
                                 power_on_log = output.split('\n')[1]
                                 conf_file,file_status = getConfigFileName(obj.realpath)
                                 config_status,standby_to_on_threshold = getDeviceConfigKeyValue(conf_file,"STANDBY_TO_ON_THRESHOLD_VALUE")
-                                if standby_to_on_threshold != "":
+                                offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                if all(value != "" for value in (standby_to_on_threshold,offset)):
                                     start_power_on_in_millisec = getTimeInMilliSec(start_power_on)
                                     power_on_time = getTimeStampFromString(power_on_log)
                                     power_on_time_in_millisec = getTimeInMilliSec(power_on_time)
@@ -219,7 +220,7 @@ if expectedResult in result.upper():
                                     time_taken_for_poweron = power_on_time_in_millisec - start_power_on_in_millisec
                                     print "\n Time taken to Power ON from STANDBY: {}(ms)".format(time_taken_for_poweron)
                                     print "\n Validate the time: \n"
-                                    if 0 < time_taken_for_poweron < int(standby_to_on_threshold) :
+                                    if 0 < time_taken_for_poweron < (int(standby_to_on_threshold) + int(offset)) :
                                         print "\n Time taken for setting power state to ON is within the expected range \n"
                                         tdkTestObj.setResultStatus("SUCCESS")
                                     else:
