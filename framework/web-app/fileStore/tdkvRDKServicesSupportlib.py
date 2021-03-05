@@ -216,7 +216,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["Test_Step_Status"] = "FAILURE"
 
 
-        elif tag == "network_get_stb_ip":
+        elif tag == "network_check_results":
             info = checkAndGetAllResultInfo(result,result.get("success"))
 
         elif tag == "network_get_named_endpoints":
@@ -288,6 +288,14 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "network_check_interface_enable_set_status":
             if str(result.get("success")).lower() == "true":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "network_check_connectedto_internet":
+            info["ConnectedToInternet"] = result.get("connectedToInternet")
+            status = checkNonEmptyResultData(result)
+            if status and str(result.get("connectedToInternet")).lower() == "true":
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -394,16 +402,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
         elif tag == "webkitbrowser_check_fps":
-            info["fps"] = result
-            if int(result) >= int(expectedValues[0]):
-                message = "FPS should be > %s & it is as expected" %(expectedValues[0])
+            if int(result) >= 0:
+                info["fps"] = result
                 info["Test_Step_Status"] = "SUCCESS"
             else:
-                message = "FPS should be > %s & it is not as expected" %(expectedValues[0])
                 info["Test_Step_Status"] = "FAILURE"
-            info["Test_Step_Message"] = message
+
 
         elif tag == "webkitbrowser_get_cookie_policy":
             info["cookie_accept_policy"] = result
@@ -1169,10 +1174,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             else:
-                if str(result.get("success")).lower() == "true" and str(int(float(result.get('gain')))) in expectedValues:
+                if int(expectedValues[0])== 0 and int(float(result.get('gain')))== 2 and str(result.get("success")).lower() == "true":
+                    info["Test_Step_Status"] = "SUCCESS"
+
+                elif str(result.get("success")).lower() == "true" and str(int(float(result.get('gain')))) in expectedValues:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
-                    info["Test_Step_Status"] = "FAILURE" 
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_muted":
             info["muted"] = result.get('muted');
@@ -1359,20 +1367,47 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
         elif tag == "bluetooth_get_paired_devices":
-            info = checkAndGetAllResultInfo(result,result.get("success"))
-            status = False
-            pairedDevices = result.get("pairedDevices")
-            success = str(result.get("success")).lower() == "true"
-            for pairedDevice in pairedDevices:
-               if str(pairedDevice.get("name")) in expectedValues[0]:
-                   status = True
-                   info = pairedDevice
-            if success and status:
-                info["Test_Step_Status"] = "SUCCESS"
-            else:
-                info["Test_Step_Status"] = "FAILURE"
+            if arg[0] == "check_device_paired":
+                info = checkAndGetAllResultInfo(result,result.get("success"))
+                status = False
+                pairedDevices = result.get("pairedDevices")
+                success = str(result.get("success")).lower() == "true"
+                for pairedDevice in pairedDevices:
+                    if str(pairedDevice.get("name")) in expectedValues[0]:
+                        status = True
+                        info = pairedDevice
+                if success and status:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif arg[0] == "check_paired_device_list_empty":
+                if len(result.get("pairedDevices")) == 0:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+
+        elif tag == "bluetooth_get_connected_devices":
+            if arg[0] == "check_device_connected":
+                info = checkAndGetAllResultInfo(result,result.get("success"))
+                status = False
+                connectedDevices = result.get("connectedDevices")
+                success = str(result.get("success")).lower() == "true"
+                for connectedDevice in connectedDevices:
+                    if str(connectedDevice.get("name")) in expectedValues[0]:
+                        status = True
+                        info = connectedDevice
+                if success and status:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif arg[0] == "check_connected_device_list_empty":
+                if len(result.get("connectedDevices")) == 0:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
 
         # FirmwareCotrol Plugin Response result parser steps
         elif tag == "fwc_get_status":
@@ -1399,9 +1434,15 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
 
         # Warehouse Plugin Response result parser steps
+        
         elif tag == "warehouse_get_device_info":
-            info = checkAndGetAllResultInfo(result,result.get("success"))
-
+            if arguments[0].lower() == "enable":
+                info = checkAndGetAllResultInfo(result,result.get("success"))
+            elif arguments[0].lower() == "disable":
+                rf4ce_Mac = result.get("rf4ce_mac")
+                result.pop("rf4ce_mac")
+                info = checkAndGetAllResultInfo(result,result.get("success"))
+                info["rf4ce_mac"] = rf4ce_Mac
         elif tag == "warehouse_set_operation":
             info = result.copy()
             if len(arg) and arg[0] == "invalid":
@@ -2008,6 +2049,16 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             else:
                 info = header
 
+        elif tag == "webkitbrowser_check_average_fps":
+            testStepResults = testStepResults[0].values()[0]
+            fpsValues = 0;count = 0
+            for result in testStepResults:
+                count += 1
+                fpsValues += int(result.get("fps"))
+            average= fpsValues/count
+            info["Average"] = average
+
+
         # System plugin result parser steps
         elif tag == "system_toggle_gz_enabled_status":
             testStepResults = testStepResults[0].values()[0]
@@ -2336,6 +2387,11 @@ def checkTestCaseApplicability(methodTag,configKeyData,arguments):
                 result = "TRUE"
             else:
                 result = "FALSE"
+        elif tag == "controller_check_feature_applicability":
+            if arg[0] in str(keyData).lower():
+                result = "TRUE"
+            else:
+                result = "FALSE"
 
         elif tag == "system_check_feature_applicability":
             if arg[0] in keyData:
@@ -2469,6 +2525,18 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             command = "IARM_event_sender ChannelMapEvent 1"
             info["deatils"] = executeCommand(deviceConfigFile, deviceIP, command)
             info["Test_Step_Status"] =  "SUCCESS"
+        elif tag == "Trust_MAC":
+            deviceType = arguments[0]
+            command = "bluetoothctl <<< 'trust "+arguments[1]+"'"
+            executeCommand(deviceConfigFile, deviceIP, command, deviceType)
+        elif tag == "Enable_TR181_Parameter":
+            command = arguments[0]
+            output = executeCommand(deviceConfigFile, deviceIP, command)
+            if "set operation success" in output.lower():
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
         elif tag == "EncodeHexToBase64":
             arguments[1] = arguments[1]+"0"
             hex_code  = "".join((arguments[1],arguments[0]))
@@ -2488,6 +2556,18 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             else:
                 info["RESULT"] = "File not created"
                 info["Test_Step_Status"] = "FAILURE"
+        elif tag == "check_fps_value":
+            expectedFPS = (int(expectedValues[0])-int(expectedValues[1]))
+            info["AVERAGE_FPS"] = arguments[0]
+            if int(arguments[0]) >= expectedFPS:
+                message = "FPS should be >= %d & it is as expected" %(expectedFPS)
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                message = "FPS should be >= %d & it is not as expected" %(expectedFPS)
+                info["Test_Step_Status"] = "FAILURE"
+            info["Test_Step_Message"] = message
+
+
         elif tag == "Check_If_File_Exists":
             command = "[ -f "+arguments[0]+" ] && echo 1 || echo 0"
             status = executeCommand(deviceConfigFile, deviceIP, command)
@@ -2627,11 +2707,17 @@ def executeBluetoothCtl(deviceConfigFile,commands):
 
     return status
 
-def executeCommand(deviceConfigFile, deviceIP, command):
+def executeCommand(deviceConfigFile, deviceIP, command, device="test-device"):
     configParser = ConfigParser.ConfigParser()
     configParser.read(r'%s' % deviceConfigFile)
-    username = configParser.get('device.config', 'SSH_USERNAME')
-    password = configParser.get('device.config', 'SSH_PASSWORD')
+    if device == "test-device":
+        username = configParser.get('device.config', 'SSH_USERNAME')
+        password = configParser.get('device.config', 'SSH_PASSWORD')
+    elif device == "bt-emu":
+        deviceIP = configParser.get('device.config', 'BT_EMU_IP')
+        username = configParser.get('device.config', 'BT_EMU_USER_NAME')
+        password = configParser.get('device.config', 'BT_EMU_PWD')
+        deviceName = configParser.get('device.config','BT_EMU_DEVICE_NAME')
     if password == "None":
         password = ''
 

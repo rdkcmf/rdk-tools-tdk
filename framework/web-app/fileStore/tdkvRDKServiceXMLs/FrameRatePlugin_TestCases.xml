@@ -90,9 +90,8 @@
             <event pluginName="WebKitBrowser" eventName="Event_Load_Finished" />
           </prerequisite>
         </pluginPreRequisite>
-
         <testCase testCaseId="FR_01" testCaseName="FrameRate_Collect_FPS" desc="Launches playback url using webkit browser and gets fps using onFpsEvent Event">
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="stress" configurableRepeat="true" repeatKey="WEBKIT_FPS_REPEAT_COUNT"/>
             <testStep testStepId="1" name="Set_Collection_Frequency_Default_10Sec" method="Set_Collection_Frequency_Default" >
               <resultGeneration useMethodTag="framerate_check_set_operation" />
             </testStep>
@@ -111,18 +110,25 @@
                 <expectedValues useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
               </resultGeneration>
             </testStep>
-            <testStep testStepId="5" name="Get_Browser_FPS_Value" method="Get_Browser_FPS" delay="20" pluginName="WebKitBrowser">
-              <resultGeneration useMethodTag="webkitbrowser_check_fps" >
-                <expectedValues useConfigFile="true" key="WEBKIT_EXPECTED_FPS" />
+            <testStep testStepId="5" name="Get_Browser_FPS_Value"  delay="60" testStepType="repeat">
+              <subtestStep subtestStepId="1" name="Get_Browser_FPS_Value" method="Get_Browser_FPS" saveResult="true" pluginName="WebKitBrowser" delay="2">
+                <resultGeneration useMethodTag="webkitbrowser_check_fps" >
+                </resultGeneration>
+              </subtestStep>
+            </testStep>
+            <testStep testStepId="6" name="Get_Browser_FPS_Average_Value"  action="externalFnCall"  >
+              <resultGeneration useMethodTag="check_fps_value" >
+                <arguments usePreviousResult="true" Id="5" useMethodTag="webkitbrowser_check_average_fps" />
+                <expectedValues useConfigFile="true" key="WEBKIT_EXPECTED_FPS,WEBKIT_THRESHOLD_FPS" />
               </resultGeneration>
             </testStep>
-            <testStep testStepId="6" name="Start_FPS_Collection" method="Start_FPS_Collection" >
+            <testStep testStepId="7" name="Start_FPS_Collection" method="Start_FPS_Collection" >
               <resultGeneration useMethodTag="framerate_check_set_operation" />
             </testStep>
-            <testStep testStepId="7" name="Stop_FPS_Collection" method="Stop_FPS_Collection" delay="30">
+            <testStep testStepId="8" name="Stop_FPS_Collection" method="Stop_FPS_Collection" delay="30">
               <resultGeneration useMethodTag="framerate_check_set_operation" />
             </testStep>
-            <testStep testStepId="8" name="Check_On_FPS_Event" event="Event_On_FPS" action="eventListener">
+            <testStep testStepId="9" name="Check_On_FPS_Event" event="Event_On_FPS" action="eventListener">
               <resultGeneration useMethodTag="framerate_check_fps_event" />
             </testStep>
         </testCase>

@@ -386,5 +386,59 @@
                 </resultGeneration>
             </testStep>
         </testCase>
-
+        <testCase testCaseId="SYS_27" testCaseName= "System_Get_Image_Version" desc="Get requested device detail">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_Image_Version" method="Get_Device_Info">
+                <params>
+                  <param tag="params" value="imageVersion" />
+                </params>
+                <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+       </testCase>
+       <testCase testCaseId="SYS_28" testCaseName= "System_Get_model_number" desc="Get requested device detail">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_model_number" method="Get_Device_Info">
+                <params>
+                  <param tag="params" value="model_number" />
+                </params>
+                <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+       </testCase>
+       <testCase testCaseId="SYS_29" testCaseName= "System_Get_boxIP" desc="Get requested device detail">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_boxIP" method="Get_Device_Info">
+                <params>
+                  <param tag="params" value="boxIP" />
+                </params>
+                <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+       </testCase>
+       <testCase testCaseId="SYS_30" testCaseName= "System_Get_build_type" desc="Get requested device detail">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_build_type" method="Get_Device_Info">
+                <params>
+                  <param tag="params" value="build_type" />
+                </params>
+                <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+       </testCase>
+       <testCase testCaseId="SYS_31" testCaseName= "System_Get_eth_mac" desc="Get requested device detail">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_eth_mac" method="Get_Device_Info">
+                <params>
+                  <param tag="params" value="eth_mac" />
+                </params>
+                <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+       </testCase>
+       <testCase testCaseId="SYS_32" testCaseName= "System_Get_rf4ce_mac" desc="Get requested device detail">
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="SYSTEM_DEVICE_PARAMS" useMethodTag="system_check_feature_applicability" arguments="Enable"/>
+            <testStep testStepId="1" name="Get_Device_rf4ce_mac" method="Get_Device_Info">
+                <params>
+                  <param tag="params" value="rf4ce_mac" />
+                </params>
+                <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+       </testCase>
+ 
 </testPlugin>
