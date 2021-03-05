@@ -18,6 +18,10 @@
 # limitations under the License.
 ##########################################################################
 
+import ConfigParser
+from pexpect import pxssh
+from time import sleep
+
 ##################################################################
 # Methods
 #################################################################
@@ -77,4 +81,75 @@ def setAdapterPowerON (bluetoothhalObj, adapterPath):
         actualresult = "FAILURE"
 
     return actualresult
-        
+
+
+##################################################
+#
+# Method to execute the commands in client device shell
+#
+##################################################
+
+def executeBluetoothCtl(bluetoothObj,commands):
+
+    try :
+
+        #Get Bluetooth configuration file
+        bluetoothConfigFile = bluetoothObj.realpath+'fileStore/bluetoothcredential.config'
+        configParser = ConfigParser.ConfigParser()
+        configParser.read(r'%s' % bluetoothConfigFile)
+        ip = configParser.get('bluetooth-config', 'ip')
+        username = configParser.get('bluetooth-config', 'username')
+        password = configParser.get('bluetooth-config', 'password')
+        global deviceName;
+        deviceName = configParser.get('bluetooth-config','devicename')
+        BT_Mac =  configParser.get('bluetooth-config','DUT_BT_controller_mac')
+        #Executing the commands in device
+        print 'Number of commands:', len(commands)
+        print 'Commands List:', commands
+        print "Connecting to client device"
+        global session
+        session = pxssh.pxssh(options={
+                            "StrictHostKeyChecking": "no",
+                            "UserKnownHostsFile": "/dev/null"})
+        session.login(ip,username,password,sync_multiplier=3)
+        print "Executing the bluetoothctl commands"
+        for parameters in range(0,len(commands)):
+            if 'scan on' in commands[parameters]:
+                session.sendline(commands[parameters])
+                print "Scanning started"
+                sleep(20);
+            elif 'pair' in commands[parameters]:
+                commands[parameters] += ' '+ BT_Mac;
+                session.sendline(commands[parameters])
+                print "Paired with DUT"
+                sleep(3);
+            elif 'remove' in commands[parameters]:
+                commands[parameters] += ' '+ BT_Mac;
+                session.sendline(commands[parameters])
+                print "Un Paired with DUT"
+                sleep(3);
+            else:
+                session.sendline(commands[parameters])
+        session.prompt()
+        status = session.before
+        print "Successfully Executed bluetoothctl commands in client device"
+
+    except Exception, e:
+        print e;
+        status = "FAILURE"
+
+    return status
+
+##################################################
+#
+# Method to close the ssh session in the client device
+#
+##################################################
+
+def closeSSHSession ():
+
+    if session:
+        print "Closing the ssh session with bluetooth client device"
+        session.logout()
+        session.close()
+

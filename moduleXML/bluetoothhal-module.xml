@@ -43,6 +43,23 @@
       <function name='TestMgr_BluetoothHal_SetAdapterDiscoverableTimeout' />
       <function name='TestMgr_BluetoothHal_GetAdapterDiscoverableStatus' />
       <function name='TestMgr_BluetoothHal_GetAdapterAddr' />
+      <function name='TestMgr_BluetoothHal_GetAdapterName' />
+      <function name='TestMgr_BluetoothHal_SetAdapterName' />
+      <function name='TestMgr_BluetoothHal_GetVersionInfo' />
+      <function name='TestMgr_BluetoothHal_StartDiscovery' />
+      <function name='TestMgr_BluetoothHal_StopDiscovery' />
+      <function name='TestMgr_BluetoothHal_GetListOfScannedDevices' />
+      <function name='TestMgr_BluetoothHal_PairDevice' />
+      <function name='TestMgr_BluetoothHal_UnPairDevice' />
+      <function name='TestMgr_BluetoothHal_GetListOfPairedDevices' />
+      <function name='TestMgr_BluetoothHal_IsDeviceConnectable' />
+      <function name='TestMgr_BluetoothHal_ConnectDevice' />
+      <function name='TestMgr_BluetoothHal_DisconnectDevice' />
+      <function name='TestMgr_BluetoothHal_GetDeviceConnected' />
+      <function name='TestMgr_BluetoothHal_GetDeviceDisconnected' />
+      <function name='TestMgr_BluetoothHal_FindDevice' />
+      <function name='TestMgr_BluetoothHal_FindService' />
+      <function name='TestMgr_BluetoothHal_GetSupportedServices' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -57,6 +74,30 @@
       <parameter funName='TestMgr_BluetoothHal_SetAdapterDiscoverableTimeout' parameterName='timeout' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_BluetoothHal_GetAdapterDiscoverableStatus' parameterName='adapter_path' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_BluetoothHal_GetAdapterAddr' parameterName='adapter_number' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_GetAdapterName' parameterName='adapter_path' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_SetAdapterName' parameterName='adapter_path' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_SetAdapterName' parameterName='adapter_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_StartDiscovery' parameterName='adapter_path' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_StartDiscovery' parameterName='timeout' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_StartDiscovery' parameterName='device_type' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_StopDiscovery' parameterName='adapter_path' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_StopDiscovery' parameterName='device_type' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_PairDevice' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_UnPairDevice' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_IsDeviceConnectable' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_ConnectDevice' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_ConnectDevice' parameterName='device_type' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_DisconnectDevice' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_DisconnectDevice' parameterName='device_type' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_GetDeviceConnected' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_GetDeviceConnected' parameterName='device_type' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_GetDeviceDisconnected' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_GetDeviceDisconnected' parameterName='device_type' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_BluetoothHal_FindDevice' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_FindService' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_FindService' parameterName='uuid' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_FindService' parameterName='xml_data' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_GetSupportedServices' parameterName='device_id' parameterType='STRING' range='A-Z' />
     </parameters>
   </module>
 </xml>
