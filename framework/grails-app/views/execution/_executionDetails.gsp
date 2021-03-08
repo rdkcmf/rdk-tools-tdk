@@ -17,7 +17,7 @@
  limitations under the License.
 -->
 <tr>
-	<td class="tdhead" title="Shows the result of 5 previous executions having the same box type">Script Trend</td>
+	<td colspan="2" class="tdhead" title="Shows the result of 5 previous executions having the same box type">Script Trend</td>
         <td colspan="4">
                 &emsp;<span id="showTrendLink${executionResultInstance?.id}" >
                 <g:remoteLink action="showScriptTrend" update="scriptTrend${executionResultInstance?.id}" onSuccess="showTrendHideLink(${executionResultInstance?.id});" params="[execResId : "${executionResultInstance?.id}"]">Show</g:remoteLink>                                         &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
@@ -29,11 +29,11 @@
         </td>
 </tr>
 <tr>
-	<td class="tdhead">TimeTaken(min)</td>
+	<td  colspan="2" class="tdhead">TimeTaken(min)</td>
 	<td colspan="4">${executionResultInstance?.executionTime}</td>
 </tr>
 <tr>
-	<td class="tdhead">Method Results</td>
+	<td  colspan="2" class="tdhead">Method Results</td>
 	<td colspan="4">
 		&emsp;<span id="showMethodResultLink${executionResultInstance?.id}">
 			<g:remoteLink action="showMethodResult" update="MethodResult${executionResultInstance?.id}" onSuccess="showMethodResults(${executionResultInstance?.id});" params="[execResId : "${executionResultInstance?.id}"]"><b><i>Show</i></b></g:remoteLink>
@@ -43,7 +43,7 @@
 	</td>
 </tr>
 <tr>
-	<td>Log Data <br> <g:link action="showExecutionResult" params="[execResult : "${executionResultInstance?.id}"]" target="_blank"> Log link </g:link>
+	<td colspan="2">Log Data <br> <g:link action="showExecutionResult" params="[execResult : "${executionResultInstance?.id}"]" target="_blank"> Log link </g:link>
 	</td>
-	<td colspan="6"><div style="overflow: auto; height: 180px;">${executionResultInstance?.executionOutput}</div></td>
+	<td colspan="4"><div style="overflow: auto; height: 180px;">${executionResultInstance?.executionOutput}</div></td>
 </tr>
