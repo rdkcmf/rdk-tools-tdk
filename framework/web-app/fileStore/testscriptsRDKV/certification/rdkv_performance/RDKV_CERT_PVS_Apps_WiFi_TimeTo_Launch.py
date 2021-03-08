@@ -111,7 +111,7 @@ if expectedResult in result.upper():
     video_test_url = getTestURL(appURL,appArguments)
 
     print "Check Pre conditions"
-    status = "SUCCESS"
+    status = closed_status = "SUCCESS"
     revert_plugins_dict = {}
     revert_if  = revert_device_info = revert_plugins = "NO"
     #Check current interface
