@@ -691,7 +691,7 @@
         </testCase>
 
         <testCase testCaseId="DS_30" testCaseName= "Check_Sink_Atmos_Capability" desc="Check the the Atmos capability of the sink">
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="SinkAtmosCapability"/>
             <testStep testStepId="1" name="Check_Sink_Atmos_Capability" method="Get_Sink_Atmos_Capability">
                 <resultGeneration useMethodTag="check_sink_atmos_capability" />
             </testStep>

@@ -1520,28 +1520,29 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         # Monitor Plugin Response result parser steps
         elif tag == "monitor_get_result_data":
-            measurement_keys = ["resident", "allocated", "shared", "process"]
-            measurements =  result.get("measurements")
+            if arg[0] == "get_status":
+                measurements =  result[0].get("measurements")
+                info["observable"] = result[0].get("observable")
+                info["restart_limit"] = result[0].get("restart").get("limit")
+                info["restart_window"] = result[0].get("restart").get("window")
+            elif arg[0] == "get_reset_statistics":
+                measurements =  result.get("measurements")
+                info["observable"] = result.get("observable")
+                info["restart_limit"] = result.get("restart").get("limit")
+                info["restart_window"] = result.get("restart").get("window")
             status = []
             measurement_detail = []
-            for key in measurement_keys:
-                detail = []
-                detail.append(key)
-                detail.append(measurements.get(key).get("min"))
-                detail.append(measurements.get(key).get("max"))
-                detail.append(measurements.get(key).get("average"))
-                detail.append(measurements.get(key).get("last"))
-                status.append(checkNonEmptyResultData(detail))
-                measurement_detail.append("Name:"+str(detail[0])+",Min:"+str(detail[1])+",Max:"+str(detail[2])+",Average:"+str(detail[3])+",Last:"+str(detail[3]))
-            info["measurements"] = measurement_detail
-            info["observable"] = result.get("observable")
-            info["restart_limit"] = result.get("restart").get("limit")
-            info["restart_window"] = result.get("restart").get("window")
-
+            for key in measurements:
+                detail_Values=[]
+                detail_Values.append(measurements.get(key))
+                status.append(checkNonEmptyResultData(detail_Values))
+                measurement_detail.append(str(key)+": "+str(measurements.get(key)))
+            info["measurements"] =  measurement_detail
             if "FALSE" not in status:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+
 
         # ScreenCapture Plugin Response result parser steps
         elif tag == "screencapture_upload_screen":
