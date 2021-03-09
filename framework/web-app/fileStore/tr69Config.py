@@ -20,6 +20,9 @@
 #URI of ACS server to be used for testing
 ACS_URI=""
 
+#Tr69 Managment Server URL
+SERVER_URL=""
+
 # Name of the xml file(including its full path), holding the soap request for TS_TR069PA_Enable_CWMP_ConnectToACS.py, could be any set/get request
 Enable_CWMP_XML=""
 
