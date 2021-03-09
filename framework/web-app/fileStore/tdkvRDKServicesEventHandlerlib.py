@@ -284,9 +284,16 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
         # FrameRate Events response result parser steps
         elif tag == "framerate_check_fps_event":
             fps_info = []
+            flag = 0
             for fps_data in result:
                 fps_info.append(fps_data)
+                if fps_data.get("average") <= 0 and fps_data.get("min") <= 0 and fps_data.get("max") <= 0:
+                    flag = 1
             info["fps_info"] = fps_info
+            if flag==1:
+                info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "SUCCESS"
 
 
         # Bluetooth Events response result parser steps
