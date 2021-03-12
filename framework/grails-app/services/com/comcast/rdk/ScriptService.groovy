@@ -2420,4 +2420,136 @@ class ScriptService {
 			e.printStackTrace()
 		}
 	}
+	
+	/**
+	 * Method to check if script file is present in filestore and delete from db if not present
+	 * @param scriptId
+	 * @param scriptName
+	 * @return
+	 */
+	def verifyScriptFile(def realPath, Long scriptId, String scriptName){
+		ScriptFile scriptFile
+		if(scriptId){
+			scriptFile = ScriptFile?.findById(scriptId)
+		}else {
+			scriptFile = ScriptFile?.findByScriptName(scriptName)
+		}
+		try {
+			def requestGetRealPath = realPath
+			if(scriptFile && getScriptFileObj(requestGetRealPath, scriptFile?.moduleName,scriptFile?.scriptName,scriptFile?.category,scriptFile?.id ) == null){
+				def sgList = []
+				def scriptGroups = ScriptGroup.where {
+					scriptList { id == scriptFile?.id }
+				}
+				scriptGroups?.each{ scriptGrp ->
+					sgList.add(scriptGrp?.id)
+				}
+
+				sgList?.each{ sId ->
+					def sGroup = ScriptGroup.findById(sId)
+					sGroup?.scriptList?.removeAll(scriptFile)
+					sGroup?.save()
+				}
+				scriptFile?.delete()
+			}
+		} catch (Exception e) {
+			println "Error in verifyScriptFile - "+e.getMessage() + " scriptName "+scriptFile?.scriptName+" , id -"+scriptFile?.id
+			e.printStackTrace()
+		}
+	}
+	
+	/**
+	 * Method to check if a script file is present in filestore , otherwise return null
+	 * @param realPath
+	 * @param dirName
+	 * @param fileName
+	 * @param category
+	 * @param scriptId
+	 * @return
+	 */
+	def getScriptFileObj(realPath,dirName,fileName, def category,scriptId){
+		dirName = dirName?.trim()
+		fileName = fileName?.trim()
+		Map script = [:]
+		try {
+			def moduleObj = Module.findByName(dirName)
+			def scriptDirName = Constants.COMPONENT
+			if(moduleObj){
+				if(moduleObj?.testGroup?.groupValue.equals(TestGroup.E2E.groupValue)){
+					scriptDirName = Constants.INTEGRATION
+				}else if(moduleObj?.testGroup?.groupValue.equals(TestGroup.Certification.groupValue)){
+					scriptDirName = Constants.CERTIFICATION
+				}
+			}
+			if(category.toString().equals("RDKV_RDKSERVICE")){
+				category = Category.RDKV
+			}
+			def path = getFileFromPath( realPath, scriptDirName, dirName,  fileName,  category, scriptId)
+			File file = new File(path)
+			
+			if(file.exists()){
+				return file;
+			}
+		} catch (Exception e) {
+			script = null
+			e.printStackTrace()
+		}
+		return null;
+	}
+	
+	/**
+	 * Method to get the path of a script according to the module , category etc
+	 * @param realPath
+	 * @param dirName
+	 * @param moduleName
+	 * @param fileName
+	 * @param category
+	 * @param scriptId
+	 * @return
+	 */
+	def getFileFromPath(def realPath, def dirName, def moduleName, def fileName, def category, def scriptId){
+		def path = new StringBuffer()
+		path = path?.append(realPath).append(FILE_SEPARATOR).append(FILESTORE)
+		boolean isAdvanced = checkIfAdvanced(scriptId)
+		String testDirName = ""
+		String extn = ".py"
+		switch(category){
+			case Category.RDKV:
+				testDirName =  FileStorePath.RDKV.value()
+				if(isAdvanced){
+					testDirName =  FileStorePath.RDKVADVANCED.value()
+				}
+				break;
+			case Category.RDKB:
+				testDirName =  FileStorePath.RDKB.value()
+				if(isAdvanced){
+					testDirName =  FileStorePath.RDKBADVANCED.value()
+				}
+				break;
+			case Category.RDKC:
+				testDirName =  FileStorePath.RDKC.value()
+				break;
+			case Category.RDKB_TCL:
+				testDirName = FileStorePath.RDKTCL.value()
+				extn = ".tcl"
+				break;
+			default: break;
+		}
+		path = path?.append(FILE_SEPARATOR).append(testDirName).append(FILE_SEPARATOR).append(dirName).append(FILE_SEPARATOR).append(moduleName).append(FILE_SEPARATOR).append(fileName).append(extn)
+		return path?.toString()
+	}
+	
+	/**
+	 * Method to check whether a script is part of advanced scripts.
+	 */
+	def checkIfAdvanced(scriptId){
+		boolean isAdv = false
+		try {
+			String filePath = scriptsListAdvanced.get(scriptId)
+			isAdv = (filePath?.equals(TESTSCRIPTS_RDKV_ADV) || filePath?.equals(TESTSCRIPTS_RDKB_ADV) )
+		} catch (Exception e) {
+			e.printStackTrace()
+		}
+		return isAdv
+	}
 }

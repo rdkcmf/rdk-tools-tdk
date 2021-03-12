@@ -157,6 +157,11 @@ class BootStrap {
 		}catch(Exception e){
 			e.printStackTrace()
 		}
+		try{
+			removeDuplicateCertificationScripts(rootFile.file.getAbsolutePath())
+		}catch(Exception e){
+			e.printStackTrace()
+		}
 		/*List<Script> scriptList = Script.list()
 		
 		scriptList.each{ scriptInstance ->
@@ -420,6 +425,31 @@ class BootStrap {
 							}
 						}
 				}
+			}
+		}
+	}
+	
+	/*
+	 * Method to remove duplicate certification scripts
+	 */
+	def removeDuplicateCertificationScripts(def realPath){
+		List moduleList = [Constants.RDKV_PERFORMANCE,Constants.RDKV_STABILITY,Constants.RDKV_MEDIA,Constants.RDKV_SECURITY,Constants.RDKV_MEDIAVALIDATION,Constants.RDKSERVICES]
+		ScriptFile.withTransaction {
+			def sFObjectList = []
+			try{
+				moduleList?.each{
+					def sFList = ScriptFile.findAllByModuleNameAndCategory(it,Category.RDKV_RDKSERVICE)
+					if(sFList){
+						sFList?.each{sF->
+							sFObjectList.add(sF)
+						}
+					}
+				}
+				sFObjectList?.each{sFO->
+					scriptService.verifyScriptFile(realPath,sFO?.id, sFO?.scriptName)
+				}
+			}catch(Exception e){
+				e.printStackTrace()
 			}
 		}
 	}
