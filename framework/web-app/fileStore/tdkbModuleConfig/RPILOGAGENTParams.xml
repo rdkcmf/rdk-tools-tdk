@@ -54,7 +54,7 @@
                <!--whether set is applicable or not -->
                <writable>false</writable>
                 <persistentSet>false</persistentSet>
-               <defaultValue>0</defaultValue>
+               <defaultValue>4</defaultValue>
                <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
         </parameter>
        <parameter>
@@ -69,7 +69,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>true</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
@@ -84,7 +84,7 @@
                <writable>false</writable>
                 <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>0</defaultValue>
+               <defaultValue>4</defaultValue>
                <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
         </parameter>
        <parameter>
@@ -99,7 +99,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default vaue of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>true</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
@@ -114,7 +114,7 @@
                <writable>false</writable>
                 <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>0</defaultValue>
+               <defaultValue>4</defaultValue>
                <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
         </parameter>
          <parameter>
@@ -129,7 +129,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>true</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
@@ -144,7 +144,7 @@
                <writable>false</writable>
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>0</defaultValue>
+               <defaultValue>4</defaultValue>
                <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
         </parameter>
         <parameter>
@@ -159,7 +159,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>true</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
@@ -174,7 +174,7 @@
                <writable>false</writable>
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>0</defaultValue>
+               <defaultValue>4</defaultValue>
                <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
         </parameter>
         <parameter>
@@ -189,7 +189,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>true</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
@@ -264,7 +264,7 @@
                <writable>false</writable>
                 <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>0</defaultValue>
+               <defaultValue>4</defaultValue>
                <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
         </parameter>
 <parameter>
@@ -279,7 +279,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>true</defaultValue>
                <expectedValues>true,false</expectedValues>
         </parameter>
         <parameter>
@@ -293,7 +293,7 @@
                <writable>false</writable>
                 <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>0</defaultValue>
+               <defaultValue>4</defaultValue>
                <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
         </parameter>
         <parameter>
@@ -308,7 +308,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>true</defaultValue>
                <expectedValues>true,false</expectedValues>
         </parameter>
 <parameter>
@@ -322,7 +322,7 @@
                <writable>false</writable>
                 <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>0</defaultValue>
+               <defaultValue>4</defaultValue>
                <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
         </parameter>
 <parameter>
@@ -337,7 +337,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>true</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
@@ -352,7 +352,7 @@
                <writable>false</writable>
                 <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>0</defaultValue>
+               <defaultValue>4</defaultValue>
                <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14</expectedValues>
         </parameter>
 <parameter>
@@ -367,7 +367,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>true</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>true,false</expectedValues>
         </parameter>
