@@ -43,6 +43,8 @@
       <function name='rdkservice_getBrowserScore_SunSpider' />
       <function name='rdkservice_getRequiredLog' />
       <function name='rdkservice_getSSHParams' />
+      <function name='rdkservice_getBluetoothMac' />
+      <function name='rdkservice_getSupportedPlugins' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -61,6 +63,8 @@
       <parameter funName='rdkservice_getRequiredLog' parameterName='command' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getSSHParams' parameterName='realpath' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getSSHParams' parameterName='deviceIP' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_getSupportedPlugins' parameterName='plugins' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_getSupportedPlugins' parameterName='realpath' parameterType='STRING' range='a-z' />
     </parameters>
   </module>
 </xml>
