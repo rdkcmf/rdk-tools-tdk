@@ -28,7 +28,7 @@
   <synopsis>Check if multiple IR event notification is received for repeated key press/release for search key.
 Testcase ID: CT_IARMBUS_111</synopsis>
   <groups_id/>
-  <execution_time>3</execution_time>
+  <execution_time>4</execution_time>
   <long_duration>false</long_duration>
   <remarks/>
   <skip>false</skip>
