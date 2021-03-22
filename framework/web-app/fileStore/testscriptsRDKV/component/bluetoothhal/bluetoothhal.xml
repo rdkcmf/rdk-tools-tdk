@@ -197,6 +197,13 @@
           <parameter name="device_id" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="BluetoothHal_GetDeviceTypeClass" id=" " version="1">
+        <function>TestMgr_BluetoothHal_GetDeviceTypeClass</function>
+        <parameters>
+          <parameter name="device_id" value=""/>
+          <parameter name="device_type" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
