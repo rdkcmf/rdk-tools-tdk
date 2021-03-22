@@ -1148,6 +1148,44 @@ void BluetoothHalAgent::BluetoothHal_GetSupportedServices (IN const Json::Value&
 }
 
 
+/****************************************************************************************************************
+ *Function name : BluetoothHal_GetDeviceTypeClass
+ *Descrption    : This function gets the current device class info 
+ *****************************************************************************************************************/
+void BluetoothHalAgent::BluetoothHal_GetDeviceTypeClass (IN const Json::Value& req, OUT Json::Value& response)
+{
+   DEBUG_PRINT (DEBUG_TRACE, "BluetoothHal_GetDeviceTypeClass --->Entry\n");
+
+   char deviceIDString [BT_ADAPTER_STR_LEN] = {'\0'};
+   unsigned long long int deviceID;
+   enBTRCoreDeviceType deviceType;
+   enBTRCoreDeviceClass deviceClass = enBTRCore_DC_Unknown;
+   strcpy (deviceIDString, req["device_id"].asCString ());
+   deviceID = strtoull (deviceIDString, NULL, 10);
+   deviceType = (enBTRCoreDeviceType) req["device_type"].asInt ();
+
+   DEBUG_PRINT (DEBUG_TRACE, "BluetoothHal_GetDeviceTypeClass : Executing BTRCore_GetDeviceTypeClass() with input (device ID - %llu, device type - %d)\n", deviceID, deviceType);
+   gBTRCoreRet = BTRCore_GetDeviceTypeClass (gBTRCoreHandle, deviceID, &deviceType, &deviceClass);
+   if (enBTRCoreSuccess == gBTRCoreRet)
+   {
+       response["result"] = "SUCCESS";
+       response["details"] = deviceClass;
+       DEBUG_PRINT (DEBUG_TRACE, "BluetoothHal_GetDeviceTypeClass call is SUCCESS");
+       DEBUG_PRINT (DEBUG_TRACE, "BluetoothHal_GetDeviceTypeClass: Device Class is: %x & Device Type is: %x", deviceClass, deviceType);
+       DEBUG_PRINT (DEBUG_TRACE, "BluetoothHal_GetDeviceTypeClass --->Exit\n");
+   }
+   else
+   {
+       response["result"] = "FAILURE";
+       response["details"] = gBTRCoreRet;
+       DEBUG_PRINT (DEBUG_ERROR, "BluetoothHal_GetDeviceTypeClass call is FAILURE");
+       DEBUG_PRINT (DEBUG_TRACE, "BluetoothHal_GetDeviceTypeClass -->Exit\n");
+   }
+
+   return;
+}
+
+
 /**************************************************************************
 Function Name   : cleanup
 

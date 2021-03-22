@@ -78,6 +78,7 @@ class BluetoothHalAgent : public RDKTestStubInterface , public AbstractServer<Bl
                     this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_FindDevice", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_FindDevice);
                     this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_FindService", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, "uuid", JSON_STRING, "xml_data", JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_FindService);
                     this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_GetSupportedServices", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, NULL), &BluetoothHalAgent::BluetoothHal_GetSupportedServices);
+                    this->bindAndAddMethod (Procedure ("TestMgr_BluetoothHal_GetDeviceTypeClass", PARAMS_BY_NAME, JSON_STRING, "device_id", JSON_STRING, "device_type", JSON_INTEGER, NULL), &BluetoothHalAgent::BluetoothHal_GetDeviceTypeClass);
                 }
 
                 //Inherited functions
@@ -119,6 +120,7 @@ class BluetoothHalAgent : public RDKTestStubInterface , public AbstractServer<Bl
                 void BluetoothHal_FindDevice (IN const Json::Value& req, OUT Json::Value& response);
                 void BluetoothHal_FindService (IN const Json::Value& req, OUT Json::Value& response);
                 void BluetoothHal_GetSupportedServices (IN const Json::Value& req, OUT Json::Value& response);
+                void BluetoothHal_GetDeviceTypeClass (IN const Json::Value& req, OUT Json::Value& response);
 };
 #endif //__BLUETOOTHHAL_STUB_H__
 
