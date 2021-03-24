@@ -58,7 +58,10 @@ def execute_step(data):
     try:
         response = requests.post(url, headers=headers, data=data, timeout=20)
         json_response = json.loads(response.content)
-        return json_response.get("result");
+	result = json_response.get("result")
+        if result != None and "'success': False" in str(result):
+            result = "EXCEPTION OCCURRED"
+        return result;
     except requests.exceptions.RequestException as e:
         print "ERROR!! \nEXCEPTION OCCURRED WHILE EXECUTING CURL COMMANDS!!"
         print "Error message received :\n",e;
