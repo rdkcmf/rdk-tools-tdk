@@ -386,7 +386,7 @@
                 </resultGeneration>
             </testStep>
         </testCase>
-        <testCase testCaseId="SYS_27" testCaseName= "System_Get_Image_Version" desc="Get requested device detail">
+        <testCase testCaseId="SYS_27" testCaseName= "System_Get_Image_Version" desc="Gets the image version">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Device_Image_Version" method="Get_Device_Info">
                 <params>
@@ -395,7 +395,7 @@
                 <resultGeneration useMethodTag="system_get_api_info"/>
             </testStep>
        </testCase>
-       <testCase testCaseId="SYS_28" testCaseName= "System_Get_model_number" desc="Get requested device detail">
+       <testCase testCaseId="SYS_28" testCaseName= "System_Get_model_number" desc="Gets the model number">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Device_model_number" method="Get_Device_Info">
                 <params>
@@ -404,7 +404,7 @@
                 <resultGeneration useMethodTag="system_get_api_info"/>
             </testStep>
        </testCase>
-       <testCase testCaseId="SYS_29" testCaseName= "System_Get_boxIP" desc="Get requested device detail">
+       <testCase testCaseId="SYS_29" testCaseName= "System_Get_boxIP" desc="Gets the box IP">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Device_boxIP" method="Get_Device_Info">
                 <params>
@@ -413,7 +413,7 @@
                 <resultGeneration useMethodTag="system_get_api_info"/>
             </testStep>
        </testCase>
-       <testCase testCaseId="SYS_30" testCaseName= "System_Get_build_type" desc="Get requested device detail">
+       <testCase testCaseId="SYS_30" testCaseName= "System_Get_build_type" desc="Gets the build type">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Device_build_type" method="Get_Device_Info">
                 <params>
@@ -422,7 +422,7 @@
                 <resultGeneration useMethodTag="system_get_api_info"/>
             </testStep>
        </testCase>
-       <testCase testCaseId="SYS_31" testCaseName= "System_Get_eth_mac" desc="Get requested device detail">
+       <testCase testCaseId="SYS_31" testCaseName= "System_Get_eth_mac" desc="Gets eth mac of the device">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Device_eth_mac" method="Get_Device_Info">
                 <params>
@@ -431,8 +431,8 @@
                 <resultGeneration useMethodTag="system_get_api_info"/>
             </testStep>
        </testCase>
-       <testCase testCaseId="SYS_32" testCaseName= "System_Get_rf4ce_mac" desc="Get requested device detail">
-            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="SYSTEM_DEVICE_PARAMS" useMethodTag="system_check_feature_applicability" arguments="Enable"/>
+       <testCase testCaseId="SYS_32" testCaseName= "System_Get_rf4ce_mac" desc="Gets the rf4ce mac of the device">
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="RF4CE_MAC" useMethodTag="system_check_feature_applicability" arguments="Enable"/>
             <testStep testStepId="1" name="Get_Device_rf4ce_mac" method="Get_Device_Info">
                 <params>
                   <param tag="params" value="rf4ce_mac" />
@@ -440,5 +440,36 @@
                 <resultGeneration useMethodTag="system_get_api_info"/>
             </testStep>
        </testCase>
- 
+       <testCase testCaseId="SYS_33" testCaseName= "System_Get_Bluetooth_mac" desc="Gets device bluetooth mac">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_Bluetooth_Mac" method="Get_Device_Info">
+                <params>
+                  <param tag="params" value="bluetooth_mac" />
+                </params>
+                <resultGeneration useMethodTag="system_check_mac_address" arguments="bluetooth_mac" />
+            </testStep>
+       </testCase>
+       <testCase testCaseId="SYS_34" testCaseName= "System_Get_WiFi_Mac" desc="Gets device WiFi mac">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_WiFi_Mac" method="Get_Device_Info">
+                <params>
+                  <param tag="params" value="wifi_mac" />
+                </params>
+                <resultGeneration useMethodTag="system_check_mac_address" arguments="wifi_mac" />
+            </testStep>
+       </testCase>
+       <testCase testCaseId="SYS_35" testCaseName="Check_Power_State_Before_Reboot" desc="Checks the powerstate before reboot" >
+            <testCaseInfo testCaseType="direct" revert="true" />
+            <testStep testStepId="1" name="Get_Power_State" method="Get_Power_State" saveResult="true" >
+                <resultGeneration useMethodTag="system_get_power_state"/>
+            </testStep>
+            <testStep testStepId="2" name="Execute_Reboot_Command" action="externalFnCall" rebootStep="yes">
+                <resultGeneration useMethodTag="executeRebootCmd"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Power_State_Before_Reboot" method="Get_Power_State_Before_Reboot" saveResult="true" >
+                <resultGeneration useMethodTag="system_validate_powerstate_before_reboot">
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_get_powerstate_before_reboot"/>
+                </resultGeneration>
+            </testStep>
+       </testCase>
 </testPlugin>

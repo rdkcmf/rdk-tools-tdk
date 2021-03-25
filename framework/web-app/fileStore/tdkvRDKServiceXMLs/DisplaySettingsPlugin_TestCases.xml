@@ -1868,6 +1868,385 @@
                   <resultGeneration useMethodTag="display_settings_check_set_operation"  />
             </testStep>
         </testCase>
-
+        <testCase testCaseId="DS_72" testCaseName= "Set_And_Get_Supported_MS12_Audio_Profiles_HDMI0"  desc="Check whether supported MS12 audio profiles are able to set in HDMI0 port">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="MS12AudioProfile,HDMI0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="HDMI0"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_MS12_Audio_Profiles" method="Get_Supported_MS12_Audio_Profiles" saveResult="true">
+                  <params>
+                    <param tag="audioPort" value="HDMI0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_supported_MS12_Audio_Profiles"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+	          </params>
+		  <resultGeneration useMethodTag="check_audio_profile">
+		    <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles"/>
+		  </resultGeneration>
+            </testStep>
+            <testStep testStepId="4"  name="Set_MS12_Audio_Profile" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_MS12_Audio_Profile" method="Set_MS12_Audio_Profile" revertSet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0"/>
+                    <param tag="ms12AudioProfile" usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles" iteration="true" revertParam="yes"  />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_73" testCaseName= "Set_And_Get_Supported_MS12_Audio_Profiles_SPDIF0"  desc="Check whether supported MS12 audio profiles are able to set in SPDIF0 port">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="MS12AudioProfile,SPDIF0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPDIF0"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_MS12_Audio_Profiles" method="Get_Supported_MS12_Audio_Profiles" saveResult="true">
+                  <params>
+                    <param tag="audioPort" value="SPDIF0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_supported_MS12_Audio_Profiles"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" value="SPDIF0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles"/>
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="4"  name="Set_MS12_Audio_Profile" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_MS12_Audio_Profile" method="Set_MS12_Audio_Profile" revertSet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPDIF0"/>
+                    <param tag="ms12AudioProfile" usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles" iteration="true" revertParam="yes"  />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" value="SPDIF0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_74" testCaseName= "Set_And_Get_Supported_MS12_Audio_Profiles_IDLR0"  desc="Check whether supported MS12 audio profiles are able to set in IDLR0 port">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="MS12AudioProfile,IDLR0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="IDLR0"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_MS12_Audio_Profiles" method="Get_Supported_MS12_Audio_Profiles" saveResult="true">
+                  <params>
+                    <param tag="audioPort" value="IDLR0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_supported_MS12_Audio_Profiles"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" value="IDLR0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles"/>
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="4"  name="Set_MS12_Audio_Profile" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_MS12_Audio_Profile" method="Set_MS12_Audio_Profile" revertSet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="IDLR0"/>
+                    <param tag="ms12AudioProfile" usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles" iteration="true" revertParam="yes"  />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" value="IDLR0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_75" testCaseName= "Set_And_Get_Supported_MS12_Audio_Profiles_SPEAKER0"  desc="Check whether supported MS12 audio profiles are able to set in SPEAKER0 port">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="MS12AudioProfile,SPEAKER0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPEAKER0"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_MS12_Audio_Profiles" method="Get_Supported_MS12_Audio_Profiles" saveResult="true">
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_supported_MS12_Audio_Profiles"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles"/>
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="4"  name="Set_MS12_Audio_Profile" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_MS12_Audio_Profile" method="Set_MS12_Audio_Profile" revertSet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0"/>
+                    <param tag="ms12AudioProfile" usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles" iteration="true" revertParam="yes"  />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_76" testCaseName= "Enable_And_Disable_AudioPort_HDMI0" desc="Check whether able to enable and disable HDMI0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="HDMI0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="HDMI0"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Enable_Audio_Port" method="Get_Enable_Audio_Port" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0"/>
+                  </params>
+              <resultGeneration useMethodTag="check_audio_port_status" expectedValues="True,False" />
+            </testStep>
+            <testStep testStepId="3" name="Enable_And_Disable_Audio_port" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Enable_Audio_Port" method="Set_Enable_Audio_Port" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                    <param tag="enable" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Enable_Audio_Port" method="Get_Enable_Audio_Port" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_port_status" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_77" testCaseName= "Enable_And_Disable_AudioPort_SPDIF0" desc="Check whether able to enable and disable SPDIF0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="SPDIF0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPDIF0"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Enable_Audio_Port" method="Get_Enable_Audio_Port" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPDIF0"/>
+                  </params>
+              <resultGeneration useMethodTag="check_audio_port_status" expectedValues="True,False" />
+            </testStep>
+            <testStep testStepId="3" name="Enable_And_Disable_Audio_port" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Enable_Audio_Port" method="Set_Enable_Audio_Port" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="SPDIF0" />
+                    <param tag="enable" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Enable_Audio_Port" method="Get_Enable_Audio_Port" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPDIF0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_port_status" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>        
+        <testCase testCaseId="DS_78" testCaseName= "Enable_And_Disable_AudioPort_IDLR0" desc="Check whether able to enable and disable IDLR0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="IDLR0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="IDLR0"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Enable_Audio_Port" method="Get_Enable_Audio_Port" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="IDLR0"/>
+                  </params>
+              <resultGeneration useMethodTag="check_audio_port_status" expectedValues="True,False" />
+            </testStep>
+            <testStep testStepId="3" name="Enable_And_Disable_Audio_port" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Enable_Audio_Port" method="Set_Enable_Audio_Port" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="IDLR0" />
+                    <param tag="enable" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Enable_Audio_Port" method="Get_Enable_Audio_Port" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="IDLR0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_port_status" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_79" testCaseName= "Enable_And_Disable_AudioPort_SPEAKER0" desc="Check whether able to enable and disable SPEAKER0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="SPEAKER0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPEAKER0"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Enable_Audio_Port" method="Get_Enable_Audio_Port" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0"/>
+                  </params>
+              <resultGeneration useMethodTag="check_audio_port_status" expectedValues="True,False" />
+            </testStep>
+            <testStep testStepId="3" name="Enable_And_Disable_Audio_port" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Enable_Audio_Port" method="Set_Enable_Audio_Port" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                    <param tag="enable" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Enable_Audio_Port" method="Get_Enable_Audio_Port" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_port_status" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_80" testCaseName= "Set_And_Get_Graphic_Equalizer_Mode_HDMI0" desc="Check whether Graphic equalizer mode values are able to set and get for HDMI0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="GraphicEqualizer,HDMI0"/>
+	    <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="HDMI0"/>
+            </testStep>
+	    <testStep testStepId="2" name="Get_Graphic_Equalizer_Mode" method="Get_Graphic_Equalizer_Mode" saveResult="true" revertGet="yes" >
+                <params>
+                  <param tag="audioPort"  value="HDMI0"/>
+                </params>
+                <resultGeneration useMethodTag="check_graphic_equalizer_mode" expectedValues="0,1,2,3" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Graphic_Equalizer_Mode" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Graphic_Equalizer_Mode" method="Set_Graphic_Equalizer_Mode" revertSet="yes">
+		  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                    <param tag="graphicEqualizerMode" value="0,1,2,3" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+	      <subtestStep subtestStepId="2" name="Get_Graphic_Equalizer_Mode" method="Get_Graphic_Equalizer_Mode" revertFlag="yes" >
+		  <params>
+                    <param tag="audioPort"  value="HDMI0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_graphic_equalizer_mode" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>          
+        <testCase testCaseId="DS_81" testCaseName= "Set_And_Get_Graphic_Equalizer_Mode_SPDIF0" desc="Check whether Graphic equalizer mode values are able to set and get for SPDIF0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="GraphicEqualizer,SPDIF0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPDIF0"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Graphic_Equalizer_Mode" method="Get_Graphic_Equalizer_Mode" saveResult="true" revertGet="yes" >
+                <params>
+                  <param tag="audioPort"  value="SPDIF0"/>
+                </params>
+                <resultGeneration useMethodTag="check_graphic_equalizer_mode" expectedValues="0,1,2,3" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Graphic_Equalizer_Mode" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Graphic_Equalizer_Mode" method="Set_Graphic_Equalizer_Mode" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="SPDIF0" />
+                    <param tag="graphicEqualizerMode" value="0,1,2,3" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Graphic_Equalizer_Mode" method="Get_Graphic_Equalizer_Mode" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPDIF0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_graphic_equalizer_mode" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_82" testCaseName= "Set_And_Get_Graphic_Equalizer_Mode_IDLR0" desc="Check whether Graphic equalizer mode values are able to set and get for IDLR0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="GraphicEqualizer,IDLR0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="IDLR0"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Graphic_Equalizer_Mode" method="Get_Graphic_Equalizer_Mode" saveResult="true" revertGet="yes" >
+                <params>
+                  <param tag="audioPort"  value="IDLR0"/>
+                </params>
+                <resultGeneration useMethodTag="check_graphic_equalizer_mode" expectedValues="0,1,2,3" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Graphic_Equalizer_Mode" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Graphic_Equalizer_Mode" method="Set_Graphic_Equalizer_Mode" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="IDLR0" />
+                    <param tag="graphicEqualizerMode" value="0,1,2,3" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Graphic_Equalizer_Mode" method="Get_Graphic_Equalizer_Mode" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="IDLR0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_graphic_equalizer_mode" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_83" testCaseName= "Set_And_Get_Graphic_Equalizer_Mode_SPEAKER0" desc="Check whether Graphic equalizer mode values are able to set and get for SPEAKER0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="GraphicEqualizer,SPEAKER0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPEAKER0"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Graphic_Equalizer_Mode" method="Get_Graphic_Equalizer_Mode" saveResult="true" revertGet="yes" >
+                <params>
+                  <param tag="audioPort"  value="SPEAKER0"/>
+                </params>
+                <resultGeneration useMethodTag="check_graphic_equalizer_mode" expectedValues="0,1,2,3" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Graphic_Equalizer_Mode" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Graphic_Equalizer_Mode" method="Set_Graphic_Equalizer_Mode" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                    <param tag="graphicEqualizerMode" value="0,1,2,3" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Graphic_Equalizer_Mode" method="Get_Graphic_Equalizer_Mode" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_graphic_equalizer_mode" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
 </testPlugin>  
 
