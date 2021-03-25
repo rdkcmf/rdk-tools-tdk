@@ -71,7 +71,7 @@
                 <resultGeneration useMethodTag="screencapture_upload_screen" expectedValues="True"/>
             </testStep>
             <testStep testStepId="2" name="Check_Upload_Complete_Event" event="Event_Upload_Complete" action="eventListener" delay="10">
-              <resultGeneration useMethodTag="screencapture_check_upload_complete_event" expectedValues="True"/>
+              <resultGeneration useMethodTag="screencapture_check_upload_complete_event" arguments="check_upload_status" expectedValues="True"/>
             </testStep>
         </testCase>
 
@@ -83,9 +83,21 @@
                 <resultGeneration useMethodTag="screencapture_upload_screen" expectedValues="True"/>
             </testStep>
             <testStep testStepId="2" name="Check_Upload_Complete_Event" event="Event_Upload_Complete" action="eventListener" delay="10">
-              <resultGeneration useMethodTag="screencapture_check_upload_complete_event" expectedValues="False"/>
+              <resultGeneration useMethodTag="screencapture_check_upload_complete_event"  arguments="check_upload_status" expectedValues="False"/>
             </testStep>
         </testCase>
 
+        <testCase testCaseId="SC_05" testCaseName="ScreenCapture_Check_CallGUID" desc="Upload screen and check GUID in  uploadComplete Event">
+            <testStep testStepId="1" name="Upload_Screen_Capture" method="Upload_Screen_Capture" >
+                <params>
+                  <param tag="url" useConfigFile="true" key="SC_UPLOAD_URL"/>
+                  <param tag="callGUID" value="screenshot"/>
+                </params>
+                <resultGeneration useMethodTag="screencapture_upload_screen" expectedValues="True"/>
+            </testStep>
+            <testStep testStepId="2" name="Check_Upload_Complete_Event" event="Event_Upload_Complete" action="eventListener" delay="10">
+              <resultGeneration useMethodTag="screencapture_check_upload_complete_event" arguments="check_status_and_callguid" expectedValues="True,screenshot"/>
+            </testStep>
+        </testCase>
 </testPlugin>
 

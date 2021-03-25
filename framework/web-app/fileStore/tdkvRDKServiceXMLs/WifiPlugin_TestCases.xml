@@ -570,4 +570,23 @@
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
        </testCase>
+        
+       <testCase testCaseId="WIFI_14" testCaseName="WIFI_Check_Scanned_SSID_Name" desc="Scan for particular SSID and check the SSID in onAvailableSSIDs Event">
+            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME" />
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value="" />
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Check_On_Available_SSIDs_Event" event="Event_On_Available_SSIDs" action="eventListener" delay="5">
+                <resultGeneration useMethodTag="wifi_check_available_ssids_event" arguments="check_scanned_ssid_name" >
+                  <expectedValues  useConfigFile="true" key="WIFI_SSID_NAME" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase>
 </testPlugin>

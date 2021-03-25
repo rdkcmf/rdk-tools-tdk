@@ -272,6 +272,17 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             if len(arg) and arg[0] == "get_ssid_names":
                 info["ssids"] = ssids
                 info["Test_Step_Status"] = "SUCCESS"
+            elif len(arg) and arg[0] == "check_scanned_ssid_name":
+                ssid_found = 0
+                for ssid in ssids:
+                    if ssid in expectedValues:
+                        info["ssid"] = ssid
+                        ssid_found = 1
+                        break
+                if ssid_found == 1:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "wifi_check_on_error_event":
             result = result[0]
@@ -412,12 +423,20 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
 
         # ScreenCapture Events response result parser steps
         elif tag == "screencapture_check_upload_complete_event":
-            result=result[0]
-            info = result
-            if str(result.get("status")) in expectedValues:
-                info["Test_Step_Status"] = "SUCCESS"
-            else:
+            if arg[0] == "check_upload_status":
                 info["Test_Step_Status"] = "FAILURE"
+                for eventResult in result:
+                    if str(eventResult.get("status")) in  expectedValues:
+                        info = eventResult
+                        info["Test_Step_Status"] = "SUCCESS"
+                        break;
+            elif arg[0] == "check_status_and_callguid":
+                info["Test_Step_Status"] = "FAILURE"
+                for eventResult in result:
+                    if str(eventResult.get("status")) in  expectedValues and str(eventResult.get("call_guid")) in  expectedValues:
+                        info = eventResult
+                        info["Test_Step_Status"] = "SUCCESS"
+                        break;
 
         # HdmiCec Events response result parser steps
         elif tag == "hdmicec_check_on_message_event":

@@ -622,6 +622,32 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+        elif tag== "system_check_mac_address":
+            if arg[0] == "bluetooth_mac":
+                info["bluetooth_mac"] = result.get("bluetooth_mac")
+                macAddress = result.get("bluetooth_mac")
+                success = str(result.get("success")).lower() == "true"
+                status = checkNonEmptyResultData(result.get("bluetooth_mac"))
+            elif arg[0] == "wifi_mac":
+                info["wifi_mac"] = result.get("wifi_mac")
+                macAddress = result.get("wifi_mac")
+                success = str(result.get("success")).lower() == "true"
+                status = checkNonEmptyResultData(result.get("wifi_mac"))
+            if success and status == "TRUE":
+                if re.match("[0-9a-f]{2}([-:])[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", macAddress.lower()) is None:
+                    info["Test_Step_Status"] = "FAILURE"
+                else:
+                    info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "system_validate_powerstate_before_reboot":
+            powerState = result.get("state")
+            info["powerState"] = powerState
+            success = str(result.get("success")).lower() == "true"
+            if success and powerState in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
 
         # User Preferces Plugin Response result parser steps
@@ -1243,6 +1269,34 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "check_supported_MS12_Audio_Profiles":
+            info["supportedMS12AudioProfiles"] = result.get('supportedMS12AudioProfiles')
+            success = str(result.get("success")).lower() == "true"
+            status = checkNonEmptyResultData(result.get('supportedMS12AudioProfiles'))
+            if success and status == "TRUE":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_audio_profile":
+            info["ms12AudioProfile"] = result.get('ms12AudioProfile')
+            if str(result.get("success")).lower() == "true" and str(result.get('ms12AudioProfile')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "check_audio_port_status":
+            info["audioPortStatus"] = result.get('enable')
+            if str(result.get("success")).lower() == "true" and str(result.get('enable')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_graphic_equalizer_mode":
+            info["graphicEqualizerMode"] = result.get('mode')
+            if str(result.get("success")).lower() == "true" and str(result.get('mode')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_check_adapter_state":
@@ -1361,6 +1415,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     if str(device_info.get("name")) in expectedValues[0]:
                         info["deviceID"] = str(device_info.get("deviceID"))
                         checkStatus = "TRUE"
+                        break
+                status.append(checkStatus)
+            elif len(arg) and arg[0] == "check_device_not_discovered":
+                checkStatus = "TRUE"
+                for device_info in discoveredDevices:
+                    if str(device_info.get("name")) in expectedValues[0]:
+                        checkStatus = "FALSE"
                         break
                 status.append(checkStatus)
             if "FALSE" not in status and success:
@@ -2089,6 +2150,14 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 print testStepResults[0].get("MAX")
                 info["MAX"] = float(testStepResults[0].get("MAX")) + 10
 
+        elif tag == "system_get_bluetooth_mac":
+            testStepResults = testStepResults[0].values()[0]
+            info["bluetooth_mac"] = testStepResults[0].get("bluetooth_mac")
+
+        elif tag == "system_get_powerstate_before_reboot":
+            testStepResults = testStepResults[0].values()[0]
+            info["powerState"] = testStepResults[0].get("powerState")
+
         # user Preferences result parser steps
         elif tag == "userpreferences_switch_ui_language":
             testStepResults = testStepResults[0].values()[0]
@@ -2220,6 +2289,11 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             testStepResults = testStepResults[0].values()[0]
             supportedResolutions = testStepResults[0].get("supportedResolutions")
             info["resolution"] = ",".join(supportedResolutions)
+
+        elif tag =="get_supported_audio_profiles":
+            testStepResults = testStepResults[0].values()[0]
+            audioProfiles = testStepResults[0].get("supportedMS12AudioProfiles")
+            info["ms12AudioProfile"] = ",".join(audioProfiles)
 
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_toggle_adapter_state":
@@ -2544,19 +2618,29 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             base64_data = hex_code.decode("hex").encode("base64")
             info["Hex_Data"] = hex_code
             info["message"] = base64_data.strip()
+
         elif tag == "Create_File":
-            command = "touch "+arguments[0]
-            executeCommand(deviceConfigFile, deviceIP, command)
-            command = "[ -f "+arguments[0]+" ] && echo 1 || echo 0"
+            command = "mkdir "+arguments[0]+"Controller;[ -d "+arguments[0]+"Controller ] && echo 1 || echo 0"
             status = executeCommand(deviceConfigFile, deviceIP, command)
             status = str(status).split("\n")
             result = 1
             if int(status[1]) == result:
-                info["RESULT"] = "File created"
-                info["Test_Step_Status"] = "SUCCESS"
+                info["RESULT"] = "Controller directory created"
+                command = "touch "+arguments[0]+"Controller/TDK_TEST_FILE.txt;[ -f "+arguments[0]+"Controller/TDK_TEST_FILE.txt ] && echo 1 || echo 0"
+                status = executeCommand(deviceConfigFile, deviceIP, command)
+                status = str(status).split("\n")
+                result = 1
+                if int(status[1]) == result:
+                    info["RESULT"] = "File created"
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["RESULT"] = "File not created"
+                    info["Test_Step_Status"] = "FAILURE"
+
             else:
-                info["RESULT"] = "File not created"
+                info["RESULT"] = "Controller directory not created"
                 info["Test_Step_Status"] = "FAILURE"
+        
         elif tag == "check_fps_value":
             expectedFPS = (int(expectedValues[0])-int(expectedValues[1]))
             info["AVERAGE_FPS"] = arguments[0]
@@ -2568,9 +2652,8 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
                 info["Test_Step_Status"] = "FAILURE"
             info["Test_Step_Message"] = message
 
-
         elif tag == "Check_If_File_Exists":
-            command = "[ -f "+arguments[0]+" ] && echo 1 || echo 0"
+            command = "[ -f "+arguments[0]+"Controller/TDK_TEST_FILE.txt ] && echo 1 || echo 0"
             status = executeCommand(deviceConfigFile, deviceIP, command)
             status = str(status).split("\n")
             result = 0
@@ -2580,6 +2663,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             else:
                 info["RESULT"] = "File exist"
                 info["Test_Step_Status"] = "FAILURE"
+
         elif tag == "executeRebootCmd":
             command = "reboot"
             info["deatils"] = executeCommand(deviceConfigFile, deviceIP, command)
