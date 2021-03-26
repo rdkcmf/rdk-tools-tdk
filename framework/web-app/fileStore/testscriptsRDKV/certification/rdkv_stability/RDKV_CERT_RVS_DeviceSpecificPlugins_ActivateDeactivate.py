@@ -20,12 +20,12 @@
 <?xml version="1.0" encoding="UTF-8"?><xml>
   <id/>
   <version>2</version>
-  <name>RDKV_CERT_RVS_ActivateDeactivate_Plugins</name>
+  <name>RDKV_CERT_RVS_DeviceSpecificPlugins_ActivateDeactivate</name>
   <primitive_test_id/>
   <primitive_test_name>rdkservice_validateCPULoad</primitive_test_name>
   <primitive_test_version>2</primitive_test_version>
   <status>FREE</status>
-  <synopsis>The objective of this script is to activate and deactivate 3 plugins for 1000 times and get the status of Controller and validate CPU load and memory usage.</synopsis>
+  <synopsis>The objective of this test is to activate and deactivate device specific plugins for given number of times.</synopsis>
   <groups_id/>
   <execution_time>720</execution_time>
   <long_duration>false</long_duration>
@@ -37,33 +37,34 @@
     <box_type>RPI-HYB</box_type>
     <box_type>Video_Accelerator</box_type>
   </box_types>
-  <rdk_versions>
-    <rdk_version>RDK2.0</rdk_version>
-  </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_STABILITY_10</test_case_id>
-    <test_objective>The objective of this script is to activate and deactivate 3 plugins for 1000 times and get the status of Controller and validate CPU load and memory usage.</test_objective>
+    <test_case_id>RDKV_STABILITY_22</test_case_id>
+    <test_objective>The objective of this test is to activate and deactivate device specific plugins for given number of times.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI,Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
-    <input_parameters>3 plugins </input_parameters>
-    <automation_approch>1. Get the plugins from StabilityVariables file
-2. Get the current status of plugins
-3. Change the status of plugins in a loop, validate controller plugin status and validate the cpu and memory load in the loop.</automation_approch>
-    <expected_output>Plugin status should be expected ones and cpu load and memory usage must be in expected range.</expected_output>
+    <input_parameters>None</input_parameters>
+    <automation_approch>1. Get the current status of plugins.
+2. Change the status of plugins in a loop,using activate method and deactivate method of Controller plugin.
+3. Validate the cpu and memory load in the loop.
+4. Revert the plugins status after loop.</automation_approch>
+    <expected_output>The plugins should be activated and deactivated each time. DUT should be stable after each iteration and CPU load and memory usage must be within expected range</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_stability</test_stub_interface>
-    <test_script>RDKV_CERT_RVS_ActivateDeactivate_Plugins</test_script>
+    <test_script>RDKV_CERT_RVS_DeviceSpecificPlugins_ActivateDeactivate</test_script>
     <skipped>No</skipped>
-    <release_version>M84</release_version>
+    <release_version>M87</release_version>
     <remarks/>
   </test_cases>
+  <rdk_versions>
+    <rdk_version>RDK2.0</rdk_version>
+  </rdk_versions>
   <script_tags/>
 </xml>
 
 '''
-# use tdklib library,which provides a wrapper for tdk testcase script 
+ # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
 from rdkv_performancelib import *
 from StabilityTestUtility import *
@@ -76,7 +77,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_stability","1",standAlone=True);
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_RVS_ActivateDeactivate_Plugins');
+obj.configureTestCase(ip,port,'RDKV_CERT_RVS_DeviceSpecificPlugins_ActivateDeactivate');
 
 output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
@@ -87,40 +88,63 @@ cpu_mem_info_dict = {}
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
 obj.setLoadModuleStatus(result);
-expectedResult = "SUCCESS"
 
+expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     activate_deactivate_max_count = StabilityTestVariables.activate_deactivate_max_count
-    plugins_list = []
-    revert = "NO"
-    device_info_status_dict = get_plugins_status(obj,["DeviceInfo"])
-    if device_info_status_dict["DeviceInfo"] != "activated" :
-        revert = "YES"
-        set_plugins_status(obj,{"DeviceInfo":"activated"})
-    plugins = StabilityTestVariables.activate_deactivate_plugins
-    if plugins != "":
-        for plugin in plugins.split(","):
-            plugins_list.append(plugin)
-        print "\n Plugins used for the test: ",plugins_list
-        print "\n Get the current status of plugins \n"
-        curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
-        print "\n Initial status dictionary :",curr_plugins_status_dict
+    plugins = "org.rdk.ScreenCapture,DisplayInfo"
+    status = "SUCCESS"
+    device_info = "DeviceInfo"
+    tdkTestObj = obj.createTestStep('rdkservice_getSupportedPlugins')
+    tdkTestObj.addParameter("realpath",obj.realpath)
+    tdkTestObj.addParameter("plugins",plugins)
+    tdkTestObj.executeTestCase(expectedResult)
+    result = tdkTestObj.getResult()
+    supported_plugins = tdkTestObj.getResultDetails()
+    if result == "SUCCESS" and supported_plugins != "FAILURE":
+        tdkTestObj.setResultStatus("SUCCESS")
+        plugins_list = supported_plugins.split(',')
+        plugins_list.append(device_info)
+        initial_status_dict = get_plugins_status(obj,plugins_list)
+        curr_plugins_status_dict = dict(initial_status_dict)
+        if curr_plugins_status_dict != {}:
+            device_info_status = curr_plugins_status_dict[device_info]
+            if device_info_status != "activated":
+                tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus');
+                tdkTestObj.addParameter("plugin",device_info_plugin);
+                tdkTestObj.addParameter("status","activate");
+                tdkTestObj.executeTestCase(expectedResult);
+                result1 = tdkTestObj.getResult();
+                if expectedResult in result1:
+                    print "\n Deviceinfo is activated \n"
+                    tdkTestObj.setResultStatus("SUCCESS")
+                else:
+                    print "\n Error while activating DeviceInfo\n"
+                    tdkTestObj.setResultStatus("FAILURE")
+                    status = "FAILURE"
+            else:
+                print "\n DeviceInfo is activated"
+        else:
+            print "\n Unable to get plugins status"
+            status = "FAILURE"
+        curr_plugins_status_dict.pop(device_info)
+    else:
+        status = "FAILURE"
+        tdkTestObj.setResultStatus("FAILURE")
+    if status == "SUCCESS":
         new_status_dict = {}
         error_in_loop = False
         for count in range(0,activate_deactivate_max_count):
             print "\n########## Iteration :{} ##########\n".format(count+1)
             result_dict = {}
-            for inner_count in range(0,2):
+            for inner_count in range (0,2):
                 print "\n##### Inner iteration : {}.{} #####\n".format(count+1,inner_count+1)
                 for plugin in curr_plugins_status_dict:
-                    if curr_plugins_status_dict[plugin] == "deactivated" :
-                        new_status_dict[plugin] = 'activate'
-                    else:
-                        new_status_dict[plugin] = 'deactivate'
-                for plugin in new_status_dict:
-                    if new_status_dict[plugin] == 'activate':
+                    if curr_plugins_status_dict[plugin] == "deactivated":
+                        new_status_dict[plugin] = "activate"
                         expected_status = ['activated','resumed']
                     else:
+                        new_status_dict[plugin] = "deactivate"
                         expected_status = ['deactivated']
                     print "\n Setting {} plugin to {} \n".format(plugin,new_status_dict[plugin])
                     tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
@@ -163,26 +187,7 @@ if expectedResult in result.upper():
                     break
             if error_in_loop:
                 break
-            print "\n##### Inner iterations for  activation and deactivation of plugins completed ##### \n"
-            #check status of controller
-            print "\n ##### Checking current status of Controller plugin #####\n"
-            tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus')
-            tdkTestObj.addParameter("plugin","Controller")
-            tdkTestObj.executeTestCase(expectedResult)
-            result = tdkTestObj.getResult()
-            if result == "SUCCESS":
-                status = tdkTestObj.getResultDetails()
-                print "\n Current status of Controller plugin : {}\n".format(status)
-                if status == "activated":
-                    tdkTestObj.setResultStatus("SUCCESS")
-                else:
-                    print "Controller plugin is not in activated state, current status: ",status
-                    tdkTestObj.setResultStatus("FAILURE")
-                    break
-            else:
-                print "Error while getting status of Controller plugin"
-                tdkTestObj.setResultStatus("FAILURE")
-                break
+            print "\n##### Inner iterations for  activation and deactivation of plugin completed ##### \n"
             print "\n ##### Validating CPU load and memory usage #####\n"
             tdkTestObj = obj.createTestStep('rdkservice_getCPULoad')
             tdkTestObj.executeTestCase(expectedResult)
@@ -241,13 +246,14 @@ if expectedResult in result.upper():
         cpu_mem_info_dict["cpuMemoryDetails"] = result_dict_list
         json.dump(cpu_mem_info_dict,json_file)
         json_file.close()
+        #Revert the values
+        curr_plugins_status_dict[device_info] = device_info_status
+        if initial_status_dict != curr_plugins_status_dict:
+            print "\n Revert the values before exiting"
+            status = set_plugins_status(obj,initial_status_dict)
     else:
-        print "\n[Error] Please configure the plugins !!!\n"
+        print "\n Preconditions are not met\n"
         obj.setLoadModuleStatus("FAILURE")
-    #Revert the values
-    if revert=="YES":
-        print "\n Revert the values before exiting"
-        status = set_plugins_status(obj,device_info_status_dict)
     obj.unloadModule("rdkv_stability");
 else:
     print "Failed to load module"
