@@ -94,9 +94,7 @@ animation_duration:int</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
-from BrowserPerformanceUtility import *
-from rdkv_performancelib import *
-from web_socket_util import *
+from rdkv_medialib import *
 import MediaValidationVariables
 from MediaValidationUtility import *
 
@@ -116,37 +114,14 @@ print "[LIB LOAD STATUS]  :  %s" %result;
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    appURL    = MediaValidationVariables.lightning_objects_animation_test_app_url
-    # Setting Animation test app URL arguments
-    setURLArgument("ip",ip)
-    setURLArgument("port",MediaValidationVariables.thunder_port)
-    setURLArgument("object","Rect,Text,Image")
-    setURLArgument("text","demo")
-    setURLArgument("showfps","true")
-    setURLArgument("count",MediaValidationVariables.objects_count)
-    setURLArgument("duration",MediaValidationVariables.animation_duration)
-    setURLArgument("autotest","true")
-    appArguments = getURLArguments()
-    # Getting the complete test app URL
-    animation_test_url = getTestURL(appURL,appArguments)
-
-    print "Check Pre conditions"
-    #No need to revert any values if the pre conditions are already set.
-    revert="NO"
-    status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
-    print "Current values \nWebKitBrowser:%s\nCobalt:%s"%(curr_webkit_status,curr_cobalt_status);
-    if status == "FAILURE":
-        set_pre_requisites(obj)
-        #Need to revert the values since we are changing plugin status
-        revert="YES"
-        status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
-    #Check residentApp status and deactivate if its activated
-    check_status,resapp_status,resapp_revert,resapp_url = checkAndDeactivateResidentApp(obj)
-    #Reading the FPS and threshold for FPS from the device config file
+    print "\nCheck Pre conditions..."
+    tdkTestObj = obj.createTestStep('rdkv_media_pre_requisites');
+    tdkTestObj.executeTestCase(expectedResult);
+    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,False)
     config_status = "SUCCESS"
-    conf_file,result = getConfigFileName(obj.realpath)
-    result1, expected_fps  = getDeviceConfigKeyValue(conf_file,"EXPECTED_FPS")
-    result2, threshold     = getDeviceConfigKeyValue(conf_file,"FPS_THRESHOLD")
+    conf_file,result = getDeviceConfigFile(obj.realpath)
+    result1, expected_fps  = readDeviceConfigKeyValue(conf_file,"EXPECTED_FPS")
+    result2, threshold     = readDeviceConfigKeyValue(conf_file,"FPS_THRESHOLD")
     if "SUCCESS" in result1 and "SUCCESS" in result2:
         if expected_fps == "" and threshold == "":
             config_status = "FAILURE"
@@ -154,105 +129,68 @@ if expectedResult in result.upper():
     else:
         config_status = "FAILURE"
         print "Failed to get the FPS value & threshold value from device config file"
-    if status == "SUCCESS" and config_status == "SUCCESS" and check_status == "SUCCESS":
-        print "\nPre conditions for the test are set successfully";
-        print "\nGet the URL in WebKitBrowser"
-        tdkTestObj = obj.createTestStep('rdkservice_getValue');
-        tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-        tdkTestObj.executeTestCase(expectedResult);
-        result = tdkTestObj.getResult()
-        current_url = tdkTestObj.getResultDetails();
-        if current_url != None and expectedResult in result:
-            tdkTestObj.setResultStatus("SUCCESS");
-            webkit_console_socket = createEventListener(ip,MediaValidationVariables.webinspect_port,[],"/devtools/page/1",False)
-            time.sleep(10)
-            print "Current URL:",current_url
-            print "\nSet Lightning Objects Animation test app URL"
-            tdkTestObj = obj.createTestStep('rdkservice_setValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.addParameter("value",animation_test_url);
+    if pre_requisite_status == "SUCCESS" and config_status == "SUCCESS":
+        tdkTestObj.setResultStatus("SUCCESS");
+        print "Pre conditions for the test are set successfully"
+
+        print "\nSet Lightning animation test app url..."
+        #Setting device config file
+        setDeviceConfigFile(conf_file)
+        appURL    = MediaValidationVariables.lightning_objects_animation_test_app_url
+        # Setting Animation test app URL arguments
+        setURLArgument("ip",ip)
+        setURLArgument("port",MediaValidationVariables.thunder_port)
+        setURLArgument("object","Rect,Text,Image")
+        setURLArgument("text","demo")
+        setURLArgument("showfps","true")
+        setURLArgument("count",MediaValidationVariables.objects_count)
+        setURLArgument("duration",MediaValidationVariables.animation_duration)
+        setURLArgument("autotest","true")
+        appArguments = getURLArguments()
+        # Getting the complete test app URL
+        animation_test_url = getTestURL(appURL,appArguments)
+
+        launch_status = launchPlugin(obj,"WebKitBrowser",animation_test_url)
+        if "SUCCESS" in launch_status:
+            test_result,average_fps = monitorAnimationTest(obj,webkit_console_socket,"Average FPS");
+            tdkTestObj = obj.createTestStep('rdkv_media_test');
             tdkTestObj.executeTestCase(expectedResult);
-            result = tdkTestObj.getResult();
-            if expectedResult in result:
-                print "\nValidate if the URL is set successfully or not"
-                tdkTestObj = obj.createTestStep('rdkservice_getValue');
-                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-                tdkTestObj.executeTestCase(expectedResult);
-                result= tdkTestObj.getResult()
-                new_url = tdkTestObj.getResultDetails();
-                if new_url in animation_test_url and expectedResult in result:
+            minfps = float(int(expected_fps) - int(threshold))
+            if "SUCCESS" in test_result:
+                print "Obtained Average FPS =",average_fps
+                if "NaN" in str(average_fps):
+                    print "Failed to get the average FPS Value"
+                    print "[TEST EXECUTION RESULT]: FAILURE"
+                    tdkTestObj.setResultStatus("FAILURE");
+                elif float(average_fps) >= minfps:
+                    print "Average FPS is >= %f" %(minfps)
+                    print "%d Text Strings are rendered for around 60 sec and average FPS is as expected" %(MediaValidationVariables.objects_count)
+                    print "[TEST EXECUTION RESULT]: SUCCESS"
                     tdkTestObj.setResultStatus("SUCCESS");
-                    print "URL(",new_url,") is set successfully"
-                    continue_count = 0
-                    test_result = ""
-                    average_fps = 0
-                    app_progress = 1
-                    minfps = float(int(expected_fps) - int(threshold))
-                    while True:
-                        if continue_count > 60:
-                            app_progress = 0
-                            print "\nApp not proceeding for 1 min. Exiting..."
-                            break
-                        if (len(webkit_console_socket.getEventsBuffer())== 0):
-                            time.sleep(1)
-                            continue_count += 1
-                            continue
-                        else:
-                            continue_count = 0
-                        console_log = webkit_console_socket.getEventsBuffer().pop(0)
-                        dispConsoleLog(console_log)
-                        if "Average FPS" in console_log:
-                            average_fps = getConsoleMessage(console_log).split("[DiagnosticInfo]:")[1].split(":")[1]
-                        if "TEST COMPLETED" in console_log or "Connection refused" in console_log:
-                            test_result = getConsoleMessage(console_log)
-                            break;
-                    webkit_console_socket.disconnect()
-                    print "Obtained Average FPS =",average_fps
-                    if "NaN" in str(average_fps) or app_progress == 0:
-                        print "Failed to get the average FPS Value"
-                        print "[TEST EXECUTION RESULT]: FAILURE"
-                        tdkTestObj.setResultStatus("FAILURE");
-                    elif float(average_fps) >= minfps:
-                        print "Average FPS is >= %f" %(minfps)
-                        print "%d Text Strings are rendered for around 60 sec and average FPS is as expected" %(MediaValidationVariables.objects_count)
-                        print "[TEST EXECUTION RESULT]: SUCCESS"
-                        tdkTestObj.setResultStatus("SUCCESS");
-                    else:
-                        print "Average FPS is < %f" %(minfps)
-                        print "%d Text Strings rendered for around 60 sec and average FPS is not as expected" %(MediaValidationVariables.objects_count)
-                        print "[TEST EXECUTION RESULT]: FAILURE"
-                        tdkTestObj.setResultStatus("FAILURE");
-                    #Set the URL back to previous
-                    tdkTestObj = obj.createTestStep('rdkservice_setValue');
-                    tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-                    tdkTestObj.addParameter("value",current_url);
-                    tdkTestObj.executeTestCase(expectedResult);
-                    result = tdkTestObj.getResult();
-                    if result == "SUCCESS":
-                        print "URL is reverted successfully"
-                        tdkTestObj.setResultStatus("SUCCESS");
-                    else:
-                        print "Failed to revert the URL"
-                        tdkTestObj.setResultStatus("FAILURE");
                 else:
-                    print "Failed to load the URL %s" %(new_url)
+                    print "Average FPS is < %f" %(minfps)
+                    print "%d Text Strings rendered for around 60 sec and average FPS is not as expected" %(MediaValidationVariables.objects_count)
+                    print "[TEST EXECUTION RESULT]: FAILURE"
                     tdkTestObj.setResultStatus("FAILURE");
             else:
                 tdkTestObj.setResultStatus("FAILURE");
-                print "Failed to set the URL"
+
+            print "\nSet post conditions..."
+            tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
+            tdkTestObj.executeTestCase(expectedResult);
+            post_requisite_status = setMediaTestPostRequisites(obj)
+            if post_requisite_status == "SUCCESS":
+                print "Post conditions for the test are set successfully\n"
+                tdkTestObj.setResultStatus("SUCCESS");
+            else:
+                print "Post conditions are not met\n"
+                tdkTestObj.setResultStatus("FAILURE");
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Unable to get the current URL loaded in webkit"
+            print "Unable to load the Animation Test URL in Webkit\n"
     else:
-        print "Pre conditions are not met"
-        obj.setLoadModuleStatus("FAILURE");
-    #Revert the values
-    if revert=="YES":
-        print "Revert the values before exiting"
-        status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
-    if resapp_revert=="YES":
-        setURLAndActivateResidentApp(obj,resapp_url)
-        time.sleep(10)
+        print "Pre conditions are not met\n"
+        tdkTestObj.setResultStatus("FAILURE");
     obj.unloadModule("rdkv_media");
 else:
     obj.setLoadModuleStatus("FAILURE");

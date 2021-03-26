@@ -393,9 +393,11 @@ export default class App extends Lightning.Component {
 
   // Method to open the video player with the video URL
   loadVideoPlayer(){
-    if (this.urlType == "hls"){
+    if (this.urlType == "hls" && this.usehlslib){
         this.registerEvents();
         this.tag('VideoPlayer').openHls(this.videoURL)
+    }else if (this.urlType == "hls" && ! this.usehlslib){
+        this.tag('VideoPlayer').open(this.videoURL)
     }else if (this.urlType == "dash" && this.usedashlib){
         this.registerEvents();
         this.tag('VideoPlayer').openDash(this.videoURL)
@@ -650,6 +652,7 @@ export default class App extends Lightning.Component {
     this.message2 = ""
     this.init     = 0
     this.usedashlib = false
+    this.usehlslib  = false
     this.interval = 1000
     this.checkInterval= 3000
     this.seekInterval = 10
@@ -715,6 +718,11 @@ export default class App extends Lightning.Component {
          if (dashlib == "yes" || dashlib == "YES")
            this.usedashlib = true;
       }
+      else if(item.includes("useHlslib")){
+         var hlslib = item.split('(')[1].split(')')[0]
+         if (hlslib == "yes" || hlslib == "YES")
+           this.usehlslib = true;
+      }
     });
 
     this.loadVideoPlayer();
@@ -723,3 +731,4 @@ export default class App extends Lightning.Component {
   }
 
 }
+

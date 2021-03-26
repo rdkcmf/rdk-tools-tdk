@@ -25,6 +25,8 @@ import MediaValidationVariables
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common import exceptions
+from rdkv_performancelib import getDeviceConfigKeyValue
+from SSHUtility import *
 
 deviceIP=""
 devicePort=""
@@ -45,6 +47,101 @@ def init_module(libobj,port,deviceInfo):
     deviceName = deviceInfo["devicename"]
     deviceType = deviceInfo["boxtype"]
 
+
+def rdkv_media_pre_requisites():
+    return "SUCCESS"
+def rdkv_media_test():
+    return "SUCCESS"
+def rdkv_media_post_requisites():
+    return "SUCCESS"
+
+#----------------------------------------------------------------------
+#GET THE NAME OF DEVICE CONFIG FILE
+#----------------------------------------------------------------------
+def getDeviceConfigFile(basePath):
+    deviceConfigFile=""
+    status ="SUCCESS"
+    configPath = basePath + "/"   + "fileStore/tdkvRDKServiceConfig"
+    deviceNameConfigFile = configPath + "/" + deviceName + ".config"
+    deviceTypeConfigFile = configPath + "/" + deviceType + ".config"
+    # Check whether device / platform config files required for
+    # executing the test are present
+    if os.path.exists(deviceNameConfigFile) == True:
+        deviceConfigFile = deviceNameConfigFile
+        print "[INFO]: Using Device config file: %s" %(deviceNameConfigFile)
+    elif os.path.exists(deviceTypeConfigFile) == True:
+        deviceConfigFile = deviceTypeConfigFile
+        print "[INFO]: Using Device config file: %s" %(deviceTypeConfigFile)
+    else:
+        status = "FAILURE"
+        print "[ERROR]: No Device config file found : %s or %s" %(deviceNameConfigFile,deviceTypeConfigFile)
+    return deviceConfigFile,status;
+
+
+#-------------------------------------------------------------------
+# Function to read the proc validation parameters from device config file
+#-------------------------------------------------------------------
+def rdkv_media_getProcCheckInfo(realpath,procfile):
+    validation_dict = {}
+    print "\n Reading proc validation params from conf file..."
+    conf_file,result = getDeviceConfigFile(realpath)
+    result, proc_check = getDeviceConfigKeyValue(conf_file,"VALIDATION_REQ")
+    if result == "SUCCESS":
+        if proc_check == "NO":
+            validation_dict["proc_check"] = False
+        else:
+            validation_dict["proc_check"] = True
+            result,validation_dict["ssh_method"]    = getDeviceConfigKeyValue(conf_file,"SSH_METHOD")
+            if validation_dict["ssh_method"] == "directSSH":
+                validation_dict["host_name"] = deviceIP
+                result,validation_dict["user_name"] = getDeviceConfigKeyValue(conf_file,"SSH_USERNAME")
+                result,validation_dict["password"]  = getDeviceConfigKeyValue(conf_file,"SSH_PASSWORD")
+                if validation_dict["password"] == "None":
+                    password = ""
+                else:
+                    password = validation_dict["password"]
+                credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+                validation_dict["credentials"] = credentials
+            else:
+                #TODO
+                print "selected ssh method is {}".format(validation_dict["ssh_method"])
+                pass
+            result,validation_dict["proc_file"] = getDeviceConfigKeyValue(conf_file,procfile)
+    else:
+        print "Failed to get the validation parameters from config file, please configure values before test"
+    if any(value == "" for value in validation_dict.itervalues()):
+        print "please configure validation parameters before test"
+        validation_dict = {}
+    return validation_dict
+
+
+#-------------------------------------------------------------------
+# Function to check required pattern in proc entry file
+#-------------------------------------------------------------------
+def rdkv_media_checkProcEntry(sshMethod,credentials,procfile,pattern):
+    result_val = "FAILURE"
+    if sshMethod == "directSSH":
+        credentials_list = credentials.split(',')
+        host_name = credentials_list[0]
+        user_name = credentials_list[1]
+        password = credentials_list[2]
+    else:
+        #TODO
+        print "Secure ssh to CPE"
+        pass
+    command = "cat " + str(procfile)
+    output = ssh_and_execute(sshMethod,host_name,user_name,password,command)
+    output_list =  output.split('\n')
+    for item in output_list:
+        if pattern in item:
+            print item
+            result_val = "SUCCESS"
+    if result_val == "SUCCESS":
+        print "Expected data is found in the proc file\n"
+    else:
+        print "Expected data is not found in the proc file\n"
+
+    return result_val
 
 #-------------------------------------------------------------------
 #SET WEBDRIVER AND OPEN CHROME BROWSER
@@ -107,4 +204,6 @@ def rdkv_media_readUIData(elementExpandXpath,dataXpath,count):
         ui_data = "Unable to get the data from the web UI"
         driver.quit()
    return ui_data
+
+
 

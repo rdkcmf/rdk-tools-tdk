@@ -92,9 +92,7 @@ seekbwd_check_interval:int</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
-from BrowserPerformanceUtility import *
-from rdkv_performancelib import *
-from web_socket_util import *
+from rdkv_medialib import *
 import MediaValidationVariables
 from MediaValidationUtility import *
 
@@ -114,155 +112,77 @@ print "[LIB LOAD STATUS]  :  %s" %result;
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    appURL    = MediaValidationVariables.lightning_video_test_app_url
-    videoURL  = MediaValidationVariables.video_src_url_hls
-    seekInterval  = str(MediaValidationVariables.seekbwd_interval)
-    checkInterval = str(MediaValidationVariables.seekbwd_check_interval)
-    # Setting VideoPlayer Operations
-    # play for some duration and start seek backward
-    setOperation("seekbwd","300")
-    setOperation("repeat","1")
-    setOperation("seekbwd",MediaValidationVariables.operation_max_interval)
-    setOperation("repeat",MediaValidationVariables.repeat_count_stress)
-    operations = getOperations()
-    # Setting VideoPlayer test app URL arguments
-    setURLArgument("url",videoURL)
-    setURLArgument("options","seekInterval("+seekInterval+"),checkInterval("+checkInterval+")")
-    setURLArgument("operations",operations)
-    setURLArgument("autotest","true")
-    setURLArgument("type","hls")
-    appArguments = getURLArguments()
-    # Getting the complete test app URL
-    video_test_url = getTestURL(appURL,appArguments)
+    print "\nCheck Pre conditions..."
+    tdkTestObj = obj.createTestStep('rdkv_media_pre_requisites');
+    tdkTestObj.executeTestCase(expectedResult);
+    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj)
+    if pre_requisite_status == "SUCCESS":
+        tdkTestObj.setResultStatus("SUCCESS");
+        print "Pre conditions for the test are set successfully"
 
-    #Example video test url
-    #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
-    #url=<video_url>.m3u8&operations=seekbwd(180),repeat(1),seekbwd(10),repat(15)&options=seekInterval(20)&autotest=true&type=hls
+        print "\nSet Lightning video player test app url..."
+        #Setting device config file
+        conf_file,result = getDeviceConfigFile(obj.realpath)
+        setDeviceConfigFile(conf_file)
+        appURL    = MediaValidationVariables.lightning_video_test_app_url
+        videoURL  = MediaValidationVariables.video_src_url_hls
+        seekInterval  = str(MediaValidationVariables.seekbwd_interval)
+        checkInterval = str(MediaValidationVariables.seekbwd_check_interval)
+        # Setting VideoPlayer Operations
+        # play for some duration and start seek backward
+        setOperation("seekbwd","300")
+        setOperation("repeat","1")
+        setOperation("seekbwd",MediaValidationVariables.operation_max_interval)
+        setOperation("repeat",MediaValidationVariables.repeat_count_stress)
+        operations = getOperations()
+        # Setting VideoPlayer test app URL arguments
+        setURLArgument("url",videoURL)
+        setURLArgument("options","seekInterval("+seekInterval+"),checkInterval("+checkInterval+")")
+        setURLArgument("operations",operations)
+        setURLArgument("autotest","true")
+        setURLArgument("type","hls")
+        appArguments = getURLArguments()
+        # Getting the complete test app URL
+        video_test_url = getTestURL(appURL,appArguments)
 
-    print "Check Pre conditions"
-    #No need to revert any values if the pre conditions are already set.
-    revert="NO"
-    status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
-    print "Current values \nUX:%s\nWebKitBrowser:%s\nCobalt:%s"%(curr_ux_status,curr_webkit_status,curr_cobalt_status);
-    if status == "FAILURE":
-        set_pre_requisites(obj)
-        #Need to revert the values since we are changing plugin status
-        revert="YES"
-        status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
-    #Check residentApp status and deactivate if its activated
-    check_status,resapp_status,resapp_revert,resapp_url = checkAndDeactivateResidentApp(obj)
-    #Checking whether device supports proc entry validation. If supported, get
-    #device information to access and read the proc file
-    validation_dict = getProcValidationParams(obj,"VIDEO_PROC_FILE")
-    if status == "SUCCESS" and validation_dict != {} and check_status == "SUCCESS":
-        print "\nPre conditions for the test are set successfully";
-        print "\nGet the URL in WebKitBrowser"
-        tdkTestObj = obj.createTestStep('rdkservice_getValue');
-        tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-        tdkTestObj.executeTestCase(expectedResult);
-        current_url = tdkTestObj.getResultDetails();
-        result = tdkTestObj.getResult()
-        if current_url != None and expectedResult in result:
-            tdkTestObj.setResultStatus("SUCCESS");
-            webkit_console_socket = createEventListener(ip,MediaValidationVariables.webinspect_port,[],"/devtools/page/1",False)
-            time.sleep(10)
-            print "Current URL:",current_url
-            print "\nSet Lightning video player test app URL"
-            tdkTestObj = obj.createTestStep('rdkservice_setValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-            tdkTestObj.addParameter("value",video_test_url);
+        #Example video test url
+        #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
+        #url=<video_url>.m3u8&operations=seekbwd(180),repeat(1),seekbwd(10),repat(15)&options=seekInterval(20)&autotest=true&type=hls
+
+        launch_status = launchPlugin(obj,"WebKitBrowser",video_test_url)
+        if "SUCCESS" in launch_status:
+            test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Video Player Playing");
+            tdkTestObj = obj.createTestStep('rdkv_media_test');
             tdkTestObj.executeTestCase(expectedResult);
-            result = tdkTestObj.getResult();
-            if expectedResult in result:
-                print "\nValidate if the URL is set successfully or not"
-                tdkTestObj = obj.createTestStep('rdkservice_getValue');
-                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-                tdkTestObj.executeTestCase(expectedResult);
-                new_url = tdkTestObj.getResultDetails();
-                result = tdkTestObj.getResult()
-                if new_url in video_test_url and expectedResult in result:
-                    tdkTestObj.setResultStatus("SUCCESS");
-                    print "URL(",new_url,") is set successfully"
-                    if validation_dict["proc_check"]:
-                        proc_file = validation_dict["proc_file"]
-                        if validation_dict["ssh_method"] == "directSSH":
-                            if validation_dict["password"] == "None":
-                                password = ""
-                            else:
-                                password = validation_dict["password"]
-                            credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
-                        else:
-                            #TODO
-                            print "selected ssh method is {}".format(validation_dict["ssh_method"])
-                            pass
-                        print "\nProc entry validation for video player test is enabled\n"
-                    else:
-                        print "\nProc entry validation for video player test is skipped\n"
-                    continue_count = 0
-                    test_result = ""
-                    proc_check_list = []
-                    while True:
-                        if continue_count > 60:
-                            print "\nApp not proceeding for 1 min. Exiting..."
-                            break
-                        if (len(webkit_console_socket.getEventsBuffer())== 0):
-                            time.sleep(1)
-                            continue_count += 1
-                            continue
-                        else:
-                            continue_count = 0
-                        console_log = webkit_console_socket.getEventsBuffer().pop(0)
-                        dispConsoleLog(console_log)
-                        if "Video Player Playing" in console_log and validation_dict["proc_check"]:
-                            proc_check_list.append(checkProcEntry(validation_dict["ssh_method"],credentials,proc_file,"started"));
-                            time.sleep(1);
-                        if "TEST RESULT:" in console_log or "Connection refused" in console_log:
-                            test_result = getConsoleMessage(console_log)
-                            break;
-                    webkit_console_socket.disconnect()
-                    if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
-                        print "Video play is fine"
-                        print "[TEST EXECUTION RESULT]: SUCCESS"
-                        tdkTestObj.setResultStatus("SUCCESS");
-                    elif "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
-                        print "Decoder proc entry check returns failure.Video not playing fine"
-                        print "[TEST EXECUTION RESULT]: FAILURE"
-                        tdkTestObj.setResultStatus("FAILURE");
-                    else:
-                        print "Video not playing fine"
-                        print "[TEST EXECUTION RESULT]: FAILURE"
-                        tdkTestObj.setResultStatus("FAILURE");
-                    #Set the URL back to previous
-                    tdkTestObj = obj.createTestStep('rdkservice_setValue');
-                    tdkTestObj.addParameter("method","WebKitBrowser.1.url");
-                    tdkTestObj.addParameter("value",current_url);
-                    tdkTestObj.executeTestCase(expectedResult);
-                    result = tdkTestObj.getResult();
-                    if result == "SUCCESS":
-                        print "URL is reverted successfully"
-                        tdkTestObj.setResultStatus("SUCCESS");
-                    else:
-                        print "Failed to revert the URL"
-                        tdkTestObj.setResultStatus("FAILURE");
-                else:
-                    print "Failed to load the URL %s" %(new_url)
-                    tdkTestObj.setResultStatus("FAILURE");
-            else:
+            if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
+                print "Video play is fine"
+                print "[TEST EXECUTION RESULT]: SUCCESS"
+                tdkTestObj.setResultStatus("SUCCESS");
+            elif "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
+                print "Decoder proc entry check returns failure.Video not playing fine"
+                print "[TEST EXECUTION RESULT]: FAILURE"
                 tdkTestObj.setResultStatus("FAILURE");
-                print "Failed to set the URL"
+            else:
+                print "Video not playing fine"
+                print "[TEST EXECUTION RESULT]: FAILURE"
+                tdkTestObj.setResultStatus("FAILURE");
+
+            print "\nSet post conditions..."
+            tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
+            tdkTestObj.executeTestCase(expectedResult);
+            post_requisite_status = setMediaTestPostRequisites(obj)
+            if post_requisite_status == "SUCCESS":
+                print "Post conditions for the test are set successfully\n"
+                tdkTestObj.setResultStatus("SUCCESS");
+            else:
+                print "Post conditions are not met\n"
+                tdkTestObj.setResultStatus("FAILURE");
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Unable to get the current URL loaded in webkit"
+            print "Unable to load the video Test URL in Webkit\n"
     else:
-        print "Pre conditions are not met"
-        obj.setLoadModuleStatus("FAILURE");
-    #Revert the values
-    if revert=="YES":
-        print "Revert the values before exiting"
-        status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
-    if resapp_revert=="YES":
-        setURLAndActivateResidentApp(obj,resapp_url)
-        time.sleep(10)
+        print "Pre conditions are not met\n"
+        tdkTestObj.setResultStatus("FAILURE");
     obj.unloadModule("rdkv_media");
 else:
     obj.setLoadModuleStatus("FAILURE");

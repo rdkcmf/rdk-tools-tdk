@@ -13,7 +13,7 @@
  limitations under the License.
 -->
 
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xml>
   <module testGroup="Certification" name="rdkv_media">
     <primitiveTests>
@@ -27,6 +27,30 @@
           <parameter name="count" value=""/>
           <parameter name="dataXpath" value=""/>
           <parameter name="elementExpandXpath" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkv_media_pre_requisites" id="" version="1">
+        <function>rdkv_media_pre_requisites</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkv_media_post_requisites" id="" version="1">
+        <function>rdkv_media_post_requisites</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkv_media_getProcCheckInfo" id=" " version="1">
+        <function>rdkv_media_getProcCheckInfo</function>
+        <parameters>
+          <parameter name="procfile" value=""/>
+          <parameter name="realpath" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkv_media_checkProcEntry" id=" " version="1">
+        <function>rdkv_media_checkProcEntry</function>
+        <parameters>
+          <parameter name="credentials" value=""/>
+          <parameter name="pattern" value=""/>
+          <parameter name="procfile" value=""/>
+          <parameter name="sshMethod" value=""/>
         </parameters>
       </primitiveTest>
     </primitiveTests>
