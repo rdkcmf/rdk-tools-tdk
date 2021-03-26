@@ -16,22 +16,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###########################################################################
-
 import sys
-import urllib2
-from StringIO import StringIO
+import requests
+import json
+
 if ( (len(sys.argv)) != 3):
         print "Usage : python " + sys.argv[0] + " Device_IP_Address Thunder_Port"
         print "eg    : python " + sys.argv[0] + " 192.168.160.229 9998"
         exit()
 else:
+    data = '{"jsonrpc":"2.0","id":"3","method": "Controller.1.status@Controller"}'
+    headers = {'content-type': 'text/plain;',}
+    url = 'http://'+sys.argv[1]+':'+sys.argv[2]+'/jsonrpc'
+
     try:
-        url = 'http://'+sys.argv[1]+':'+sys.argv[2]+'/jsonrpc'
-        statusCode = urllib2.urlopen(url,timeout=3).getcode()
-        if statusCode == 200:
-                print "FREE"
+        response = requests.post(url, headers=headers, data=data, timeout=3)
+        if response.status_code == 200:
+            print "FREE"
         else:
-                print "NOT_FOUND"
-    except:
-        e = sys.exc_info()
+            print "NOT_FOUND"
+
+    except Exception as e:
         print "NOT_FOUND"
