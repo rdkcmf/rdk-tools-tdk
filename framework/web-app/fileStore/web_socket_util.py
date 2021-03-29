@@ -23,6 +23,8 @@ import thread
 import requests
 import json,ast
 import inspect
+from datetime import datetime
+
 #-----------------------------------------------------------------------------------------------
 #               ***  RDK SERVICES VALIDATION FRAMEWORK SUPPORTING FUNCTIONS ***
 #-----------------------------------------------------------------------------------------------
@@ -41,7 +43,8 @@ class createEventListener(object):
         self.listenflag = False
         self.eventsbuffer = []
         self.eventsregisterinfo = []
-	self.events = ['{"id":1,"method":"Inspector.enable"}','{"id":22,"method":"Console.enable"}','{"id":23,"method":"Inspector.initialized"}']
+        if not events:
+	    self.events = ['{"id":1,"method":"Inspector.enable"}','{"id":22,"method":"Console.enable"}','{"id":23,"method":"Inspector.initialized"}']
 	self.firstElement = None
     def getEventsRegisterInfo(self):
         return self.eventsregisterinfo
@@ -100,6 +103,8 @@ class createEventListener(object):
         thread.start_new_thread(run, ())
 
     def on_message(self,message):
+        if ("method" in message) and "client.events" in json.loads(message).get("method"):
+            message = str(datetime.utcnow()).split()[1] + '$$$' + message
         if self.trace:
             print "\n Received Event Response: %s" %(message)
         if "\\" in message:
