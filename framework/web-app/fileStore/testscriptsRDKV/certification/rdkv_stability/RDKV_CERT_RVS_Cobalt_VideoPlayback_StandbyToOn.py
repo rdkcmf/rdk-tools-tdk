@@ -92,6 +92,8 @@ CPU load and memory usage must be within the expected limit.</expected_output>
 import tdklib; 
 from StabilityTestUtility import *
 import StabilityTestVariables
+from web_socket_util import *
+import PerformanceTestVariables
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_stability","1",standAlone=True);
@@ -114,16 +116,18 @@ print "[LIB LOAD STATUS]  :  %s" %result;
 obj.setLoadModuleStatus(result);
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
+    thunder_port = PerformanceTestVariables.thunder_port
     cobalt_test_url = StabilityTestVariables.cobalt_test_url;
     print "Check Pre conditions"
+    event_listener = None
     if cobalt_test_url == "":
         print "\n Please configure the cobalt_test_url value\n"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    plugins_list = ["WebKitBrowser","Cobalt","DeviceInfo"]
+    plugins_list = ["WebKitBrowser","Cobalt","DeviceInfo","org.rdk.System"]
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
     status = "SUCCESS"
-    plugin_status_needed = {"WebKitBrowser":"deactivated","Cobalt":"deactivated","DeviceInfo":"activated"}
+    plugin_status_needed = {"WebKitBrowser":"deactivated","Cobalt":"deactivated","DeviceInfo":"activated","org.rdk.System":"activated"}
     if curr_plugins_status_dict != plugin_status_needed:
         revert = "YES"
         status = set_plugins_status(obj,plugin_status_needed)
@@ -131,47 +135,17 @@ if expectedResult in result.upper():
         if plugins_status_dict != plugin_status_needed:
             status = "FAILURE"
     validation_dict = get_validation_params(obj)
-    conf_file,result = getConfigFileName(obj.realpath)
-    result, ssh_required = getDeviceConfigKeyValue(conf_file,"SSH_VALIDATION")
-    if ssh_required.upper() == "YES":
-        tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
-        tdkTestObj.addParameter("realpath",obj.realpath)
-        tdkTestObj.addParameter("deviceIP",obj.IP)
-        tdkTestObj.executeTestCase(expectedResult)
-        ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
-        result = tdkTestObj.getResult()
-        if expectedResult in result and ssh_param_dict != {}:
-            tdkTestObj.setResultStatus("SUCCESS")
-            if ssh_param_dict["ssh_method"] == "directSSH":
-                if ssh_param_dict["password"] == "None":
-                    password = ""
-                else:
-                    password = ssh_param_dict["password"]
-                ssh_credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
-            else:
-                #TODO
-                print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
-                pass
-        else:
-            tdkTestObj.setResultStatus("FAILURE")
-            status = "FAILURE"
-    if status == "SUCCESS" and validation_dict != {} and cobalt_test_url != "" and ssh_required != "":
+    if status == "SUCCESS" and validation_dict != {} and cobalt_test_url != "":
+        event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.System.1.register","params": {"event": "onSystemPowerStateChanged", "id": "client.events.1" }}'],"/jsonrpc",False)
+        time.sleep(5)
         print "\nPre conditions for the test are set successfully \n"
         if validation_dict["validation_required"]:
             if validation_dict["validation_method"] == "proc_entry":
-                if validation_dict["ssh_method"] == "directSSH":
-                    if ssh_required.upper() == "YES":
-                        credentials = ssh_credentials
-                    else:
-                        if validation_dict["password"] == "None":
-                            password = ""
-                        else:
-                            password = validation_dict["password"]
-                        credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+                if validation_dict["password"] == "None":
+                    password = ""
                 else:
-                    #TODO
-                    print "selected ssh method is {}".format(validation_dict["ssh_method"])
-                    pass
+                    password = validation_dict["password"]
+                credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
             else:
                 print "\n Validation method other than proc_entry is currently not supported \n"
                 validation_dict["validation_required"] = False
@@ -273,8 +247,27 @@ if expectedResult in result.upper():
                                             tdkTestObj.executeTestCase(expectedResult);
                                             result = tdkTestObj.getResult();
                                             if expectedResult in result:
-                                                tdkTestObj.setResultStatus("SUCCESS")
                                                 time.sleep(10)
+                                                continue_count = 0
+                                                while True:
+                                                    if (continue_count > 60):
+                                                        break
+                                                    if (len(event_listener.getEventsBuffer())== 0):
+                                                        continue_count += 1
+                                                        time.sleep(1)
+                                                        continue
+                                                    event_log = event_listener.getEventsBuffer().pop(0)
+                                                    print "\n Triggered event: ",event_log
+                                                    if (new_power_state == "STANDBY" and "LIGHT_SLEEP" in event_log) or (new_power_state == "ON" and "ON" in event_log):
+                                                        print "onSystemPowerStateChanged event triggered while setting {} power state".format(new_power_state)
+                                                        break
+                                                    else:
+                                                       continue_count = 61
+                                                if continue_count > 60 :
+                                                    print "\n onSystemPowerStateChanged event is not triggered for power state: {} \n".format(power_states[i])
+                                                    tdkTestObj.setResultStatus("FAILURE")
+                                                    break
+                                                tdkTestObj.setResultStatus("SUCCESS")
                                                 print "\n Verify the Power state \n"
                                                 tdkTestObj = obj.createTestStep('rdkservice_getReqValueFromResult')
                                                 tdkTestObj.addParameter("method","org.rdk.System.1.getPowerState")
@@ -285,25 +278,6 @@ if expectedResult in result.upper():
                                                 if expectedResult in result and current_power_state == new_power_state:
                                                     print "\n Successfully set power state to : {}\n".format(new_power_state)
                                                     tdkTestObj.setResultStatus("SUCCESS")
-                                                    if ssh_required.upper() == "YES":
-                                                        #validate power statechange using wpeframework log
-                                                        command = 'cat /opt/logs/wpeframework.log | grep -inr "onSystemPowerStateChanged.*power state changed to.*" |  tail -1'
-                                                        tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
-                                                        tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
-                                                        tdkTestObj.addParameter("credentials",ssh_credentials)
-                                                        tdkTestObj.addParameter("command",command)
-                                                        tdkTestObj.executeTestCase(expectedResult)
-                                                        result = tdkTestObj.getResult()
-                                                        output = tdkTestObj.getResultDetails()
-                                                        if output != "EXCEPTION" and expectedResult in result and current_power_state in output:
-                                                            print "\n Log from wpeframework.log ",output.split("onSystemPowerStateChanged")[-1],"\n"
-                                                            tdkTestObj.setResultStatus("SUCCESS")
-                                                        else:
-                                                            print "\n Power state change related event prints are not available in wpeframework log \n"
-                                                            tdkTestObj.setResultStatus("FAILURE")
-                                                            break
-                                                    else:
-                                                        print "\n Validation using wpeframework.log file is skipped \n"
                                                     if current_power_state == "ON":
                                                         if validation_dict["validation_required"]:
                                                             time.sleep(20)
@@ -460,6 +434,8 @@ if expectedResult in result.upper():
         else:
             print "\n Unable to get Power state of DUT \n"
             tdkTestObj.setResultStatus("FAILURE")
+        event_listener.disconnect()
+        time.sleep(5)
     else:
         print "\n Pre conditions are not met \n"
         obj.setLoadModuleStatus("FAILURE");
