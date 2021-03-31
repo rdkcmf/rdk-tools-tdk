@@ -121,6 +121,15 @@
               <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
         </testCase>
-
+        <pluginPostRequisite>
+          <postrequisite requisiteId="1" requisiteName="Exit_Cobalt">
+            <testStep testStepId="1" name="Destroy_Application" method="DestroyApplication" pluginName="RDKShell">
+              <params>
+                <param tag="callsign"  value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+          </postrequisite>
+        </pluginPostRequisite>
 </testPlugin>
 
