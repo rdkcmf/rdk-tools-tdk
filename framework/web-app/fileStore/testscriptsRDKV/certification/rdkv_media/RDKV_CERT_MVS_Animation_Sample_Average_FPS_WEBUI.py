@@ -119,6 +119,9 @@ if expectedResult in result.upper():
     tdkTestObj = obj.createTestStep('rdkv_media_pre_requisites');
     tdkTestObj.executeTestCase(expectedResult);
     socketConnectionEnableDisable(False);
+    # Setting the pre-requites for media test. Launching the wekit browser via RDKShell and
+    # moving it to the front, openning a socket connection to the webkit inspect page and
+    # disabling proc validation
     pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,False)
     config_status = "SUCCESS"
     conf_file,result = getDeviceConfigFile(obj.realpath)
@@ -140,6 +143,7 @@ if expectedResult in result.upper():
         setDeviceConfigFile(conf_file)
         animation_test_url = MediaValidationVariables.sample_animation_test_url
 
+        # Setting the animation test url in webkit browser using RDKShell
         launch_status = launchPlugin(obj,"WebKitBrowser",animation_test_url)
         if "SUCCESS" in launch_status:
             tdkTestObj = obj.createTestStep('rdkv_media_readUIData');
@@ -181,6 +185,8 @@ if expectedResult in result.upper():
             print "\nSet post conditions..."
             tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
             tdkTestObj.executeTestCase(expectedResult);
+            # Setting the post-requites for media test.Removing app utl from webkit browser and
+            # moving residentApp to front if its active
             post_requisite_status = setMediaTestPostRequisites(obj)
             if post_requisite_status == "SUCCESS":
                 print "Post conditions for the test are set successfully\n"
