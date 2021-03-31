@@ -65,9 +65,8 @@ Time taken to launch UI from another window. should be within the expected limit
     <remarks/>
   </test_cases>
 </xml>
-
 '''
-# use tdklib library,which provides a wrapper for tdk testcase script 
+ # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
 from datetime import datetime
 import json
@@ -137,16 +136,11 @@ if expectedResult in result.upper():
                     result_val = ""
                     if validation_dict["validation_required"]:
                         if validation_dict["validation_method"] == "proc_entry":
-                            if validation_dict["ssh_method"] == "directSSH":
-                                if validation_dict["password"] == "None":
-                                    password = ""
-                                else:
-                                    password = validation_dict["password"]
-                                credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+                            if validation_dict["password"] == "None":
+                                password = ""
                             else:
-                                #TODO
-                                print "selected ssh method is {}".format(validation_dict["ssh_method"])
-                                pass
+                                password = validation_dict["password"]
+                            credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
                             print "\n check whether video is playing"
                             tdkTestObj = obj.createTestStep('rdkservice_validateProcEntry')
                             tdkTestObj.addParameter("sshmethod",validation_dict["ssh_method"])
@@ -176,21 +170,11 @@ if expectedResult in result.upper():
                         time.sleep(20)
                         if expectedResult in rdkshell_result:
                             tdkTestObj.setResultStatus("SUCCESS")
-                            if ssh_param_dict["ssh_method"] == "directSSH":
-                                if ssh_param_dict["password"] == "None":
-                                    password = ""
-                                else:
-                                    password = ssh_param_dict["password"]
-                                credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
-                            else:
-                                #TODO
-                                print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
-                                pass
                             command = 'cat /opt/logs/wpeframework.log | grep -inr ResidentApp.*moveToFront.*Success| tail -1'
                             #get the log line containing the main UI loaded info from wpeframework log
                             tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
                             tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
-                            tdkTestObj.addParameter("credentials",credentials)
+                            tdkTestObj.addParameter("credentials",ssh_param_dict["credentials"])
                             tdkTestObj.addParameter("command",command)
                             tdkTestObj.executeTestCase(expectedResult)
                             result = tdkTestObj.getResult()

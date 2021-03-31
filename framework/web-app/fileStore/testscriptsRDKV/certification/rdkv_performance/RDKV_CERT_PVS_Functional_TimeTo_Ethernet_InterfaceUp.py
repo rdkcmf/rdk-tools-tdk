@@ -69,7 +69,6 @@
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib
 from StabilityTestVariables import *
-from PerformanceTestUtility import *
 import rebootTestUtility
 from rebootTestUtility import *
 from datetime import datetime
@@ -107,26 +106,23 @@ if expectedResult in result.upper():
         if expectedResult in result:
             uptime = int(tdkTestObj.getResultDetails())
             if uptime < 240:
+                tdkTestObj.setResultStatus("SUCCESS")
                 print "Device is rebooted and uptime is: {}".format(uptime)
-                ssh_param_dict = get_ssh_params(obj)
-                if ssh_param_dict != {}:
+                tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
+                tdkTestObj.addParameter("realpath",obj.realpath)
+                tdkTestObj.addParameter("deviceIP",obj.IP)
+                tdkTestObj.executeTestCase(expectedResult)
+                result = tdkTestObj.getResult()
+                ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
+                if expectedResult in result and ssh_param_dict != {}:
+                    tdkTestObj.setResultStatus("SUCCESS")
                     time.sleep(10)
-                    if ssh_param_dict["ssh_method"] == "directSSH":
-                        if ssh_param_dict["password"] == "None":
-                            password = ""
-                        else:
-                            password = ssh_param_dict["password"]
-                        credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
-                    else:
-                        #TODO
-                        print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
-                        pass
                     command = 'cat /opt/logs/nlmon.log | grep -inr "eth0 up"| head -n 1'
                     check_print = '/lib/rdk/networkLinkEvent.sh'
                     #get the log line containing the interface_up info from nlmon.log
                     tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
                     tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
-                    tdkTestObj.addParameter("credentials",credentials)
+                    tdkTestObj.addParameter("credentials",ssh_param_dict["credentials"])
                     tdkTestObj.addParameter("command",command)
                     tdkTestObj.executeTestCase(expectedResult)
                     result = tdkTestObj.getResult()

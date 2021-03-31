@@ -168,22 +168,12 @@ def switch_to_wifi(obj):
         ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
         if ssh_param_dict != {} and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS")
-            if ssh_param_dict["ssh_method"] == "directSSH":
-                if ssh_param_dict["password"] == "None":
-                    password = ""
-                else:
-                    password = ssh_param_dict["password"]
-                credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
-            else:
-                #TODO
-                print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
-                pass
             print "\n Enable the RFC Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.PreferredNetworkInterface.Enable in DUT \n"
             #command to enable RFC for PreferredNetworkInterface
             command = "tr181 -s -v true Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.PreferredNetworkInterface.Enable; tr181 Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.PreferredNetworkInterface.Enable"
             tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
             tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
-            tdkTestObj.addParameter("credentials",credentials)
+            tdkTestObj.addParameter("credentials",ssh_param_dict["credentials"])
             tdkTestObj.addParameter("command",command)
             tdkTestObj.executeTestCase(expectedResult)
             result = tdkTestObj.getResult()

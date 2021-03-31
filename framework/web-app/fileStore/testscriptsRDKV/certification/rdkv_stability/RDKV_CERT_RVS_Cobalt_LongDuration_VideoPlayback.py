@@ -152,16 +152,11 @@ if expectedResult in result.upper():
                 while int(round(time.time() * 1000)) < time_limit:
                     if validation_dict["validation_required"]:
                         if validation_dict["validation_method"] == "proc_entry":
-                            if validation_dict["ssh_method"] == "directSSH":
-                                if validation_dict["password"] == "None":
-                                    password = ""
-                                else:
-                                    password = validation_dict["password"]
-                                credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+                            if validation_dict["password"] == "None":
+                                password = ""
                             else:
-                                #TODO
-                                print "selected ssh method is {}".format(validation_dict["ssh_method"])
-                                pass
+                                password = validation_dict["password"]
+                            credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
                             tdkTestObj = obj.createTestStep('rdkservice_validateProcEntry')
                             tdkTestObj.addParameter("sshmethod",validation_dict["ssh_method"])
                             tdkTestObj.addParameter("credentials",credentials)
