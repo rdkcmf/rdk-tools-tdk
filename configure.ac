@@ -77,6 +77,7 @@ SUBDIR_HYBRID=" "
 SUBDIR_CLIENT=" "
 SM_STUB_CFLAG_HYBRID=" "
 BLUETOOTH_LIBS=" "
+MFRHAL_LIBS=" "
 
 AC_ARG_ENABLE([hybrid],
         AS_HELP_STRING([--enable-hybrid],[enable hybrid build]),
@@ -237,6 +238,23 @@ AC_ARG_ENABLE([bluetoothhal],
 AM_CONDITIONAL([BLUETOOTHHAL], [test x$BLUETOOTHHAL = xtrue])
 
 
+AC_ARG_ENABLE([mfrhal],
+         AS_HELP_STRING([--enable-mfrhal],[enable mfrhal (default is no)]),
+         [
+           case "${enableval}" in
+              yes) MFRHAL=true
+                   AS_IF([test x$HYBRID = xtrue], [SUBDIR_HYBRID+=" MfrHal_stub "],
+                          [echo MfrHal enabled in Hybrid])
+                   AS_IF([test x$CLIENT = xtrue], [SUBDIR_CLIENT+=" MfrHal_stub "],
+                          [echo MfrHal enabled in Client]) ;;
+             no) MFRHAL=false ;;
+            *) AC_MSG_ERROR([bad value ${enableval} for --enable-mfrhal ]) ;;
+             esac
+            ],
+           [echo "mfrhal component is not enabled"])
+AM_CONDITIONAL([MFRHAL], [test x$MFRHAL = xtrue])
+
+
 AC_ARG_ENABLE([deepsleephal],
          AS_HELP_STRING([--enable-deepsleephal],[enable deepsleephal (default is no)]),
          [
@@ -334,6 +352,7 @@ AC_SUBST(SUBDIR_HYBRID)
 AC_SUBST(SUBDIR_CLIENT)
 AC_SUBST(SM_STUB_CFLAG_HYBRID)
 AC_SUBST(BLUETOOTH_LIBS)
+AC_SUBST(MFRHAL_LIBS)
 AC_CONFIG_FILES([Makefile
          cfg/Makefile
          agent/Makefile
@@ -349,6 +368,7 @@ AC_CONFIG_FILES([Makefile
          MocaHal_stub/Makefile
          Bluetooth_stub/Makefile
          BluetoothHal_stub/Makefile
+         MfrHal_stub/Makefile
 	 AudioCaptureMgr_stub/Makefile
 	 USBCtrl_stub/Makefile
 	 SystemUtil_stub/Makefile
