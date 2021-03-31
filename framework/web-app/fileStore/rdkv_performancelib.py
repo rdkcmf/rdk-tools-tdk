@@ -29,6 +29,7 @@ from selenium.common import exceptions
 from SSHUtility import *
 import re
 from datetime import datetime
+import importlib
 
 deviceIP=""
 devicePort=""
@@ -58,7 +59,7 @@ def execute_step(data):
     try:
         response = requests.post(url, headers=headers, data=data, timeout=20)
         json_response = json.loads(response.content)
-	result = json_response.get("result")
+        result = json_response.get("result")
         if result != None and "'success': False" in str(result):
             result = "EXCEPTION OCCURRED"
         return result;
@@ -433,17 +434,21 @@ def getTimeInMilliSec(time_string):
 #-------------------------------------------------------------------
 def rdkservice_getRequiredLog(ssh_method,credentials,command):
     output = ""
+    credentials_list = credentials.split(',')
+    host_name = credentials_list[0]
+    user_name = credentials_list[1]
+    password = credentials_list[2]
+    lib = importlib.import_module("SSHUtility")
     if ssh_method == "directSSH":
-        credentials_list = credentials.split(',')
-        host_name = credentials_list[0]
-        user_name = credentials_list[1]
-        password = credentials_list[2]
+        method = "ssh_and_execute"
     else:
-        #TODO
-        print "Secure ssh to CPE"
-        pass
+        method = "ssh_and_execute_" + ssh_method
+    method_to_call = getattr(lib, method)
     try:
-        output = ssh_and_execute(ssh_method,host_name,user_name,password,command)
+        if ssh_method == "directSSH":
+            output = method_to_call(ssh_method,host_name,user_name,password,command)
+        else:
+            output = method_to_call(host_name,user_name,password,command)
     except Exception as e:
         print "Exception occured during ssh session"
         print e
@@ -460,20 +465,19 @@ def rdkservice_getSSHParams(realpath,deviceIP):
     print "\n getting ssh params from conf file"
     conf_file,result = getConfigFileName(realpath)
     if result == "SUCCESS":
-        result,ssh_dict["ssh_method"] = getDeviceConfigKeyValue(conf_file,"SSH_METHOD")
-        if ssh_dict["ssh_method"] == "directSSH":
-            ssh_dict["host_name"] = deviceIP
-            result,ssh_dict["user_name"] = getDeviceConfigKeyValue(conf_file,"SSH_USERNAME")
-            result,ssh_dict["password"] = getDeviceConfigKeyValue(conf_file,"SSH_PASSWORD")
+        result,ssh_method = getDeviceConfigKeyValue(conf_file,"SSH_METHOD")
+        result,user_name = getDeviceConfigKeyValue(conf_file,"SSH_USERNAME")
+        result,password = getDeviceConfigKeyValue(conf_file,"SSH_PASSWORD")
+        if any(value == "" for value in (ssh_method,user_name,password)):
+            print "please configure values before test"
+            ssh_dict = {}
         else:
-            #TODO
-            print "selected ssh method is {}".format(ssh_dict["ssh_method"])
-            pass
+            ssh_dict["ssh_method"] = ssh_method
+            if password.upper() == "NONE":
+                password = ""
+            ssh_dict["credentials"] = deviceIP +","+ user_name +","+ password
     else:
         print "Failed to find the device specific config file"
-    if any(value == "" for value in ssh_dict.itervalues()):
-        print "please configure values before test"
-        ssh_dict = {}
     ssh_dict = json.dumps(ssh_dict)
     return ssh_dict
 
@@ -520,3 +524,37 @@ def launch_plugin(obj,plugin):
         tdkTestObj.setResultStatus("FAILURE")
         status = "FAILURE"
     return status,start_lauch
+
+#-------------------------------------------------------------------
+#GET BLUETOOTH MAC OF DUT
+#-------------------------------------------------------------------
+def rdkservice_getBluetoothMac():
+    method = "org.rdk.System.1.getDeviceInfo"
+    reqValue = "bluetooth_mac"
+    data = '"method": "'+method+'","params":{"params":"'+reqValue+'"}'
+    result = execute_step(data)
+    if result != "EXCEPTION OCCURRED":
+        value = result[reqValue]
+        return value
+    else:
+        return result
+
+#-------------------------------------------------------------------
+#GET SUPPORTED PLUGINS FROM DEVICE CONFIG FILE
+#-------------------------------------------------------------------
+def rdkservice_getSupportedPlugins(realpath,plugins):
+    conf_file,result = getConfigFileName(realpath)
+    if result == "SUCCESS":
+        status,supported_plugins = getDeviceConfigKeyValue(conf_file,"SUPPORTED_PLUGINS")
+        if supported_plugins != "":
+            plugins_list = plugins.split(',')
+            supported_plugins_list = supported_plugins.split(',')
+            if not all(plugin in supported_plugins_list for plugin in plugins_list):
+                updated_plugins_list = [plugin for plugin in plugins_list if plugin in supported_plugins_list]
+                plugins = ','.join(plugin for plugin in updated_plugins_list)
+        else:
+            print "\n Please configure the supported plugins in device configuration file \n"
+            plugins = "FAILURE"
+        return plugins
+    else:
+        return result

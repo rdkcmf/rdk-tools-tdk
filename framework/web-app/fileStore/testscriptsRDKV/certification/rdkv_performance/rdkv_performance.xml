@@ -98,6 +98,17 @@
           <parameter name="deviceIP" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkservice_getBluetoothMac" id="" version="1">
+        <function>rdkservice_getBluetoothMac</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_getSupportedPlugins" id=" " version="1">
+        <function>rdkservice_getSupportedPlugins</function>
+        <parameters>
+          <parameter name="plugins" value=""/>
+          <parameter name="realpath" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
