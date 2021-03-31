@@ -84,10 +84,7 @@ url_loop_count = 500
 loop_test_url_1 = ""
 loop_test_url_2 = ""
 
-##Activate and Deactivate test details
-#name of plugins used for test(should be given as comma seperated. eg: "WebKitBrowser,Cobalt,org.rdk.Bluetooth")
-activate_deactivate_plugins = ""
-
+##Activate and Deactivate tests details
 #maximum number of activate and deactivate operations
 activate_deactivate_max_count = 1000
 
@@ -108,3 +105,7 @@ max_power_state_changes = 1000
 ##Interface toggle test
 #maximum number of network interface changes required
 max_interface_changes = 1000
+
+##Bluetooth connect-disconnect test
+#maximum number of connect and disconnect operations
+connect_disconnect_max_count = 1000
