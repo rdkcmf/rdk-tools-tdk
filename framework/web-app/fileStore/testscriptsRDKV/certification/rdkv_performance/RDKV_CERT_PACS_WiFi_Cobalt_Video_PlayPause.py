@@ -158,16 +158,11 @@ if expectedResult in result.upper():
                     tdkTestObj.setResultStatus("SUCCESS")
                     if validation_dict["validation_required"]:
                         if validation_dict["validation_method"] == "proc_entry":
-                            if validation_dict["ssh_method"] == "directSSH":
-                                if validation_dict["password"] == "None":
-                                    password = ""
-                                else:
-                                    password = validation_dict["password"]
-                                credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+                            if validation_dict["password"] == "None":
+                                password = ""
                             else:
-                                #TODO
-                                print "selected ssh method is {}".format(validation_dict["ssh_method"])
-                                pass
+                                password = validation_dict["password"]
+                            credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
                             print "\n check whether video is playing"
                             tdkTestObj = obj.createTestStep('rdkservice_validateProcEntry')
                             tdkTestObj.addParameter("sshmethod",validation_dict["ssh_method"])

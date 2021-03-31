@@ -25,6 +25,7 @@ from PIL import Image
 import numpy as np
 from itertools import combinations
 from ip_change_detection_utility import *
+import importlib
 
 deviceIP=""
 devicePort=""
@@ -145,20 +146,24 @@ def rdkservice_validateMemoryUsage(value,threshold):
 #-------------------------------------------------------------------
 def rdkservice_validateProcEntry(sshmethod,credentials,procfile,mincdb):
     result_val = "SUCCESS"
-    if sshmethod == "directSSH":
-        credentials_list = credentials.split(',')
-        host_name = credentials_list[0]
-        user_name = credentials_list[1]
-        password = credentials_list[2]
-    else:
-        #TODO
-        print "Secure ssh to CPE"
-        pass
+    credentials_list = credentials.split(',')
+    host_name = credentials_list[0]
+    user_name = credentials_list[1]
+    password = credentials_list[2]
     command = "cat " +procfile
     counter = 0
     decoded_val_list =[]
+    lib = importlib.import_module("SSHUtility")
+    if sshmethod == "directSSH":
+        method = "ssh_and_execute"
+    else:
+        method = "ssh_and_execute_" + sshmethod
+    method_to_call = getattr(lib, method)
     while counter < 2 :
-        output = ssh_and_execute(sshmethod,host_name,user_name,password,command)
+        if sshmethod == "directSSH":
+            output = method_to_call(sshmethod,host_name,user_name,password,command)
+        else:
+            output = method_to_call(host_name,user_name,password,command)
         output_list =  output.split('\n')
         cdb_data = ""
         decoded = ""

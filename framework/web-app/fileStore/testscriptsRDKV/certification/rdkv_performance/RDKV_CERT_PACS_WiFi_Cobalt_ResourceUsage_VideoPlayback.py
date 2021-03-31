@@ -158,17 +158,11 @@ if expectedResult in result.upper():
         if device_info_activated:
             if validation_dict["validation_required"]:
                 if validation_dict["validation_method"] == "proc_entry":
-                    if validation_dict["ssh_method"] == "directSSH":
-                        if validation_dict["password"] == "None":
-                            password = ""
-                        else:
-                            password = validation_dict["password"]
-                        credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+                    if validation_dict["password"] == "None":
+                        password = ""
                     else:
-                        #TODO
-                        print "selected ssh method is {}".format(validation_dict["ssh_method"])
-                        validation_dict["validation_required"] = False
-                        pass
+                        password = validation_dict["password"]
+                    credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
                 else:
                     print "\n proc_entry validation is only supported validation method \n"
                     validation_dict["validation_required"] = False
