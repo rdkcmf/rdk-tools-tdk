@@ -92,6 +92,8 @@ import tdklib;
 import StabilityTestVariables
 from StabilityTestUtility import *
 from rdkv_performancelib import *
+from web_socket_util import *
+import PerformanceTestVariables
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_stability","1",standAlone=True);
@@ -108,6 +110,7 @@ result_dict_list = []
 cpu_mem_info_dict = {}
 max_powerstate_changes = StabilityTestVariables.max_power_state_changes
 
+
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -116,6 +119,8 @@ obj.setLoadModuleStatus(result)
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     print "Check Pre conditions"
+    event_listener = None
+    thunder_port = PerformanceTestVariables.thunder_port
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
     plugins_list = ["org.rdk.System","DeviceInfo"]
@@ -126,35 +131,11 @@ if expectedResult in result.upper():
         revert = "YES"
         set_status = set_plugins_status(obj,plugin_status_needed)
         plugins_status_dict = get_plugins_status(obj,plugins_list)
-        if plugins_status_dict == plugin_status_needed:
-            status = "SUCCESS"
-        else:
+        if plugins_status_dict != plugin_status_needed:
             status = "FAILURE"
-    conf_file,result = getConfigFileName(obj.realpath)
-    result, ssh_required = getDeviceConfigKeyValue(conf_file,"SSH_VALIDATION")
-    if ssh_required.upper() == "YES":
-        tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
-        tdkTestObj.addParameter("realpath",obj.realpath)
-        tdkTestObj.addParameter("deviceIP",obj.IP)
-        tdkTestObj.executeTestCase(expectedResult)
-        ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
-        result = tdkTestObj.getResult()
-        if expectedResult in result and ssh_param_dict != {}:
-            tdkTestObj.setResultStatus("SUCCESS")
-            if ssh_param_dict["ssh_method"] == "directSSH":
-                if ssh_param_dict["password"] == "None":
-                    password = ""
-                else:
-                    password = ssh_param_dict["password"]
-                credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
-            else:
-                #TODO
-                print "Selected ssh method is {}".format(ssh_param_dict["ssh_method"])
-                pass
-        else:
-            tdkTestObj.setResultStatus("FAILURE")
-            status = "FAILURE"
-    if set_status == status == "SUCCESS":
+    if status == "SUCCESS":
+        event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.System.1.register","params": {"event": "onSystemPowerStateChanged", "id": "client.events.1" }}'],"/jsonrpc",False)
+        time.sleep(5)
         print "\nPre conditions for the test are set successfully"
         print "\n Get the current power state: \n"
         tdkTestObj = obj.createTestStep('rdkservice_getReqValueFromResult')
@@ -207,8 +188,27 @@ if expectedResult in result.upper():
                             tdkTestObj.executeTestCase(expectedResult);
                             result = tdkTestObj.getResult();
                             if expectedResult in result:
-                                tdkTestObj.setResultStatus("SUCCESS")
                                 time.sleep(10)
+                                continue_count = 0
+                                while True:
+                                    if (continue_count > 60):
+                                        break
+                                    if (len(event_listener.getEventsBuffer())== 0):
+                                        continue_count += 1
+                                        time.sleep(1)
+                                        continue
+                                    event_log = event_listener.getEventsBuffer().pop(0)
+                                    print "\n Triggered event: ",event_log
+                                    if (new_power_state == "STANDBY" and "LIGHT_SLEEP" in event_log) or (new_power_state == "ON" and "ON" in event_log):
+                                        print "onSystemPowerStateChanged event triggered while setting {} power state".format(new_power_state)
+                                        break
+                                    else:
+                                       continue_count = 61
+                                if continue_count > 60 :
+                                    print "\n onSystemPowerStateChanged event is not triggered for power state: {} \n".format(new_power_state)
+                                    tdkTestObj.setResultStatus("FAILURE")
+                                    break
+                                tdkTestObj.setResultStatus("SUCCESS")
                                 print "\n Verify the Power state \n"
                                 tdkTestObj = obj.createTestStep('rdkservice_getReqValueFromResult')
                                 tdkTestObj.addParameter("method","org.rdk.System.1.getPowerState")
@@ -219,26 +219,6 @@ if expectedResult in result.upper():
                                 if expectedResult in result and current_power_state == new_power_state:
                                     print "\n Successfully set power state to : {}\n".format(new_power_state)
                                     tdkTestObj.setResultStatus("SUCCESS")
-                                    if ssh_required.upper() == "YES":
-                                        #validate power statechange using wpeframework log
-                                        command = 'cat /opt/logs/wpeframework.log | grep -inr "onSystemPowerStateChanged.*power state changed to.*" |  tail -1'
-                                        tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
-                                        tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
-                                        tdkTestObj.addParameter("credentials",credentials)
-                                        tdkTestObj.addParameter("command",command)
-                                        tdkTestObj.executeTestCase(expectedResult)
-                                        result = tdkTestObj.getResult()
-                                        output = tdkTestObj.getResultDetails()
-                                        if output != "EXCEPTION" and expectedResult in result and current_power_state in output:
-                                            print "\n Log from wpeframework.log ",output.split("onSystemPowerStateChanged")[-1],"\n"
-                                            tdkTestObj.setResultStatus("SUCCESS")
-                                        else:
-                                            print "\n Power state change related event prints are not available in wpeframework log \n"
-                                            tdkTestObj.setResultStatus("FAILURE")
-                                            break
-                                    else:
-                                        print "\n Validation using wpeframework.log file is skipped \n"
-
                                     result_dict = {}
                                     #get the cpu load
                                     tdkTestObj = obj.createTestStep('rdkservice_getCPULoad')
@@ -352,6 +332,8 @@ if expectedResult in result.upper():
         else:
             print "\n Error while executing org.rdk.System.1.getPowerState method \n"
             tdkTestObj.setResultStatus("FAILURE")
+        event_listener.disconnect()
+        time.sleep(5)
     else:
         print "\n Pre conditions are not met \n"
         obj.setLoadModuleStatus("FAILURE");

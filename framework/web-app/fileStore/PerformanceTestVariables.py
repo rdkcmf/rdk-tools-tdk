@@ -28,3 +28,6 @@ channel_change_url = "http://cdn.metrological.com/static/storm/cc_time_v2.html?t
 
 #The url used for testing cobalt
 cobalt_test_url = ""
+
+#Thunder port for listening to events
+thunder_port = "9998"
