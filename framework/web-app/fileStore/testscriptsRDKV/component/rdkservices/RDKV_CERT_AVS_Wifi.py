@@ -116,7 +116,6 @@ if expectedResult in result.upper():
         revert="YES"
         status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
     #Check residentApp status and deactivate if its activated
-    check_status,resapp_status,resapp_revert,resapp_url = checkAndDeactivateResidentApp(obj)
     ip_change_app_url = ip_change_detection_variables.ip_change_app_url
     user_name = ip_change_detection_variables.tm_username
     password = ip_change_detection_variables.tm_password
@@ -133,7 +132,7 @@ if expectedResult in result.upper():
     #Checking whether device supports proc entry validation. If supported, get
     #device information to access and read the proc file
     #validation_dict = getProcValidationParams(obj,"VIDEO_PROC_FILE")
-    if status == "SUCCESS" and  check_status == "SUCCESS":
+    if status == "SUCCESS" and  config_status == "SUCCESS":
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
@@ -198,13 +197,6 @@ if expectedResult in result.upper():
     else:
         print "Pre conditions are not met"
         obj.setLoadModuleStatus("FAILURE");
-    #Revert the values
-    if revert=="YES":
-        print "Revert the values before exiting"
-        status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
-    if resapp_revert=="YES":
-        setURLAndActivateResidentApp(obj,resapp_url)
-        time.sleep(10)
     obj.unloadModule("rdkservices");
 else:
     obj.setLoadModuleStatus("FAILURE");
