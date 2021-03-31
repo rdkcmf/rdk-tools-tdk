@@ -113,6 +113,9 @@ if expectedResult in result.upper():
     print "\nCheck Pre conditions..."
     tdkTestObj = obj.createTestStep('rdkv_media_pre_requisites');
     tdkTestObj.executeTestCase(expectedResult);
+    # Setting the pre-requites for media test. Launching the wekit browser via RDKShell and
+    # moving it to the front, openning a socket connection to the webkit inspect page and
+    # getting the details for proc validation from config file
     pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj)
     if pre_requisite_status == "SUCCESS":
         tdkTestObj.setResultStatus("SUCCESS");
@@ -141,8 +144,11 @@ if expectedResult in result.upper():
         #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
         #url=<video_url>.m3u8&operations=mute(30),unmute(30)&autotest=true&type=hls
 
+        # Setting the video test url in webkit browser using RDKShell
         launch_status = launchPlugin(obj,"WebKitBrowser",video_test_url)
         if "SUCCESS" in launch_status:
+            # Monitoring the app progress, checking whether app plays the video properly or any hang detected in between,
+            # performing proc entry check and getting the test result from the app
             test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Observed Event: volumechange");
             tdkTestObj = obj.createTestStep('rdkv_media_test');
             tdkTestObj.executeTestCase(expectedResult);
@@ -162,6 +168,8 @@ if expectedResult in result.upper():
             print "\nSet post conditions..."
             tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
             tdkTestObj.executeTestCase(expectedResult);
+            # Setting the post-requites for media test.Removing app utl from webkit browser and
+            # moving residentApp to front if its active
             post_requisite_status = setMediaTestPostRequisites(obj)
             if post_requisite_status == "SUCCESS":
                 print "Post conditions for the test are set successfully\n"
