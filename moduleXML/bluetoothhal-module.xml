@@ -60,6 +60,7 @@
       <function name='TestMgr_BluetoothHal_FindDevice' />
       <function name='TestMgr_BluetoothHal_FindService' />
       <function name='TestMgr_BluetoothHal_GetSupportedServices' />
+      <function name='TestMgr_BluetoothHal_GetDeviceTypeClass' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -98,6 +99,8 @@
       <parameter funName='TestMgr_BluetoothHal_FindService' parameterName='uuid' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_BluetoothHal_FindService' parameterName='xml_data' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_BluetoothHal_GetSupportedServices' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_GetDeviceTypeClass' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_GetDeviceTypeClass' parameterName='device_type' parameterType='INTEGER' range='0-9' />
     </parameters>
   </module>
 </xml>
