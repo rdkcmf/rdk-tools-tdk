@@ -159,7 +159,7 @@ if expectedResult in result.upper():
                 if plugin_status == "deactivated":
                     new_status = "activate"
                     method = "org.rdk.RDKShell.1.launch"
-                    params = '{"callsign": "'+plugin+'", "type":"", "uri":"", "x":0, "y":0, "w":1920, "h":1080}'
+                    params = '{"callsign": "'+plugin+'", "type":"'+plugin+'", "uri":"'+ui_app_url+'", "x":0, "y":0, "w":1920, "h":1080}'
                     expected_status = ["activated","resumed"]
                 else:
                     new_status = "deactivate"
@@ -174,7 +174,7 @@ if expectedResult in result.upper():
                 result = tdkTestObj.getResult()
                 if result == "SUCCESS":
                     tdkTestObj.setResultStatus("SUCCESS")
-                    time.sleep(5)
+                    time.sleep(10)
                     #check status
                     print "\n Checking current status of {} plugin \n".format(plugin)
                     tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus')
@@ -268,6 +268,7 @@ if expectedResult in result.upper():
             curr_ui_app_url = tdkTestObj.getResultDetails();
             result = tdkTestObj.getResult()
             if ui_app_url == curr_ui_app_url and  result == "SUCCESS" :
+                print "\n Resident App is having initial URL \n"
                 tdkTestObj.setResultStatus("SUCCESS")
             else:
                 print "[ERROR] Resident App is not having the initial URL: {},\n Current URL :{} \n".format(ui_app_url,curr_ui_app_url)
