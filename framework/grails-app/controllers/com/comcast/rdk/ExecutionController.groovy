@@ -1014,6 +1014,25 @@ class ExecutionController {
 		}
 		render device
 	}
+	
+	/**
+	 * Method to fetch device status
+	 * @param stbName
+	 * @return
+	 */
+	def fetchDeviceStatus(){
+		def stbName = params?.device
+		def status
+		try {
+			if(stbName){
+				def deviceInstance = Device.findByStbName(stbName)
+				status = deviceInstance?.deviceStatus
+			}
+		}catch(Exception e) {
+			e.printStackTrace()
+		}
+		render status
+	}
 
 	def getRealtimeDeviceStatus(final String stbName, final String boxType){
 		JsonObject device = new JsonObject()
@@ -1690,6 +1709,7 @@ class ExecutionController {
         def repeatCount
         def repeatCountInt
 		String repeatExecution = "false"
+		def statusListForPopUpExecution = []
         if(executionNameCheck.contains("(R")){
 	        def executionNameCheckList = executionNameCheck.split("\\(R")
 	        if(executionNameCheckList[1].contains(")")){
@@ -1730,6 +1750,21 @@ class ExecutionController {
 					if(totalStatus.indexOf(status) == -1) {
 						totalStatus.add(status)
 					}
+				}
+			}
+			statusListForPopUpExecution = totalStatus.collect()
+			if(statusListForPopUpExecution){
+				if(statusListForPopUpExecution.contains("N/A")){
+					def indexOfNA = statusListForPopUpExecution.indexOf("N/A")
+					statusListForPopUpExecution.remove(indexOfNA)
+				}
+				if(statusListForPopUpExecution.contains("SKIPPED")){
+					def indexOfSKIPPED = statusListForPopUpExecution.indexOf("SKIPPED")
+					statusListForPopUpExecution.remove(indexOfSKIPPED)
+				}
+				if(statusListForPopUpExecution.contains("ALL")){
+					def indexOfALL = statusListForPopUpExecution.indexOf("ALL")
+					statusListForPopUpExecution.remove(indexOfALL)
 				}
 			}
 			statusResultMap.put(executionDevice, listStatusCount)
@@ -1787,7 +1822,7 @@ class ExecutionController {
 		}
 		tDataMap.put(Constants.PASS_RATE_SMALL,rate)
 		
-		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus]
+		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus, statusListForPopUpExecution : statusListForPopUpExecution]
 	}
 
 	/**
@@ -4864,4 +4899,276 @@ class ExecutionController {
 		}
 		render rdkScriptList as JSON
 	}
+	
+	/**
+	 * Method to fetch the result of an execution
+	 * @param execResId
+	 * @return
+	 */
+	def triggerNewExecution(){
+		def execId = params?.execId
+		def ex
+		def category
+		def deviceList
+		List freeDeviceNameList = []
+		def scriptCategory
+		try{
+			if(execId){
+				ex = Execution.findById(execId)
+				if(ex){
+					def execRes = ExecutionResult.findByExecution(ex)
+					def script = ScriptFile.findByScriptName(execRes?.script)
+					scriptCategory = script?.category?.toString()
+				}
+			}
+			if(ex?.category){
+				deviceList = Device.findAllByCategory(ex?.category)
+				if(deviceList){
+					deviceList?.each{
+						if(it?.deviceStatus == Status.FREE){
+							if(ex?.category.toString() == Constants.RDKV && scriptCategory && (scriptCategory == Constants.RDKV_THUNDER || scriptCategory == Constants.RDKV_RDKSERVICE)){
+								if(it?.isThunderEnabled == 1){
+									freeDeviceNameList.add(it?.stbName)
+								}
+							}else{
+								if(it?.isThunderEnabled == 0){
+									freeDeviceNameList.add(it?.stbName)
+								}
+							}
+						}
+					}
+				}
+			}
+			category = ex?.category
+		}catch(Exception e){
+			e.printStackTrace()
+		}
+		render(template: "triggerNewExecution", model: [execId : ex?.id, category : category, freeDeviceList : freeDeviceNameList])
+	}
+
+	/**
+	 * Method to fetch the devices that are FREE at present 
+	 * @return
+	 */
+	def getFreeDevicesList(){
+		def execId = params?.exId
+		def ex
+		def category
+		def deviceList
+		List freeDeviceNameList = []
+		def scriptCategory
+		try{
+			if(execId){
+				ex = Execution.findById(execId)
+				if(ex){
+					def execRes = ExecutionResult.findByExecution(ex)
+					def script = ScriptFile.findByScriptName(execRes?.script)
+					scriptCategory = script?.category?.toString()
+					category = ex?.category
+				}
+				if(category){
+					deviceList = Device.findAllByCategory(category)
+					if(deviceList){
+						deviceList?.each{
+							if(it?.deviceStatus == Status.FREE){
+								if(ex?.category?.toString() == Constants.RDKV && scriptCategory && (scriptCategory == Constants.RDKV_THUNDER || scriptCategory == Constants.RDKV_RDKSERVICE)){
+									if(it?.isThunderEnabled == 1){
+										freeDeviceNameList.add(it?.stbName)
+									}
+								}else{
+									if(it?.isThunderEnabled == 0){
+										freeDeviceNameList.add(it?.stbName)
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace()
+		}
+		render freeDeviceNameList as JSON
+	}
+	
+	/**
+	 * Method to execute scripts from execution result pop-up
+	 * @return
+	 */
+	def triggerExecutionFromPopUp(){
+		def executionResultIdString = params?.exResults
+		List executionResultIdList = []
+		executionResultIdList = executionResultIdString.split(",")
+		executionResultIdList.remove(0)
+		def scriptList = []
+		def executionResultObjectList = []
+		def baseExecution
+		def executionName = params?.executionName
+		executionResultIdList?.each{
+			def exRes = ExecutionResult.findById(it)
+			baseExecution = exRes?.execution
+			def scriptName = exRes?.script 
+			if(!scriptList?.contains(scriptName)){
+				scriptList.add(scriptName)
+				executionResultObjectList.add(exRes)
+			}
+		}
+		def deviceInstance = Device.findByStbName(params?.device)
+		String category = deviceInstance?.category?.toString()
+		String status = ""
+		boolean allocated = false
+		if(deviceInstance){
+			try {
+				status = DeviceStatusUpdater.fetchDeviceStatus(grailsApplication, deviceInstance)
+				if(executionService.deviceAllocatedList.contains(deviceInstance?.id)){
+					status = "BUSY"
+				}else{
+					if((status.equals( Status.FREE.toString() ))){
+						if(!executionService.deviceAllocatedList.contains(deviceInstance?.id)){
+							allocated = true
+							executionService.deviceAllocatedList.add(deviceInstance?.id)
+							Thread.start{
+								deviceStatusService.updateOnlyDeviceStatus(deviceInstance, Status.BUSY.toString())
+							}
+						}
+					}
+				}
+			}catch(Exception e){
+				e.printStackTrace()
+			}
+		}
+		def executionSaveStatus
+		def scriptName = ""
+		def executionInstance
+		def realPath = getRealPath()
+		def filePath = "${request.getRealPath('/')}//fileStore"
+		def appUrl = getApplicationUrl()
+		def scriptInstance
+		boolean aborted = false
+		boolean pause = false
+		def htmlData
+		List pendingScripts = []
+		if(scriptList?.size() == 1){
+			scriptName = scriptList[0]
+		}else{
+			scriptName = MULTIPLESCRIPT
+		}
+		try{
+			executionSaveStatus = executionService.saveExecutionDetails(executionName,[scriptName:scriptName, deviceName:params?.device, scriptGroupInstance:null, appUrl:appUrl, isBenchMark:"false", isSystemDiagnostics:"false", rerun:"false", isLogReqd:"false", category:category, rerunOnFailure:FALSE, groups:baseExecution?.groups])
+			if(executionSaveStatus){
+				Execution.withTransaction{
+					executionInstance = Execution.findByName(executionName)
+				}
+				def deviceBoxType = deviceInstance?.boxType
+				def deviceBoxTypeName = deviceBoxType.name
+				ExecutionDevice executionDevice = null
+				ExecutionDevice.withTransaction {
+					executionDevice = new ExecutionDevice()
+					executionDevice.execution = executionInstance
+					executionDevice.device = deviceInstance?.stbName
+					executionDevice.boxType = deviceBoxTypeName
+					executionDevice.deviceIp = deviceInstance?.stbIp
+					executionDevice.dateOfExecution = new Date()
+					executionDevice.status = UNDEFINED_STATUS
+					executionDevice.category = Utility.getCategory(category)
+					executionDevice.buildName = executionService.getBuildName( deviceInstance?.stbName )
+					executionDevice.save(flush:true)
+				}
+				if(deviceInstance?.isThunderEnabled != 1){
+					executionService.executeVersionTransferScript(realPath, filePath, executionName, executionDevice?.id, deviceInstance?.stbName, deviceInstance?.logTransferPort, appUrl)
+				}else{
+					try{
+						def executionObjectId = executionInstance?.id
+						StormExecuter.createThunderVersionFile(realPath, executionObjectId, executionDevice?.id, executionDevice?.deviceIp)
+					}catch(Exception e){
+						e.printStackTrace()
+					}
+				}
+				try{
+					if(scriptList?.size() > 0 && deviceInstance?.isThunderEnabled != 1){
+						LogTransferService.transferLog(executionName, deviceInstance)
+					}
+				}catch(Exception e){
+					e.printStackTrace()
+				}
+				executionResultObjectList.each{ executionResult ->
+					def scriptFile = ScriptFile.findByScriptName(executionResult?.script)
+					scriptInstance = scriptService.getScript(realPath,scriptFile?.moduleName,scriptFile?.scriptName, category)
+					def deviceStatus = " "
+					try{
+						deviceStatus = DeviceStatusUpdater.fetchDeviceStatus(grailsApplication, deviceInstance)
+					}catch (Exception e){
+						e.printStackTrace()
+					}
+					if(scriptInstance){
+						String rdkVersion = executionService.getRDKBuildVersion(deviceInstance)
+						if(executionService.validateScriptBoxTypes(scriptInstance,deviceInstance) && executionService.validateScriptRDKVersions(scriptInstance,rdkVersion) ){
+							def startExecutionTime = new Date()
+							aborted = executionService.abortList?.toString().contains(executionInstance?.id?.toString())
+							if(!aborted && !(deviceStatus?.toString().equals(Status.NOT_FOUND.toString()) || deviceStatus?.toString().equals(Status.HANG.toString())) && !pause){
+								htmlData = executescriptService.executeScript(executionName, executionDevice, scriptInstance, deviceInstance, appUrl, filePath, realPath,"false","false",executionName,FALSE,null,"false", category)
+							}else{
+								if(!aborted && (deviceStatus.equals(Status.NOT_FOUND.toString()) ||  deviceStatus.equals(Status.HANG.toString()))){
+									pause = true
+								}
+								if(!aborted && pause) {
+									try{
+										pendingScripts.add(scriptInstance)
+										ExecutionResult.withTransaction { resultstatus ->
+											try {
+												def executionResult1 = new ExecutionResult()
+												executionResult1.execution = executionInstance
+												executionResult1.executionDevice = executionDevice
+												executionResult1.script = scriptInstance?.name
+												executionResult1.device = deviceInstance?.stbName
+												executionResult1.execDevice = null
+												executionResult1.deviceIdString = deviceInstance?.id?.toString()
+												executionResult1.status = PENDING
+												executionResult1.dateOfExecution = new Date()
+												executionResult1.category=Utility.getCategory(executionDevice?.category?.toString())
+												if(! executionResult1.save(flush:true)) {
+												}
+												resultstatus.flush()
+											}
+											catch(Throwable th) {
+												resultstatus.setRollbackOnly()
+											}
+										}
+									}catch(Exception e){
+										e.printStackTrace()
+									}
+								}
+							}
+							def endExecutionTime = new Date()
+							executescriptService.executionTimeCalculation(executionName,startExecutionTime,endExecutionTime)
+						}
+					}
+				}
+				try{
+					if(scriptList.size() > 0 && deviceInstance?.isThunderEnabled != 1){
+						LogTransferService.closeLogTransfer(executionName)
+					}
+				}catch(Exception e){
+					e.printStackTrace()
+				}
+				if(aborted && executionService.abortList.contains(executionInstance?.id?.toString())){
+					executionService.abortList.remove(executionInstance?.id?.toString())
+					executionService.saveExecutionStatus(aborted, executionInstance?.id)
+				}
+				if(!aborted && pause && pendingScripts.size() > 0 ){
+					executionService.savePausedExecutionStatus(executionInstance?.id)
+					executionService.saveExecutionDeviceStatusData(PAUSED, executionDevice?.id)
+				}
+				if(!aborted && !pause){
+					executionService.saveExecutionStatus(aborted,executionInstance?.id)
+				}
+			}
+			if(allocated && executionService.deviceAllocatedList.contains(deviceInstance?.id)){
+				executionService.deviceAllocatedList.remove(deviceInstance?.id)
+			}
+		}catch(Exception e){
+			e.printStackTrace()
+		}
+	}
+
 }

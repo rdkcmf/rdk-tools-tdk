@@ -23,6 +23,10 @@
 <%@ page import="com.comcast.rdk.Device"%>
 <head>
 <script type='text/javascript'>
+$(document).ready(function() {
+	$("#statusListFilter").select2();
+});
+
 function viewOnClick(me,k,i)
 { 
   if(document.getElementById('allmessages'+k+'_'+i).style.display == 'none') {
@@ -68,17 +72,45 @@ function hideLogs(k,i){
 }
 
 
- function filterChanged () {
-	var filterValue = $('#filterDropdown').val();
-	  
-	$('.resultRow').each(function(i, obj) {
-		if(filterValue == "ALL" || $(this).hasClass(filterValue)) {
+function filterChanged(){
+	var selected = [];
+	var statusListFilter = document.getElementById('statusListFilter');
+	var statusListFilterOptions = statusListFilter.options;
+	var selected = [].filter.call(statusListFilterOptions, option => option.selected).map(option => option.text);
+	if(selected.length == 0){
+		$('.resultRow').each(function() {
 			$(this).show();
-	  	} else {
+		});
+		$(":checkbox").each(function() {
+			if($(this).hasClass('toExecute')) {
+				$(this).prop('checked', false);
+			}
+		});
+	}else{
+		$('.resultRow').each(function() {
 			$(this).hide();
-		}
-	});
- }
+		});
+		$(":checkbox").each(function() {
+			if($(this).hasClass('toExecute')) {
+				$(this).prop('checked', false);
+			}
+		});
+		$('.resultRow').each(function() {
+			for(var status in selected){
+				if($(this).hasClass(selected[status])) {
+					$(this).show();
+				}
+			}
+		});
+		$(":checkbox").each(function() {
+			for(var status in selected){
+				if($(this).hasClass(selected[status])){
+					$(this).prop('checked', true);
+				}
+			}
+		});
+	}
+}
 
 /*function showLogs(k){
 	$('#hidelink'+k).show();
@@ -144,6 +176,96 @@ function hideScriptTrend(execResId){
         $('#showTrendLink'+execResId).show();
         $('#scriptTrend'+execResId).hide();
         $('#hideTrendLink'+execResId).hide();
+}
+
+/*Method to show the execution trigger area*/
+function showExecutionTriggerArea(execId){
+    $('#hideExecutionTriggerAreaLink'+execId).show();
+    if(document.getElementById('TriggerNewExecution'+execId).style.display == 'none') {
+    	document.getElementById('TriggerNewExecution'+execId).style.display ='';
+    }
+    $('#showExecutionTriggerAreaLink'+execId).hide();
+}
+
+/*Method to hide the execution trigger area*/
+function hideExecutionTriggerArea(execId){
+    $('#showExecutionTriggerAreaLink'+execId).show();
+    if(document.getElementById('TriggerNewExecution'+execId).style.display == '') {
+    	document.getElementById('TriggerNewExecution'+execId).style.display ='none';
+    }
+    $('#hideExecutionTriggerAreaLink'+execId).hide();
+}
+
+/*Method to refresh the device list*/
+function refreshDeviceList(exId){
+	$('#freeDevicesList').empty();
+	$.get('getFreeDevicesList', {exId: exId}, function(freeDevicesList) {
+		for (var i = 0; i < freeDevicesList.length; i++) {
+			$("#freeDevicesList").append('<option>'+freeDevicesList[i]+'</option>');
+		}
+	});
+}
+
+/*Method to clear all the filters*/
+function clearFilters(){
+	var clearFiltersBox = document.getElementById('clearFiltersId');
+	$('.resultRow').each(function() {
+		$(this).show();
+	});
+	$(":checkbox").each(function() {
+		if($(this).hasClass('toExecute')) {
+			$(this).prop('checked', false);
+		}
+	});
+	$("#statusListFilter").val('').change();
+}
+
+/*Method to select/unselect all execution results*/
+function selectUnselect(){
+	var selectUnselectBox = document.getElementById('selectUnselectId');
+	if (selectUnselectBox.checked) {
+		$(":checkbox").each(function() {
+			if($(this).hasClass('toExecute')) {
+				$(this).prop('checked', true);
+			}
+		});
+	}else{
+		$(":checkbox").each(function() {
+			if($(this).hasClass('toExecute')) {
+				$(this).prop('checked', false);
+			}
+		});
+	}
+}
+
+/*Method to trigger execution for selected scripts from pop-up*/
+function triggerExecutionFromPopUp(){
+	var executionResultsSelected = "";
+	$(":checkbox").each(function() {
+		if($(this).hasClass('toExecute')) {
+			if($(this).prop("checked") == true){
+				executionResultsSelected = executionResultsSelected + "," + $(this).val();
+			}
+		}
+	});
+	var deviceSelected = document.getElementById('freeDevicesList').value;
+	var executionName
+	if(deviceSelected){
+		$.get('fetchDeviceStatus', {device: deviceSelected}, function(data) {
+			if(data && data != "FREE"){
+				alert("Unable to trigger execution. Device is not FREE");
+			}else{
+				alert("Execution Triggered");
+				$.get('showDateTime', {}, function(data) {
+					executionName = deviceSelected+"-"+data;
+					$.get('triggerExecutionFromPopUp', {device: deviceSelected, exResults: executionResultsSelected, executionName: executionName}, function(dataNew) {
+					});
+				});
+			}
+		});
+	}else{
+		alert("No device selected");
+	}
 }
 </script>
 
@@ -281,14 +403,6 @@ function hideScriptTrend(execResId){
             </g:else>
         </td>
 	</tr>
-	<g:if test="${statusList.size() > 1}">
-		<tr class="odd" id="filterRow">
-			<td> Filter By: </td>
-			<td>
-	     		<g:select name="Status" from="${statusList}" id="filterDropdown"  onchange ="filterChanged()"/>
-			</td>
-	</tr>
-	</g:if>
 	<tr class="odd">
 		<th>Test Group 
 		</th>
@@ -364,8 +478,8 @@ function hideScriptTrend(execResId){
 		<g:if test = "${(executionInstance?.executionStatus).equals("COMPLETED")}" >
 			<g:if test="${executionInstance?.scriptGroup  || executionInstance?.script?.toString()?.equals("Multiple Scripts") || executionInstance?.scriptGroup?.toString()?.equals("Multiple Scriptgroups")}">
 						<tr class="even" id="testing">
-					<td colspan="2">
-						<table>						
+					<td colspan="3">
+						<table>
 							<tr align="center" style="background: #DFDFDF;">
 								<%--<td><g:link action="repeatExecution "  onclick="deviceStatusCheck('${deviceStatus}');"
 										params="[executionName : executionInstance?.name , device  : executionInstance?.device , scriptGroup : executionInstance?.scriptGroup , script : executionInstance?.script, devices :executionInstance?.device?.size(), rerun :1, isBenchMark :executionInstance?.isBenchMarkEnabled , isSystemDiagonisticEnabled : executionIntstance?.isSystemDiagnosticsEnabled  ]">
@@ -376,15 +490,38 @@ function hideScriptTrend(execResId){
 										<b> Rerun On Failure Scripts </b>
 									</g:link></td>
 							--%>
-							<td><g:submitToRemote value="Repeat Execution"
+								<td><g:submitToRemote value="Repeat Execution"
 											url="[action: 'repeatExecution',params:[executionName : executionInstance?.name , device  : executionInstance?.device , scriptGroup : executionInstance?.scriptGroup , script : executionInstance?.script, devices :executionInstance?.device?.size(), rerun :1, isBenchMark :executionInstance?.isBenchMarkEnabled , isSystemDiagonisticEnabled :executionIntstance?.isSystemDiagnosticsEnabled]]"
 										    before="deviceStatusCheck('${deviceInstance}','${deviceStatus}');" />
-									</td>
-								<td><g:submitToRemote value="Rerun Of Failure Scripts"
+								</td>
+								<td colspan="2"><g:submitToRemote value="Rerun Of Failure Scripts"
 											url="[action :'rerunOnFailure', params:[executionName : executionInstance , device  : executionInstance?.device, scriptGroup : executionInstance?.scriptGroup , script : executionInstance?.script ]]"
 											before="failureScriptCheck('${executionInstance}','${deviceInstance}','${deviceStatus}'  );" />
 								</td>
 							</tr>
+							<g:if test="${statusListForPopUpExecution.size() > 1}">
+								<tr>
+									<td> Filter By: </td>
+									<td colspan="2">
+	     								<g:select id="statusListFilter" name="statusListFilter" from="${statusListForPopUpExecution}" required="" value="" class="many-to-one selectCombo" multiple="true" onchange ="filterChanged()"/>
+	     								&emsp;&emsp;<input type="button" id="clearFiltersId" name="clearFilters" value="Clear Filters" onclick="clearFilters()">&emsp;&emsp;<g:checkBox id="selectUnselectId" name="selectUnselect" checked="false" onclick="selectUnselect()"/>&nbsp;Select/Unselect All
+									</td>
+								</tr>
+							</g:if>
+							<g:if test="${executionDeviceInstance?.executionresults?.size() > 1}">
+								<tr>
+									<td>Trigger a New Execution from Here</td>
+									<td colspan="2">
+										<span id="showExecutionTriggerAreaLink${executionInstance?.id}">
+											<g:remoteLink class="button" action="triggerNewExecution" update="TriggerNewExecution${executionInstance?.id}" onSuccess="showExecutionTriggerArea(${executionInstance?.id});" params="[execId : "${executionInstance?.id}"]">Show Execution Trigger area</g:remoteLink>
+										</span>
+										<span id="hideExecutionTriggerAreaLink${executionInstance?.id}" style="display:none;">
+											<a style="color:#7E2217;" href="#" onclick="hideExecutionTriggerArea(${executionInstance?.id})">Hide</a>
+										</span>
+										<div id="TriggerNewExecution${executionInstance?.id}" style="display:none;"></div>
+									</td>
+								</tr>
+							</g:if>
 						</table>
 					</td>
 				</tr>
@@ -420,17 +557,18 @@ function hideScriptTrend(execResId){
 					<td><a href="#" id="expander${k}_${i}" onclick="this.innerHTML='Hide';viewOnClick(this,${k},${i}); return false;">Details</a></td>
 				</tr> --%>
 				<tr class="scripthead">
+				    <td align="left" style="width: 2%;"><g:checkBox name="toExecute" value="${executionResultInstance?.id}" id="${executionResultInstance?.id}" checked = "true" class="toExecute ${executionResultInstance?.status}" /></td>
 					<td style="width:10%;font-weight: bold;">Test Script </td>
 					<td style="width:50%"><g:link controller="scriptGroup" action="exportScriptData" id="${executionResultInstance?.script}" target="_blank" >${executionResultInstance?.script} </g:link> </td>					
 					<td style="width:10%;font-weight: bold;">Status</td>
-					<td style="width:10%;">${executionResultInstance?.status}</td>		
+					<td style="width:8%;">${executionResultInstance?.status}</td>		
 					<td style="width:10%;"><g:remoteLink id="expander${k}_${i}" action="getExecutionDetails" update="allmessages${k}_${i}" onSuccess="this.innerHTML='Hide';viewOnClick(this,${k},${i}); return false;" params="[execResId : "${executionResultInstance?.id}"]" >Details</g:remoteLink>	</td>		
 				</tr>
 			<tbody id="allmessages${k}_${i}"  style="display: none;">
 			</tbody>
 			<tbody id="alllogs${k}_${i}"  style="display: none;">
 			<tr>
-			<td>
+			<td colspan="2">
 			<g:if test="${executionDeviceInstance?.category != 'RDKV_THUNDER'}">
 			Agent Console Log
 			</g:if>
@@ -461,7 +599,7 @@ function hideScriptTrend(execResId){
 
 
 				--%><tr>
-					<td>Log	Files</td>	
+					<td colspan="2">Log	Files</td>	
 					<td colspan="4">
 						&emsp;<span id="hidelink${k}_${i}" style="display:none;"><a  href="#" onclick="hideLogs(${k},${i})">Hide</a></span>
 						<span id="showlink${k}_${i}">
@@ -480,7 +618,7 @@ function hideScriptTrend(execResId){
 				</tr>
 				--%>
 				<tr>
-					<td>Crash Log Files</td>	
+					<td colspan="2">Crash Log Files</td>	
 					<td colspan="4">
 						&emsp;<span id="hidecrashlink${k}_${i}" style="display:none;"><a href="#" onclick="hideCrashLogs(${k},${i})">Hide</a></span>
 						<span id="showcrashlink${k}_${i}">			
