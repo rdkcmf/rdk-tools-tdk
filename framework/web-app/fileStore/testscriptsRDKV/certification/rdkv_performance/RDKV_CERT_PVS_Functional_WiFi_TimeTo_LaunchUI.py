@@ -161,21 +161,11 @@ if expectedResult in result.upper():
                         ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
                         if ssh_param_dict != {} and expectedResult in result:
                             tdkTestObj.setResultStatus("SUCCESS")
-                            if ssh_param_dict["ssh_method"] == "directSSH":
-                                if ssh_param_dict["password"] == "None":
-                                    password = ""
-                                else:
-                                    password = ssh_param_dict["password"]
-                                credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
-                            else:
-                                #TODO
-                                print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
-                                pass
                             command = 'cat /opt/logs/wpeframework.log | grep -inr LoadFinished.*url.*'+ui_app_url+'| tail -1'
                             #get the log line containing the loadfinished info from wpeframework log
                             tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
                             tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
-                            tdkTestObj.addParameter("credentials",credentials)
+                            tdkTestObj.addParameter("credentials",ssh_param_dict["credentials"])
                             tdkTestObj.addParameter("command",command)
                             tdkTestObj.executeTestCase(expectedResult)
                             result = tdkTestObj.getResult()
@@ -187,7 +177,7 @@ if expectedResult in result.upper():
                                 for item in load_finished_list:
                                     if "LoadFinished:" in item:
                                         load_finished_line = item
-                                if load_finished_line != "" and '"httpstatus": 200' in load_finished_line:
+                                if load_finished_line != "" and '"httpstatus":200' in load_finished_line:
                                     load_finished_time = getTimeStampFromString(load_finished_line)
                                     print "\n Device reboot initiated at :{} (UTC)\n".format(start_time)
                                     print "UI load finished at :{} (UTC) \n ".format(load_finished_time)
@@ -251,4 +241,3 @@ if expectedResult in result.upper():
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"
-

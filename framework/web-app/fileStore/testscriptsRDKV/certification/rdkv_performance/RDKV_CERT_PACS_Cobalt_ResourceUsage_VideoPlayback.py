@@ -102,17 +102,11 @@ if expectedResult in result.upper():
     if status == "SUCCESS" and validation_dict != {} and cobalt_test_url != "":
         if validation_dict["validation_required"]:
             if validation_dict["validation_method"] == "proc_entry":
-                if validation_dict["ssh_method"] == "directSSH":
-                    if validation_dict["password"] == "None":
-                        password = ""
-                    else:
-                        password = validation_dict["password"]
-                    credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+                if validation_dict["password"] == "None":
+                    password = ""
                 else:
-                    #TODO
-                    print "selected ssh method is {}".format(validation_dict["ssh_method"])
-                    validation_dict["validation_required"] = False
-                    pass
+                    password = validation_dict["password"]
+                credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
             else:
                 print "\n proc_entry validation is only supported validation method \n"
                 validation_dict["validation_required"] = False
@@ -142,7 +136,7 @@ if expectedResult in result.upper():
                 tdkTestObj.addParameter("value",params)
                 tdkTestObj.executeTestCase(expectedResult)
                 result2 = tdkTestObj.getResult()
-                time.sleep(40)
+                time.sleep(60)
                 if "SUCCESS" == (result1 and result2):
                     result_val = "SUCCESS"
                     if validation_dict["validation_required"]:

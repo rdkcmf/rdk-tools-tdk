@@ -82,7 +82,6 @@ obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_ResourceUsage_TopCommand
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
 obj.setLoadModuleStatus(result)
-
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
@@ -93,21 +92,11 @@ if expectedResult in result.upper():
     ssh_param_dict = json.loads(tdkTestObj.getResultDetails()) 
     if ssh_param_dict != {} and expectedResult in result:
         tdkTestObj.setResultStatus("SUCCESS")
-        if ssh_param_dict["ssh_method"] == "directSSH":
-            if ssh_param_dict["password"] == "None":
-                password = ""
-            else:
-                password = ssh_param_dict["password"]
-            credentials = ssh_param_dict["host_name"]+','+ssh_param_dict["user_name"]+','+password
-        else:
-            #TODO
-            print "selected ssh method is {}".format(ssh_param_dict["ssh_method"])
-            pass
         #command to get the top output
         command = "top -b -n 1 -o +%CPU -w 512 | awk '/PID USER/,0' | awk '{print $9,$12}' | awk '{if($1>90)print $1,$2}'"
         tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
         tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
-        tdkTestObj.addParameter("credentials",credentials)
+        tdkTestObj.addParameter("credentials",ssh_param_dict["credentials"])
         tdkTestObj.addParameter("command",command)
         tdkTestObj.executeTestCase(expectedResult)
         result = tdkTestObj.getResult()
@@ -131,7 +120,7 @@ if expectedResult in result.upper():
         command = "top -b -n 1 -o +%MEM -w 512 | awk '/PID USER/,0' | awk '{print $10,$12}' | awk '{if($1>90)print $1,$2}'"
         tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
         tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
-        tdkTestObj.addParameter("credentials",credentials)
+        tdkTestObj.addParameter("credentials",ssh_param_dict["credentials"])
         tdkTestObj.addParameter("command",command)
         tdkTestObj.executeTestCase(expectedResult)
         output = tdkTestObj.getResultDetails()
