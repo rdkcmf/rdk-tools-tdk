@@ -448,7 +448,7 @@
             <expectedValues>true,false</expectedValues>
         </method>
         <method name="Reboot" api="reboot" type="method" desc="system perform a reboot of the set-top box" />
-
+        <method name="Get_Power_State_Before_Reboot" api="getPowerStateBeforeReboot" type="method" desc="Gets the power state before reboot" />
         <event name="Event_MacAddresses_Retreived" eventName="onMacAddressesRetreived" eventId="client.events.1" type="event" desc="MacAddressesRetreived" />
         <event name="Event_PowerState_Changed" eventName="onSystemPowerStateChanged" eventId="client.events.1" type="event" desc="power state changed event" />
 
@@ -1233,6 +1233,44 @@
                 <param tag="scartParameterData"  defaultValue="null" />
             </params>
         </method>
+        <method name="Get_Supported_MS12_Audio_Profiles" api="getSupportedMS12AudioProfiles" type="method" desc="Gets the supported MS12 audio profiles" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_MS12_Audio_Profile" api="getMS12AudioProfile" type="method" desc="Gets the current MS12 audio profile" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Set_MS12_Audio_Profile" api="setMS12AudioProfile" type="method" desc="Configures selected MS12 Audio Profile" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="ms12AudioProfile" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Enable_Audio_Port" api="getEnableAudioPort" type="method" desc="Gets the current port enable status of specified input audioPort" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Set_Enable_Audio_Port" api="setEnableAudioPort" type="method" desc="Enable or disable specified audioPort based on the input audio port" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="enable" type="bool" />
+            </params>
+        </method>
+        <method name="Get_Graphic_Equalizer_Mode" api="getGraphicEqualizerMode" type="method" desc="Gets the Graphic equalizer mode for specified audio port" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Set_Graphic_Equalizer_Mode" api="setGraphicEqualizerMode" type="method" desc="Sets the Graphic  equalizer mode for specified audio port" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="graphicEqualizerMode" type="int" />
+            </params>
+        </method>
         <event name="Event_Zoom_Settings_Updated" eventName="zoomSettingUpdated" eventId="client.events.1" type="event" desc="Zoom settings updated event "/>
     </plugin>
 
@@ -1282,6 +1320,7 @@
         <method name="Upload_Screen_Capture" api="uploadScreenCapture" type="method" desc="Takes screenshot and uploads it to the specified url">
             <params>
                 <param tag="url" type="string" />
+                <param tag="callGUID"  type="string"/>
             </params>
         </method>
         <event name="Event_Upload_Complete" eventName="uploadComplete" eventId="client.events.1" type="event" desc="Fired after an upload of screen capture" />

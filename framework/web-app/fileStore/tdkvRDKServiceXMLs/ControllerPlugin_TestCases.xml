@@ -122,15 +122,19 @@
     <testCase testCaseId="Controller_09" testCaseName="Delete_Directory_Contents"  desc="Removes contents of a directory from the persistent storage">
       <testCaseInfo testCaseType="direct"/>
       <testStep testStepId="1" name="Execute_Command" action="externalFnCall" >
-        <resultGeneration useMethodTag="Create_File" arguments="/tmp/Controller/TDK_Test_File.txt" />
+        <resultGeneration useMethodTag="Create_File">
+          <arguments useConfigFile="true" key="CONTROLLER_FILE_DELETE_PATH" />
+        </resultGeneration>
       </testStep>
       <testStep testStepId="2" name="Delete_Directory_Contents" method="Delete_Directory_Contents">
         <params>
-          <param tag="path" value="/tmp/Controller/TDK_Test_File.txt" />
+          <param tag="path" value="TDK_TEST_FILE.txt" />
         </params>
       </testStep>
       <testStep testStepId="3" name="Execute_Command" action="externalFnCall" >
-        <resultGeneration useMethodTag="Check_If_File_Exists" arguments="/tmp/Controller/TDK_Test_File.txt" expectedValues="File does not exist" />
+        <resultGeneration useMethodTag="Check_If_File_Exists"  expectedValues="File does not exist" >
+          <arguments useConfigFile="true" key="CONTROLLER_FILE_DELETE_PATH" />
+        </resultGeneration>
       </testStep>
     </testCase>
 </testPlugin>
