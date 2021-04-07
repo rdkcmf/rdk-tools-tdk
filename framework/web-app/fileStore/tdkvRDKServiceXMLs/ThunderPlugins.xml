@@ -1070,7 +1070,7 @@
             </params>
         </method>
         <method name="Get_Dolby_Volume_Mode" api="getDolbyVolumeMode" type="method" desc="Get the dolby volume mode status" >
-            <expectedValues>True,False </expectedValues>
+            <expectedValues>True,False</expectedValues>
         </method>
         <method name="Set_Dialog_Enhancement" api="setDialogEnhancement" type="method" desc="Set the dialog enhancement values" >
             <params>

@@ -248,7 +248,7 @@
 
         <!-- Test case 15 -->
         <testCase testCaseId="SYS_15" testCaseName= "System_Get_Core_Temperature" desc="Fetch the core temperature of the device.">
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="CoreTemperature" />
             <testStep testStepId="1" name="Get_Core_Temperature" method="Get_Core_Temperature" >
               <resultGeneration useMethodTag="system_validate_core_temperature"/>
             </testStep>
@@ -307,7 +307,7 @@
 
         <!-- Test case 21 -->
         <testCase testCaseId="SYS_21" testCaseName= "System_Get_Temperature_Thresholds" desc="Retrieves temperature threshold values.">
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="direct"  configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="TemperatureThreshold"/>
             <testStep testStepId="1" name="Get_Temperature_Thresholds" method="Get_Temperature_Thresholds" >
               <resultGeneration useMethodTag="system_get_state_info"  arguments="temperatureThresholds" />
             </testStep>
@@ -369,7 +369,7 @@
 
         <!-- Test case 26 -->
         <testCase testCaseId="SYS_26" testCaseName= "System_SetAndGet_Temperature_Thresholds" desc="Set and get temperature thresholds">
-            <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="TempThresholdChange"/>
+            <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="TemperatureThreshold"/>
             <testStep testStepId="1" name="Get_Temperature_Thresholds" method="Get_Temperature_Thresholds" saveResult="true" revertGet="yes">
                 <resultGeneration useMethodTag="system_get_state_info"  />
             </testStep>
@@ -458,7 +458,7 @@
                 <resultGeneration useMethodTag="system_check_mac_address" arguments="wifi_mac" />
             </testStep>
        </testCase>
-       <testCase testCaseId="SYS_35" testCaseName="Check_Power_State_Before_Reboot" desc="Checks the powerstate before reboot" >
+       <!--testCase testCaseId="SYS_35" testCaseName="Check_Power_State_Before_Reboot" desc="Checks the powerstate before reboot" >
             <testCaseInfo testCaseType="direct" revert="true" />
             <testStep testStepId="1" name="Get_Power_State" method="Get_Power_State" saveResult="true" >
                 <resultGeneration useMethodTag="system_get_power_state"/>
@@ -471,5 +471,5 @@
                   <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_get_powerstate_before_reboot"/>
                 </resultGeneration>
             </testStep>
-       </testCase>
+       </testCase-->
 </testPlugin>

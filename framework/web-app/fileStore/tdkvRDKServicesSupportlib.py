@@ -1091,8 +1091,8 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_MS12_audio_compression":
-            info["compressionlevel"] = result.get('compressionlevel');
-            if str(result.get("success")).lower() == "true" and result.get('compressionlevel') in expectedValues :
+            info["compresionLevel"] = result.get('compressionlevel');
+            if str(result.get("success")).lower() == "true" and str(result.get('compressionlevel')) in expectedValues :
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -1119,8 +1119,8 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_intelligent_equalizer_mode":
-            info["intelligentEqualizerMode"] = result.get('intelligentEqualizerMode');
-            if str(result.get("success")).lower() == "true" and str(result.get('intelligentEqualizerMode')) in expectedValues:
+            info["intelligentEqualizerMode"] = result.get('mode');
+            if str(result.get("success")).lower() == "true" and str(result.get('mode')) in expectedValues:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -1285,7 +1285,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
         elif tag == "check_audio_port_status":
-            info["audioPortStatus"] = result.get('enable')
+            info["enable"] = result.get('enable')
             if str(result.get("success")).lower() == "true" and str(result.get('enable')) in expectedValues:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
@@ -1497,13 +1497,8 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
         # Warehouse Plugin Response result parser steps
         
         elif tag == "warehouse_get_device_info":
-            if arguments[0].lower() == "enable":
-                info = checkAndGetAllResultInfo(result,result.get("success"))
-            elif arguments[0].lower() == "disable":
-                rf4ce_Mac = result.get("rf4ce_mac")
-                result.pop("rf4ce_mac")
-                info = checkAndGetAllResultInfo(result,result.get("success"))
-                info["rf4ce_mac"] = rf4ce_Mac
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+
         elif tag == "warehouse_set_operation":
             info = result.copy()
             if len(arg) and arg[0] == "invalid":
@@ -2144,10 +2139,8 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             testStepResults = testStepResults[0].values()[0]
             testStepResults[0] = testStepResults[0].get("temperatureThresholds")
             if str(arg[0]) == "warn":
-                print testStepResults[0].get("WARN")
                 info["WARN"] = float(testStepResults[0].get("WARN")) + 10
             if str(arg[0]) == "max":
-                print testStepResults[0].get("MAX")
                 info["MAX"] = float(testStepResults[0].get("MAX")) + 10
 
         elif tag == "system_get_bluetooth_mac":
@@ -2534,7 +2527,7 @@ def generateComplexTestInputParam(methodTag,testParams):
         elif tag == "rdkshell_set_animations_params":
             userGeneratedParam = {"animations":[testParams]}
         elif tag == "system_set_thresholds_params":
-            userGeneratedParam = {"thresholds":{testParams}}
+            userGeneratedParam = {"thresholds":testParams}
 
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)
