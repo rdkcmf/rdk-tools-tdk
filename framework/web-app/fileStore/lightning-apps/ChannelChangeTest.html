@@ -1,0 +1,273 @@
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+
+ Copyright 2021 RDK Management
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+
+    <style>
+        body {
+            background: black;
+        }
+        #state {
+            position: absolute;
+            left: 10%;
+            top: 5%;
+            width: 30%;
+            height: 30%;
+            overflow: hidden;
+            opacity: 1;
+            background: black;
+            color: green;
+        }
+    </style>
+
+</head>
+<body style="margin:0;background:transparent;">
+    <div id="font-preload" style="position: absolute; z-index: -1; opacity: 0">
+        <div id="light">.</div>
+        <div id="regular">.</div>
+        <div id="semiBold">.</div>
+        <div id="bold">.</div>
+    </div>
+    <div id="state"></div>
+    <video autoplay="" id="video" width="1280" height="720" style="position: absolute; z-index: -1" src="//cdn.metrological.com/hls/sanfrancisco720.m3u8"></video>
+<script>
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const TUNE_INTERVAL = urlParams.get('tune_interval') || 8
+    const TEST_DURATION = urlParams.get('test_duration') || 5
+
+    console.log('Starting channel change test with params:');
+    console.log('Test duration:', TEST_DURATION);
+    console.log('Tune interval', TUNE_INTERVAL);
+
+    var channels = [
+      {
+        "manifest" : { "src": "//cdn.metrological.com/hls/greenland720.m3u8" },
+        "id" : "Greenland",
+        "rid": 1,
+        "name" : "Greenland",
+        "image" : "images/channels/greenland.png",
+        "linear": true,
+        "imgPath": "greenland",
+        "streamOffset": 0
+      },
+      {
+        "manifest" : { "src": "//cdn.metrological.com/hls/hongkong720.m3u8" },
+        "id" : "Hongkong",
+        "rid": 5,
+        "name" : "Hong Kong",
+        "image" : "images/channels/hongkong.png",
+        "imgPath": "hongkong",
+        "streamOffset": 0
+      },
+      {
+        "manifest" : { "src": "//cdn.metrological.com/hls/dubai720.m3u8"},
+        "id" : "Dubai",
+        "rid": 3,
+        "name" : "Dubai",
+        "image" : "images/channels/dubai.png",
+        "linear": true,
+        "imgPath": "dubai",
+        "streamOffset": 0
+      },
+      {
+        "manifest" : { "src": "//cdn.metrological.com/hls/hawaii720.m3u8" },
+        "id" : "Hawaii",
+        "rid": 4,
+        "name" : "Hawaii",
+        "image" : "images/channels/hawaii.png",
+        "imgPath": "hawaii",
+        "streamOffset": 0
+      },
+      {
+        "manifest" : { "src": "//cdn.metrological.com/hls/liwa720.m3u8" },
+        "id" : "Liwa",
+        "rid": 6,
+        "name" : "Liwa",
+        "image" : "images/channels/liwa.png",
+        "imgPath": "liwa",
+        "streamOffset": 0
+      },
+      {
+        "manifest" : { "src": "//cdn.metrological.com/hls/london720.m3u8" },
+        "id" : "London",
+        "rid": 7,
+        "name" : "London",
+        "image" : "images/channels/london.png",
+        "imgPath": "london",
+        "streamOffset": 0
+      },
+      {
+        "manifest" : { "src": "//cdn.metrological.com/hls/losangeles720.m3u8" },
+        "id" : "Losangeles",
+        "rid": 10,
+        "name" : "Los Angeles",
+        "image" : "images/channels/losangeles.png",
+        "imgPath": "losangeles",
+        "streamOffset": 0
+      },
+      {
+        "manifest" : { "src": "//cdn.metrological.com/hls/newyork720.m3u8" },
+        "id" : "Newyork",
+        "rid": 11,
+        "name" : "New York",
+        "image" : "images/channels/newyork.png",
+        "imgPath": "newyork",
+        "streamOffset": 0
+      },
+      {
+        "manifest" : { "src": "//cdn.metrological.com/hls/sanfrancisco720.m3u8" },
+        "id" : "Sanfransisco",
+        "rid": 12,
+        "name" : "San Francisco",
+        "image" : "images/channels/sanfrancisco.png",
+        "imgPath": "sanfransisco",
+        "streamOffset": 0
+      }
+  ];
+
+    window.onload = function() {
+        function runTest() {
+            const videoEl = document.getElementById('video');
+            videoEl.addEventListener('canplay', () => {
+                console.log('Canplay ', curIdx)
+                videoEl.play();
+            });
+
+            videoEl.addEventListener('error', () => {
+                console.error('Error tuning to ', curIdx)
+            });
+
+            videoEl.addEventListener('playing', () => {
+                console.log('Playing ', curIdx)
+                channelchange_stop = performance.now();
+                setTimeout(processLog, 500);
+            });
+
+            videoEl.addEventListener('onlicenseacquire_start', () => {
+                licenseacquire_start = performance.now();
+            });
+
+            videoEl.addEventListener('onlicenseacquire_stop', () => {
+                licenseacquire_stop = performance.now();
+            });
+
+            //eme = initEme()
+            //eme.setup(videoEl)
+
+            /*
+             * Stages:
+             *  0. Channel change start
+             *  1. handleLicenseAcquire start/stop
+             *  2. Channel change stop
+             */
+
+            let channelchange_start, channelchange_stop, licenseacquire_start, licenseacquire_stop;
+
+            let curIdx = 0;
+            function tuneToChannel() {
+                // reset
+                channelchange_stop = 0;
+                channelchange_start = 0;
+                licenseacquire_start = 0;
+                licenseacquire_stop = 0;
+
+                if (curIdx >= channels.length)
+                    curIdx = 0;
+
+                let _channel = channels[ curIdx ];
+                console.log(`Tuning to channel ${curIdx+1} with src: ${_channel.manifest.src}`);
+
+                videoEl.setAttribute('src', '');
+                //eme
+                //setTimeout(eme.start, 100, stream.stream_url);
+                setTimeout( () => {
+                  channelchange_start = performance.now();
+                  videoEl.setAttribute('src', _channel.manifest.src);
+                }, 100)
+
+                curIdx++;
+            }
+
+            let avg_channelchange = 0;
+            let avg_channelchange_log = [];
+            let avg_licenseacquire = 0;
+            let avg_licenseacquire_log = [];
+
+            function processLog() {
+                const stateEl = document.getElementById('state');
+
+                let lastChannelChange = (channelchange_stop - channelchange_start).toFixed(0);
+                let lastLicenseAcquire = (licenseacquire_stop - licenseacquire_start).toFixed(0);
+
+                avg_channelchange_log.push(lastChannelChange);
+                avg_channelchange = average(avg_channelchange_log);
+
+                avg_licenseacquire_log.push(lastLicenseAcquire)
+                avg_licenseacquire = average(avg_licenseacquire_log);
+
+                stateStr = `Channel change statistics:<br>
+                    last channel change:        ${lastChannelChange} ms<br>
+                    last license acquire:       ${lastLicenseAcquire} ms<br>
+                    <br>
+                    Averages:<br>
+                    avg channel change:         ${avg_channelchange} ms<br>
+                    avg license request:        ${avg_licenseacquire} ms<br>`;
+
+                stateEl.innerHTML = stateStr;
+
+                console.log(`channel change: ${lastChannelChange} avg: ${avg_channelchange}, license: ${lastLicenseAcquire} avg: ${avg_licenseacquire}`);
+            }
+
+            function average(log) {
+                if (log.length === 0)
+                    return null;
+
+                let total = parseFloat(log[0]);
+                for (let i=1;i<log.length;i++) {
+                    total += parseFloat(log[i]);
+                }
+
+                let avg = (total/log.length)
+                return avg.toFixed(0);
+            }
+
+            function endTest() {
+                clearInterval(programLoop);
+
+                const stateEl = document.getElementById('state');
+                stateEl.innerHTML += '<br>Test ended';
+
+                videoEl.setAttribute('src', '');
+
+                console.log('Test ended');
+            }
+
+            programLoop = setInterval(tuneToChannel, TUNE_INTERVAL * 1000);
+            setTimeout(endTest, TEST_DURATION * 60 * 1000); //5min
+        }
+
+        setTimeout(runTest, 5000);
+    }
+</script>
+
+
+</body></html>
