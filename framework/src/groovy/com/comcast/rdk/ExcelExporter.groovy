@@ -26,7 +26,10 @@ import de.andreasschmitt.export.builder.ExcelBuilder
 import de.andreasschmitt.export.exporter.AbstractExporter
 import de.andreasschmitt.export.exporter.Exporter;
 import de.andreasschmitt.export.exporter.ExportingException;
-
+import jxl.write.WritableHyperlink;
+import jxl.write.WritableSheet
+import jxl.write.WritableCell
+import jxl.write.biff.CellValue
 /**
  * Exporter for excel exporting of consolidated report.
  *
@@ -128,7 +131,7 @@ class ExcelExporter extends AbstractExporter {
 
 							}
 						}else{
-						int rowIndex = 0
+						int rowIndex = 1
 							Map tabMap = dataMap.get(sheetName)
 							if(tabMap != null){
 								List data = tabMap?.get("dataList")
@@ -165,6 +168,34 @@ class ExcelExporter extends AbstractExporter {
 									}
 								}
 							}
+						}
+					}
+					WritableSheet[] workbookSheets = workbook.getSheets()
+					workbookSheets.each { eachSheet ->
+						String sheetName = eachSheet.getName()
+						if(sheetName.equals("Summary")){
+							int i = 10
+							while(1){
+								WritableCell cell = eachSheet.getWritableCell(5,i)
+								def contents = cell.getContents()
+								if(contents.equals("Total")){
+									break;
+								}else{
+									WritableSheet contentSheet = workbook.getSheet(contents)
+									if(contentSheet){
+										def link = new WritableHyperlink(5,i,"",contentSheet,0,0)
+										link.setDescription(contents);
+										eachSheet.addHyperlink(link);
+									}
+								}
+								i++
+							}
+						}else{
+							WritableSheet summarySheet = workbook.getSheet("Summary")
+							eachSheet.mergeCells(0,0,5,0);
+							def link = new WritableHyperlink(0,0,"",summarySheet,0,0)
+							link.setDescription("Go to Summary");
+							eachSheet.addHyperlink(link);
 						}
 					}
 				}
@@ -267,7 +298,7 @@ class ExcelExporter extends AbstractExporter {
 																
 							}
 						}else{  // Diffrent sheets
-							int rowIndex = 0
+							int rowIndex = 1
 							if(!sheetName.equals("CoverPage")){
 								List columnWidthList=[0.6]
 								//module wise script list iteration 
@@ -282,7 +313,7 @@ class ExcelExporter extends AbstractExporter {
 									// shows script list including  scipt name
 								//	cell(row: rowIndex, column: 0, value: "Sl No", format: "header")
 									cell(row: rowIndex, column: 0, value: "Script Name", format: "header")
-									rowIndex = 1	
+									rowIndex = 2	
 								//	int scriptCount = 1							
 									data?.each { script ->
 										//cell(row: rowIndex, column: 0,  value:scriptCount?.toString(), format: "cell")
@@ -292,6 +323,33 @@ class ExcelExporter extends AbstractExporter {
 									}
 								}
 							}
+						}
+					}
+					WritableSheet[] workbookSheets = workbook.getSheets()
+					workbookSheets.each { eachSheet ->
+						String sheetName = eachSheet.getName()
+						if(sheetName.equals("Summary")){
+							int i = 1
+							while(1){
+								WritableCell cell = eachSheet.getWritableCell(5,i)
+								def contents = cell.getContents()
+								if(!contents || contents == ""){
+									break;
+								}else{
+									WritableSheet contentSheet = workbook.getSheet(contents)
+									if(contentSheet){
+										def link = new WritableHyperlink(5,i,"",contentSheet,0,0)
+										link.setDescription(contents);
+										eachSheet.addHyperlink(link);
+									}
+								}
+								i++
+							}
+						}else{
+							WritableSheet summarySheet = workbook.getSheet("Summary")
+							def link = new WritableHyperlink(0,0,"",summarySheet,0,0)
+							link.setDescription("Go to Summary");
+							eachSheet.addHyperlink(link);
 						}
 					}
 				}
@@ -654,10 +712,9 @@ class ExcelExporter extends AbstractExporter {
 
 									}
 								}
-
 							}
 						}else if(sheetName.equals("rdkservices")){
-							int rowIndex = 0
+							int rowIndex = 1
 							Map tabMap = dataMap.get(sheetName)
 							if(tabMap != null){
 								List data = tabMap?.get("rdkserviceScripts")
@@ -677,10 +734,11 @@ class ExcelExporter extends AbstractExporter {
 										cell(row: rowIndex, column: 0, value: "Sl No", format: "header")
 										cell(row: rowIndex, column: 1, value: "Script Name", format: "header")
 										cell(row: rowIndex, column: 2, value: "Status", format: "header")
-										cell(row: rowIndex, column: 3, value: "Log Data", format: "header")
-										cell(row: rowIndex, column: 4, value: "Jira #", format: "header")
-										cell(row: rowIndex, column: 5, value: "Issue Type", format: "header")
-										cell(row: rowIndex, column: 6, value: "Remarks", format: "header")
+										cell(row: rowIndex, column: 3, value: "Executed On", format: "header")
+										cell(row: rowIndex, column: 4, value: "Log Data", format: "header")
+										cell(row: rowIndex, column: 5, value: "Jira #", format: "header")
+										cell(row: rowIndex, column: 6, value: "Issue Type", format: "header")
+										cell(row: rowIndex, column: 7, value: "Remarks", format: "header")
 										rowIndex ++
 
 										//Rows
@@ -694,7 +752,7 @@ class ExcelExporter extends AbstractExporter {
 								}
 							}
 						}else{
-						int rowIndex = 0
+						int rowIndex = 1
 							Map tabMap = dataMap.get(sheetName)
 							if(tabMap != null){
 								List data = tabMap?.get("dataList")
@@ -716,10 +774,11 @@ class ExcelExporter extends AbstractExporter {
 										cell(row: rowIndex, column: 0, value: "Sl No", format: "header")
 										cell(row: rowIndex, column: 1, value: "Pre-Requisite Name", format: "header")
 										cell(row: rowIndex, column: 2, value: "Status", format: "header")
-										cell(row: rowIndex, column: 3, value: "Log Data", format: "header")
-										cell(row: rowIndex, column: 4, value: "Jira #", format: "header")
-										cell(row: rowIndex, column: 5, value: "Issue Type", format: "header")
-										cell(row: rowIndex, column: 6, value: "Remarks", format: "header")
+										cell(row: rowIndex, column: 3, value: "Executed On", format: "header")
+										cell(row: rowIndex, column: 4, value: "Log Data", format: "header")
+										cell(row: rowIndex, column: 5, value: "Jira #", format: "header")
+										cell(row: rowIndex, column: 6, value: "Issue Type", format: "header")
+										cell(row: rowIndex, column: 7, value: "Remarks", format: "header")
 										rowIndex ++
 										
 										preRequisiteList.eachWithIndex { object, k ->
@@ -755,10 +814,11 @@ class ExcelExporter extends AbstractExporter {
 											cell(row: rowIndex, column: 0, value: "Sl No", format: "header")
 											cell(row: rowIndex, column: 1, value: "Post-Requisite Name", format: "header")
 											cell(row: rowIndex, column: 2, value: "Status", format: "header")
-											cell(row: rowIndex, column: 3, value: "Log Data", format: "header")
-											cell(row: rowIndex, column: 4, value: "Jira #", format: "header")
-											cell(row: rowIndex, column: 5, value: "Issue Type", format: "header")
-											cell(row: rowIndex, column: 6, value: "Remarks", format: "header")
+											cell(row: rowIndex, column: 3, value: "Executed On", format: "header")
+											cell(row: rowIndex, column: 4, value: "Log Data", format: "header")
+											cell(row: rowIndex, column: 5, value: "Jira #", format: "header")
+											cell(row: rowIndex, column: 6, value: "Issue Type", format: "header")
+											cell(row: rowIndex, column: 7, value: "Remarks", format: "header")
 											rowIndex ++
 											
 											postRequisiteList.eachWithIndex { object, k ->
@@ -776,6 +836,34 @@ class ExcelExporter extends AbstractExporter {
 									}
 								}
 							}
+						}
+					}
+					WritableSheet[] workbookSheets = workbook.getSheets()
+					workbookSheets.each { eachSheet ->
+						String sheetName = eachSheet.getName()
+						if(sheetName.equals("Summary")){
+							int i = 10
+							while(1){
+								WritableCell cell = eachSheet.getWritableCell(5,i)
+								def contents = cell.getContents()
+								if(contents.equals("Total")){
+									break;
+								}else{
+									WritableSheet contentSheet = workbook.getSheet(contents)
+									if(contentSheet){
+										def link = new WritableHyperlink(5,i,"",contentSheet,0,0)
+										link.setDescription(contents);
+										eachSheet.addHyperlink(link);
+									}
+								}
+								i++
+							}
+						}else{
+							WritableSheet summarySheet = workbook.getSheet("Summary")
+							eachSheet.mergeCells(0,0,4,0);
+							def link = new WritableHyperlink(0,0,"",summarySheet,0,0)
+							link.setDescription("Go to Summary");
+							eachSheet.addHyperlink(link);
 						}
 					}
 				}

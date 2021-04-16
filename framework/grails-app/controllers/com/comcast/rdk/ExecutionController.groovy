@@ -2238,7 +2238,7 @@ class ExecutionController {
 					String executionResultOutput = executionResultList[i]?.executionOutput
 					if(scriptfile){
 						if(scriptfile?.category?.toString()?.equals(RDKV_RDKSERVICE?.toString())){
-							if(executionResultOutput?.contains("[Pre-requisite Status]")) {
+							if(scriptfile?.moduleName?.equals((RDKSERVICES?.toString()))) {
 								isPatternPresent = true
 							}
 							isRDKServiceExecution = true
@@ -2249,9 +2249,9 @@ class ExecutionController {
 					}
 				}
 				if(isRDKServiceExecution && isPatternPresent){
-					columnWidthList = [0.08,0.4,0.15,0.9]
+					columnWidthList = [0.08,0.4,0.15,0.15,0.9]
 					dataMap = executedbService.getDataForRDKServiceConsolidatedListExcelExport(executionInstance, getRealPath(),getApplicationUrl())
-					fieldMap = ["C1":" Sl.No ", "C2":" Test Case Name ","C3":"Status","C4":" Log Data ","C5":"Jira #","C6":"Issue Type","C7":"Remarks"]
+					fieldMap = ["C1":" Sl.No ", "C2":" Test Case Name ","C3":"Status","C4":"Executed On","C5":" Log Data ","C6":"Jira #","C7":"Issue Type","C8":"Remarks"]
 				}else{
 					dataMap = executedbService.getDataForConsolidatedListExcelExport(executionInstance, getRealPath(),getApplicationUrl())
 					fieldMap = ["C1":" Sl.No ", "C2":" Script Name ","C3":"Executed","C4":" Status ", "C5":"Executed On ","C6":"Log Data","C7":"Jira #","C8":"Issue Type","C9":"Remarks","C10":" Agent Console Log"]

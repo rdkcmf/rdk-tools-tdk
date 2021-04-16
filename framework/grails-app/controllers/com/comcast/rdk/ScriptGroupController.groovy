@@ -3547,7 +3547,7 @@ class ScriptGroupController {
 				detailsMap.put(moduleName, scripts.size())
 			}
 
-			detailsMap.put("TCL_SCRIPTS",tclScriptMap?.size() )
+			detailsMap.put("TCL_SCRIPT",tclScriptMap?.size() )
 			coverPageMap.put("Details", detailsMap)
 			detailDataMap.put("coverPage", coverPageMap)
 			// For script list display according to the module wise
