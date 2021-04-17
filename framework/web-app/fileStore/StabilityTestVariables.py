@@ -20,8 +20,8 @@
 #The port must be 9998 for thunder builds and 9224 for rdkservice builds
 webinspect_port = ""
 
-#channel change application url, sample application:"http://cdn.metrological.com/static/storm/cc_time_v2.html?test_duration=730"
-channel_change_url = ""
+#channel change application url,replace <TM-IP> with Test manager IP in the URL:
+channel_change_url = "http://<TM-IP>:8080/rdk-test-tool/fileStore/lightning-apps/ChannelChangeTest.html?test_duration=730"
 
 #no of channel changes to perform
 max_channel_change_count = 1000
@@ -109,3 +109,9 @@ max_interface_changes = 1000
 ##Bluetooth connect-disconnect test
 #maximum number of connect and disconnect operations
 connect_disconnect_max_count = 1000
+
+##WebKitBrowser KeyStress test
+key_stress_max_count = 100
+
+##MoveTofront and MoveToBack test
+moveto_operation_max_count = 1000
