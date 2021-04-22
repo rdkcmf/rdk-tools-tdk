@@ -451,7 +451,8 @@
         <method name="Get_Power_State_Before_Reboot" api="getPowerStateBeforeReboot" type="method" desc="Gets the power state before reboot" />
         <event name="Event_MacAddresses_Retreived" eventName="onMacAddressesRetreived" eventId="client.events.1" type="event" desc="MacAddressesRetreived" />
         <event name="Event_PowerState_Changed" eventName="onSystemPowerStateChanged" eventId="client.events.1" type="event" desc="power state changed event" />
-
+        <event name="Event_SystemMode_Changed" eventName="onSystemModeChanged" eventId="client.events.1" type="event" desc="Fires on system mode changed event" />
+        <event name="Event_Temperature_Threshold_Changed" eventName="onTemperatureThresholdChanged" eventId="client.events.1" type="event" desc="Fires on temperature threshold change" />
     </plugin>
 
 
@@ -729,6 +730,10 @@
         <method name="DisplayInfo_GetHDRFormatInUse" api="hdrsetting" type="property" desc="Gets HDR format in use" >
             <expectedValues>HdrOff,Hdr10,Hdr10Plus,HdrHlg,HdrDolbyvision,HdrTechnicolor</expectedValues>
         </method>
+        <method name="Get_Total_GPU_RAM" api="totalgpuram" type="property" desc="Gets the total GPU DRAM memory in bytes"/>
+        <method name="Get_Free_GPU_RAM" api="freegpuram" type="property" desc="Gets the free GPU DRAM memory in bytes"/>
+        <method name="Get_Width_In_Centimeters" api="widthincentimeters" type="property" desc="Gets the horizontal size in centimeters"/>
+        <method name="Get_Height_In_Centimeters" api="heightincentimeters" type="property" desc="Gets the vertical size in centimeters"/>
     </plugin>
 
 
@@ -899,6 +904,7 @@
         <method name="Disconnect" api="disconnect" type="method" desc="Disconnects the given device from this device">
             <params>
                 <param tag="deviceID" defaultValue="null"/>
+                <param tag="deviceType" defaultValue="null" />
             </params>
         </method>
         <method name="Pair" api="pair" type="method" desc="Pairs the given device with this device">
@@ -1272,6 +1278,7 @@
             </params>
         </method>
         <event name="Event_Zoom_Settings_Updated" eventName="zoomSettingUpdated" eventId="client.events.1" type="event" desc="Zoom settings updated event "/>
+        <event name="Event_Resolution_Changed" eventName="resolutionChanged" eventId="client.events.1" type="event" desc="Fires on changing resolution"/>
     </plugin>
 
     <!-- Messenger Plugin Information -->
@@ -1418,6 +1425,73 @@
         <method name="Read_Edid" api="readEDID" type="method" desc="Returns a current EDID value">
             <expectedValues>EDID</expectedValues>
         </method>
+    </plugin>
+   
+    <!-- PlayerInfo Plugin Information -->
+    <plugin pluginName="PlayerInfo" serviceName="PlayerInfo" serviceVersion="1">
+        <method name="Get_Audio_Codecs" api="audiocodecs" type="method" desc="Returns supported Audio codecs"/>
+        <method name="Get_Video_Codecs" api="videocodecs" type="method" desc="Returns supported Video codecs"/>
+        <method name="Get_Resolution" api="resolution" type="method" desc="Returns current Video playback resolution" />
+        <method name="Is_AudioEquivalence_Enabled" api="isaudioequivalenceenabled" type="method" desc="Checks Loudness Equivalence in platform"/>
+        <method name="Get_Dolby_Atmos_MetaData" api="dolby_atmosmetadata" type="method" desc="Atmos capabilities of Sink" />
+        <method name="Get_Dolby_SoundMode" api="dolby_soundmode" type="method" desc="Gets the dolby sound mode" />
+        <method name="Set_Atmos_Output" api="dolby_enableatmosoutput" type="method" desc="Enables Atmos Audio Output" >
+            <params paramType="directBool" >
+                <param tag="enable"  />
+            </params>
+        </method>
+        <event name="Event_Dolby_AudioMode_Changed" eventName="dolby_audiomodechanged" eventId="client.events.1" type="event" desc="Notifies audio mode changed event" />
+    </plugin>
+  
+    <!-- PersistentStore Plugin Information -->
+    <plugin pluginName="PersistentStore" serviceName="org.rdk.PersistentStore" serviceVersion="1">
+        <method name="Set_Value" api="setValue" type="method" desc="Sets the value of the key for given the namespace" >
+            <params>
+               <param tag="namespace" />
+               <param tag="key" />
+               <param tag="value" />
+            </params>
+        </method>
+        <method name="Get_Value" api="getValue" type="method" desc="Gets the value of the key for given namespace">
+            <params>
+               <param tag="namespace" />
+               <param tag="key" />
+            </params>
+        </method>
+        <method name="Get_Keys" api="getKeys" type="method" desc="Gets the keys list for given namespace" >
+            <params>
+               <param tag="namespace" />
+            </params>
+        </method>
+        <method name="Delete_Key" api="deleteKey" type="method" desc="Deletes the key for given namespace" >
+            <params>
+               <param tag="namespace" />
+               <param tag="key" />
+            </params>
+        </method>
+        <method name="Delete_Namespace" api="deleteNamespace" type="method" desc="Deletes the given Namespace">
+            <params>
+               <param tag="namespace" />
+               <param tag="key" />
+            </params>
+        </method>
+        <method name="Get_Namespaces" api="getNamespaces" type="method" desc="Gets the available namespaces" />
+        <method name="Get_Storage_Size" api="getStorageSize" type="method" desc="Returns the size occupied by each namespace" />
+        <method name="Flush_Cache" api="flushCache" type="method" desc="flushes the database cache" />
+    </plugin>
+
+    <!-- TextToSpeech Plugin Information -->
+    <plugin pluginName="TextToSpeech" serviceName="org.rdk.TextToSpeech" serviceVersion="1">
+        <method name="Enable_TTS" api="enabletts" type="method" desc="Enables/Disables the Text To Speech conversion processing" >
+            <params>
+               <param tag="enabletts" type="bool" />
+            </params>
+        </method>
+        <method name="Is_TTS_Enabled" api="isttsenabled" type="method" desc="Checks whether TTS Engine is enabled or not">
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Get_API_Version" api="getapiversion" type="method" desc="Gets the apiversion" />
+        <event name="Event_TTS_State_Changed" eventName="onttsstatechanged" eventId="client.events.1" type="event" desc="Notifies on TTS state changed" />
     </plugin>
 </thunderPlugins>
 

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2021 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<testPlugin pluginName="PlayerInfo" pluginVersion="1">
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="PlayerInfo" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,PlayerInfo" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,PlayerInfo" />
+                <params>
+                  <param tag="callsign" value="PlayerInfo" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,PlayerInfo" />
+                <params>
+                  <param tag="plugin" value="PlayerInfo" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,PlayerInfo" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+          <prerequisite requisiteId="2" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+                <params>
+                  <param tag="callsign" value="org.rdk.DisplaySettings" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+                <params>
+                  <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+        </pluginPreRequisite>
+
+        <testCase testCaseId="PI_01" testCaseName="PlayerInfo_Check_Audio_Codecs"  desc="checks the audio codecs list">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Get_Audio_Codecs" method="Get_Audio_Codecs">
+              <resultGeneration useMethodTag="playerinfo_check_audio_video_codecs" >
+                 <expectedValues useConfigFile="true" key="SUPPORTED_AUDIO_CODECS" />
+              </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="PI_02" testCaseName="PlayerInfo_Check_Video_Codecs"  desc="checks the video codecs list">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Get_Video_Codecs" method="Get_Video_Codecs">
+              <resultGeneration useMethodTag="playerinfo_check_audio_video_codecs" >
+                 <expectedValues useConfigFile="true" key="SUPPORTED_Video_CODECS" />
+              </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="PI_03" testCaseName="PlayerInfo_Check_AudioEquivalence_Enabled"  desc="Checks Loudness Equivalence in platform">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Is_AudioEquivalence_Enabled" method="Is_AudioEquivalence_Enabled">
+              <resultGeneration useMethodTag="playerinfo_validate_boolean_result" />
+            </testStep>
+        </testCase>
+        <testCase testCaseId="PI_04" testCaseName="PlayerInfo_Check_Dolby_Atmos_MetaData"  desc="Gets the Atmos capabilities of Sink">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Get_Dolby_Atmos_MetaData" method="Get_Dolby_Atmos_MetaData">
+              <resultGeneration useMethodTag="playerinfo_validate_boolean_result" />
+            </testStep>
+        </testCase>
+        <testCase testCaseId="PI_05" testCaseName="PlayerInfo_Check_Dolby_Sound_mode"  desc="Checks the dolby sound mode">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Get_Dolby_SoundMode" method="Get_Dolby_SoundMode">
+              <resultGeneration useMethodTag="playerinfo_check_results" expectedValues="Unknown,Mono,Stereo,Surround,Passthru"/>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="PI_06" testCaseName= "Enable_Disable_Audio_Atmos_Output" desc="Check whether audio atmos output is possile to enable and disable">
+            <testCaseInfo testCaseType="loop" />
+            <testStep testStepId="1" name="Enable_Disable_Audio_Atmos_Output" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Enable_Disable_Audio_Atmos_Output" method="Set_Atmos_Output" >
+                  <params>
+                    <param tag="enable" value="True,False" iteration="true" />
+                  </params>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="PI_07" testCaseName= "SetAndGet_All_Supported_Resolutions" desc="Set and get all the supported resolution by both TV and STB">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" pluginName="DisplaySettings">
+                <resultGeneration useMethodTag="display_connected_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_Resolutions" method="Get_Supported_Resolutions" saveResult="true" pluginName="DisplaySettings">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="display_supported_resolutions"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Current_Resolution"  method="Get_Current_Resolution" saveResult="true" revertGet="yes" pluginName="DisplaySettings">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="check_current_resolution" >
+                  <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_resolutions"/>
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Set_Resolution" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Resolution" method="Set_Current_Resolution" revertSet="yes" pluginName="DisplaySettings">
+                  <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                  <param tag="resolution" usePreviousResult="true" Id="2" iteration="true" useMethodTag="player_info_get_resolutions" revertParam="yes"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Resolution"  method="Get_Resolution" revertFlag="yes" >
+                  <resultGeneration useMethodTag="playerinfo_check_resolution" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+</testPlugin>
+

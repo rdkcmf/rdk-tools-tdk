@@ -40,6 +40,7 @@
           </prerequisite>
           <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" >
             <event pluginName="DisplaySettings" eventName="Event_Zoom_Settings_Updated" />
+            <event pluginName="DisplaySettings" eventName="Event_Resolution_Changed" />
           </prerequisite>
         </pluginPreRequisite>
        
@@ -262,7 +263,7 @@
             </testStep>
         </testCase>
 
-        <testCase testCaseId="DS_15" testCaseName= "SetAndGet_All_Supported_Resolutions" desc="Set and get all the supported resolution by both TV and STB">
+        <testCase testCaseId="DS_15" testCaseName= "SetAndGet_All_Supported_Resolutions" desc="Set and get all the supported resolution by both TV and STB, also checks for the resolution changed event">
             <testCaseInfo testCaseType="loop" revert="true" />
             <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true">
                 <resultGeneration useMethodTag="display_connected_status"/>
@@ -289,6 +290,11 @@
               </subtestStep>
               <subtestStep subtestStepId="2" name="Get_Current_Resolution"  method="Get_Current_Resolution" revertFlag="yes" >
                   <resultGeneration useMethodTag="check_current_resolution" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Check_Resolution_Changed_Event" event="Event_Resolution_Changed" action="eventListener" delay="3" >
+                  <resultGeneration useMethodTag="displaysettings_check_resolution_changed_event" >
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>

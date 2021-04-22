@@ -574,7 +574,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
         elif tag == "system_get_preferred_standby_mode":
             preferredStandbyMode = result.get("preferredStandbyMode")
             success = str(result.get("success")).lower() == "true"
-            info["preferredStandbyMode"] = preferredStandbyMode
+            info["standbyMode"] = preferredStandbyMode
             if success and preferredStandbyMode in expectedValues:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
@@ -785,6 +785,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "displayinfo_check_for_nonempty_result":
             info = checkAndGetAllResultInfo(result)
+        
+        elif tag == "displayinfo_validate_results":
+            info["Result"] = result
+            if result > 0:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "displayinfo_validate_boolean_result":
             if str(result.lower()) == "true" or str(result.lower()) == "false" :
@@ -827,6 +834,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "displayinfo_check_edid_result":
+            info = checkAndGetAllResultInfo(result)
+            EDID = result.get("data")
+            if str(EDID) == str(expectedValues[0]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
         # Parser Code for ActivityMonitor plugin
         elif tag == "activitymonitor_check_applications_memory":
             info = checkAndGetAllResultInfo(result,result.get("success"))
@@ -1677,6 +1691,116 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        # PlayerInfo Plugin Response result parser steps
+        elif tag == "playerinfo_check_audio_video_codecs":
+            info["RESULT"] = result
+            status = checkNonEmptyResultData(result)
+            codec_status = [ "FALSE" for codec in expectedValues if codec  not in result ]
+            if status == "TRUE" and "FALSE" not in codec_status:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "playerinfo_validate_boolean_result":
+            info["RESULT"] = result
+            if str(result).lower() == "true" or str(result).lower() == "false" :
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "playerinfo_check_results":
+            info["RESULT"] = result
+            if result in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "playerinfo_check_resolution":
+            result = re.split('Resolution',result)
+            info["resolution"] = str(result[1]).lower()
+            if str(result[1]).lower() in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "playerinfo_check_resolution":
+            info["resolution"]= result
+            fps_data = ""
+            resolution = result.replace("Resolution","")
+            fps_data = re.split('(p|i)',str(expectedValues[0]))[2]
+            if fps_data == "60":
+                expectedValues = str(expectedValues[0])[0:-2]
+            if str(resolution).lower() in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+     
+        # PersistentStore Plugin Response result parser steps
+        elif tag == "persistentstore_check_set_operation":
+            if str(result.get("success")).lower() == "true":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "persistentstore_check_value":
+            info["value"] = result.get("value")
+            success = str(result.get("success")).lower() == "true"
+            if success and str(result.get("value")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "persistentstore_get_keys":
+            keys = result.get("keys")
+            info["Keys"] = keys
+            if arg[0] == "check_not_exists":
+                if expectedValues[0] not in keys:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif arg[0] == "check_if_exists":
+                if expectedValues[0] in keys:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+        elif tag == "persistentstore_get_namespaces":
+            Namespaces = result.get("namespaces")
+            info["Namespaces"] = Namespaces
+            if arg[0] == "check_not_exists":
+                if expectedValues[0] not in Namespaces:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif arg[0] == "check_if_exists":
+                if expectedValues[0] in Namespaces:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+        elif tag == "persistentstore_get_storage_size":
+            status = checkNonEmptyResultData(result)
+            if "FALSE" not in status:
+                storage_size = []
+                for key,value in result.get("namespaceSizes").iteritems():
+                    storage_size.append(str(key)+": "+str(value))
+                    info["storage_size"] =  storage_size
+                    info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["storage_size"] = result
+                info["Test_Step_Status"] = "FAILURE"
+
+        # TextToSpeech Plugin Response result parser steps
+        elif tag == "texttospeech_get_enabled_status":
+            info["enabletts"] = result.get("isenabled")
+            success = str(result.get("success")).lower() == "true"
+            if success and str(result.get("isenabled")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "texttospeech_check_result":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+
+        elif tag == "texttospeech_check_api_version":
+            info["version"] = result.get("version")
+            success = str(result.get("success")).lower() == "true"
+            if success and result.get("version") == int(expectedValues[0]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_state":
@@ -2219,6 +2343,10 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             SupportingRes = testStepResults[0].get("supportedResolutions")
             info["resolutions"] = ",".join(SupportingRes)
 
+        elif tag == "displayinfo_get_connected_device_edid":
+            testStepResults = testStepResults[0].values()[0]
+            info["connected_device_edid"] = testStepResults[0].get('connected_device_edid')
+
         # Parser Code for ActivityMonitor plugin
         elif tag == "activitymonitor_get_appPid":
             testStepResults = testStepResults[0].values()[0]
@@ -2358,6 +2486,21 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             for portId in port_id_list:
                 portIds.append(portId)
             info["portId"] = ",".join(portIds)
+
+        #PlayerInfo Plugin Response result parser steps
+        elif tag == "player_info_get_resolutions":
+            testStepResults = testStepResults[0].values()[0]
+            SupportingRes = testStepResults[0].get("supportedResolutions")
+            info["resolution"] = ",".join(SupportingRes)
+        
+        # TextToSpeech Plugin Response result parser steps
+        elif tag == "texttospeech_toggle_enabled_status":
+            testStepResults = testStepResults[0].values()[0]
+            enabled_status = testStepResults[0].get("enabletts")
+            if str(enabled_status).lower() == "true":
+                info["enabletts"] = False
+            else:
+                info["enabletts"] = True
 
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_name":

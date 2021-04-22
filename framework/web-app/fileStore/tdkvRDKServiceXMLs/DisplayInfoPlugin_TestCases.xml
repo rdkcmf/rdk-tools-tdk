@@ -162,15 +162,27 @@
 
 
         <!-- Test case 08 -->
-        <!--
         <testCase testCaseId="DISP_08" testCaseName= "DisplayInfo_Get_EDID_DATA" desc="Get EDID of connected display">
             <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="GetEDID" method="DisplayInfo_GetEDID">
-                         #TODO: Need to add params.length parameter
-                <resultGeneration useMethodTag="displayinfo_check_for_nonempty_result" />
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Get_Connected_Device__EDID_Details" method="Read_EDID" pluginName="DisplaySettings" saveResult="true" >
+                <resultGeneration useMethodTag="check_connected_device_edid"/>
             </testStep>
-        </testCase> -->
-
+            <testStep testStepId="2" name="GetEDID" method="DisplayInfo_GetEDID">
+                <params>
+                   <param tag="length" useConfigFile="true" key="DISPLAYINFO_EDID_DATA_LENGTH"/>
+                </params>
+                <resultGeneration useMethodTag="displayinfo_check_edid_result" >
+                   <expectedValues usePreviousResult="true" Id="1" useMethodTag="displayinfo_get_connected_device_edid" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
 
 
         <!-- Test case 09 -->
@@ -244,8 +256,34 @@
                 <resultGeneration useMethodTag="displayinfo_validate_hdr_format_in_use" />
             </testStep>
         </testCase>
-
-    
+     <!-- Test case 13 -->    
+        <testCase testCaseId="DISP_13" testCaseName= "DisplayInfo_Get_Total_GPU_RAM" desc="Gets the total GPU DRAM memory in bytes" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Total_GPU_RAM" method="Get_Total_GPU_RAM">
+                <resultGeneration useMethodTag="displayinfo_validate_results" />
+            </testStep>
+        </testCase>
+     <!-- Test case 14 -->
+        <testCase testCaseId="DISP_14" testCaseName= "DisplayInfo_Get_Free_GPU_RAM" desc="Gets the free GPU DRAM memory in bytes" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Free_GPU_RAM" method="Get_Free_GPU_RAM">
+                <resultGeneration useMethodTag="displayinfo_validate_results" />
+            </testStep>
+        </testCase>
+     <!-- Test case 15 -->
+        <testCase testCaseId="DISP_15" testCaseName= "DisplayInfo_Get_Widthincentimeters" desc="Gets the horizontal size in centimeters" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Width_In_Centimeters" method="Get_Width_In_Centimeters" >
+                <resultGeneration useMethodTag="displayinfo_validate_results" />
+            </testStep>
+        </testCase>
+     <!-- Test case 16 -->
+        <testCase testCaseId="DISP_16" testCaseName= "DisplayInfo_Get_Heightincentimeters" desc="Gets the vertical size in centimeters" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Height_In_Centimeters" method="Get_Height_In_Centimeters">
+                <resultGeneration useMethodTag="displayinfo_validate_results" />
+            </testStep>
+        </testCase>
 </testPlugin>
 
 

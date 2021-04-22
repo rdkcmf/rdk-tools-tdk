@@ -274,7 +274,6 @@
                     <expectedValues useConfigFile="true" key="BT_EMU_DEVICE_NAME"/>
                 </resultGeneration>
             </testStep>
-
             <testStep testStepId="5" name="Pair" method="Pair" >
                 <params>
                   <param tag="deviceID" usePreviousResult="true" Id="4" useMethodTag="bluetooth_get_device_id"  />
@@ -313,6 +312,7 @@
             <testStep testStepId="11" name="Disconnect" method="Disconnect" delay="40">
                 <params>
                   <param tag="deviceID" usePreviousResult="true" Id="4" useMethodTag="bluetooth_get_device_id"  />
+                  <param tag="deviceType"  value="HUMAN INTERFACE DEVICE"/>
                 </params>
                 <resultGeneration useMethodTag="bluetooth_set_operation" />
             </testStep>
@@ -387,6 +387,7 @@
             <testStep testStepId="11" name="Disconnect" method="Disconnect" delay="40">
                 <params>
                   <param tag="deviceID" usePreviousResult="true" Id="4" useMethodTag="bluetooth_get_device_id"  />
+                  <param tag="deviceType"  value="HUMAN INTERFACE DEVICE"/>
                 </params>
                 <resultGeneration useMethodTag="bluetooth_set_operation" />
             </testStep>
@@ -461,6 +462,7 @@
             <testStep testStepId="11" name="Disconnect" method="Disconnect" delay="40">
                 <params>
                   <param tag="deviceID" usePreviousResult="true" Id="4" useMethodTag="bluetooth_get_device_id"  />
+                  <param tag="deviceType"  value="HUMAN INTERFACE DEVICE"/>
                 </params>
                 <resultGeneration useMethodTag="bluetooth_set_operation" />
             </testStep>

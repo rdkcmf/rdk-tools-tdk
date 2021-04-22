@@ -40,6 +40,8 @@
           <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
             <event pluginName="System" eventName="Event_MacAddresses_Retreived" />
             <event pluginName="System" eventName="Event_PowerState_Changed" />
+            <event pluginName="System" eventName="Event_SystemMode_Changed" />
+            <event pluginName="System" eventName="Event_Temperature_Threshold_Changed" />
           </prerequisite>
 
         </pluginPreRequisite>
@@ -195,16 +197,16 @@
 
         <testCase testCaseId="SYS_11" testCaseName="System_SetAndGet_Preferred_StandBy_Mode" desc="Set and get preferred standby mode" >
            <testCaseInfo testCaseType="loop" revert="true" />
-            <testStep testStepId="1" name="Get_Available_StandBy_Modes" method="Get_Available_StandBy_Modes" saveResult="true">
+            <testStep testStepId="1" name="Get_Available_StandBy_Modes" method="Get_Available_StandBy_Modes" saveResult="true" >
                 <resultGeneration useMethodTag="system_get_available_standby_modes" />
             </testStep>
-            <testStep testStepId="2" name="Get_Preferred_StandBy_Mode" method="Get_Preferred_StandBy_Mode" revertGet="yes">
+            <testStep testStepId="2" name="Get_Preferred_StandBy_Mode" method="Get_Preferred_StandBy_Mode" saveResult="true" revertGet="yes">
                 <resultGeneration useMethodTag="system_get_preferred_standby_mode" />
             </testStep>
             <testStep testStepId="3" name="SetAndGet_Preferred_StandBy_Mode" testStepType="loop">
               <subtestStep testStepId="1" name="Set_Preferred_StandBy_Mode" method="Set_Preferred_StandBy_Mode" revertSet="yes">
                   <params>
-                    <param tag="standbyMode" usePreviousResult="true" Id="1" useMethodTag="system_get_available_standby_modes" iteration="true" />
+                    <param tag="standbyMode" usePreviousResult="true" Id="1" useMethodTag="system_get_available_standby_modes" iteration="true" revertParam="yes" />
                   </params>
                   <resultGeneration useMethodTag="system_check_set_operation" />
               </subtestStep>
@@ -385,6 +387,9 @@
                   <expectedValues  usePreviousResult="true" Id="2" useMethodTag="system_generate_new_temperature_thresholds" />
                 </resultGeneration>
             </testStep>
+            <testStep testStepId="4" name="Check_Temperature_Thresholds_Change_Event" event="Event_Temperature_Threshold_Changed" action="eventListener" delay="3"  >
+              <resultGeneration useMethodTag="system_check_temperature_threshold_change_event"/>
+            </testStep>
         </testCase>
         <testCase testCaseId="SYS_27" testCaseName= "System_Get_Image_Version" desc="Gets the image version">
             <testCaseInfo testCaseType="direct"/>
@@ -472,4 +477,29 @@
                 </resultGeneration>
             </testStep>
        </testCase-->
+       <testCase testCaseId="SYS_35" testCaseName="System_Check_On_SystemMode_Changed" desc="Checks for the system mode changed event" >
+           <testCaseInfo testCaseType="direct" revert="true" />
+            <testStep testStepId="1" name="Get_STB_Mode" method="Get_Mode" >
+                <resultGeneration useMethodTag="system_validate_modes"/>
+            </testStep>
+            <testStep testStepId="2" name="Set_STB_Mode_WAREHOUSE" method="Set_Mode">
+                <params>
+                  <param tag="duration"  value="5" />
+                  <param tag="mode" value="WAREHOUSE" />
+                </params>
+                <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="3" name="Get_STB_Mode" method="Get_Mode" >
+                <resultGeneration useMethodTag="system_validate_modes" expectedValues="WAREHOUSE" />
+            </testStep>
+            <testStep testStepId="4" name="Check_On_SystemMode_Changed_Event" event="Event_SystemMode_Changed" action="eventListener"  >
+              <resultGeneration useMethodTag="system_check_system_mode_change_event" expectedValues="WAREHOUSE"/>
+            </testStep>
+            <testStep testStepId="5" name="Check_On_SystemMode_Changed_Event" event="Event_SystemMode_Changed" action="eventListener"  delay="5">
+              <resultGeneration useMethodTag="system_check_system_mode_change_event" expectedValues="NORMAL"/>
+            </testStep>
+            <testStep testStepId="6" name="Get_STB_Mode" method="Get_Mode" >
+                <resultGeneration useMethodTag="system_validate_modes" expectedValues="NORMAL" />
+            </testStep>
+       </testCase>
 </testPlugin>

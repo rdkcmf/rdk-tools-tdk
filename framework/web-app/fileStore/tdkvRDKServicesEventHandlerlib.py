@@ -353,6 +353,20 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             if str(result.get("powerState")) == str(expectedValues[0]):
                 info["Test_Step_Status"] = "SUCCESS"
 
+        elif tag == "system_check_temperature_threshold_change_event":
+            result=result[0]
+            info["Test_Step_Status"] = "FAILURE"
+            if str(result.get("exceeded")) == "true":
+                info["Test_Step_Status"] = "SUCCESS"
+
+        elif tag == "system_check_system_mode_change_event":
+            result = result[0]
+            info = result
+            if str(result.get("mode")) in  expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
         # LoggerPreferences Events response result parser steps
         elif tag == "loggingpreferences_check_onkeystroke_mask_enabled_change_event":
             result = result[0]
@@ -367,6 +381,13 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             result = result[0]
             info = result
             if str(result.get("zoomSetting")) in  expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "displaysettings_check_resolution_changed_event":
+            result = result[0]
+            info = result
+            if str(result.get("resolution")) in  expectedValues:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -547,6 +568,15 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
+
+        # TextToSpeech Events response result parser steps
+        elif tag == "texttospeech_check_tts_state_changed_event":
+            result = result[0]
+            info = result
+            if str(result.get("state")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # FirmwareControl Events response result parser steps
         elif tag == "fwc_check_upgrade_progress_event":
