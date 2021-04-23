@@ -73,6 +73,7 @@ import BrowserPerformanceUtility
 from rdkv_performancelib import *
 import rdkv_performancelib
 import BrowserPerformanceVariables
+import json
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
@@ -90,19 +91,20 @@ obj.setLoadModuleStatus(result);
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     browser_test_url=BrowserPerformanceVariables.octane_test_url;
-
+    browser_subcategory_list = ["EarleyBoyer","Splay","SplayLatency","pdf.js","CodeLoad"]
+    sub_category_failure = False
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
-    print "Current values \nUX:%s\nWebKitBrowser:%s\nCobalt:%s"%(curr_ux_status,curr_webkit_status,curr_cobalt_status);
+    status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
+    print "Current values \nWebKitBrowser:%s\nCobalt:%s"%(curr_webkit_status,curr_cobalt_status);
     if status == "FAILURE":
-        if "FAILURE" not in (curr_ux_status,curr_webkit_status,curr_cobalt_status):
+        if "FAILURE" not in (curr_webkit_status,curr_cobalt_status):
             set_status = set_pre_requisites(obj)
             #Need to revert the values since we are changing plugin status
             revert="YES"
             if set_status == "SUCCESS":
-                status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
+                status,webkit_status,cobalt_status = check_pre_requisites(obj)
             else:
                 status = "FAILURE";
     if status == "SUCCESS":
@@ -139,24 +141,36 @@ if expectedResult in result.upper():
                     time.sleep(300)
                     tdkTestObj = obj.createTestStep('rdkservice_getBrowserScore_Octane');
                     tdkTestObj.executeTestCase(expectedResult);
-                    browser_score = tdkTestObj.getResultDetails();
+                    browser_score_dict = json.loads(tdkTestObj.getResultDetails());
                     result = tdkTestObj.getResult()
-                    if browser_score != "Unable to get the browser score" and expectedResult in result:
+                    if browser_score_dict["main_score"] != "Unable to get the browser score" and expectedResult in result:
                         tdkTestObj.setResultStatus("SUCCESS");
-                        browser_score = browser_score.replace("Octane Score: ","");
+                        browser_score = browser_score_dict["main_score"].replace("Octane Score: ","");
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                        result, octane_threshold_value = getDeviceConfigKeyValue(conf_file,"OCTANE_THRESHOLD_VALUE")
-                        if result == "SUCCESS":
+                        result1, octane_threshold_value = getDeviceConfigKeyValue(conf_file,"OCTANE_THRESHOLD_VALUE")
+                        result2, octane_subcategory_threshold_values = getDeviceConfigKeyValue(conf_file,"OCTANE_SUBCATEGORY_THRESHOLD_VALUES")
+                        if all(value != "" for value in (octane_threshold_value,octane_subcategory_threshold_values)):
                             if int(browser_score) > int(octane_threshold_value):
-                                tdkTestObj.setResultStatus("SUCCESS");
-                                print "\n The browser performance is high as expected \n"
+                                print "\n The browser performance main score is high as expected \n"
+                                subcategory_threshold_value_list = octane_subcategory_threshold_values.split(',')
+                                for index,subcategory in enumerate(browser_subcategory_list):
+                                    if int(browser_score_dict[subcategory]) < int(subcategory_threshold_value_list[index]):
+                                        print "\n Subcategory {} score:{} is less than the threshold value:{} \n".format(subcategory,browser_score_dict[subcategory],subcategory_threshold_value_list[index])
+                                        tdkTestObj.setResultStatus("FAILURE")
+                                        sub_category_failure = True
+                                if not sub_category_failure:
+                                    tdkTestObj.setResultStatus("SUCCESS")
+                                    print "\n The subcategory scores of {} are also as high as expected\n".format(browser_subcategory_list)
+                                else:
+                                    tdkTestObj.setResultStatus("FAILURE")
+                                    print "\n The overall browser performance is lower than expected \n"
                             else:
                                 tdkTestObj.setResultStatus("FAILURE");
                                 print "\n The browser performance is lower than expected \n"
                         else:
                             tdkTestObj.setResultStatus("FAILURE");
                             print "Failed to get the threshold value from config file"
-                    elif "Running Octane" in browser_score:
+                    elif "Running Octane" in browser_score_dict["main_score"]:
                         tdkTestObj.setResultStatus("FAILURE");
                         print "Octane test is not completed"
                     else:
@@ -190,7 +204,7 @@ if expectedResult in result.upper():
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"
-        status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
+        status = revert_value(curr_webkit_status,curr_cobalt_status,obj);
     obj.unloadModule("rdkv_performance");
 else:
     obj.setLoadModuleStatus("FAILURE");

@@ -92,18 +92,20 @@ obj.setLoadModuleStatus(result);
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     browser_test_url=BrowserPerformanceVariables.sunspider_url
+    browser_subcategory_list = ["access","bitops","3bit-bits-in-byte","bits-in-byte","bitwise-and","nsieve-bits","controlflow","recursive","math"]
+    sub_category_failure = False
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
-    print "Current values \nUX:%s\nWebKitBrowser:%s\nCobalt:%s"%(curr_ux_status,curr_webkit_status,curr_cobalt_status);
+    status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
+    print "Current values \nWebKitBrowser:%s\nCobalt:%s"%(curr_webkit_status,curr_cobalt_status);
     if status == "FAILURE":
-        if "FAILURE" not in (curr_ux_status,curr_webkit_status,curr_cobalt_status):
+        if "FAILURE" not in (curr_webkit_status,curr_cobalt_status):
             set_status=set_pre_requisites(obj)
             #Need to revert the values since we are changing plugin status
             revert="YES"
             if set_status == "SUCCESS":
-                status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
+                status,webkit_status,cobalt_status = check_pre_requisites(obj)
             else:
                 status = "FAILURE";
     if status == "SUCCESS":
@@ -137,22 +139,35 @@ if expectedResult in result.upper():
                     time.sleep(40)
                     tdkTestObj = obj.createTestStep('rdkservice_getBrowserScore_SunSpider')
                     tdkTestObj.executeTestCase(expectedResult)
-                    browser_score = tdkTestObj.getResultDetails()
+                    browser_score_dict = json.loads(tdkTestObj.getResultDetails())
                     result = tdkTestObj.getResult()
                    
-                    if browser_score != "FAILURE" and expectedResult in result:
+                    if browser_score_dict["main_score"] != "FAILURE" and expectedResult in result:
                         tdkTestObj.setResultStatus("SUCCESS")
-	                print "\nThe Browser performance value(in ms) using SunSpider test is :{}\n".format(browser_score)
-	                browser_score = browser_score.split()[0].replace("ms","")
+	                print "\nThe Browser performance value(in ms) using SunSpider test is :{}\n".format(browser_score_dict["main_score"])
+	                browser_score = browser_score_dict["main_score"].split()[0].replace("ms","")
 	                conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                        result, sunspider_threshold_value = getDeviceConfigKeyValue(conf_file,"SUNSPIDER_THRESHOLD_VALUE")
-                        if result == "SUCCESS":
+                        result1, sunspider_threshold_value = getDeviceConfigKeyValue(conf_file,"SUNSPIDER_THRESHOLD_VALUE")
+                        result2, sunspider_subcategory_threshold_values = getDeviceConfigKeyValue(conf_file,"SUNSPIDER_SUBCATEGORY_THRESHOLD_VALUES")
+                        if all(value != "" for value in (sunspider_threshold_value,sunspider_subcategory_threshold_values)):
                             if float(browser_score) < float(sunspider_threshold_value):
                                 tdkTestObj.setResultStatus("SUCCESS");
-                                print "\n The browser performance is high as expected\n"
+                                print "\n The browser performance main score is high as expected\n"
+                                subcategory_threshold_value_list = sunspider_subcategory_threshold_values.split(',')
+                                for index,subcategory in enumerate(browser_subcategory_list):
+                                    if float(browser_score_dict[subcategory]) > float(subcategory_threshold_value_list[index]):
+                                        print "\n Subcategory {} time:{}ms is greater than the threshold time:{}ms \n".format(subcategory,browser_score_dict[subcategory],subcategory_threshold_value_list[index])
+                                        tdkTestObj.setResultStatus("FAILURE")
+                                        sub_category_failure = True
+                                if not sub_category_failure:
+                                    tdkTestObj.setResultStatus("SUCCESS")
+                                    print "\n The subcategory scores of {} are also as high as expected\n".format(browser_subcategory_list)
+                                else:
+                                    tdkTestObj.setResultStatus("FAILURE")
+                                    print "\n The overall browser performance is lower than expected \n"
                             else:
                                 tdkTestObj.setResultStatus("FAILURE");
-                                print "\n The browser performance is lower than expected\n"
+                                print "\n The browser performance main score is lower than expected\n"
                         else:
                             tdkTestObj.setResultStatus("FAILURE");
                             print "\n Failed to get the threshold value from config file\n"
@@ -185,7 +200,7 @@ if expectedResult in result.upper():
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"
-        status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
+        status = revert_value(curr_webkit_status,curr_cobalt_status,obj);
     obj.unloadModule("rdkv_performance");
 else:
     obj.setLoadModuleStatus("FAILURE");

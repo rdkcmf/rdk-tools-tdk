@@ -35,6 +35,7 @@ deviceIP=""
 devicePort=""
 deviceName=""
 deviceType=""
+graphical_plugins_list = ["Cobalt","WebKitBrowser","Amazon"]
 #METHODS
 #---------------------------------------------------------------
 #INITIALIZE THE MODULE
@@ -118,7 +119,13 @@ def rdkservice_getAllPluginStatus():
 #SET PLUGIN STATUS
 #------------------------------------------------------------------
 def rdkservice_setPluginStatus(plugin,status):
-    data = '"method": "Controller.1.'+status+'", "params": {"callsign": "'+plugin+'"}'
+    if plugin in graphical_plugins_list:
+        if status in "activate":
+            data = '"method":"org.rdk.RDKShell.1.launch", "params":{"callsign": "'+plugin+'", "type":"", "uri":""}'
+        else:
+            data = '"method":"org.rdk.RDKShell.1.destroy", "params":{"callsign": "'+plugin+'"}}'
+    else:
+        data = '"method": "Controller.1.'+status+'", "params": {"callsign": "'+plugin+'"}'
     result = execute_step(data)
     return result
 
@@ -191,6 +198,8 @@ def openChromeBrowser(url):
 #-------------------------------------------------------------------
 def rdkservice_getBrowserScore_CSS3():
    try:
+        browser_score_dict = {}
+        browser_subcategory_list = ["Basic User Interface Level 3","Basic User Interface Level 4","Cascading and Inheritance Level 3","Cascading and Inheritance Level 4","Custom Properties for Cascading Variables Level 1","Media Queries Level 3","Media Queries Level 4","Media Queries Level 5"]
         webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
         driver = openChromeBrowser(webinspectURL);
         if driver != "EXCEPTION OCCURRED":
@@ -210,6 +219,7 @@ def rdkservice_getBrowserScore_CSS3():
                 pass
             time.sleep(10)
             browser_score= driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol/ol/li[2]/span/span[2]').text
+            browser_score_dict["main_score"] = browser_score.replace("%","")
             print "\nThe Browser score using CSS3 test is : ",browser_score
             print "\n Subcategory scores:\n"
             print "===================================="
@@ -219,24 +229,30 @@ def rdkservice_getBrowserScore_CSS3():
                 parent = driver.find_elements_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li')
                 count = len(parent)
                 score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li['+str(count-1)+']/span/span[2]').text
+                if sub_category in browser_subcategory_list:
+                    new_score = score.replace("%","")
+                    browser_score_dict[sub_category] = new_score
                 print sub_category + '  :  ' + score
             print '\n'
             time.sleep(5)
             driver.quit()
         else:
-            browser_score = "Unable to get the browser score"
+            browser_score_dict["main_score"]= "Unable to get the browser score"
    except Exception as error:
         print "Got exception while getting the browser score"
         print error
-        browser_score = "Unable to get the browser score"
+        browser_score_dict["main_score"] = "Unable to get the browser score"
         driver.quit()
-   return browser_score;
+   browser_score_dict = json.dumps(browser_score_dict)
+   return browser_score_dict
 
 #-------------------------------------------------------------------
 #GET THE BROWSER SCORE FROM OCTANE TEST
 #-------------------------------------------------------------------
 def rdkservice_getBrowserScore_Octane():
    try:
+        browser_score_dict = {}
+        browser_subcategory_list = ["EarleyBoyer","Splay","SplayLatency","pdf.js","CodeLoad"]
         webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
         driver = openChromeBrowser(webinspectURL);
         if driver != "EXCEPTION OCCURRED":
@@ -256,6 +272,7 @@ def rdkservice_getBrowserScore_Octane():
                 pass
             time.sleep(10)
             browser_score= driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol/ol/li[1]/span/span[2]').text
+            browser_score_dict["main_score"] = browser_score
             print "\nThe Browser score using Octane test is : ",browser_score
             print "\n Subcategory scores:\n"
             print "===================================="
@@ -263,20 +280,25 @@ def rdkservice_getBrowserScore_Octane():
                 for j in range(1,5):
                     sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol['+str(i)+']/ol['+str(j)+']/ol/li[1]/span/span[2]').text
                     score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol['+str(i)+']/ol['+str(j)+']/ol/li[2]/span/span[2]').text
+                    if sub_category in browser_subcategory_list:
+                        browser_score_dict[sub_category] = score
                     print sub_category + '     :    ' + score
             sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol[4]/ol[5]/ol/li[1]/span/span[2]').text
             score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[3]/ol[4]/ol[5]/ol/li[2]/span/span[2]').text
+            if sub_category in browser_subcategory_list:
+                browser_score_dict[sub_category] = score
             print sub_category + '     :    ' + score + '\n'
             time.sleep(10)
             driver.quit()
         else:
-            browser_score = "Unable to get the browser score"
+            browser_score_dict["main_score"] = "Unable to get the browser score"
    except Exception as error:
         print "Got exception while getting the browser score"
         print error
-        browser_score = "Unable to get the browser score"
+        browser_score_dict["main_score"] = "Unable to get the browser score"
         driver.quit()
-   return browser_score;
+   browser_score_dict = json.dumps(browser_score_dict)
+   return browser_score_dict
 
 #----------------------------------------------------------------------
 #GET THE NAME OF DEVICE CONFIG FILE
@@ -331,6 +353,8 @@ def getDeviceConfigKeyValue(deviceConfigFile,key):
 #-------------------------------------------------------------------
 def rdkservice_getBrowserScore_HTML5():
    try:
+        browser_score_dict = {}
+        browser_subcategory_list = ["Parsing rules","Communication","Streams","Performance","Security","Video","Audio","Streaming"]
         webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
         print "url:",webinspectURL
         driver = openChromeBrowser(webinspectURL);
@@ -353,6 +377,7 @@ def rdkservice_getBrowserScore_HTML5():
             browser_score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol[3]/ol[1]/ol[1]/ol/li[2]/span/span[2]').text
             max_browser_score_text = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[1]/ol[1]/ol/li[3]/span/span[2]').text
             browser_score = browser_score + ' ' + max_browser_score_text
+            browser_score_dict["main_score"] = browser_score
             print "\n Browser score from HTML5 test: {}".format(browser_score)
 	    print "\n Subcategory scores:\n"
             print "===================================="
@@ -363,17 +388,20 @@ def rdkservice_getBrowserScore_HTML5():
                     for k in range(2,count+1):
                        sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[2]/ol/ol['+str(i)+']/ol/ol['+str(j)+']/ol['+str(k)+']/ol[1]/ol/ol/li[1]/span/span').text
                        score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[2]/ol[3]/ol[2]/ol/ol['+str(i)+']/ol/ol['+str(j)+']/ol['+str(k)+']/ol[1]/ol/ol/ol/ol/li[1]/span/span[2]').text
+                       if sub_category in browser_subcategory_list:
+                           browser_score_dict[sub_category] = score.split('/')[0]
                        print "{}   :{}".format(sub_category,score)
             time.sleep(5)
             driver.quit()
         else:
-            browser_score = "Unable to get the browser score"
+            browser_score_dict["main_score"] = "Unable to get the browser score"
    except Exception as error:
         print "Got exception while getting the browser score"
         print error
-        browser_score = "Unable to get the browser score"
+        browser_score_dict["main_score"] = "Unable to get the browser score"
         driver.quit()
-   return browser_score;
+   browser_score_dict = json.dumps(browser_score_dict)
+   return browser_score_dict;
 
 #-------------------------------------------------------------------
 #GET THE BROWSER SCORE FROM SUNSPIDER TEST
@@ -381,6 +409,8 @@ def rdkservice_getBrowserScore_HTML5():
 def rdkservice_getBrowserScore_SunSpider():
    try:
         browser_score = ''
+        browser_score_dict = {}
+        browser_subcategory_list = ["access","bitops","3bit-bits-in-byte","bits-in-byte","bitwise-and","nsieve-bits","controlflow","recursive","math"]
         webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
         driver = openChromeBrowser(webinspectURL);
         if driver != "EXCEPTION OCCURRED":
@@ -408,20 +438,28 @@ def rdkservice_getBrowserScore_SunSpider():
                 if total_score_text in child.text:
                     browser_score = child.text
             if browser_score == '':
-                browser_score = "FAILURE"
+                browser_score_dict["main_score"] = "FAILURE"
             else:
-                browser_score = browser_score.replace("Total: ","")
+                browser_score_dict["main_score"] = browser_score.split("Total: ")[1]
             driver.quit()
             text_values = text_values.replace('<br>','\n').replace('</pre>','\n')
+            text_list = text_values.split('\n')
+            for category in text_list:
+                sub_category_list = category.replace("\"","").split(':')
+                sub_category = sub_category_list[0].strip()
+                if sub_category in browser_subcategory_list:
+                    score = sub_category_list[1].split('ms')[0].strip()
+                    browser_score_dict[sub_category] = score
             print "Details of SunSider Test:\n",text_values
         else:
-            browser_score = "FAILURE"
+            browser_score_dict["main_score"] = "FAILURE"
    except Exception as error:
         print "Got exception while getting the browser score"
         print error
-        browser_score = "FAILURE"
+        browser_score_dict["main_score"] = "FAILURE"
         driver.quit()
-   return browser_score
+   browser_score_dict = json.dumps(browser_score_dict)
+   return browser_score_dict;
 
 #-------------------------------------------------------------------
 #GET THE TIMESTAMP FROM THE LOG STRING
@@ -522,7 +560,7 @@ def suspend_plugin(obj,plugin):
 def launch_plugin(obj,plugin):
     status = expectedResult = "SUCCESS"
     print "\n Resuming {} \n".format(plugin)
-    params = '{"callsign":"'+plugin+'", "type":"", "uri":"", "x":0, "y":0, "w":1920, "h":1080}'
+    params = '{"callsign":"'+plugin+'", "type":"", "uri":""}'
     tdkTestObj = obj.createTestStep('rdkservice_setValue')
     tdkTestObj.addParameter("method","org.rdk.RDKShell.1.launch")
     tdkTestObj.addParameter("value",params)

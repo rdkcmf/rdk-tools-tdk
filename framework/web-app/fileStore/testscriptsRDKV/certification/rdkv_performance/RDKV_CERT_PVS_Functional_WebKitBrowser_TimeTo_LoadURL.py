@@ -96,7 +96,7 @@ if expectedResult in result.upper():
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
+    status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
     print "Current values \nWebKitBrowser:%s\nCobalt:%s"%(curr_webkit_status,curr_cobalt_status);
     if status == "FAILURE":
         if "FAILURE" not in (curr_webkit_status,curr_cobalt_status):
@@ -104,7 +104,7 @@ if expectedResult in result.upper():
             #Need to revert the values since we are changing plugin status
             revert="YES"
             if set_status == "SUCCESS":
-                status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
+                status,webkit_status,cobalt_status = check_pre_requisites(obj)
             else:
                 status = "FAILURE"
     if status == "SUCCESS" and browser_test_url != "":
@@ -211,7 +211,7 @@ if expectedResult in result.upper():
     #Revert the values
     if revert=="YES":
         print "\nRevert the values before exiting"
-        status = revert_value(curr_ux_status,curr_webkit_status,curr_cobalt_status,obj);
+        status = revert_value(curr_webkit_status,curr_cobalt_status,obj);
     obj.unloadModule("rdkv_performance");
 else:
     obj.setLoadModuleStatus("FAILURE");
