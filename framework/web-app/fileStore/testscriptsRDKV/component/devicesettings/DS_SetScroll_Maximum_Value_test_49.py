@@ -98,8 +98,23 @@ if "SUCCESS" in loadmodulestatus.upper():
         actualresult = tdkTestObj.getResult();
         #Check for SUCCESS/FAILURE return value of DS_ManagerInitialize
         if expectedresult in actualresult:
+            tdkTestObj.setResultStatus("SUCCESS");
+            print "SUCCESS :Application successfully initialized with Device Settings library";
+            #Disable clock display by setting enable = 0 before calling setScroll
+            tdkTestObj = obj.createTestStep('DS_FP_enableDisplay');
+            enable = 0
+            print "Value given to enable/disable display : ", enable
+            tdkTestObj.addParameter("enable", enable);
+            expectedresult="SUCCESS"
+            tdkTestObj.executeTestCase(expectedresult);
+            actualresult = tdkTestObj.getResult();
+            details = tdkTestObj.getResultDetails();
+            print "[TEST EXECUTION RESULT] : %s" %actualresult;
+            print "Details: [%s]"%details;
+            #Set the result status of execution
+            if expectedresult in actualresult:
                 tdkTestObj.setResultStatus("SUCCESS");
-                print "SUCCESS :Application successfully initialized with Device Settings library";
+
                 #calling Device Settings - setScroll and getScroll APIs
                 tdkTestObj = obj.createTestStep('DS_SetScroll');
                 #setting scroll class parameters
@@ -146,6 +161,9 @@ if "SUCCESS" in loadmodulestatus.upper():
                 else:
                         tdkTestObj.setResultStatus("FAILURE");
                         print "FAILURE: Deinitalize failed" ;
+            else:
+                tdkTestObj.setResultStatus("FAILURE");
+                print "FAILURE : Clock disable failed";
         else:
                 tdkTestObj.setResultStatus("FAILURE");
                 print "FAILURE: Device Setting Initialize failed";

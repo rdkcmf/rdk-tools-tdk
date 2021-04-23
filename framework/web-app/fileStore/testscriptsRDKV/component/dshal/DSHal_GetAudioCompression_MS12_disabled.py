@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2020 RDK Management
+# Copyright 2021 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,19 +21,19 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>1</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>DSHal_IsAudioPortEnabled_UnSupportedPortType</name>
+  <name>DSHal_GetAudioCompression_MS12_disabled</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
-  <primitive_test_name>DSHal_IsAudioPortEnabled</primitive_test_name>
+  <primitive_test_name>DSHal_GetAudioCompression</primitive_test_name>
   <!--  -->
   <primitive_test_version>1</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>To check if the audio port enable status is retrieved for unsupported port type</synopsis>
+  <synopsis>To check if the audio compression is retrieved for ms12 disabled device</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -48,8 +48,9 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
+    <box_type>IPClient-3</box_type>
+    <!--  -->
     <box_type>Hybrid-1</box_type>
-    <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -58,35 +59,34 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>CT_DS_HAL_152</test_case_id>
-    <test_objective>To check if the audio port enable status is retrieved for unsupported port type</test_objective>
-    <test_type>Positive</test_type>
+    <test_objective>To check if the audio compression  is retrieved for ms12 disabled device</test_objective>
+    <test_type>Negative</test_type>
     <test_setup>XG1V3</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr
 4. Initialize DSHAL subsystems</pre_requisite>
     <api_or_interface_used>dsGetAudioPort(dsAudioPortType_t type, int index, int *handle)
-dsIsAudioPortEnabled(int handle, bool *enabled)</api_or_interface_used>
+dsGetAudioCompression(int handle, int *compression)</api_or_interface_used>
     <input_parameters>type - Audio port type
 index- Audio port index
 handle - Audio port handle</input_parameters>
     <automation_approch>1. TM loads the DSHAL agent via the test agent.
-2 . DSHAL agent will invoke the api dsGetAudioPort to get the handle for port type which is not supported for dsIsAudioPortEnabled API
-3 . DSHAL agent will invoke the api dsIsAudioPortEnabled to get the audio port enable status
+2 . DSHAL agent will invoke the api dsGetAudioPort to get the handle for port type.
+3 . DSHAL agent will invoke the api dsGetAudioCompression for the audioPort handle.
 4. TM checks if the API call fails and return SUCCESS/FAILURE status.</automation_approch>
-    <expected_output>Checkpoint 1.Verify the API call is failure</expected_output>
+    <expected_output>Verify the GetAudioCompression call is failure fro ms12 disabled device</expected_output>
     <priority>High</priority>
     <test_stub_interface>libdshalstub.so.0.0.0</test_stub_interface>
-    <test_script>DSHal_IsAudioPortEnabled_UnSupportedPortType</test_script>
+    <test_script>DSHal_GetAudioCompression_MS12_disabled</test_script>
     <skipped>No</skipped>
-    <release_version>M80</release_version>
+    <release_version>M88</release_version>
     <remarks></remarks>
   </test_cases>
-  <script_tags />
 </xml>
 '''
-# use tdklib library,which provides a wrapper for tdk testcase script 
-import tdklib; 
+# use tdklib library,which provides a wrapper for tdk testcase script
+import tdklib;
 from dshalUtility import *;
 
 #Test component to be tested
@@ -96,7 +96,7 @@ dshalObj = tdklib.TDKScriptingLibrary("dshal","1");
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-dshalObj.configureTestCase(ip,port,'DSHal_IsAudioPortEnabled_UnSupportedPortType');
+dshalObj.configureTestCase(ip,port,'DSHal_GetAudioCompression_MS12_disabled');
 
 #Get the result of connection with test component and STB
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
@@ -108,7 +108,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
     expectedResult="SUCCESS";
     #Prmitive test case which associated to this Script
     tdkTestObj = dshalObj.createTestStep('DSHal_GetAudioPort');
-    tdkTestObj.addParameter("portType", audioPortType["LR"]);
+    tdkTestObj.addParameter("portType", audioPortType["HDMI"]);
     #Execute the test case in STB
     tdkTestObj.executeTestCase(expectedResult);
     actualResult = tdkTestObj.getResult();
@@ -118,24 +118,53 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
         tdkTestObj.setResultStatus("SUCCESS");
         details = tdkTestObj.getResultDetails();
         print details;
-        expectedResult = "FAILURE";
 
-        tdkTestObj = dshalObj.createTestStep('DSHal_IsAudioPortEnabled');
+        #Check current AudioMS12Decode status
+        tdkTestObj = dshalObj.createTestStep('DSHal_IsAudioMS12Decode');
         #Execute the test case in STB
         tdkTestObj.executeTestCase(expectedResult);
         actualResult = tdkTestObj.getResult();
-        print "DSHal_IsAudioPortEnabled result: ", actualResult;
-        details = tdkTestObj.getResultDetails();
-        print "Audio port enable status: ", details
+        print "DSHal_IsAudioMS12Decode result: ", actualResult
         if expectedResult in actualResult:
             tdkTestObj.setResultStatus("SUCCESS");
-            print "Audio port enable status not retrieved for unsupported port type which is expected";
+            ms12Decode = tdkTestObj.getResultDetails();
+            print "AudioMS12Decode status retrieved", ms12Decode;
+
+            if ms12Decode:
+                tdkTestObj.setResultStatus("SUCCESS");
+                print "AudioMS12Decode status retrieved"
+            else:
+                tdkTestObj.setResultStatus("FAILURE");
+                print "AudioMS12Decode status not retrieved";
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Audio port enable status retrieved for unsupported port type which is not expected";
+            print "Failed to get AudioMS12Decode status";
+
     else:
         tdkTestObj.setResultStatus("FAILURE");
-        print "Audio port handle retrieved for invalid port type";
+        print "AudioPort handle not retrieved";
+    
+    if "false" in ms12Decode:
+        print "MS12 is disabled in the device, proceeding to execute testcase";
+
+        tdkTestObj = dshalObj.createTestStep('DSHal_GetAudioCompression');
+        #Execute the test case in STB
+        expectedResult="FAILURE";
+        tdkTestObj.executeTestCase(expectedResult);
+        actualResult = tdkTestObj.getResult();
+        print "DSHal_GetAudioCompression result: ", actualResult
+        if expectedResult in actualResult:
+            tdkTestObj.setResultStatus("SUCCESS");
+            details = tdkTestObj.getResultDetails();
+            print details
+            print "Failed to get audio compression as expected"
+        else:
+            tdkTestObj.setResultStatus("FAILURE");
+            print "Audio compression is retrieved for ms12 disabled device";
+
+    else:
+        print "Testcase not applicable as MS12 is enabled in this device";
+        tdkTestObj.setResultStatus("FAILURE");
 
     dshalObj.unloadModule("dshal");
 

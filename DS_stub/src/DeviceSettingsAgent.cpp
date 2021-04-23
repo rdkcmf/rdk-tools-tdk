@@ -660,10 +660,8 @@ void DeviceSettingsAgent::AOP_setLevel(IN const Json::Value& req, OUT Json::Valu
 	memset(levelDetails,'\0', (sizeof(char)*20));
 	try
 	{
-		/*getting instance for video ports*/	
-		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
-		/*getting instance for audio ports*/	
-		device::AudioOutputPort aPort = vPort.getAudioOutputPort();
+                /*getting instance for audio ports*/
+                device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(portName);
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling setLevel\n");
 		aPort.setLevel(level);
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling getLevel\n");
@@ -715,10 +713,8 @@ void DeviceSettingsAgent::AOP_setDB(IN const Json::Value& req, OUT Json::Value& 
 	memset(minDBDetails,'\0', (sizeof(char)*20));
 	try
 	{
-		/*getting instance for video ports*/	
-		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
-		/*getting instance for audio ports*/	
-		device::AudioOutputPort aPort = vPort.getAudioOutputPort();
+                /*getting instance for audio ports*/
+                device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(portName);
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling setDB\n");
 		aPort.setDB(dBValue);
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling getDB\n");
@@ -1038,10 +1034,8 @@ void DeviceSettingsAgent::AOP_setEncoding(IN const Json::Value& req, OUT Json::V
 	memset(encodingDetails,'\0', (sizeof(char)*20));
 	try
 	{
-		/*getting instance for video ports*/	
-		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
-		/*getting instance for audio ports*/	
-		device::AudioOutputPort aPort = vPort.getAudioOutputPort();
+                /*getting instance for audio ports*/
+                device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(portName);
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling setEncoding\n");
 		aPort.setEncoding(encodingFormat);
 		DEBUG_PRINT(DEBUG_LOG,"\nCalling getEncoding\n");
@@ -1085,10 +1079,8 @@ void DeviceSettingsAgent::AOP_setCompression(IN const Json::Value& req, OUT Json
 	try
 	{
 		printf("\ncompressionDetails1:%s\n",compressionDetails1);
-		/*getting instance for video ports*/	
-		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
-		/*getting instance for audio ports*/	
-		device::AudioOutputPort aPort = vPort.getAudioOutputPort();
+                /*getting instance for audio ports*/
+                device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(portName);
 		if(!get_only)
 		{
 			DEBUG_PRINT(DEBUG_LOG,"\nCalling setCompression\n");
@@ -1896,10 +1888,8 @@ void DeviceSettingsAgent::AOP_loopThru(IN const Json::Value& req, OUT Json::Valu
 	memset(loopThruDetails,'\0', (sizeof(char)*20));
 	try
 	{
-		/*getting instance for video ports*/	
-		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
-		/*getting instance for audio ports*/	
-		device::AudioOutputPort aPort = vPort.getAudioOutputPort();
+                /*getting instance for audio ports*/
+                device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(portName);
 		/*Enable loop thru*/
 		aPort.setLoopThru(loopthru);
 		/*checking loop thru status*/
@@ -1963,10 +1953,8 @@ void DeviceSettingsAgent::AOP_mutedStatus(IN const Json::Value& req, OUT Json::V
 	memset(muteDetails,'\0', (sizeof(char)*20));
 	try
 	{
-		/*getting instance for video ports*/	
-		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
-		/*getting instance for audio ports*/	
-		device::AudioOutputPort aPort = vPort.getAudioOutputPort();
+                /*getting instance for audio ports*/
+                device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(portName);
 		/*Enable mute */
 		aPort.setMuted(mute);
 		/*checking mute status*/
@@ -2022,10 +2010,8 @@ void DeviceSettingsAgent::AOPTYPE_getSupportedEncodings(IN const Json::Value& re
 
 		//device::List<device::AudioEncoding> encodings  = device::AudioOutputPortType.getInstance().getSupportedEncodings();
 		
-		/*getting instance for video ports*/	
-		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
-		/*getting instance for audio ports*/	
-		device::AudioOutputPort aPort = vPort.getAudioOutputPort();
+                /*getting instan for audio ports*/
+                device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(portName);
 		for (size_t i = 0; i < aPort.getSupportedEncodings().size(); i++) 
 		{
 			strcpy(supportedEncodingDetails,(char*)aPort.getSupportedEncodings().at(i).getName().c_str());
@@ -2072,10 +2058,8 @@ void DeviceSettingsAgent::AOPTYPE_getSupportedCompressions(IN const Json::Value&
 	try
 	{
 		strcpy(supportedCompression,"Supported Compressions:");
-		/*getting instance for video ports*/	
-		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
-		/*getting instance for audio ports*/	
-		device::AudioOutputPort aPort = vPort.getAudioOutputPort();
+                /*getting instance for audio ports*/
+                device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(portName);
 		for (size_t i = 0; i < aPort.getSupportedCompressions().size(); i++)
 		{
 			strcpy(supportedCompressionDetails,(char*)aPort.getSupportedCompressions().at(i).getName().c_str());

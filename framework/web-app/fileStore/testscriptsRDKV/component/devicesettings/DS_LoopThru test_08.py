@@ -47,7 +47,7 @@ Test Case ID : CT_DS_08</synopsis>
   <test_cases>
     <test_case_id>CT_DS_8</test_case_id>
     <test_objective>Device Setting – checking whether the given audio port is configured for loop thro'.</test_objective>
-    <test_type>Positive</test_type>
+    <test_type>Negative</test_type>
     <test_setup>XI3-1/XG1-1</test_setup>
     <pre_requisite>1. dsMgrMain should be up and running.
 2. IARMDaemonMain should be up and running.</pre_requisite>
@@ -105,27 +105,21 @@ if "SUCCESS" in loadmodulestatus.upper():
                 print "LoopThru value set to:%d" %loop_thru;
                 tdkTestObj = obj.createTestStep('DS_LoopThru');
                 tdkTestObj.addParameter("port_name","HDMI0");
+                #Loopthru is not supported for HDMI audioPort
                 tdkTestObj.addParameter("loop_thru",loop_thru);
-                expectedresult="SUCCESS"
+                expectedresult="FAILURE"
                 tdkTestObj.executeTestCase(expectedresult);
                 actualresult = tdkTestObj.getResult();
                 loopthrudetails = tdkTestObj.getResultDetails();
                 setloopthru = "%s" %loop_thru;
                 #Check for SUCCESS/FAILURE return value of DS_LoopThru
                 if expectedresult in actualresult:
-                        print "SUCCESS :Application successfully calls setLoopThru";
-                        print "1:set 0:not set";
-                        print "getloopthru %s" %loopthrudetails;
-                        #comparing loopthru status before and after setting
-                        if setloopthru in loopthrudetails:
-                                tdkTestObj.setResultStatus("SUCCESS");
-                                print "SUCCESS : setLoopThru and isLoopThru executed successfully";
-                        else:
-                                tdkTestObj.setResultStatus("FAILURE");
-                                print "FAILURE : setLoopThru and isLoopThru failed to execute";
+                        print "SUCCESS :Application doesnot set LoopThru as expected";
+                        tdkTestObj.setResultStatus("SUCCESS");
                 else:
+                        print "Details %s" %loopthrudetails;
+                        print "FAILURE :Application sets LoopThru which is unexpected";
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "FAILURE :Application failed execute setLoopThru ";
                 #calling DS_ManagerDeInitialize to DeInitialize API
                 tdkTestObj = obj.createTestStep('DS_ManagerDeInitialize');
                 expectedresult="SUCCESS"

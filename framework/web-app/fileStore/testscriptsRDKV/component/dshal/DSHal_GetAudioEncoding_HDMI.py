@@ -132,7 +132,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
                 tdkTestObj.setResultStatus("SUCCESS");
                 details = tdkTestObj.getResultDetails();
                 print "AudioEncoding retrieved", details
-                if int(details) == audioEncodingType["PCM"] or int(details) == audioEncodingType["AC3"] or int(details) == audioEncodingType["EAC3"]:
+                if int(details) == audioEncodingType["PCM"] or int(details) == audioEncodingType["AC3"] or int(details) == audioEncodingType["EAC3"] or int(details) == audioEncodingType["DISPLAY"]:
                     tdkTestObj.setResultStatus("SUCCESS");
                     print "AudioEncoding has valid value for HDMI";
                 else:
