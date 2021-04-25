@@ -263,7 +263,7 @@ if expectedResult in result.upper():
                                                                 print "\n Unable to get the memory usage\n"
                                                                 tdkTestObj.setResultStatus("FAILURE")
                                                             #Disconnect Bluetooth device
-                                                            params = '{"deviceID": "' +device_id + '"}'
+                                                            params = '{"deviceID": "' +device_id + '","deviceType":"HUMAN INTERFACE DEVICE"}'
                                                             tdkTestObj = obj.createTestStep('rdkservice_setValue')
                                                             tdkTestObj.addParameter("method","org.rdk.Bluetooth.1.disconnect")
                                                             tdkTestObj.addParameter("value",params)

@@ -251,7 +251,7 @@ if expectedResult in result.upper():
                                                                 tdkTestObj.setResultStatus("SUCCESS")
                                                                 #Disconnect Bluetooth device
                                                                 print "\n Disconnecting from Bluetooth device \n" 
-                                                                params = '{"deviceID": "' +device_id + '"}'
+                                                                params = '{"deviceID": "' +device_id + '","deviceType":"HUMAN INTERFACE DEVICE"}'
                                                                 tdkTestObj = obj.createTestStep('rdkservice_setValue')
                                                                 tdkTestObj.addParameter("method","org.rdk.Bluetooth.1.disconnect")
                                                                 tdkTestObj.addParameter("value",params)
