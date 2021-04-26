@@ -23,11 +23,13 @@ webinspect_port=""
 #Port used by ThunderJS in lightning app,port must be 9998 for rdkservice builds
 thunder_port=""
 
+lightning_apps_loc = ""
+
 #lightning application url
-lightning_video_test_app_url = ""
-lightning_animation_test_app_url = ""
-lightning_multianimation_test_app_url = ""
-lightning_objects_animation_test_app_url = ""
+lightning_video_test_app_url     = lightning_apps_loc + ""
+lightning_animation_test_app_url = lightning_apps_loc + ""
+lightning_multianimation_test_app_url    = lightning_apps_loc + ""
+lightning_objects_animation_test_app_url = lightning_apps_loc + ""
 
 #Video URL
 video_src_url = ""
@@ -44,15 +46,24 @@ video_src_url_live_dash = ""
 
 #MP4 Video URL
 video_src_url_mp4 = ""
+video_src_url_dash_mp4 = ""
+
+#H.264 Codec Video URL
+video_src_url_dash_h264 = ""
+video_src_url_hls_h264  = ""
+
+#HEVC Codec Video URL
+video_src_url_dash_hevc = ""
+video_src_url_hls_hevc  = ""
 
 #AAC Codec Video URL
 video_src_url_aac = ""
 
-#H.264 Codec Video URL
-video_src_url_h264 = ""
-
 #VP9 Codec Video URL
 video_src_url_vp9 = ""
+
+#VP8 Codec Video URL
+video_src_url_vp8 = ""
 
 #Opus Codec Video URL
 video_src_url_opus = ""
@@ -77,10 +88,9 @@ video_src_url_ogg = ""
 
 #Type of the different codecs video stream. If the url extension is .mpd, then type is dash. If .m3u8, then type is hls
 #If the extension is .mp4,.ogg etc mention as mp4,ogg etc.
-mp4_url_type = ""
 aac_url_type  = ""
-h264_url_type = ""
 vp9_url_type = ""
+vp8_url_type = ""
 opus_url_type = ""
 audio_url_type = ""
 mpegts_url_type = ""
@@ -89,6 +99,74 @@ ac3_url_type  = ""
 ec3_url_type  = ""
 ogg_url_type  = ""
 
+
+# DRM Protected content URLs
+# Example:
+# video_src_url_playready_dash = "http://playready_dash_url.mpd"
+# video_src_url_playready_dash_drmconfigs = "com.microsoft.playready[http://license_url]|com.widevine.alpha[http://license_url]|headers[X-AxDRM-Message:header_info]"
+# Note: Each drm config must be seperated by "|" and the values must be enclosed withing "[" "]" as above.
+
+# PlayReady DRM URLs
+video_src_url_playready_dash_aac = ""
+video_src_url_playready_dash_aac_drmconfigs = ""
+
+video_src_url_playready_dash_h264 = ""
+video_src_url_playready_dash_ac3_drmconfigs = ""
+
+video_src_url_playready_dash_ac3 = ""
+video_src_url_playready_dash_ac3_drmconfigs = ""
+
+video_src_url_playready_dash_ec3 = ""
+video_src_url_playready_dash_ec3_drmconfigs = ""
+
+video_src_url_playready_dash_hevc = ""
+video_src_url_playready_dash_hevc_drmconfigs = ""
+
+video_src_url_playready_hls_aac = ""
+video_src_url_playready_hls_aac_drmconfigs = ""
+
+video_src_url_playready_hls_h264 = ""
+video_src_url_playready_hls_h264_drmconfigs = ""
+
+video_src_url_playready_hls_hevc = ""
+video_src_url_playready_hls_hevc_drmconfigs = ""
+
+# Widevine DRM URLs
+video_src_url_widevine_dash_aac = ""
+video_src_url_widevine_dash_aac_drmconfigs = ""
+
+video_src_url_widevine_dash_h264 = ""
+video_src_url_widevine_dash_h264_drmconfigs = ""
+
+video_src_url_widevine_dash_ac3 = ""
+video_src_url_widevine_dash_ac3_drmconfigs =""
+
+video_src_url_widevine_dash_ec3 = ""
+video_src_url_widevine_dash_ec3_drmconfigs =""
+
+video_src_url_widevine_dash_hevc = ""
+video_src_url_widevine_dash_hevc_drmconfigs =""
+
+video_src_url_widevine_dash_vp9 = ""
+video_src_url_widevine_dash_vp9_drmconfigs = ""
+
+video_src_url_widevine_hls_aac = ""
+video_src_url_widevine_hls_aac_drmconfigs = ""
+
+video_src_url_widevine_hls_h264 = ""
+video_src_url_widevine_hls_h264_drmconfigs = ""
+
+video_src_url_widevine_hls_hevc = ""
+video_src_url_widevine_hls_hevc_drmconfigs = ""
+
+video_src_url_widevine_dash_av1 = ""
+video_src_url_widevine_dash_av1_drmconfigs = ""
+
+video_src_url_widevine_dash_opus = ""
+video_src_url_widevine_dash_opus_drmconfigs = ""
+
+video_src_url_widevine_dash_vp8 = ""
+video_src_url_widevine_dash_vp8_drmconfigs = ""
 
 # Time duration for operations
 # Provided time (seconds) is the duration after how much second the operation should take place

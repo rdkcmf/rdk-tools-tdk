@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>4</version>
+  <version>1</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RDKV_CERT_MVS_Video_Play_MP4</name>
+  <name>RDKV_CERT_MVS_Video_Play_PlayReady_DASH_HEVC</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operation of mp4 content for few minutes and close the player</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operation of PlayReady DRM protected HEVC codec dash stream for few minutes and close the player</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -48,10 +48,6 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
-    <box_type>RPI-Client</box_type>
-    <!--  -->
-    <box_type>RPI-HYB</box_type>
-    <!--  -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
@@ -60,34 +56,33 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_39</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operation of mp4 content for few minutes and close the player</test_objective>
+    <test_case_id>RDKV_Media_Validation_77</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operation of PlayReady DRM protected HEVC codec dash stream for few minutes and close the player		</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>RPI, Accelerator</test_setup>
+    <test_setup>Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
 2.Lightning Player app should be hosted</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Lightning player App URL: string
 webinspect_port: string
-video_src_url_dash_mp4: string
-close_interval: int
-</input_parameters>
+video_src_url_playready_dash_hevc: string
+video_src_url_playready_dash_hevc_drmconfigs:string
+close_interval: int</input_parameters>
     <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
 2. Get the current URL in webkitbrowser
 3. Load the player app with the video src url and duration for close.
-4. App starts playing the mp4 video and closes the player after the provided duration.
+4. App starts playing the PlayReady DRM protected hevc dash stream video and closes the player after the provided duration.
 5. If expected event video playing is observed then update the result as SUCCESS or else FAILURE
 6. Update the test script result as SUCCESS/FAILURE based on event validation result and proc check status (if applicable)
 7. Revert all values</automation_approch>
     <expected_output>Player should play the video for provided duration, expected event playing should occur and if proc validation is applicable, then expected data should be available in proc file </expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RDKV_CERT_MVS_Video_Play_MP4</test_script>
+    <test_script>RDKV_CERT_MVS_Video_Play_PlayReady_DASH_HEVC</test_script>
     <skipped>No</skipped>
-    <release_version>M86</release_version>
+    <release_version>M88</release_version>
     <remarks></remarks>
   </test_cases>
-  <script_tags />
 </xml>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
@@ -102,7 +97,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_Play_MP4')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_Play_PlayReady_DASH_HEVC')
 
 webkit_console_socket = None
 
@@ -128,13 +123,14 @@ if expectedResult in result.upper():
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_video_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_dash_mp4
+        videoURL  = MediaValidationVariables.video_src_url_playready_dash_hevc
         # Setting VideoPlayer Operations
         setOperation("close",MediaValidationVariables.close_interval)
         operations = getOperations()
         # Setting VideoPlayer test app URL arguments
         setURLArgument("url",videoURL)
         setURLArgument("operations",operations)
+        setURLArgument("drmconfigs",MediaValidationVariables.video_src_url_playready_dash_hevc_drmconfigs)
         setURLArgument("autotest","true")
         setURLArgument("type","dash")
         appArguments = getURLArguments()
@@ -143,7 +139,7 @@ if expectedResult in result.upper():
 
         #Example video test url
         #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
-        #url=<video_mp4_url>&operations=close(60)&autotest=true&type=dash
+        #url=<video_hevc_url>.mpd&drmconfigs=com.playready(license_url)&operations=close(60)&autotest=true&type=dash
 
         # Setting the video test url in webkit browser using RDKShell
         launch_status = launchPlugin(obj,"WebKitBrowser",video_test_url)

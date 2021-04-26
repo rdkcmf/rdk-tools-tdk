@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>3</version>
+  <version>4</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_MVS_Video_Mute_UnMute_MP4</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -69,7 +69,7 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Lightning player App URL: string
 webinspect_port: string
-video_src_url_mp4: string</input_parameters>
+video_src_url_dash_mp4: string</input_parameters>
     <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
 2. Get the current URL in webkitbrowser
 3. Load the player app url with the operations to be performed, mute and unmute with given interval.
@@ -126,7 +126,7 @@ if expectedResult in result.upper():
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_video_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_mp4
+        videoURL  = MediaValidationVariables.video_src_url_dash_mp4
         # Setting VideoPlayer Operations
         setOperation("mute","30")
         setOperation("unmute","30")
@@ -135,14 +135,14 @@ if expectedResult in result.upper():
         setURLArgument("url",videoURL)
         setURLArgument("operations",operations)
         setURLArgument("autotest","true")
-        setURLArgument("type",MediaValidationVariables.mp4_url_type)
+        setURLArgument("type","dash")
         appArguments = getURLArguments()
         # Getting the complete test app URL
         video_test_url = getTestURL(appURL,appArguments)
 
         #Example video test url
         #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
-        #url=<video_url>.mp4&operations=mute(30),unmute(30)&autotest=true&type=mp4
+        #url=<video_mp4_url>&operations=mute(30),unmute(30)&autotest=true&type=dash
 
         # Setting the video test url in webkit browser using RDKShell
         launch_status = launchPlugin(obj,"WebKitBrowser",video_test_url)

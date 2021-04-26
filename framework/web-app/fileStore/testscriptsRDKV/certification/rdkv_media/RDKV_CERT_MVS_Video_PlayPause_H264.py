@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>3</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_MVS_Video_PlayPause_H264</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -69,7 +69,7 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Lightning player App URL: string
 webinspect_port: string
-video_src_url_h264: string
+video_src_url_dash_h264: string
 h264_url_type:string
 play_interval: int
 pause_interval:int</input_parameters>
@@ -129,7 +129,7 @@ if expectedResult in result.upper():
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_video_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_h264
+        videoURL  = MediaValidationVariables.video_src_url_dash_h264
         # Setting VideoPlayer Operations
         setOperation("pause",MediaValidationVariables.pause_interval)
         setOperation("play",MediaValidationVariables.play_interval)
@@ -138,7 +138,7 @@ if expectedResult in result.upper():
         setURLArgument("url",videoURL)
         setURLArgument("operations",operations)
         setURLArgument("autotest","true")
-        setURLArgument("type",MediaValidationVariables.h264_url_type)
+        setURLArgument("type","dash")
         appArguments = getURLArguments()
         # Getting the complete test app URL
         video_test_url = getTestURL(appURL,appArguments)

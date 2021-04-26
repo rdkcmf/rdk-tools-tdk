@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>4</version>
+  <version>2</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RDKV_CERT_MVS_Video_Play_MP4</name>
+  <name>RDKV_CERT_MVS_Video_UVE_Play_HLS_H264</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operation of mp4 content for few minutes and close the player</synopsis>
+  <synopsis>Test Script to launch a lightning UVE player application via Webkit Browser and perform video play operation of H.264 codec hls stream for few minutes and close the player</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -60,31 +60,30 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_39</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operation of mp4 content for few minutes and close the player</test_objective>
+    <test_case_id>RDKV_Media_Validation_70</test_case_id>
+    <test_objective>Test Script to launch a lightning UVE player application via Webkit Browser and perform video play operation of H.264 codec hls stream for few minutes and close the player</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
-2.Lightning Player app should be hosted</pre_requisite>
+2.Lightning UVE Player app should be hosted</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
-    <input_parameters>Lightning player App URL: string
+    <input_parameters>Lightning UVE player App URL: string
 webinspect_port: string
-video_src_url_dash_mp4: string
-close_interval: int
-</input_parameters>
+video_src_url_hls_h264: string
+close_interval: int</input_parameters>
     <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
 2. Get the current URL in webkitbrowser
-3. Load the player app with the video src url and duration for close.
-4. App starts playing the mp4 video and closes the player after the provided duration.
+3. Load the uve player app with the video src url and duration for close.
+4. App starts playing the h.264 hls stream video and closes the player after the provided duration.
 5. If expected event video playing is observed then update the result as SUCCESS or else FAILURE
 6. Update the test script result as SUCCESS/FAILURE based on event validation result and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>Player should play the video for provided duration, expected event playing should occur and if proc validation is applicable, then expected data should be available in proc file </expected_output>
+    <expected_output>UVE Player should play the video for provided duration, expected event playing should occur and if proc validation is applicable, then expected data should be available in proc file </expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RDKV_CERT_MVS_Video_Play_MP4</test_script>
+    <test_script>RDKV_CERT_MVS_Video_UVE_Play_HLS_H264</test_script>
     <skipped>No</skipped>
-    <release_version>M86</release_version>
+    <release_version>M88</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -102,7 +101,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_Play_MP4')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_UVE_Play_HLS_H264')
 
 webkit_console_socket = None
 
@@ -116,7 +115,7 @@ if expectedResult in result.upper():
     tdkTestObj = obj.createTestStep('rdkv_media_pre_requisites');
     tdkTestObj.executeTestCase(expectedResult);
     # Setting the pre-requites for media test. Launching the wekit browser via RDKShell and
-    # moving it to the front, openning a socket connection to the webkit inspect page and
+    # moving it to the front, opening a socket connection to the webkit inspect page and
     # getting the details for proc validation from config file
     pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj)
     if pre_requisite_status == "SUCCESS":
@@ -127,8 +126,8 @@ if expectedResult in result.upper():
         #Setting device config file
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
-        appURL    = MediaValidationVariables.lightning_video_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_dash_mp4
+        appURL    = MediaValidationVariables.lightning_uve_test_app_url
+        videoURL  = MediaValidationVariables.video_src_url_hls_h264
         # Setting VideoPlayer Operations
         setOperation("close",MediaValidationVariables.close_interval)
         operations = getOperations()
@@ -136,14 +135,13 @@ if expectedResult in result.upper():
         setURLArgument("url",videoURL)
         setURLArgument("operations",operations)
         setURLArgument("autotest","true")
-        setURLArgument("type","dash")
         appArguments = getURLArguments()
         # Getting the complete test app URL
         video_test_url = getTestURL(appURL,appArguments)
 
         #Example video test url
-        #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
-        #url=<video_mp4_url>&operations=close(60)&autotest=true&type=dash
+        #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkuveplayer/build/index.html?
+        #url=<video_h264_url>.m3u8&operations=close(60)&autotest=true
 
         # Setting the video test url in webkit browser using RDKShell
         launch_status = launchPlugin(obj,"WebKitBrowser",video_test_url)

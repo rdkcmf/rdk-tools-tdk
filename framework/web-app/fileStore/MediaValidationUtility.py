@@ -52,6 +52,21 @@ def getOperations():
 def setURLArgument(key,val):
     if key == "options":
         updateOptions(val)
+    elif key == "url" or (key == "drmconfigs" and val.strip() != ""):
+        val = val.replace("&",":and:").replace("=",":eq:")
+        if key == "drmconfigs":
+            drm_config = ""
+            for drm_info in val.split("|"):
+                print drm_info
+                drm_tag = drm_info.split("[",1)[0]
+                drm_val = drm_info.split("[",1)[1].rsplit("]",1)[0]
+                drm_val = drm_val.replace("(",":ob:").replace(")",":cb:").replace(",",":comma:")
+                if drm_config != "":
+                    drm_config += ","
+                drm_config += drm_tag + "(" + drm_val + ")"
+            all_arguments[key] = drm_config
+        else:
+            all_arguments[key] = val
     else:
         all_arguments[key] = val
     if key == "type":
@@ -115,7 +130,7 @@ def dispConsoleLog(log):
                         sys.stdout.flush()
    except:
        print("An exception occurred")
-       print str(log).replace('\\n','\n')
+       print str(log).replace('\\n','\n').replace("\\","")
 
 # Function to get the text message from web inspect json message
 def getConsoleMessage(log):
