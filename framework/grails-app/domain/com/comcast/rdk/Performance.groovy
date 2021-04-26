@@ -29,6 +29,8 @@ class Performance {
 	
 	String processValue
 	
+	String processType
+	
 	String processValue1
 	
 	Category category = Category.RDKV
@@ -40,6 +42,7 @@ class Performance {
 		performanceType(nullable:true, blank:true)
 		processName(nullable:true, blank:true)
 		processValue(nullable:true, blank:true)
+		processType(nullable:true, blank:true)
 		processValue1(nullable:true, blank:true)
 		category(nullable:false, blank:false)
     }

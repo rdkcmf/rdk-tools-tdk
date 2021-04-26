@@ -449,6 +449,38 @@
 				</table>
 				
 			</div>
+			<div id="benchMarkPerformanceTypeListDiv" style="display: none;margin-bottom:20px;">
+				<div style="float: left;">&emsp;&emsp;&emsp;&emsp; Performance Scripts</div>
+				&emsp;&emsp;&emsp;<g:select id="benchMarkPerformanceTypeList" name="benchMarkPerformanceTypeList" style="width:300px" noSelection="['' : 'Please Select']" value="" from="" class="many-to-one "/>
+			</div>
+			<div id="messageDiv" style="display: none;margin-bottom:20px;margin-left:40%;font: bold; font-size: 12px;">
+			</div>
+			<div id="benchmarkData"  style="display: none;">
+				<table class="noClass" style="border: 1; border-color: black; " >
+					<tr>
+						<td style="width:200px">&emsp;&emsp;&emsp;&emsp;Select Parameter</td>
+						<td id="parameterId">
+							<select name="parameterValue" id = "parameterValue" style="width: 200px">
+								<option value="">Please Select</option>
+							</select>
+						</td>
+						<td style="vertical-align: middle;" >Result No's</td>
+						<td ><input type="number" id="resultBenchmarkCounts" name="result.count" value="25" min="2" max="100">
+						</td>
+						<td>
+						<span class="buttons"><input type="button" value="Show" onclick="getBenchMarkChartData();"></span>
+						</td>					
+					</tr>
+				</table>							
+				<table>
+					<tr>
+						<td style="width: 2%;"></td>
+						<td style="width: 70%;">
+							<div class="chartdivBenchMarkclass" id="chartdivBenchMark" style="width: 100%; height: 1000px;"></div>
+						</td>
+					</tr>
+				</table>
+			</div>
 			<div id="analyzeExecution" style="display: none;">
 				<table class="noClass" style="border: 1; border-color: black;">
 					<tr>

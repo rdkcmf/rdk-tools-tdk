@@ -2583,82 +2583,153 @@ class ExecutescriptService {
 	 * @return
 	 */
 	def saveCpuMemoryInfo(def logPath,def executionId,def executionResultId){
-		def cpuMemoryInfoFile = new File(logPath+"${executionId}_CPUMemoryInfo.json")
-		if(cpuMemoryInfoFile.exists()){
-			def executionResult = ExecutionResult.findById(executionResultId)
-			def content = cpuMemoryInfoFile.readLines();
-			def eachLineContent = content[0]
-			if(eachLineContent){
-				JSONObject jsonObj = new JSONObject(eachLineContent);
-				if(jsonObj.has('cpuMemoryDetails')){
-					def cpuMemoryDetails = jsonObj.get('cpuMemoryDetails')
-					if(!(cpuMemoryDetails.isEmpty())){
-						String cpu_load_ValueList = ""
-						String memory_usage_ValueList = ""
-						int cpuCounter =1
-						def lastCpuMemory = cpuMemoryDetails[cpuMemoryDetails.size()-1]
-						def lastIterationNo = lastCpuMemory.get('iteration')
-						cpuMemoryDetails.each{ eachIteration ->
-							if(eachIteration.has('iteration') && eachIteration.has('cpu_load') && eachIteration.has('memory_usage')){
-								if(cpuCounter == 11){
-									cpuCounter = 1
-									def performanceInstance = new Performance()
-									performanceInstance.executionResult = executionResult
-									performanceInstance.performanceType = "CPUMemoryInfo"
-									performanceInstance.processName = "cpu_load"
-									performanceInstance.processValue = cpu_load_ValueList
-									performanceInstance.category = "RDKV"
-									performanceInstance.save(flush:true)
-									cpu_load_ValueList = ""
-									def performanceInstanceForMem = new Performance()
-									performanceInstanceForMem.executionResult = executionResult
-									performanceInstanceForMem.performanceType = "CPUMemoryInfo"
-									performanceInstanceForMem.processName = "memory_usage"
-									performanceInstanceForMem.processValue = memory_usage_ValueList
-									performanceInstanceForMem.category = "RDKV"
-									performanceInstanceForMem.save(flush:true)
-									memory_usage_ValueList = ""
+		try{
+			def cpuMemoryInfoFile = new File(logPath+"${executionId}_CPUMemoryInfo.json")
+			//For saving CPU memory information in performance table
+			if(cpuMemoryInfoFile.exists()){
+				def executionResult = ExecutionResult.findById(executionResultId)
+				def content = cpuMemoryInfoFile.readLines();
+				def eachLineContent = content[0]
+				def type
+				if(eachLineContent){
+					JSONObject jsonObj = new JSONObject(eachLineContent);
+					
+					if(jsonObj.has('type')){
+						type = jsonObj.get('type')
+					}else{
+						type = "multipleEntries"
+					}
+					if(jsonObj.has('cpuMemoryDetails')){
+						def cpuMemoryDetails = jsonObj.get('cpuMemoryDetails')
+						if(!(cpuMemoryDetails.isEmpty())){
+							String cpu_load_ValueList = ""
+							String memory_usage_ValueList = ""
+							int cpuCounter =1
+							def lastCpuMemory = cpuMemoryDetails[cpuMemoryDetails.size()-1]
+							def lastIterationNo
+							if(lastCpuMemory.has('iteration')){
+								lastIterationNo = lastCpuMemory.get('iteration')
+							}
+							cpuMemoryDetails.each{ eachIteration ->
+								if(eachIteration.has('iteration') && eachIteration.has('cpu_load') && eachIteration.has('memory_usage')){
+									if(cpuCounter == 11){
+										cpuCounter = 1
+										def performanceInstance = new Performance()
+										performanceInstance.executionResult = executionResult
+										performanceInstance.performanceType = "CPUMemoryInfo"
+										performanceInstance.processName = "cpu_load"
+										performanceInstance.processValue = cpu_load_ValueList
+										performanceInstance.processType = type
+										performanceInstance.category = "RDKV"
+										performanceInstance.save(flush:true)
+										cpu_load_ValueList = ""
+										def performanceInstanceForMem = new Performance()
+										performanceInstanceForMem.executionResult = executionResult
+										performanceInstanceForMem.performanceType = "CPUMemoryInfo"
+										performanceInstanceForMem.processName = "memory_usage"
+										performanceInstanceForMem.processValue = memory_usage_ValueList
+										performanceInstanceForMem.processType = type
+										performanceInstanceForMem.category = "RDKV"
+										performanceInstanceForMem.save(flush:true)
+										memory_usage_ValueList = ""
+									}
+									def iterationNo = eachIteration.get('iteration')
+									def cpu_load = eachIteration.get('cpu_load')
+									if(cpu_load_ValueList.isEmpty()){
+										cpu_load_ValueList = cpu_load
+									}else{
+										cpu_load_ValueList = cpu_load_ValueList + "," +cpu_load
+									}
+									def memory_usage = eachIteration.get('memory_usage')
+									memory_usage = memory_usage.toFloat()
+									memory_usage = memory_usage.round(2)
+									memory_usage = memory_usage.toString()
+									if(memory_usage_ValueList.isEmpty()){
+										memory_usage_ValueList = memory_usage
+									}else{
+										memory_usage_ValueList = memory_usage_ValueList + "," +memory_usage
+									}
+									if(iterationNo == lastIterationNo){
+										def performanceInstance = new Performance()
+										performanceInstance.executionResult = executionResult
+										performanceInstance.performanceType = "CPUMemoryInfo"
+										performanceInstance.processName = "cpu_load"
+										performanceInstance.processValue = cpu_load_ValueList
+										performanceInstance.processType = type
+										performanceInstance.category = "RDKV"
+										performanceInstance.save(flush:true)
+										cpu_load_ValueList = ""
+										def performanceInstanceForMem = new Performance()
+										performanceInstanceForMem.executionResult = executionResult
+										performanceInstanceForMem.performanceType = "CPUMemoryInfo"
+										performanceInstanceForMem.processName = "memory_usage"
+										performanceInstanceForMem.processValue = memory_usage_ValueList
+										performanceInstanceForMem.processType = type
+										performanceInstanceForMem.category = "RDKV"
+										performanceInstanceForMem.save(flush:true)
+										memory_usage_ValueList = ""
+									}
+									cpuCounter ++
 								}
-								def iterationNo = eachIteration.get('iteration')
-								def cpu_load = eachIteration.get('cpu_load')
-								if(cpu_load_ValueList.isEmpty()){
-									cpu_load_ValueList = cpu_load
-								}else{
-									cpu_load_ValueList = cpu_load_ValueList + "," +cpu_load
-								}
-								def memory_usage = eachIteration.get('memory_usage')
-								memory_usage = memory_usage.toFloat()
-								memory_usage = memory_usage.round(2)
-								memory_usage = memory_usage.toString()
-								if(memory_usage_ValueList.isEmpty()){
-									memory_usage_ValueList = memory_usage
-								}else{
-									memory_usage_ValueList = memory_usage_ValueList + "," +memory_usage
-								}
-								if(iterationNo == lastIterationNo){
-									def performanceInstance = new Performance()
-									performanceInstance.executionResult = executionResult
-									performanceInstance.performanceType = "CPUMemoryInfo"
-									performanceInstance.processName = "cpu_load"
-									performanceInstance.processValue = cpu_load_ValueList
-									performanceInstance.category = "RDKV"
-									performanceInstance.save(flush:true)
-									cpu_load_ValueList = ""
-									def performanceInstanceForMem = new Performance()
-									performanceInstanceForMem.executionResult = executionResult
-									performanceInstanceForMem.performanceType = "CPUMemoryInfo"
-									performanceInstanceForMem.processName = "memory_usage"
-									performanceInstanceForMem.processValue = memory_usage_ValueList
-									performanceInstanceForMem.category = "RDKV"
-									performanceInstanceForMem.save(flush:true)
-									memory_usage_ValueList = ""
-								}
-								cpuCounter ++
 							}
 						}
 					}
 				}
 			}
+		} catch (Exception e) {
+			println("Error while saving CPU data")
+			e.printStackTrace()
+		}
+		try{
+			//For saving HW Performance BenchMarkData in performance table
+			def finalLogparserFileName = ""
+			File logDir  = new File(logPath)
+			if(logDir.isDirectory()){
+				logDir.eachFile{ file->
+					def currentFileName = file?.getName()
+					if(file?.getName()?.contains("logparser-results.txt") && file?.getName()?.contains("_")){
+						finalLogparserFileName = currentFileName?.substring(0,currentFileName?.lastIndexOf("_") )
+						file.renameTo(new File(logPath,finalLogparserFileName?.trim()));
+					}
+				}
+			}
+			def logparserFile = new File(logPath+finalLogparserFileName)
+			def benchMarkDataContent
+			if(logparserFile?.exists() && !(logparserFile.isDirectory())){
+				def executionResult = ExecutionResult.findById(executionResultId)
+				benchMarkDataContent = logparserFile.readLines();
+				for (int i = 0; i < benchMarkDataContent.size(); i++){
+					def benchMarkDataEachLineContent = benchMarkDataContent[i]
+					if(benchMarkDataEachLineContent){
+						JSONObject benchMarkDataJsonObj = new JSONObject(benchMarkDataEachLineContent);
+						if(benchMarkDataJsonObj.has('utility') && benchMarkDataJsonObj.has('values') && benchMarkDataJsonObj.has('type')){
+							def utility = benchMarkDataJsonObj.get('utility')
+							def values = benchMarkDataJsonObj.get('values')
+							def type = benchMarkDataJsonObj.get('type')
+							def keys = values.keySet();
+							Iterator a = keys.iterator();
+							while(a.hasNext()) {
+								String key = a.next();
+								String value = values[key];
+
+								Performance.withTransaction {
+									def performanceInstance = new Performance()
+									performanceInstance.executionResult = executionResult
+									performanceInstance.performanceType = utility
+									performanceInstance.processName = key
+									performanceInstance.processValue = value
+									performanceInstance.processType = type
+									performanceInstance.category = "RDKV"
+									performanceInstance.save(flush:true)
+								}
+							}
+						}
+					}
+				}
+			}
+		}catch (Exception e) {
+			println("Error while saving HW Performance data")
+			e.printStackTrace()
 		}
 	}
 	

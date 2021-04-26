@@ -62,6 +62,19 @@ $(document).ready(function() {
 			$("#rdkServiceScriptId").html('<select style="width:300px"><option value="">Please Select</option></select>');
 		}
 	});
+	
+	$("#benchMarkPerformanceTypeList").live('change', function(){
+		var benchMarkScript = $(this).val();
+		if(benchMarkScript != '') {
+			getProcessTypeOfScript(benchMarkScript)
+		}
+		else {
+			$("#parameterId").html(''); 
+			$("#analyzeExecution").hide();	
+			$("#benchmarkData").hide();	
+			$("#messageDiv").hide();	
+		}
+	});
 });
 
 /**
@@ -1413,6 +1426,9 @@ function showExecutionBased(){
 	$("#categoryLabel").show();
 	$("#categoryId").show();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 }
 /**
  * Function display the device based chart 
@@ -1441,6 +1457,9 @@ function showDeviceBased(){
 	$("#categoryLabel").show();
 	$("#categoryId").show();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 }
 
 /**
@@ -1472,22 +1491,21 @@ function showAnalyzeExecution(){
 	$('.chartdivAnalyzeExecution').empty(); 
 	$("#rdkServiceDiv").hide(); 
 	$("#chartdivAnalyzeExecutionDiv3").hide(); 	
-	$("#analyzeExecution").show();	
-	$( "#fromDateFilterExecutions" ).datepicker();
-	$( "#toDateFilterExecutions" ).datepicker();
-	 var today = new Date();
-	 var priorDate = new Date();
-	 priorDate.setDate(today.getDate() - 7)
-	 var ddtoday = String(today.getDate()).padStart(2, '0');
-	 var mmtoday = String(today.getMonth() + 1).padStart(2, '0');
-	 var yyyytoday = today.getFullYear();
-	 today = mmtoday + '/' + ddtoday + '/' + yyyytoday;
-	 var ddprior = String(priorDate.getDate()).padStart(2, '0');
-	 var mmprior = String(priorDate.getMonth() + 1).padStart(2, '0');
-	 var yyyyprior = priorDate.getFullYear();
-	 priorDate = mmprior + '/' + ddprior + '/' + yyyyprior;
-	 document.getElementById("fromDateFilterExecutions").value = priorDate
-	 document.getElementById("toDateFilterExecutions").value = today
+	$('#benchMarkPerformanceTypeList').empty()
+	$("#benchMarkPerformanceTypeList").append(`<option value="">Please select</option>`);
+	
+	$.get('getBenchMarkScripts', function(data) {
+		var listObject = data.replace("[", "");
+		listObject = listObject.replace("]", ""); 
+		var listObjects = listObject.split(",");
+		var str = ""
+	    for (var item of listObjects) {
+	    	item = item.replace("'", "");
+	    	item = item.replace("'", "");
+			$("#benchMarkPerformanceTypeList").append(`<option value="${item}">${item}</option>`);
+	    }
+	    $("#benchMarkPerformanceTypeListDiv").show();
+	});	
 }
 /**
  * Function display the boxtype based section 
@@ -1522,6 +1540,9 @@ function showBoxTypeBased(){
 	$("#categoryLabel").show();
 	$("#categoryId").show();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 }
 
 /**
@@ -1550,6 +1571,9 @@ function showScriptBased(){
 	$("#categoryLabel").show();
 	$("#categoryId").show();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 }
 
 /**
@@ -1580,6 +1604,9 @@ function showComparisonReport(){
 	$("#categoryLabel").hide();
 	$("#categoryId").hide();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 	
 }
 /**
@@ -1608,6 +1635,9 @@ function showNormalExecutionBased(){
 	$("#categoryLabel").show();
 	$("#categoryId").show();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 	
 	var category = $('#category').val();
 	$.get('executionsForAnalysis', {category: category}, function(data) {
@@ -1653,6 +1683,9 @@ function showBoxScriptBased()
 	$("#categoryLabel").show();
 	$("#categoryId").show();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 }
 /**
  * Function display the script based chart based on boxtype 
@@ -1680,6 +1713,9 @@ function showBoxGroupBased()
 	$("#categoryLabel").show();
 	$("#categoryId").show();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 }
 
 /**
@@ -1691,6 +1727,7 @@ function showPerformanceBased(){
 	$('input[name=chartOptions][value=DeviceBased]').prop(
 						'checked', false);
 	$("#performance").show();
+	$("#chartOptions").val($("#chartOptions option:first").val());
 	$( ".chartdivisionclass" ).empty();
 	$("#normal").hide();
 	$("#normalexecutionsbased").hide();
@@ -1713,6 +1750,9 @@ function showPerformanceBased(){
 	$("#categoryLabel").show();
 	$("#categoryId").show();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 }
 
 /**
@@ -1752,6 +1792,9 @@ function showNormalBased(){
 	$("#categoryLabel").show();
 	$("#categoryId").show();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 }
 
 /**
@@ -1797,6 +1840,9 @@ function showBuildNameBased(category){
 	$("#categoryLabel").show();
 	$("#categoryId").show();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 	
 }
 
@@ -1835,6 +1881,9 @@ function showBuildScriptBased()
 	$("#categoryLabel").show();
 	$("#categoryId").show();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 }
 
 /**
@@ -1864,6 +1913,9 @@ function showBuildGroupBased()
 	$("#categoryLabel").show();
 	$("#categoryId").show();
 	$("#analyzeExecution").hide();	
+	$("#benchmarkData").hide();	
+	$("#benchMarkPerformanceTypeListDiv").hide();
+	$("#messageDiv").hide();
 }
 
 /**
@@ -2837,5 +2889,172 @@ function getScriptsByExecution(execution_name) {
 	}
 	else {
 		$("#rdkServiceScriptId").html('');
+	}
+}
+
+/**
+ * Method to get the processType of the benchmark tool selected 
+ * @param benchMarkScript
+ */
+function getProcessTypeOfScript(benchMarkScript) {
+	var url = $("#url").val();
+	var benchMarkScrpt = benchMarkScript
+	$('.chartdivAnalyzeExecution').empty(); 
+	$('.chartdivBenchMarkclass').empty(); 
+	if(benchMarkScrpt != '') {
+	    $.get('getProcessTypeOfScript', {benchMarkScrpt: benchMarkScrpt}, function(data) {
+	    	if(data.processType == "multipleEntries"){
+	    		$("#rdkServiceDiv").hide(); 
+	    		$("#chartdivAnalyzeExecutionDiv3").hide(); 	
+	    		$("#benchmarkData").hide();	
+	    		$("#analyzeExecution").show();	
+	    		$( "#fromDateFilterExecutions" ).datepicker();
+	    		$( "#toDateFilterExecutions" ).datepicker();
+	    		 $("#messageDiv").show();
+	    		 document.getElementById("messageDiv").innerText = "Plot data values across iterations for a single execution";
+	    		 document.getElementById("messageDiv").style.fontSize = "medium";
+	    		 var today = new Date();
+	    		 var priorDate = new Date();
+	    		 priorDate.setDate(today.getDate() - 7)
+	    		 var ddtoday = String(today.getDate()).padStart(2, '0');
+	    		 var mmtoday = String(today.getMonth() + 1).padStart(2, '0');
+	    		 var yyyytoday = today.getFullYear();
+	    		 today = mmtoday + '/' + ddtoday + '/' + yyyytoday;
+	    		 var ddprior = String(priorDate.getDate()).padStart(2, '0');
+	    		 var mmprior = String(priorDate.getMonth() + 1).padStart(2, '0');
+	    		 var yyyyprior = priorDate.getFullYear();
+	    		 priorDate = mmprior + '/' + ddprior + '/' + yyyyprior;
+	    		 document.getElementById("fromDateFilterExecutions").value = priorDate
+	    		 document.getElementById("toDateFilterExecutions").value = today
+	    	}else if(data.processType == "singleEntry"){
+	    		$("#analyzeExecution").hide();	
+	    		$("#benchmarkData").show();	
+	    		$("#messageDiv").show();
+	    		document.getElementById("messageDiv").innerText = "Plot data values across executions";
+	    		document.getElementById("messageDiv").style.fontSize = "medium";
+	    		var benchMarkPerformance = data.benchMarkPerformance
+				var select = '<select style="width: 200px" id="parameterValue" name="parameterValue"><option value="">Please Select</option>';
+				select += '<option value="ALL">ALL</option>';
+				for(var index = 0; index < benchMarkPerformance.length; index ++ ) {
+					select += '<option value="' + benchMarkPerformance[index] + '">' + benchMarkPerformance[index] + '</option>';
+				}
+				select += '</select>';
+				$("#parameterId").html(''); 
+				$("#parameterId").html(select); 
+	    	}
+	    });	
+	}
+	else {
+	}
+}
+
+/**
+ * Method to return the data map for plotting Hardware performance data in according to the benchmark tool selected
+ */
+function getBenchMarkChartData(){
+	$(".chartdivBenchMarkclass" ).empty();
+	var parameterValue = $("#parameterValue").val();
+	var resultcount = $("#resultBenchmarkCounts").val();	
+	var utilityName = $("#benchMarkPerformanceTypeList").val();	
+	if(utilityName == null || utilityName.length == 0 )
+	{ alert ('please select a utility value  ');}
+	if(parameterValue == null || parameterValue.length == 0 )
+	{ alert ('please select a parmeter value  ');}
+	else if(resultcount == null || resultcount.length == 0){
+		alert ('please give a valid result number  ');
+	}else if(parseInt(resultcount) < 2 || parseInt(resultcount) > 100){
+		alert ('Maximum allowed range is 2-100');
+	}else{
+		$.get('getBenchMarkChartData', {utilityName : utilityName, parameterValue : parameterValue, resultcount : resultcount} , function(data) {
+			if(parameterValue == "ALL"){
+				var series = [];
+				for(var i = 0; i < data.parameterKeyList.length; i++){
+				    var label = data.parameterKeyList[i];
+				    series.push({label:label});
+				}				
+				var plot1 = $.jqplot('chartdivBenchMark', data.resultList, {
+				      title: "<b>" + data.executionName.length   +" Execution Results </b>", 
+				      seriesDefaults: { 
+				        showMarker:true,
+				        //pointLabels: { show:true }, // uncomment this to display value of each point
+			            breakOnNull: true
+				        
+				      },
+				      series: series,
+				      axes:{
+				    	  	xaxis:{
+				            	renderer: $.jqplot.CategoryAxisRenderer,
+								label:'Execution Name',	
+								min:0,
+								max:data.yMax ,
+								ticks: data.executionName,
+								tickOptions:{
+									angle: -60,
+									fontSize: '8pt'
+								},
+								tickRenderer:$.jqplot.CanvasAxisTickRenderer
+				            },
+				            yaxis: {
+								label:parameterValue,
+								min:0,
+								max:data.yMax  
+							}
+				      },
+				      legend: {
+				          show: true,
+				          placement: 'outsideGrid',
+				          labels: data.parameterKeyList
+				      },
+				      highlighter: {
+				    	  show: true,
+				          showTooltip: true,
+				          tooltipLocation:'ne',
+				          tooltipAxes: 'y',
+				          tooltipContentEditor: function (str, seriesIndex, pointIndex, plot) {
+				              var val = plot.data[seriesIndex][pointIndex][1];
+				              var parma = plot.series[seriesIndex]["label"]
+				              var execName = plot.options.axes.xaxis.ticks[pointIndex]
+				              var html = "<div>Value: ";
+				              html += val;
+				              html += "  <br>Parameter Name : ";
+				              html += parma;
+				              html += "  <br>Execution Name : ";
+				              html += execName;
+				              return html;
+				          }
+				      },
+				      cursor: {
+				    	  show: false
+				      }
+				 });
+			}else{
+				var plot1 = $.jqplot('chartdivBenchMark', [data.resultList], {
+					      title: "<b>" + data.resultList.length   +" Execution Results </b>", 
+					      seriesDefaults: { 
+					        showMarker:true,
+					        pointLabels: { show:true } 
+					      },
+					      	axes:{
+					    	  	xaxis:{
+					            	renderer: $.jqplot.CategoryAxisRenderer,
+									label:'Execution Name',	
+									min:0,
+									max:data.yMax ,
+									ticks: data.executionName,
+									tickOptions:{
+										angle: -60,
+										fontSize: '8pt'
+									},
+									tickRenderer:$.jqplot.CanvasAxisTickRenderer
+					            },
+					            yaxis: {
+									label:parameterValue,
+									min:0,
+									max:data.yMax  
+								}
+					      }
+					 });
+			}
+		} );
 	}
 }

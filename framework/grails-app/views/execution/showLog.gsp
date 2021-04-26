@@ -645,7 +645,30 @@ function triggerExecutionFromPopUp(){
 					</g:if>
 						<span id="allmessagesperf${k}_${i}"  style="display: none;">
 						<section class="round-border">
-						
+						<%
+							def benchMarkPerformance = Performance.findAllByExecutionResultAndPerformanceTypeNotEqual(executionResultInstance,"CPUMemoryInfo")
+							def utility = benchMarkPerformance.performanceType[0]
+						%>
+						<g:if test="${benchMarkPerformance}">	
+							<table>
+								<tbody >
+									<tr class="fnhead1">
+										<td class="tdhead">Utility</td>
+										<td class="tdhead">${utility}</td>
+									</tr>
+									<tr class="fnhead1">												
+										<td class="tdhead">Parameter</td>
+										<td class="tdhead">Value</td>							
+									</tr>
+									<g:each in="${benchMarkPerformance}" var="benchMarkPerformanceInstance">
+										<tr>																					
+											<td>${benchMarkPerformanceInstance?.processName}</td>												
+											<td>${benchMarkPerformanceInstance?.processValue}</td>				
+										</tr>					
+									</g:each>						
+								</tbody>
+							</table>	
+						</g:if>
 						<%
 							def performance = Performance.findAllByExecutionResultAndPerformanceType(executionResultInstance,"BenchMark")							
 						%>

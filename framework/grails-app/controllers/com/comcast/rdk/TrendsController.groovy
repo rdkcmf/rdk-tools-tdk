@@ -1670,7 +1670,7 @@ class TrendsController {
 				ExecutionDevice executionDevice  = ExecutionDevice.findByExecution(fullExecutionList[i])
 				List executionResultList =  ExecutionResult.findAllByExecutionAndExecutionDevice(fullExecutionList[i],executionDevice)
 				for(int j=0;j<executionResultList.size();j++){
-					List performanceList = Performance.findAllByExecutionResult(executionResultList[j])
+					List performanceList = Performance.findAll("from Performance as p where p.executionResult.id ='${executionResultList[j].id}' and (p.processType = 'multipleEntries' or p.processType is null)")
 					if(!(performanceList.isEmpty())){
 						isRDKServiceExecution = true
 						break
@@ -1736,6 +1736,125 @@ class TrendsController {
 			}
 		}
 		def mapData = [cpuLoadList :cpuLoadList, memUsageList:memUsageList,yMaxCpuLoad:yMaxCpuLoad,yMaxMemUsage:yMaxMemUsage]
+		render mapData as JSON
+	}
+	
+	/*
+	 * Method to display all the distinct performance type from performance table
+	 */
+	def getBenchMarkScripts(){
+		
+		List benchMarkPerformanceTypeListDuplicate = Performance?.executeQuery("select p.performanceType from Performance p order by id desc")
+		List benchMarkPerformanceTypeList = []
+		benchMarkPerformanceTypeListDuplicate?.each{performanceType ->
+			if(!benchMarkPerformanceTypeList?.contains(performanceType)){
+				benchMarkPerformanceTypeList?.add(performanceType)
+			}
+		}
+		if(benchMarkPerformanceTypeList?.contains("CPUMemoryInfo")){
+			benchMarkPerformanceTypeList?.remove("CPUMemoryInfo")
+			benchMarkPerformanceTypeList?.add("CPU Performance");
+		}
+		render benchMarkPerformanceTypeList
+	}
+	
+	/**
+	 * Method to get the processType of the benchmark tool selected 
+	 * @param benchMarkScrpt
+	 * @return
+	 */
+	def getProcessTypeOfScript(String benchMarkScrpt){
+		benchMarkScrpt = benchMarkScrpt?.trim()
+		List benchMarkPerformance = []
+		if(benchMarkScrpt?.equals("CPU Performance")){
+			benchMarkScrpt = "CPUMemoryInfo"
+		}
+		def performanceInstance = Performance?.findByPerformanceType(benchMarkScrpt)
+		String processType = performanceInstance?.processType
+		if(!processType){
+			processType = "multipleEntries"
+		}
+		List benchMarkPerformanceDuplicate = Performance?.executeQuery("select p.processName from Performance p where p.performanceType=:performanceType",[performanceType:benchMarkScrpt])
+		benchMarkPerformanceDuplicate?.each{processName ->
+			if(!benchMarkPerformance?.contains(processName)){
+				benchMarkPerformance?.add(processName)
+			}
+		}
+		def mapData = [processType:processType, benchMarkPerformance:benchMarkPerformance]
+		render mapData as JSON
+	}
+	
+	/**
+	 * Method to return the data map for plotting Hardware performance data in according to the benchmark tool selected
+	 * @return
+	 */
+	def getBenchMarkChartData(){
+		List<String> executionList = new ArrayList<String>();
+		List<Integer> resultList =  new ArrayList<Integer>();
+		List benchmarkList = []
+		List parameterKeyDuplicateList = []
+		List parameterKeyList = []
+		def yMax
+		if(params?.parameterValue?.trim()?.equals("ALL")){
+			List<Integer> yList =  new ArrayList<Integer>();
+			parameterKeyDuplicateList = Performance?.executeQuery("select p.processName from Performance p where p.performanceType=?",[params?.utilityName.trim()])
+			parameterKeyDuplicateList?.each{parameter ->
+				if(!parameterKeyList?.contains(parameter)){
+					parameterKeyList?.add(parameter)
+				}
+			}
+			parameterKeyList.each{parameterKey ->
+				List<Integer> parameterResultList =  new ArrayList<Integer>();
+				benchmarkList = Performance.findAllByProcessNameAndPerformanceType(parameterKey,params?.utilityName.trim(),[max:params?.resultcount.trim(), sort: "id", order: "desc"])
+				benchmarkList = benchmarkList.reverse();
+				def counter = 1;
+				benchmarkList.each{benchmark ->
+					List<Integer> singleResultList =  new ArrayList<Integer>();
+						def executionResult = benchmark.executionResult
+						def paramValSplit = benchmark.processValue.split("MB/s")
+						if(!(executionList.contains(executionResult?.execution?.name))){
+							executionList.add(executionResult?.execution?.name)
+						}
+						if(paramValSplit[0]){
+							yList.add(paramValSplit[0])
+							singleResultList.addAll(counter.toString(), paramValSplit[0])
+						}
+					counter++
+					parameterResultList.add(singleResultList)
+				}
+				resultList.add(parameterResultList)
+			}
+			def resultListFloat =  []
+			yList.each{resultString ->
+				def resultFloat = resultString as float
+				resultListFloat.add(resultFloat)
+			}
+			yMax =  resultListFloat.max()
+			yMax = yMax + yMax*0.1
+			yMax = yMax.round(2)
+
+		}else{
+
+			benchmarkList = Performance.findAllByProcessName(params?.parameterValue.trim(),[max:params?.resultcount.trim(), sort: "id", order: "desc"])
+			benchmarkList = benchmarkList.reverse();
+			benchmarkList.each{benchmark ->
+				def executionResult = benchmark.executionResult
+				def paramValSplit = benchmark.processValue.split("MB/s")
+				if(paramValSplit[0]){
+					resultList.add(paramValSplit[0])
+					executionList.add(executionResult?.execution?.name)
+				}
+			}
+			def resultListFloat =  []
+			resultList.each{resultString ->
+				def resultFloat = resultString as float
+				resultListFloat.add(resultFloat)
+			}
+			yMax =  resultListFloat.max()
+			yMax = yMax + yMax*0.5
+			yMax = yMax.round(2)
+		}
+		def mapData = [executionName :executionList, resultList:resultList, yMax:yMax ,parameterKeyList:parameterKeyList]
 		render mapData as JSON
 	}
 }
