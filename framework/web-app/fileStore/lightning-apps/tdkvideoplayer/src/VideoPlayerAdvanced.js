@@ -42,28 +42,65 @@ export default class VideoPlayerAdvanced extends Lightning.Component {
         VideoPlayer.open(url)
     }
 
-    openHls(url) {
-        window.Hls = Hls
-        if (!window.Hls) {
-            window.Hls = class Hls {
-            static isSupported() {
+    openHls(url,config) {
+            /*let basic_config = {
+            maxBufferLength: 5,
+            maxBufferSize: 1*1024*1024,
+            enableWorker: false,
+            debug: false,
+            liveDurationInfinity: true
+            }*/
+            let basic_config = {liveDurationInfinity: true}
+            window.Hls = Hls
+            if (!window.Hls) {
+              window.Hls = class Hls {
+              static isSupported() {
                 console.warn('hls-light not included')
                 return false
+                }
+              }
             }
-          }
-        }
-        if (window.Hls.isSupported()) {
-            if (!this._hls) this._hls = new window.Hls({ liveDurationInfinity: true })
-            this._hls.loadSource(url)
-            this._hls.attachMedia(VideoPlayer._videoEl)
-            VideoPlayer._videoEl.style.display = 'block'
-        }
+            if (Object.keys(config).length != 0){
+                if (config.hasOwnProperty("com.widevine.alpha")){
+                    //console.log("Videoplayer (HLSJS): attaching protection data: " + JSON.stringify(config));
+                    basic_config.emeEnabled = true;
+                    basic_config.widevineLicenseUrl = config["com.widevine.alpha"]
+                }
+            }
+            if (window.Hls.isSupported()) {
+              if (!this._hls) this._hls = new window.Hls(basic_config)
+              this._hls.attachMedia(VideoPlayer._videoEl)
+              this._hls.on(Hls.Events.MEDIA_ATTACHED, function () {
+                console.log("Video and HLSJS are now bound together !!!");
+              });
+              setTimeout(()=>{
+                console.log("Videoplayer (HLSJS): attaching video source url: " + url);
+                this._hls.loadSource(url);
+              },1000);
+            }
+            /*this._hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+              console.log("Manifest loaded, found " + data.levels.length + " quality level.");
+            });*/
+            //VideoPlayer._videoEl.style.display = 'block'
     }
 
-    openDash(url) {
+    openDash(url,config) {
         this.player = dashjs.MediaPlayer().create()
-        VideoPlayer._videoEl.style.display = 'block'
+        this.player.updateSettings({
+            "streaming": {
+                    "bufferPruningInterval": 5,
+                    "bufferToKeep": 5,
+                    "bufferTimeAtTopQuality": 5,
+                    "bufferTimeAtTopQualityLongForm": 5,
+            }
+        });
         this.player.initialize(VideoPlayer._videoEl, url, true)
+        //this.player.attachSource(url)
+        if (Object.keys(config).length != 0){
+            //console.log("Videoplayer (DASHJS): attaching protection data: " + JSON.stringify(config));
+            this.player.setProtectionData(config);
+        }
+        console.log("Videoplayer (DASHJS): attaching video source url: " + url);
     }
 
     close() {

@@ -1,8 +1,8 @@
 {
-  "name": "tdkvideoplayer",
-  "description": "TDKVideoPlayer",
+  "name": "tdkuveplayer",
+  "description": "TDKUVEPlayerApp",
   "dependencies": {
-    "@lightningjs/sdk": "^4.0.0"
+    "@lightningjs/sdk": "^4.3.0"
   },
   "lint-staged": {
     "*.js": [
@@ -23,8 +23,6 @@
     "eslint-plugin-prettier": "^3.1.1",
     "husky": "^3.1.0",
     "lint-staged": "^9.4.3",
-    "prettier": "^1.19.1",
-    "hls.js": "^0.13.2",
-    "dashjs": "^3.2.1"
+    "prettier": "^1.19.1"
   }
 }

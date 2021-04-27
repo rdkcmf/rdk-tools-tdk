@@ -395,12 +395,12 @@ export default class App extends Lightning.Component {
   loadVideoPlayer(){
     if (this.urlType == "hls" && this.usehlslib){
         this.registerEvents();
-        this.tag('VideoPlayer').openHls(this.videoURL)
+        this.tag('VideoPlayer').openHls(this.videoURL,this.DRMconfig)
     }else if (this.urlType == "hls" && ! this.usehlslib){
         this.tag('VideoPlayer').open(this.videoURL)
     }else if (this.urlType == "dash" && this.usedashlib){
         this.registerEvents();
-        this.tag('VideoPlayer').openDash(this.videoURL)
+        this.tag('VideoPlayer').openDash(this.videoURL,this.DRMconfig)
     }else if (this.urlType == "dash" && ! this.usedashlib){
         this.tag('VideoPlayer').open(this.videoURL)
     }else{
@@ -643,11 +643,13 @@ export default class App extends Lightning.Component {
   _init() {
 
     this.inputs = window.location.search.substring(1).split("&");
-    this.videoURL = GetURLParameter("url")
+    this.videoURL = GetURLParameter("url").replace(/:and:/g,"&").replace(/:eq:/g, "=")
     this.autotest = GetURLParameter("autotest")
     this.urlType  = GetURLParameter("type")
     this.autoplay = true
     this.options  = []
+    this.configs  = []
+    this.DRMconfig= {}
     this.message1 = ""
     this.message2 = ""
     this.init     = 0
@@ -685,6 +687,9 @@ export default class App extends Lightning.Component {
     this.inputs.forEach(item => {
         if(item.split("=")[0] == "options"){
             this.options = GetURLParameter("options").split(",");
+        }
+        else if(item.split("=")[0] == "drmconfigs"){
+            this.configs = GetURLParameter("drmconfigs").split(",");
         }
     });
 
@@ -725,10 +730,38 @@ export default class App extends Lightning.Component {
       }
     });
 
+    // check the DRM options provided in the url and update the configs
+    this.license_header = "";
+    this.configs.forEach(item => {
+      if(item.includes("headers")){
+          this.license_header = String(item.split('(')[1].split(')')[0]);
+      }
+    });
+    this.configs.forEach(item => {
+      if(! item.includes("headers")){
+          var drm = String(item.split('(')[0]);
+          var license_url = String(item.split('(')[1].split(')')[0]);
+          license_url = license_url.replace(/:and:/g,"&").replace(/:eq:/g, "=").replace(/:ob:/g,"(").replace(/:cb:/g,")").replace(/:comma:/g,",");
+          if(this.urlType == "dash"){
+             this.DRMconfig[drm] = {"serverURL":license_url};
+             if(this.license_header != ""){
+               var header_tag  = this.license_header.split(":")[0];
+               var header_info = this.license_header.split(":")[1];
+               this.DRMconfig[drm]["httpRequestHeaders"] = {};
+               this.DRMconfig[drm]["httpRequestHeaders"][header_tag] = header_info;
+             }
+          }else if(this.urlType == "hls"){
+             this.DRMconfig[drm] = license_url;
+          }
+      }
+    });
+    //logMsg("DRM info: "+ JSON.stringify(this.DRMconfig));
+
     this.loadVideoPlayer();
     this.vidDuration = VideoPlayer.duration;
 
   }
 
 }
+
 
