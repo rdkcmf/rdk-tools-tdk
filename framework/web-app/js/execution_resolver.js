@@ -163,6 +163,8 @@ function jsExecution(){
 	var thunderPythonExecuteButtons = document.getElementById("thunderPythonExecuteButtons");
 	var thunderPythonDiagnosisCheckBox = document.getElementById("rdkCertificationDiagnosisId");
 	thunderPythonDiagnosisCheckBox.disabled = true;
+	var thunderPythonPerformanceCheckBox = document.getElementById("rdkCertificationPerformanceId");
+	thunderPythonPerformanceCheckBox.disabled = true;	
 	thunderJavascriptExecuteButtons.style.display = "block";
 	thunderPythonExecuteButtons.style.display = "none";
 	document.getElementById("thunderExecutionType").value = "javascript";
@@ -194,6 +196,8 @@ function pythonExecution(){
 	var thunderPythonExecuteButtons = document.getElementById("thunderPythonExecuteButtons");
 	var thunderPythonDiagnosisCheckBox = document.getElementById("rdkCertificationDiagnosisId");
 	thunderPythonDiagnosisCheckBox.disabled = false;
+	var thunderPythonPerformanceCheckBox = document.getElementById("rdkCertificationPerformanceId");
+	thunderPythonPerformanceCheckBox.disabled = false;
 	thunderJavascriptExecuteButtons.style.display = "none";
 	thunderPythonExecuteButtons.style.display = "block";
 	document.getElementById("category").value = "RDKV";
