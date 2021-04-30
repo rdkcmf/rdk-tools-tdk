@@ -65,7 +65,7 @@ stress_test_url = "https://cdn.metrological.com/static/storm/app_redirect1.html"
 #The directed urls will follow the below pattern
 expected_url_pattern = "https://cdn.metrological.com/static/storm/app_redirect[1|2].html\?run=\d*&runs=-1&wait=200&requests=20&side=[A|B]"
 
-####Suspend and Resume tests details - used for both webkit test and cobalt test
+####Suspend and Resume tests details
 #The maximum number of times the test should repeat:
 suspend_resume_max_count = 1000
 
@@ -115,3 +115,10 @@ key_stress_max_count = 100
 
 ##MoveTofront and MoveToBack test
 moveto_operation_max_count = 1000
+
+##Cobalt trickplay test
+#time in minutes till the test should be performed
+cobalt_trickplay_duration = 1440
+
+##SSH stress test
+ssh_max_count = 30
