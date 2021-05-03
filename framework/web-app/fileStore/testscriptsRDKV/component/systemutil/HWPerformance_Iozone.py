@@ -93,6 +93,21 @@ if ("SUCCESS" in sysUtilLoadStatus.upper()):
          print "Json reponse: %s" %details
          if expectedresult in actualresult:
                  tdkTestObj.setResultStatus("SUCCESS");
+                 print "transfer log file"
+                 filepath = tdkTestObj.transferLogs( "/opt/TDK/logs/logparser-results.txt", "false" );
+                 try:
+                   data = open(filepath,'r');
+                   message = data.read()
+                   print "\n**************HW Performance tools Execution Log - Begin**********\n"
+                   print(message)
+                   data.close()
+                   print "\n**************HW Performance tools Execution - End*************\n"
+                   print "[TEST EXECUTION RESULT] : SUCCESS"
+                 except IOError:
+                   print "ERROR : Unable to open execution log file"
+                   tdkTestObj.setResultStatus("FAILURE");
+                   obj.unloadModule("systemutil");
+                   exit()
                  print "[TEST EXECUTION RESULT] : SUCCESS"
          else:
                  tdkTestObj.setResultStatus("FAILURE");

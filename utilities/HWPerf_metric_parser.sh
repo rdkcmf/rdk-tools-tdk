@@ -40,7 +40,7 @@ update_parser_result_string()
 #------------------------------------------------------------------------------------------------------
 generate_parser_result_log()
 {
-    parser_result_json="{\"utility\": \"$1\",\"values\":{$2}}"
+    parser_result_json="{\"utility\": \"$1\",\"type\": \"singleEntry\" ,\"values\":{$2}}"
     echo -e "$parser_result_json" > $PARSER_RES_FILE
     echo -e "Generated Json string : $parser_result_json " >> $PARSER_LOG_FILE
 }
