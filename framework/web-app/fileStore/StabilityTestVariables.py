@@ -122,3 +122,13 @@ cobalt_trickplay_duration = 1440
 
 ##SSH stress test
 ssh_max_count = 30
+
+##Cobalt video search and play test
+#name of the video to be searched in Cobalt 
+cobalt_search_and_play_video_name = ""
+
+#Maximum number of video searches required
+cobalt_search_and_play_max_count = 1000
+
+##Video resize test details
+video_resize_max_count = 300

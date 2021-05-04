@@ -263,3 +263,25 @@ def rdkservice_setDefaultInterface(new_interface):
     if status == "FAILURE":
         result_status = "FAILURE"
     return result_status
+
+#-------------------------------------------------------------------
+#SEND KEYCODES TO DUT CORRESPONDING TO THE KEYWORD INPUT
+#-------------------------------------------------------------------
+def rdkservice_sendKeyCodes(keyword):
+    key_codes_dict = {"a":"65","b":"66","c":"67","d":"68","e":"69","f":"70","g":"71","h":"72","i":"73","j":"74","k":"75","l":"76","m":"77","n":"78","o":"79","p":"80","q":"81","r":"82","s":"83","t":"84","u":"85","v":"86","w":"87","x":"88","y":"89","z":"90","@":"shift,50",".":"190"," ":"32","0":"48","2":"50","3":"51","4":"52","5":"53","6":"54","7":"55","8":"56","9":"57"}
+    for key in keyword:
+        if "shift" in key_codes_dict[key]:
+            key = key_codes_dict[key].split(",")[-1]
+            data = '"method":"org.rdk.RDKShell.1.generateKey", "params":{"keys":[ {"keyCode": '+key+',"modifiers": ["shift"],"delay":1.0}]}'
+        else:
+            data = '"method":"org.rdk.RDKShell.1.generateKey", "params":{"keys":[ {"keyCode": '+key_codes_dict[key]+',"modifiers": [],"delay":1.0}]}'
+        result = execute_step(data)
+        if result == "EXCEPTION OCCURRED":
+            break
+    return result
+        
+        
+
+
+
+

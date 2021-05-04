@@ -71,6 +71,12 @@
           <parameter name="new_interface" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkservice_sendKeyCodes" id=" " version="1">
+        <function>rdkservice_sendKeyCodes</function>
+        <parameters>
+          <parameter name="keyword" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
