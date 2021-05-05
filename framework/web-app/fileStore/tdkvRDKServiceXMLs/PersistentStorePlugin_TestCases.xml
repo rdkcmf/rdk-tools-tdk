@@ -126,11 +126,6 @@
             </testStep>
         </testCase>
 
-        <testCase testCaseId="PS_05" testCaseName="PersistentStore_Flush_Cache"  desc="flushes the database cache" >
-            <testCaseInfo testCaseType="direct" />
-            <testStep testStepId="1" name="Flush_Cache" method="Flush_Cache" >
-                <resultGeneration useMethodTag="persistentstore_check_set_operation" />
-            </testStep>
-        </testCase>
+        
 </testPlugin>
 

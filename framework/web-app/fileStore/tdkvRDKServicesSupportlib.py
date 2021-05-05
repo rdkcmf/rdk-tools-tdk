@@ -784,7 +784,12 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info = checkAndGetAllResultInfo(result)
 
         elif tag == "displayinfo_check_for_nonempty_result":
-            info = checkAndGetAllResultInfo(result)
+            info["Result"] = result
+            status = checkNonEmptyResultData(result)
+            if status == "TRUE":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
         
         elif tag == "displayinfo_validate_results":
             info["Result"] = result
@@ -794,19 +799,19 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "displayinfo_validate_boolean_result":
-            if str(result.lower()) == "true" or str(result.lower()) == "false" :
+            if str(result) in expectedValues:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "displayinfo_validate_width_or_height":
-            if arg[0] is "width":
+            if arg[0] == "width":
                 index = 0
-            elif arg[0] is "height":
+            elif arg[0] == "height":
                 index = 1
             SupportingRes=expectedValues
             search_key = int(result)
-            Resolution_Details = {"480i":[720,480],"480p":[720,480],"576p50":[720,576],"720p":[1280,720],"720p50":[1280,720],"1080p24":[1920,1080],"1080i":[1920,1080],"1080p60":[1920,1080],"1080i50":[1920,1080],"2160p30":[3840,2160],"2160p60":[3840,2160]}
+            Resolution_Details = {"480i":[720,480],"480p":[720,480],"576p50":[720,576],"720p":[1280,720],"720p50":[1280,720],"1080p":[1920,1080],"1080p24":[1920,1080],"1080i":[1920,1080],"1080p60":[1920,1080],"1080i50":[1920,1080],"2160p30":[3840,2160],"2160p60":[3840,2160]}
             #Create a sub dictionary of width and height pair from the SupportingRes keys.
             subdict=dict([(x,Resolution_Details[x]) for x in SupportingRes])
 
@@ -820,17 +825,23 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "displayinfo_validate_hdr_formats":
-            info = checkAndGetAllResultInfo(result)
-            status = [ "FALSE" for form in result if form not in expectedValues ]
-            if "FALSE" not in status:
-                info["Test_Step_Status"] = "SUCCESS"
+            status = checkNonEmptyResultData(result)
+            if status == "TRUE":
+                info["Result"] = result
+                status = [ "FALSE" for form in result if form not in expectedValues ]
+                if "FALSE" not in status:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
-        elif tag == "displayinfo_validate_hdr_format_in_use":
-            info = checkAndGetAllResultInfo(result)
-            if str(result) in expectedValues:
-                info["Test_Step_Status"] = "SUCCESS"
+        elif tag == "displayinfo_validate_expected_results":
+            status = checkNonEmptyResultData(result)
+            if status == "TRUE":
+                info["Result"] = result
+                if str(result) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
@@ -1709,13 +1720,6 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
         elif tag == "playerinfo_check_results":
             info["RESULT"] = result
             if result in expectedValues:
-                info["Test_Step_Status"] = "SUCCESS"
-            else:
-                info["Test_Step_Status"] = "FAILURE"
-        elif tag == "playerinfo_check_resolution":
-            result = re.split('Resolution',result)
-            info["resolution"] = str(result[1]).lower()
-            if str(result[1]).lower() in expectedValues:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"

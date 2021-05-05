@@ -108,14 +108,13 @@ if expectedResult in result.upper():
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    status,curr_ux_status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
-    print "Current values \nUX:%s\nWebKitBrowser:%s\nCobalt:%s"%(curr_ux_status,curr_webkit_status,curr_cobalt_status);
+    status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
+    print "Current values \nWebKitBrowser:%s\nCobalt:%s"%(curr_webkit_status,curr_cobalt_status);
     if status == "FAILURE":
         set_pre_requisites(obj)
         #Need to revert the values since we are changing plugin status
         revert="YES"
-        status,ux_status,webkit_status,cobalt_status = check_pre_requisites(obj)
-    #Check residentApp status and deactivate if its activated
+        status,webkit_status,cobalt_status = check_pre_requisites(obj)
     ip_change_app_url = ip_change_detection_variables.ip_change_app_url
     user_name = ip_change_detection_variables.tm_username
     password = ip_change_detection_variables.tm_password

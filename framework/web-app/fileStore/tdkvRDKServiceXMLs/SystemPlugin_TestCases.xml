@@ -166,7 +166,7 @@
             <testStep testStepId="2" name="Get_Preferred_StandBy_Mode" method="Get_Preferred_StandBy_Mode" saveResult="true">
                 <resultGeneration useMethodTag="system_get_preferred_standby_mode" />
             </testStep>
-            <testStep testStepId="3" name="Set_Preferred_StandBy_Mode" method="Set_Preferred_StandBy_Mode" revertSet="yes">
+            <testStep testStepId="3" name="Set_Preferred_StandBy_Mode" method="Set_Preferred_StandBy_Mode" >
                 <conditionalExecution enable="true" Id="2" useMethodTag="system_check_preferred_standby_mode" arguments="isNotEqual,LIGHT_SLEEP" />
                 <params>
                   <param tag="standbyMode" value="LIGHT_SLEEP" />

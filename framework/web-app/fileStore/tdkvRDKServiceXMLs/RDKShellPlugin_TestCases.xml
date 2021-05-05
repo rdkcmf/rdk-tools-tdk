@@ -92,7 +92,7 @@
             </testStep>
             <testStep testStepId="2" name="movefront" method="MoveToFront">
               <params>
-                <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />
+                <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="1" />
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>

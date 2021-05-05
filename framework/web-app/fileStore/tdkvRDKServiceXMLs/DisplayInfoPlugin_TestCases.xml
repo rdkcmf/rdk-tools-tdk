@@ -100,7 +100,7 @@
                   <params>
                          <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display" />
                   </params>
-                  <resultGeneration useMethodTag="displayinfo_check_for_nonempty_result" />
+                  <resultGeneration useMethodTag="display_supported_resolutions" />
             </testStep>
 
             <testStep testStepId="3" name="Getresolutionwidth" method="DisplayInfo_GetWidth">
@@ -123,7 +123,7 @@
                 <params>
                         <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display" />
                 </params>
-                <resultGeneration useMethodTag="displayinfo_check_for_nonempty_result" />
+                <resultGeneration useMethodTag="display_supported_resolutions" />
             </testStep>
 
             <testStep testStepId="3" name="Getresolutionheight" method="DisplayInfo_GetHeight">
@@ -138,7 +138,7 @@
         <testCase testCaseId="DISP_05" testCaseName= "DisplayInfo_GET_vertical_frequency" desc="Get Vertical frequency.">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Getverticalfrequency" method="DisplayInfo_Getverticalfreq">
-                <resultGeneration useMethodTag="displayinfo_validate_boolean_result" />
+                <resultGeneration useMethodTag="displayinfo_validate_results" />
             </testStep>
         </testCase>
 
@@ -147,7 +147,7 @@
         <testCase testCaseId="DISP_06" testCaseName= "DisplayInfo_GET_HDCP_protocol_version" desc="Get HDCP version.">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Gethdcpversion" method="DisplayInfo_GetHDCPversion">
-                <resultGeneration useMethodTag="displayinfo_validate_hdcp_version" expectedValues="HdcpUnencrypted, Hdcp1X, Hdcp2X" />
+                <resultGeneration useMethodTag="displayinfo_validate_expected_results" expectedValues="HdcpUnencrypted,Hdcp1X,Hdcp2X" />
             </testStep>
         </testCase>
 
@@ -253,7 +253,7 @@
         <testCase testCaseId="DISP_12" testCaseName= "DisplayInfo_GET_HDR_Format_In_Use" desc="Gets the HDR formats in use">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="GetHDRFormatInUse" method="DisplayInfo_GetHDRFormatInUse">
-                <resultGeneration useMethodTag="displayinfo_validate_hdr_format_in_use" />
+                <resultGeneration useMethodTag="displayinfo_validate_expected_results" />
             </testStep>
         </testCase>
      <!-- Test case 13 -->    
