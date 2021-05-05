@@ -146,9 +146,9 @@ if expectedResult in result.upper():
                                 json_msg = json.loads(event_log.split('$$$')[1])
                                 print json_msg
                                 if json_msg["params"]["client"] == "Cobalt":
-                                    if "onSuspended" in json_msg["method"]:
+                                    if "onSuspended" in json_msg["method"] and not suspended_time:
                                         suspended_time = event_log.split('$$$')[0]
-                                    elif "onLaunched" in json_msg["method"]:
+                                    elif "onLaunched" in json_msg["method"] and not resumed_time:
                                         resumed_time = event_log.split('$$$')[0]
                             if suspended_time and resumed_time:
                                 conf_file,file_status = getConfigFileName(obj.realpath)

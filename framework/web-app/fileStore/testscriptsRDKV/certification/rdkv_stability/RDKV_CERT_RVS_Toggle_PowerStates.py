@@ -199,7 +199,7 @@ if expectedResult in result.upper():
                                         continue
                                     event_log = event_listener.getEventsBuffer().pop(0)
                                     print "\n Triggered event: ",event_log
-                                    if (new_power_state == "STANDBY" and "LIGHT_SLEEP" in event_log) or (new_power_state == "ON" and "ON" in event_log):
+                                    if (new_power_state == "STANDBY" and ("LIGHT_SLEEP" in event_log or "STANDBY" in event_log)) or (new_power_state == "ON" and "ON" in event_log):
                                         print "onSystemPowerStateChanged event triggered while setting {} power state".format(new_power_state)
                                         break
                                     else:
