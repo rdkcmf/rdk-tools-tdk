@@ -49,7 +49,6 @@
   <!--  -->
   <box_types>
     <box_type>Hybrid-1</box_type>
-    <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -79,7 +78,7 @@ audioDelayOffsetMs - Audio delay offset in Ms</input_parameters>
 Checkpoint 2 Verify that the audio delay offset is set</expected_output>
     <priority>High</priority>
     <test_stub_interface>libdshalstub.so.0.0.0</test_stub_interface>
-    <test_script>DSHal_SetandGet_AudioDelayOffsetOffset_LR</test_script>
+    <test_script>DSHal_SetandGet_AudioDelayOffset_LR</test_script>
     <skipped>No</skipped>
     <release_version>M75</release_version>
     <remarks></remarks>
