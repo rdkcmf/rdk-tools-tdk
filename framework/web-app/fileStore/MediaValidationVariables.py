@@ -32,9 +32,6 @@ lightning_animation_test_app_url = lightning_apps_loc + ""
 lightning_multianimation_test_app_url    = lightning_apps_loc + ""
 lightning_objects_animation_test_app_url = lightning_apps_loc + ""
 
-#Video URL
-video_src_url = ""
-
 #HLS Video URL
 video_src_url_hls = ""
 video_src_url_4k_hls = ""

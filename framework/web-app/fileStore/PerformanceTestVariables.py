@@ -31,3 +31,12 @@ cobalt_test_url = ""
 
 #Thunder port for listening to events
 thunder_port = "9998"
+
+#Video player app URL, sample URL: http://<TM-IP>:8080/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html
+lightning_video_test_app_url = ""
+
+#Video URL, either HLS URL or DASH URL
+video_src_url = ""
+
+#Type of the video url configured above, give hls for .m3u8 and dash for .mpd
+video_src_url_type = ""

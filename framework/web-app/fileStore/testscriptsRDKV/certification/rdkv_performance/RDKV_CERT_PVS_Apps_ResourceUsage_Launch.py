@@ -68,7 +68,7 @@
  # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
 from web_socket_util import *
-import MediaValidationVariables
+import PerformanceTestVariables
 from MediaValidationUtility import *
 from StabilityTestUtility import *
 from rdkv_performancelib import *
@@ -90,8 +90,9 @@ obj.setLoadModuleStatus(result);
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    appURL    = MediaValidationVariables.lightning_video_test_app_url
-    videoURL  = MediaValidationVariables.video_src_url
+    appURL    = PerformanceTestVariables.lightning_video_test_app_url
+    videoURL  = PerformanceTestVariables.video_src_url
+    videoURL_type = PerformanceTestVariables.video_src_url_type.lower()
     # Setting VideoPlayer Operations
     setOperation("close",5)
     operations = getOperations()
@@ -99,6 +100,7 @@ if expectedResult in result.upper():
     setURLArgument("url",videoURL)
     setURLArgument("operations",operations)
     setURLArgument("autotest","true")
+    setURLArgument("type",videoURL_type)
     appArguments = getURLArguments()
     # Getting the complete test app URL
     video_test_url = getTestURL(appURL,appArguments)
@@ -124,7 +126,7 @@ if expectedResult in result.upper():
         result = tdkTestObj.getResult();
         if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
-            webkit_console_socket = createEventListener(ip,MediaValidationVariables.webinspect_port,[],"/devtools/page/1",False)
+            webkit_console_socket = createEventListener(ip,PerformanceTestVariables.webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
             print "\nCurrent URL:",current_url
             print "\nSet Lightning Application URL"
