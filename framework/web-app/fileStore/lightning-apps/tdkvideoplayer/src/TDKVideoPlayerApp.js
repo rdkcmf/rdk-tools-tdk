@@ -212,11 +212,14 @@ export default class App extends Lightning.Component {
             this.errorFlag = 1
     }
   }
-  $videoPlayerProgress() {
+  /*$videoPlayerProgress() {
     this.progressEventHandler()
-  }
+  }*/
   $videoPlayerTimeUpdate() {
     this.timeUpdateEventHandler()
+  }
+  $videoPlayerPlaying(){
+    this.playingEventHandler()
   }
   $videoPlayerPlay(){
     this.playEventHandler()
@@ -248,11 +251,14 @@ export default class App extends Lightning.Component {
           this.videoEl.addEventListener(event, () => {
               this.message1 = "Video Player " + this.vidElementEvents[event];
               logMsg(this.message1 + " !!!")
-              if ( event == "ended")
+              if ( event == "error")
                 this.errorFlag = 1
           });
       });
 
+     this.videoEl.addEventListener("playing", () => {
+         this.playingEventHandler()
+     });
      this.videoEl.addEventListener("play", () => {
          this.playEventHandler()
      });
@@ -271,9 +277,9 @@ export default class App extends Lightning.Component {
      this.videoEl.addEventListener("ratechange", () => {
          this.rateChangeEventHandler()
      });
-     this.videoEl.addEventListener("progress", () => {
+     /*this.videoEl.addEventListener("progress", () => {
          this.progressEventHandler();
-     });
+     });*/
      this.videoEl.addEventListener("timeupdate", () => {
          this.timeUpdateEventHandler();
      });
@@ -287,8 +293,10 @@ export default class App extends Lightning.Component {
   // Video progress Event handler
   // Below are the event handler methods for video operations
 
-  // Progress Event Handler
-  progressEventHandler(){
+  // Playing Event Handler
+  playingEventHandler(){
+    this.message1 = "Video Player Playing"
+    logMsg(this.message1 + " !!!")
     if ( this.init == 0 ){
         logMsg("******************* VIDEO STARTED PLAYING !!! *******************")
         logMsg("VIDEO LOOP: " + VideoPlayer.looped)
@@ -676,12 +684,12 @@ export default class App extends Lightning.Component {
 
     this.vidElementEvents = {
         "loadstart":"Load Start", "loadeddata":"Loaded Data", "loadedmetadata":"Loaded MetaData",
-        "encrypted": "Encrypted", "playing":"Playing", "emptied":"Emptied", "durationchange":"Duration Change",
+        "encrypted": "Encrypted", "progress":"Progress", "emptied":"Emptied", "durationchange":"Duration Change",
         "canplay":"CanPlay", "canplaythrough":"CanPlay Through", "waiting":"Waiting", "stalled":"Stalled", "error":"Error"
     }
     this.vidplayerEvents = {
         "LoadStart":"Load Start", "LoadedData":"Loaded Data", "LoadedMetadata":"Loaded MetaData",
-        "Encrypted": "Encrypted", "Playing":"Playing", "Emptied":"Emptied", "DurationChange":"Duration Change",
+        "Encrypted": "Encrypted", "Progress":"Progress", "Emptied":"Emptied", "DurationChange":"Duration Change",
         "CanPlay":"CanPlay", "CanPlayThrough":"CanPlay Through", "Waiting":"Waiting", "Stalled":"Stalled", "Error":"Error"
     }
     this.inputs.forEach(item => {
@@ -763,5 +771,6 @@ export default class App extends Lightning.Component {
   }
 
 }
+
 
 

@@ -27,6 +27,7 @@ lightning_apps_loc = ""
 
 #lightning application url
 lightning_video_test_app_url     = lightning_apps_loc + ""
+lightning_uve_test_app_url       = lightning_apps_loc + ""
 lightning_animation_test_app_url = lightning_apps_loc + ""
 lightning_multianimation_test_app_url    = lightning_apps_loc + ""
 lightning_objects_animation_test_app_url = lightning_apps_loc + ""
@@ -104,14 +105,14 @@ ogg_url_type  = ""
 # Example:
 # video_src_url_playready_dash = "http://playready_dash_url.mpd"
 # video_src_url_playready_dash_drmconfigs = "com.microsoft.playready[http://license_url]|com.widevine.alpha[http://license_url]|headers[X-AxDRM-Message:header_info]"
-# Note: Each drm config must be seperated by "|" and the values must be enclosed withing "[" "]" as above.
+# Note: Each drm config must be seperated by "|" and the values must be enclosed within "[" "]" as above.
 
 # PlayReady DRM URLs
 video_src_url_playready_dash_aac = ""
 video_src_url_playready_dash_aac_drmconfigs = ""
 
 video_src_url_playready_dash_h264 = ""
-video_src_url_playready_dash_ac3_drmconfigs = ""
+video_src_url_playready_dash_h264_drmconfigs = ""
 
 video_src_url_playready_dash_ac3 = ""
 video_src_url_playready_dash_ac3_drmconfigs = ""
