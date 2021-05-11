@@ -726,7 +726,7 @@ void WIFIHAL::WIFI_HAL_GetStats(IN const Json::Value& req, OUT Json::Value& resp
 
     wifi_getStats(radioIndex,&currStationStat);
 
-    sprintf(details, "Current Station: sta_SSID=%s,sta_BSSID=%s,sta_BAND=%s,sta_PhyRate=%f,sta_Noise=%f,sta_RSSI=%f,sta_AvgRSSI=%f,sta_LastDataDownlinkRate=%u,sta_LastDataUplinkRate=%u,sta_Retransmissions=%u",currStationStat.sta_SSID,currStationStat.sta_BSSID,currStationStat.sta_BAND,currStationStat.sta_PhyRate,currStationStat.sta_Noise,currStationStat.sta_RSSI,currStationStat.sta_AvgRSSI,currStationStat.sta_LastDataDownlinkRate,currStationStat.sta_LastDataUplinkRate,currStationStat.sta_Retransmissions);
+    sprintf(details, "Current Station: sta_SSID=%s,sta_BSSID=%s,sta_BAND=%s,sta_PhyRate=%f,sta_Noise=%f,sta_RSSI=%f,sta_LastDataDownlinkRate=%u,sta_LastDataUplinkRate=%u,sta_Retransmissions=%u",currStationStat.sta_SSID,currStationStat.sta_BSSID,currStationStat.sta_BAND,currStationStat.sta_PhyRate,currStationStat.sta_Noise,currStationStat.sta_RSSI,currStationStat.sta_LastDataDownlinkRate,currStationStat.sta_LastDataUplinkRate,currStationStat.sta_Retransmissions);
     response["result"]="SUCCESS";
     response["details"]=details;
     DEBUG_PRINT(DEBUG_TRACE,"\n WIFI_HAL_GetStats --->Exit\n");
