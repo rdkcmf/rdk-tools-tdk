@@ -151,13 +151,13 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
                             else:
                                 print "eotf value: ", item[1]
                         if item[0] == "coefficients" and item[1]:
-                            if int(item[1]) not in eotf.values():
+                            if int(item[1]) not in matrixCoefficients.values():
                                 status = "failure";
                                 print "Invalid coefficients value";
                             else:
                                 print "coefficients value: ", item[1]
                         if item[0] == "colorSpace":
-                            if not item[1]:
+                            if int(item[1]) not in colorSpace.values():
                                 status = "failure";
                                 print "Invalid colorSpace value";
                             else:
