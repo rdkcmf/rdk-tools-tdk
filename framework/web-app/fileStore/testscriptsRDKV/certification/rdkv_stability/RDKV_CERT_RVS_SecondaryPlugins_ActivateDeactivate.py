@@ -129,7 +129,7 @@ if expectedResult in result.upper():
             device_info_status = curr_plugins_status_dict[device_info]
             if device_info_status != "activated":
                 tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus');
-                tdkTestObj.addParameter("plugin",device_info_plugin);
+                tdkTestObj.addParameter("plugin",device_info);
                 tdkTestObj.addParameter("status","activate");
                 tdkTestObj.executeTestCase(expectedResult);
                 result1 = tdkTestObj.getResult();
