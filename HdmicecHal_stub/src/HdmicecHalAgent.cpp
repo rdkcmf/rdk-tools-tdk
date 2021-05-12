@@ -342,9 +342,11 @@ bool HdmicecHalAgent::testmodulepost_requisites()
     DEBUG_PRINT(DEBUG_TRACE, "HdmiCecClose ...\n");
     int term = HdmiCecClose(driverHandle);
 
+#ifndef NO_DEVICE_READY_EVENT
     IARM_Bus_UnRegisterEventHandler(IARM_BUS_CECMGR_NAME, IARM_BUS_CECMGR_EVENT_STATUS_UPDATED);
     IARM_Bus_Disconnect();
     IARM_Bus_Term();
+#endif
 
     if (term == HDMI_CEC_IO_SUCCESS){
         DEBUG_PRINT(DEBUG_TRACE, "HdmiCecClose call success\n");
