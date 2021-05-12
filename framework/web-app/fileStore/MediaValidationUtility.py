@@ -37,6 +37,8 @@ webkit_socket_conn = True
 
 expectedResult = "SUCCESS"
 
+next_z_order_client = None
+
 # Function to set the operation and interval
 def setOperation(operation,intervalOrCount):
     global all_operations
@@ -250,6 +252,54 @@ def checkRDKShellClients(obj,plugin):
 
     return result,check_client
 
+def checkClientZOrder(obj,client):
+    print "\nChecking Clients Z-Order..."
+    tdkTestObj = obj.createTestStep('rdkservice_getValue');
+    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.getZOrder");
+    tdkTestObj.executeTestCase("SUCCESS");
+    result  = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    client_z_order_status = None
+    global next_z_order_client
+    next_z_order_client   = None
+    if "SUCCESS" in result:
+        clients_list = ast.literal_eval(details)["clients"]
+        print "Clients Z-Order: %s" %(clients_list)
+        if len(clients_list) > 0:
+            tdkTestObj.setResultStatus("SUCCESS")
+            if clients_list[0] == client:
+                client_z_order_status = True
+                if len(clients_list) > 1:
+                    next_z_order_client = clients_list[1]
+            else:
+                client_z_order_status = False
+        else:
+            print "Clients Z-Order list is empty"
+            tdkTestObj.setResultStatus("FAILURE")
+    else:
+        print "Unable to get Clients Z-Order"
+        tdkTestObj.setResultStatus("FAILURE")
+
+    return result,client_z_order_status
+
+def checkWebkitReadyState(obj,result,webkit_client,webkit_z_order_status):
+    if "SUCCESS" in result and not webkit_z_order_status:
+        move_status = moveToFrontClient(obj,webkit_client)
+        if "SUCCESS" in move_status:
+            result,webkit_z_order_status = checkClientZOrder(obj,webkit_client)
+            if "SUCCESS" in result and webkit_z_order_status:
+                webkit_ready = True
+            else:
+                webkit_ready = False
+        else:
+            webkit_ready = False
+    elif "SUCCESS" in result and webkit_z_order_status:
+        webkit_ready = True
+    else:
+        webkit_ready = False
+
+    return webkit_ready
+
 def checkProcEntry(obj,validation_dict,proc_pattern):
     tdkTestObj = obj.createTestStep('rdkv_media_checkProcEntry')
     tdkTestObj.addParameter("sshMethod",validation_dict["ssh_method"])
@@ -322,8 +372,9 @@ def setMediaTestPreRequisites(obj,get_proc_info=True):
             if "SUCCESS" in launch_status:
                 client_status,webkit_client = checkRDKShellClients(obj,"WebKitBrowser")
                 if "SUCCESS" in client_status and webkit_client != "":
-                    move_status = moveToFrontClient(obj,webkit_client)
-                    if "SUCCESS" in move_status:
+                    result,webkit_z_order_status = checkClientZOrder(obj,webkit_client)
+                    webkit_ready_state = checkWebkitReadyState(obj,result,webkit_client,webkit_z_order_status)
+                    if webkit_ready_state:
                           if webkit_socket_conn:
                               webkit_console_socket = createWebKitSocket(obj)
                           pre_requisite_status = "SUCCESS"
@@ -427,18 +478,14 @@ def setMediaTestPostRequisites(obj):
     # TODO webkit browser has to be killed, but when launched again it is not
     # listed as clients after killing. This can be handled when the issues are fixed
     if "SUCCESS" in launch_status:
-        client_status,resapp_client = checkRDKShellClients(obj,"ResidentApp")
-        if "SUCCESS" in client_status and resapp_client != "":
-            move_status = moveToFrontClient(obj,resapp_client)
+        if next_z_order_client != None:
+            move_status = moveToFrontClient(obj,next_z_order_client)
             if "SUCCESS" not in move_status:
                 post_requisite_status = "FAILURE"
-        elif "SUCCESS" in client_status and resapp_client == "":
-            post_requisite_status = "SUCCESS"
-            print "Skipping moving ResidentApp to front"
-        else:
-            post_requisite_status = "FAILURE"
     else:
         post_requisite_status = "FAILURE"
 
     return post_requisite_status
+
+
 
