@@ -22,7 +22,10 @@ from tdkbVariables import *;
 
 #The Expected Wan Manager Policies
 ExpectedPolicyList = "FIXED_MODE_ON_BOOTUP, FIXED_MODE, PRIMARY_PRIORITY, PRIMARY_PRIORITY_ON_BOOTUP, MULTIWAN_MODE";
-
+#The Expected Wan Manager interface names
+interfaceName = ["dsl0", "eth3", "veip0"];
+#The Expected Wan Manager Display Names
+displayName =["DSL","WANOE","GPON"];
 #################################################################################
 # A utility function to check if the policy is from ExpectedPolicyList
 #
@@ -116,4 +119,3 @@ def get_policy(tdkTestObj, step) :
         #Get the result of execution
         print "[TEST EXECUTION RESULT] : FAILURE";
         return status,policy;
-
