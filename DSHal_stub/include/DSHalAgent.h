@@ -62,8 +62,8 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                 //Constructor
                 DSHalAgent(TcpSocketServer &ptrRpcServer) : AbstractServer <DSHalAgent>(ptrRpcServer)
                 {
-                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetAudioPort", PARAMS_BY_NAME, JSON_STRING,"portType", JSON_INTEGER,"index", JSON_INTEGER, NULL), &DSHalAgent::DSHal_GetAudioPort);
-                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetVideoPort", PARAMS_BY_NAME, JSON_STRING,"portType", JSON_INTEGER,"index", JSON_INTEGER, NULL), &DSHalAgent::DSHal_GetVideoPort);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetAudioPort", PARAMS_BY_NAME, JSON_STRING,"portType", JSON_INTEGER,"index", JSON_INTEGER, "get_DefaultType", JSON_INTEGER, "secondary_portType", JSON_INTEGER, NULL), &DSHalAgent::DSHal_GetAudioPort);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetVideoPort", PARAMS_BY_NAME, JSON_STRING,"portType", JSON_INTEGER,"index", JSON_INTEGER, "get_DefaultType", JSON_INTEGER, "secondary_portType", JSON_INTEGER, NULL), &DSHalAgent::DSHal_GetVideoPort);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetDisplay", PARAMS_BY_NAME, JSON_STRING,"portType", JSON_INTEGER,"index", JSON_INTEGER, NULL), &DSHalAgent::DSHal_GetDisplay);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetSurroundMode", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetSurroundMode);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetStereoMode", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetStereoMode);
@@ -136,6 +136,12 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetSinkDeviceAtmosCapability", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetSinkDeviceAtmosCapability);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetAudioCompression", PARAMS_BY_NAME, JSON_STRING, "audioCompression", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetAudioCompression);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetAudioCompression", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetAudioCompression);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetSurroundVirtualizer", PARAMS_BY_NAME, JSON_STRING, "mode", JSON_INTEGER, "boost", JSON_INTEGER, NULL), &DSHalAgent::DSHal_SetSurroundVirtualizer);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetSurroundVirtualizer", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetSurroundVirtualizer);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetVolumeLeveller", PARAMS_BY_NAME, JSON_STRING, "mode", JSON_INTEGER, "level", JSON_INTEGER, NULL), &DSHalAgent::DSHal_SetVolumeLeveller);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetVolumeLeveller", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetVolumeLeveller);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetQuantizationRange", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetQuantizationRange);
+
                 }
 
                 //Inherited functions
@@ -220,5 +226,10 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                 void DSHal_GetSinkDeviceAtmosCapability(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_GetAudioCompression(IN const Json::Value& req, OUT Json::Value& response);
                 void DSHal_SetAudioCompression(IN const Json::Value& req, OUT Json::Value& response);
-};
+                void DSHal_SetSurroundVirtualizer(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetSurroundVirtualizer(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_SetVolumeLeveller(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetVolumeLeveller(IN const Json::Value& req, OUT Json::Value& response);
+                void DSHal_GetQuantizationRange(IN const Json::Value& req, OUT Json::Value& response);             
+}; 
 #endif //__DSHAL_STUB_H__

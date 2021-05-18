@@ -29,6 +29,8 @@
         <parameters>
           <parameter name="index" value="0"/>
           <parameter name="portType" value=""/>
+          <parameter name="get_DefaultType" value="1"/>
+          <parameter name="secondary_portType" value="3"/>
         </parameters>
       </primitiveTest>
       <primitiveTest id=" " name="DSHal_GetVideoPort" version="1">
@@ -36,6 +38,8 @@
         <parameters>
           <parameter name="index" value="0"/>
           <parameter name="portType" value=""/>
+          <parameter name="get_DefaultType" value="1"/>
+          <parameter name="secondary_portType" value="8"/>
         </parameters>
       </primitiveTest>
       <primitiveTest id=" " name="DSHal_SetStereoMode" version="1">
@@ -386,6 +390,28 @@
       </primitiveTest>
       <primitiveTest name="DSHal_GetAudioCompression" id="" version="1">
         <function>TestMgr_DSHal_GetAudioCompression</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_SetSurroundVirtualizer" id=" " version="1">
+        <function>TestMgr_DSHal_SetSurroundVirtualizer</function>
+        <parameters>
+          <parameter name="boost" value="0"/>
+          <parameter name="mode" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetSurroundVirtualizer" id="" version="1">
+        <function>TestMgr_DSHal_GetSurroundVirtualizer</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="DSHal_SetVolumeLeveller" id=" " version="1">
+        <function>TestMgr_DSHal_SetVolumeLeveller</function>
+        <parameters>
+          <parameter name="level" value="0"/>
+          <parameter name="mode" value="0"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="DSHal_GetVolumeLeveller" id="" version="1">
+        <function>TestMgr_DSHal_GetVolumeLeveller</function>
         <parameters/>
       </primitiveTest>
     </primitiveTests>

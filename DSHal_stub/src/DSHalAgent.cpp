@@ -191,8 +191,29 @@ void DSHalAgent::DSHal_GetVideoPort(IN const Json::Value& req, OUT Json::Value& 
 
     dsVideoPortType_t portType = (dsVideoPortType_t) req["portType"].asInt();
     int index = req["index"].asInt();
+    int get_DefaultType = req["get_DefaultType"].asInt();
+
     dsError_t ret = dsERR_NONE;
     ret = dsGetVideoPort(portType, index, &vpHandle);
+
+    /*videoPortType = {"HDMI":6, "INTERNAL":8}
+
+    if portName is HDMI0 , check if portInstance is obtained
+    if portInstance is not obtained , try to obtain portInstance for secondary_portType
+
+    In order to skip this functionality get_DefaultType must be set to 0 */
+
+    if ((portType == 6) && (get_DefaultType == 1))
+    {
+        if (ret != dsERR_NONE)
+        {
+            DEBUG_PRINT(DEBUG_LOG, "Unable to GetVideoPort Instance as videoPort is unsupported");
+            DEBUG_PRINT(DEBUG_LOG, "Getting secondary videoPort instance instead");
+            portType = (dsVideoPortType_t) req["secondary_portType"].asInt();
+            ret = dsGetVideoPort(portType, index, &vpHandle);
+        }
+    }
+
 
     if (ret == dsERR_NONE and vpHandle)
     {
@@ -227,10 +248,28 @@ void DSHalAgent::DSHal_GetAudioPort(IN const Json::Value& req, OUT Json::Value& 
 
     dsAudioPortType_t portType = (dsAudioPortType_t) req["portType"].asInt();
     int index = req["index"].asInt();
-
+    int get_DefaultType = req["get_DefaultType"].asInt();
 
     dsError_t ret = dsERR_NONE;
     ret = dsGetAudioPort(portType, index, &apHandle);
+
+    /*audioPortType = {"LR":0, "HDMI":1, "SPDIF":2, "SPEAKER":3, "HDMI_ARC":4, "HEADPHONE":5, "INVALID":9}
+
+    if portName is HDMI0 , check if portInstance is obtained
+    if portInstance is not obtained , try to obtain portInstance for secondary_portType
+
+    In order to skip this functionality get_DefaultType must be set to 0 */
+
+    if ((portType == 1) && (get_DefaultType == 1))
+    {
+        if (ret != dsERR_NONE)
+        {
+            DEBUG_PRINT(DEBUG_LOG, "Unable to GetAudioPort Instance as audioPort is unsupported");
+            DEBUG_PRINT(DEBUG_LOG, "Getting secondary audioPort instance instead");
+            portType = (dsAudioPortType_t) req["secondary_portType"].asInt();
+            ret = dsGetAudioPort(portType, index, &apHandle);
+        }
+    }
 
     if (ret == dsERR_NONE)
     {
@@ -2776,7 +2815,7 @@ void DSHalAgent::DSHal_GetCurrentOutputSettings(IN const Json::Value& req, OUT J
     DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetCurrentOutputSettings --->Entry\n");
 
     dsError_t ret = dsERR_NONE;
-    char output[50];
+    char output[80];
     dsHDRStandard_t eotf;
     dsDisplayMatrixCoefficients_t coefficients;
     dsDisplayColorSpace_t colorSpace;
@@ -3036,6 +3075,190 @@ void DSHalAgent::DSHal_SetAudioCompression(IN const Json::Value& req, OUT Json::
    	    DEBUG_PRINT(DEBUG_TRACE1, "Handle : %d\n",apHandle);
         DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetAudioCompression call is FAILURE");
         DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetAudioCompression -->Exit\n");
+        return;
+    }
+}
+
+/***************************************************************************
+ *Function name : DSHal_SetSurroundVirtualizer
+ *Description    : This function is to set the Surround Virtualizer mode
+ *****************************************************************************/
+void DSHalAgent::DSHal_SetSurroundVirtualizer(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetSurroundVirtualizer --->Entry\n");
+    if(&req["mode"] == NULL)
+    {
+        return;
+    }
+
+    dsSurroundVirtualizer_t virtualizer;
+    virtualizer.mode = req["mode"].asInt();
+    virtualizer.boost = req["boost"].asInt();
+
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsSetSurroundVirtualizer(apHandle,virtualizer);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetSurroundVirtualizer call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetSurroundVirtualizer call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetSurroundVirtualizer -->Exit\n");
+        return;
+    }
+    else
+    {
+        checkERROR(ret,&error);
+        response["result"] = "FAILURE";
+        response["details"] = "SetSurroundVirtualizer call failed" + error;
+            DEBUG_PRINT(DEBUG_TRACE1, "Handle : %d\n",apHandle);
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetSurroundVirtualizer call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetSurroundVirtualizer -->Exit\n");
+        return;
+    }
+}
+
+/***************************************************************************
+ *Function name : DSHal_GetSurroundVirtualizer
+ *Description    : This function is to get the Surround Virtualizer mode
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetSurroundVirtualizer(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSurroundVirtualizer --->Entry\n");
+    if(&req["virtualizer"] == NULL)
+    {
+        return;
+    }
+
+    char output[300];
+    dsSurroundVirtualizer_t Virtualizer;
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsGetSurroundVirtualizer(apHandle,&Virtualizer);
+    sprintf(output, "Mode : %d , Boost : %d" , Virtualizer.mode, Virtualizer.boost);
+
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = output;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetSurroundVirtualizer call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSurroundVirtualizer -->Exit\n");
+        return;
+    }
+    else
+    {
+        checkERROR(ret,&error);
+        response["result"] = "FAILURE";
+        response["details"] = "GetSurroundVirtualizer call failed" + error;
+            DEBUG_PRINT(DEBUG_TRACE1, "Handle : %d\n",apHandle);
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetSurroundVirtualizer call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetSurroundVirtualizer -->Exit\n");
+        return;
+    }
+}
+
+/**************************************************************************************************
+ *Function name : DSHal_SetVolumeLeveller
+ *Description    : This function is to set Volume leveller mode & level used in a given audio port
+ *************************************************************************************************/
+void DSHalAgent::DSHal_SetVolumeLeveller(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetVolumeLeveller --->Entry\n");
+    if(&req["mode"] == NULL)
+    {
+        return;
+    }
+    dsVolumeLeveller_t volLeveller;
+    volLeveller.mode = req["mode"].asInt();
+    volLeveller.level = req["level"].asInt();
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsSetVolumeLeveller(apHandle,volLeveller);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = "SetVolumeLeveller call success";
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_SetVolumeLeveller call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetVolumeLeveller -->Exit\n");
+        return;
+    }
+    else
+    {
+        checkERROR(ret,&error);
+        response["result"] = "FAILURE";
+        response["details"] = "SetVolumeLeveller call failed" + error;
+            DEBUG_PRINT(DEBUG_TRACE1, "Handle : %d\n",apHandle);
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_SetVolumeLeveller call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_SetVolumeLeveller -->Exit\n");
+        return;
+    }
+}
+
+/**************************************************************************************************
+ *Function name : DSHal_GetVolumeLeveller
+ *Description    : This function is to set Volume leveller mode & level used in a given audio port
+ *************************************************************************************************/
+void DSHalAgent::DSHal_GetVolumeLeveller(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVolumeLeveller --->Entry\n");
+    if(&req["mode"] == NULL)
+    {
+        return;
+    }
+
+    char output[300];
+    dsVolumeLeveller_t VolLeveller;
+    dsError_t ret = dsERR_NONE;
+
+    ret = dsGetVolumeLeveller(apHandle,&VolLeveller);
+    sprintf(output, "Mode : %d , Level : %d" , VolLeveller.mode, VolLeveller.level);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = output;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetVolumeLeveller call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVolumeLeveller -->Exit\n");
+        return;
+    }
+    else
+    {
+        checkERROR(ret,&error);
+        response["result"] = "FAILURE";
+        response["details"] = "GetVolumeLeveller call failed" + error;
+            DEBUG_PRINT(DEBUG_TRACE1, "Handle : %d\n",apHandle);
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetVolumeLeveller call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetVolumeLeveller -->Exit\n");
+        return;
+    }
+}
+
+/***************************************************************************
+ *Function name : DSHal_GetQuantizationRange
+ *Description    : This function is to get the quantization_range
+ *****************************************************************************/
+void DSHalAgent::DSHal_GetQuantizationRange(IN const Json::Value& req, OUT Json::Value& response)
+{
+    DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetQuantizationRange --->Entry\n");
+    dsError_t ret = dsERR_NONE;
+    dsDisplayQuantizationRange_t quantization_range = dsDISPLAY_QUANTIZATIONRANGE_UNKNOWN;
+    ret = dsGetQuantizationRange(vpHandle, &quantization_range);
+    if (ret == dsERR_NONE)
+    {
+        response["result"] = "SUCCESS";
+        response["details"] = quantization_range;
+        DEBUG_PRINT(DEBUG_LOG, "DSHal_GetQuantizationRange call is SUCCESS");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetQuantizationRange -->Exit\n");
+        return;
+    }
+    else
+    {
+	checkERROR(ret,&error);
+        response["result"] = "FAILURE";
+        response["details"] = "Quantization_range not retrieved"+ error;
+        DEBUG_PRINT(DEBUG_TRACE1, "Range : %d\n",quantization_range);
+        DEBUG_PRINT(DEBUG_ERROR, "DSHal_GetQuantizationRange call is FAILURE");
+        DEBUG_PRINT(DEBUG_TRACE, "DSHal_GetQuantizationRange -->Exit\n");
         return;
     }
 }

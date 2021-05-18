@@ -2,7 +2,7 @@
 <!--
  If not stated otherwise in this file or this component's Licenses.txt file the
  following copyright and licenses apply:
- Copyright 2019 RDK Management
+ Copyright 2020 RDK Management
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -101,13 +101,25 @@
       <function name='TestMgr_DSHal_SetAudioAtmosOutputMode' />
       <function name='TestMgr_DSHal_SetIntelligentEqualizerMode' />
       <function name='TestMgr_DSHal_GetIntelligentEqualizerMode' />
+      <function name='TestMgr_DSHal_GetDialogEnhancement' />
+      <function name='TestMgr_DSHal_SetDialogEnhancement' />
+      <function name='TestMgr_DSHal_SetAudioCompression' />
+      <function name='TestMgr_DSHal_GetAudioCompression' />
+      <function name='TestMgr_DSHal_SetSurroundVirtualizer' />
+      <function name='TestMgr_DSHal_GetSurroundVirtualizer' />
+      <function name='TestMgr_DSHal_SetVolumeLeveller' />
+      <function name='TestMgr_DSHal_GetVolumeLeveller' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
       <parameter funName='TestMgr_DSHal_GetAudioPort' parameterName='portType' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_DSHal_GetAudioPort' parameterName='index' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_GetAudioPort' parameterName='get_DefaultType' parameterType='INTEGER' range='0-14' />
+      <parameter funName='TestMgr_DSHal_GetAudioPort' parameterName='secondary_portType' parameterType='INTEGER' range='0-14' />
       <parameter funName='TestMgr_DSHal_GetVideoPort' parameterName='portType' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_DSHal_GetVideoPort' parameterName='index' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_GetVideoPort' parameterName='get_DefaultType' parameterType='INTEGER' range='0-14' />
+      <parameter funName='TestMgr_DSHal_GetVideoPort' parameterName='secondary_portType' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_DSHal_SetStereoMode' parameterName='stereoMode' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_DSHal_EnableAudioPort' parameterName='enable' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_DSHal_EnableVideoPort' parameterName='enable' parameterType='INTEGER' range='0-1' />
@@ -149,6 +161,12 @@
       <parameter funName='TestMgr_DSHal_HdmiInScaleVideo' parameterName='height' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_DSHal_SetAudioAtmosOutputMode' parameterName='enable' parameterType='INTEGER' range='0-1' />
       <parameter funName='TestMgr_DSHal_SetIntelligentEqualizerMode' parameterName='mode' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_SetDialogEnhancement' parameterName='level' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_SetAudioCompression' parameterName='audioCompression' parameterType='INTEGER' range='0-9' />
+      <parameter funName='TestMgr_DSHal_SetSurroundVirtualizer' parameterName='mode' parameterType='INTEGER' range='0-14' />
+      <parameter funName='TestMgr_DSHal_SetSurroundVirtualizer' parameterName='boost' parameterType='INTEGER' range='0-14' />
+      <parameter funName='TestMgr_DSHal_SetVolumeLeveller' parameterName='mode' parameterType='INTEGER' range='0-14' />
+      <parameter funName='TestMgr_DSHal_SetVolumeLeveller' parameterName='level' parameterType='INTEGER' range='0-14' />
     </parameters>
   </module>
 </xml>
