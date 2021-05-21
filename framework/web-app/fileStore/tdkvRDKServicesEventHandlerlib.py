@@ -50,6 +50,10 @@ class createEventListener(object):
         self.listen = True
         self.listenflag = False
         self.eventsbuffer = []
+        self.neweventflag = False
+        self.neweventaction   = None
+        self.neweventcommand  = None
+        self.neweventresponse = None
         self.eventsregisterstatus   = []
         self.eventsunregisterstatus = []
         self.eventsregisterinfo   = []
@@ -58,6 +62,12 @@ class createEventListener(object):
         return self.eventsregisterinfo
     def getEventsUnRegisterInfo(self):
         return self.eventsunregisterinfo
+    def setNewEventDetails(self,cmd,action):
+        self.neweventcommand = cmd
+        self.neweventaction = action
+        self.neweventflag = True
+    def getNewEventResponse(self):
+        return self.neweventresponse
     def getEventsBuffer(self):
         return self.eventsbuffer
     def clearEventsBuffer(self):
@@ -87,25 +97,30 @@ class createEventListener(object):
 
     def on_open(self):
         def run(*args):
-            print("[INFO]: Registering Events...")
-            self.eventsRegisterAndUnRegister("register")
-            if "FAILURE" not in self.eventsregisterstatus:
-                print("[INFO]: Events Registration success")
-                print("[INFO]: Starting Event listener...")
-                self.setListenerFlag()
-                while self.listen:
-                    time.sleep(1)
-                print ("[INFO]: Stopped Event listener...")
-                print ("[INFO]: UnRegistering Events...")
-                self.eventsRegisterAndUnRegister("unregister")
-                self.resetListenerFlag()
-                if "FAILURE" not in self.eventsunregisterstatus:
-                    print("[INFO]: Events UnRegistration success")
+            try:
+                print("[INFO]: Registering Events...")
+                self.eventsRegisterAndUnRegister("register")
+                if "FAILURE" not in self.eventsregisterstatus:
+                    print("[INFO]: Events Registration success")
+                    print("[INFO]: Starting Event listener...")
+                    self.setListenerFlag()
+                    while self.listen:
+                        time.sleep(1)
+                        if self.neweventflag:
+                            self.handleNewEvent()
+                    print ("[INFO]: Stopped Event listener...")
+                    print ("[INFO]: UnRegistering Events...")
+                    self.eventsRegisterAndUnRegister("unregister")
+                    self.resetListenerFlag()
+                    if "FAILURE" not in self.eventsunregisterstatus:
+                        print("[INFO]: Events UnRegistration success")
+                    else:
+                        print("[ERROR]: Events UnRegistration failed")
+                    self.ws.close()
                 else:
-                    print("[ERROR]: Events UnRegistration failed")
-                self.ws.close()
-            else:
-                print("[ERROR]: Events Registration failed")
+                    print("[ERROR]: Events Registration failed")
+            except Exception as e:
+                print "\nException Occurred in EventListener thread: [%s] %s" %(inspect.stack()[0][3],e)
         thread.start_new_thread(run, ())
 
 
@@ -125,10 +140,20 @@ class createEventListener(object):
             self.ws.send(event)
             time.sleep(2)
             response = json.loads(self.getEventsBuffer()[0])
-            if int(response.get("result")) == 0:
-                status = "SUCCESS"
-            else:
+            try:
+                if response.get("error") is not None:
+                    if "Duplicate registration" in response.get("error").get("message"):
+                        status = "SUCCESS"
+                    else:
+                        status = "FAILURE"
+                elif int(response.get("result")) == 0:
+                    status = "SUCCESS"
+                else:
+                    status = "FAILURE"
+            except Exception as e:
                 status = "FAILURE"
+                print "\nException Occurred: [%s] %s" %(inspect.stack()[0][3],e)
+
             eventinfo = {}
             eventinfo["event"]  = json.loads(event).get("params").get("event")
             eventinfo["status"] = status
@@ -139,6 +164,20 @@ class createEventListener(object):
             elif action == "unregister":
                 self.eventsunregisterstatus.append(status)
                 self.eventsunregisterinfo.append(eventinfo)
+
+    def handleNewEvent(self):
+        event = self.neweventcommand
+        if self.trace:
+            if self.neweventaction== "register":
+                print "\n Register Event %s" %(event)
+            elif self.neweventaction == "unregister":
+                print "\n UnRegister Event %s" %(event)
+        self.clearEventsBuffer()
+        self.ws.send(event)
+        time.sleep(2)
+        response = json.loads(self.getEventsBuffer()[0])
+        self.neweventresponse = response
+        self.neweventflag = False
 
 
     def on_message(self,message):

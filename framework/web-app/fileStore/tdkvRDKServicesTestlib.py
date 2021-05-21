@@ -275,6 +275,8 @@ def executeTestCases(testCaseID="all"):
 
     global eventResgisterTag
     eventResgisterTag = None
+    global eventsBufferBackup
+    eventsBufferBackup = []
 
     # ------------------------------- PLUGIN PRE-REQUISITES ----------------------------------
     # Perform plugin pre-requisite steps such as activate or deactivate plugins common for all
@@ -552,20 +554,16 @@ def executeTestCases(testCaseID="all"):
 
     if testPlugin.find("pluginPostRequisite") is not None or eventListener is not None:
         print "\n#---------------------------- Plugin Post-requisite ----------------------------#"
-        if testPlugin.find("pluginPostRequisite") is not None:
-            pluginPostRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPostRequisite"),"Post")
-            postRequisiteCount = 0
-            for requisite in testPlugin.find("pluginPostRequisite"):
-                postRequisiteCount += 1
-        else:
-            postRequisiteCount = 0
         if eventListener is not None:
             print "\nPost Requisite : UnRegister_Events"
-            print "Post Requisite No : %d" %(int(postRequisiteCount) + 1)
+            print "Post Requisite No : 0"
             print "------------- Event-Handling -------------"
             eventListener.disconnect()
             unRegisterStatus = getEventsUnRegistrationInfo()
             print "\n#--------- [Post-requisite Status] : %s ----------#" %(unRegisterStatus[0])
+        if testPlugin.find("pluginPostRequisite") is not None:
+            pluginPostRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPostRequisite"),"Post")
+        if eventListener is not None:
             pluginPostRequisiteStatus.extend(unRegisterStatus)
 
         if "FAILURE" in pluginPostRequisiteStatus:
@@ -706,7 +704,7 @@ def executeEventHandlerRequisite(requisite):
     if len(registerIssues) != 0:
         print "\n Failed to register below event(s)"
         for issue in registerIssues:
-            print json.loads(issue).get("response")
+            print issue.get("response")
 
     # Display event register test step info
     eventtestStepInfo["name"] = requisite.attrib.get("requisiteName")
@@ -1139,9 +1137,10 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
     # If the test step does not have any issues in forming the test API
     # and params & if the condition to execute satisfies, then test is initated
     if parseStatus != "FAILURE" and conditionalExecStatus != "FALSE" and methodNotFound is None and eventRegistration != "FAILURE":
-        rebootStep = testStepInfo.get("rebootStep")
-        IPChangeStep = testStepInfo.get("ipChangeStep")
-        if (rebootStep == "yes" or IPChangeStep == "yes") and eventListener is not None:
+        rebootStep      = testStepInfo.get("rebootStep")
+        IPChangeStep    = testStepInfo.get("ipChangeStep")
+        closeConnection = testStepInfo.get("closeConn")
+        if (rebootStep == "yes" or IPChangeStep == "yes") and eventListener is not None and closeConnection != "false":
             if rebootStep == "yes":
                 print "\nClosing websocket connection before reboot..."
             elif IPChangeStep == "yes":
@@ -1149,8 +1148,11 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
             eventListener.disconnect()
             time.sleep(5)
             eventListener = None
+
         if testStepInfo.get("action") == "eventListener":
             execStatus,response = getListenedEvent(testMethod,testStepInfo.get("clear"))
+        elif testStepInfo.get("action") in ["eventRegister","eventUnRegister"]:
+            testParams,execStatus,response = newEventHandler(testMethod,testStepInfo)
         elif testStepInfo.get("action") == "externalFnCall":
             execStatus,response = "SUCCESS",None
         else:
@@ -1161,6 +1163,8 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
         if execStatus == "SUCCESS":
             if testStepInfo.get("action") == "eventListener":
                 result = testStepResultGeneration(response,testStepInfo.get("resultGeneration"),"eventListener")
+            elif testStepInfo.get("action") in ["eventRegister","eventUnRegister"]:
+                result  = testStepResultGeneration(response,testStepInfo.get("resultGeneration"),testStepInfo.get("action"))
             elif testStepInfo.get("action") == "externalFnCall":
                 result = testStepResultGeneration(response,testStepInfo.get("resultGeneration"),"externalFnCall")
             else:
@@ -1188,6 +1192,10 @@ def executeTest(testMethod,testParams,testStepInfo,saveResultInfo):
                newIPUpdateStatus = handleDeviceIPChange()
                if newIPUpdateStatus == "FAILURE":
                    testStepStatus = "FAILURE"
+            elif testStepInfo.get("PluginOnStep") == "yes":
+                setUpPluginOn = handlePluginOn()
+                if setUpPluginOn == "FAILURE":
+                    testStepStatus = "FAILURE"
 
             return testStepStatus,result
         else:
@@ -1255,12 +1263,22 @@ def executeCommand(testMethod,testParams):
 #-----------------------------------------------------------------------------------------------
 # getListenedEvent
 #-----------------------------------------------------------------------------------------------
+# Syntax      : getListenedEvent(eventAPI,clearStatus)
+# Description : Method to find the expected events from the listened events
+# Parameter   : eventAPI  - Event API used for selecting the events from buffer
+#             : clearStatus - True/False whether to clear the events buffer or not
+# Return Value: Execution status (SUCCESS/FAILURE) & selected events
+#-----------------------------------------------------------------------------------------------
 def getListenedEvent(eventAPI,clearStatus):
     status = "SUCCESS"
     listenedEvents = []
 
     time.sleep(2)
     eventsBuffer = eventListener.getEventsBuffer()
+    global eventsBufferBackup
+    if eventsBufferBackup != []:
+        eventsBuffer.extend(eventsBufferBackup)
+        eventsBufferBackup = []
     for eventResponse in eventsBuffer:
         if eventAPI in eventResponse:
             try:
@@ -1300,7 +1318,7 @@ def getEventsUnRegistrationInfo():
     if len(unregisterIssues) != 0:
         print "\n Failed to unregister below event(s)"
         for issue in unregisterIssues:
-            print json.loads(issue).get("response")
+            print issue.get("response")
 
     # Display event register test step info
     eventtestStepInfo = {}
@@ -1314,6 +1332,33 @@ def getEventsUnRegistrationInfo():
     dispTestStepInfo(eventtestStepInfo,eventUnRegisterParams,result)
 
     return [unregisterStatus]
+
+
+def newEventHandler(eventMethod,testStepInfo):
+    if testStepInfo.get("params") != {}:
+        eventID = ".".join(testStepInfo.get("params").values()) + "." + testStepInfo.get("eventId")
+    else:
+        eventID = testStepInfo.get("eventId")
+    eventParams =  { "event" : testStepInfo.get("eventName") , "id" : eventID }
+
+    jsonCmd = { "jsonrpc" : "2.0" , "id" : 2 , "method" : eventMethod , "params" : eventParams}
+    jsonCmd = json.dumps(jsonCmd)
+    if eventListener is not None:
+        if testStepInfo.get("action") == "eventRegister":
+            eventListener.setNewEventDetails(jsonCmd,"register")
+        else:
+            eventListener.setNewEventDetails(jsonCmd,"unregister")
+        time.sleep(5)
+        execStatus = "SUCCESS"
+        response = eventListener.getNewEventResponse()
+    else:
+        execStatus = "FAILURE"
+        print "\n [ERROR]: Event Handler thread not started"
+
+    #execStatus,response = executeCommand(eventMethod,eventParams)
+    return eventParams,execStatus,response
+
+
 
 
 def handleDeviceReboot():
@@ -1334,37 +1379,31 @@ def handleDeviceReboot():
         time.sleep(5)
 
     if deviceStatus == "UP":
-        print "Device is UP. Setting back pre-requisites..."
-        global testStepResults
-        global bktestStepResults
-        bktestStepResults = testStepResults
-        global logDisplay
-        logDisplay = False
-        time.sleep(10)
-        setPreRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPreRequisite"),"Pre")
-        logDisplay = True
-        testStepResults = bktestStepResults
-        if "FAILURE" in setPreRequisiteStatus:
-            print "Plugin pre-requisites are not set back properly"
-            return "FAILURE"
-        else:
-            print "Plugin pre-requisites are set back properly"
-            return "SUCCESS"
+        print "Device is UP. Setting back pre-requisites if any..."
+        setUpStatus = setUpPreRequisitesBack()
+        return setUpStatus
     else:
         return "FAILURE"
 
 
 def getTestDeviceStatus():
     try:
+        data = '{"jsonrpc":"2.0","id":"2","method": "Controller.1.status@Controller"}'
+        headers = {'content-type': 'text/plain;'}
         url = 'http://' + deviceIP + ':' + portNo + '/jsonrpc'
-        statusCode = urllib2.urlopen(url,timeout=3).getcode()
-        if statusCode == 200:
+        response = requests.post(url, headers=headers, data=data, timeout=3)
+        if response.status_code == 200:
             return "FREE"
         else:
             return "NOT_FOUND"
-    except:
-        e = sys.exc_info()
+    except Exception as e:
         return "NOT_FOUND"
+
+
+def handlePluginOn():
+    print "\nTurning ON Plugin. Setting back pre-requisites if any..."
+    setUpStatus = setUpPreRequisitesBack()
+    return setUpStatus
 
 def handleDeviceIPChange():
     #IP change handling, get the latest IP from TM and update here
@@ -1383,6 +1422,12 @@ def handleDeviceIPChange():
         if eventResgisterTag != None:
             global logDisplay
             logDisplay = False
+            global eventListener
+            if eventListener != None:
+                global eventsBufferBackup
+                eventsBufferBackup = eventListener.getEventsBuffer();
+                print "Storing events buffer",eventsBufferBackup
+                eventListener = None
             requisiteStepStatus = executeEventHandlerRequisite(eventResgisterTag)
             logDisplay = True
             if "FAILURE" in requisiteStepStatus:
@@ -1397,6 +1442,34 @@ def handleDeviceIPChange():
         print "Unable to get Device Details from REST !!!"
         sys.stdout.flush()
         return "FAILURE"
+
+
+
+def setUpPreRequisitesBack():
+    if testPlugin.find("pluginPreRequisite") is not None:
+        global testStepResults
+        global bktestStepResults
+        bktestStepResults = testStepResults
+        global logDisplay
+        logDisplay = False
+        global eventListener
+        if eventListener != None:
+            global eventsBufferBackup
+            eventsBufferBackup = eventListener.getEventsBuffer();
+            print "Storing events buffer",eventsBufferBackup
+            eventListener = None
+        time.sleep(1)
+        setPreRequisiteStatus = executePrePostRequisite(testPlugin.find("pluginPreRequisite"),"Pre")
+        logDisplay = True
+        testStepResults = bktestStepResults
+        if "FAILURE" in setPreRequisiteStatus:
+            print "Plugin pre-requisites are not set back properly"
+            return "FAILURE"
+        else:
+            print "Plugin pre-requisites are set back properly"
+            return "SUCCESS"
+    else:
+        return "SUCCESS"
 
 
 
@@ -1493,6 +1566,14 @@ def getTestStepAPI(testStepInfo):
     if testStepInfo.get("action") == "eventListener":
         testMethod = str(testStepInfo.get("eventId")) + "." + str(testStepInfo.get("eventName"))
         return testMethod
+    if testStepInfo.get("action") == "eventRegister":
+        testMethod = str(testStepInfo.get("serviceName"))    + "." + \
+                     str(testStepInfo.get("serviceVersion")) + "." + "register"
+        return testMethod
+    if testStepInfo.get("action") == "eventUnRegister":
+        testMethod = str(testStepInfo.get("serviceName"))    + "." + \
+                     str(testStepInfo.get("serviceVersion")) + "." + "unregister"
+        return testMethod
 
     if testStepInfo.get("action") == "externalFnCall":
         testMethod = None
@@ -1530,7 +1611,7 @@ def getTestStepInfo(testStep):
     testStepInfo = testStep.attrib.copy()
     if testStepInfo.get("testStepId") is not None and testStepInfo.get("testStepType") is None:
         testStepInfo["testStepType"] = "direct"
-    if testStepInfo.get("action") == "eventListener":
+    if testStepInfo.get("action") in ["eventListener","eventRegister","eventUnRegister"]:
         apiType = "event"
     elif testStepInfo.get("action") == "externalFnCall":
         apiType = None
@@ -1549,10 +1630,17 @@ def getTestStepInfo(testStep):
     else:
         pluginAPIInfo = {}
 
+    # Getting the Service Name and Version
+    # If API has specific version, then it is taken as Service Version
+    # or else the common version for the plugin is used for the testing
     testStepInfo["serviceName"]   = pluginAPIInfo.get("serviceName")
-    testStepInfo["serviceVersion"] = pluginAPIInfo.get("serviceVersion")
+    if pluginAPIInfo.get("version") is not None:
+        testStepInfo["serviceVersion"] = pluginAPIInfo.get("version")
+    else:
+        testStepInfo["serviceVersion"] = pluginAPIInfo.get("serviceVersion")
 
-    if testStepInfo.get("action") == "eventListener":
+    # Populating essential parameters for methods/Events
+    if testStepInfo.get("action") in ["eventListener","eventRegister","eventUnRegister"]:
         testStepInfo["eventId"] = pluginAPIInfo.get("eventId")
         testStepInfo["eventName"] = pluginAPIInfo.get("eventName")
     else:
@@ -1967,6 +2055,11 @@ def testStepResultGeneration(testStepResponse,resultGenerationInfo, action="exec
         for response in testStepResponse:
             eventResult = response.get("param") if response.get("param") is not None else response.get("params")
             result.append(eventResult)
+    if action in ["eventRegister","eventUnRegister"]:
+        if testStepResponse.get("result") is not None:
+            result = testStepResponse.get("result")
+        else:
+            result = testStepResponse.get("params")
     elif action == "execution":
         result = testStepResponse.get("result")
         responseInfo = testStepResponse.copy()
@@ -1986,7 +2079,7 @@ def testStepResultGeneration(testStepResponse,resultGenerationInfo, action="exec
              expectedValues = expectedValues.split(",")
         else:
              expectedValues = []
-        if action == "eventListener":
+        if action in ["eventListener","eventRegister","eventUnRegister"]:
             info = CheckAndGenerateEventResult(result,tag,arg,expectedValues)
         elif action == "externalFnCall":
             paths = [ basePathLoc, deviceConfigFile, deviceIP ]
