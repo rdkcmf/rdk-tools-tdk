@@ -96,7 +96,6 @@ obj.setLoadModuleStatus(result);
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    channel_change_url = StabilityTestVariables.channel_change_url
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"

@@ -19,13 +19,13 @@
 '''
 <?xml version="1.0" encoding="UTF-8"?><xml>
   <id/>
-  <version>6</version>
-  <name>RDKV_CERT_PVS_Functional_TimeTo_LaunchUI</name>
+  <version>8</version>
+  <name>RDKV_CERT_PVS_Functional_TimeTo_LaunchSplashScreen</name>
   <primitive_test_id/>
   <primitive_test_name>rdkservice_getRequiredLog</primitive_test_name>
   <primitive_test_version>1</primitive_test_version>
   <status>FREE</status>
-  <synopsis>The script is to get the time to launch the main UI after reboot.</synopsis>
+  <synopsis>The script is to get the time to launch the splash screen after reboot.</synopsis>
   <groups_id/>
   <execution_time>10</execution_time>
   <long_duration>false</long_duration>
@@ -42,7 +42,7 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_PERFORMANCE_08</test_case_id>
-    <test_objective>The script is to get the time to launch the main UI after reboot.</test_objective>
+    <test_objective>The script is to get the time to launch the splash screen after reboot.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -56,7 +56,7 @@
     <expected_output>The time taken should be within expected range of ms.</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_performance</test_stub_interface>
-    <test_script>RDKV_CERT_PVS_Functional_TimeTo_LaunchUI</test_script>
+    <test_script>RDKV_CERT_PVS_Functional_TimeTo_LaunchSplashScreen</test_script>
     <skipped>No</skipped>
     <release_version>M83</release_version>
     <remarks/>
@@ -81,7 +81,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_LaunchUI')
+obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_LaunchSplashScreen')
 
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
@@ -108,7 +108,7 @@ if expectedResult in result.upper():
             uptime = int(tdkTestObj.getResultDetails())
             if uptime < 240:
                 print "\n Device is rebooted and uptime is: {}\n".format(uptime)
-                time.sleep(30)
+                time.sleep(50)
                 tdkTestObj.setResultStatus("SUCCESS")
                 tdkTestObj = obj.createTestStep('rdkservice_getValue');
                 tdkTestObj.addParameter("method","ResidentApp.1.url");
@@ -116,7 +116,7 @@ if expectedResult in result.upper():
                 ui_app_url = tdkTestObj.getResultDetails();
                 result = tdkTestObj.getResult()
                 if ui_app_url != "" and  result == "SUCCESS" :
-                    ui_app_url = ui_app_url.split('?')[0]
+                    ui_app_url = ui_app_url.split('#')[0]
                     print ui_app_url
                     tdkTestObj.setResultStatus("SUCCESS")
                     tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
@@ -127,7 +127,7 @@ if expectedResult in result.upper():
                     ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
                     if ssh_param_dict != {} and expectedResult in result:
                         tdkTestObj.setResultStatus("SUCCESS")
-                        command = 'cat /opt/logs/wpeframework.log | grep -inr LoadFinished.*url.*'+ui_app_url+'| tail -1'
+                        command = 'cat /opt/logs/wpeframework.log | grep -inr LoadFinished.*url.*'+ui_app_url+'.*splash.*| tail -1'
                         #get the log line containing the loadfinished info from wpeframework log
                         tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
                         tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])

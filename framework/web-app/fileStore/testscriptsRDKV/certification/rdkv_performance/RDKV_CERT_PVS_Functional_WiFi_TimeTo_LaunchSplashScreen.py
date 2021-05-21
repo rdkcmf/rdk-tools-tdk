@@ -19,13 +19,13 @@
 '''
 <?xml version="1.0" encoding="UTF-8"?><xml>
   <id/>
-  <version>2</version>
-  <name>RDKV_CERT_PVS_Functional_WiFi_TimeTo_LaunchUI</name>
+  <version>3</version>
+  <name>RDKV_CERT_PVS_Functional_WiFi_TimeTo_LaunchSplashScreen</name>
   <primitive_test_id/>
   <primitive_test_name>rdkservice_getRequiredLog</primitive_test_name>
   <primitive_test_version>1</primitive_test_version>
   <status>FREE</status>
-  <synopsis>The script is to get the time to launch the main UI after reboot, when the DUT is connected to WiFi.</synopsis>
+  <synopsis>The script is to get the time to launch the splash screen after reboot, when the DUT is connected to WiFi.</synopsis>
   <groups_id/>
   <execution_time>15</execution_time>
   <long_duration>false</long_duration>
@@ -42,7 +42,7 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_PERFORMANCE_26</test_case_id>
-    <test_objective>The script is to get the time to launch the main UI after reboot, when the DUT is connected to WiFi.</test_objective>
+    <test_objective>The script is to get the time to launch the splash screen after reboot, when the DUT is connected to WiFi.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI,Accelerator</test_setup>
     <pre_requisite>1. Either the DUT should be already connected and configured with WiFi IP in test manager or WiFi Access point with same IP range is required.
@@ -67,7 +67,7 @@ d) Set WIFI as default interface
     <expected_output>The UI launch time should be within the expected limit.</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_performance</test_stub_interface>
-    <test_script>RDKV_CERT_PVS_Functional_WiFi_TimeTo_LaunchUI</test_script>
+    <test_script>RDKV_CERT_PVS_Functional_WiFi_TimeTo_LaunchSplashScreen</test_script>
     <skipped>No</skipped>
     <release_version>M85</release_version>
     <remarks/>
@@ -93,7 +93,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_WiFi_TimeTo_LaunchUI');
+obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_WiFi_TimeTo_LaunchSplashScreen');
 
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
@@ -150,7 +150,7 @@ if expectedResult in result.upper():
                     result = tdkTestObj.getResult()
                     if ui_app_url != "" and  result == "SUCCESS" :
                         print "\n Main UI URL :",ui_app_url
-                        ui_app_url = ui_app_url.split('?')[0]
+                        ui_app_url = ui_app_url.split('#')[0]
                         print "\n URL to check in device logs: ",ui_app_url
                         tdkTestObj.setResultStatus("SUCCESS")
                         tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
@@ -161,7 +161,7 @@ if expectedResult in result.upper():
                         ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
                         if ssh_param_dict != {} and expectedResult in result:
                             tdkTestObj.setResultStatus("SUCCESS")
-                            command = 'cat /opt/logs/wpeframework.log | grep -inr LoadFinished.*url.*'+ui_app_url+'| tail -1'
+                            command = 'cat /opt/logs/wpeframework.log | grep -inr LoadFinished.*url.*'+ui_app_url+'.*splash.*| tail -1'
                             #get the log line containing the loadfinished info from wpeframework log
                             tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
                             tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])

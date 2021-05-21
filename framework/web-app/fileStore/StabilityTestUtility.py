@@ -37,6 +37,7 @@ def get_plugins_status(obj,plugins):
 
 def set_plugins_status(obj,plugins_state_dict):
     plugin_status_list = []
+    plugin_status = ""
     for plugin in plugins_state_dict:
         if plugins_state_dict[plugin] != "deactivated" and plugins_state_dict[plugin] != "None":
             print "{}  activating".format(plugin)
