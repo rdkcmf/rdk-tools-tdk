@@ -38,15 +38,18 @@
                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,Messenger" expectedValues="activated"/>
             </testStep>
           </prerequisite>
-
+    
+          <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
+            <event pluginName="Messenger" eventName="Event_Room_Updated" />
+          </prerequisite>
         </pluginPreRequisite>
 
         <testCase testCaseId="MS_01" testCaseName= "Messenger_Join_Leave_Room"  desc="Joins and leaves a messaging room">
             <testCaseInfo testCaseType="direct" />
             <testStep testStepId="1" name="Messenger_Join" method="Messenger_Join" saveResult="true">
                 <params>
-                  <param tag="user"  value="Bob"/>
-                  <param tag="room"  value="Lounge"/>
+                  <param tag="user"  value="user_1"/>
+                  <param tag="room"  value="room_1"/>
                 </params>
               <resultGeneration useMethodTag="messenger_join_room" />
             </testStep>
@@ -61,8 +64,8 @@
             <testCaseInfo testCaseType="direct" />
             <testStep testStepId="1" name="Messenger_Join" method="Messenger_Join" saveResult="true">
                 <params>
-                  <param tag="user"  value="Alex"/>
-                  <param tag="room"  value="Lounge"/>
+                  <param tag="user"  value="user_2"/>
+                  <param tag="room"  value="room_2"/>
                 </params>
               <resultGeneration useMethodTag="messenger_join_room" />
             </testStep>
@@ -78,6 +81,98 @@
                 </params>
             </testStep>
         </testCase>
+        
+	<testCase testCaseId="MS_03" testCaseName= "Messenger_Check_Room_Update_Event"  desc="Checks for the room update event">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Messenger_Join" method="Messenger_Join" saveResult="true">
+                <params>
+                  <param tag="user"  value="user_3"/>
+                  <param tag="room"  value="room_3"/>
+                </params>
+              <resultGeneration useMethodTag="messenger_join_room" />
+            </testStep>
+            <testStep testStepId="2" name="Check_Room_Updated_Event" event="Event_Room_Updated" action="eventListener" delay="2" >
+                <resultGeneration useMethodTag="messenger_check_room_updated_event" expectedValues="room_3,created" />
+            </testStep>
+            <testStep testStepId="3" name="Messenger_Leave" method="Messenger_Leave">
+                <params>
+                  <param tag="roomid"  usePreviousResult="true" Id="1" useMethodTag="messenger_get_roomid" />
+                </params>
+            </testStep>
+            <testStep testStepId="4" name="Check_Room_Updated_Event" event="Event_Room_Updated" action="eventListener" delay="2" >
+                <resultGeneration useMethodTag="messenger_check_room_updated_event" expectedValues="room_3,destroyed" />
+            </testStep>
+        </testCase>
 
+        <testCase testCaseId="MS_04" testCaseName= "Messenger_Check_User_Update_Event"  desc="Checks for the user update event">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Messenger_Join" method="Messenger_Join" saveResult="true">
+                <params>
+                  <param tag="user"  value="user_4"/>
+                  <param tag="room"  value="room_4"/>
+                </params>
+              <resultGeneration useMethodTag="messenger_join_room" />
+            </testStep>
+            <testStep testStepId="2" name="Register_and_Check_User_Update_Event" event="Event_User_Update" action="eventRegister" >
+                  <params>
+                    <param tag="roomid" usePreviousResult="true" Id="1" useMethodTag="messenger_get_roomid" />
+                  </params>
+                <resultGeneration useMethodTag="check_event_registration" arguments="check_user_update_event" expectedValues="user_4,joined" />
+            </testStep>
+            <testStep testStepId="3" name="Messenger_Leave" method="Messenger_Leave">
+                <params>
+                  <param tag="roomid"  usePreviousResult="true" Id="1" useMethodTag="messenger_get_roomid" />
+                </params>
+            </testStep>
+            <testStep testStepId="4" name="Check_User_Update_Event" event="Event_User_Update" action="eventListener" delay="2" >
+                <params>
+                    <param tag="roomid" usePreviousResult="true" Id="1" useMethodTag="messenger_get_roomid" />
+                </params>
+                <resultGeneration useMethodTag="messenger_check_user_update_event" expectedValues="user_4,left" />
+            </testStep>
+            <testStep testStepId="5" name="UnRegister_User_Update_Event" event="Event_User_Update" action="eventUnRegister" >
+                  <params>
+                    <param tag="roomid" usePreviousResult="true" Id="1" useMethodTag="messenger_get_roomid" />
+                  </params>
+                <resultGeneration useMethodTag="check_event_registration" expectedValues="0" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="MS_05" testCaseName= "Messenger_Check_Message_Event"  desc="Checks for the Meesage event">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Messenger_Join" method="Messenger_Join" saveResult="true">
+                <params>
+                  <param tag="user"  value="user_5"/>
+                  <param tag="room"  value="room_5"/>
+                </params>
+              <resultGeneration useMethodTag="messenger_join_room" />
+            </testStep>
+            <testStep testStepId="2" name="Register_Message_Event" event="Event_Message" action="eventRegister" >
+                  <params>
+                    <param tag="roomid" usePreviousResult="true" Id="1" useMethodTag="messenger_get_roomid" />
+                  </params>
+                <resultGeneration useMethodTag="check_event_registration" expectedValues="0" />
+            </testStep>
+            <testStep testStepId="3" name="Messenger_Send" method="Messenger_Send">
+                <params>
+                  <param tag="roomid"  usePreviousResult="true" Id="1" useMethodTag="messenger_get_roomid" />
+                  <param tag="message"  value="Hello"/>
+                </params>
+            </testStep>
+            <testStep testStepId="4" name="Check_Message_Event" event="Event_Message" action="eventListener" delay="2" >
+                <resultGeneration useMethodTag="messenger_check_message_event" expectedValues="user_5,hello" />
+            </testStep>
+            <testStep testStepId="5" name="UnRegister_Message_Event" event="Event_Message" action="eventUnRegister" >
+                  <params>
+                    <param tag="roomid" usePreviousResult="true" Id="1" useMethodTag="messenger_get_roomid" />
+                  </params>
+                <resultGeneration useMethodTag="check_event_registration" expectedValues="0" />
+            </testStep>
+            <testStep testStepId="6" name="Messenger_Leave" method="Messenger_Leave">
+                <params>
+                  <param tag="roomid"  usePreviousResult="true" Id="1" useMethodTag="messenger_get_roomid" />
+                </params>
+            </testStep>
+        </testCase>
 </testPlugin>
 

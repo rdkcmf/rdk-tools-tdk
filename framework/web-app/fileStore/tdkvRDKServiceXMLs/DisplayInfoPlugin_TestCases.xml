@@ -68,6 +68,9 @@
               </testStep>
           </prerequisite>
 
+	  <prerequisite requisiteId="4" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
+            <event pluginName="DisplayInfo" eventName="Event_Resolution_PostChange" />
+          </prerequisite>
         </pluginPreRequisite>
 
         <!-- Test case 01 -->
@@ -234,6 +237,16 @@
                   <resultGeneration useMethodTag="deviceinfo_get_system_info" arguments="check_cpu_load" />
               </subtestStep>
             </testStep>
+        <testCasePostRequisite>
+         <postrequisite requisiteId="1" requisiteName="Check_PluginActive_Status">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  PluginOnStep="yes">
+                  <params>
+                    <param tag="plugin" value="DeviceInfo" indexOnly="true" />
+                  </params>
+                  <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" expectedValues="activated"/>
+            </testStep>
+         </postrequisite>
+        </testCasePostRequisite>
         </testCase>
        <!-- Test case 10 -->
         <testCase testCaseId="DISP_10" testCaseName= "DisplayInfo_GET_HDR_Formats_TV" desc="Gets the HDR formats supported by TV">
@@ -284,6 +297,42 @@
                 <resultGeneration useMethodTag="displayinfo_validate_results" />
             </testStep>
         </testCase>
+     <!-- Test case 17 -->
+        <testCase testCaseId="DISP_17" testCaseName= "Check_Resolution_PostChange_Event" desc="Checks for the Resolution Post Change event">
+            <testCaseInfo testCaseType="loop" revert="true"  />
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" pluginName="DisplaySettings">
+                <resultGeneration useMethodTag="display_connected_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_Resolutions" method="Get_Supported_Resolutions" saveResult="true" pluginName="DisplaySettings">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="display_supported_resolutions"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Current_Resolution"  method="Get_Current_Resolution" saveResult="true" revertGet="yes" pluginName="DisplaySettings">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="check_current_resolution"/>
+            </testStep>
+            <testStep testStepId="4" name="Set_Resolution" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Resolution" method="Set_Current_Resolution" revertSet="yes" pluginName="DisplaySettings">
+                  <params>
+                    <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                    <param tag="resolution" usePreviousResult="true" Id="2" iteration="true" useMethodTag="display_info_get_supported_resolution_list" revertParam="yes"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Current_Resolution"  method="Get_Current_Resolution" revertFlag="yes" pluginName="DisplaySettings">
+                  <resultGeneration useMethodTag="check_current_resolution" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Check_Updated_PostRequisite_Change_Event" event="Event_Resolution_PostChange" action="eventListener" delay="2" >
+                  <resultGeneration useMethodTag="displayinfo_check_resolution_postchange_event" expectedValues="postresolutionchange" />
+              </subtestStep>
+            </testStep>
+        </testCase> 
 </testPlugin>
 
 

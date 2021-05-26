@@ -188,7 +188,11 @@
             </params>
         </method>
         <method name="Is_ConnectedTo_Internet" api="isConnectedToInternet" type="method" desc="Checks internet connectivity"/>
-
+        <method name="Get_STB_IP_Family" api="getStbIp" type="method" desc="Gets the IP address of the default interface by address family">
+            <params>
+                <param tag="family"  defaultValue="null"/>
+            </params>
+        </method>
         <event name="Event_Interface_Status_Changed" eventName="onInterfaceStatusChanged" eventId="client.events.1" type="event" desc="Interface status changed  event" />
         <event name="Event_Connection_Status_Changed" eventName="onConnectionStatusChanged" eventId="client.events.1" type="event" desc="Connection status changed event" />
         <event name="Event_IPAddress_Status_Changed" eventName="onIPAddressStatusChanged" eventId="client.events.1" type="event" desc="IPAddress status changed event" />
@@ -452,7 +456,8 @@
         <event name="Event_MacAddresses_Retreived" eventName="onMacAddressesRetreived" eventId="client.events.1" type="event" desc="MacAddressesRetreived" />
         <event name="Event_PowerState_Changed" eventName="onSystemPowerStateChanged" eventId="client.events.1" type="event" desc="power state changed event" />
         <event name="Event_SystemMode_Changed" eventName="onSystemModeChanged" eventId="client.events.1" type="event" desc="Fires on system mode changed event" />
-        <event name="Event_Temperature_Threshold_Changed" eventName="onTemperatureThresholdChanged" eventId="client.events.1" type="event" desc="Fires on temperature threshold change" />
+	<event name="Event_Temperature_Threshold_Changed" eventName="onTemperatureThresholdChanged" eventId="client.events.1" type="event" desc="Fires on temperature threshold change" />
+	<event name="Event_Reboot_Request" eventName="onRebootRequest" eventId="client.events.1" type="event" desc="Fires on reboot request" />
     </plugin>
 
 
@@ -473,6 +478,7 @@
             </params>
             <expectedValues>null</expectedValues>
         </method>
+        <event name="Event_Cobalt_State_Changed" eventName="statechange" eventId="client.events.1" type="event" desc="cobalt state changed event" />
     </plugin>
 
 
@@ -733,7 +739,8 @@
         <method name="Get_Total_GPU_RAM" api="totalgpuram" type="property" desc="Gets the total GPU DRAM memory in bytes"/>
         <method name="Get_Free_GPU_RAM" api="freegpuram" type="property" desc="Gets the free GPU DRAM memory in bytes"/>
         <method name="Get_Width_In_Centimeters" api="widthincentimeters" type="property" desc="Gets the horizontal size in centimeters"/>
-        <method name="Get_Height_In_Centimeters" api="heightincentimeters" type="property" desc="Gets the vertical size in centimeters"/>
+	<method name="Get_Height_In_Centimeters" api="heightincentimeters" type="property" desc="Gets the vertical size in centimeters"/>
+	<event name="Event_Resolution_PostChange" eventName="updated" eventId="client.events.1" type="event" desc="Fires on changing the resolution"/>
     </plugin>
 
 
@@ -859,12 +866,13 @@
         </method>
         <method name="Is_Signal_Threshold_Change_Enabled" api="isSignalThresholdChangeEnabled" type="method" desc="Returns true when threshold changes are enabled">
             <expectedValues>0,1</expectedValues>
-        </method>
+        </method>i
         <method name="Initiate_WPS_Pairing" api="initiateWPSPairing" type="method" desc="Initiates the connection via WPS" />
         <method name="Cancel_WPS_Pairing" api="cancelWPSPairing" type="method" desc="Cancels WPS pairing" />
         <method name="Is_Paired" api="isPaired" type="method" desc="Determines if the device paired to an SSID" />
         <method name="Get_Paired_SSID" api="getPairedSSID" type="method" desc="Returns the SSID the device is currently paired with" />
-        <method name="Get_Paired_SSID_Info" api="getPairedSSIDInfo" type="method" desc="Returns the SSID the device is currently paired with also including the BSSID" />
+	<method name="Get_Paired_SSID_Info" api="getPairedSSIDInfo" type="method" desc="Returns the SSID the device is currently paired with also including the BSSID" />
+	<method name="Get_Supported_Security_Modes" api="getSupportedSecurityModes" type="method" version="2" desc="Returns the Wifi security modes that the device supports" />
         <event name="Event_On_WIFI_State_Changed" eventName="onWIFIStateChanged" eventId="client.events.1" type="event" desc="Indicates state change" />
         <event name="Event_On_Available_SSIDs" eventName="onAvailableSSIDs" eventId="client.events.1" type="event" desc="Gives SSID after scan" />
         <event name="Event_On_Error" eventName="onError" eventId="client.events.1" type="event" desc="Indicates unexpected Wifi error occurs" />
@@ -1155,7 +1163,7 @@
         <method name="Set_DRC_Mode" api="setDRCMode" type="method" desc="Set the DRC mode values " >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
-                <param tag="DRCMode"  defaultValue="null" />
+                <param tag="DRCMode" type="int" />
             </params>
         </method>
         <method name="Get_DRC_Mode" api="getDRCMode" type="method" desc="Get the DRC mode value" >
@@ -1277,8 +1285,19 @@
                 <param tag="graphicEqualizerMode" type="int" />
             </params>
         </method>
+        <method name="Get_Settop_Audio_Capabilities" api="getSettopAudioCapabilities" type="method" desc="Gets the set-top audio capabilities for the specified audio port" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Settop_MS12_Capabilities" api="getSettopMS12Capabilities" type="method" desc="Gets the set-top MS12 audio capabilities for the specified audio port" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
         <event name="Event_Zoom_Settings_Updated" eventName="zoomSettingUpdated" eventId="client.events.1" type="event" desc="Zoom settings updated event "/>
-        <event name="Event_Resolution_Changed" eventName="resolutionChanged" eventId="client.events.1" type="event" desc="Fires on changing resolution"/>
+	<event name="Event_Resolution_Changed" eventName="resolutionChanged" eventId="client.events.1" type="event" desc="Fires on changing resolution"/>
+	<event name="Event_Audio_Mute_Status_Changed" eventName="audioMuteStatusChanged" eventId="client.events.1" type="event" desc="Fires on changing audio mute status"/>
     </plugin>
 
     <!-- Messenger Plugin Information -->
@@ -1302,6 +1321,9 @@
             </params>
             <expectedValues>null</expectedValues>
         </method>
+        <event name="Event_Room_Updated" eventName="roomupdate" eventId="client.events.1" type="event" desc="Gives room status update"/>
+        <event name="Event_User_Update" eventName="userupdate" eventId="client.events.1" type="event" desc="Gives user status update" />
+        <event name="Event_Message" eventName="message" eventId="client.events.1" type="event" desc="Fires on sending the message" />
     </plugin>
 
     <!-- Monitor Plugin Information -->
@@ -1440,7 +1462,7 @@
                 <param tag="enable"  />
             </params>
         </method>
-        <event name="Event_Dolby_AudioMode_Changed" eventName="dolby_audiomodechanged" eventId="client.events.1" type="event" desc="Notifies audio mode changed event" />
+        <event name="Event_AudioMode_Changed" eventName="dolby_audiomodechanged" eventId="client.events.1" type="event" desc="Notifies audio mode changed event" />
     </plugin>
   
     <!-- PersistentStore Plugin Information -->
@@ -1493,6 +1515,34 @@
         <method name="Get_API_Version" api="getapiversion" type="method" desc="Gets the apiversion" />
         <event name="Event_TTS_State_Changed" eventName="onttsstatechanged" eventId="client.events.1" type="event" desc="Notifies on TTS state changed" />
     </plugin>
+
+    <!-- XCast Plugin Information -->
+    <plugin pluginName="XCast" serviceName="org.rdk.Xcast" serviceVersion="1">
+        <method name="Get_Enabled" api="getEnabled" type="method" desc="Returns whether xcast is enabled or disabled" >
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Set_Enabled" api="setEnabled" type="method" desc="Enables or disables xcast" >
+            <params>
+               <param tag="enabled" type="bool" />
+            </params>
+        </method>
+        <method name="Get_API_Version" api="getApiVersionNumber" type="method" desc="Gets the api version" />
+        <method name="Get_Friendly_Name" api="getFriendlyName" type="method" desc="Gets the human readable name for the implementation" />
+        <method name="Set_Friendly_Name" api="setFriendlyName" type="method" desc="Sets a name for the implementation" >
+            <params>
+               <param tag="friendlyname" defaultValue="null" />
+            </params>
+        </method>
+        <method name="Get_Standby_Behavior" api="getStandbyBehavior" type="method" desc="Gets the expected xcast behavior in standby mode" >
+            <expectedValues>active,inactive</expectedValues>
+        </method>
+        <method name="Set_Standby_Behavior" api="setStandbyBehavior" type="method" desc="Sets the expected xcast behavior in standby mode" >
+            <params>
+               <param tag="standbybehavior" defaultValue="null" />
+            </params>
+        </method>
+    </plugin>
+
 </thunderPlugins>
 
 

@@ -40,7 +40,8 @@
           </prerequisite>
           <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" >
             <event pluginName="DisplaySettings" eventName="Event_Zoom_Settings_Updated" />
-            <event pluginName="DisplaySettings" eventName="Event_Resolution_Changed" />
+	    <event pluginName="DisplaySettings" eventName="Event_Resolution_Changed" />
+	    <event pluginName="DisplaySettings" eventName="Event_Audio_Mute_Status_Changed" />
           </prerequisite>
         </pluginPreRequisite>
        
@@ -147,13 +148,15 @@
                   <params>
                     <param tag="audioPort" value="HDMI0" />
                   </params>
-                <resultGeneration useMethodTag="check_sound_mode"/>
+		  <resultGeneration useMethodTag="check_sound_mode">
+			  <expectedValues usePreviousResult="true" Id="3" useMethodTag="get_supported_sound_modes"/>
+                  </resultGeneration>
             </testStep>
             <testStep testStepId="5"  name="Set_Sound_Mode" testStepType="loop" >
               <subtestStep subtestStepId="1" name="Set_Sound_Mode" method="Set_Sound_Mode" revertSet="yes">
                   <params>
                     <param tag="audioPort"  value="HDMI0" />
-                    <param tag="soundMode" usePreviousResult="true" Id="3" useMethodTag="get_supported_sound_modes" iteration="true" revertParam="yes" />
+                    <param tag="soundMode" usePreviousResult="true" Id="3" useMethodTag="get_formatted_sound_modes" iteration="true" revertParam="yes" />
                     <param tag="persist" value="false" />
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
@@ -162,7 +165,7 @@
                   <params>
                     <param tag="audioPort" value="HDMI0" />
                   </params>
-                  <resultGeneration useMethodTag="check_sound_mode" >
+                  <resultGeneration useMethodTag="check_sound_mode" arguments="check_expected_sound_mode" >
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
@@ -382,7 +385,7 @@
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
-              <subtestStep subtestStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Levelle" revertFlag="yes" >
+              <subtestStep subtestStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Leveller" revertFlag="yes" >
                   <params>
                     <param tag="audioPort"  value="HDMI0"  />
                   </params>
@@ -541,7 +544,8 @@
                   <params>
                     <param tag="audioPort" value="HDMI0"/>
                   </params>
-                  <resultGeneration useMethodTag="check_drc_mode" >
+                  <resultGeneration useMethodTag="check_drc_mode" arguments="validate_drc_mode" >
+                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -628,6 +632,11 @@
                     <param tag="audioPort"  value="HDMI0" />
                   </params>
                   <resultGeneration useMethodTag="check_muted" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+	      </subtestStep>
+              <subtestStep subtestStepId="3" name="Check_Audio_Mute_Status_Changed_Event" event="Event_Audio_Mute_Status_Changed" action="eventListener" delay="3" >
+                  <resultGeneration useMethodTag="displaysettings_check_audio_mute_status_changed_event" >
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
@@ -772,13 +781,15 @@
                   <params>
                     <param tag="audioPort" value="SPDIF0" />
                   </params>
-                <resultGeneration useMethodTag="check_sound_mode"/>
+		  <resultGeneration useMethodTag="check_sound_mode">
+			  <expectedValues usePreviousResult="true" Id="3" useMethodTag="get_supported_sound_modes"/>
+                  </resultGeneration>
             </testStep>
             <testStep testStepId="5"  name="Set_Sound_Mode" testStepType="loop" >
               <subtestStep subtestStepId="1" name="Set_Sound_Mode" method="Set_Sound_Mode" revertSet="yes">
                   <params>
                     <param tag="audioPort" value="SPDIF0" />
-                    <param tag="soundMode" usePreviousResult="true" Id="3" useMethodTag="get_supported_sound_modes" iteration="true" revertParam="yes" />
+                    <param tag="soundMode" usePreviousResult="true" Id="3" useMethodTag="get_formatted_sound_modes" iteration="true" revertParam="yes" />
                     <param tag="persist" value="false" />
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
@@ -787,7 +798,7 @@
                   <params>
                     <param tag="audioPort" value="SPDIF0" />
                   </params>
-                  <resultGeneration useMethodTag="check_sound_mode" >
+                  <resultGeneration useMethodTag="check_sound_mode" arguments="check_expected_sound_mode">
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
@@ -812,13 +823,15 @@
                   <params>
                     <param tag="audioPort" value="IDLR0" />
                   </params>
-                <resultGeneration useMethodTag="check_sound_mode"/>
+		  <resultGeneration useMethodTag="check_sound_mode">
+			  <expectedValues usePreviousResult="true" Id="3" useMethodTag="get_supported_sound_modes"/>
+                  </resultGeneration>
             </testStep>
             <testStep testStepId="5"  name="Set_Sound_Mode" testStepType="loop" >
               <subtestStep subtestStepId="1" name="Set_Sound_Mode" method="Set_Sound_Mode" revertSet="yes">
                   <params>
                     <param tag="audioPort" value="IDLR0" />
-                    <param tag="soundMode" usePreviousResult="true" Id="3" useMethodTag="get_supported_sound_modes" iteration="true" revertParam="yes" />
+                    <param tag="soundMode" usePreviousResult="true" Id="3" useMethodTag="get_formatted_sound_modes" iteration="true" revertParam="yes" />
                     <param tag="persist" value="false" />
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
@@ -827,7 +840,7 @@
                   <params>
                     <param tag="audioPort" value="IDLR0" />
                   </params>
-                  <resultGeneration useMethodTag="check_sound_mode" >
+                  <resultGeneration useMethodTag="check_sound_mode" arguments="check_expected_sound_mode">
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
@@ -852,13 +865,15 @@
                   <params>
                     <param tag="audioPort" value="SPEAKER0" />
                   </params>
-                <resultGeneration useMethodTag="check_sound_mode"/>
+		  <resultGeneration useMethodTag="check_sound_mode">
+			  <expectedValues usePreviousResult="true" Id="3" useMethodTag="get_supported_sound_modes"/>
+                  </resultGeneration>
             </testStep>
             <testStep testStepId="5"  name="Set_Sound_Mode" testStepType="loop" >
               <subtestStep subtestStepId="1" name="Set_Sound_Mode" method="Set_Sound_Mode" revertSet="yes">
                   <params>
                     <param tag="audioPort" value="SPEAKER0" />
-                    <param tag="soundMode" usePreviousResult="true" Id="3" useMethodTag="get_supported_sound_modes" iteration="true" revertParam="yes" />
+                    <param tag="soundMode" usePreviousResult="true" Id="3" useMethodTag="get_formatted_sound_modes" iteration="true" revertParam="yes" />
                     <param tag="persist" value="false" />
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
@@ -867,7 +882,7 @@
                   <params>
                     <param tag="audioPort" value="SPEAKER0" />
                   </params>
-                  <resultGeneration useMethodTag="check_sound_mode" >
+                  <resultGeneration useMethodTag="check_sound_mode" arguments="check_expected_sound_mode">
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
@@ -894,7 +909,7 @@
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
-              <subtestStep subtestStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Levelle" revertFlag="yes" >
+              <subtestStep subtestStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Leveller" revertFlag="yes" >
                   <params>
                     <param tag="audioPort" value="SPDIF0" />
                   </params>
@@ -925,7 +940,7 @@
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
-              <subtestStep subtestStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Levelle" revertFlag="yes" >
+              <subtestStep subtestStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Leveller" revertFlag="yes" >
                   <params>
                     <param tag="audioPort" value="IDLR0" />
                   </params>
@@ -956,7 +971,7 @@
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
-              <subtestStep subtestStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Levelle" revertFlag="yes" >
+              <subtestStep subtestStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Leveller" revertFlag="yes" >
                   <params>
                     <param tag="audioPort" value="SPEAKER0" />
                   </params>
@@ -1362,7 +1377,8 @@
                   <params>
                     <param tag="audioPort"  value="SPDIF0" />
                   </params>
-                  <resultGeneration useMethodTag="check_drc_mode" >
+                  <resultGeneration useMethodTag="check_drc_mode" arguments="validate_drc_mode" >
+                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -1391,7 +1407,8 @@
                   <params>
                     <param tag="audioPort"  value="IDLR0" />
                   </params>
-                  <resultGeneration useMethodTag="check_drc_mode" >
+                  <resultGeneration useMethodTag="check_drc_mode" arguments="validate_drc_mode" >
+                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -1421,7 +1438,8 @@
                   <params>
                     <param tag="audioPort"  value="SPEAKER0" />
                   </params>
-                  <resultGeneration useMethodTag="check_drc_mode" >
+                  <resultGeneration useMethodTag="check_drc_mode" arguments="validate_drc_mode" >
+                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -1618,6 +1636,11 @@
                   <resultGeneration useMethodTag="check_muted" >
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
+	      </subtestStep>
+              <subtestStep subtestStepId="3" name="Check_Audio_Mute_Status_Changed_Event" event="Event_Audio_Mute_Status_Changed" action="eventListener" delay="2" >
+                  <resultGeneration useMethodTag="displaysettings_check_audio_mute_status_changed_event" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
               </subtestStep>
             </testStep>
         </testCase>
@@ -1649,6 +1672,11 @@
                   <resultGeneration useMethodTag="check_muted" >
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
+	      </subtestStep>
+              <subtestStep subtestStepId="3" name="Check_Audio_Mute_Status_Changed_Event" event="Event_Audio_Mute_Status_Changed" action="eventListener" delay="2" >
+                  <resultGeneration useMethodTag="displaysettings_check_audio_mute_status_changed_event" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
               </subtestStep>
             </testStep>
         </testCase>
@@ -1677,6 +1705,11 @@
                     <param tag="audioPort" value="SPEAKER0" />
                   </params>
                   <resultGeneration useMethodTag="check_muted" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+	      </subtestStep>
+              <subtestStep subtestStepId="3" name="Check_Audio_Mute_Status_Changed_Event" event="Event_Audio_Mute_Status_Changed" action="eventListener" delay="2" >
+                  <resultGeneration useMethodTag="displaysettings_check_audio_mute_status_changed_event" >
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
@@ -2252,6 +2285,28 @@
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_84" testCaseName= "Check_Settop_Audio_Capabilities_HDMI0" desc="Check whether settop displays all supported audio capabilities">
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="HDMI0" />
+	    <testStep testStepId="1" name="Get_Settop_Audio_Capabilities" method="Get_Settop_Audio_Capabilities" >
+		<params>
+                    <param tag="audioPort"  value="HDMI0" />
+                </params>    
+                <resultGeneration useMethodTag="check_settop_supported_audio_capabilities" >
+                  <expectedValues useConfigFile="true" key="SETTOP_SUPPORTED_AUDIO_CAPABILITIES" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_85" testCaseName= "Check_Settop_MS12_Capabilities_HDMI0" desc="Check whether settop displays all supported MS12 capabilities">
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="HDMI0" />
+	    <testStep testStepId="1" name="Get_Settop_MS12_Capabilities" method="Get_Settop_MS12_Capabilities" >
+		<params>
+                    <param tag="audioPort"  value="HDMI0" />
+                </params>
+                <resultGeneration useMethodTag="check_settop_supported_ms12_capabilities" >
+                  <expectedValues useConfigFile="true" key="SETTOP_SUPPORTED_MS12_CAPABILITIES" />
+                </resultGeneration>
             </testStep>
         </testCase>
 </testPlugin>  
