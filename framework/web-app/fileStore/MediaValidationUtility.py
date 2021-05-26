@@ -39,6 +39,15 @@ expectedResult = "SUCCESS"
 
 next_z_order_client = None
 
+video_port = None
+audio_port = None
+
+current_resolution = None
+resolution_revert = False
+
+current_mode = None
+mode_revert = False
+
 # Function to set the operation and interval
 def setOperation(operation,intervalOrCount):
     global all_operations
@@ -331,6 +340,390 @@ def moveToFrontClient(obj,client):
         tdkTestObj.setResultStatus("FAILURE");
         return "FAILURE"
 
+def getConnectedVideoDisplay(obj):
+    global video_port
+    print "\nChecking Connected video displays..."
+    tdkTestObj = obj.createTestStep('rdkservice_getValue');
+    tdkTestObj.addParameter("method","org.rdk.DisplaySettings.1.getConnectedVideoDisplays");
+    tdkTestObj.executeTestCase("SUCCESS");
+    result  = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    if "SUCCESS" in result:
+        disp_list = ast.literal_eval(details)["connectedVideoDisplays"]
+        print "Connected displays: %s" %(disp_list)
+        if "HDMI0" in disp_list:
+            video_port  = "HDMI0"
+            conn_status = "SUCCESS"
+        elif "Internal0" in disp_list:
+            video_port  = "Internal0"
+            conn_status = "SUCCESS"
+        else:
+            print "Please test with TV connected setup"
+            conn_status =  "FAILURE"
+    else:
+        conn_status =  "FAILURE"
+        print "Unable to get connected displays"
+
+    tdkTestObj.setResultStatus(conn_status)
+    return conn_status
+
+def getConnectedAudioPorts(obj):
+    global audio_port
+    print "\nChecking Connected audio ports..."
+    tdkTestObj = obj.createTestStep('rdkservice_getValue');
+    tdkTestObj.addParameter("method","org.rdk.DisplaySettings.1.getConnectedAudioPorts");
+    tdkTestObj.executeTestCase("SUCCESS");
+    result  = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    if "SUCCESS" in result:
+        disp_list = ast.literal_eval(details)["connectedAudioPorts"]
+        print "Connected audio ports: %s" %(disp_list)
+        if "HDMI0" in disp_list:
+            audio_port  = "HDMI0"
+            conn_status = "SUCCESS"
+        else:
+            print "Please test with TV connected setup"
+            conn_status =  "FAILURE"
+    else:
+        conn_status =  "FAILURE"
+        print "Unable to get connected audio ports"
+
+    tdkTestObj.setResultStatus(conn_status)
+    return conn_status
+
+def checkSupportedAudioModes(obj,mode):
+    print "\nChecking Supported Audio modes..."
+    tdkTestObj = obj.createTestStep('rdkservice_setValue');
+    params = '{"audioPort":"'+audio_port+'"}'
+    tdkTestObj.addParameter("method","org.rdk.DisplaySettings.1.getSupportedAudioModes");
+    tdkTestObj.addParameter("value",params)
+    tdkTestObj.executeTestCase("SUCCESS");
+    result  = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    check_status = ""
+    if "SUCCESS" in result:
+        mode_list = ast.literal_eval(details)["supportedAudioModes"]
+        print "Supported Audio modes: %s" %(mode_list)
+        mode_match = False
+        for mode_value in mode_list:
+            if mode.lower() in mode_value.lower():
+                mode_match = True
+                if "AUTO" in mode_value:
+                    mode = mode_value.split("(")[1].split(")")[0]
+                else:
+                    mode = mode_value;
+                break;
+        if mode_match:
+            check_status = "SUCCESS"
+        else:
+            print "%s audio mode is not supported" %(mode)
+            check_status = "FAILURE"
+    else:
+        check_status = "FAILURE"
+        print "Unable to get supported audio modes"
+
+    tdkTestObj.setResultStatus(check_status)
+    return mode,check_status
+
+
+def checkSupportedAudioCapabilities(obj,mode):
+    print "\nChecking Supported Audio capabilities..."
+    tdkTestObj = obj.createTestStep('rdkservice_setValue');
+    params = '{"audioPort":"'+audio_port+'"}'
+    tdkTestObj.addParameter("method","org.rdk.DisplaySettings.1.getSettopAudioCapabilities");
+    tdkTestObj.addParameter("value",params)
+    tdkTestObj.executeTestCase("SUCCESS");
+    result  = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    check_status = ""
+    if "SUCCESS" in result:
+        mode_list = ast.literal_eval(details)["AudioCapabilities"]
+        print "Supported Audio capabilities: %s" %(mode_list)
+        mode_match = False
+        for mode_value in mode_list:
+            if mode.lower() in mode_value.lower():
+                mode_match = True
+                break;
+        if mode_match:
+            check_status = "SUCCESS"
+        else:
+            print "%s audio capability is not supported" %(mode)
+            check_status = "FAILURE"
+    else:
+        check_status = "FAILURE"
+        print "Unable to get supported audio capabilities"
+
+    tdkTestObj.setResultStatus(check_status)
+    return check_status
+
+
+def checkSupportedResolution(obj,res):
+    print "\nChecking Supported Resolutions..."
+    tdkTestObj = obj.createTestStep('rdkservice_setValue');
+    params = '{"videoDisplay":"'+video_port+'"}'
+    tdkTestObj.addParameter("method","org.rdk.DisplaySettings.1.getSupportedResolutions");
+    tdkTestObj.addParameter("value",params)
+    tdkTestObj.executeTestCase("SUCCESS");
+    result  = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    check_status = ""
+    if "SUCCESS" in result:
+        res_list = ast.literal_eval(details)["supportedResolutions"]
+        print "Supported Resolutions: %s" %(res_list)
+        if res in res_list:
+            check_status = "SUCCESS"
+        else:
+            res_match = False
+            for res_value in res_list:
+                if res in res_value:
+                    res_match = True
+                    res = res_value;
+                    break;
+            if res_match:
+                check_status = "SUCCESS"
+            else:
+                print "%s resolution is not supported" %(res)
+                check_status = "FAILURE"
+    else:
+        check_status = "FAILURE"
+        print "Unable to get supported resolutions"
+
+    tdkTestObj.setResultStatus(check_status)
+    return res,check_status
+
+def getCurrentSoundMode(obj):
+    print "\nGet Current Sound Mode..."
+    tdkTestObj = obj.createTestStep('rdkservice_setValue');
+    params = '{"audioPort":"'+audio_port+'"}'
+    tdkTestObj.addParameter("method","org.rdk.DisplaySettings.1.getSoundMode");
+    tdkTestObj.addParameter("value",params)
+    tdkTestObj.executeTestCase("SUCCESS");
+    result  = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    if "SUCCESS" in result:
+        curr_mode = ast.literal_eval(details)["soundMode"]
+        print "Current sound mode: %s" %(curr_mode)
+        tdkTestObj.setResultStatus("SUCCESS")
+        return "SUCCESS",curr_mode
+    else:
+        print "Unable to get current sound mode"
+        tdkTestObj.setResultStatus("FAILURE")
+        return "FAILURE",None
+
+def getCurrentResolution(obj):
+    print "\nGet Current Resolution..."
+    tdkTestObj = obj.createTestStep('rdkservice_setValue');
+    params = '{"videoDisplay":"'+video_port+'"}'
+    tdkTestObj.addParameter("method","org.rdk.DisplaySettings.1.getCurrentResolution");
+    tdkTestObj.addParameter("value",params)
+    tdkTestObj.executeTestCase("SUCCESS");
+    result  = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    if "SUCCESS" in result:
+        curr_res = ast.literal_eval(details)["resolution"]
+        print "Current Resolution: %s" %(curr_res)
+        tdkTestObj.setResultStatus("SUCCESS")
+        return "SUCCESS",curr_res
+    else:
+        print "Unable to get current resolution"
+        tdkTestObj.setResultStatus("FAILURE")
+        return "FAILURE",None
+
+def setCurrentSoundMode(obj,mode):
+    status,curr_mode = getCurrentSoundMode(obj)
+    if "FAILURE" in status:
+        return status
+    global current_mode
+    global mode_revert
+    if "AUTO" in curr_mode:
+        current_mode = curr_mode.split("(")[1].split(")")[0]
+    else:
+        current_mode = curr_mode
+    set_status = ""
+    if mode.lower() in curr_mode.lower():
+        set_status = "SUCCESS"
+        print "Required sound mode is set already"
+    else:
+        print "\nSetting %s sound mode...." %(mode)
+        tdkTestObj = obj.createTestStep('rdkservice_setValue');
+        params = '{"audioPort":"'+audio_port+'","soundMode":"'+mode+'", "persist":false}'
+        tdkTestObj.addParameter("method","org.rdk.DisplaySettings.1.setSoundMode");
+        tdkTestObj.addParameter("value",params)
+        tdkTestObj.executeTestCase("SUCCESS");
+        result  = tdkTestObj.getResult();
+        details = tdkTestObj.getResultDetails();
+        if "SUCCESS" in result:
+            status,new_mode = getCurrentSoundMode(obj)
+            if mode.lower() in new_mode.lower():
+                mode_revert = True
+                set_status = "SUCCESS"
+                tdkTestObj.setResultStatus("SUCCESS")
+                print "Sound Mode %s set successfully" %(mode)
+            else:
+                set_status = "FAILURE"
+                tdkTestObj.setResultStatus("FAILURE")
+                print "Sound Mode %s not set properly" %(mode)
+        else:
+            set_status = "FAILURE"
+            tdkTestObj.setResultStatus("FAILURE")
+            print "Unable to set the sound mode"
+
+    return set_status
+
+def setCurrentResolution(obj,res):
+    status,curr_res = getCurrentResolution(obj)
+    if "FAILURE" in status:
+        return status
+    global current_resolution
+    global resolution_revert
+    current_resolution = curr_res
+    set_status = ""
+    if res == curr_res:
+        set_status = "SUCCESS"
+        print "Required resolution is set already"
+    else:
+        print "\nSetting %s Resolution...." %(res)
+        tdkTestObj = obj.createTestStep('rdkservice_setValue');
+        params = '{"videoDisplay":"'+video_port+'","resolution":"'+res+'", "persist":false}'
+        tdkTestObj.addParameter("method","org.rdk.DisplaySettings.1.setCurrentResolution");
+        tdkTestObj.addParameter("value",params)
+        tdkTestObj.executeTestCase("SUCCESS");
+        result  = tdkTestObj.getResult();
+        details = tdkTestObj.getResultDetails();
+        if "SUCCESS" in result:
+            status,new_res = getCurrentResolution(obj)
+            if new_res == res:
+                resolution_revert = True
+                set_status = "SUCCESS"
+                tdkTestObj.setResultStatus("SUCCESS")
+                print "Resolution %s set successfully" %(res)
+            else:
+                set_status = "FAILURE"
+                tdkTestObj.setResultStatus("FAILURE")
+                print "Resolution %s not set properly" %(res)
+        else:
+            set_status = "FAILURE"
+            tdkTestObj.setResultStatus("FAILURE")
+            print "Unable to set the resolution"
+
+    return set_status
+
+def setAudioAtmosOutputMode(obj,enable):
+    print "\nSetting Audio Atmos o/p mode %s" %(enable)
+    tdkTestObj = obj.createTestStep('rdkservice_setValue');
+    params = '{"enable":"'+str(enable)+'"}'
+    tdkTestObj.addParameter("method","org.rdk.DisplaySettings.1.setAudioAtmosOutputMode");
+    tdkTestObj.addParameter("value",params);
+    tdkTestObj.executeTestCase("SUCESS");
+    result = tdkTestObj.getResult();
+    if "SUCCESS" in result:
+        print "Audio Atmos o/p mode enable %s" %(enable)
+        tdkTestObj.setResultStatus("SUCCESS");
+        return "SUCCESS"
+    else:
+        print "Unable to set audio atmos o/p enable as %s" %(enable)
+        tdkTestObj.setResultStatus("FAILURE");
+        return "FAILURE"
+
+
+# Function to set the resolution pre-requisites
+def setResolutionPreRequisites(obj,res):
+    result,ds_status = checkPluginStatus(obj,"org.rdk.DisplaySettings");
+    if "FAILURE" in result or ds_status != "activated":
+        setPluginState(obj,"org.rdk.DisplaySettings","activate");
+        time.sleep(3)
+        result,ds_status = checkPluginStatus(obj,"org.rdk.DisplaySettings");
+    if "SUCCESS" in result and "activated" in ds_status:
+        hdmi_connected = getConnectedVideoDisplay(obj)
+        if "SUCCESS" in hdmi_connected:
+            res,res_supported = checkSupportedResolution(obj,res)
+            if "SUCCESS" in res_supported:
+                res_set_status = setCurrentResolution(obj,res)
+                if "SUCCESS" in res_set_status:
+                    return True
+                else:
+                    return False
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
+
+# Function to set the resolution post-requisites
+def setResolutionPostRequisites(obj):
+    if resolution_revert:
+        res_set_status = setCurrentResolution(obj,current_resolution)
+        if "SUCCESS" in res_set_status:
+            return True
+        else:
+            return False
+    else:
+        return True
+
+# Function to set the sound mode pre-requisites
+def setSoundModePreRequisites(obj,mode):
+    result,ds_status = checkPluginStatus(obj,"org.rdk.DisplaySettings");
+    if "FAILURE" in result or ds_status != "activated":
+        setPluginState(obj,"org.rdk.DisplaySettings","activate");
+        time.sleep(3)
+        result,ds_status = checkPluginStatus(obj,"org.rdk.DisplaySettings");
+    if "SUCCESS" in result and "activated" in ds_status:
+        hdmi_connected = getConnectedVideoDisplay(obj)
+        hdmi_audioport = getConnectedAudioPorts(obj)
+        if "SUCCESS" in hdmi_connected and "SUCCESS" in hdmi_audioport:
+            mode,mode_supported = checkSupportedAudioModes(obj,mode)
+            if "SUCCESS" in mode_supported:
+                mode_set_status = setCurrentSoundMode(obj,mode)
+                if "SUCCESS" in mode_set_status:
+                    return True
+                else:
+                    return False
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
+
+# Function to set the sound mode post-requisites
+def setSoundModePostRequisites(obj):
+    if mode_revert:
+        mode_set_status = setCurrentSoundMode(obj,current_mode)
+        if "SUCCESS" in mode_set_status:
+            return True
+        else:
+            return False
+    else:
+        return True
+
+
+# Function to set the atmos o/p mode pre-requisites
+def setAudioAtmosOutputModePreRequisites(obj,mode):
+    result,ds_status = checkPluginStatus(obj,"org.rdk.DisplaySettings");
+    if "FAILURE" in result or ds_status != "activated":
+        setPluginState(obj,"org.rdk.DisplaySettings","activate");
+        time.sleep(3)
+        result,ds_status = checkPluginStatus(obj,"org.rdk.DisplaySettings");
+    if "SUCCESS" in result and "activated" in ds_status:
+        hdmi_connected = getConnectedVideoDisplay(obj)
+        hdmi_audioport = getConnectedAudioPorts(obj)
+        if "SUCCESS" in hdmi_connected and "SUCCESS" in hdmi_audioport:
+            mode_supported = checkSupportedAudioCapabilities(obj,mode)
+            if "SUCCESS" in mode_supported:
+                atmos_set_status = setAudioAtmosOutputMode(obj,True)
+                if "SUCCESS" in atmos_set_status:
+                    return True
+                else:
+                    return False
+            else:
+                return False
+        else:
+            return False
+    else:
+        return False
+
+
 # function to set the primary pre-requisites
 def setMediaTestPreRequisites(obj,get_proc_info=True):
     pre_requisite_status = "SUCCESS"
@@ -362,7 +755,7 @@ def setMediaTestPreRequisites(obj,get_proc_info=True):
 
     if "SUCCESS" in config_status:
         result,rdkshell_status = checkPluginStatus(obj,"org.rdk.RDKShell");
-        if "FAILURE" in result or "activated" not in rdkshell_status:
+        if "FAILURE" in result or rdkshell_status != "activated":
             setPluginState(obj,"org.rdk.RDKShell","activate");
             time.sleep(3)
             result,rdkshell_status = checkPluginStatus(obj,"org.rdk.RDKShell");
@@ -486,6 +879,7 @@ def setMediaTestPostRequisites(obj):
         post_requisite_status = "FAILURE"
 
     return post_requisite_status
+
 
 
 

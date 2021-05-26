@@ -26,11 +26,14 @@ thunder_port=""
 lightning_apps_loc = ""
 
 #lightning application url
-lightning_video_test_app_url     = lightning_apps_loc + ""
-lightning_uve_test_app_url       = lightning_apps_loc + ""
-lightning_animation_test_app_url = lightning_apps_loc + ""
-lightning_multianimation_test_app_url    = lightning_apps_loc + ""
-lightning_objects_animation_test_app_url = lightning_apps_loc + ""
+lightning_video_test_app_url     = lightning_apps_loc + "tdkvideoplayer/build/index.html"
+lightning_uve_test_app_url       = lightning_apps_loc + "tdkuveplayer/build/index.html"
+lightning_animation_test_app_url = lightning_apps_loc + "tdkanimations/build/index.html"
+lightning_multianimation_test_app_url    = lightning_apps_loc + "tdkmultianimations/build/index.html"
+lightning_objects_animation_test_app_url = lightning_apps_loc + "tdkobjectanimations/build/index.html"
+
+#HTML player application url
+html_video_test_app_url = lightning_apps_loc + "tdkhtmlplayer.html"
 
 #HLS Video URL
 video_src_url_hls = ""
@@ -54,6 +57,9 @@ video_src_url_hls_h264  = ""
 video_src_url_dash_hevc = ""
 video_src_url_hls_hevc  = ""
 
+#H.263 Codec Video URL
+video_src_url_h263 = ""
+
 #AAC Codec Video URL
 video_src_url_aac = ""
 
@@ -72,6 +78,9 @@ video_src_url_audio = ""
 #MPEG-TS Video URL
 video_src_url_mpegts = ""
 
+#MPEG 1/2 Video URL
+video_src_url_mpeg = ""
+
 #AV1 Codec Video URL
 video_src_url_av1 = ""
 
@@ -84,18 +93,29 @@ video_src_url_ec3 = ""
 #OGG Video URL
 video_src_url_ogg = ""
 
+#Dolby Video URL
+video_src_url_dolby = ""
+
 #Type of the different codecs video stream. If the url extension is .mpd, then type is dash. If .m3u8, then type is hls
 #If the extension is .mp4,.ogg etc mention as mp4,ogg etc.
+h263_url_type = ""
 aac_url_type  = ""
 vp9_url_type = ""
 vp8_url_type = ""
 opus_url_type = ""
 audio_url_type = ""
 mpegts_url_type = ""
+mpeg_url_type = ""
 av1_url_type  = ""
 ac3_url_type  = ""
 ec3_url_type  = ""
 ogg_url_type  = ""
+dolby_url_type = ""
+
+
+# direct ogg & webm container streams
+video_src_url_direct_ogg  = ""
+video_src_url_direct_webm = ""
 
 
 # DRM Protected content URLs
@@ -165,6 +185,12 @@ video_src_url_widevine_dash_opus_drmconfigs = ""
 
 video_src_url_widevine_dash_vp8 = ""
 video_src_url_widevine_dash_vp8_drmconfigs = ""
+
+#Multi-DRM Test streams
+video_src_url_multi_drm_dash = ""
+video_src_url_multi_drm_dash_pref_playready_drmconfigs = ""
+video_src_url_multi_drm_dash_pref_widevine_drmconfigs  = ""
+
 
 # Time duration for operations
 # Provided time (seconds) is the duration after how much second the operation should take place
