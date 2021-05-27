@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<!--
+##########################################################################
+# If not stated otherwise in this file or this component's Licenses.txt
+# file the following copyright and licenses apply:
+#
+# Copyright 2021 RDK Management
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#########################################################################
+-->
+<!--
+    * This sample application loads the video and performs basic playback operations
+    * Video URL should be provided at the run time.
+-->
+<html>
+<style>
+
+.disp {
+    position : absolute;
+    color    : Green;
+    font-family: bold;
+}
+
+</style>
+<head>
+  <title>HTML-PLAYER</title>
+</head>
+<body width="1920" height="1080" bgcolor="#303030" onload="vidLoad();">
+<table class="disp" width="100%">
+    <tr>
+    <td width="30%"><h1 align="center" >HTML VIDEO PLAYER</h1></td>
+    <td width="50%"><h1 align="center"  id="eventStatus" ></h1></td>
+        <td width="30%"><h1 align="center"  id="vidTime"></h1></td>
+        </tr>
+</table>
+    <video id="vid" width="1920" height="1080" controls autoplay>
+        <source src="" type="video/mp4">
+                <source src="" type="video/ogg">
+                <source src="" type="video/webm">
+        Browser does not support HTML5 video.
+    </video>
+
+
+<script>
+
+// GLOBAL VARIABLES
+var inputs = "";
+var videoURL = "";
+var eventMsg;
+var eventInfo;
+var expectedEvents = [];
+var observedEvents = [];
+var interval       = 1000;
+var checkInterval  = 3000
+var expectedPos    = 0
+var observedPos    = 0
+var expectedRate   = 0
+var observedRate   = 0
+var expectedMute   = ""
+var observedMute   = ""
+var initFlag  = 0;
+var errorFlag = 0;
+var eventFlowFlag = 1;
+var progressLogger= null;
+var videoEl = document.getElementById("vid");
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//VIDEO OPERATIONS
+function Play(){
+    expectedEvents = ["play"]
+    logMsg("Expected Event: " + expectedEvents)
+    videoEl.playbackRate = 1
+    videoEl.play(videoURL)
+}
+function Pause() {
+    expectedEvents = ["paused"]
+    logMsg("Expected Event: " + expectedEvents)
+    videoEl.pause()
+  }
+function Close(){
+    videoEl.removeAttribute('src')
+    videoEl.load()
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//VIDEO EVENTS
+videoEl.onerror = function() {
+    errorFlag = 1;
+    eventInfo   = "[Event]: Video Player Error";
+    document.getElementById("eventStatus").innerHTML = eventInfo;
+    logMsg(eventInfo);
+}
+videoEl.onloadedmetadata = function() {
+    eventInfo   = "[Event]: Video Player loaded MetaData";
+    document.getElementById("eventStatus").innerHTML = eventInfo;
+    logMsg(eventInfo);
+}
+videoEl.onloadeddata  = function() {
+    eventInfo   = "[Event]: Video Player loaded Data"
+    document.getElementById("eventStatus").innerHTML = eventInfo;
+    logMsg(eventInfo);
+}
+videoEl.onloadstart = function() {
+    eventInfo   = "[Event]: Video Player load Start";
+    document.getElementById("eventStatus").innerHTML = eventInfo;
+    logMsg(eventInfo);
+}
+videoEl.ondurationchange = function() {
+    eventInfo   = "[Event]: Video Player Duration Change"
+    document.getElementById("eventStatus").innerHTML = eventInfo;
+    logMsg(eventInfo);
+}
+videoEl.onvolumechange = function() {
+    observedEvents.push("volumechange")
+    observedMute = videoEl.muted
+    eventInfo    = "[Event]: Video Player Volumechange, Mute Status: " + videoEl.muted;
+        document.getElementById("eventStatus").innerHTML = eventInfo;
+    checkAndLogEvents("volumechange",eventInfo)
+}
+videoEl.ontimeupdate = function() {
+    var currentTime = videoEl.currentTime
+    var duration = videoEl.duration
+    var timerMsg = currentTime.toFixed(2) + "/" + duration.toFixed(2)
+    eventMsg = "Video Progressing "  + timerMsg
+    document.getElementById("vidTime").innerHTML = "Pos: " + timerMsg;
+};
+videoEl.onpause = function() {
+    observedEvents.push("paused")
+    eventInfo   = "[Event]: Video Player Paused";
+    document.getElementById("eventStatus").innerHTML = eventInfo;
+    checkAndLogEvents("paused",eventInfo)
+};
+videoEl.onplay = function() {
+    observedEvents.push("play")
+    eventInfo   = "[Event]: Video Player Play ";
+    document.getElementById("eventStatus").innerHTML = eventInfo;
+    checkAndLogEvents("play",eventInfo)
+}
+videoEl.onplaying = function() {
+    eventInfo   = "[Event]: Video Player Playing ";
+    document.getElementById("eventStatus").innerHTML = eventInfo;
+    logMsg(eventInfo)
+    if ( initFlag == 0 ){
+        logMsg("******************* VIDEO STARTED PLAYING !!! *******************")
+        logMsg("VIDEO LOOP: "     + videoEl.loop)
+        logMsg("VIDEO AUTOPLAY: " + videoEl.autoplay)
+        logMsg("VIDEO DURATION: " + videoEl.duration.toFixed(4))
+        checkAndStartAutoTesting()
+        initFlag = 1 //inited
+        progressLogger = setInterval(()=>{
+            dispProgressLog()
+        },1000);
+    }
+}
+videoEl.onended = function() {
+    eventInfo   = "[Event]: Video Player Ended";
+    document.getElementById("eventStatus").innerHTML = eventInfo;
+    logMsg(eventInfo);
+};
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//VIDEO LOAD AND TESTING
+//Sample URL: http://<TM_IP>/test_app.html?url=<mp4_url_stream>&operations=close(30)
+function vidLoad() {
+    inputs = window.location.search.substring(1).split("&");
+    videoURL = GetURLParameter("url").replace(/:and:/g,"&").replace(/:eq:/g, "=")
+    logMsg("URL : " + videoURL);
+    videoEl.src = videoURL;
+}
+
+function  checkAndStartAutoTesting(){
+    var operationsStr = GetURLParameter("operations")
+    var operations = getVideoOperations(operationsStr)
+    logMsg("********************** STARTING AUTO TEST ***********************")
+    performOperations(operations)
+  }
+
+function GetURLParameter(sParam){
+    var sPageURL = window.location.search.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++)
+    {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam)
+        {
+            return sParameterName[1];
+        }
+    }
+  }
+
+// Method to parse the operations from the URL parameter
+function getVideoOperations(operationsStr){
+      var operations = operationsStr.split(',');
+      var repeatpos  = []
+      var alloperations = ""
+      for (var i = 0; i < operations.length; i++){
+          if ( operations[i].includes("repeat") )
+            repeatpos.push(i)
+      }
+      if (repeatpos.length > 0 ){
+          var i,j,t,temp
+          for (var n = 0; n < repeatpos.length; n++){
+              if (n == 0)
+                  i = 0
+              else
+                  i = parseInt(repeatpos[n-1]) + 1
+              j = parseInt(repeatpos[n])
+              t = parseInt(operations[repeatpos[n]].split("(")[1].split(")")[0]);
+              temp = ""
+              for (var k = 0; k < t; k++){
+                  if (temp != "")
+                      temp += ","
+                  temp = temp + operations.slice(i,j)
+              }
+              if (alloperations!= "")
+                  alloperations += ","
+              alloperations += temp
+          }
+          temp = ""
+          i = parseInt(repeatpos[repeatpos.length - 1])
+          j = parseInt(operations.length -1)
+          if ( i != j ){
+              if ( i+1 != j )
+                  temp = temp + operations.slice(i+1,j+1)
+              else
+                  temp = temp + operations[j]
+              alloperations = alloperations + "," + temp
+          }
+          operations = alloperations.split(",")
+      }
+      return operations
+  }
+
+// Function to set the video operations
+// Video play,pause,close operations are supported
+function  performOperations(operations){
+      var actionInterval = 0
+      var duration = 0, position = 0
+      logMsg("Setting up the operations...")
+      for (var i = 0; i < operations.length; i++)
+      {
+          var action = operations[i].split('(')[0];
+          if ( action == "seekpos" ){
+              duration = parseInt(operations[i].split('(')[1].split(')')[0].split(":")[0]);
+              position = parseInt(operations[i].split('(')[1].split(')')[0].split(":")[1]);
+          }else{
+              duration = parseInt(operations[i].split('(')[1].split(')')[0]);
+          }
+          if ( action == "playtillend" )
+              actionInterval = actionInterval + (interval*parseInt(vidDuration)) + 60000;
+          else
+              actionInterval = actionInterval + (interval*duration)
+          //logMsg("setting " + action + " at " + actionInterval + " th sec")
+            if (action == "pause"){
+                setTimeout(()=> {
+                    clearEvents()
+                    Pause()
+                },actionInterval);
+            }
+            else if (action == "play"){
+                setTimeout(()=> {
+                    clearEvents()
+                    Play()
+                },actionInterval);
+            }
+            else if (action == "close"){
+                setTimeout(()=> {
+                    logMsg("**************** Going to close ****************")
+                    Close()
+                },actionInterval);
+            }
+            if (action != "close"){
+                setTimeout(()=> {
+                    updateEventFlowFlag();
+                },actionInterval+checkInterval);
+            }
+      }
+      if (! operations.find(o=> o.includes("close"))){
+          setTimeout(()=> {
+            logMsg("**************** Going to close ****************")
+            Close()
+          },(actionInterval+10000));
+      }
+      setTimeout(()=> {
+        dispTestResult()
+      },(actionInterval+15000));
+      console.log("\n");
+
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//EVENTS VALIDATION
+function  checkAndLogEvents(checkevent,msg){
+    if ( expectedEvents.includes(checkevent) ){
+        logEventMsg(observedEvents,msg)
+    }else{
+        logMsg(msg)
+    }
+  }
+function  clearEvents(){
+      observedEvents = []
+      expectedEvents = []
+  }
+
+function updateEventFlowFlag(){
+     var Status = "SUCCESS"
+      if( ! expectedEvents.every(e=> observedEvents.indexOf(e) >= 0)){
+          eventFlowFlag = 0
+          Status = "FAILURE"
+      }
+      logMsg("Test step status: " + Status)
+      clearEvents();
+  }
+function  dispProgressLog(){
+      if(eventMsg != "")
+          logMsg(eventMsg)
+  }
+
+function  dispTestResult(){
+    clearInterval(progressLogger);
+    if (eventFlowFlag == 1 && errorFlag == 0)
+        logMsg("TEST RESULT: SUCCESS")
+    else{
+        logMsg("eventFlowFlag: " + eventFlowFlag + " errorFlag: " + errorFlag)
+        logMsg("TEST RESULT: FAILURE")
+    }
+  }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//LOGGING
+function logMsg(msg) {
+    console.log("[ " + dispTime() + " ] " + msg );
+}
+function logEventMsg(observedEvents,msg){
+    console.log("*****************************************************************\n" +
+                "Observed Event: " + observedEvents    + "\n"  +
+                "Event Details : " + "[ " + dispTime() + " ] " + msg  + "\n" +
+                "*****************************************************************");
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//TIMER
+function dispTime() {
+    var now = new Date();
+    var h  = now.getUTCHours()
+    var m  = now.getUTCMinutes()
+    var s  = now.getUTCSeconds()
+    var ms = now.getUTCMilliseconds()
+    if (h < 10)
+      h = "0" + h
+    if (m < 10)
+      m = "0" + m
+    if (s < 10)
+      s = "0" + s
+    if (ms < 10)
+      ms = "00" + ms
+    else if (ms < 100)
+      ms = "0" + ms
+    return h + ":" + m + ":" + s + ":" + ms;
+  }
+</script>
+</body>
+</html>
+
+

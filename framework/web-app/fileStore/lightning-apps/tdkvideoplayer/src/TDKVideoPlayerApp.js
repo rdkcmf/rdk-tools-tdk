@@ -351,12 +351,12 @@ export default class App extends Lightning.Component {
     this.message1 = "Video Player " + e + " " + currentTime.toFixed(2) + "/" + duration.toFixed(2)
     this.dispUIMessage(this.message1)
     this.checkAndLogEvents(e,this.message1)
-    /*if ( e =="seeked" && this.expectedEvents.includes("seeked")){
-    setTimeout(()=>{
-        this.videoEl.playbackRate = 1
-        this.videoEl.play()
-    },1000);
-    }*/
+    if ( e =="seeked" && this.expectedEvents.includes("seeked")){
+      setTimeout(()=>{
+          this.videoEl.playbackRate = 1
+          this.videoEl.play()
+      },1000);
+    }
   }
   // RateChange Event Handler
   rateChangeEventHandler(){
