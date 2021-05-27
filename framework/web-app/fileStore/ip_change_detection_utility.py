@@ -23,7 +23,7 @@ import PerformanceTestVariables
 import ast
 import rdkv_performancelib
 import json
-import ip_change_detection_variables
+import IPChangeDetectionVariables
 import urllib
 import sys
 
@@ -70,15 +70,15 @@ def get_lightning_app_url(obj):
     status = "SUCCESS"
     complete_url = ""
     global device_name
-    ip_change_app_url = ip_change_detection_variables.ip_change_app_url
+    ip_change_app_url = IPChangeDetectionVariables.ip_change_app_url
     device_name = rdkv_performancelib.deviceName
-    user_name = ip_change_detection_variables.tm_username
-    password = ip_change_detection_variables.tm_password
+    user_name = IPChangeDetectionVariables.tm_username
+    password = IPChangeDetectionVariables.tm_password
     conf_file,file_status = getConfigFileName(obj.realpath)
     ip_address_type_status,ip_address_type = getDeviceConfigKeyValue(conf_file,"DEVICE_IP_ADDRESS_TYPE")
     complete_url = ip_change_app_url+'?tmURL='+obj.url+'&deviceName='+device_name+'&tmUserName='+user_name+'&tmPassword='+password+'&ipAddressType='+ip_address_type
     if any(value == "" for value in (ip_change_app_url,user_name,password,ip_address_type)):
-        print "\n Please configure values in ip_change_detection_variables and Device specific configuration file \n" 
+        print "\n Please configure values in IPChangeDetectionVariables and Device specific configuration file \n" 
         status = "FAILURE"
     return status,complete_url
 
@@ -154,7 +154,7 @@ def get_curr_device_ip(tm_url):
     return device_ip
 
 # Function to enable WIFI interface and set it as default interface
-def switch_to_wifi(obj):
+def switch_to_wifi(obj,ap_freq = "2.4",start_time_needed = False):
     status = "FAILURE"
     expectedResult =  "SUCCESS"
     complete_app_url_status,complete_app_url = get_lightning_app_url(obj)
@@ -218,24 +218,27 @@ def switch_to_wifi(obj):
                                         if interface["interface"] == "WIFI":
                                             wifi_dict = interface
                                     if wifi_dict["enabled"]:
-                                        wifi_connect_status = connect_wifi(obj)
-                                        if expectedResult in wifi_connect_status:
-                                            time.sleep(20)
-                                            app_status = launch_lightning_app(obj,complete_app_url)
-                                            if expectedResult in app_status:
-                                                time.sleep(60)
-                                                result = set_default_interface(obj,"WIFI")
+                                        app_status = launch_lightning_app(obj,complete_app_url)
+                                        if expectedResult in app_status:
+                                            time.sleep(40)
+                                            wifi_connect_status = connect_wifi(obj,ap_freq)
+                                            if expectedResult in wifi_connect_status:
+                                                time.sleep(20)
+                                                if start_time_needed:
+                                                    result,start_time = set_default_interface(obj,"WIFI",start_time_needed)
+                                                else:
+                                                    result = set_default_interface(obj,"WIFI")
                                                 if expectedResult in result:
                                                     tdkTestObj.setResultStatus("SUCCESS")
                                                     status = "SUCCESS"
-                                                    time.sleep(60)
+                                                    time.sleep(30)
                                                 else:
                                                     print "\n Error while setting WIFI as default interface \n"
                                                     tdkTestObj.setResultStatus("FAILURE")
                                             else:
-                                                print "\n Error while setting URL in WebKitBrowser \n"
+                                                print "\n Error while connecting to WIFI SSID \n"
                                         else:
-                                            print "\n Error while connecting to WIFI SSID \n"
+                                            print "\n Error while setting URL in WebKitBrowser \n"
                                     else:
                                         print "\n Unable to set WIFI to enabled state \n"
                                         tdkTestObj.setResultStatus("FAILURE")
@@ -262,16 +265,27 @@ def switch_to_wifi(obj):
             tdkTestObj.setResultStatus("FAILURE")
     else:
         print "\n Please check the preconditions before test \n"
-    return status,plugin_status_dict,revert
+    if start_time_needed:
+        return status,plugin_status_dict,revert,start_time
+    else:
+        return status,plugin_status_dict,revert
 
 # Function to connect to a SSID given in the Device configuration file               
-def connect_wifi(obj):
+def connect_wifi(obj,ap_freq):
     status = "FAILURE"
     conf_file,conf_status = getConfigFileName(obj.realpath)
     if conf_status == "SUCCESS":
-        result,ssid = getDeviceConfigKeyValue(conf_file,"WIFI_SSID_NAME")
-        result,password = getDeviceConfigKeyValue(conf_file,"WIFI_PASSPHRASE")
-        result,security_mode = getDeviceConfigKeyValue(conf_file,"WIFI_SECURITY_MODE")
+        if ap_freq == "2.4":
+            ssid_name_key = "WIFI_SSID_NAME"
+            password_key = "WIFI_PASSPHRASE"
+            security_mode_key = "WIFI_SECURITY_MODE"
+        else:
+            ssid_name_key = "WIFI_SSID_NAME_5GHZ"
+            password_key = "WIFI_PASSPHRASE_5GHZ"
+            security_mode_key = "WIFI_SECURITY_MODE_5GHZ"
+        result,ssid = getDeviceConfigKeyValue(conf_file,ssid_name_key)
+        result,password = getDeviceConfigKeyValue(conf_file,password_key)
+        result,security_mode = getDeviceConfigKeyValue(conf_file,security_mode_key)
         if any(value == "" for value in (ssid,password,security_mode)):
             print "please configure values before test"
         else:
@@ -304,7 +318,11 @@ def connect_wifi(obj):
                         result = tdkTestObj.getResult()
                         if result == "SUCCESS":
                             tdkTestObj.setResultStatus("SUCCESS")
-                            time.sleep(10)
+                            time.sleep(20)
+                            device_ip = get_curr_device_ip(obj.url)
+                            if obj.IP != device_ip:
+                                obj.IP = device_ip
+                                time.sleep(50)
                             #check wthether connected
                             print "\n Checking whether DUT is connected to SSID \n"
                             tdkTestObj = obj.createTestStep('rdkservice_getReqValueFromResult')
@@ -342,25 +360,35 @@ def connect_wifi(obj):
     return status
 
 # Function to set default interface
-def set_default_interface(obj,interface):
+def set_default_interface(obj,interface,start_time_needed = False):
     status = expectedResult = "SUCCESS"
     print "Set {} as default interface".format(interface)
     params = '{ "interface":"'+interface+'", "persist":true}'
     tdkTestObj = obj.createTestStep('rdkservice_setValue');
     tdkTestObj.addParameter("method","org.rdk.Network.1.setDefaultInterface");
     tdkTestObj.addParameter("value",params);
+    start_time = str(datetime.utcnow()).split()[1]
     tdkTestObj.executeTestCase(expectedResult);
     result = tdkTestObj.getResult();
     if expectedResult in result:
-        print "\n Successfully set {} as Default interface for the DUT \n".format(interface)
+        print "\n Set default interface method executed successfuly for {} interfce \n".format(interface)
         tdkTestObj.setResultStatus("SUCCESS")
         time.sleep(40)
-        obj.IP = get_curr_device_ip(obj.url)
+        device_ip = get_curr_device_ip(obj.url)
+        if obj.IP != device_ip:
+            obj.IP = device_ip
+        new_interface,revert = check_current_interface(obj)
+        if interface not in new_interface:
+            print "\n Current interface is: {} , unable to set {} interface \n".format(new_interface,interface)
+            status = "FAILURE"
     else:
         status = "FAILURE"
         print "\n Unable to set {} as Default interface \n".format(interface)
         tdkTestObj.setResultStatus("FAILURE")
-    return status
+    if start_time_needed:
+        return status,start_time
+    else:
+        return status
 
 # Function to close the Lightning App by setting the initial URL in WebKit
 def close_lightning_app(obj):
@@ -390,3 +418,32 @@ def close_lightning_app(obj):
         print "\n Error while executing WebKitBrowser.1.url method \n"
         tdkTestObj.setResultStatus("FAILURE")
     return status
+
+def check_cur_ssid_freq(obj):
+    return_val = "FAILURE"
+    conf_file,conf_status = getConfigFileName(obj.realpath)
+    result1,ssid = getDeviceConfigKeyValue(conf_file,"WIFI_SSID_NAME")
+    result2,ssid_5ghz = getDeviceConfigKeyValue(conf_file,"WIFI_SSID_NAME_5GHZ")
+    if all(value != "" for value in (ssid,ssid_5ghz)):
+        tdkTestObj = obj.createTestStep('rdkservice_getReqValueFromResult')
+        tdkTestObj.addParameter("method","org.rdk.Wifi.1.getConnectedSSID")
+        tdkTestObj.addParameter("reqValue","ssid")
+        tdkTestObj.executeTestCase(expectedResult)
+        result = tdkTestObj.getResult()
+        if result == "SUCCESS":
+            tdkTestObj.setResultStatus("SUCCESS")
+            connected_ssid = tdkTestObj.getResultDetails()
+            print " \n Connected SSID Name: {}\n ".format(connected_ssid)
+            if ssid == connected_ssid:
+                return_val = "2.4"
+            elif ssid_5ghz == connected_ssid:
+                return_val = "5"
+            else:
+                print "\n DUT is not connected to any of the SSIDs configured in device specific config file \n"
+                tdkTestObj.setResultStatus("FAILURE")
+        else:
+            print "\n Error while checking connected SSID \n"
+            tdkTestObj.setResultStatus("FAILURE")
+    else:
+        print "\n Please configure the SSID details in device specific config file\n"
+    return return_val

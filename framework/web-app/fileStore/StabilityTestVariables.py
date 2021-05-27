@@ -132,3 +132,10 @@ cobalt_search_and_play_max_count = 1000
 
 ##Video resize test details
 video_resize_max_count = 300
+
+##FPS validation test details
+fps_test_duration = 360
+
+##Toggle SSID test details
+#maximum number of Wi-Fi SSID changes
+max_ssid_changes = 1000

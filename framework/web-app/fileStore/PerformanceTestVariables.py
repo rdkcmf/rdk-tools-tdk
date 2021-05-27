@@ -40,3 +40,6 @@ video_src_url = ""
 
 #Type of the video url configured above, give hls for .m3u8 and dash for .mpd
 video_src_url_type = ""
+
+#Amazon video url 
+amazon_test_url = ""
