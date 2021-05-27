@@ -39,11 +39,13 @@ html_video_test_app_url = lightning_apps_loc + "tdkhtmlplayer.html"
 video_src_url_hls = ""
 video_src_url_4k_hls = ""
 video_src_url_live_hls = ""
+video_src_url_short_duration_hls = ""
 
 #DASH Video URL
 video_src_url_dash = ""
 video_src_url_4k_dash = ""
 video_src_url_live_dash = ""
+video_src_url_short_duration_dash = ""
 
 #MP4 Video URL
 video_src_url_mp4 = ""

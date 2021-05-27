@@ -254,6 +254,21 @@ AC_ARG_ENABLE([mfrhal],
            [echo "mfrhal component is not enabled"])
 AM_CONDITIONAL([MFRHAL], [test x$MFRHAL = xtrue])
 
+AC_ARG_ENABLE([fireboltcompliance],
+         AS_HELP_STRING([--enable-fireboltcompliance],[enable fireboltcompliance (default is no)]),
+         [
+           case "${enableval}" in
+              yes) FIREBOLTCOMPLIANCE=true
+                   AS_IF([test x$HYBRID = xtrue], [SUBDIR_HYBRID+=" FireboltCompliance_Validation "],
+                          [echo "FireboltCompliance enabled in Hybrid"])
+                   AS_IF([test x$CLIENT = xtrue], [SUBDIR_CLIENT+=" FireboltCompliance_Validation "],
+                          [echo "FireboltCompliance enabled in Client"]) ;;
+             no) FIREBOLTCOMPLIANCE=false ;;
+            *) AC_MSG_ERROR([bad value ${enableval} for --enable-fireboltcompliance ]) ;;
+             esac
+            ],
+           [echo "FireboltCompliance is not enabled"])
+AM_CONDITIONAL([FIREBOLTCOMPLIANCE], [test x$FIREBOLTCOMPLIANCE = xtrue])
 
 AC_ARG_ENABLE([deepsleephal],
          AS_HELP_STRING([--enable-deepsleephal],[enable deepsleephal (default is no)]),
@@ -369,6 +384,7 @@ AC_CONFIG_FILES([Makefile
          Bluetooth_stub/Makefile
          BluetoothHal_stub/Makefile
          MfrHal_stub/Makefile
+         FireboltCompliance_Validation/Makefile
 	 AudioCaptureMgr_stub/Makefile
 	 USBCtrl_stub/Makefile
 	 SystemUtil_stub/Makefile
