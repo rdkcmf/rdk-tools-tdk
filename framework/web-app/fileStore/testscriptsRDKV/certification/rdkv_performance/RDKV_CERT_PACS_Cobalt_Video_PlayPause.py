@@ -71,14 +71,10 @@
 '''
  # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
-from BrowserPerformanceUtility import *
-import BrowserPerformanceUtility
 from rdkv_performancelib import *
 import rdkv_performancelib
 import PerformanceTestVariables
 from StabilityTestUtility import *
-from SSHUtility import *
-import ast
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
@@ -142,23 +138,18 @@ if expectedResult in result.upper():
                 result_val = ""
                 tdkTestObj.setResultStatus("SUCCESS")
                 if validation_dict["validation_required"]:
-                    if validation_dict["validation_method"] == "proc_entry":
-                        if validation_dict["password"] == "None":
-                            password = ""
-                        else:
-                            password = validation_dict["password"]
-                        credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
-                        print "\n check whether video is playing"
-                        tdkTestObj = obj.createTestStep('rdkservice_validateProcEntry')
-                        tdkTestObj.addParameter("sshmethod",validation_dict["ssh_method"])
-                        tdkTestObj.addParameter("credentials",credentials)
-                        tdkTestObj.addParameter("procfile",validation_dict["validation_file"])
-                        tdkTestObj.addParameter("mincdb",validation_dict["min_cdb"])
-                        tdkTestObj.executeTestCase(expectedResult)
-                        result_val = tdkTestObj.getResultDetails()
+                    if validation_dict["password"] == "None":
+                        password = ""
                     else:
-                        print "\n Validation method other than proc_entry is not supported"
-                        validation_dict["validation_required"] = False
+                        password = validation_dict["password"]
+                    credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+                    print "\n check whether video is playing"
+                    tdkTestObj = obj.createTestStep('rdkservice_validateProcEntry')
+                    tdkTestObj.addParameter("sshmethod",validation_dict["ssh_method"])
+                    tdkTestObj.addParameter("credentials",credentials)
+                    tdkTestObj.addParameter("video_validation_script",validation_dict["video_validation_script"])
+                    tdkTestObj.executeTestCase(expectedResult)
+                    result_val = tdkTestObj.getResultDetails()
                 else:
                     print "\n Validation is not required, proceeding the test \n"
                 if result_val == "SUCCESS" or not validation_dict["validation_required"]:
@@ -179,8 +170,7 @@ if expectedResult in result.upper():
                             tdkTestObj = obj.createTestStep('rdkservice_validateProcEntry')
                             tdkTestObj.addParameter("sshmethod",validation_dict["ssh_method"])
                             tdkTestObj.addParameter("credentials",credentials)
-                            tdkTestObj.addParameter("procfile",validation_dict["validation_file"])
-                            tdkTestObj.addParameter("mincdb",validation_dict["min_cdb"])
+                            tdkTestObj.addParameter("video_validation_script",validation_dict["video_validation_script"])
                             tdkTestObj.executeTestCase(expectedResult)
                             result_val = tdkTestObj.getResultDetails()
                         else:
@@ -202,8 +192,7 @@ if expectedResult in result.upper():
                                     tdkTestObj = obj.createTestStep('rdkservice_validateProcEntry')
                                     tdkTestObj.addParameter("sshmethod",validation_dict["ssh_method"])
                                     tdkTestObj.addParameter("credentials",credentials)
-                                    tdkTestObj.addParameter("procfile",validation_dict["validation_file"])
-                                    tdkTestObj.addParameter("mincdb",validation_dict["min_cdb"])
+                                    tdkTestObj.addParameter("video_validation_script",validation_dict["video_validation_script"])
                                     tdkTestObj.executeTestCase(expectedResult)
                                     result_val = tdkTestObj.getResultDetails()
                                     if result_val == "SUCCESS" :

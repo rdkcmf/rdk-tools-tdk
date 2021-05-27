@@ -126,17 +126,10 @@ def get_validation_params(obj):
         else:
             validation_dict["validation_required"] = True
             result,validation_dict["ssh_method"] = getDeviceConfigKeyValue(conf_file,"SSH_METHOD")
-            if validation_dict["ssh_method"] == "directSSH":
-                validation_dict["host_name"] = obj.IP
-                result,validation_dict["user_name"] = getDeviceConfigKeyValue(conf_file,"SSH_USERNAME")
-                result,validation_dict["password"] = getDeviceConfigKeyValue(conf_file,"SSH_PASSWORD")
-            else:
-                #TODO
-                print "selected ssh method is {}".format(validation_dict["ssh_method"])
-                pass
-            result,validation_dict["validation_method"] = getDeviceConfigKeyValue(conf_file,"VALIDATION_METHOD")
-            result,validation_dict["validation_file"] = getDeviceConfigKeyValue(conf_file,"VIDEO_PROC_FILE")
-            result,validation_dict["min_cdb"] = getDeviceConfigKeyValue(conf_file,"MIN_CDB")
+            validation_dict["host_name"] = obj.IP
+            result,validation_dict["user_name"] = getDeviceConfigKeyValue(conf_file,"SSH_USERNAME")
+            result,validation_dict["password"] = getDeviceConfigKeyValue(conf_file,"SSH_PASSWORD")
+            result,validation_dict["video_validation_script"] = getDeviceConfigKeyValue(conf_file,"VIDEO_VALIDATION_SCRIPT_FILE")
     else:
         print "Failed to get the validation required value from config file, please configure values before test"
     if any(value == "" for value in validation_dict.itervalues()):

@@ -101,15 +101,11 @@ if expectedResult in result.upper():
     validation_dict = get_validation_params(obj)
     if status == "SUCCESS" and validation_dict != {} and cobalt_test_url != "":
         if validation_dict["validation_required"]:
-            if validation_dict["validation_method"] == "proc_entry":
-                if validation_dict["password"] == "None":
-                    password = ""
-                else:
-                    password = validation_dict["password"]
-                credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+            if validation_dict["password"] == "None":
+                password = ""
             else:
-                print "\n proc_entry validation is only supported validation method \n"
-                validation_dict["validation_required"] = False
+                password = validation_dict["password"]
+            credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
         cobalt_launch_status = launch_cobalt(obj)
         if cobalt_launch_status in expectedResult:
             time.sleep(30)
@@ -143,8 +139,7 @@ if expectedResult in result.upper():
                         tdkTestObj = obj.createTestStep('rdkservice_validateProcEntry')
                         tdkTestObj.addParameter("sshmethod",validation_dict["ssh_method"])
                         tdkTestObj.addParameter("credentials",credentials)
-                        tdkTestObj.addParameter("procfile",validation_dict["validation_file"])
-                        tdkTestObj.addParameter("mincdb",validation_dict["min_cdb"])
+                        tdkTestObj.addParameter("video_validation_script",validation_dict["video_validation_script"])
                         tdkTestObj.executeTestCase(expectedResult)
                         result_val = tdkTestObj.getResultDetails()
                         if result_val == "SUCCESS" :

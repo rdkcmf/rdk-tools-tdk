@@ -162,27 +162,25 @@ if expectedResult in result.upper():
                         completed = False
                         break
                     if validation_dict["validation_required"]:
-                        if validation_dict["validation_method"] == "proc_entry":
-                            if validation_dict["password"] == "None":
-                                password = ""
-                            else:
-                                password = validation_dict["password"]
-                            credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
-                            tdkTestObj = obj.createTestStep('rdkservice_validateProcEntry')
-                            tdkTestObj.addParameter("sshmethod",validation_dict["ssh_method"])
-                            tdkTestObj.addParameter("credentials",credentials)
-                            tdkTestObj.addParameter("procfile",validation_dict["validation_file"])
-                            tdkTestObj.addParameter("mincdb",validation_dict["min_cdb"])
-                            tdkTestObj.executeTestCase(expectedResult)
-                            result_val = tdkTestObj.getResultDetails()
-                            if result_val == "SUCCESS" :
-                                tdkTestObj.setResultStatus("SUCCESS")
-                                print "\nVideo playback is happening\n"
-                            else:
-                                tdkTestObj.setResultStatus("FAILURE")
-                                print "Video playback is not happening"
-                                completed =  False
-                                break
+                        if validation_dict["password"] == "None":
+                            password = ""
+                        else:
+                            password = validation_dict["password"]
+                        credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+                        tdkTestObj = obj.createTestStep('rdkservice_validateProcEntry')
+                        tdkTestObj.addParameter("sshmethod",validation_dict["ssh_method"])
+                        tdkTestObj.addParameter("credentials",credentials)
+                        tdkTestObj.addParameter("video_validation_script",validation_dict["video_validation_script"])
+                        tdkTestObj.executeTestCase(expectedResult)
+                        result_val = tdkTestObj.getResultDetails()
+                        if result_val == "SUCCESS" :
+                            tdkTestObj.setResultStatus("SUCCESS")
+                            print "\nVideo playback is happening\n"
+                        else:
+                            tdkTestObj.setResultStatus("FAILURE")
+                            print "Video playback is not happening"
+                            completed =  False
+                            break
                     result_dict = {}
                     iteration += 1
                     tdkTestObj = obj.createTestStep('rdkservice_getCPULoad')

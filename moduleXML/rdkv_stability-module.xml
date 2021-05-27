@@ -49,9 +49,8 @@
       <parameter funName='rdkservice_validateMemoryUsage' parameterName='value' parameterType='FLOAT' range='0-1000' />
       <parameter funName='rdkservice_validateMemoryUsage' parameterName='threshold' parameterType='FLOAT' range='0-1000' />
       <parameter funName='rdkservice_validateProcEntry' parameterName='credentials' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_validateProcEntry' parameterName='procfile' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_validateProcEntry' parameterName='sshmethod' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkservice_validateProcEntry' parameterName='mincdb' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_validateProcEntry' parameterName='video_validation_script' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_setDefaultInterface' parameterName='new_interface' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_sendKeyCodes' parameterName='keyword' parameterType='STRING' range='a-z' />
     </parameters>

@@ -60,9 +60,8 @@
         <function>rdkservice_validateProcEntry</function>
         <parameters>
           <parameter name="credentials" value=""/>
-          <parameter name="mincdb" value=""/>
-          <parameter name="procfile" value=""/>
-          <parameter name="sshmethod" value=""/>
+	  <parameter name="sshmethod" value=""/>
+	  <parameter name="video_validation_script" value=""/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="rdkservice_setDefaultInterface" id=" " version="2">
