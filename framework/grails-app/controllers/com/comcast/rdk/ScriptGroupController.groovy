@@ -4857,4 +4857,226 @@ class ScriptGroupController {
 			render "No script available with this name : "+scriptName
 		}
 	}
+	
+	/**
+	 * Method to list certification suite configuration files in configure page by reading the contents
+	 * of testVariables.config file
+	 * @return
+	 */
+	def listCertificationSuiteConfigFiles(){
+		def requestGetRealPath = request.getRealPath("/")
+		List fileNameList = []
+		File testVariablesConfig = new File( "${realPath}//fileStore//testVariables.config")
+		def configFileContent = []
+		if(testVariablesConfig?.exists()){
+			configFileContent = testVariablesConfig?.readLines()
+		} 
+		int counter = 0;
+		for (int index = 0; index < configFileContent?.size(); index++) {
+			if(configFileContent[index].contains("################")){
+				counter ++
+			}
+			if(counter == 2){
+				if(!configFileContent[index].contains("################")){
+				   fileNameList.add(configFileContent[index])
+				}
+			}
+		}		
+		[fileNameList : fileNameList,currentConfigFileName:params?.fileName]
+	}
+	
+	/**
+	 * Method to display certification suite configuration files 
+	 * @return
+	 */
+	def displayCertificationSuiteConfigFile(){
+		def realPath = request.getRealPath("/")
+		def configFileContent = []
+		String content = ""
+		if(params?.fileName){
+			String configFileName = params?.fileName + ".py"
+			File configFile = new File( "${realPath}//fileStore//"+configFileName)
+			if(configFile?.exists()){
+				configFileContent = configFile?.readLines()
+			}
+		}
+		int counter = 0;
+		int startingIndex = 0
+		for (int index = 0; index < configFileContent?.size(); index++) {
+			if(configFileContent[index].contains("################")){
+				counter ++
+			}
+			if(counter == 2){
+				startingIndex = index
+				break;
+			}
+		}
+		for (int index = startingIndex+1; index < configFileContent?.size(); index++) {
+			content = content + configFileContent[index]+"\r\n"
+		}
+		[content:content,fileName:params?.fileName,createOrUpdate:params?.createOrUpdate]
+	}
+	
+	/**
+	 * Method to update certification suite configuration files 
+	 * @return
+	 */
+	def updateCertificationSuiteConfigFile(){
+		boolean updateConfigFile
+		String fileName = ""
+		try{
+			fileName = params?.configFileName
+			File configFile = new File( "${realPath}//fileStore//"+fileName+ ".py")
+			File pyHeader = new File( "${realPath}//fileStore//pyHeader.txt")
+			def pyHeaderContentList = pyHeader?.readLines()
+			String pyHeaderContent = ""
+			pyHeaderContentList?.each {
+				pyHeaderContent += it?.toString()+"\r\n"
+			}
+			String data =pyHeaderContent+"\r\n"+params?.configArea		
+			configFile.write(data)
+			updateConfigFile = true
+		}catch (Exception e) {
+			e.printStackTrace()
+		}	 
+		if(updateConfigFile){
+			flash.message = "Config File Updated"
+		}else{
+			flash.message = "Error updating config File"
+		}
+		redirect(action: "listCertificationSuiteConfigFiles", params: [fileName: fileName])
+	}
+	
+	/**
+	 * Method to create and save a certification suite configuration file 
+	 * @return
+	 */
+	def saveCertificationSuiteConfigFile(){
+		boolean createConfigFile
+		boolean duplicate
+		String fileName = ""
+		try{
+			fileName = params?.certificationSuiteConfigFileName
+			if(fileName != ""){
+				File testVariablesConfig = new File( "${realPath}//fileStore//testVariables.config")
+				def configFileContentList = []
+				if(testVariablesConfig?.exists()){
+					configFileContentList = testVariablesConfig?.readLines()
+				}
+				if(!configFileContentList?.contains(fileName)){
+					File configFile = new File( "${realPath}//fileStore//"+fileName+ ".py")
+					File pyHeader = new File( "${realPath}//fileStore//pyHeader.txt")
+					def pyHeaderContentList = pyHeader?.readLines()
+					String pyHeaderContent = ""
+					pyHeaderContentList?.each {
+						pyHeaderContent += it?.toString()+"\r\n"
+					}
+					String data =pyHeaderContent+"\r\n"+params?.configArea
+					configFile.write(data)
+					String configFileContent = ""
+					configFileContentList?.each {
+						configFileContent += it?.toString()+"\r\n"
+					}
+					configFileContent += fileName+"\r\n" 
+					testVariablesConfig.write(configFileContent)
+					createConfigFile = true
+				}else{
+					duplicate = true	
+					flash.message = "Duplicate Config File Name"
+					redirect(action: "listCertificationSuiteConfigFiles")
+					return
+				}
+			}
+		}catch (Exception e) {
+			e.printStackTrace()
+		}	
+		if(createConfigFile){
+			flash.message = "Config File Created"
+		}else{
+			flash.message = "Error creating config File"
+		}
+		redirect(action: "listCertificationSuiteConfigFiles", params: [fileName: fileName])
+	}
+	
+	/**
+	 * Method to upload certification suite configuration files 
+	 * @return
+	 */
+	def uploadSuiteConfigFile(){
+		boolean uploadConfigFile
+		try{
+			def uploadedFile = request?.getFile("file")
+			String content = ""
+			String originalFilename = uploadedFile?.originalFilename
+			if( originalFilename?.endsWith(".py")) {
+				InputStreamReader reader = new InputStreamReader(uploadedFile?.getInputStream())
+				def fileContent = reader?.readLines()
+				if(fileContent){
+					fileContent?.each {
+						content += it?.toString()+"\r\n"
+					}
+					File configFile = new File( "${realPath}//fileStore//"+originalFilename)
+					configFile.write(content)
+
+					String fileName = originalFilename?.replace(".py","")
+					File testVariablesConfig = new File( "${realPath}//fileStore//testVariables.config")
+					def configFileContentList = []
+					if(testVariablesConfig?.exists()){
+						configFileContentList = testVariablesConfig?.readLines()
+					}
+					if(!configFileContentList?.contains(fileName)){
+						String configFileContent = ""
+						configFileContentList?.each {
+							configFileContent += it?.toString()+"\r\n"
+						}
+						configFileContent += fileName+"\r\n"
+						testVariablesConfig.write(configFileContent)
+					}
+					uploadConfigFile =  true
+				}
+			}
+		}catch (Exception e) {
+			e.printStackTrace()
+		}
+		if(uploadConfigFile){
+			flash.message = "Uploaded config File"
+		}else{
+			flash.message = "Error while trying to Upload config File"
+		}
+		redirect(action: "listCertificationSuiteConfigFiles")
+	}
+	
+	/**
+	 * Method to download certification suite configuration files 
+	 * @return
+	 */
+	def downloadSuiteConfigFile(){
+		def downloadConfigFile
+		String fileName = ""
+		if(params?.configFileName){
+			fileName = params?.configFileName
+			try{
+				File configFile = new File( "${realPath}//fileStore//"+fileName+ ".py")
+				if(configFile?.exists()){
+					params.format = "text"
+					params.extension = "py"
+					String data = new String(configFile.getBytes())
+					response.setHeader("Content-Type", "application/octet-stream;")
+					response.setHeader("Content-Disposition", "attachment; filename=\""+ params?.configFileName+".py\"")
+					//response.setHeader("Content-Length", ""+data.length())  // Issue fix parial script download
+					response.outputStream << data.getBytes()
+					downloadConfigFile = true
+				}				
+			}catch(Exception e){
+				e.printStackTrace()
+			}
+			if(!downloadConfigFile){
+				flash.message = "Download failed. No valid config file is available for download."
+				redirect(action: "listCertificationSuiteConfigFiles", params: [fileName: fileName])
+			}
+		}else{
+			flash.message = "Download failed. No valid config file is available for download."
+			redirect(action: "listCertificationSuiteConfigFiles")
+		}
+	}
 }

@@ -158,6 +158,13 @@ function display(val) {
 						</g:link></td>
 					<td>Option to configure Storm JSON RPC Server</td>
 				</tr>
+				<tr>
+					<td><g:link controller="scriptGroup" action="listCertificationSuiteConfigFiles"
+							params="[category:com.comcast.rdk.Category.RDKV ]">
+							<span>RDK Certification</span>
+						</g:link></td>
+					<td>Option to configure Certification Suite files</td>
+				</tr>
 				<%--<g:if test="${SecurityUtils.subject.principal.equals("admin")}">
 					<tr>
 						<td><g:link controller="groups" action="index"

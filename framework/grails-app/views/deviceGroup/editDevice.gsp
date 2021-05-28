@@ -106,6 +106,6 @@
 		</div>
 	</div>
 
-
+<div id="deviceConfigPopup"	style="display: none; overflow: auto; width : 98%; height : 98%;"></div>
 </g:if>
 	

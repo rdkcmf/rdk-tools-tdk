@@ -444,7 +444,18 @@ class DeviceGroupController {
 		if(deviceInstance?.isThunderEnabled == 1){
 			isThunderEnabledCheck = "true"
 		}
-        [url : getApplicationUrl(),deviceInstance: deviceInstance, flag : flag, showBlankRadio:showBlankRadio,blankList:blankList,gateways : devices, deviceStreams : deviceStream,radiodeviceStreams:radiodeviceStream, editPage : true, uploadBinaryStatus: deviceInstance.uploadBinaryStatus, id: id, category:deviceInstance?.category, streamingDetailsInstanceTotal: StreamingDetails.count(),radioStreamingDetailsInstanceTotal: RadioStreamingDetails.count(),isThunderEnabledCheck: isThunderEnabledCheck]
+		def realPath = request.getSession().getServletContext().getRealPath(FILE_SEPARATOR)
+		String finalConfigFile = ""
+		def deviceConfigFilePresent = false		
+		File deviceConfigFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+deviceInstance?.stbName+".config")
+		File boxTypeConfigFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+deviceInstance?.boxType?.name+".config")
+		if(deviceConfigFile?.exists()){
+			finalConfigFile = deviceInstance?.stbName+".config"
+			deviceConfigFilePresent = true
+		}else if(boxTypeConfigFile?.exists()){
+			finalConfigFile = deviceInstance?.boxType?.name+".config"
+		}
+        [url : getApplicationUrl(),deviceInstance: deviceInstance, flag : flag, showBlankRadio:showBlankRadio,blankList:blankList,gateways : devices, deviceStreams : deviceStream,radiodeviceStreams:radiodeviceStream, editPage : true, uploadBinaryStatus: deviceInstance.uploadBinaryStatus, id: id, category:deviceInstance?.category, streamingDetailsInstanceTotal: StreamingDetails.count(),radioStreamingDetailsInstanceTotal: RadioStreamingDetails.count(),isThunderEnabledCheck: isThunderEnabledCheck,finalConfigFile:finalConfigFile,deviceConfigFilePresent:deviceConfigFilePresent]
     }
 
     /**
@@ -501,7 +512,9 @@ class DeviceGroupController {
             return
         }
         else{
-			
+			String prevDeviceName = deviceInstance?.stbName
+			String newDeviceName = params?.stbName
+
 			String currentBoxType = deviceInstance?.boxType?.type?.toLowerCase()
 			
 			BoxType boxType = BoxType.findById(params?.boxType?.id)
@@ -575,7 +588,14 @@ class DeviceGroupController {
                 redirect(action:"list")
                 return
             }
-           
+			if (prevDeviceName != newDeviceName){
+				def realPath = request.getSession().getServletContext().getRealPath(FILE_SEPARATOR)
+				File deviceConfigFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+prevDeviceName+".config")
+				File newdeviceConfigFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+newDeviceName+".config")
+				if(deviceConfigFile?.exists()){
+					deviceConfigFile?.renameTo(newdeviceConfigFile);
+				}
+			}
            DeviceStream deviceStream
 
 			if(deviceInstance?.category == Category.RDKV){
@@ -767,6 +787,13 @@ class DeviceGroupController {
 							toDelete.delete()
 						}
 					}
+					if(deviceInstance?.category?.toString().equals(RDKV)){
+						def realPath = request.getSession().getServletContext().getRealPath(FILE_SEPARATOR)
+						File deviceConfigFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+deviceInstance.stbName+".config")
+						if(deviceConfigFile?.exists()){
+							deviceConfigFile?.delete()
+						}
+					}
 					if(!deviceInstance.delete(flush: true)){
 							Device.withTransaction {
 								Device dev = Device.findById(deviceInstance?.id)
@@ -926,6 +953,13 @@ class DeviceGroupController {
 						if(isConfigFileExeists){
 							File toDelete = new File(Utility.getConfigFilePath(path,deviceInstance.stbName))
 							toDelete.delete()
+						}
+					}
+					if(deviceInstance?.category?.toString().equals(RDKV)){
+						def realPath = request.getSession().getServletContext().getRealPath(FILE_SEPARATOR)
+						File deviceConfigFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+deviceInstance.stbName+".config")
+						if(deviceConfigFile?.exists()){
+							deviceConfigFile?.delete()
 						}
 					}
 					if(!deviceInstance.delete(flush: true)){
@@ -2507,6 +2541,237 @@ class DeviceGroupController {
 		}else{
 			outData.addProperty("Result",  "Device not found");
 			render outData
+		}
+	}
+	
+	/**
+	 * Method to show the contents of device/box type configuration file in a popup
+	 * @return
+	 */
+	def editDeviceConfigFile(){
+		def realPath = request.getRealPath("/")
+		def configFileContent = []
+		String content = ""
+		if(params?.fileName){
+			String configFileName = params?.fileName
+			File configFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+configFileName)
+			if(configFile?.exists()){
+				configFileContent = configFile?.readLines()
+			}
+		}
+		 int counter = 0;
+		 int startingIndex = 0
+		 for (int index = 0; index < configFileContent?.size(); index++) {
+			if(configFileContent[index].contains("################")){
+				counter ++
+			}
+			if(counter == 2){
+				startingIndex = index
+				break;
+			}
+		 }
+		 for (int index = startingIndex+1; index < configFileContent?.size(); index++) {
+			content = content + configFileContent[index]+"\r\n"
+		 }
+		 String createConfigFileName = ""
+		 String boxTypeName = ""
+		 boolean boxTypeConfigFileExists = false
+		 if(!params?.editFlagForDeviceConfigForm && params?.stbName && params?.boxType){
+			 createConfigFileName = params?.stbName+".config"
+			 def boxType = BoxType.findById(params?.boxType)
+			 boxTypeName = boxType?.name+".config"
+			 File boxTypeConfigFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+boxTypeName)
+			 if(boxTypeConfigFile?.exists()){
+				 boxTypeConfigFileExists = true
+			 }
+		 }
+		 render(template: "editDeviceConfigForm", model: [fileName:params?.fileName , content:content,editFlagForDeviceConfigForm:params?.editFlagForDeviceConfigForm,createConfigFileName:createConfigFileName,boxTypeConfigFileExists:boxTypeConfigFileExists,boxTypeName:boxTypeName ])
+	}
+	
+	/**
+	 * Method to update/create a device/boxtype configuration file
+	 * @return
+	 */
+	def updateDeviceConfigContent(){
+		def realPath = request.getRealPath("/")
+		boolean updateConfigFile
+		String fileName = ""
+		String messageDiv = ""
+		if(params?.configFileName){
+			try{
+				fileName = params?.configFileName
+				File configFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+fileName)
+				File pyHeader = new File( "${realPath}//fileStore//pyHeader.txt")
+				def pyHeaderContentList = pyHeader?.readLines()
+				String pyHeaderContent = ""
+				pyHeaderContentList?.each {
+					pyHeaderContent += it?.toString()+"\n"
+				}
+				String data =pyHeaderContent+"\n"+params?.configAreaEdit
+				configFile.write(data)
+				updateConfigFile = true
+			}catch (Exception e) {
+				e.printStackTrace()
+			}
+		}
+		if(updateConfigFile){
+			if(params?.updateOrCreate?.equals('update')){
+				messageDiv = "Config File Updated"
+			}else{
+				messageDiv = "Config File Created"
+			}
+		}else{
+			if(params?.updateOrCreate?.equals('update')){
+				messageDiv = "Error updating config File"
+			}else{
+				messageDiv = "Error creating config File"
+			}
+		}
+		render messageDiv
+	}
+	
+	/**
+	 * Method to update the device configuration div with the latest configuration file
+	 * @return
+	 */
+	def updateDeviceConfigDiv(){
+		String stbName = params?.stbName?.replace(".config","")
+		String boxType = params?.boxType?.replace(".config","")
+		BoxType bType = BoxType.findByNameAndCategory(boxType, Utility.getCategory("RDKV"))
+		def bTypeId = bType?.id
+		render(template: "updateDeviceConfigDiv", model: [finalConfigFile:params?.fileName,finalDeviceConfigFileType:params?.finalDeviceConfigFileType,stbName:stbName,boxTypeConfigFileName:params?.boxType,bTypeId:bTypeId])
+	}
+	
+	/**
+	 * Method to download device/boxtype configuration file
+	 * @return
+	 */
+	def downloadDeviceConfigFile(){
+		def downloadConfigFile
+		String fileName = ""
+		def realPath = request.getRealPath("/")
+		if(params?.configFileName){
+			fileName = params?.configFileName?.replace(".config","")
+			try{
+				File configFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+fileName+ ".config")
+				if(configFile?.exists()){
+					params.format = "text"
+					params.extension = "config"
+					String data = new String(configFile.getBytes())
+					response.setHeader("Content-Type", "application/octet-stream;")
+					response.setHeader("Content-Disposition", "attachment; filename=\""+ fileName+".config\"")
+					response.outputStream << data.getBytes()
+					downloadConfigFile = true
+				}
+			}catch(Exception e){
+				e.printStackTrace()
+			}
+			if(!downloadConfigFile){
+				flash.message = "Download failed. No valid config file is available for download."
+			}
+		}else{
+			flash.message = "Download failed. No valid config file is available for download."
+		}
+	}
+	
+	/**
+	 * Method to delete device configuration file
+	 * @return
+	 */
+	def deleteDeviceConfigFile(){
+		def realPath = request.getRealPath("/")
+		def deleteDiv = "deleteDiv"
+		String deleteMessage = ""
+		String boxTypeName = ""
+		String finalConfigFile = ""
+		boolean boxTypeConfigFileExists = false
+		def boxType = BoxType.findById(params?.boxType)
+		boxTypeName = boxType?.name+".config"
+		File boxTypeConfigFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+boxTypeName)
+		if(boxTypeConfigFile?.exists()){
+			boxTypeConfigFileExists = true
+			finalConfigFile = boxTypeName
+		}else{
+			finalConfigFile = "sample.config"
+		}
+		File fileToDelete = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+params?.fileName)
+		def fileDelete = false
+		if(fileToDelete != null && fileToDelete?.exists()){
+			try {
+				fileDelete = fileToDelete?.delete()
+			} catch (Exception e) {
+				e.printStackTrace()
+			}
+		}
+		if(fileDelete){
+			deleteMessage = "Config File Deleted"
+			
+		}else{
+			deleteMessage = "Failed to delete the config file"
+		}
+		render(template: "updateDeviceConfigDiv", model: [deleteDiv:deleteDiv,boxTypeConfigFileExists:boxTypeConfigFileExists,finalConfigFile:finalConfigFile,stbName:params?.stbName,bTypeId:params?.boxType,deleteMessage:deleteMessage])
+	}
+	
+	/**
+	 * Method to upload device/boxtype configuration file
+	 * @return
+	 */
+	def uploadDeviceConfiguration(){
+		def message = 'Upload failed'
+		String finalFileName = params?.finalFileName
+		def filePath
+		def realPath = request.getSession().getServletContext().getRealPath(FILE_SEPARATOR)
+		filePath =  realPath+"//fileStore//tdkvRDKServiceConfig//"
+		String content = ""
+		if(!finalFileName?.equals("undefined")){
+			try{
+				def uploadedFile =  request.getFile('configFile')
+				if(!uploadedFile.empty){
+					InputStreamReader reader = new InputStreamReader(uploadedFile?.getInputStream())
+					def fileContent = reader?.readLines()
+					if(fileContent){
+						fileContent?.each {
+							content += it?.toString()+"\r\n"
+						}
+						File configFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+finalFileName)
+						configFile.write(content)
+					}
+					message = 'File uploaded successfully'
+				}
+			}
+			catch(Exception e){
+				println e.getMessage()
+			}
+		}
+		render message
+	}
+	
+	/**
+	 * Method to update device/boxtype config div when boxtype is changed during device create or edit
+	 * @return
+	 */
+	def updateConfigDivOnBoxTypeChange(){
+		def realPath = request.getSession().getServletContext().getRealPath(FILE_SEPARATOR)
+		String boxTypeName = params?.boxType+".config"
+		boolean boxTypeConfigFileExists
+		boolean deviceConfigFileExists
+		String finalConfigFile = ""
+		File deviceConfigFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+params?.stbName+".config")
+		if(deviceConfigFile?.exists()){
+			deviceConfigFileExists =  true 
+		}
+		if(!deviceConfigFileExists){
+			File boxTypeConfigFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+boxTypeName)
+			if(boxTypeConfigFile?.exists()){
+				boxTypeConfigFileExists = true
+				finalConfigFile = boxTypeName
+			}else{
+				finalConfigFile = "sample.config"
+			}
+			render(template: "updateDeviceConfigDiv", model: [deleteDiv:'deleteDiv',boxTypeConfigFileExists:boxTypeConfigFileExists,finalConfigFile:finalConfigFile,stbName:params?.stbName,bTypeId:params?.boxId])
+		}
+		else{
+			render(template: "updateDeviceConfigDiv", model: [finalConfigFile:params?.stbName+".config"])
 		}
 	}
 }

@@ -20,7 +20,7 @@ Datatables is licensed under the MIT license
 Copyright 2018 SoftAtHome
 Licensed under the Apache License, Version 2.0
 
-Copyright 2013 jQuery Foundation and other contributors Licensed MIT
+Copyright 2013,2014 jQuery Foundation and other contributors Licensed MIT
 
 Copyright (c) 2010 Eric Martin - http://ericmmartin.com
 Licensed under the MIT license
@@ -39,11 +39,6 @@ Licensed under MIT and GPL". In this case licensed under the MIT license.
  Contributors: Dan G. Switzer, II
 Parts of this plugin are inspired by Joern Zaefferer's Tooltip plugin
 Dual licensed under the MIT and GPL licenses". In this case licensed under the MIT license.
-
-Copyright (c) 2007 Jörn Zaefferer
- Dual licensed under the MIT and GPL licenses. In this case licensed under the MIT license.
- 
-Copyright 2014 jQuery Foundation and other contributors; Licensed MIT
 
 Copyright (c) 2008-2013  (<a href="http://www.cloudgen.cloudgravity.net">Cloudgen</a>)
   Licensed under the MIT License
@@ -105,3 +100,6 @@ Licensed under the BSD-2 license
 Roboto Regular font is:
 Copyright 2017 Google Inc. All Rights Reserved.
 Licensed under the Apache License, Version 2.0
+
+Copyright (c) codemirror by Marijn Haverbeke and others
+Distributed under an MIT license: https://codemirror.net/LICENSE

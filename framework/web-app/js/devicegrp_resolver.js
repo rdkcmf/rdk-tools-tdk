@@ -51,6 +51,19 @@ $(document).ready(function() {
 		}
 	});
 	
+	$('#deviceConfigFileName').contextMenu('deviceConfigFile_menu', {
+		bindings : {
+			'delete_deviceConfigFile' : function(node) {
+				if (confirm('Are you want to delete this Device Config File?')) {
+					deleteDeviceConfigFile(node.innerHTML,document.getElementById("boxType").value,document.getElementById("stbName").value)
+				}
+			},
+			'download_deviceConfigFile' : function(node) {
+				downloadDeviceConfigFile(node.innerHTML)
+			}
+		}
+	});
+	
 	$("#deviceid").addClass("changecolor");
 });
 
@@ -78,6 +91,13 @@ function showFields(){
 	var boxId = $("#boxType").find('option:selected').val();
 	var isThunderEnabled = $("#isThunderEnabled").prop('checked');
 	var url = $("#url").val();
+	var stbName = document.getElementById('stbName').value
+	if(isThunderEnabled){
+		$.get('updateConfigDivOnBoxTypeChange', {stbName:stbName,editFlag:$("#editFlag").val(),boxType:boxType,boxId:boxId}, function(data) {
+			$("#deviceConfigFile").html(""); 
+			$("#deviceConfigFileUpdatedDiv").html(data); 
+		});		
+	}
 	$.get('getBoxType', {id: boxId }, function(data) {
 		if((data[0].type == 'gateway' || data[0].type == 'stand-alone-client') && data[0].category==='RDKV' && !isThunderEnabled){
 			var xmlhttp;	
@@ -318,8 +338,17 @@ function showThunderPortDiv(){
 		editPage = true
 	}
 	if(document.getElementById('isThunderEnabled').checked) {
+		var boxType = $("#boxType").find('option:selected').text();
+		var boxId = $("#boxType").find('option:selected').val();
+		var stbName = document.getElementById('stbName').value
 		$("#thunderPortConfigure").show();
 		$("#deviceTemplateDropdown").hide();
+		$("#deviceConfigFile").show();
+		$("#deviceConfigFileUpdatedDiv").show();
+		$.get('updateConfigDivOnBoxTypeChange', {stbName:stbName,editFlag:editPage,boxType:boxType,boxId:boxId}, function(data) {
+			$("#deviceConfigFile").html(""); 
+			$("#deviceConfigFileUpdatedDiv").html(data); 
+		});	
 		if(editPage){
 			$("#recorderIdedit").hide();
 			$("#recorderId").hide();
@@ -331,6 +360,8 @@ function showThunderPortDiv(){
 		}
 	}else{
 		$("#thunderPortConfigure").hide();
+		$("#deviceConfigFile").hide();
+		$("#deviceConfigFileUpdatedDiv").hide();
 		var boxId = $("#boxType").find('option:selected').val();
 		var url = $("#url").val();
 		$.get('getBoxType', {id: boxId }, function(data) {
@@ -391,4 +422,138 @@ function showThunderPortDiv(){
 			}
 		});
 	}
+}
+
+/**
+ * Function to display the device/boxtype config file contents in a popup
+ * @param fileName
+ */
+function showDeviceConfigContent(fileName){
+	var editFlagForDeviceConfigForm = true
+	$.get('editDeviceConfigFile', {fileName: fileName,editFlagForDeviceConfigForm:editFlagForDeviceConfigForm}, function(data) {
+		$("#deviceConfigPopup").html(data); 
+	});		
+	$("#deviceConfigPopup").modal({ opacity : 40, overlayCss : {
+		  backgroundColor : "#c4c4c4" }, containerCss: {
+			  	width: ($(window).width() - 50),
+			  	height:  ($(window).height() -100)	  
+	        } }, { onClose : function(dialog) {
+		  $.modal.close(); } });
+}
+
+/**
+ * Function to update device config file
+ * @param fileName
+ * @param configAreaContent
+ * @param updateOrCreate
+ * @param boxTypeConfigFileExists
+ * @param finalDeviceConfigFileType
+ * @param boxType
+ * @param stbName
+ */
+function updateDeviceConfigContent(fileName,configAreaContent,updateOrCreate,boxTypeConfigFileExists,finalDeviceConfigFileType,boxType,stbName){
+	$.post('updateDeviceConfigContent', {configFileName: fileName,configAreaEdit:configAreaContent,updateOrCreate:updateOrCreate}, function(data) {
+		if(data == "Config File Created"){
+			$.get('updateDeviceConfigDiv', {fileName: fileName,finalDeviceConfigFileType:finalDeviceConfigFileType,boxType:boxType,stbName:stbName}, function(result) {
+				$("#deviceConfigFile").html(""); 
+				$("#deviceConfigFileUpdatedDiv").html(result); 
+				alert(data)
+				$.modal.close();
+			});		
+		}else{
+			alert(data)
+			$.modal.close();
+		}
+	});
+}
+
+/**
+ * Function to create device config file
+ * @param configfile
+ * @param stbName
+ * @param boxType
+ */
+function createDeviceConfigFile(configfile,stbName,boxType){
+	$.get('editDeviceConfigFile', {fileName: configfile,stbName:stbName,boxType:boxType}, function(data) {
+		$("#deviceConfigPopup").html(data); 
+	});		
+	$("#deviceConfigPopup").modal({ opacity : 40, overlayCss : {
+		  backgroundColor : "#c4c4c4" }, containerCss: {	
+			  	width: ($(window).width() - 50),
+			  	height:  ($(window).height() -100)	  
+	        } }, { onClose : function(dialog) {
+		  $.modal.close(); } });
+}
+
+/**
+ * Function to donwload device config file
+ * @param configFileName
+ */
+function downloadDeviceConfigFile(configFileName){
+	window.location = "downloadDeviceConfigFile?configFileName="+ configFileName
+}
+
+/**
+ * Function to delete device config file
+ * @param configFileName
+ * @param boxTypeId
+ * @param stbName
+ */
+function deleteDeviceConfigFile(configFileName,boxTypeId,stbName){
+	var url = $("#url").val();
+	$.get(url+'/boxType/getBoxType', {id: boxTypeId}, function(data) {
+		var boxTypeName = data[0]+'.config'
+		if(configFileName == boxTypeName){
+			alert("Cannot delete box type config file")
+		}else{
+			$.get('deleteDeviceConfigFile', {fileName: configFileName,boxType:boxTypeId,stbName:stbName}, function(result) {
+				$("#deviceConfigFile").html(""); 
+				$("#deviceConfigFileUpdatedDiv").html(""); 
+				$("#deviceConfigFileUpdatedDiv").html(result); 
+			});
+		}
+	});
+}
+
+/**
+ * Function to upload device config file
+ * @param createFileName
+ * @param fileName
+ * @param finalDeviceConfigFileType
+ * @param boxType
+ * @param stbName
+ * @param editFlagForDeviceConfigForm
+ */
+function uploadDeviceConfigFile(createFileName,fileName,finalDeviceConfigFileType,boxType,stbName,editFlagForDeviceConfigForm){
+	var finalFileName
+	if(createFileName != "" && createFileName != null){
+		finalFileName = createFileName
+	}else{
+		finalFileName = fileName
+	}
+	var elem = new FormData(document.forms.namedItem('uploadDevConfigForm'));
+	elem.append('finalFileName', finalFileName);
+	 var url="uploadDeviceConfiguration";
+     $.ajax({
+         url:url,
+         type:'POST',
+         data:elem,
+         processData: false,
+         contentType: false ,
+         success:function (response) {
+				if(response == 'File uploaded successfully' && editFlagForDeviceConfigForm == 'true'){
+					alert(response)
+					$.modal.close();
+				}else if(response == 'File uploaded successfully' && editFlagForDeviceConfigForm != 'true'){
+					$.get('updateDeviceConfigDiv', {fileName: finalFileName,finalDeviceConfigFileType:finalDeviceConfigFileType,boxType:boxType,stbName:stbName}, function(result) {
+						$("#deviceConfigFile").html(""); 
+						$("#deviceConfigFileUpdatedDiv").html(result); 
+						alert(response)
+						$.modal.close();
+					});
+				}else{
+					alert(response)
+				}
+            }
+     });
 }

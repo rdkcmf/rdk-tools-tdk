@@ -35,6 +35,10 @@
 <g:javascript library="jquery.dataTables"/>
 <g:javascript library="jquery-ui"/>
 <g:javascript library="common" />
+<link rel="stylesheet" href="${resource(dir:'css',file:'codemirror.css')}" />
+<g:javascript library="codemirror"/>
+<g:javascript library="python"/>
+
 <link rel="stylesheet" href="${resource(dir:'css',file:'demo_table.css')}" type="text/css" />
 	<script type="text/javascript">
 

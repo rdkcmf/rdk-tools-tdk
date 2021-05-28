@@ -19,6 +19,7 @@
 <%@page import="com.comcast.rdk.Category"%>
 <%@ page import="com.comcast.rdk.Device"%>
 <%@ page import="com.comcast.rdk.DeviceTemplate"%>
+<g:javascript library="devicegrp_resolver" />
 
 <div id="uploadBinarypopup"
 	style="display: none; overflow: auto; width: 98%; height: 98%;">
@@ -303,6 +304,23 @@
 			<g:textField name="thunderPortValue" id="thunderPort"
 				value="${deviceInstance?.thunderPort}" class="textwidth" />
 		</div>
+		<div id="deviceConfigFile" class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'thunderPort', 'error')} required">
+			<label for="deviceConfigFileLabel"> <g:message
+					code="device.thunderPort.label" default="Device Config File" /><span
+					class="required-indicator">*</span>
+			</label>
+			<g:if test="${finalConfigFile != "" && deviceConfigFilePresent == true}">
+				<a href="#" onclick="showDeviceConfigContent('${finalConfigFile}');" id="deviceConfigFileName">${finalConfigFile}</a>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+			</g:if>
+			<g:elseif test="${finalConfigFile != "" && deviceConfigFilePresent == false}">
+				<a href="#" onclick="showDeviceConfigContent('${finalConfigFile}');" id="deviceConfigFileName">${finalConfigFile}</a>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+				<a href="#" onclick="createDeviceConfigFile('${finalConfigFile}',document.getElementById('stbName').value,document.getElementById('boxType').value)" id="createDeviceConfigFile">Create New Device Config File</a>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+			</g:elseif>		
+			<g:else>
+			    <a href="#" onclick="createDeviceConfigFile('sample.config',document.getElementById('stbName').value,document.getElementById('boxType').value)" id="createDeviceConfigFile">Create New Device Config File</a>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+			</g:else>	
+		</div>
+		<div id="deviceConfigFileUpdatedDiv" class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'thunderPort', 'error')} required"></div>
 	</g:if>
 	<g:else>
 		<div id="thunderPortConfigure" style="display: none;" class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'thunderPort', 'error')} required">
@@ -313,6 +331,23 @@
 			<g:textField name="thunderPortValue" id="thunderPort"
 				value="80" class="textwidth" />
 		</div>
+		<div id="deviceConfigFile" style="display: none;" class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'thunderPort', 'error')} required">
+			<label for="deviceConfigFileLabel"> <g:message
+					code="device.thunderPort.label" default="Device Config File" /><span
+					class="required-indicator">*</span>
+			</label>
+			<g:if test="${finalConfigFile != "" && deviceConfigFilePresent == true}">
+				<a href="#" onclick="showDeviceConfigContent('${finalConfigFile}');" id="deviceConfigFileName">${finalConfigFile}</a>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+			</g:if>
+			<g:elseif test="${finalConfigFile != "" && deviceConfigFilePresent == false}">
+				<a href="#" onclick="showDeviceConfigContent('${finalConfigFile}');" id="deviceConfigFileName">${finalConfigFile}</a>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+				<a href="#" onclick="createDeviceConfigFile('${finalConfigFile}',document.getElementById('stbName').value,document.getElementById('boxType').value)" id="createDeviceConfigFile">Create New Device Config File</a>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+			</g:elseif>		
+			<g:else>
+			    <a href="#" onclick="createDeviceConfigFile('sample.config',document.getElementById('stbName').value,document.getElementById('boxType').value)" id="createDeviceConfigFile">Create New Device Config File</a>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+			</g:else>	
+		</div>
+		<div id="deviceConfigFileUpdatedDiv" class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'thunderPort', 'error')} required"></div>
 	</g:else>
 </g:if>
 <div id="portConfigureDiv" class="fieldcontain ${hasErrors(bean: deviceInstance, field: 'portConfigure', 'error')}">
@@ -392,5 +427,11 @@
 	</div>
 
 --%>
+<div class="contextMenu" id="deviceConfigFile_menu" style="display:none">
+	<ul>
+	    <li id="delete_deviceConfigFile"><img src="../images/delete.png" />Delete</li>	
+	    <li id="download_deviceConfigFile"><img src="../images/reorder_down.png" />Download</li>	
+	</ul>
+</div>
 <g:hiddenField name="category" value="${category}" />
 <g:hiddenField id="editFlag" name="editFlag" value="${editPage}" />
