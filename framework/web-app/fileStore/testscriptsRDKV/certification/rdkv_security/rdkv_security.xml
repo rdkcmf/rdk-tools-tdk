@@ -36,6 +36,32 @@
           <parameter name="sshMethod" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkvsecurity_getValue" id=" " version="1">
+        <function>rdkvsecurity_getValue</function>
+        <parameters>
+          <parameter name="method" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkvsecurity_setValue" id=" " version="1">
+        <function>rdkvsecurity_setValue</function>
+        <parameters>
+          <parameter name="method" value=""/>
+          <parameter name="value" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkvsecurity_getPluginStatus" id=" " version="1">
+        <function>rdkvsecurity_getPluginStatus</function>
+        <parameters>
+          <parameter name="plugin" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkvsecurity_getReqValueFromResult" id=" " version="1">
+        <function>rdkvsecurity_getReqValueFromResult</function>
+        <parameters>
+          <parameter name="method" value=""/>
+          <parameter name="reqValue" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>

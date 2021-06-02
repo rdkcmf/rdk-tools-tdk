@@ -22,7 +22,7 @@
   <!-- Excecution time out of module -->
     <executionTimeOut>5</executionTimeOut>
   <!-- Excecution time out of module -->
-    <testGroup>Component</testGroup>
+    <testGroup>Certification</testGroup>
   <!-- Logs File Names of module -->
     <logFileNames>[]</logFileNames>
   <!-- Crash File Names of the module -->
@@ -32,6 +32,10 @@
       <function name='rdkvsecurity_getDeviceConfig' />
       <function name='rdkvsecurity_executeInTM' />
       <function name='rdkvsecurity_executeInDUT' />
+      <function name='rdkvsecurity_getValue' />
+      <function name='rdkvsecurity_setValue' />
+      <function name='rdkvsecurity_getPluginStatus' />
+      <function name='rdkvsecurity_getReqValueFromResult' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -41,6 +45,12 @@
       <parameter funName='rdkvsecurity_executeInDUT' parameterName='sshMethod' parameterType='STRING' range='A-Z' />
       <parameter funName='rdkvsecurity_executeInDUT' parameterName='credentials' parameterType='STRING' range='A-Z' />
       <parameter funName='rdkvsecurity_executeInDUT' parameterName='command' parameterType='STRING' range='A-Z' />
+      <parameter funName='rdkvsecurity_getValue' parameterName='method' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkvsecurity_setValue' parameterName='method' parameterType='STRING' range='A-Z' />
+      <parameter funName='rdkvsecurity_setValue' parameterName='value' parameterType='STRING' range='A-Z' />
+      <parameter funName='rdkvsecurity_getPluginStatus' parameterName='plugin' parameterType='STRING' range='A-Z' />
+      <parameter funName='rdkvsecurity_getReqValueFromResult' parameterName='method' parameterType='STRING' range='A-Z' />
+      <parameter funName='rdkvsecurity_getReqValueFromResult' parameterName='reqValue' parameterType='STRING' range='reqValue' />
     </parameters>
   </module>
 </xml>

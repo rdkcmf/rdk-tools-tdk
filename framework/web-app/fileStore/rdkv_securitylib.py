@@ -131,4 +131,66 @@ def rdkvsecurity_getDeviceConfig (basePath, configKey):
         output = "FAILURE : Exception Occurred: [" + inspect.stack()[0][3] + "] " + e.message
         print output
     return output;
+#---------------------------------------------------------------
+#EXECUTE CURL REQUESTS
+# Description  : Execute curl request in DUT
+# Parameters   : Data - a string which contains actual curl request
+# Return Value : contains response of the curl request sent
+#---------------------------------------------------------------
+def execute_step(Data):
+    data = '{"jsonrpc": "2.0", "id": 1234567890, '+Data+'}'
+    headers = {'content-type': 'text/plain;',}
+    url = 'http://'+str(deviceIP)+':'+str(devicePort)+'/jsonrpc'
+    try:
+        response = requests.post(url, headers=headers, data=data, timeout=20)
+        json_response = json.loads(response.content)
+        result = json_response.get("result")
+        if result != None and "'success': False" in str(result):
+            result = "EXCEPTION OCCURRED"
+        return result;
+    except requests.exceptions.RequestException as e:
+        print "ERROR!! \nEXCEPTION OCCURRED WHILE EXECUTING CURL COMMANDS!!"
+        print "Error message received :\n",e;
+        return "EXCEPTION OCCURRED"
 
+#-------------------------------------------------------------------
+#GET THE VALUE OF A METHOD
+#-------------------------------------------------------------------
+def rdkvsecurity_getValue(method):
+    data = '"method": "'+method+'"'
+    result = execute_step(data)
+    return result
+
+#------------------------------------------------------------------
+#SET VALUE FOR A METHOD
+#------------------------------------------------------------------
+def rdkvsecurity_setValue(method,value):
+    data = '"method": "'+method+'","params": '+value
+    result = execute_step(data)
+    return result
+
+#-----------------------------------------------------------------
+#GET PLUGIN STATUS
+#-----------------------------------------------------------------
+def rdkvsecurity_getPluginStatus(plugin):
+    data = '"method": "Controller.1.status@'+plugin+'"'
+    result = execute_step(data)
+    if result != None and result != "EXCEPTION OCCURRED":
+        for x in result:
+            PluginStatus=x["state"]
+        return PluginStatus
+    else:
+        return result;
+
+#-------------------------------------------------------------------
+#GET THE REQUIRED VALUE FROM A RESULT
+#-------------------------------------------------------------------
+def rdkvsecurity_getReqValueFromResult(method,reqValue):
+    data = '"method": "'+method+'"'
+    result = execute_step(data)
+    if result != "EXCEPTION OCCURRED":
+        value = result[reqValue]
+        return value
+    else:
+        return result
+                              
