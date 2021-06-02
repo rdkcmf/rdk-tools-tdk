@@ -166,6 +166,22 @@ bool Is_valid_indicator(std::string indicator_name)
 		return false;
 	}
 }
+
+void GetDefaultVideoPort(std::string& portName)
+{
+        if (!(portName.compare("HDMI0")))
+        {
+                DEBUG_PRINT(DEBUG_LOG,"Calling getDefaultVideoPortName \n");
+                std::string strVideoPort = device::Host::getInstance().getDefaultVideoPortName();
+                DEBUG_PRINT(DEBUG_LOG,"getDefaultVideoPortName result : %s ", strVideoPort.c_str());
+                portName = strVideoPort.c_str();
+        }
+        else
+        {
+                DEBUG_PRINT(DEBUG_LOG,"PortName isn't HDMI0 , proceeding the testcase with the %s \n", portName.c_str());
+        }
+}
+
 /***************************************************************************
  *Function name	: FPI_setBrightness
  *Descrption	: This function is to check the functionality of setBrightness and getBrightness APIs
@@ -1345,6 +1361,7 @@ void DeviceSettingsAgent::VOP_setResolution(IN const Json::Value& req, OUT Json:
 
 	try
 	{	/*getting video port instance*/
+                GetDefaultVideoPort(portName);
 		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
 		if (false == getOnly) {
 		    /*setting VOP resolution*/
@@ -2197,7 +2214,8 @@ void DeviceSettingsAgent::VOP_isDisplayConnected(IN const Json::Value& req, OUT 
 	bool display_connect=false;
 	try
 	{
-		/*getting instance for video ports*/	
+		/*getting instance for video ports*/
+                GetDefaultVideoPort(portName);
 		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
 		/*checking DisplayConnection status*/
 		display_connect=vPort.isDisplayConnected();
@@ -2290,6 +2308,7 @@ void DeviceSettingsAgent::VOPTYPE_getSupportedResolutions(IN const Json::Value& 
 	try
 	{
 		strcpy(supportedResolutions,"Supported Resolutions:");
+                GetDefaultVideoPort(portName);
 		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
 		DEBUG_PRINT(DEBUG_LOG,"\nsupportedResolutions::size:%d\n",vPort.getType().getSupportedResolutions().size());
 		for (size_t i = 0; i < vPort.getType().getSupportedResolutions().size(); i++)
@@ -2337,6 +2356,7 @@ void DeviceSettingsAgent::VOPTYPE_isHDCPSupported(IN const Json::Value& req, OUT
 	try
 	{
 		/*getting instance for video ports*/
+                GetDefaultVideoPort(portName);
 		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
 		/*checking HDCP support*/
 		bool HDCPEnable = vPort.getType().isHDCPSupported();
@@ -2601,6 +2621,7 @@ void DeviceSettingsAgent::VOPCONFIG_getPixelResolution(IN const Json::Value& req
 		char details[50] = {'\0'};
 		//Get PixelResolution for current resolution on given video output port
        		std::string portName=req["port_name"].asCString();
+                GetDefaultVideoPort(portName);
 		std::string pixel = device::Host::getInstance().getVideoOutputPort(portName).getResolution().getPixelResolution().toString();
 		sprintf(details,"%s",pixel.c_str());
 		DEBUG_PRINT(DEBUG_LOG,"PortName:%s PixelResolution:%s\n", portName.c_str(), details);
@@ -2709,6 +2730,7 @@ void DeviceSettingsAgent::VOPCONFIG_getFrameRate(IN const Json::Value& req, OUT 
                 char details[50] = {'\0'};
                 //Get FrameRate for current resolution on given video output port
                 std::string portName=req["port_name"].asCString();
+                GetDefaultVideoPort(portName);
                 std::string framerate = device::Host::getInstance().getVideoOutputPort(portName).getResolution().getFrameRate().toString();
                 sprintf(details,"%s",framerate.c_str());
                 DEBUG_PRINT(DEBUG_LOG,"PortName:%s Framerate: %s\n", portName.c_str(), details);
@@ -2890,6 +2912,7 @@ void DeviceSettingsAgent::VOP_getHDCPStatus(IN const Json::Value& req, OUT Json:
         {
                 char details[30] = {'\0'};
                 // getting instance for video port
+                GetDefaultVideoPort(portName);
                 device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
                 // checking HDCP status
                 int hdcpStatus = vPort.getHDCPStatus();
@@ -2954,7 +2977,8 @@ void DeviceSettingsAgent::VOPTYPE_isDynamicResolutionSupported(IN const Json::Va
 	memset(dynamicResolutionSupportDetails,'\0', (sizeof(char)*20));
 	try
 	{
-		/*getting instance for video ports*/	
+		/*getting instance for video ports*/
+                GetDefaultVideoPort(portName);
 		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
 		/*checking for DynamicResolution supported*/
 		dynamicResolutionSupport=vPort.isDynamicResolutionSupported();
@@ -3000,6 +3024,7 @@ void DeviceSettingsAgent::VOP_isContentProtected(IN const Json::Value& req, OUT 
 	try
 	{
 		/*getting instance for video ports*/	
+                GetDefaultVideoPort(portName);
 		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
 		bool cpSupport = vPort.isContentProtected();
 		DEBUG_PRINT(DEBUG_LOG,"\nIs Content Protected: %d\n",vPort.isContentProtected());
@@ -3045,7 +3070,8 @@ void DeviceSettingsAgent::VOP_getAspectRatio(IN const Json::Value& req, OUT Json
 	memset(aspectRatio,'\0', (sizeof(char)*20));
 	try
 	{
-		/*getting instance for video ports*/	
+		/*getting instance for video ports*/
+                GetDefaultVideoPort(portName);
 		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
 		/*getting AspectRatio for a given video ports*/
 		strcpy(aspectRatio,(char*)vPort.getDisplay().getAspectRatio().getName().c_str());
@@ -3096,7 +3122,8 @@ void DeviceSettingsAgent::VOP_getDisplayDetails(IN const Json::Value& req, OUT J
 	try
 	{
 		strcpy(displayDetails1,"Display Details:");
-		/*getting instance for video ports*/	
+		/*getting instance for video ports*/
+                GetDefaultVideoPort(portName);
 		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
 		/*getting list of details for a given video ports*/	
 		sprintf(weekDetails,"%d",vPort.getDisplay().getManufacturerWeek());
@@ -3149,6 +3176,7 @@ void DeviceSettingsAgent::VOP_setEnable(IN const Json::Value& req, OUT Json::Val
 
         try
         {       /*getting video port instance*/
+                GetDefaultVideoPort(portName);
                 device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
                 if (true == enable)
 		{
@@ -3717,6 +3745,7 @@ void DeviceSettingsAgent::HOST_getVideoOutputPortFromName(IN const Json::Value& 
 
 		std::string portName=req["port_name"].asCString();
 		//Convert the video port Name to the corresponding port object
+                GetDefaultVideoPort(portName);
                 device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
 		std::string outPortName = vPort.getName();
 		if (portName == outPortName)
@@ -4151,6 +4180,7 @@ void DeviceSettingsAgent::VR_isInterlaced(IN const Json::Value& req, OUT Json::V
                 char details[2048]={'\0'};
                 std::string portName=req["port_name"].asCString();
 		//Get video port instance
+                GetDefaultVideoPort(portName);
 		device::VideoOutputPort vPort = device::Host::getInstance().getVideoOutputPort(portName);
                 //Check video resolution of VideoOutputPort is interlaced
                 bool isInterlaced = vPort.getResolution().isInterlaced();
