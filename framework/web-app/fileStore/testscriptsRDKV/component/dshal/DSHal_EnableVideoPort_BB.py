@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>2</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>DSHal_EnableVideoPort_UnSupportedPortType</name>
+  <name>DSHal_EnableVideoPort_BB</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -49,7 +49,6 @@
   <!--  -->
   <box_types>
     <box_type>Hybrid-1</box_type>
-    <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -58,7 +57,7 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>CT_DS_HAL_149</test_case_id>
-    <test_objective>To check if the video port enable status is set for unsupported port type</test_objective>
+    <test_objective>To check if the video port enable status is set for BaseBand port type</test_objective>
     <test_type>Positive</test_type>
     <test_setup>XG1V3</test_setup>
     <pre_requisite>1. Initialize IARMBus
@@ -75,10 +74,10 @@ enabled - enable status to set</input_parameters>
 2 . DSHAL agent will invoke the api dsGetVideoPort to get the handle for port type which is not supported for dsEnableVideoPort API
 3 . DSHAL agent will invoke the api dsEnableVideoPort to get the video port enable status
 4. TM checks if the API call fails and return SUCCESS/FAILURE status.</automation_approch>
-    <expected_output>Checkpoint 1.Verify the API call is failure</expected_output>
+    <expected_output>Checkpoint 1.Verify the API call is success</expected_output>
     <priority>High</priority>
     <test_stub_interface>libdshalstub.so.0.0.0</test_stub_interface>
-    <test_script>DSHal_EnableVideoPort_UnSupportedPortType</test_script>
+    <test_script>DSHal_EnableVideoPort_BB</test_script>
     <skipped>No</skipped>
     <release_version>M80</release_version>
     <remarks></remarks>
@@ -97,7 +96,7 @@ dshalObj = tdklib.TDKScriptingLibrary("dshal","1");
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-dshalObj.configureTestCase(ip,port,'DSHal_EnableVideoPort_UnSupportedPortType');
+dshalObj.configureTestCase(ip,port,'DSHal_EnableVideoPort_BB');
 
 #Get the result of connection with test component and STB
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
@@ -119,9 +118,10 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
         tdkTestObj.setResultStatus("SUCCESS");
         details = tdkTestObj.getResultDetails();
         print details;
-        expectedResult = "FAILURE";
+        expectedResult = "SUCCESS";
 
         tdkTestObj = dshalObj.createTestStep('DSHal_EnableVideoPort');
+        tdkTestObj.addParameter("enable", 1);
         #Execute the test case in STB
         tdkTestObj.executeTestCase(expectedResult);
         actualResult = tdkTestObj.getResult();
@@ -130,10 +130,23 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
         print "Video port enable status: ", details
         if expectedResult in actualResult:
             tdkTestObj.setResultStatus("SUCCESS");
-            print "Video port enable status not set for unsupported port type which is expected";
+            print "SUCCESS: BB port enable call is successfull as expected";
+            tdkTestObj = dshalObj.createTestStep('DSHal_IsVideoPortEnabled');
+            #Execute the test case in STB
+            tdkTestObj.executeTestCase(expectedResult);
+            actualResult = tdkTestObj.getResult();
+            print "DSHal_IsVideoPortEnabled result: ", actualResult;
+            details = tdkTestObj.getResultDetails();
+            print "Video port enable status: ", details
+            if expectedResult in actualResult:
+                tdkTestObj.setResultStatus("SUCCESS");
+                print "BaseBand Video port enable status retrieved";
+            else:
+                tdkTestObj.setResultStatus("FAILURE");
+                print "BaseBand Video port enable status not retrieved";
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Video port enable status set for unsupported port type which is not expected";
+            print "Video port enable status not set for BB port type which is not expected";
     else:
         tdkTestObj.setResultStatus("FAILURE");
         print "Video port handle retrieved for invalid port type";

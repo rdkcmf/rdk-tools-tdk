@@ -128,17 +128,18 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
             #Prmitive test case which associated to this Script
             tdkTestObj = dshalObj.createTestStep('DSHal_SetStereoMode');
             tdkTestObj.addParameter("stereoMode", stereoModeType["INVALID"]);
+            expectedResult="FAILURE";
             #Execute the test case in STB
             tdkTestObj.executeTestCase(expectedResult);
             actualResult = tdkTestObj.getResult();
-            print "DSHal_SetStereoMode result: ", actualResult
 
             if expectedResult in actualResult:
                 tdkTestObj.setResultStatus("SUCCESS");
                 details = tdkTestObj.getResultDetails();
-                print "DSHal_SetStereoMode: ", details
+                print "DSHal_SetStereoMode failed for invalid stereomode as expected";
                 
                 tdkTestObj = dshalObj.createTestStep('DSHal_GetStereoMode');
+                expectedResult="SUCCESS";
                 #Execute the test case in STB
                 tdkTestObj.executeTestCase(expectedResult);
                 actualResult = tdkTestObj.getResult();
@@ -158,7 +159,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
                     print "Failed to get stereo mode";
             else:
                 tdkTestObj.setResultStatus("FAILURE");
-                print "DSHal_SetStereoMode failed";
+                print "DSHal_SetStereoMode passed for invalid stereomode which is not expected";
 
         else:
             tdkTestObj.setResultStatus("FAILURE");

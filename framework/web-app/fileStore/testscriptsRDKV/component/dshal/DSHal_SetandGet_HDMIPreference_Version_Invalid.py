@@ -137,18 +137,18 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
             details = tdkTestObj.getResultDetails();
             print "Display connection status: ", details
             if details == "true":
-                details = tdkTestObj.getResultDetails();
-                print details;
                 tdkTestObj = dshalObj.createTestStep('DSHal_SetHdmiPreference');
                 tdkTestObj.addParameter("hdcpProtocol", hdcpProtocolVersion["VERSION_INVALID"]);
+                expectedResult="FAILURE";
                 #Execute the test case in STB
                 tdkTestObj.executeTestCase(expectedResult);
                 actualResult = tdkTestObj.getResult();
-                print "DSHal_SetHdmiPreference result: ", actualResult;
                 details = tdkTestObj.getResultDetails();
-                print details;
                 if expectedResult in actualResult:
+                    print "DSHal_SetHdmiPreference failed for invalid version as expected";
+                    print details;
                     tdkTestObj = dshalObj.createTestStep('DSHal_GetHdmiPreference');
+                    expectedResult="SUCCESS";
                     #Execute the test case in STB
                     tdkTestObj.executeTestCase(expectedResult);
                     actualResult = tdkTestObj.getResult();
@@ -168,7 +168,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
                         print "Failed to get HdmiPreference";
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
-                    print "DSHal_SetHdmiPreference call Failed";
+                    print "DSHal_SetHdmiPreference passed for invalid version which is not expected";
             else:
                 tdkTestObj.setResultStatus("FAILURE");
                 print "Please test connecting a display device";
@@ -177,7 +177,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
             print "Failed to get display connection status";
     else:
         tdkTestObj.setResultStatus("FAILURE");
-        print "VideooPort handle not retrieved";
+        print "VideoPort handle not retrieved";
 
     dshalObj.unloadModule("dshal");
 

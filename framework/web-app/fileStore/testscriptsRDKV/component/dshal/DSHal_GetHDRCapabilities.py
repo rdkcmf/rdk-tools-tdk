@@ -75,6 +75,34 @@ import tdklib;
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("dshal","1");
 
+def check_hdr_capability():
+    sysUtilObj = tdklib.TDKScriptingLibrary("systemutil","1");
+    sysUtilObj.configureTestCase(ip,port,'DSHal_GetHDRCapabilities');
+    sysUtilLoadStatus = sysUtilObj.getLoadModuleResult();
+    print "System module loading status : %s" %sysUtilLoadStatus;
+    #Set the module loading status
+    sysUtilObj.setLoadModuleStatus(sysUtilLoadStatus);
+
+    if "SUCCESS" in sysUtilLoadStatus.upper():
+        tdkTestObj = sysUtilObj.createTestStep('ExecuteCommand');
+        cmd = "cat /etc/device.properties | grep HDR_CAPABILITY"
+        print cmd;
+        tdkTestObj.addParameter("command", cmd);
+        expectedResult="SUCCESS"
+        tdkTestObj.executeTestCase(expectedResult);
+        actualResult = tdkTestObj.getResult();
+        details = tdkTestObj.getResultDetails()
+        if expectedResult in actualResult:
+            if details:
+                print "Device has HDR capability"
+                return True
+            else:
+                print "Device doesnot have HDR capability"
+                return False
+        else:
+            print "check_hdr_capability failed";
+    sysUtilObj.unloadModule("systemutil");
+
 #IP and Port of box, No need to change,
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
@@ -89,8 +117,9 @@ print "[LIB LOAD STATUS]  :  %s" %loadModuleStatus;
 if "SUCCESS" in loadModuleStatus.upper():
     obj.setLoadModuleStatus("SUCCESS");
     expectedResult="SUCCESS";
-    print "\nTEST STEP1 : Get the HDR capabilities of SoC using dsGetHDRCapabilities API"
-    print "EXEPECTED OUTPUT : Should get the  OR-ed value of STB HDR capabilities"
+    HDR_CAPABILITY = check_hdr_capability()
+    #print "\nTEST STEP1 : Get the HDR capabilities of SoC using dsGetHDRCapabilities API"
+    #print "EXEPECTED OUTPUT : Should get the  OR-ed value of STB HDR capabilities"
     tdkTestObj = obj.createTestStep('DSHal_GetHDRCapabilities');
     tdkTestObj.executeTestCase(expectedResult);
     actualResult = tdkTestObj.getResult();
@@ -98,36 +127,16 @@ if "SUCCESS" in loadModuleStatus.upper():
         details = tdkTestObj.getResultDetails();
         print "ACTUAL RESULT  : dsGetHDRCapabilities call is success"
         print "Value Returned : STB HDR Capabilities : ",details
-
-        print "\nTEST STEP2 : Check HDR capabilities based on platform"
-        print "EXPECTED RESULT : HDR capabilities should be > 0 for AXG1V4,XI5 & >1 for XI6"
-        if ("AX014" or "PX051") in imagename:
-            if int(details) > 0:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "ACTUAL RESULT : STB supports HDR10 standard";
-                print "[TEST EXECUTION RESULT] : SUCCESS\n"
-            else:
-                tdkTestObj.setResultStatus("FAILURE");
-                print "ACTUAL RESULT : STB expected HDR10 standard not retrieved";
-                print "[TEST EXECUTION RESULT] : FAILURE\n"
-        elif "AX061" in imagename:
-            if int(details) > 1:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "ACTUAL RESULT : STB supports HDR10,DolbyVision,TechnicolorPrime standards";
-                print "[TEST EXECUTION RESULT] : FAILURE\n"
-            else:
-                tdkTestObj.setResultStatus("FAILURE");
-                print "ACTUAL RESULT : STB expected HDR10,DolbyVision,TechnicolorPrime standards not retrieved";
-                print "[TEST EXECUTION RESULT] : FAILURE\n"
-        else:
-            if int(details) == 0:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "ACTUAL RESULT : STB does not support HDR";
-                print "[TEST EXECUTION RESULT] : SUCCESS\n"
-            else:
-                tdkTestObj.setResultStatus("FAILURE");
-                print "ACTUAL RESULT : No HDR Support : But HDR standard retrieved";
-                print "[TEST EXECUTION RESULT] : FAILURE\n"
+     
+        if (HDR_CAPABILITY and (int(details) > 0)):
+            print "HDR standard retrieved as expected";
+            print "[TEST EXECUTION RESULT] : SUCCESS\n"
+            tdkTestObj.setResultStatus("SUCCESS");
+        elif((not(HDR_CAPABILITY)) and (int(details) == 0)):
+            print "No HDR standard retrieved as expected";
+            print "[TEST EXECUTION RESULT] : SUCCESS\n"
+            tdkTestObj.setResultStatus("SUCCESS");
+       
     else:
         tdkTestObj.setResultStatus("FAILURE");
         details = tdkTestObj.getResultDetails();
