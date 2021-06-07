@@ -204,6 +204,7 @@ def switch_to_wifi(obj,ap_freq = "2.4",start_time_needed = False):
                             tdkTestObj.executeTestCase(expectedResult);
                             result = tdkTestObj.getResult();
                             if expectedResult in  result:
+                                time.sleep(40)
                                 tdkTestObj.setResultStatus("SUCCESS")
                                 tdkTestObj = obj.createTestStep('rdkservice_getValue');
                                 tdkTestObj.addParameter("method","org.rdk.Network.1.getInterfaces");
