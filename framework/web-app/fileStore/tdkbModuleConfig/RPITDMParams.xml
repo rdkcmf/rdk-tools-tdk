@@ -114,7 +114,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>ARMv7 Processor rev 4 (v7l)</defaultValue>
+               <defaultValue>RPI</defaultValue>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
