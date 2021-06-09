@@ -33,6 +33,8 @@ ReportingparamList = ["Device.DSL.X_RDK_Report.DSL.Enabled", "Device.DSL.X_RDK_R
 DSL_WAN_Params = ["Device.X_RDK_WanManager.CPEInterface.1.Wan.Enable", "Device.X_RDK_WanManager.CPEInterface.1.Wan.Status", "Device.X_RDK_WanManager.CPEInterface.1.Wan.ActiveLink"];
 #WANoE WAN Parameters
 WANoE_WAN_Params = ["Device.X_RDK_WanManager.CPEInterface.2.Wan.Enable", "Device.X_RDK_WanManager.CPEInterface.2.Wan.Status", "Device.X_RDK_WanManager.CPEInterface.2.Wan.ActiveLink"];
+#Log file to check for DSL Diagnostic Report logs
+DSL_log_file = "/rdklogs/logs/XDSLMANAGERLog.txt.0";
 
 #################################################################################
 # A utility function to check if the policy is from ExpectedPolicyList
@@ -131,14 +133,13 @@ def get_policy(tdkTestObj, step) :
 #################################################################################
 # A utility function to get the number of lines from the Log file
 #
-# Syntax       : getLogFileTotalLinesCount(tdkTestObj, string, from_logFile, step)
-# Parameter    : tdkTestObj, string, from_logFile, step
+# Syntax       : getLogFileTotalLinesCount(tdkTestObj, string, step)
+# Parameter    : tdkTestObj, string,  step
 # Return Value : return the number of lines and the current step
 #################################################################################
 
-def getLogFileTotalLinesCount(tdkTestObj, string, from_logFile, step):
-    expectedresult="SUCCESS";
-    cmd = "grep -ire " + "\"" + string + "\"  " + from_logFile + " | wc -l";
+def getLogFileTotalLinesCount(tdkTestObj, string, step):
+    cmd = "grep -ire " + "\"" + string + "\"  " + DSL_log_file + " | wc -l";
     expectedresult="SUCCESS";
     tdkTestObj.addParameter("command",cmd);
     tdkTestObj.executeTestCase(expectedresult);
