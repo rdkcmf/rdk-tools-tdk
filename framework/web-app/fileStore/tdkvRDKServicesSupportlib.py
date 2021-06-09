@@ -300,6 +300,14 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "network_check_device_ip_changed":
+            info["Device_IP"] = result.get("ip")
+            if str(result.get("ip")) != str(expectedValues):
+                message = "Internally received onIPAddressStatusChanged event and default interface changed"
+                info["Test_Step_Message"] = message
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # Front Panel Response result parser steps
         elif tag == "frontpanel_get_led_info":
@@ -1069,27 +1077,50 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
+                
         elif tag == "check_connected_audio_ports":
-            info["connected_audio_port"] = result.get('connectedAudioPorts')
-            if json.dumps(result.get('success')) == "true" and str(expectedValues[0]) in result.get('connectedAudioPorts'):
-                info["Test_Step_Status"] = "SUCCESS"
+            if len(arg) and arg[0] == "check_value":
+                info["connected_audio_port"] = result.get('connectedAudioPorts')
+                if json.dumps(result.get('success')) == "true":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
-                info["Test_Step_Status"] = "FAILURE"
+                info["connected_audio_port"] = result.get('connectedAudioPorts')
+                if json.dumps(result.get('success')) == "true" and str(expectedValues[0]) in result.get('connectedAudioPorts'):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_supported_audio_modes":
             info["supported_audio_modes"] = result.get('supportedAudioModes');
-            if str(result.get("success")).lower() == "true":
+            success = str(result.get("success")).lower() == "true"
+            status = checkNonEmptyResultData(result.get('supportedAudioModes'))
+            if "FALSE" not in status and success:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
+                
         elif tag == "check_sound_mode":
-            info["soundMode"] = result.get('soundMode');
-            if str(result.get("success")).lower() == "true":
-                info["Test_Step_Status"] = "SUCCESS"
+            soundMode = result.get('soundMode')
+            if "AUTO" in soundMode:
+                message = "Best sound mode of the device %s" %(soundMode)
+                info["Test_Step_Message"] = message
+                soundMode = re.search(r"\((.*?)\)",soundMode).group(1)
+            info["soundMode"] = soundMode
+            if len(arg) and arg[0] == "check_expected_sound_mode":
+                expectedMode = str(expectedValues[0]).lower()
+                print expectedMode
+                print result.get('soundMode').lower()
+                if result.get('soundMode').lower() == expectedMode or expectedMode in result.get('soundMode').lower():
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
-                info["Test_Step_Status"] = "FAILURE"
+                if str(result.get("success")).lower() == "true" and result.get('soundMode') in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE" 
 
         elif tag == "check_zoom_settings":
             info["zoomSetting"] = result.get('zoomSetting');
@@ -1198,11 +1229,24 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_drc_mode":
-            info["DRCMode"] = result.get('DRCMode');
-            if str(result.get("success")).lower() == "true" and str(result.get('DRCMode')) in expectedValues:
-                info["Test_Step_Status"] = "SUCCESS"
+            if result.get('DRCMode').lower() == "line":
+                DRCMode = 0
+                message = "DRCMode => line-0"
+            elif result.get('DRCMode').lower() == "rf":
+                DRCMode = 1
+                message = "DRCMode => RF-1"
+            info["DRCMode"] = DRCMode
+            info["Test_Step_Message"] = message
+            if len(arg) and arg[0] == "validate_drc_mode":
+                if str(result.get("success")).lower() == "true" and DRCMode == int(expectedValues[0]):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
-                info["Test_Step_Status"] = "FAILURE"
+                if str(result.get("success")).lower() == "true" and str(result.get('DRCMode')) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_volume_level":
             info["volumeLevel"] = result.get('volumeLevel');
@@ -1323,6 +1367,26 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "check_settop_supported_audio_capabilities":
+            info["audioCapabilities"] = result.get('AudioCapabilities')
+            status = checkNonEmptyResultData(result)
+            audioCapabilities = [value.lower() for value in result.get('AudioCapabilities')]
+            audioCapabilities_status = [ "FALSE" for value in expectedValues if value.lower() not in audioCapabilities ]
+            if status == "TRUE" and "FALSE" not in  audioCapabilities_status:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_settop_supported_ms12_capabilities":
+            info["ms12Capabilities"] = result.get('MS12Capabilities')
+            status = checkNonEmptyResultData(result)
+            ms12Capabilities = [value.lower() for value in result.get('MS12Capabilities')]
+            ms12Capabilities_status = [ "FALSE" for value in expectedValues if value.lower() not in ms12Capabilities ]
+            if status == "TRUE" and "FALSE" not in  ms12Capabilities_status:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_check_adapter_state":
             info = result.copy()
@@ -1383,6 +1447,15 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
         elif tag == "wifi_get_paired_ssid":
             info = checkAndGetAllResultInfo(result,result.get("success"))
             if str(result.get("success")).lower() == "true" and str(result.get("ssid")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "wifi_check_supported_security_modes":
+            info["supported_security_modes"] = result.get("security_modes")
+            success = str(result.get("success")).lower() == "true"
+            status = checkNonEmptyResultData(result)
+            if "FALSE" not in status and success:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -1806,6 +1879,49 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        # XCast Plugin Response result parser steps
+        elif tag == "xcast_get_enabled_status":
+            info["enabled"] = result.get("enabled")
+            success = str(result.get("success")).lower() == "true"
+            if success and str(result.get("enabled")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "xcast_check_result":
+            info = checkAndGetAllResultInfo(result,result.get("success"))
+
+        elif tag == "xcast_check_api_version":
+            info["version"] = result.get("version")
+            success = str(result.get("success")).lower() == "true"
+            if success and result.get("version") == int(expectedValues[0]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "xcast_check_set_operation":
+            info["success"] = result.get("success")
+            if str(result.get("success")).lower() == "true":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "xcast_check_friendly_name":
+            info["friendlyname"] = result.get("friendlyname")
+            success = str(result.get("success")).lower() == "true"
+            if success and str(result.get("friendlyname")).lower() in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "xcast_check_standby_behavior":
+            info["standbybehavior"] = result.get("standbybehavior")
+            success = str(result.get("success")).lower() == "true"
+            if success and str(result.get("standbybehavior")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_state":
             if arg[0] == "check_status":
@@ -2154,6 +2270,10 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             else:
                 info["enabled"] = True
 
+        elif tag == "network_get_stb_ip":
+            testStepResults = testStepResults[0].values()[0]
+            info["Device_IP"] = testStepResults[0].get("ip")
+
 
         # Front Panel Plugin Response result parser steps
         elif tag == "frontpanel_get_brightness_levels":
@@ -2345,7 +2465,7 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag == "display_info_get_supported_resolution_list":
             testStepResults = testStepResults[0].values()[0]
             SupportingRes = testStepResults[0].get("supportedResolutions")
-            info["resolutions"] = ",".join(SupportingRes)
+            info["resolution"] = ",".join(SupportingRes)
 
         elif tag == "displayinfo_get_connected_device_edid":
             testStepResults = testStepResults[0].values()[0]
@@ -2420,6 +2540,26 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             audioProfiles = testStepResults[0].get("supportedMS12AudioProfiles")
             info["ms12AudioProfile"] = ",".join(audioProfiles)
 
+        elif tag == "get_connected_audio_port":
+            testStepResults = testStepResults[0].values()[0]
+            audioPorts = testStepResults[0].get("connected_audio_port")
+            if "HDMI0" in audioPorts:
+                info["audioPort"] = "HDMI0"
+            else:
+                info["audioPort"] = audioPorts[0]
+
+        elif tag =="get_formatted_sound_modes":
+            testStepResults = testStepResults[0].values()[0]
+            supported_sound_modes = testStepResults[0].get("supported_audio_modes")
+            soundModes = []
+            for mode in supported_sound_modes:
+                if "AUTO" in mode:
+                    value = re.search(r"\((.*?)\)",mode).group(1)
+                    soundModes.append(value)
+                else:
+                    soundModes.append(mode)
+            info["soundMode"] = ",".join(soundModes)
+            
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_toggle_adapter_state":
             testStepResults = testStepResults[0].values()[0]
@@ -2505,6 +2645,22 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["enabletts"] = False
             else:
                 info["enabletts"] = True
+
+        # XCast Plugin Response result parser steps
+        elif tag == "xcast_toggle_enabled_status":
+            testStepResults = testStepResults[0].values()[0]
+            enabled_status = testStepResults[0].get("enabled")
+            if str(enabled_status).lower() == "true":
+                info["enabled"] = False
+            else:
+                info["enabled"] = True
+        elif tag == "xcast_toggle_standby_behavior_status":
+            testStepResults = testStepResults[0].values()[0]
+            standbyBehavior = testStepResults[0].get("standbybehavior")
+            if str(standbyBehavior).lower() == "active":
+                info["standbybehavior"] = "inactive"
+            else:
+                info["standbybehavior"] = "active"
 
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_name":
@@ -2748,6 +2904,13 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             command = arguments[0]
             output = executeCommand(deviceConfigFile, deviceIP, command)
             if "set operation success" in output.lower():
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "network_check_stb_ip_family":
+            info["STB_IP_Family"] = expectedValues
+            if str(expectedValues[0]) == str(deviceIP):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"

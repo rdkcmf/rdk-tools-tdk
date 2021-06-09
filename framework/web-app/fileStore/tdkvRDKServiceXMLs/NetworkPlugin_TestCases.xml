@@ -82,6 +82,14 @@
             <event pluginName="Network" eventName="Event_Connection_Status_Changed" />
             <event pluginName="Network" eventName="Event_IPAddress_Status_Changed" />
           </prerequisite>
+
+	  <prerequisite requisiteId="4" requisiteName="Enable_Preferred_network_parameter" >
+            <testStep testStepId="1" name="Enable_Preferred_Network_Parameter"  action="externalFnCall"  >
+                <resultGeneration useMethodTag="Enable_TR181_Parameter" >
+                  <arguments useConfigFile="true" key="PREFERRED_NETWORK_PARAMETER"/>
+                </resultGeneration>
+            </testStep>
+          </prerequisite>
         </pluginPreRequisite>
 
         <testCase testCaseId="NW_01" testCaseName="Network_Get_Device_Interfaces" desc="Gets list of interfaces supported by device" >
@@ -292,7 +300,18 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="2" pluginName="Wifi"  name="Connect" method="Connect" delay="5">
+            <testStep testStepId="2" name="Set_WIFI_Interface_Enabled" method="Set_Interface_Enabled"  >
+                <params>
+                  <param tag="interface"  value="WIFI" />
+                  <param tag="enabled"   value="true" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
+            </testStep>
+            <testStep testStepId="3" name="Get_STB_IP" method="Get_STB_IP" saveResult="true" >
+                <resultGeneration useMethodTag="network_check_results" />
+            </testStep>
+            <testStep testStepId="4" pluginName="Wifi"  name="Connect" method="Connect" delay="5">
                 <params>
                   <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
                   <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
@@ -300,21 +319,47 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="3" pluginName="Wifi"  name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5">
-                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
-                    <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
-                </resultGeneration>
+            <testStep testStepId="5" name="Set_Default_Interface_WiFi" method="Set_Default_Interface" ipChangeStep="yes">
+                <params>
+                  <param tag="interface" value="WIFI" />
+                  <param tag="persist"   useDefault= "true"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
             </testStep>
-            <testStep testStepId="4" name="Check_IPAddress_Status_Change_Event" event="Event_IPAddress_Status_Changed" action="eventListener" delay="10"  >
-                <resultGeneration useMethodTag="network_ipaddress_status_change_event" expectedValues="ACQUIRED" />
+            <testStep testStepId="6" name="Get_Default_Interface" method="Get_Default_Interface" delay="50">
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="WIFI" />
             </testStep>
-            <testStep testStepId="5" pluginName="Wifi" name="Disconnect" method="Disconnect" delay="3">
+            <testStep testStepId="7" name="Check_STB_IP" method="Get_STB_IP"  >
+                <resultGeneration useMethodTag="network_check_device_ip_changed" >
+                    <expectedValues usePreviousResult="true" Id="3" useMethodTag="network_get_stb_ip"/>
+            </resultGeneration>
+            </testStep>
+       <testCasePostRequisite>
+         <postrequisite requisiteId="1" requisiteName="Setting_Default_Interface_Ethernet">
+            <testStep testStepId="1" name="Set_Ethernet_Interface_Enabled" method="Set_Interface_Enabled" pluginName="Network" >
+                <params>
+                  <param tag="interface"  value="ETHERNET" />
+                  <param tag="enabled"   value="true" />
+                  <param tag="persist"   useDefault="true"/>
+                </params>
+                <resultGeneration useMethodTag="network_check_interface_enable_set_status" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Default_Interface_Ethernet" method="Set_Default_Interface"  ipChangeStep="yes" >
+                <params>
+                  <param tag="interface" value="ETHERNET" />
+                  <param tag="persist"   useDefault= "true"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
+            </testStep>
+            <testStep testStepId="3" name="Get_Default_Interface" method="Get_Default_Interface" delay="50"  >
+                <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="ETHERNET" />
+            </testStep>
+            <testStep testStepId="4" name="Stop_Scan" method="Stop_Scan" pluginName="Wifi" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="6" pluginName="Wifi" name="Stop_Scan" method="Stop_Scan" >
-                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
-            </testStep>
-       </testCase>  
+         </postrequisite>
+       </testCasePostRequisite>
+       </testCase>
        <testCase testCaseId="NW_13" testCaseName="Check_Internet_Connectivity" desc="Checks the internet connectivity">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Set_Connectivity_Endpoints" method="Set_Connectivity_Test_Endpoints">
@@ -327,6 +372,19 @@
                 <resultGeneration useMethodTag="network_check_connectedto_internet" expectedValues="true"/>
             </testStep>
        </testCase>
-
+       <testCase testCaseId="NW_14" testCaseName="Get_STB_IP_Family" desc="Gets the IP address of the default interface by address family" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_STB_IP_Family" method="Get_STB_IP_Family" saveResult ="true" >
+                <params>
+                  <param tag="family"  value="AF_INET" />
+                </params>
+                <resultGeneration useMethodTag="network_check_results"/>
+            </testStep>
+            <testStep testStepId="2" name="Check_STB_IP" action="externalFnCall" >
+                <resultGeneration useMethodTag="network_check_stb_ip_family" >
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="network_get_stb_ip" />
+                </resultGeneration>
+            </testStep>
+       </testCase>
 </testPlugin>
 

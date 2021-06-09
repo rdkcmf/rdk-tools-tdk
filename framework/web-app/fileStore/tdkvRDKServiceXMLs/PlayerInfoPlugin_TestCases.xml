@@ -57,6 +57,9 @@
                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" expectedValues="activated"/>
             </testStep>
           </prerequisite>
+          <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
+            <event pluginName="PlayerInfo" eventName="Event_AudioMode_Changed" />
+          </prerequisite>
         </pluginPreRequisite>
 
         <testCase testCaseId="PI_01" testCaseName="PlayerInfo_Check_Audio_Codecs"  desc="checks the audio codecs list">
@@ -137,5 +140,50 @@
               </subtestStep>
             </testStep>
         </testCase>
+        <testCase testCaseId="PI_08" testCaseName= "Check_Dolby_AudioMode_Changed_Event"  desc="Checks for the audio mode changed event">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true" pluginName="DisplaySettings" >
+                <resultGeneration useMethodTag="check_connected_audio_ports" arguments="check_value" >
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_Audio_Modes" method="Get_Supported_AudioModes" saveResult="true" pluginName="DisplaySettings" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_connected_audio_port" />
+                  </params>
+                <resultGeneration useMethodTag="check_supported_audio_modes"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Sound_Mode" method="Get_Sound_Mode" saveResult="true" revertGet="yes" pluginName="DisplaySettings" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_connected_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_sound_mode" >
+                     <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_sound_modes" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="4"  name="Set_Sound_Mode" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Sound_Mode" method="Set_Sound_Mode" revertSet="yes" pluginName="DisplaySettings" >
+                  <params>
+                    <param tag="audioPort"  usePreviousResult="true" Id="1" useMethodTag="get_connected_audio_port" />
+                    <param tag="soundMode" usePreviousResult="true" Id="2" useMethodTag="get_formatted_sound_modes" iteration="true" revertParam="yes" />
+                    <param tag="persist" value="false" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Sound_Mode" method="Get_Sound_Mode" revertFlag="yes" pluginName="DisplaySettings" >
+                  <params>
+                    <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_connected_audio_port" />
+                  </params>
+                  <resultGeneration useMethodTag="check_sound_mode" arguments="check_expected_sound_mode" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Check_Dolby_AudioMode_Changed_Event" event="Event_AudioMode_Changed" action="eventListener" delay="2" >
+                  <resultGeneration useMethodTag="playerinfo_check_dolby_audiomode_changed_event" >
+                    <expectedValues useIterableValue="true"/>
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
 </testPlugin>
 

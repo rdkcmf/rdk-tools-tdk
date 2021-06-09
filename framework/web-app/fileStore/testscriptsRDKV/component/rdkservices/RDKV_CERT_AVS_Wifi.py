@@ -85,10 +85,7 @@ from BrowserPerformanceUtility import *
 import BrowserPerformanceUtility
 from rdkv_performancelib import *
 import rdkv_performancelib
-import MediaValidationVariables
-from MediaValidationUtility import *
-import MediaValidationUtility
-import ip_change_detection_variables
+import IPChangeDetectionVariables
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkservices","1",standAlone=True);
@@ -115,9 +112,9 @@ if expectedResult in result.upper():
         #Need to revert the values since we are changing plugin status
         revert="YES"
         status,webkit_status,cobalt_status = check_pre_requisites(obj)
-    ip_change_app_url = ip_change_detection_variables.ip_change_app_url
-    user_name = ip_change_detection_variables.tm_username
-    password = ip_change_detection_variables.tm_password
+    ip_change_app_url = IPChangeDetectionVariables.ip_change_app_url
+    user_name = IPChangeDetectionVariables.tm_username
+    password = IPChangeDetectionVariables.tm_password
     tm_url = obj.url
     device_name = rdkv_performancelib.deviceName
     #Reading the Device IP Type from the device config file
@@ -126,7 +123,7 @@ if expectedResult in result.upper():
     ip_address_type_status,ip_address_type = getDeviceConfigKeyValue(conf_file,"DEVICE_IP_ADDRESS_TYPE")
     video_test_url = ip_change_app_url+'?tmURL='+obj.url+'&deviceName='+device_name+'&tmUserName='+user_name+'&tmPassword='+password+'&ipAddressType='+ip_address_type
     if any(value == "" for value in (ip_change_app_url,user_name,password,ip_address_type)):
-        print "\n Please configure values in ip_change_detection_variables and Device specific configuration file \n"
+        print "\n Please configure values in IPChangeDetectionVariables and Device specific configuration file \n"
         config_status = "FAILURE"
     #Checking whether device supports proc entry validation. If supported, get
     #device information to access and read the proc file

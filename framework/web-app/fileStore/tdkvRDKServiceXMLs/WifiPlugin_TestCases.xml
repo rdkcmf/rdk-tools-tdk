@@ -600,4 +600,11 @@
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
        </testCase>
+
+       <testCase testCaseId="WIFI_15" testCaseName="WIFI_Get_Supported_Security_Modes" desc="Checks the supported security modes" >
+           <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Get_Supported_Security_Modes" method="Get_Supported_Security_Modes">
+                <resultGeneration useMethodTag="wifi_check_supported_security_modes" />
+            </testStep>
+       </testCase>
 </testPlugin>

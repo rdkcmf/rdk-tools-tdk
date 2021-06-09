@@ -406,6 +406,12 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "system_check_reboot_reason_event":
+             result=result[0]
+             info["Test_Step_Status"] = "FAILURE"
+             if str(result.get("rebootReason")) == str(expectedValues[0]):
+                info["Test_Step_Status"] = "SUCCESS"
+
         # LoggerPreferences Events response result parser steps
         elif tag == "loggingpreferences_check_onkeystroke_mask_enabled_change_event":
             result = result[0]
@@ -430,7 +436,14 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-       
+        elif tag == "displaysettings_check_audio_mute_status_changed_event":
+            result = result[0]
+            info = result
+            if str(result.get("muteStatus")) in  expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE" 
+
         # Timer Events response result parser steps
         elif tag == "timer_check_timer_expired_event":
             result = result[0]
@@ -463,14 +476,6 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
-        elif tag == "network_ipaddress_status_change_event":
-            info["Test_Step_Status"] = "FAILURE"
-            for eventResult in result:
-                if str(eventResult.get("status")) in  expectedValues:
-                    info = eventResult
-                    info["Test_Step_Status"] = "SUCCESS"
-                    break;
   
         # DataCapture Events response result parser steps
         elif tag == "datacapture_check_on_audioclip_ready_event":
@@ -613,6 +618,72 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             result = result[0]
             info = result
             if str(result.get("state")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+     
+        # Cobalt Events response result parser steps
+        elif tag == "cobalt_check_state_change_event":
+            result = result[0]
+            info = result
+            if str(result.get("suspended")).lower() in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+                
+        # DisplayInfo Events response result parser steps
+        elif tag == "displayinfo_check_resolution_postchange_event":
+            result = result[0]
+            info = result
+            if str(result.get("event")).lower() in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        # Messenger Events response result parser steps
+        elif tag == "messenger_check_room_updated_event":
+            result = result[0]
+            info = result
+            if str(result.get("room")).lower() == str(expectedValues[0]) and str(result.get("action")).lower() == str(expectedValues[1]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "messenger_check_user_update_event":
+            info["Test_Step_Status"] = "FAILURE"
+            for eventResult in result:
+                if str(eventResult.get("user")).lower() == str(expectedValues[0]) and str(eventResult.get("action")).lower() == str(expectedValues[1]):
+                    info = eventResult
+                    info["Test_Step_Status"] = "SUCCESS"
+                    break;
+
+        elif tag == "check_event_registration":
+            if len(arg) and arg[0] == "check_user_update_event":
+                if str(result.get("user")).lower() == str(expectedValues[0]) and str(result.get("action")).lower() == str(expectedValues[1]):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["result"] = result
+                if int(result) == int(expectedValues[0]):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "messenger_check_message_event":
+            result = result[0]
+            info = result
+            if str(result.get("user")).lower() == str(expectedValues[0]) and str(result.get("message")).lower() == str(expectedValues[1]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        # PlayerInfo Events response result parser steps
+        elif tag == "playerinfo_check_dolby_audiomode_changed_event":
+            result = result[0]
+            info = result
+            expectedMode = str(expectedValues[0]).lower()
+            if result.get('mode').lower() == expectedMode or expectedMode in result.get('mode').lower():
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"

@@ -41,7 +41,8 @@
             <event pluginName="System" eventName="Event_MacAddresses_Retreived" />
             <event pluginName="System" eventName="Event_PowerState_Changed" />
             <event pluginName="System" eventName="Event_SystemMode_Changed" />
-            <event pluginName="System" eventName="Event_Temperature_Threshold_Changed" />
+	    <event pluginName="System" eventName="Event_Temperature_Threshold_Changed" />
+	    <event pluginName="System" eventName="Event_Reboot_Request" />
           </prerequisite>
 
         </pluginPreRequisite>
@@ -500,6 +501,18 @@
             </testStep>
             <testStep testStepId="6" name="Get_STB_Mode" method="Get_Mode" >
                 <resultGeneration useMethodTag="system_validate_modes" expectedValues="NORMAL" />
+            </testStep>
+       </testCase>
+       <testCase testCaseId="SYS_36" testCaseName= "System_Check_Reboot_Reason_Event" desc="Retrieve basic information about a reboot">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="System_reboot" method="Reboot" closeConn="false" rebootStep="yes">
+               <params>
+                  <param tag="rebootReason" value="API Validation" />
+               </params>
+              <resultGeneration useMethodTag="system_check_set_operation"  />
+            </testStep>
+            <testStep testStepId="2" name="Check_On_Reboot_Request_Event" event="Event_Reboot_Request" action="eventListener" delay="60">
+              <resultGeneration useMethodTag="system_check_reboot_reason_event" expectedValues= "API Validation" />
             </testStep>
        </testCase>
 </testPlugin>
