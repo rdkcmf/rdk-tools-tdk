@@ -196,8 +196,9 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #If the output string returned from 'mediapipelinetests' contains "Failures: 0" and "Errors: 0", then the test suite executed successfully 
     if expectedResult in actualresult.upper() and output:
         passStringList = ["Failures: 0", "Errors: 0"]
-        if (all (token in output for token in passStringList)):
-        #if ("Failures: 0" not in output and "Errors: 0" not in output) :
+        passString = "failed: 0"
+        
+        if ((all (token in output for token in passStringList)) or (passString in output)):
             tdkTestObj.setResultStatus("SUCCESS")
             print "HLS Play-pause using 'playbin' and 'westeros-sink' was successfull"
             print "Mediapipeline test executed successfully"
