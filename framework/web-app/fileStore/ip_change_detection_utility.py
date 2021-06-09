@@ -157,6 +157,7 @@ def get_curr_device_ip(tm_url):
 def switch_to_wifi(obj,ap_freq = "2.4",start_time_needed = False):
     status = "FAILURE"
     expectedResult =  "SUCCESS"
+    start_time = ""
     complete_app_url_status,complete_app_url = get_lightning_app_url(obj)
     plugin_status,plugin_status_dict,revert = set_plugins(obj)
     if plugin_status == "SUCCESS" and complete_app_url_status == "SUCCESS":
