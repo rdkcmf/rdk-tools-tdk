@@ -75,9 +75,8 @@ IARM_Bus_Term : None
 </input_parameters>
     <automation_approch>1.TM loads the IARMBUS_Agent via the test agent
 2.The IARMBUS_Agent initializes and registers with IARM Bus Daemon (First Application).
-3.TM loads(initializes and registers) another application with IARM Daemon(second application) .
-4.IARMBUS_Agent will register for “IARM_BUS_SYSMGR_EVENT_HDCP_PROFILE_UPDATE” event and waits on event.
-5.Second application will broadcast the event to the bus.
+3.IARMBUS_Agent will register for “IARM_BUS_SYSMGR_EVENT_HDCP_PROFILE_UPDATE” event and waits on event.
+4.IARMBUS_Agent will broadcast the event to the bus using IARM_Bus_BroadcastEvent api.
 6.IARMBUS_Agent should receive the event and event handler should handle the event(printing some log message) .
 7.IARMBUS_Agent deregisters from the IARM Bus Daemon.
 8.For each API called in the script, IARMBUS_Agent will send SUCCESS or FAILURE status to Test Agent by comparing the return vale of APIs.
@@ -151,8 +150,9 @@ if "SUCCESS" in loadmodulestatus.upper():
                         if expectedresult in actualresult:
                                 tdkTestObj.setResultStatus("SUCCESS");
                                 print "SUCCESS :Event Handler registered successfully";
-                                #invoking application to broadcast event
-                                tdkTestObj = obj.createTestStep('IARMBUS_InvokeSecondApplication');
+                                tdkTestObj = obj.createTestStep('IARMBUS_BroadcastEvent')
+                                tdkTestObj.addParameter("owner_name","SYSMgr");
+                                tdkTestObj.addParameter("event_id",4);
 
                                 expectedresult="SUCCESS"
                                 tdkTestObj.executeTestCase(expectedresult);

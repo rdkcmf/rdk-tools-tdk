@@ -118,9 +118,9 @@ if "SUCCESS" in loadmodulestatus.upper():
                         if expectedresult in actualresult:
                                 tdkTestObj.setResultStatus("SUCCESS");
                                 print "SUCCESS :Event Handler registered successfully";
-                                #invoking application to broadcast event
-                                tdkTestObj = obj.createTestStep('IARMBUS_InvokeSecondApplication');
-                                
+                                tdkTestObj = obj.createTestStep('IARMBUS_BroadcastEvent')
+                                tdkTestObj.addParameter("owner_name","SYSMgr");
+                                tdkTestObj.addParameter("event_id",4);
                                 expectedresult="SUCCESS"
                                 tdkTestObj.executeTestCase(expectedresult);
                                 actualresult = tdkTestObj.getResult();

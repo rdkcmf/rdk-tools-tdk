@@ -69,7 +69,7 @@ IARM_Bus_Disconnect : None
 IARM_Bus_Term : None</input_parameters>
     <automation_approch>1.TM loads the IARMBUS_Agent via the test agent
 2.The IARMBUS_Agent initializes and registers with IARM Bus Daemon (First Application).
-3.TM loads(initializes and registers) another application with IARM Daemon(second application which broadcasts the Dummy events) .
+3.IARMBUS_Agent will broadcast dummy events to the bus using IARM_Bus_BroadcastEvent api.
 4.IARMBUS_Agent will register for “IARM_BUS_EVENT_RESOLUTIONCHANGE” event and waits on event using a  event handler.(should pass)
 5.IARMBUS_Agent will unregister the event handler for “IARM_BUS_EVENT_RESOLUTIONCHANGE” event .
 6.IARMBUS_Agent should not be able to remove the event handler after unresiter
@@ -156,17 +156,17 @@ if "SUCCESS" in loadmodulestatus.upper():
                                 if expectedresult in actualresult:
                                         tdkTestObj.setResultStatus("SUCCESS");
                                         print "SUCCESS :Event Handler registered successfully";
-                                        #Call second application to check for resource available event
-                                        tdkTestObj = obj.createTestStep('IARMBUS_InvokeSecondApplication');
+                                        tdkTestObj = obj.createTestStep('IARMBUS_BroadcastEvent')
+                                        tdkTestObj.addParameter("event_id",0);
                                         expectedresult="SUCCESS"
                                         tdkTestObj.executeTestCase(expectedresult);
                                         actualresult = tdkTestObj.getResult();
                                         if expectedresult in actualresult:
                                                 tdkTestObj.setResultStatus("SUCCESS");
-                                                print "SUCCESS:InvokeSecondApplication success";
+                                                print "SUCCESS: Event Broadcast success";
                                         else:
                                                 tdkTestObj.setResultStatus("FAILURE");
-                                                print "FAILURE:InvokeSecondApplication fails";
+                                                print "FAILURE: Event Broadcast fails";
 
                                         #wait for 2 sec to receive event that is broadcasted from second app
                                         sleep(2);

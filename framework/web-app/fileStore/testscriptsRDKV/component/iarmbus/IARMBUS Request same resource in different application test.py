@@ -66,10 +66,9 @@ IARM_Bus_Disconnect : None
 IARM_Bus_Term : None</input_parameters>
     <automation_approch>1.TM loads the IARMBUS_Agent via the test agent
 2.The IARMBUS_Agent initializes and registers with IARM Bus Daemon ( First application) .
-3.TM loads(initializes and registers) another application with IARM Daemon(second application).
-4.Second application will request and acquire  “IARM_BUS_RESOURCE_FOCUS” resource.
+3.IARMBUS_Agentwill request and acquire  “IARM_BUS_RESOURCE_FOCUS” resource.
 5.IARMBUS_Agent application will request for a resource which is currently acquired by second application.
-6.Second application will release the resource and the resource will be utilized by IARMBUS_Agent application.
+6.IARMBUS_Agent will release the resource and the resource will be utilized by IARMBUS_Agent application.
 7.IARMBUS_Agent will release “IARM_BUS_RESOURCE_FOCUS” resource.
 8.Both the applications  deregister from the IARM Bus Daemon.
 9.For each API called in the script, IARMBUS_Agent will send SUCCESS or FAILURE status to Test Agent by comparing the return vale of APIs.</automation_approch>
@@ -128,7 +127,8 @@ if "SUCCESS" in loadmodulestatus.upper():
                         print "SUCCESS: Application successfully connected with IARMBUS ";
                         #wait for 2 sec to start second application
                         time.sleep(2);
-                        tdkTestObj = obj.createTestStep('IARMBUS_InvokeSecondApplication');
+                        tdkTestObj = obj.createTestStep('IARMBUS_BroadcastEvent')
+                        tdkTestObj.addParameter("event_id",0);
                         expectedresult="SUCCESS"
                         tdkTestObj.executeTestCase(expectedresult);
                         actualresult = tdkTestObj.getResult();
@@ -136,10 +136,10 @@ if "SUCCESS" in loadmodulestatus.upper():
                         #Check for SUCCESS/FAILURE return value
                         if expectedresult in actualresult:
                                 tdkTestObj.setResultStatus("SUCCESS");
-                                print "SUCCESS: Second application Invoked successfully";
+                                print "SUCCESS: Event broadcasted successfully";
                         else:
                                 tdkTestObj.setResultStatus("FAILURE");
-                                print "FAILURE: Second application failed to execute";
+                                print "FAILURE: Event broadcast failed";
                         #This agent application also tries to grabb the same resource mentioned above
                         #calling IARMBUS API "IARM_BusDaemon_RequestOwnership"
                         tdkTestObj = obj.createTestStep('IARMBUS_RequestResource');
