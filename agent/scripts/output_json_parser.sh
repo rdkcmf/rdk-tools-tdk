@@ -29,7 +29,7 @@ echo "Base Url     :" $BASE_URL
 #Parse xdiscovery.conf file to get the location of output.json file
 outputjsonfile=`cat $XDISCOVERY_PATH/xdiscovery.conf|grep outputJsonFile=|grep -v "#"|awk -F "=" '{print $2}' | tr -d '\r\n'`
 echo "Location of output.json file="$outputjsonfile
-if [ $? == 0 ] && [ "$outputjsonfile" != "" ]; then
+if [ "$outputjsonfile" != "" ]; then
         echo "SUCCESS<DETAILS>Parsed output.json location" > $LOG_PATH/$LOGFILE
 	if [ -e $outputjsonfile ]; then
         	echo $outputjsonfile "file found"
@@ -48,7 +48,7 @@ fi
 if [ "$STREAMING_IP" == "mdvr" ]; then
 	playUrl=`cat $outputjsonfile |grep playbackUrl|cut -f2- -d":"|cut -f1 -d "&"|cut -f2 -d "\""|head -1`
 	echo "mDVR PlayUrl="$playUrl
-        if [ $? == 0 ] && [ "$playUrl" != "" ]; then
+        if [ "$playUrl" != "" ]; then
                 echo "SUCCESS<DETAILS>PlayUrl="$playUrl >> $LOG_PATH/$LOGFILE
         else
                 echo "Unable to read play url from output.json"
@@ -58,12 +58,12 @@ if [ "$STREAMING_IP" == "mdvr" ]; then
 else 
 	playUrl=`cat $outputjsonfile |grep playbackUrl|cut -f2- -d":"|cut -f1 -d "&"|grep $STREAMING_IP|cut -f2 -d "\""`
 	echo "StreamingIP PlayUrl="$playUrl
-	if [ $? == 0 ] && [ "$playUrl" != "" ]; then
+	if [ "$playUrl" != "" ]; then
 		echo "SUCCESS<DETAILS>PlayUrl="$playUrl >> $LOG_PATH/$LOGFILE
 	else
 		playUrl=`cat $outputjsonfile |grep playbackUrl|cut -f2- -d":"|cut -f1 -d "&"|grep 127.0.0.1|cut -f2 -d "\""`
 		echo "LoopbackIP PlayUrl="$playUrl
-        	if [ $? == 0 ] && [ "$playUrl" != "" ]; then
+        	if [ "$playUrl" != "" ]; then
 			echo "SUCCESS<DETAILS>PlayUrl="$playUrl >> $LOG_PATH/$LOGFILE
         	else
 			displayJson=`cat $outputjsonfile`
@@ -77,7 +77,7 @@ fi
 #parse the base URL
 baseUrl=`echo $BASE_URL |cut -f2 -d "?"`
 echo "Service locator="$baseUrl
-if [ $? == 0 ] && [ "$baseUrl" != "" ]; then
+if [ "$baseUrl" != "" ]; then
         echo "SUCCESS<DETAILS>Service locator="$baseUrl >> $LOG_PATH/$LOGFILE
 else
         echo "FAILURE<DETAILS>Unable to read service locator from base url" >> $LOG_PATH/$LOGFILE
