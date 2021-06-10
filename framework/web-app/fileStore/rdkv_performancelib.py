@@ -35,7 +35,7 @@ deviceIP=""
 devicePort=""
 deviceName=""
 deviceType=""
-graphical_plugins_list = ["Cobalt","WebKitBrowser","Amazon"]
+graphical_plugins_list = ["Cobalt","WebKitBrowser"]
 #METHODS
 #---------------------------------------------------------------
 #INITIALIZE THE MODULE
