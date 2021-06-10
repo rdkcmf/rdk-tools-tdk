@@ -176,7 +176,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
         print "Video playback status check is added"
         check_av_status = check_av_status_flag
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT' that specifies the video playback timeout in seconds 
-    actualresult, timeout = getDeviceConfigValue('PLAYBACK_FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUTTIMEOUT')
+    actualresult, timeout = getDeviceConfigValue('FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT')
         
     #If the value of FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT is retrieved correctly and its value is not empty, timeout value should be passed to the test application
     #if the device config value is empty, default timeout(10sec) is passed
