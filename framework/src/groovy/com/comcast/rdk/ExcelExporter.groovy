@@ -644,7 +644,7 @@ class ExcelExporter extends AbstractExporter {
 					sheetsList.each { sheetName ->
 						if(sheetName.equals("CoverPage")){
 							Map coverPageMap = dataMap.get(sheetName)
-							List columnWidthList = [0.05,0.05,0.05,0.05,0.08,0.4,0.15,0.2,0.2,0.2,0.2,0.2,0.4,0.15,0.15,0.15,0.2,0.2,0.2]
+							List columnWidthList = [0.05,0.05,0.05,0.05,0.08,0.2,0.2,0.2,0.2,0.2,0.2,0.2,0.15,0.15,0.15,0.15,0.2,0.2,0.2]
 							sheet(name: "Summary" ?: "Export", widths: columnWidthList){
 								int rowIndex = 0
 								//Default format

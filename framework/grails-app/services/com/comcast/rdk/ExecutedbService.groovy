@@ -1113,6 +1113,7 @@ class ExecutedbService {
 							def pluginMap = [:]
 							pluginMap.put("Sl No", counter)
 							pluginMap.put("Plugins", pluginName)
+							pluginMap.put("Script Status", executionResult?.status)
 							pluginMap.put("Total Test Case", totalTests?.toInteger())
 							pluginMap.put("Executed", executedTests?.toInteger())
 							pluginMap.put(Constants.SUCCESS_STATUS, passedTests?.toInteger())
@@ -1121,14 +1122,55 @@ class ExecutedbService {
 							coverPageMap.put(pluginName,pluginMap)
 							counter++
 						}else{
+							int timeoutScriptTestCaseCount = 0
+							int timeoutScriptTestCaseExecutedCount = 0
+							int timeoutScriptTestCaseSuccessCount = 0
+							int timeoutScriptTestCaseFailureCount = 0
+							int timeoutScriptTestCaseNaCount = 0
+							int timeoutScriptTestCaseDetailsPresentCount = 0
+							String pluginTotalTestCase = StringUtils.substringBetween(executionResultOutput, "PLUGIN TOTAL TEST CASES:", "<br/>");
+							if(pluginTotalTestCase){
+								pluginTotalTestCase = pluginTotalTestCase?.trim()
+								timeoutScriptTestCaseCount = pluginTotalTestCase?.toInteger()
+								totalCount = totalCount + pluginTotalTestCase?.toInteger()
+							}
+							List testCaseNameList = StringUtils.substringsBetween(executionResultOutput, "TEST CASE NAME   :", "<br/>")
+							if(testCaseNameList){
+								testCaseNameList.each{ testCaseName ->
+									testCaseName = testCaseName?.toString()?.trim()
+									String testCaseDetails = StringUtils.substringBetween(executionResultOutput, testCaseName, "----------##")
+									if(testCaseDetails){
+										timeoutScriptTestCaseDetailsPresentCount++
+										if(!pluginTotalTestCase){
+											timeoutScriptTestCaseCount++
+											totalCount++
+										}
+										String testCaseStatus = testCaseDetails.substring(testCaseDetails?.indexOf("[TEST EXECUTION STATUS] :") + 25 , testCaseDetails?.length());
+										testCaseStatus = testCaseStatus?.trim()
+										if(Constants.SUCCESS_STATUS.equals(testCaseStatus)){
+											timeoutScriptTestCaseSuccessCount++
+											totalSuccessCount++
+										}else if(Constants.FAILURE_STATUS.equals(testCaseStatus)){
+											timeoutScriptTestCaseFailureCount++
+											totalFailureCount++
+										}else if(Constants.NOT_APPLICABLE_STATUS.equals(testCaseStatus)){
+											timeoutScriptTestCaseNaCount++
+											totalNaCount++
+										}
+									}
+								}
+							}
+							timeoutScriptTestCaseExecutedCount = timeoutScriptTestCaseDetailsPresentCount - timeoutScriptTestCaseNaCount
+							totalExecutedCount = totalExecutedCount + timeoutScriptTestCaseExecutedCount
 							def pluginMap = [:]
 							pluginMap.put("Sl No", counter)
 							pluginMap.put("Plugins", pluginName)
-							pluginMap.put("Total Test Case", 0)
-							pluginMap.put("Executed", 0)
-							pluginMap.put(Constants.SUCCESS_STATUS, 0)
-							pluginMap.put(Constants.FAILURE_STATUS, 0)
-							pluginMap.put(Constants.NOT_APPLICABLE_STATUS, 0)
+							pluginMap.put("Script Status", executionResult?.status)
+							pluginMap.put("Total Test Case", timeoutScriptTestCaseCount)
+							pluginMap.put("Executed", timeoutScriptTestCaseExecutedCount)
+							pluginMap.put(Constants.SUCCESS_STATUS, timeoutScriptTestCaseSuccessCount)
+							pluginMap.put(Constants.FAILURE_STATUS, timeoutScriptTestCaseFailureCount)
+							pluginMap.put(Constants.NOT_APPLICABLE_STATUS, timeoutScriptTestCaseNaCount)
 							coverPageMap.put(pluginName,pluginMap)
 							counter++
 						}
@@ -1236,6 +1278,7 @@ class ExecutedbService {
 			totalScriptExecutedCount = totalScriptCount - totalScriptNaCount
 			pluginMap.put("Sl No", counter)
 			pluginMap.put("Plugins", "rdkservices")
+			pluginMap.put("Script Status", "FAILURE")
 			pluginMap.put("Total Test Case", totalScriptCount)
 			pluginMap.put("Executed", totalScriptExecutedCount)
 			pluginMap.put(Constants.SUCCESS_STATUS, totalScriptSuccessCount)
@@ -1253,6 +1296,7 @@ class ExecutedbService {
 		Map totalMap = [:]
 		totalMap.put("Sl No", "")
 		totalMap.put("Plugins", "Total")
+		totalMap.put("Script Status", "")
 		totalMap.put("Total Test Case", totalCount + totalScriptCount)
 		totalMap.put("Executed", totalExecutedCount + totalScriptExecutedCount)
 		totalMap.put(Constants.SUCCESS_STATUS, totalSuccessCount + totalScriptSuccessCount)
