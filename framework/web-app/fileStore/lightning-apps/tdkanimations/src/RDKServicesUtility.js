@@ -88,7 +88,7 @@ export class RDKServicesInterface extends Lightning.Component {
       .catch(function(error) {
           logMsg(error)
       })
-      this.thunderJS.WebKitBrowser.fps()
+      this.thunderJS.LightningApp.fps()
       .then((result) => { tag = this
           tag.settings.consumer.tag(tag.settings.fpsholder).text.text = "FPS : " + result
           tag.diagnosticsInfo["fps"] = result

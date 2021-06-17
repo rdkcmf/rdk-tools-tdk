@@ -119,6 +119,15 @@ export default class App extends Lightning.Component {
   stop() {
       this.player.stop();
   }
+  setPlaybackRate(rate, overshoot = 0) {
+      this.expectedEvents = ["ratechange"]
+      logMsg("Expected Rate : " + this.expectedRate)
+      logMsg("Expected Event: " + this.expectedEvents)
+      this.player.setPlaybackRate(rate, overshoot);
+  }
+  getPlaybackRate() {
+     return this.player.getPlaybackRate();
+  }
   getCurrentState() {
       return this.player.getCurrentState();
   }
@@ -203,6 +212,12 @@ export default class App extends Lightning.Component {
             break;
     }
   }
+  eventplaybackRateChanged(event) {
+    tag.observedEvents.push("ratechange")
+    tag.observedRate = event.speed;
+    var rate_info = "Video Player Rate Change to " + tag.observedRate
+    tag.checkAndLogEvents("ratechange",rate_info);
+  }
   eventplaybackCompleted(){
     tag.observedEvents.push("ended")
     tag.handlePlayerEvents("Video PlayBack Completed")
@@ -270,6 +285,7 @@ export default class App extends Lightning.Component {
     this.addEventListener("playbackProgressUpdate",this.eventplaybackProgressUpdate)
     this.addEventListener("playbackStateChanged",this.eventplaybackStateChanged)
     this.addEventListener("playbackCompleted",this.eventplaybackCompleted)
+    this.addEventListener("playbackSpeedChanged",this.eventplaybackRateChanged)
     this.addEventListener("playbackFailed",this.eventplaybackFailed)
     logMsg("Event listeners added successfully...")
   }
@@ -322,6 +338,24 @@ export default class App extends Lightning.Component {
                     this.setExpPlayBackEvents()
                 },actionInterval);
             }
+            else if (action == "fastfwd4x" || action == "fastfwd16x" || action == "fastfwd32x"){
+                if (action == "fastfwd32x"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.setPlaybackRate(32)
+                },actionInterval);
+                }else if (action == "fastfwd4x"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.setPlaybackRate(4)
+                },actionInterval);
+                }else if (action == "fastfwd16x"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.setPlaybackRate(16)
+                },actionInterval);
+                }
+            }
             else if (action == "close"){
                 setTimeout(()=> {
                     logMsg("**************** Going to close ****************")
@@ -366,6 +400,38 @@ export default class App extends Lightning.Component {
       if( ! this.expectedEvents.every(e=> this.observedEvents.indexOf(e) >= 0)){
           this.eventFlowFlag = 0
           Status = "FAILURE"
+      } else{
+          if (this.expectedEvents.includes("paused")){
+              var currState = this.getCurrentState();
+              if (currState == this.playerStates.Paused){
+                logMsg("video pause operation success")
+              }else{
+                this.eventFlowFlag = 0
+                Status = "FAILURE"
+                logMsg("video pause operation failure")
+              }
+          }
+          else if(this.expectedEvents.includes("playing")){
+              var currState = this.getCurrentState();
+              if (currState == this.playerStates.Playing){
+                logMsg("video play operation success")
+              }else{
+                this.eventFlowFlag = 0
+                Status = "FAILURE"
+                logMsg("video play operation failure")
+              }
+          }
+          else if(this.expectedEvents.includes("ratechange")){
+              var currRate = parseInt(this.observedRate)
+              //logMsg("Observed Rate : " + currRate)
+              if( currRate == this.expectedRate && currRate == parseInt(this.getPlaybackRate())){
+                logMsg("video rate change operation success")
+              }else{
+                this.eventFlowFlag = 0
+                Status = "FAILURE"
+                logMsg("video rate change operation failure")
+              }
+           }
       }
       logMsg("Test step status: " + Status)
   }
@@ -408,6 +474,8 @@ export default class App extends Lightning.Component {
     this.expectedEvents = []
     this.progressEventMsg  = ""
     this.progressLogger    = null
+    this.playbackSpeeds = [-64, -32, -16, -4, 1, 4, 16, 32, 64];
+    this.playbackRateIndex = this.playbackSpeeds.indexOf(1)
     logMsg("URL Info: " + this.videoURL )
 
     tag = this;

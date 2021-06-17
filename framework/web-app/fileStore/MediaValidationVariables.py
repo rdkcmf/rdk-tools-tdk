@@ -17,8 +17,26 @@
 # limitations under the License.
 #########################################################################
 
-#The port must be 9998 for thunder builds and 9224 for rdkservice builds
+# The default browser instance used for launching the video test apps
+# webkit_instance can be "WebKitBrowser" or "LightningApp"
+webkit_instance = "WebKitBrowser"
+# The default browser instance used for launching html video test app
+# webkit_instance_html can be "WebKitBrowser" or "HtmlApp"
+webkit_instance_html = "HtmlApp"
+
+# If the webkit_instance is "WebKitBrowser", then port must be 9998 for
+# thunder builds and 9224 for rdkservice builds. If the webkit_instance
+# is "LightningApp", then port must be 10002
 webinspect_port=""
+
+# If the webkit_instance_html is "WebKitBrowser", then port must be 9998 for
+# thunder builds and 9224 for rdkservice builds. If the webkit_instance_html
+# is "HtmlApp", then port must be 10001
+webinspect_port_html = ""
+
+# For the animation tests, default  browser instance is "LightningApp". So
+# the port value should be 10002
+webinspect_port_lightning = ""
 
 #Port used by ThunderJS in lightning app,port must be 9998 for rdkservice builds
 thunder_port=""
@@ -196,18 +214,21 @@ video_src_url_multi_drm_dash_pref_widevine_drmconfigs  = ""
 
 # Time duration for operations
 # Provided time (seconds) is the duration after how much second the operation should take place
+# The time interval for any operation should be set with the consideration of time taken to ssh
+# and get proc details. Eg. If fetching proc details takes 5 seconds then interval should be
+# greater than time taken say 10
 pause_interval = 30
 play_interval = 10
 
-pause_interval_stress = 5
-play_interval_stress  = 5
+pause_interval_stress = 10
+play_interval_stress  = 10
 repeat_count_stress = 15
 
-operation_min_interval = 5
 operation_max_interval = 10
 
 fastfwd_max_interval = 60
 
+# Default jump interval for seek forward or backward operations
 seekfwd_interval = 10
 seekbwd_interval = 20
 seekfwd_check_interval = 3

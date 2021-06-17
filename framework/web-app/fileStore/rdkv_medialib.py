@@ -20,6 +20,7 @@
 import time
 import os
 import inspect
+import importlib
 import ConfigParser
 import MediaValidationVariables
 from selenium import webdriver
@@ -81,7 +82,7 @@ def getDeviceConfigFile(basePath):
 #-------------------------------------------------------------------
 # Function to read the proc validation parameters from device config file
 #-------------------------------------------------------------------
-def rdkv_media_getProcCheckInfo(realpath,procfile):
+def rdkv_media_getProcCheckInfo(realpath):
     validation_dict = {}
     print "\n Reading proc validation params from conf file..."
     conf_file,result = getDeviceConfigFile(realpath)
@@ -92,21 +93,16 @@ def rdkv_media_getProcCheckInfo(realpath,procfile):
         else:
             validation_dict["proc_check"] = True
             result,validation_dict["ssh_method"]    = getDeviceConfigKeyValue(conf_file,"SSH_METHOD")
-            if validation_dict["ssh_method"] == "directSSH":
-                validation_dict["host_name"] = deviceIP
-                result,validation_dict["user_name"] = getDeviceConfigKeyValue(conf_file,"SSH_USERNAME")
-                result,validation_dict["password"]  = getDeviceConfigKeyValue(conf_file,"SSH_PASSWORD")
-                if validation_dict["password"] == "None":
-                    password = ""
-                else:
-                    password = validation_dict["password"]
-                credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
-                validation_dict["credentials"] = credentials
+            validation_dict["host_name"] = deviceIP
+            result,validation_dict["user_name"] = getDeviceConfigKeyValue(conf_file,"SSH_USERNAME")
+            result,validation_dict["password"]  = getDeviceConfigKeyValue(conf_file,"SSH_PASSWORD")
+            result,validation_dict["validation_script"] = getDeviceConfigKeyValue(conf_file,"VIDEO_VALIDATION_SCRIPT_FILE")
+            if validation_dict["password"] == "None":
+                password = ""
             else:
-                #TODO
-                print "selected ssh method is {}".format(validation_dict["ssh_method"])
-                pass
-            result,validation_dict["proc_file"] = getDeviceConfigKeyValue(conf_file,procfile)
+                password = validation_dict["password"]
+            credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+            validation_dict["credentials"] = credentials
     else:
         print "Failed to get the validation parameters from config file, please configure values before test"
     if any(value == "" for value in validation_dict.itervalues()):
@@ -118,30 +114,20 @@ def rdkv_media_getProcCheckInfo(realpath,procfile):
 #-------------------------------------------------------------------
 # Function to check required pattern in proc entry file
 #-------------------------------------------------------------------
-def rdkv_media_checkProcEntry(sshMethod,credentials,procfile,pattern):
-    result_val = "FAILURE"
-    if sshMethod == "directSSH":
-        credentials_list = credentials.split(',')
-        host_name = credentials_list[0]
-        user_name = credentials_list[1]
-        password = credentials_list[2]
-    else:
-        #TODO
-        print "Secure ssh to CPE"
-        pass
-    command = "cat " + str(procfile)
-    output = ssh_and_execute(sshMethod,host_name,user_name,password,command)
-    output_list =  output.split('\n')
-    for item in output_list:
-        if pattern in item:
-            print item
-            result_val = "SUCCESS"
-    if result_val == "SUCCESS":
-        print "Expected data is found in the proc file\n"
-    else:
-        print "Expected data is not found in the proc file\n"
+def rdkv_media_checkProcEntry(sshMethod,credentials,validation_script):
+    result = "FAILURE"
+    validation_script = validation_script.split('.py')[0]
+    try:
+        lib = importlib.import_module(validation_script)
+        method = "check_video_status"
+        method_to_call = getattr(lib, method)
+        result = method_to_call(sshMethod,credentials)
+    except Exception as e:
+        print "[ERROR]: Failed to import video validation script file, please check the configuration"
+        result = "FAILURE"
+    finally:
+        return result
 
-    return result_val
 
 #-------------------------------------------------------------------
 #SET WEBDRIVER AND OPEN CHROME BROWSER
@@ -173,12 +159,15 @@ def rdkv_media_readUIData(elementExpandXpath,dataXpath,count):
             time.sleep(10)
             action = ActionChains(driver)
             source = driver.find_element_by_xpath(elementExpandXpath)
+            time.sleep(3)
             action.move_to_element(source).context_click().perform()
             time.sleep(10)
             options = driver.find_elements_by_class_name('soft-context-menu')
+            time.sleep(3)
             try:
                 for option in options:
                     current_option = option.find_elements_by_class_name('item')
+                    time.sleep(3)
                     for item in current_option:
                         if "Expand All" in item.text:
                             item.click()
@@ -204,6 +193,7 @@ def rdkv_media_readUIData(elementExpandXpath,dataXpath,count):
         ui_data = "Unable to get the data from the web UI"
         driver.quit()
    return ui_data
+
 
 
 

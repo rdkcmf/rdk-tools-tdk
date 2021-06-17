@@ -33,18 +33,22 @@ all_operations = ""
 # Global variable to store all the url arguments
 all_arguments  = {}
 
+# Global variable to store websocket conn feature
 webkit_socket_conn = True
+# Global variable to store default webinspect port
+webkit_socket_port = webinspect_port
 
 expectedResult = "SUCCESS"
-
+# Global variable to store client with high z-order
 next_z_order_client = None
 
+# Global variables to store default AV port
 video_port = None
 audio_port = None
-
+# Global variables to store resolution info
 current_resolution = None
 resolution_revert = False
-
+# Global variables to store sound modes
 current_mode = None
 mode_revert = False
 
@@ -165,14 +169,20 @@ def readDeviceConfigKeyValue(conf_file,key):
     result,value = getDeviceConfigKeyValue(conf_file,key)
     return result,value
 
+# Function to enable/disable websocket conn
 def socketConnectionEnableDisable(flag):
     global webkit_socket_conn
     webkit_socket_conn = flag
 
+# Function to update webnspect port
+def setWebKitSocketPort(port):
+    global webkit_socket_port
+    webkit_socket_port = port
+
 # Function to create websocket connection to webki webinspect page
 def createWebKitSocket(obj):
-    print "\nInitiate Connection to Webinspect page..."
-    socket = createEventListener(obj.IP,webinspect_port,[],"/devtools/page/1",False)
+    print "\nInitiate Connection to Webinspect page (port:%s)..." %(webkit_socket_port)
+    socket = createEventListener(obj.IP,webkit_socket_port,[],"/devtools/page/1",False)
     time.sleep(10)
     return socket
 
@@ -209,7 +219,7 @@ def launchPlugin(obj,plugin,url):
     print "\nLaunching %s using RDKShell..." %(plugin)
     url = url.replace('\"',"")
     tdkTestObj = obj.createTestStep('rdkservice_setValue')
-    params = '{"callsign":"'+plugin+'", "type":"HtmlApp", "uri":"'+url+'"}'
+    params = '{"callsign":"'+plugin+'", "type":"'+plugin+'", "uri":"'+url+'"}'
     tdkTestObj.addParameter("method","org.rdk.RDKShell.1.launch")
     tdkTestObj.addParameter("value",params)
     tdkTestObj.executeTestCase(expectedResult);
@@ -309,12 +319,11 @@ def checkWebkitReadyState(obj,result,webkit_client,webkit_z_order_status):
 
     return webkit_ready
 
-def checkProcEntry(obj,validation_dict,proc_pattern):
+def checkProcEntry(obj,validation_dict):
     tdkTestObj = obj.createTestStep('rdkv_media_checkProcEntry')
     tdkTestObj.addParameter("sshMethod",validation_dict["ssh_method"])
     tdkTestObj.addParameter("credentials",validation_dict["credentials"])
-    tdkTestObj.addParameter("procfile",validation_dict["proc_file"])
-    tdkTestObj.addParameter("pattern",proc_pattern)
+    tdkTestObj.addParameter("validation_script",validation_dict["validation_script"])
     tdkTestObj.executeTestCase(expectedResult);
     result = tdkTestObj.getResult();
     info = tdkTestObj.getResultDetails();
@@ -725,13 +734,12 @@ def setAudioAtmosOutputModePreRequisites(obj,mode):
 
 
 # function to set the primary pre-requisites
-def setMediaTestPreRequisites(obj,get_proc_info=True):
+def setMediaTestPreRequisites(obj,webkit_browser_instance,get_proc_info=True):
     pre_requisite_status = "SUCCESS"
     webkit_console_socket = None
     if get_proc_info:
         tdkTestObj = obj.createTestStep('rdkv_media_getProcCheckInfo')
         tdkTestObj.addParameter("realpath",obj.realpath)
-        tdkTestObj.addParameter("procfile","VIDEO_PROC_FILE")
         tdkTestObj.executeTestCase(expectedResult);
         result = tdkTestObj.getResult();
         validation_dict = tdkTestObj.getResultDetails();
@@ -761,9 +769,9 @@ def setMediaTestPreRequisites(obj,get_proc_info=True):
             result,rdkshell_status = checkPluginStatus(obj,"org.rdk.RDKShell");
 
         if "SUCCESS" in result and "activated" in rdkshell_status:
-            launch_status = launchPlugin(obj,"WebKitBrowser","about:blank")
+            launch_status = launchPlugin(obj,webkit_browser_instance,"about:blank")
             if "SUCCESS" in launch_status:
-                client_status,webkit_client = checkRDKShellClients(obj,"WebKitBrowser")
+                client_status,webkit_client = checkRDKShellClients(obj,webkit_browser_instance)
                 if "SUCCESS" in client_status and webkit_client != "":
                     result,webkit_z_order_status = checkClientZOrder(obj,webkit_client)
                     webkit_ready_state = checkWebkitReadyState(obj,result,webkit_client,webkit_z_order_status)
@@ -793,6 +801,9 @@ def monitorVideoTest(obj,webkit_console_socket,validation_dict,check_pattern,tim
     proc_check_list = []
     play_status = "FAILURE"
     video_test_result = ""
+    # Decoder value will not be increasing suring paused state and we check
+    # the proc details after getting seeeked event not during the seek operation
+    skip_proc_check_events = ["Video Player Paused", "Video Player seeking"]
     while True:
         if continue_count > timeout:
             hang_detected = 1
@@ -808,10 +819,10 @@ def monitorVideoTest(obj,webkit_console_socket,validation_dict,check_pattern,tim
         dispConsoleLog(console_log)
         if "Video Player Playing" in console_log:
             play_status = "SUCCESS"
-        if  check_pattern in console_log and validation_dict["proc_check"]:
-            info = checkProcEntry(obj,validation_dict,"started")
+        if  check_pattern in console_log and validation_dict["proc_check"] and (all(skip_events not in console_log for skip_events in skip_proc_check_events)):
+            info = checkProcEntry(obj,validation_dict)
             proc_check_list.append(info)
-            time.sleep(1);
+            #time.sleep(1);
         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
             test_result = getConsoleMessage(console_log)
             break;
@@ -865,9 +876,9 @@ def monitorAnimationTest(obj,webkit_console_socket,check_pattern,timeout=60):
     return animation_test_result,diagnosis_info
 
 # Function to set the primary post-requisites
-def setMediaTestPostRequisites(obj):
+def setMediaTestPostRequisites(obj,webkit_browser_instance):
     post_requisite_status = "SUCCESS"
-    launch_status = launchPlugin(obj,"WebKitBrowser","about:blank")
+    launch_status = launchPlugin(obj,webkit_browser_instance,"about:blank")
     # TODO webkit browser has to be killed, but when launched again it is not
     # listed as clients after killing. This can be handled when the issues are fixed
     if "SUCCESS" in launch_status:
@@ -879,7 +890,6 @@ def setMediaTestPostRequisites(obj):
         post_requisite_status = "FAILURE"
 
     return post_requisite_status
-
 
 
 

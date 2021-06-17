@@ -40,10 +40,8 @@
     <parameters>
       <parameter funName='rdkv_media_checkProcEntry' parameterName='sshMethod' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_media_checkProcEntry' parameterName='credentials' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkv_media_checkProcEntry' parameterName='procfile' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkv_media_checkProcEntry' parameterName='pattern' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_media_checkProcEntry' parameterName='validation_script' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_media_getProcCheckInfo' parameterName='realpath' parameterType='STRING' range='a-z' />
-      <parameter funName='rdkv_media_getProcCheckInfo' parameterName='procfile' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_media_readUIData' parameterName='elementExpandXpath' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_media_readUIData' parameterName='dataXpath' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_media_readUIData' parameterName='count' parameterType='INTEGER' range='0-60' />

@@ -40,7 +40,6 @@
       <primitiveTest name="rdkv_media_getProcCheckInfo" id=" " version="1">
         <function>rdkv_media_getProcCheckInfo</function>
         <parameters>
-          <parameter name="procfile" value=""/>
           <parameter name="realpath" value=""/>
         </parameters>
       </primitiveTest>
@@ -48,8 +47,7 @@
         <function>rdkv_media_checkProcEntry</function>
         <parameters>
           <parameter name="credentials" value=""/>
-          <parameter name="pattern" value=""/>
-          <parameter name="procfile" value=""/>
+          <parameter name="validation_script" value=""/>
           <parameter name="sshMethod" value=""/>
         </parameters>
       </primitiveTest>
