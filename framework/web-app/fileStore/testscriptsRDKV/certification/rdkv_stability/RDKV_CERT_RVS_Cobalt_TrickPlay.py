@@ -101,6 +101,10 @@ ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_RVS_Cobalt_TrickPlay');
 
+#The device will reboot before starting the stability testing if "pre_req_reboot" is
+#configured as "Yes".
+pre_requisite_reboot(obj)
+
 output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
 result_dict_list = []
@@ -110,8 +114,12 @@ cpu_mem_info_dict = {}
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
 obj.setLoadModuleStatus(result);
+
+#Check the device status before starting the stress test
+pre_condition_status = check_device_state(obj)
+
 expectedResult = "SUCCESS"
-if expectedResult in result.upper():
+if expectedResult in (result.upper() and pre_condition_status):
     cobalt_test_url = StabilityTestVariables.cobalt_test_url;
     test_time_in_mins = StabilityTestVariables.cobalt_trickplay_duration
     print "Check Pre conditions"
@@ -237,59 +245,24 @@ if expectedResult in result.upper():
                                 break
                         else:
                             print "\n ##### Validating CPU load and memory usage #####\n"
-                            tdkTestObj = obj.createTestStep('rdkservice_getCPULoad')
-                            tdkTestObj.executeTestCase(expectedResult)
-                            result = tdkTestObj.getResult()
-                            cpuload = tdkTestObj.getResultDetails()
-                            if (result == "SUCCESS"):
-                                tdkTestObj.setResultStatus("SUCCESS")
-                                #validate the cpuload
-                                tdkTestObj = obj.createTestStep('rdkservice_validateCPULoad')
-                                tdkTestObj.addParameter('value',float(cpuload))
-                                tdkTestObj.addParameter('threshold',90.0)
-                                tdkTestObj.executeTestCase(expectedResult)
-                                result = tdkTestObj.getResult()
-                                is_high_cpuload = tdkTestObj.getResultDetails()
-                                if is_high_cpuload == "YES" or expectedResult not in result:
-                                    print "\n CPU load is high :{}% during iteration:{}".format(cpuload,count+1)
-                                    tdkTestObj.setResultStatus("FAILURE")
-                                    break
-                                else:
-                                    tdkTestObj.setResultStatus("SUCCESS")
-                                    print "\n CPU load is {}% during iteration:{}\n".format(cpuload,count+1)
-                            else:
-                                tdkTestObj.setResultStatus("FAILURE")
-                                print "\n Unable to get cpuload\n"
-                                break
-                            tdkTestObj = obj.createTestStep('rdkservice_getMemoryUsage')
-                            tdkTestObj.executeTestCase(expectedResult)
-                            result = tdkTestObj.getResult()
-                            memory_usage = tdkTestObj.getResultDetails()
-                            if (result == "SUCCESS"):
-                                tdkTestObj.setResultStatus("SUCCESS")
-                                #validate memory usage
-                                tdkTestObj = obj.createTestStep('rdkservice_validateMemoryUsage')
-                                tdkTestObj.addParameter('value',float(memory_usage))
-                                tdkTestObj.addParameter('threshold',90.0)
-                                tdkTestObj.executeTestCase(expectedResult)
-                                result = tdkTestObj.getResult()
-                                is_high_memory_usage = tdkTestObj.getResultDetails()
-                                if is_high_memory_usage == "YES" or expectedResult not in result:
-                                    print "\n Memory usage is high :{}% during iteration: {}\n".format(memory_usage,count+1)
-                                    tdkTestObj.setResultStatus("FAILURE")
-                                    break
-                                else:
-                                    tdkTestObj.setResultStatus("SUCCESS")
-                                    print "\n Memory usage is {}% during iteration: {}\n".format(memory_usage,count+1)
-                            else:
-                                print "\n Unable to get the memory usage\n"
-                                tdkTestObj.setResultStatus("FAILURE")
-                                break
-                            result_dict["iteration"] = count+1
-                            result_dict["cpu_load"] = float(cpuload)
-                            result_dict["memory_usage"] = float(memory_usage)
-                            result_dict_list.append(result_dict)
-                            count += 1
+			    print "Iteration : ", count+1
+            		    tdkTestObj = obj.createTestStep('rdkservice_validateResourceUsage')
+            		    tdkTestObj.executeTestCase(expectedResult)
+            		    status = tdkTestObj.getResult()
+            		    result = tdkTestObj.getResultDetails()
+            		    if expectedResult in status and result != "ERROR":
+            		        tdkTestObj.setResultStatus("SUCCESS")
+            		        cpuload = result.split(',')[0]
+            		        memory_usage = result.split(',')[1]
+                                result_dict["iteration"] = count+1
+                                result_dict["cpu_load"] = float(cpuload)
+                                result_dict["memory_usage"] = float(memory_usage)
+                                result_dict_list.append(result_dict)
+                                count += 1
+			    else:
+				print "\n Error while validating Resource usage"
+                		tdkTestObj.setResultStatus("FAILURE")
+                		break
                     else:
                         print "\nSuccessfully completed the {} times in {} minutes".format(count,test_time_in_mins)
                     cpu_mem_info_dict["cpuMemoryDetails"] = result_dict_list
@@ -321,6 +294,7 @@ if expectedResult in result.upper():
     if revert=="YES":
         print "Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
+    post_condition_status = check_device_state(obj)
     obj.unloadModule("rdkv_stability");
 else:
     obj.setLoadModuleStatus("FAILURE");

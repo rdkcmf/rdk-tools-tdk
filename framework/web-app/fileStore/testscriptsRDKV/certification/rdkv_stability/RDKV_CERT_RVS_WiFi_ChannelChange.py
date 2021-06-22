@@ -94,6 +94,10 @@ ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_RVS_WiFi_ChannelChange');
 
+#The device will reboot before starting the stability testing if "pre_req_reboot" is
+#configured as "Yes".
+pre_requisite_reboot(obj)
+
 webkit_console_socket = None
 channel_change_count = 1
 max_channel_change_count = StabilityTestVariables.max_channel_change_count
@@ -107,8 +111,11 @@ result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
 obj.setLoadModuleStatus(result);
 
+#Check the device status before starting the stress test
+pre_condition_status = check_device_state(obj)
+
 expectedResult = "SUCCESS"
-if expectedResult in result.upper():
+if expectedResult in (result.upper() and pre_condition_status):
     channel_change_url = StabilityTestVariables.channel_change_url
     print "Check Pre conditions"
     status = "SUCCESS"
@@ -216,59 +223,25 @@ if expectedResult in result.upper():
                             check_channel_tune = True
                             check_play_count = 0
                             continue_count = 0
-                            tdkTestObj = obj.createTestStep('rdkservice_getCPULoad')
-                            tdkTestObj.executeTestCase(expectedResult)
-                            result = tdkTestObj.getResult()
-                            cpuload = tdkTestObj.getResultDetails()
-                            if (result == "SUCCESS"):
-                                tdkTestObj.setResultStatus("SUCCESS")
-                                #validate the cpuload
-                                tdkTestObj = obj.createTestStep('rdkservice_validateCPULoad')
-                                tdkTestObj.addParameter('value',float(cpuload))
-                                tdkTestObj.addParameter('threshold',90.0)
-                                tdkTestObj.executeTestCase(expectedResult)
-                                result = tdkTestObj.getResult();
-                                is_high_cpuload = tdkTestObj.getResultDetails()
-                                if is_high_cpuload == "YES" or  expectedResult not in result:
-                                    error_msg = "\ncpu load is high :{}% at channel change :{} times\nchannel_info:{}\n".format(cpuload,channel_change_count,remarks)
-                                    tdkTestObj.setResultStatus("FAILURE")
-                                    break
-                                else:
-                                    tdkTestObj.setResultStatus("SUCCESS")
-                                    print "\ncpu load is:{}% at channel change: {} times\n".format(cpuload,channel_change_count)
-                            else:
-                                tdkTestObj.setResultStatus("FAILURE")
-                                error_msg = "\nUnable to get cpuload\n"
-                                break
-                            tdkTestObj = obj.createTestStep('rdkservice_getMemoryUsage')
-                            tdkTestObj.executeTestCase(expectedResult)
-                            result = tdkTestObj.getResult()
-                            memory_usage = tdkTestObj.getResultDetails()
-                            if (result == "SUCCESS"):
-                                tdkTestObj.setResultStatus("SUCCESS")
-                                #validate memory usage
-                                tdkTestObj = obj.createTestStep('rdkservice_validateMemoryUsage')
-                                tdkTestObj.addParameter('value',float(memory_usage))
-                                tdkTestObj.addParameter('threshold',90.0)
-                                tdkTestObj.executeTestCase(expectedResult)
-                                is_high_memory_usage = tdkTestObj.getResultDetails()
-                                result  =  tdkTestObj.getResult()
-                                if is_high_memory_usage == "YES" or expectedResult not in result:
-                                    error_msg = "\nmemory usage is high :{} % at channel change:{} times\nchannel_info:{}\n".format(memory_usage,channel_change_count,remarks)
-                                    tdkTestObj.setResultStatus("FAILURE")
-                                    break
-                                else:
-                                    tdkTestObj.setResultStatus("SUCCESS")
-                                    print "\nmemory usage is {}% at channel change {} times\n".format(memory_usage,channel_change_count)
-                            else:
-                                error_msg = "\n Unable to get the memory usage\n"
-                                tdkTestObj.setResultStatus("FAILURE")
-                                break
-                            result_dict["iteration"] = channel_change_count
-                            result_dict["remarks"] = remarks
-                            result_dict["cpu_load"] = float(cpuload)
-                            result_dict["memory_usage"] = float(memory_usage)
-                            result_dict_list.append(result_dict)
+			    print "\n ##### Validating CPU load and memory usage #####\n"
+              	            print "Iteration : ", channel_change_count
+              	            tdkTestObj = obj.createTestStep('rdkservice_validateResourceUsage')
+              	            tdkTestObj.executeTestCase(expectedResult)
+              	            status = tdkTestObj.getResult()
+              	            result = tdkTestObj.getResultDetails()
+              	            if expectedResult in status and result != "ERROR":
+              	                tdkTestObj.setResultStatus("SUCCESS")
+              	                cpuload = result.split(',')[0]
+              	                memory_usage = result.split(',')[1]
+                                result_dict["iteration"] = channel_change_count
+                                result_dict["remarks"] = remarks
+                                result_dict["cpu_load"] = float(cpuload)
+                                result_dict["memory_usage"] = float(memory_usage)
+                                result_dict_list.append(result_dict)
+			    else:
+				print "\n Error while validating Resource usage"
+               			tdkTestObj.setResultStatus("FAILURE")
+                	        break
                             channel_change_count += 1
                         else:
                             check_play_count += 1
@@ -321,6 +294,7 @@ if expectedResult in result.upper():
             print "\n Error while reverting to ETHERNET \n"
     if revert_plugins_dict != {}:
         status = set_plugins_status(obj,revert_plugins_dict)
+    post_condition_status = check_device_state(obj)
     obj.unloadModule("rdkv_stability");
 else:
     obj.setLoadModuleStatus("FAILURE");

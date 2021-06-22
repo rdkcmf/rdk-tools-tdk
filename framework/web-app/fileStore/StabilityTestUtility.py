@@ -18,6 +18,8 @@
 #########################################################################
 from rdkv_performancelib import *
 import ast
+import json
+import urllib
 
 expectedResult ="SUCCESS"
 
@@ -136,3 +138,132 @@ def get_validation_params(obj):
         print "please configure values before test"
         validation_dict = {}
     return validation_dict
+
+#------------------------------------------------------------------------
+#GET CONFIG FILE NAME
+#------------------------------------------------------------------------
+def get_configfile_name(obj):
+    url = obj.url + '/deviceGroup/getDeviceDetails?deviceIp='+obj.IP
+    try:
+        data = urllib.urlopen(url).read()
+        deviceDetails = json.loads(data)
+        deviceName = deviceDetails["devicename"]
+        deviceType = deviceDetails["boxtype"]
+
+        deviceConfigFile=""
+        status ="SUCCESS"
+        configPath = obj.realpath + "/"   + "fileStore/tdkvRDKServiceConfig"
+        deviceNameConfigFile = configPath + "/" + deviceName + ".config"
+        deviceTypeConfigFile = configPath + "/" + deviceType + ".config"
+
+        # Check whether device / platform config files required for
+        # executing the test are present
+        if os.path.exists(deviceNameConfigFile) == True:
+            deviceConfigFile = deviceNameConfigFile
+            print "[INFO]: Using Device config file: %s" %(deviceNameConfigFile)
+        elif os.path.exists(deviceTypeConfigFile) == True:
+            deviceConfigFile = deviceTypeConfigFile
+            print "[INFO]: Using Device config file: %s" %(deviceTypeConfigFile)
+        else:
+            status = "FAILURE"
+            print "[ERROR]: No Device config file found : %s or %s" %(deviceNameConfigFile,deviceTypeConfigFile)
+    except:
+        print "Unable to get Device Details from REST !!!"
+        status = "FAILURE"
+
+    return deviceConfigFile,status;
+
+#------------------------------------------------------------------------
+#REBOOT DEVICE AS A PRE-REQUESITE
+#------------------------------------------------------------------------
+def pre_requisite_reboot(obj):
+    result = "SUCCESS";
+    conf_file, status = get_configfile_name(obj);
+    result, reboot_required = getDeviceConfigKeyValue(conf_file,"PRE_REQ_REBOOT")
+
+    if reboot_required.lower() == "yes":
+
+        print "\nRebooting the device as a pre-requisite before starting the script\n"
+
+        #Get the required values to reboot the device
+        url = obj.url + '/deviceGroup/getThunderDevicePorts?stbIp='+obj.IP
+        try:
+            data = urllib.urlopen(url).read()
+            thunderPortDetails = json.loads(data)
+            devicePort= thunderPortDetails['thunderPort']
+        except Exception as e:
+            print "Unable to get Thunder Port from REST to trigger the reboot !!!"
+            print "Error message received :\n",e;
+            result = "FAILURE"
+
+        #Reboot the device
+        try:
+            cmd = "curl --silent --data-binary '{\"jsonrpc\": \"2.0\", \"id\": 1234567890, \"method\": \"Controller.1.harakiri\" }' -H 'content-type:text/plain;' http://"+ str(obj.IP)+":"+str(devicePort)+ "/jsonrpc"
+            os.system(cmd)
+
+            print "WAIT TO COMPLETE THE REBOOT PROCESS"
+            time.sleep(150)
+        except Exception as e:
+            print "ERROR!! \nEXCEPTION OCCURRED WHILE REBOOTING DEVICE!!"
+            print "Error message received :\n",e;
+            result = "FAILURE"
+
+    if result == "FAILURE" or reboot_required != "Yes":
+        print "Device is not rebooted before starting the execution\n"
+
+    return result;
+
+#----------------------------------------------------------------------------
+#GET THE STATUS OF DEVICE
+#----------------------------------------------------------------------------
+def check_device_state(obj):
+    #get the resource usage and validate
+    print "\nGet CPU and Memory usage"
+    tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus')
+    tdkTestObj.addParameter("plugin","DeviceInfo")
+    tdkTestObj.executeTestCase(expectedResult)
+    status = tdkTestObj.getResult()
+    result = tdkTestObj.getResultDetails()
+    curr_status = result;
+    if expectedResult in status:
+        if "activated" != result:
+            tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
+            tdkTestObj.addParameter("plugin","DeviceInfo")
+            tdkTestObj.addParameter("status","activate")
+            tdkTestObj.executeTestCase(expectedResult)
+            plugin_status = tdkTestObj.getResult()
+            if plugin_status == "SUCCESS":
+                print "\nActivated DeviceInfo plugin to get the resource usage details"
+                result = "activated"
+            else:
+                result = "deactivated"
+        if result == "activated":
+            tdkTestObj = obj.createTestStep('rdkservice_validateResourceUsage')
+            tdkTestObj.executeTestCase(expectedResult)
+            status = tdkTestObj.getResult()
+            result = tdkTestObj.getResultDetails()
+            if expectedResult in status and "ERROR" not in result:
+                print "\nCPU and Memory usage is within expected range\n"
+                result = "SUCCESS"
+            elif result == "EXCEPTION OCCURED":
+                print "\n Failed to get the resource usage"
+            else:
+                print "\n CPU and/or Memory usage is higher than expected range\n"
+            #Revert DeviceInfo Plugin status
+            if curr_status == "deactivated":
+                tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
+                tdkTestObj.addParameter("plugin","DeviceInfo")
+                tdkTestObj.addParameter("status","deactivate")
+                tdkTestObj.executeTestCase(expectedResult)
+                plugin_status = tdkTestObj.getResult()
+                if expectedResult in plugin_status:
+                    print "Reverted the plugin status"
+                else:
+                    print "Unable to revert the plugin status"
+                    result = "FAILURE"
+        else:
+            print "Unable to activate the DeviceInfo plugin"
+    else:
+        print "Unable to get the status of DeviceInfo plugin"
+    time.sleep(5)
+    return result;

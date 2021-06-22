@@ -93,7 +93,7 @@ def getIFStatus(IF_name,validate):
                 if status == True:
                     output= "ENABLED"
                 elif status == "EXCEPTION":
-                    output = "FAILURE";
+                    output = "EXCEPTION"
                 if curr_status != "activate":
                     rev_status = rdkservice_setPluginStatus("org.rdk.Network",curr_status)
                 if rev_status == None:
@@ -109,6 +109,9 @@ def getIFStatus(IF_name,validate):
     if output == "FAILURE" and validate == "Yes":
         logger.info("Ethernet Interface is not up after reboot. Exiting the script")
         exitScript(StatusInterface,iter_no);
+    elif output == "EXCEPTION":
+        logger.info("Got exception while checking the interface status. Exiting the script")
+	exitScript(StatusInterface,iter_no);
     elif output == "FAILURE":
         StatusInterface.append(iter_no)
         output = "DISABLED";

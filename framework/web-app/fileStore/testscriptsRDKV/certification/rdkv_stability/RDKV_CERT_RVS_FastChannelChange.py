@@ -82,14 +82,21 @@ ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_RVS_FastChannelChange');
 
+#The device will reboot before starting the stability testing if "pre_req_reboot" is
+#configured as "Yes".
+pre_requisite_reboot(obj)
+
 webkit_console_socket = None
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
 obj.setLoadModuleStatus(result);
 
+#Check the device status before starting the stress test
+pre_condition_status = check_device_state(obj)
+
 expectedResult = "SUCCESS"
-if expectedResult in result.upper():
+if expectedResult in (result.upper() and pre_condition_status):
     channel_change_url = obj.url+'/fileStore/lightning-apps/FastChannelChangeTest.html'
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -172,54 +179,16 @@ if expectedResult in result.upper():
                                 channel_change_log = json.loads(event)
                                 remarks = channel_change_log.get("params").get("message").get("text")
                                 print "\n Validate CPU load and memory usage \n"
-                                tdkTestObj = obj.createTestStep('rdkservice_getCPULoad')
-                                tdkTestObj.executeTestCase(expectedResult)
-                                result = tdkTestObj.getResult()
-                                cpuload = tdkTestObj.getResultDetails()
-                                if (result == "SUCCESS"):
-                                    tdkTestObj.setResultStatus("SUCCESS")
-                                    #validate the cpuload
-                                    tdkTestObj = obj.createTestStep('rdkservice_validateCPULoad')
-                                    tdkTestObj.addParameter('value',float(cpuload))
-                                    tdkTestObj.addParameter('threshold',90.0)
-                                    tdkTestObj.executeTestCase(expectedResult)
-                                    result = tdkTestObj.getResult();
-                                    is_high_cpuload = tdkTestObj.getResultDetails()
-                                    if is_high_cpuload == "YES" or  expectedResult not in result:
-                                        print "\n CPU load is high :{}% after channel change :{} times\nchannel_info:{}\n".format(cpuload,max_channel_change_count,remarks)
-                                        tdkTestObj.setResultStatus("FAILURE")
-                                        break
-                                    else:
-                                        tdkTestObj.setResultStatus("SUCCESS")
-                                        print "\ncpu load is:{}% after channel change: {} times\n".format(cpuload,max_channel_change_count)
-                                else:
-                                    tdkTestObj.setResultStatus("FAILURE")
-                                    print "\nUnable to get cpuload\n"
-                                    break
-                                tdkTestObj = obj.createTestStep('rdkservice_getMemoryUsage')
-                                tdkTestObj.executeTestCase(expectedResult)
-                                result = tdkTestObj.getResult()
-                                memory_usage = tdkTestObj.getResultDetails()
-                                if (result == "SUCCESS"):
-                                    tdkTestObj.setResultStatus("SUCCESS")
-                                    #validate memory usage
-                                    tdkTestObj = obj.createTestStep('rdkservice_validateMemoryUsage')
-                                    tdkTestObj.addParameter('value',float(memory_usage))
-                                    tdkTestObj.addParameter('threshold',90.0)
-                                    tdkTestObj.executeTestCase(expectedResult)
-                                    is_high_memory_usage = tdkTestObj.getResultDetails()
-                                    result  =  tdkTestObj.getResult()
-                                    if is_high_memory_usage == "YES" or expectedResult not in result:
-                                        print "\n Memory usage is high :{} % after channel change:{} times\nchannel_info:{}\n".format(memory_usage,max_channel_change_count,remarks)
-                                        tdkTestObj.setResultStatus("FAILURE")
-                                        break
-                                    else:
-                                        tdkTestObj.setResultStatus("SUCCESS")
-                                        print "\n Memory usage is {}% after channel change {} times\n".format(memory_usage,max_channel_change_count)
-                                else:
-                                    print "\n Unable to get the memory usage\n"
-                                    tdkTestObj.setResultStatus("FAILURE")
-                                    break
+            		        tdkTestObj = obj.createTestStep('rdkservice_validateResourceUsage')
+            		        tdkTestObj.executeTestCase(expectedResult)
+            		        status = tdkTestObj.getResult()
+            		        result = tdkTestObj.getResultDetails()
+            		        if expectedResult in status and result != "ERROR":
+            		            tdkTestObj.setResultStatus("SUCCESS")
+				else:
+				    print "\n Error while validating Resource usage"
+                		    tdkTestObj.setResultStatus("FAILURE")
+                		    break
                                 print "\n Successfully completed the {} channel changes".format(max_channel_change_count)
                                 break
                             else:
@@ -257,6 +226,7 @@ if expectedResult in result.upper():
     if revert=="YES":
         print "Revert the values before exiting"
         status = set_plugins_status(obj,plugins_cur_status_dict)
+    post_condition_status = check_device_state(obj)
     obj.unloadModule("rdkv_stability");
 else:
     obj.setLoadModuleStatus("FAILURE");
