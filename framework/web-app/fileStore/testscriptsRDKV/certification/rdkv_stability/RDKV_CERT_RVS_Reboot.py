@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>To reboot the device for the given number of times and check the status of device after each reboot.</synopsis>
   <groups_id/>
-  <execution_time>3500</execution_time>
+  <execution_time>4000</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>

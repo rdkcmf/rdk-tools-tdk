@@ -67,6 +67,8 @@ def validateUptime(TimeAfterReboot,validate):
 #-------------------------------------------------------
 def getIFStatus(IF_name,validate):
     output = "FAILURE";
+    status = None
+    rev_status = None
     if rdkv_performancelib.devicePort == 80:
         output = getIFStatus_thunder(IF_name);
     else:
@@ -76,8 +78,9 @@ def getIFStatus(IF_name,validate):
                 curr_status = "activate"
             else:
                 curr_status = "deactivate"
-
-            status = rdkservice_setPluginStatus("org.rdk.Network","activate")
+            time.sleep(10)
+            if curr_status != "activate":
+                status = rdkservice_setPluginStatus("org.rdk.Network","activate")
             if status == None:
                 method = "org.rdk.Network.1.isInterfaceEnabled"
                 value='{"interface":"ETHERNET"}'
@@ -91,7 +94,8 @@ def getIFStatus(IF_name,validate):
                     output= "ENABLED"
                 elif status == "EXCEPTION":
                     output = "FAILURE";
-                rev_status = rdkservice_setPluginStatus("org.rdk.Network",curr_status)
+                if curr_status != "activate":
+                    rev_status = rdkservice_setPluginStatus("org.rdk.Network",curr_status)
                 if rev_status == None:
                     logger.info("Reverted network plugin status")
                 else:
@@ -109,7 +113,6 @@ def getIFStatus(IF_name,validate):
         StatusInterface.append(iter_no)
         output = "DISABLED";
     return output;
-
 #-------------------------------------------------------
 #FUNCTION TO GET THE INTERFACE STATUS FROM THUNDER BUILD
 #-------------------------------------------------------
