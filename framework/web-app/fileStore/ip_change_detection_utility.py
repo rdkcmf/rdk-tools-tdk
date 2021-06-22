@@ -421,6 +421,7 @@ def close_lightning_app(obj):
         tdkTestObj.setResultStatus("FAILURE")
     return status
 
+# Function to check the frequency of connected SSID
 def check_cur_ssid_freq(obj):
     return_val = "FAILURE"
     conf_file,conf_status = getConfigFileName(obj.realpath)
@@ -449,3 +450,44 @@ def check_cur_ssid_freq(obj):
     else:
         print "\n Please configure the SSID details in device specific config file\n"
     return return_val
+
+# Function to connect to given interface
+def connect_to_interface(obj, required_connection):
+    revert_dict = {"revert_if":False}
+    result_status = "FAILURE"
+    wifi_ssid_dict = {"WIFI":"2.4", "WIFI_5GHZ":"5"}
+    revert_plugins = "NO"
+    #Check current interface
+    current_connection, revert_nw = check_current_interface(obj)
+    if revert_nw == "YES":
+        revert_dict["org.rdk.Network"] = "deactivated"
+    if current_connection == "EMPTY":
+        return result_status, revert_dict, revert_plugins
+    elif current_connection == "WIFI":
+        #Check the frequency of SSID
+        ssid_freq = check_cur_ssid_freq(obj)
+        if ssid_freq == "FAILURE":
+            return result_status, revert_dict, revert_plugins
+        elif ssid_freq == "5":
+            current_connection = "WIFI_5GHZ"
+    if current_connection == required_connection:
+        result_status = "SUCCESS"
+    elif current_connection == "ETHERNET" or "WIFI" in required_connection:
+        revert_dict["revert_if"] = True
+        result_status, plugins_status_dict, revert_plugins = switch_to_wifi(obj, wifi_ssid_dict[required_connection], False)
+    else:
+        revert_dict["revert_if"] = True
+        plugin_status, plugins_status_dict, revert_plugins = set_plugins(obj)
+        url_status, complete_url = get_lightning_app_url(obj)
+        launch_app_status = launch_lightning_app(obj, complete_url)
+        time.sleep(60)
+        if all(status == "SUCCESS" for status in (plugin_status, url_status, launch_app_status)):
+            if required_connection == "ETHERNET":
+                result_status = set_default_interface(obj, "ETHERNET")
+        else:
+            print "\n Error while launching Lightning App"
+    revert_dict["current_if"] = current_connection
+    if revert_plugins == "YES":
+        revert_dict.update(plugins_status_dict)
+    time.sleep(30)
+    return result_status,revert_dict,revert_plugins
