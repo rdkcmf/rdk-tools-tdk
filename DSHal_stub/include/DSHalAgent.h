@@ -121,7 +121,7 @@ class DSHalAgent : public RDKTestStubInterface , public AbstractServer<DSHalAgen
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetDolbyVolumeMode", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetDolbyVolumeMode);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetSocIDFromSDK", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetSocIDFromSDK);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetResolution", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetResolution);
-                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetResolution", PARAMS_BY_NAME, JSON_STRING, "resolution", JSON_STRING,NULL), &DSHalAgent::DSHal_SetResolution);
+                    this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetResolution", PARAMS_BY_NAME, JSON_STRING, "resolution", JSON_STRING, "frameRate", JSON_INTEGER, "stereoScopicMode", JSON_INTEGER, "aspectRatio", JSON_INTEGER, "interlaced", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetResolution);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetIntelligentEqualizerMode", PARAMS_BY_NAME, JSON_STRING, "mode", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetIntelligentEqualizerMode);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_GetIntelligentEqualizerMode", PARAMS_BY_NAME, JSON_STRING,NULL), &DSHalAgent::DSHal_GetIntelligentEqualizerMode);
                     this->bindAndAddMethod(Procedure("TestMgr_DSHal_SetDialogEnhancement", PARAMS_BY_NAME, JSON_STRING, "level", JSON_INTEGER,NULL), &DSHalAgent::DSHal_SetDialogEnhancement);

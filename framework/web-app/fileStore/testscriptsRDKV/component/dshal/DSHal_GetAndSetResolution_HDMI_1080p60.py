@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>2</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>DSHal_GetAndSetResolution_HDMI_480i</name>
+  <name>DSHal_GetAndSetResolution_HDMI_1080p60</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>To check if the resolution is set to 480i</synopsis>
+  <synopsis>To check if the resolution is set to 1080p60</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -60,7 +60,7 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>CT_DS_HAL_110</test_case_id>
-    <test_objective>To check if the resolution is set to 480i</test_objective>
+    <test_objective>To check if the resolution is set to 1080p60</test_objective>
     <test_type>Positive</test_type>
     <test_setup>XG1V3,XI3</test_setup>
     <pre_requisite>1. Initialize IARMBus
@@ -76,14 +76,14 @@ handle - Video port handle
 resolution - resolution</input_parameters>
     <automation_approch>1. TM loads the DSHAL agent via the test agent.
 2 . DSHAL agent will invoke the api dsGetVideoPort to get the handle for HDMI port
-3 . DSHAL agent will invoke the api dsSetResolution to set the resolution to 480i
+3 . DSHAL agent will invoke the api dsSetResolution to set the resolution to 1080p60
 4 . DSHAL agent will invoke the api dsGetResolution
 5. TM checks if the resolution is set and return SUCCESS/FAILURE status.</automation_approch>
     <expected_output>Checkpoint 1.Verify the API call is success
 Checkpoint 2 Verify that the resolution is set</expected_output>
     <priority>High</priority>
     <test_stub_interface>libdshalstub.so.0.0.0</test_stub_interface>
-    <test_script>DSHal_GetAndSetResolution_HDMI_480i</test_script>
+    <test_script>DSHal_GetAndSetResolution_HDMI_1080p60</test_script>
     <skipped>No</skipped>
     <release_version>M76</release_version>
     <remarks></remarks>
@@ -102,7 +102,7 @@ dshalObj = tdklib.TDKScriptingLibrary("dshal","1");
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-dshalObj.configureTestCase(ip,port,'DSHal_GetAndSetResolution_HDMI_480i');
+dshalObj.configureTestCase(ip,port,'DSHal_GetAndSetResolution_HDMI_1080p60');
 
 #Get the result of connection with test component and STB
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
@@ -135,12 +135,14 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
             details = tdkTestObj.getResultDetails();
             print "Display connection status: ", details
             if details == "true":
-                resolution = "480i";
+                resolution = "1080p60";
                 tdkTestObj = dshalObj.createTestStep('DSHal_SetResolution');
                 tdkTestObj.addParameter("resolution",resolution);
-                tdkTestObj.addParameter("pixelResolution",0); #dsVIDEO_PIXELRES_720x480
-                tdkTestObj.addParameter("aspectRatio",0); #4:3 aspect ratio
-                tdkTestObj.addParameter("stereoScopicMode",1); # 2D mode
+                tdkTestObj.addParameter("pixelResolution",3); #dsVIDEO_PIXELRES_1920x1080
+                tdkTestObj.addParameter("aspectRatio",0);
+                tdkTestObj.addParameter("frameRate",8);#dsVIDEO_FRAMERATE_59dot94
+                tdkTestObj.addParameter("stereoScopicMode",1); #2D
+                tdkTestObj.addParameter("interlaced",0); #PROGRESSIVE
                 #Execute the test case in STB
                 tdkTestObj.executeTestCase(expectedResult);
                 actualResult = tdkTestObj.getResult();

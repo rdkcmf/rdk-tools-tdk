@@ -327,6 +327,8 @@
           <parameter name="aspectRatio" value=""/>
           <parameter name="stereoScopicMode" value=""/>
           <parameter name="persist" value="1"/>
+          <parameter name="interlaced" value=""/>
+          <parameter name="frameRate" value="8"/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="DSHal_GetCurrentOutputSettings" id="" version="1">

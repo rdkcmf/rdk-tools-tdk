@@ -154,6 +154,8 @@
       <parameter funName='TestMgr_DSHal_SetResolution' parameterName='aspectRatio' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_DSHal_SetResolution' parameterName='stereoScopicMode' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_DSHal_SetResolution' parameterName='persist' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_SetResolution' parameterName='interlaced' parameterType='INTEGER' range='0-1' />
+      <parameter funName='TestMgr_DSHal_SetResolution' parameterName='frameRate' parameterType='INTEGER' range='0-10' />
       <parameter funName='TestMgr_DSHal_HdmiInSelectPort' parameterName='port' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_DSHal_HdmiInScaleVideo' parameterName='x' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_DSHal_HdmiInScaleVideo' parameterName='y' parameterType='INTEGER' range='0-9' />

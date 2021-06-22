@@ -2364,8 +2364,10 @@ void DSHalAgent::DSHal_SetResolution(IN const Json::Value& req, OUT Json::Value&
     dsVideoPortResolution_t resolution;
     std::string resolutionName=req["resolution"].asCString();
     resolution.pixelResolution = (dsVideoResolution_t) req["pixelResolution"].asInt();
-    resolution.aspectRatio = (dsVideoAspectRatio_t) req["aspectRatio"].asInt();;
+    resolution.aspectRatio = (dsVideoAspectRatio_t) req["aspectRatio"].asInt();
     resolution.stereoScopicMode = (dsVideoStereoScopicMode_t) req["stereoScopicMode"].asInt();
+    resolution.frameRate = (dsVideoFrameRate_t) req["frameRate"].asInt();
+    resolution.interlaced = req["interlaced"].asInt();
     strcpy(resolution.name,resolutionName.c_str());
     bool persist = req["persist"].asInt();
     dsError_t ret = dsERR_NONE;
