@@ -73,10 +73,10 @@ def is_policy_expected(tdkTestObj, policy, step):
 def set_policy(new_policy, policy_initial, obj1, revert):
     if revert == 1 :
         if policy_initial != new_policy :
-            print "Revert Operation is required";
+            print "Revert Operation is required for Wan Manager Policy";
             policy_set = policy_initial;
         else:
-            print "Revert operation is not required";
+            print "Revert operation is not required for Wan Manager Policy";
             return;
     else:
         policy_set = new_policy;
@@ -380,6 +380,8 @@ def MakePriorityUnEqual (tdkTestObj_Get,tdkTestObj_Set):
     priority1 = 0;
     revertflag = 0;
     default = [];
+    print "TEST STEP : Making WAN priorities Un-equal if equal";
+    print "EXPECTED RESULT : Should make WAN priorities Un-equal if equal";
     for item in paramList:
         tdkTestObj = tdkTestObj_Get;
         tdkTestObj.addParameter("ParamName",item);
@@ -390,6 +392,7 @@ def MakePriorityUnEqual (tdkTestObj_Get,tdkTestObj_Set):
         if expectedresult in actualresult:
             default.append(details);
         else:
+            print "Get operation failed for %s"%item
             break;
 
     if expectedresult in actualresult:
@@ -407,11 +410,17 @@ def MakePriorityUnEqual (tdkTestObj_Get,tdkTestObj_Set):
             Setresult = tdkTestObj.getResultDetails();
         else:
             print "The priorities are unequal and no change is required";
+        print "ACTUAL RESULT :Priorities are Un-equal now"
+        #Get the result of execution
+        print "[TEST EXECUTION RESULT] : SUCCESS";
+    else:
+         print "ACTUAL RESULT : Making WAN Type un-equal cannot be procceeded as get operation failed for %s" %item;
+         print "[TEST EXECUTION RESULT]:  FAILURE";
     return revertflag,default,actualresult;
 
 #################################################################################
 # Function for script to Make Wan Priorties equal
-# Syntax       : MakePriorityUnEqual (tdkTestObj_Get,tdkTestObj_Set)
+# Syntax       : MakePriorityEqual (tdkTestObj_Get,tdkTestObj_Set)
 # Parameter    : tdkTestObj_Get,tdkTestObj_Set
 # Return Value : return the revertflag,default,actualresult
 ###############################################################################
@@ -449,3 +458,144 @@ def MakePriorityEqual (tdkTestObj_Get,tdkTestObj_Set):
         else:
             print "The priorities are equal and no change is required";
     return revertflag,default,actualresult;
+
+#################################################################################
+# Function for script to Make Wan Type unequal
+# Syntax       : MakeWANTypeUnEqual (tdkTestObj_Get,tdkTestObj_Set)
+# Parameter    : tdkTestObj_Get,tdkTestObj_Set
+# Return Value : return the revertflag,default,actualresult
+###############################################################################
+def MakeWANTypeUnEqual(tdkTestObj_Get,tdkTestObj_Set):
+    paramList = ["Device.X_RDK_WanManager.CPEInterface.1.Wan.Type","Device.X_RDK_WanManager.CPEInterface.2.Wan.Type"];
+    revertflag = 0;
+    default = [];
+    print "TEST STEP : Making WAN Type Un-equal if equal";
+    print "EXPECTED RESULT : Should make WAN Type Un-equal if equal"
+
+    for item in paramList:
+        tdkTestObj = tdkTestObj_Get;
+        tdkTestObj.addParameter("ParamName",item);
+        expectedresult= "SUCCESS";
+        tdkTestObj.executeTestCase(expectedresult);
+        actualresult = tdkTestObj.getResult();
+        details = tdkTestObj.getResultDetails().strip().replace("\\n", "");
+        if expectedresult in actualresult:
+            default.append(details);
+        else:
+            print "Get operation failed for %s "%item;
+            break;
+
+    print "Current WAN Type  Values are :",default;
+
+    if expectedresult in actualresult:
+        if default [0] == default [1]:
+            revertflag =1;
+            if default [1] == "Primary":
+                setValue = "Secondary";
+            else:
+                 setValue = "Primary";
+            print "The Wan Types are equal and changing the WAN Type for 2nd interface";
+            tdkTestObj = tdkTestObj_Set;
+            tdkTestObj.addParameter("ParamName","Device.X_RDK_WanManager.CPEInterface.2.Wan.Type");
+            tdkTestObj.addParameter("ParamValue",setValue);
+            tdkTestObj.addParameter("Type","string");
+            expectedresult= "SUCCESS";
+            #Execute testcase on DUT
+            tdkTestObj.executeTestCase(expectedresult);
+            actualresult = tdkTestObj.getResult();
+            Setresult = tdkTestObj.getResultDetails();
+        else:
+            print "The Wan Types are un-equal and no change is required";
+
+        print "ACTUAL RESULT :WAN Type are Un-equal now"
+        #Get the result of execution
+        print "[TEST EXECUTION RESULT] : SUCCESS";
+    else:
+         print "ACTUAL RESULT : Making WAN Type un-equal cannot be procceeded as get operation failed for %s" %item;
+         print "[TEST EXECUTION RESULT]:  FAILURE";
+    return revertflag,default,actualresult;
+
+#################################################################################
+# Function to get the current Wan Type and Priority for DSL and WANOE interafces
+# Syntax       : GetCurrentWanTypeAndPriority (tdkTestObj)
+# Parameter    : tdkTestObj
+# Return Value : return the defaults,actualresult
+###############################################################################
+def GetCurrentWanTypeAndPriority(tdkTestObj):
+     paramList = ["Device.X_RDK_WanManager.CPEInterface.1.Wan.Type","Device.X_RDK_WanManager.CPEInterface.2.Wan.Type","Device.X_RDK_WanManager.CPEInterface.1.Wan.Priority","Device.X_RDK_WanManager.CPEInterface.2.Wan.Priority"];
+     defaults = [];
+     expectedresult="SUCCESS";
+     print "The current WAN Type and Priority values are being fetched";
+
+     for item in paramList:
+         tdkTestObj.addParameter("ParamName",item);
+         #Execute the test case in DUT
+         tdkTestObj.executeTestCase(expectedresult);
+         actualresult = tdkTestObj.getResult();
+         details = tdkTestObj.getResultDetails().strip().replace("\\n", "");
+         if expectedresult in actualresult:
+             defaults.append(details);
+         else:
+             print "Set operation failed for %s" %item;
+             break;
+     return defaults,actualresult;
+
+#################################################################################
+# Function to Set the requested Wan Type and Priority for DSL and WANOE interafces
+# Syntax       : SetWANTypePriority (tdkTestObj,wanDSL,wanWANOE,priDSL,priWANOE)
+# Parameter    : tdkTestObj,wanDSL,wanWANOE,priDSL,priWANOE
+# Return Value : return the actualresult
+###############################################################################
+def SetWANTypePriority(tdkTestObj,wanDSL,wanWANOE,priDSL,priWANOE):
+
+    paramList = ["Device.X_RDK_WanManager.CPEInterface.1.Wan.Priority","Device.X_RDK_WanManager.CPEInterface.2.Wan.Priority","Device.X_RDK_WanManager.CPEInterface.1.Wan.Type","Device.X_RDK_WanManager.CPEInterface.2.Wan.Type"];
+    dataType = ["int","int","string","string"];
+    setValues = [priDSL,priWANOE,wanDSL,wanWANOE];
+    index =0;
+
+    for item in paramList:
+        tdkTestObj.addParameter("ParamName",item)
+        tdkTestObj.addParameter("ParamValue",setValues[index]);
+        tdkTestObj.addParameter("Type",dataType[index]);
+        expectedresult= "SUCCESS";
+        #Execute testcase on DUT
+        tdkTestObj.executeTestCase(expectedresult);
+        actualresult = tdkTestObj.getResult();
+        Setresult = tdkTestObj.getResultDetails();
+        index =index +1;
+        if expectedresult in actualresult:
+           print "Set operation sucesss for %s" %item;
+        else:
+            print "Set operation failed for %s" %item;
+            break;
+    return actualresult;
+
+#################################################################################
+# Function to Set the requested Wan Type and Priority for DSL and WANOE interafces
+# Syntax       : SetWANTypethenPriority(tdkTestObj,wanDSL,wanWANOE,priDSL,priWANOE)
+# Parameter    : tdkTestObj,wanDSL,wanWANOE,priDSL,priWANOE
+# Return Value : return the actualresult
+###############################################################################
+def SetWANTypethenPriority(tdkTestObj,wanDSL,wanWANOE,priDSL,priWANOE):
+
+    paramList = ["Device.X_RDK_WanManager.CPEInterface.1.Wan.Type","Device.X_RDK_WanManager.CPEInterface.2.Wan.Type","Device.X_RDK_WanManager.CPEInterface.1.Wan.Priority","Device.X_RDK_WanManager.CPEInterface.2.Wan.Priority"];
+    dataType = ["string","string","int","int",];
+    setValues = [wanDSL,wanWANOE,priDSL,priWANOE];
+    index =0;
+
+    for item in paramList:
+        tdkTestObj.addParameter("ParamName",item)
+        tdkTestObj.addParameter("ParamValue",setValues[index]);
+        tdkTestObj.addParameter("Type",dataType[index]);
+        expectedresult= "SUCCESS";
+        #Execute testcase on DUT
+        tdkTestObj.executeTestCase(expectedresult);
+        actualresult = tdkTestObj.getResult();
+        Setresult = tdkTestObj.getResultDetails();
+        index =index +1;
+        if expectedresult in actualresult:
+           print "Set operation sucesss for %s" %item;
+        else:
+            print "Set operation failed for %s" %item;
+            break;
+    return actualresult;
