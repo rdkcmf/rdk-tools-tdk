@@ -1786,8 +1786,9 @@ class JobSchedulerService implements Job{
 			logTransfer1(deviceInstance,logTransferFilePath1,logTransferFileName1 ,realPath, executionId,executionDevice?.id, executionResultId,url)
 		}
 		if(isLogReqd?.toString()?.equals("true") && (deviceInstance?.isThunderEnabled != 1)){
-			
-		transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+executionDevice?.id,""+executionResultId,realPath,url)
+			transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+executionDevice?.id,""+executionResultId,realPath,url)
+		}else if(isLogReqd?.toString()?.equals("true") && (deviceInstance?.isThunderEnabled == 1)){
+			transferSTBLogRdkService(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+executionDevice?.id,""+executionResultId,realPath,url)
 		}
 		Date endTime = new Date()
 		try {
@@ -2472,6 +2473,68 @@ class JobSchedulerService implements Job{
 
 			}
 		} catch (Exception e) {
+		}
+	}
+	
+	/**
+	 * Function to transfer STB logs for Rdkservice execution
+	 * @param moduleName
+	 * @param dev
+	 * @param execId
+	 * @param execDeviceId
+	 * @param execResultId
+	 * @param realPath
+	 * @param url
+	 * @return
+	 */
+	def transferSTBLogRdkService(def moduleName , def dev,def execId, def execDeviceId,def execResultId,def realPath,def url){
+		try {
+			def module
+			def stbLogFiles
+			Module.withTransaction {
+				module = Module.findByName(moduleName)
+				if(module?.stbLogFiles?.size() > 0){
+					stbLogFiles = module?.stbLogFiles
+				}
+			}
+			def stbFilePath = "${realPath}/logs//stblogs//${execId}//${execDeviceId}//${execResultId}//"
+			try{
+				new File(stbFilePath?.toString())?.mkdirs()
+			}catch(Exception e){
+				e.printStackTrace()
+			}
+			stbLogFiles?.each{ name ->
+				String boxLogTransferScript = Constants.FILE_TRANSFER_SCRIPT_RDKSERVICE
+				File boxLogTransferScriptFile = grailsApplication.parentContext.getResource(boxLogTransferScript)?.file
+				File fileStoreFolder = grailsApplication.parentContext.getResource("//fileStore//")?.file
+				def fileStorePath = fileStoreFolder.absolutePath
+				def boxLogTransferScriptFilePath = boxLogTransferScriptFile.absolutePath
+				def fname = name?.split("/")
+				int fnameSize = fname?.length
+				def fileName = fname[fnameSize-1]
+				if((boxLogTransferScriptFilePath) && !(boxLogTransferScriptFilePath.isEmpty())){
+					def cmdList = [
+						Constants.PYTHON_COMMAND,
+						boxLogTransferScriptFilePath,
+						dev?.stbIp,
+						Constants.ROOT_STRING,
+						Constants.NONE_STRING,
+						name,
+						stbFilePath,
+						fileName
+					]
+					String [] cmd = cmdList.toArray()
+					try {
+						ScriptExecutor scriptExecutor = new ScriptExecutor()
+						def outputData = scriptExecutor.executeScript(cmd,1)
+					}catch (Exception e) {
+						println " error >> "+e.getMessage()
+						e.printStackTrace()
+					}
+				}
+			}
+		} catch (Exception e) {
+			println " ERROR "+e.getMessage()
 		}
 	}
 

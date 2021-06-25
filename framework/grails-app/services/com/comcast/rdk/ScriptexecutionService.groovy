@@ -859,8 +859,10 @@ class ScriptexecutionService {
 			executescriptService.initiateDiagnosticsTest(deviceInstance, performanceFileName, tmUrl,executionName)
 			executescriptService.copyLogFileIntoDir(realPath, diagnosticsFilePath, executionId,executionDeviceInstance?.id, executionResultId,DEVICE_DIAGNOSTICS_LOG)
 		}
-		if(isLogReqd && isLogReqd?.toString().equalsIgnoreCase(TRUE)){
+		if(isLogReqd && isLogReqd?.toString().equalsIgnoreCase(TRUE) && deviceInstance?.isThunderEnabled != 1){
 			executescriptService.transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId,realPath,url)
+		}else if (isLogReqd && isLogReqd?.toString().equalsIgnoreCase(TRUE) && deviceInstance?.isThunderEnabled == 1){
+			executescriptService.transferSTBLogRdkService(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId,realPath,url)
 		}
 		
 		//def logTransferFilePath = "${realPath}/logs//consolelog//${executionId}//${execDeviceId}//${executionResultId}//"
@@ -921,8 +923,10 @@ class ScriptexecutionService {
 		   /* Execution.executeUpdate("update Execution c set c.outputData = :newStatus , c.executionTime = :newTime where c.id = :execId",
 				[newStatus: outputData, newTime: timeDiff, execId: executionId.toLong()])*/
 	   // }
-		if(executionService.abortList.contains(executionInstance?.id?.toString())&& deviceInstance?.isThunderEnabled != 1){
-			executionService.resetAgent(deviceInstance,TRUE)
+		if(executionService.abortList.contains(executionInstance?.id?.toString())){
+			if(deviceInstance?.isThunderEnabled != 1){
+				executionService.resetAgent(deviceInstance,TRUE)
+			}
 		}	else if(htmlData.contains(TDK_ERROR)){
 			htmlData = htmlData.replaceAll(TDK_ERROR,"")
 			if(htmlData.contains("SCRIPTEND#!@~")){
@@ -931,9 +935,11 @@ class ScriptexecutionService {
 			if(deviceInstance?.isThunderEnabled != 1){
 			    executescriptService.logTransfer(deviceInstance,logTransferFilePath,logTransferFileName,realPath, executionId,execDeviceId, executionResultId,url)
 			}
-			if(isLogReqd){
+			if(isLogReqd && deviceInstance?.isThunderEnabled != 1){
 				executescriptService.transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId, realPath,url)
-			}	
+			}else if(isLogReqd && deviceInstance?.isThunderEnabled == 1){
+				executescriptService.transferSTBLogRdkService(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId, realPath,url)
+			}
 			
 			executionService.updateExecutionResultsError(htmlData,executionResult?.id,executionInstance?.id,executionDeviceInstance?.id,timeDiff.toString(),singleScriptExecTime)
 			Thread.sleep(5000)

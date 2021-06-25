@@ -693,13 +693,13 @@ class ExecutionController {
 				if(performance != null  ){
 					isSystemDiagnostics1 = performance
 				}
-				if(isLogReqd != null ){
-					isLogReqd1  = isLogReqd
-	
-				}
 				if(reRunOnFailure != null ){
 					rerun1 = reRunOnFailure
 				}
+			}
+			if(isLogReqd != null ){
+				isLogReqd1  = isLogReqd
+
 			}
 			String filePath = "${request.getRealPath('/')}//fileStore"
 			if(test_request && deviceInstanceIsThunder?.isThunderEnabled != 1){
@@ -1203,7 +1203,7 @@ class ExecutionController {
 					if(params?.benchMarking.equals(KEY_ON) || params?.rdkCertificationPerformance?.equals(KEY_ON)){
 						isBenchMark = TRUE
 					}
-					if(params?.transferLogs.equals(KEY_ON)){
+					if(params?.rdkCertificationStbLogTransfer?.equals(KEY_ON) || params?.transferLogs?.equals(KEY_ON)){
 						isLogReqd = TRUE
 					}
 
@@ -3166,7 +3166,7 @@ class ExecutionController {
 		
 		def deviceInstance = Device.findByStbName(stbName)
 		if(deviceInstance && deviceInstance?.isThunderEnabled == 1){
-			singleTestRestExecutionRdkService(stbName,boxType,scriptName,exeCount,rerun)
+			singleTestRestExecutionRdkService(stbName,boxType,scriptName,exeCount,rerun,isLog)
 		}else{
 			singleTestRestExecution(stbName,boxType,scriptName,exeCount,rerun,time,perfo,isLog)
 		}
@@ -3449,10 +3449,9 @@ class ExecutionController {
 	 * @return - Return JSON with status of REST call
 	 */
 	
-	def singleTestRestExecutionRdkService(final String stbName, final String boxType, final String scriptName , final int repeat, final String reRunOnFailure){
+	def singleTestRestExecutionRdkService(final String stbName, final String boxType, final String scriptName , final int repeat, final String reRunOnFailure, final String isLog){
 		String timeInfo = FALSE
 		String performance = FALSE
-		String isLog = FALSE
 		def deviceInstance = Device.findByStbName(stbName)
 		String  url = getApplicationUrl()
 		String htmlData = ""
@@ -4278,9 +4277,9 @@ class ExecutionController {
 			if(performance && performance?.equals(TRUE)){
 				perfo = TRUE
 			}
-			if(isLogRequired && isLogRequired?.equals(TRUE)){
-				isLog = TRUE
-			}
+		}
+		if(isLogRequired && isLogRequired?.equals(TRUE)){
+			isLog = TRUE
 		}
 		JsonObject jsonOutData = new JsonObject()
 		boolean validScript = false

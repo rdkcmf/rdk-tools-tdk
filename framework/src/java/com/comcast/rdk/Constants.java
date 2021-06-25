@@ -74,6 +74,7 @@ public final class Constants
     public static final String COMPLETED_STATUS    	= "COMPLETED";
     public static final String NOT_APPLICABLE_STATUS= "N/A";
     public static final String SCRIPT_TIME_OUT      = "SCRIPT TIME OUT";
+    public static final String FILE_TRANSFER_SCRIPT_RDKSERVICE = "//fileStore//transfer_thunderdevice_logs.py";
     public static final String FILE_TRANSFER_SCRIPT = "//fileStore//filetransfer.py";
     public static final String FILE_UPLOAD_SCRIPT   = "//fileStore//fileupload.py";
     public static final String CONSOLE_FILE_TRANSFER_SCRIPT = "//fileStore//callConsoleLogTransfer.py";
@@ -150,6 +151,8 @@ public final class Constants
     public static final String HTML_PATTERN_AFTERSPAN   = "</?span\\b[^>]*>";
     
     public static final String PYTHON_COMMAND     = "python";
+    public static final String ROOT_STRING        = "root";
+    public static final String NONE_STRING        = "None";
     public static final String HYPHEN             = "-";
     public static final String XI3_BOX            = "IPClient-3"; //"Xi3";
     public static final String FOUND_MACID        = "DEVICES=";

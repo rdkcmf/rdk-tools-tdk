@@ -30,6 +30,7 @@ $(document).ready(function() {
 	$("#scriptGrpThunderPython").select2();
 	document.getElementById("rdkCertificationDiagnosisId").disabled = true;
 	document.getElementById("rdkCertificationPerformanceId").disabled = true;
+	document.getElementById("rdkCertificationStbLogTransferId").disabled = true;
 });
 
 </script>
@@ -178,6 +179,7 @@ $(document).ready(function() {
 				<td>Execution Options</td>
 				<td><g:checkBox id="rdkCertificationDiagnosisId" name="rdkCertificationDiagnosis" checked="false"  />&nbsp;Rdk Certification Diagnosis
 				&emsp;&emsp;<g:checkBox id="rdkCertificationPerformanceId" name="rdkCertificationPerformance" checked="false"  />&nbsp;Rdk Certification Performance
+				&emsp;&emsp;<g:checkBox id="rdkCertificationStbLogTransferId" name="rdkCertificationStbLogTransfer" checked="false"  />&nbsp;Rdk Certification STB Log Transfer
 				</td>
 			</tr>
 		</g:else>

@@ -161,6 +161,8 @@ function jsExecution(){
 	var singleTest = document.getElementById("singleTestRadioThunder");
 	var thunderJavascriptExecuteButtons = document.getElementById("thunderJavascriptExecuteButtons");
 	var thunderPythonExecuteButtons = document.getElementById("thunderPythonExecuteButtons");
+	var thunderPythonLogTransferCheckBox = document.getElementById("rdkCertificationStbLogTransferId");
+	thunderPythonLogTransferCheckBox.disabled = true;
 	var thunderPythonDiagnosisCheckBox = document.getElementById("rdkCertificationDiagnosisId");
 	thunderPythonDiagnosisCheckBox.disabled = true;
 	var thunderPythonPerformanceCheckBox = document.getElementById("rdkCertificationPerformanceId");
@@ -194,6 +196,8 @@ function pythonExecution(){
 	document.getElementById("thunderExecutionType").value = "rdkservice";
 	var thunderJavascriptExecuteButtons = document.getElementById("thunderJavascriptExecuteButtons");
 	var thunderPythonExecuteButtons = document.getElementById("thunderPythonExecuteButtons");
+	var thunderPythonLogTransferCheckBox = document.getElementById("rdkCertificationStbLogTransferId");
+	thunderPythonLogTransferCheckBox.disabled = false;
 	var thunderPythonDiagnosisCheckBox = document.getElementById("rdkCertificationDiagnosisId");
 	thunderPythonDiagnosisCheckBox.disabled = false;
 	var thunderPythonPerformanceCheckBox = document.getElementById("rdkCertificationPerformanceId");
@@ -462,6 +466,10 @@ function showSchedulerRdkService(id, category){
     if ($("#rerunId").prop('checked')==true){     	
     	reRun = "true";
     }
+	
+	if ($("#rdkCertificationStbLogTransferId").prop('checked')==true){  
+		isLogReqd = "true";
+	}
 	
 	if( (deviceList =="" || deviceList == null ) ){
 		alert("Please select Device");
