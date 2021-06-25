@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>3</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_MVS_Animation_Object_Compare_ScreenShots</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -68,9 +68,9 @@ thunder_port :string
 animation_duration:int
 image_upload_dir:string
 sc_upload_url:string</input_parameters>
-    <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
-2. Get the current URL in webkitbrowser
-3. Load the Animation app url with the input parameters
+    <automation_approch>1. As pre requisite, launch LightningApp  webkit instance via RDKShell, open websocket conntion to webinspect page
+2. Store the details of other launched apps. Move the LightningApp  webkit instance to front, if its z-order is low.
+3. Launch LightningApp webkit instance with animation test app url with the input parameters
 4. App performs animation to render single rectangle object for provided duration.
 5. Using screenshot plugin, capture screenshots  at regular interval and upload to the configured url
 6. compare the captured screenshots among them and check whether they are same or different
@@ -114,10 +114,10 @@ if expectedResult in result.upper():
     print "\nCheck Pre conditions..."
     tdkTestObj = obj.createTestStep('rdkv_media_pre_requisites');
     tdkTestObj.executeTestCase(expectedResult);
-    # Setting the pre-requites for media test. Launching the wekit browser via RDKShell and
+    # Setting the pre-requites for media test. Launching the wekit instance via RDKShell and
     # moving it to the front, openning a socket connection to the webkit inspect page and
     # disabling proc validation
-    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,False)
+    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,"LightningApp",False)
 
     #No need to revert any values if the pre conditions are already set.
     sc_revert="NO"
@@ -182,8 +182,8 @@ if expectedResult in result.upper():
         # Getting the complete test app URL
         animation_test_url = getTestURL(appURL,appArguments)
 
-        # Setting the animation test url in webkit browser using RDKShell
-        launch_status = launchPlugin(obj,"WebKitBrowser",animation_test_url)
+        # Setting the animation test url in webkit instance using RDKShell
+        launch_status = launchPlugin(obj,"LightningApp",animation_test_url)
         if "SUCCESS" in launch_status:
             time.sleep(15)
             sc_images_list    = []
@@ -238,9 +238,9 @@ if expectedResult in result.upper():
             print "\nSet post conditions..."
             tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
             tdkTestObj.executeTestCase(expectedResult);
-            # Setting the post-requites for media test.Removing app utl from webkit browser and
-            # moving residentApp to front if its active
-            post_requisite_status = setMediaTestPostRequisites(obj)
+            # Setting the post-requites for media test.Removing app url from webkit instance and
+            # moving next high z-order app to front (residentApp if its active)
+            post_requisite_status = setMediaTestPostRequisites(obj,"LightningApp")
             if post_requisite_status == "SUCCESS":
                 print "Post conditions for the test are set successfully\n"
                 tdkTestObj.setResultStatus("SUCCESS");

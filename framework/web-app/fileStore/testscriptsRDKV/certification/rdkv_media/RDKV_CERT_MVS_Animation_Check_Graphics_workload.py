@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>6</version>
+  <version>7</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_MVS_Animation_Check_Graphics_workload</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -72,9 +72,9 @@ webinspect_port: string
 thunder_port :string
 expected_fps:int
 threshold:int</input_parameters>
-    <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
-2. Get the current URL in webkitbrowser
-3. Load the Multi Animation app url with the arguments like fps,threshold,ip,port,duration and testing methods
+    <automation_approch>1. As pre requisite, launch LightningApp  webkit instance via RDKShell, open websocket conntion to webinspect page
+2. Store the details of other launched apps. Move the LightningApp  webkit instance to front, if its z-order is low.
+3. Launch LightningApp webkit instance with the Multi Animation app url with the arguments like fps,threshold,ip,port,duration and testing methods
 4. App performs animation of multiple objects from count of 1,10,20,50,100,250,500,1000 one by one for the provided duration.
 5. App starts with animation of single object for provided duration and collect the fps for every second, then find the average of collected fps.
 6. If the average FPS obtained is greater than or equal to expected fps value (i.e) expected_fps - threshold, then app increases number of objects to 10. Again average fps is calculated and checked, then app decides to proceed for further more number of objects or not.
@@ -84,7 +84,7 @@ threshold:int</input_parameters>
     <expected_output>Device should be able to atleast animate single object with expected FPS and number of objects the device can animate with expected FPS should be obtained</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RdkService_Media_Animation_Check_Device_Capability</test_script>
+    <test_script>RDKV_CERT_MVS_Animation_Check_Graphics_workload</test_script>
     <skipped>No</skipped>
     <release_version>M84</release_version>
     <remarks></remarks>
@@ -116,10 +116,11 @@ if expectedResult in result.upper():
     print "\nCheck Pre conditions..."
     tdkTestObj = obj.createTestStep('rdkv_media_pre_requisites');
     tdkTestObj.executeTestCase(expectedResult);
-    # Setting the pre-requites for media test. Launching the wekit browser via RDKShell and
+    setWebKitSocketPort(webinspect_port_lightning)
+    # Setting the pre-requites for media test. Launching the wekit instance via RDKShell and
     # moving it to the front, openning a socket connection to the webkit inspect page and
     # disabling proc validation
-    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,False)
+    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,"LightningApp",False)
     config_status = "SUCCESS"
     conf_file,result = getDeviceConfigFile(obj.realpath)
     result1, expected_fps  = readDeviceConfigKeyValue(conf_file,"EXPECTED_FPS")
@@ -151,8 +152,8 @@ if expectedResult in result.upper():
         # Getting the complete test app URL
         animation_test_url = getTestURL(appURL,appArguments)
 
-        # Setting the animation test url in webkit browser using RDKShell        
-        launch_status = launchPlugin(obj,"WebKitBrowser",animation_test_url)
+        # Setting the animation test url in webkit instance using RDKShell        
+        launch_status = launchPlugin(obj,"LightningApp",animation_test_url)
         if "SUCCESS" in launch_status:
             continue_count = 0
             avgerage_fps_list = []
@@ -200,9 +201,9 @@ if expectedResult in result.upper():
             print "\nSet post conditions..."
             tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
             tdkTestObj.executeTestCase(expectedResult);
-            # Setting the post-requites for media test.Removing app utl from webkit browser and
-            # moving residentApp to front if its active
-            post_requisite_status = setMediaTestPostRequisites(obj)
+            # Setting the post-requites for media test.Removing app url from webkit instance and
+            # moving next high z-order app to front (residentApp if its active)
+            post_requisite_status = setMediaTestPostRequisites(obj,"LightningApp")
             if post_requisite_status == "SUCCESS":
                 print "Post conditions for the test are set successfully\n"
                 tdkTestObj.setResultStatus("SUCCESS");

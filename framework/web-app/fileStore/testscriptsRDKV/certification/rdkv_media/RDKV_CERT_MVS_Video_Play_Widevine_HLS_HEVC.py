@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>1</version>
+  <version>2</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_MVS_Video_Play_Widevine_HLS_HEVC</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operation of  Widevine DRM protected HEVC codec hls stream for few minutes and close the player</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit instance and perform video play operation of  Widevine DRM protected HEVC codec hls stream for few minutes and close the player</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -57,20 +57,21 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_Media_Validation_89</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit Browser and perform video play operation of  Widevine DRM protected HEVC codec hls stream for few minutes and close the player</test_objective>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit instance and perform video play operation of  Widevine DRM protected HEVC codec hls stream for few minutes and close the player</test_objective>
     <test_type>Positive</test_type>
     <test_setup>Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
 2.Lightning Player app should be hosted</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Lightning player App URL: string
+webkit_instance:string
 webinspect_port: string
 video_src_url_widevine_hls_hevc: string
 video_src_url_widevine_hls_hevc_drmconfigs:string
 close_interval: int</input_parameters>
-    <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
-2. Get the current URL in webkitbrowser
-3. Load the player app with the video src url and duration for close.
+    <automation_approch>1. As pre requisite, launch webkit instance via RDKShell, open websocket conntion to webinspect page
+2. Store the details of other launched apps. Move the webkit instance to front, if its z-order is low.
+3. Launch webkit instance with video test app with the video src url and duration for close.
 4. App starts playing the Widevine DRM protected hevc hls stream video and closes the player after the provided duration.
 5. If expected event video playing is observed then update the result as SUCCESS or else FAILURE
 6. Update the test script result as SUCCESS/FAILURE based on event validation result and proc check status (if applicable)
@@ -83,6 +84,7 @@ close_interval: int</input_parameters>
     <release_version>M88</release_version>
     <remarks></remarks>
   </test_cases>
+  <script_tags />
 </xml>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
@@ -110,10 +112,10 @@ if expectedResult in result.upper():
     print "\nCheck Pre conditions..."
     tdkTestObj = obj.createTestStep('rdkv_media_pre_requisites');
     tdkTestObj.executeTestCase(expectedResult);
-    # Setting the pre-requites for media test. Launching the wekit browser via RDKShell and
+    # Setting the pre-requites for media test. Launching the wekit instance via RDKShell and
     # moving it to the front, openning a socket connection to the webkit inspect page and
     # getting the details for proc validation from config file
-    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj)
+    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,webkit_instance)
     if pre_requisite_status == "SUCCESS":
         tdkTestObj.setResultStatus("SUCCESS");
         print "Pre conditions for the test are set successfully"
@@ -138,11 +140,11 @@ if expectedResult in result.upper():
         video_test_url = getTestURL(appURL,appArguments)
 
         #Example video test url
-        #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkmediaplayer/build/index.html?
+        #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html?
         #url=<video_hevc_url>.mpd&drmconfigs=com.widevine(<license_url>)&operations=close(60)&autotest=true&type=hls
 
-        # Setting the video test url in webkit browser using RDKShell
-        launch_status = launchPlugin(obj,"WebKitBrowser",video_test_url)
+        # Setting the video test url in webkit instance using RDKShell
+        launch_status = launchPlugin(obj,webkit_instance,video_test_url)
         if "SUCCESS" in launch_status:
             # Monitoring the app progress, checking whether app plays the video properly or any hang detected in between,
             # performing proc entry check and getting the test result from the app
@@ -153,7 +155,7 @@ if expectedResult in result.upper():
                 print "Video play is fine"
                 print "[TEST EXECUTION RESULT]: SUCCESS"
                 tdkTestObj.setResultStatus("SUCCESS");
-            elif "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
+            elif "SUCCESS" in test_result and "FAILURE" in proc_check_list:
                 print "Decoder proc entry check returns failure.Video not playing fine"
                 print "[TEST EXECUTION RESULT]: FAILURE"
                 tdkTestObj.setResultStatus("FAILURE");
@@ -165,9 +167,9 @@ if expectedResult in result.upper():
             print "\nSet post conditions..."
             tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
             tdkTestObj.executeTestCase(expectedResult);
-            # Setting the post-requites for media test.Removing app utl from webkit browser and
-            # moving residentApp to front if its active
-            post_requisite_status = setMediaTestPostRequisites(obj)
+            # Setting the post-requites for media test.Removing app url from webkit instance and
+            # moving next high z-order app to front (residentApp if its active)
+            post_requisite_status = setMediaTestPostRequisites(obj,webkit_instance)
             if post_requisite_status == "SUCCESS":
                 print "Post conditions for the test are set successfully\n"
                 tdkTestObj.setResultStatus("SUCCESS");
