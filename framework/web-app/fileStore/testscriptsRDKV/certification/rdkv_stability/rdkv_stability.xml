@@ -76,6 +76,18 @@
           <parameter name="keyword" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkservice_validateResourceUsage" id="" version="1">
+        <function>rdkservice_validateResourceUsage</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_executeLifeCycle" id=" " version="1">
+        <function>rdkservice_executeLifeCycle</function>
+        <parameters>
+          <parameter name="operations" value=""/>
+          <parameter name="plugin" value=""/>
+          <parameter name="validation_details" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>

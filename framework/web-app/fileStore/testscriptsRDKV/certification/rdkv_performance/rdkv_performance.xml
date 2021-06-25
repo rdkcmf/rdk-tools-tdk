@@ -109,6 +109,14 @@
           <parameter name="realpath" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkservice_validatePluginFunctionality" id=" " version="1">
+        <function>rdkservice_validatePluginFunctionality</function>
+        <parameters>
+          <parameter name="operations" value=""/>
+          <parameter name="plugin" value=""/>
+          <parameter name="validation_details" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>

@@ -30,12 +30,14 @@ from SSHUtility import *
 import re
 from datetime import datetime
 import importlib
+import PerformanceTestVariables
+import sys
 
 deviceIP=""
 devicePort=""
 deviceName=""
 deviceType=""
-graphical_plugins_list = ["Cobalt","WebKitBrowser"]
+graphical_plugins_list = PerformanceTestVariables.graphical_plugins_list
 #METHODS
 #---------------------------------------------------------------
 #INITIALIZE THE MODULE
@@ -609,3 +611,99 @@ def rdkservice_getSupportedPlugins(realpath,plugins):
         return plugins
     else:
         return result
+
+#-------------------------------------------------------------------
+#VALIDATE VIDEO PLAYBACK IN PREMIUM APPS
+#-------------------------------------------------------------------
+def rdkservice_validateVideoPlayback(sshmethod,credentials,video_validation_script):
+    result = "SUCCESS"
+    video_validation_script = video_validation_script.split('.py')[0]
+    try:
+        lib = importlib.import_module(video_validation_script)
+        method = "check_video_status"
+        method_to_call = getattr(lib, method)
+        result = method_to_call(sshmethod,credentials)
+    except Exception as e:
+        print "\n ERROR OCCURRED WHILE IMPORTING THE VIDEO VALIDATION SCRIPT FILE, PLEASE CHECK THE CONFIGURATION \n"
+        result = "FAILURE"
+    finally:
+        return result
+
+#-------------------------------------------------------------------
+#VALIDATE PLUGIN FUNCTIONALITY
+#The function will launch the plugin and validate the functionality
+#of the plugin. eg: launch Cobalt, set video URL and validate video
+#playback
+#-------------------------------------------------------------------
+def rdkservice_validatePluginFunctionality(plugin,operations,validation_details):
+    result = "FAILURE"
+    operations = json.loads(operations)
+    validation_details = json.loads(validation_details)
+    movedToFront = False
+    #Activate plugin
+    print "\n Activating plugin : {}".format(plugin)
+    status = rdkservice_setPluginStatus(plugin,"activate")
+    time.sleep(5)
+    #Check status
+    if status != "EXCEPTION OCCURRED":
+        curr_status = rdkservice_getPluginStatus(plugin)
+        time.sleep(10)
+        if curr_status in ("activated","resumed"):
+            zorder_result = rdkservice_getValue("org.rdk.RDKShell.1.getZOrder")
+            if zorder_result != "EXCEPTION OCCURRED":
+                zorder = zorder_result["clients"]
+                if zorder[0].lower() != plugin.lower():
+                    param = '{"client": "'+plugin+'"}'
+                    movetofront_result = rdkservice_setValue("org.rdk.RDKShell.1.moveToFront",param)
+                    if movetofront_result != "EXCEPTION OCCURRED":
+                        movedToFront = True
+                else:
+                    movedToFront = True
+                if movedToFront:
+                    for operation in operations:
+                        method = [plugin_method for plugin_method in operation][0]
+                        value = [operation[plugin_method] for plugin_method in operation][0]
+                        response = rdkservice_setValue(method,value)
+                        sys.stdout.flush()
+                        if response == "EXCEPTION OCCURRED":
+                            print "\n Error while executing {} method".format(method)
+                            break
+                        time.sleep(20)
+                    else:
+                        print "\n Successfully completed launching and setting the operations for {} plugin".format(plugin)
+                        validation_check = validation_details[0]
+                        if validation_check == "video_validation":
+                            time.sleep(20)
+                            sshmethod = validation_details[1]
+                            credentials = validation_details[2]
+                            video_validation_script = validation_details[3]
+                            video_status =  rdkservice_validateVideoPlayback(sshmethod,credentials,video_validation_script)
+                            sys.stdout.flush()
+                            if video_status != "SUCCESS":
+                                print "\n Video is not playing"
+                                return result
+                            else:
+                                print "\n Video is playing"
+                                result = "SUCCESS"
+                        elif validation_check == "no_validation":
+                            print "\n Validation is not needed, proceeding the test"
+                            result = "SUCCESS"
+                        else:
+                            method = validation_check
+                            expected_value = validation_details[1]
+                            value = rdkservice_getValue(method)
+                            if value != "EXCEPTION OCCURRED" and expected_value in value:
+                                print "\n The value:{} set for {} plugin".format(value,plugin)
+                                result = "SUCCESS"
+                            else:
+                                print "\n Expected Value is not present, Current value: {}".format(value)
+                                return result
+                else:
+                    print "\n Error while moving {} plugin to front ".format(plugin)
+            else:
+                print "\n Error while getting the zorder result"
+        else:
+            print "\n Plugin is not activated, current status: {}".format(curr_status)
+    else:
+        print "\n Error while activating the plugin"
+    return result

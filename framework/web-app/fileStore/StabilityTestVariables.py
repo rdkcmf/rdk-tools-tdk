@@ -17,7 +17,7 @@
 # limitations under the License.
 #########################################################################
 
-#The port must be 9998 for thunder builds and 9224 for rdkservice builds
+#The port must be 9224 for rdkservice builds and 9998 for thunder builds
 webinspect_port = ""
 
 #channel change application url,replace <TM-IP> with Test manager IP in the URL:
@@ -139,3 +139,14 @@ fps_test_duration = 360
 ##Toggle SSID test details
 #maximum number of Wi-Fi SSID changes
 max_ssid_changes = 1000
+
+#Switch between plugins test details
+#maximum number of switch between plugins needed
+switch_plugins_max_count = 1000
+
+#URL used for testing WebKitBrowser
+webkit_test_url = "https://www.google.com/"
+
+#Life cycle management test details
+#Maximum number of complete lifecycle iterations needed
+lifecycle_max_count = 1000

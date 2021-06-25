@@ -45,6 +45,7 @@
       <function name='rdkservice_getSSHParams' />
       <function name='rdkservice_getBluetoothMac' />
       <function name='rdkservice_getSupportedPlugins' />
+      <function name='rdkservice_validatePluginFunctionality' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -65,6 +66,9 @@
       <parameter funName='rdkservice_getSSHParams' parameterName='deviceIP' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getSupportedPlugins' parameterName='plugins' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getSupportedPlugins' parameterName='realpath' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_validatePluginFunctionality' parameterName='plugin' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_validatePluginFunctionality' parameterName='operations' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_validatePluginFunctionality' parameterName='validation_details' parameterType='STRING' range='a-z' />
     </parameters>
   </module>
 </xml>

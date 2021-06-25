@@ -26,6 +26,7 @@ import numpy as np
 from itertools import combinations
 from ip_change_detection_utility import *
 import importlib
+import sys
 
 deviceIP=""
 devicePort=""
@@ -95,7 +96,6 @@ def rdkservice_rebootDevice(waitTime):
         print "ERROR!! \nEXCEPTION OCCURRED WHILE REBOOTING DEVICE!!"
         print "Error message received :\n",e;
         return "EXCEPTION OCCURRED"
-
 
 #-------------------------------------------------------------------
 #GET THE CPU LOAD VALUE FROM DEVICEINFO PLUGIN
@@ -290,3 +290,73 @@ def rdkservice_validateResourceUsage():
 
     else:
         return result
+
+#-------------------------------------------------------------------
+#EXECUTE COMPLETE LIFECYCLE METHODS OF A PLUGIN
+#-------------------------------------------------------------------
+def rdkservice_executeLifeCycle(plugin,operations,validation_details):
+    result = "FAILURE"
+    #Dictionary to store the method and parameter to be passed for that method
+    suspend_resume_dict = {"suspend":{"method":"org.rdk.RDKShell.1.suspend","param":'{"callsign":"'+plugin+'"}'},"resume":{"method":"org.rdk.RDKShell.1.launch","param":'{"callsign":"'+plugin+'", "type":"", "uri":""}'}}
+    #Dictionary to store the expected values for suspend and resume operations
+    expected_status_dict = {"suspend":["suspended"],"resume":["activated","resumed"]}
+    #Parameter used for move to front and move to back
+    param_val = '{"client": "'+plugin+'"}'
+    #Dictionary to store the index values to be checked in move to back and front operations
+    check_zorder_dict = {"moveToBack":-1,"moveToFront":0}
+    status = rdkv_performancelib.rdkservice_validatePluginFunctionality(plugin,operations,validation_details)
+    sys.stdout.flush()
+    if status == "SUCCESS":
+        #Suspend and resume operations
+        for operation in ["suspend","resume"]:
+            method = suspend_resume_dict[operation]["method"]
+            value = suspend_resume_dict[operation]["param"]
+            operation_status = rdkservice_setValue(method,value)
+            if operation_status != "EXCEPTION OCCURRED":
+                time.sleep(5)
+                curr_status = rdkv_performancelib.rdkservice_getPluginStatus(plugin)
+                sys.stdout.flush()
+                if curr_status in expected_status_dict[operation]:
+                    print "\n Successfully set {} plugin to {} status".format(plugin,curr_status)
+                else:
+                    print "\n Error while setting {} plugin to {} status, current status: {}".format(plugin,operation,curr_status)
+                    break
+            else:
+                print "\n Error while setting {} plugin to {}".format(plugin,operation)
+                break
+        #On successfull completion of the loop for suspend and resume, below block will get executed
+        else:
+            print "\n Successfully completed suspend and resume for {} plugin".format(plugin)
+            #Do move to front and back operations
+            for move_to_method in ["moveToBack","moveToFront"]:
+                move_to_status = rdkv_performancelib.rdkservice_setValue("org.rdk.RDKShell.1."+move_to_method,param_val)
+                if move_to_status != "EXCEPTION OCCURRED":
+                    time.sleep(5)
+                    zorder_result = rdkv_performancelib.rdkservice_getValue("org.rdk.RDKShell.1.getZOrder")
+                    sys.stdout.flush()
+                    if zorder_result != "EXCEPTION OCCURRED":
+                        print zorder_result
+                        zorder = zorder_result["clients"]
+                        if zorder[check_zorder_dict[move_to_method]].lower() == plugin.lower():
+                            print "\n {} operation is success ".format(move_to_method)
+                        else:
+                            print "\n Error while doing {} operation ".format(move_to_method)
+                            break
+                    else:
+                        print "\n Error while getting the zorder"
+                        break
+                else:
+                    print "\n Error while doing {} operation ".format(move_to_method)
+                    break
+            else:
+                print "\n Successfully completed move to back and move to front for the {} plugin".format(plugin)
+                result = "SUCCESS"
+    else:
+        print "\n Error occurred while lauching and checking the plugin functionality"
+    #Destroy the plugin
+    print "\n Deactivate {} plugin".format(plugin)
+    status = rdkv_performancelib.rdkservice_setPluginStatus(plugin,"deactivate")
+    if status == "EXCEPTION OCCURRED":
+        print "\n Error while deactivating {} plugin".format(plugin)
+        result = "FAILURE"
+    return result

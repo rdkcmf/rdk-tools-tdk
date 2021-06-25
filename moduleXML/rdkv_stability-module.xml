@@ -38,6 +38,8 @@
       <function name='rdkservice_validateProcEntry' />
       <function name='rdkservice_setDefaultInterface' />
       <function name='rdkservice_sendKeyCodes' />
+      <function name='rdkservice_validateResourceUsage' />
+      <function name='rdkservice_executeLifeCycle' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -53,6 +55,9 @@
       <parameter funName='rdkservice_validateProcEntry' parameterName='video_validation_script' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_setDefaultInterface' parameterName='new_interface' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_sendKeyCodes' parameterName='keyword' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_executeLifeCycle' parameterName='plugin' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_executeLifeCycle' parameterName='operations' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_executeLifeCycle' parameterName='validation_details' parameterType='STRING' range='a-z' />
     </parameters>
   </module>
 </xml>
