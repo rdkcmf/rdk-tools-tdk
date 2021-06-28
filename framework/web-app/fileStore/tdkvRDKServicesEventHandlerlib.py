@@ -389,7 +389,8 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
         elif tag == "system_validate_power_mode":
             result=result[0]
             info["Test_Step_Status"] = "FAILURE"
-            if str(result.get("powerState")) == str(expectedValues[0]):
+            powerState = str(result.get("powerState"))
+            if str(expectedValues[0]) == "STANDBY" and powerState == "LIGHT_SLEEP" or powerState == "STANDBY" or str(expectedValues[0]) == "ON" and powerState == "ON":
                 info["Test_Step_Status"] = "SUCCESS"
 
         elif tag == "system_check_temperature_threshold_change_event":

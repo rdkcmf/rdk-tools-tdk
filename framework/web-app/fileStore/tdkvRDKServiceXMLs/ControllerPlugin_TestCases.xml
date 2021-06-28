@@ -137,5 +137,31 @@
         </resultGeneration>
       </testStep>
     </testCase>
+
+    <testCase testCaseId="Controller_10" testCaseName="Check_Plugins_State"  desc="Checks the plugin status" >
+      <testCaseInfo testCaseType="loop"/>
+      <testStep testStepId="1" name="Execute_Reboot_Command" action="externalFnCall" rebootStep="yes">
+        <resultGeneration useMethodTag="executeRebootCmd"/>
+      </testStep>
+      <testStep testStepId="2" name="Check_Plugins_Status" testStepType="loop" delay="10" >
+        <subtestStep subtestStepId="1" name="Check_Plugins_Status" method="Get_Plugin_Status" >
+          <params>
+            <param tag="callsign"  iteration="true" useConfigFile="true" key="Supported_Plugins"  indexOnly="true" />
+          </params>
+          <resultGeneration useMethodTag="controller_check_default_plugin_state" >
+            <arguments value="check_default_state" useIterableArg="true"/>
+          </resultGeneration>
+        </subtestStep>
+      </testStep>
+    </testCase>
+     
+    <testCase testCaseId="Controller_11" testCaseName="Verify_WPE_Process_Status"  desc="Checks whether WPE Process is running or not" >
+      <testCaseInfo testCaseType="loop"/>
+      <testStep testStepId="1" name="Check_WPE_Process" action="externalFnCall" >
+        <resultGeneration useMethodTag="Check_WPE_Process" >
+            <expectedValues useConfigFile="true" key="WPE_PROCESSES_LIST" />
+        </resultGeneration>
+      </testStep>
+    </testCase>
 </testPlugin>
 

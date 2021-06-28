@@ -233,18 +233,20 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             target = result.get("target")
             tx_packets = int(result.get("packetsTransmitted"))
             rx_packets = int(result.get("packetsReceived"))
-            packets_loss = int(result.get("packetLoss"))
+            packets_loss = result.get("packetLoss")
+            if "duplicates" in packets_loss:
+                packets_loss = packets_loss.split("duplicates")[0]
             success = str(result.get("success")).lower() == "true"
             if len(arg) and arg[0] == "check_target":
                 packets = int(expectedValues[0])
                 host_ip = expectedValues[1]
-                if success and target == host_ip and tx_packets == packets and rx_packets == packets and packets_loss == 0:
+                if success and target == host_ip and tx_packets == packets and rx_packets == packets and int(packets_loss) == 0:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             else:
                 packets = int(expectedValues[0])
-                if success and target.strip() and tx_packets == packets and rx_packets == packets and packets_loss == 0:
+                if success and target.strip() and tx_packets == packets and rx_packets == packets and int(packets_loss) == 0:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
@@ -477,6 +479,18 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
         elif tag == "cobalt_get_state":
             info["state"] = result
             if result in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "cobalt_validate_accessibility_settings":
+            status = checkNonEmptyResultData(result)
+            closedcaptions = result.get("closedcaptions")
+            textdisplay = result.get("textdisplay")
+            for key,value in closedcaptions.items():
+                info[key] = value
+            info["ishighcontrasttextenabled"] = textdisplay.get("ishighcontrasttextenabled")
+            if status and str(closedcaptions.get("isenabled")).lower() == str(expectedValues[0]).lower() and closedcaptions.get("backgroundcolor") == expectedValues[1] and closedcaptions.get("backgroundopacity") == expectedValues[2] and closedcaptions.get("characteredgestyle") == expectedValues[3] and closedcaptions.get("fontcolor") == expectedValues[4] and closedcaptions.get("fontfamily") == expectedValues[5] and closedcaptions.get("fontopacity") == expectedValues[6] and closedcaptions.get("fontsize") == expectedValues[7] and closedcaptions.get("windowcolor") == expectedValues[8] and closedcaptions.get("windowopacity") == expectedValues[9] and str(textdisplay.get("ishighcontrasttextenabled")).lower() == str(expectedValues[10]).lower():
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -785,6 +799,30 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
          
+        elif tag == "rdkshell_check_log_level":
+            success = str(result.get("success")).lower() == "true"
+            info["LogLevel"] = result.get("logLevel")
+            if success and str(result.get("logLevel")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "rdkshell_check_hole_punch":
+            success = str(result.get("success")).lower() == "true"
+            info["holePunch"] = result.get("holePunch")
+            if success and str(result.get("holePunch")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "rdkshell_validate_topmost_client":
+            success = str(result.get("success")).lower() == "true"
+            TopMostClient = result.get("clients")[0]
+            info["TopMostClient"] = result.get("clients")[0]
+            if success and TopMostClient in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # DisplayInfo Plugin Response result parser steps
         elif tag == "displayinfo_get_general_info":
@@ -1977,6 +2015,25 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+        elif tag == "controller_check_default_plugin_state":
+            if arg[0] == "check_default_state":
+                state = ""
+                callsign = ""
+                for plugin in result:
+                    if plugin.get("callsign") == arg[1]:
+                        state = plugin.get("state")
+                        callsign = plugin.get("callsign")
+                        autostart = plugin.get("autostart")
+                        break
+                info["state"] = state
+                info["callsign"] = callsign
+                info["autostart"] = autostart
+                if autostart == True:
+                    expectedState = "activated,activation"
+                    if state in expectedState:
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
 
 
         else:
@@ -2372,13 +2429,15 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["enabled"] = False
             else:
                 info["enabled"] = True
+
         elif tag == "system_switch_power_state":
             testStepResults = testStepResults[0].values()[0]
             powerState = testStepResults[0].get("powerState")
-            if powerState == "ON":
-                info["powerState"] = "STANDBY"
-            else:
+            if powerState in ("STANDBY","DEEP_SLEEP","LIGHT_SLEEP"):
                 info["powerState"] = "ON"
+            else:
+                info["powerState"] = "STANDBY"
+
         elif tag == "system_get_available_standby_modes":
             testStepResults = testStepResults[0].values()[0]
             info["standbyMode"] = testStepResults[0].get("supportedStandbyModes")
@@ -2460,6 +2519,13 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             else:
                 info["sx"] = float(testStepResults[0].get("sx")) + 1
                 info["sy"] = float(testStepResults[0].get("sy")) + 1
+        elif tag =="rdkshell_get_last_client_zorder":
+            testStepResults = testStepResults[0].values()[0]
+            clients = testStepResults[0].get("clients")
+            print clients
+            print len(clients)
+            print str(clients[(len(clients)-1)])
+            info["client"] = str(clients[(len(clients)-1)])
 
         #Display info plugin result parser steps
         elif tag == "display_info_get_supported_resolution_list":
@@ -2764,6 +2830,12 @@ def checkTestCaseApplicability(methodTag,configKeyData,arguments):
             else:
                 result = "FALSE"
 
+        elif tag == "firmwarecontrol_check_feature_applicability":
+            if arg[0] in keyData:
+                result = "TRUE"
+            else:
+                result = "FALSE"
+
         elif tag == "system_check_feature_applicability":
             if arg[0] in keyData:
                 result = "TRUE"
@@ -2829,6 +2901,10 @@ def generateComplexTestInputParam(methodTag,testParams):
             userGeneratedParam = {"keys":[testParams]}
         elif tag == "rdkshell_set_animations_params":
             userGeneratedParam = {"animations":[testParams]}
+        elif tag == "cobalt_set_accessibility_params":
+            newtestParams = testParams.copy()
+            newtestParams.pop("ishighcontrasttextenabled")
+            userGeneratedParam = {"closedcaptions": newtestParams, "textdisplay": { "ishighcontrasttextenabled": testParams.get("ishighcontrasttextenabled") } }
         elif tag == "system_set_thresholds_params":
             userGeneratedParam = {"thresholds":testParams}
 
@@ -2943,7 +3019,28 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             else:
                 info["RESULT"] = "Controller directory not created"
                 info["Test_Step_Status"] = "FAILURE"
-        
+
+        elif tag == "Check_WPE_Process":
+            processesRunning = []
+            processesNotRunning = []
+            command = "ps -ef | awk '{print $8}' ; ps -eo comm"
+            output = executeCommand(deviceConfigFile, deviceIP, command)
+            for value in expectedValues:
+                if ":" in str(value):
+                    value = value.split(":")[1]
+                if value.lower() in str(output).lower():
+                    status = True
+                    processesRunning.append(value)
+                else:
+                    status = False
+                    processesNotRunning.append(value)
+            if status:
+                info["Running_Processes"] = processesRunning
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Running_Processes"] = processesRunning
+                info["processes_Not_Running"] = processesNotRunning
+                info["Test_Step_Status"] = "FAILURE" 
         elif tag == "check_fps_value":
             expectedFPS = (int(expectedValues[0])-int(expectedValues[1]))
             info["AVERAGE_FPS"] = arguments[0]

@@ -170,5 +170,40 @@
          </postrequisite>
         </testCasePostRequisite>
         </testCase>
+
+        <testCase testCaseId="CB_03" testCaseName= "Cobalt_Set_And_Get_Accessibility_Settings" desc="Sets and gets the accessibility settings" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Cobalt_State" method="Get_Cobalt_State" >
+                <resultGeneration useMethodTag="cobalt_get_state" expectedValues="resumed"/>
+            </testStep>
+            <testStep testStepId="2" name="Set_Accessibility_Settings" method="Set_Accessibility_Settings" >
+                <params>
+                  <param tag="isenabled" value= "false" />
+                  <param tag="backgroundcolor" value="Magenta" />
+                  <param tag="backgroundopacity" value="75" />
+                  <param tag="characteredgestyle" value="Uniform" />
+                  <param tag="fontcolor" value="White" />
+                  <param tag="fontfamily" value="Casual" />
+                  <param tag="fontopacity" value="50" />
+                  <param tag="fontsize" value="50" />
+                  <param tag="windowcolor" value="Black" />
+                  <param tag="windowopacity" value="75" />
+                  <param tag="ishighcontrasttextenabled" value="true" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Get_Accessibility_Settings" method="Get_Accessibility_Settings" >
+                <resultGeneration useMethodTag="cobalt_validate_accessibility_settings" expectedValues="false,Magenta,75,Uniform,White,Casual,50,50,Black,75,true" />
+            </testStep>
+        <testCasePostRequisite>
+         <postrequisite requisiteId="1" requisiteName="Exit_Cobalt">
+            <testStep testStepId="1" name="Destroy_Application" method="DestroyApplication" pluginName="RDKShell" PluginOnStep="yes" >
+              <params>
+                <param tag="callsign"  value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+         </postrequisite>
+        </testCasePostRequisite>
+        </testCase>
 </testPlugin>
 

@@ -478,6 +478,22 @@
             </params>
             <expectedValues>null</expectedValues>
         </method>
+        <method name="Get_Accessibility_Settings" api="accessibility" type="method" desc="Gets the accessibility settings" />
+        <method name="Set_Accessibility_Settings" api="accessibility" type="method" desc="Provides access to the accessibility settings" >
+            <params paramType="userGenerate" useMethodTag="cobalt_set_accessibility_params" >
+                <param tag="isenabled" type="bool" />
+                <param tag="backgroundcolor" defaultValue="null" />
+                <param tag="backgroundopacity" defaultValue="null" />
+                <param tag="characteredgestyle" defaultValue="null" />
+                <param tag="fontcolor" defaultValue="null" />
+                <param tag="fontfamily" defaultValue="null" />
+                <param tag="fontopacity" defaultValue="null" />
+                <param tag="fontsize" defaultValue="null" />
+                <param tag="windowcolor" defaultValue="null" />
+                <param tag="windowopacity" defaultValue="null" />
+                <param tag="ishighcontrasttextenabled" type="bool" />
+            </params>
+        </method>
         <event name="Event_Cobalt_State_Changed" eventName="statechange" eventId="client.events.1" type="event" desc="cobalt state changed event" />
     </plugin>
 
@@ -699,7 +715,31 @@
                 <param tag="interval" type="int"/>
             </params>
         </method>
-
+        <method name="Get_Hole_Punch" api="getHolePunch" type="method" desc="Returns whether video hole punching is enabled or disabled for the specified client" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Set_Hole_Punch" api="setHolePunch" type="method" desc="Enables or disables video hole punching for the specified client" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+                <param tag="holePunch" type="bool" />
+            </params>
+        </method>
+        <method name="Get_Log_Level" api="getLogLevel" type="method" desc="Returns the currently set logging level" >
+             <expectedValues>DEBUG,INFO,WARN,ERROR,FATAL</expectedValues>
+        </method>
+        <method name="Set_Log_Level" api="setLogLevel" type="method" desc="Sets the logging level" >
+            <params>
+                <param tag="logLevel" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Set_TopMost" api="setTopmost" type="method" desc="Sets the specified client appears above all other clients" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+                <param tag="topmost" type="bool"/>
+            </params>
+        </method>
         <event name="Event_On_Launched" eventName="onLaunched" eventId="client.events.1" type="event" desc="Fired on launching the client" />
         <event name="Event_On_Suspended" eventName="onSuspended" eventId="client.events.1" type="event" desc="Fired on Suspending the client" />
         <event name="Event_On_Destroyed" eventName="onDestroyed" eventId="client.events.1" type="event" desc="Fired on destroying the client"/>

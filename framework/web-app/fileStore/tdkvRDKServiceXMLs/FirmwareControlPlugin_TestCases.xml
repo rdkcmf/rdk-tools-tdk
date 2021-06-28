@@ -43,7 +43,8 @@
           </prerequisite>
         </pluginPreRequisite>
 
-        <testCase testCaseId="FWC_01" testCaseName="Upgrade_Firmware" desc="Upgrade the device to the given firmware">
+        <testCase testCaseId="FWC_01" testCaseName="Upgrade_Firmware_Using_Memory_RollBack_Feature" desc="Upgrade the device to the given firmware and reverts the image uisng memory rollback feature" >
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="SUPPORTED_PLUGINS" useMethodTag="firmwarecontrol_check_feature_applicability" arguments="FirmwareControl"/>
             <testStep testStepId="1" name="GetCurrentImageVersion" action="externalFnCall" saveResult="true" >
                 <resultGeneration useMethodTag="getImageVersion" arguments="get"/>
             </testStep>
@@ -75,6 +76,56 @@
             </testStep>
             <testStep testStepId="8" name="Toggle_Memory_Bank" action="externalFnCall" delay="10" >
                 <resultGeneration useMethodTag="toggleMemoryBank"/>
+            </testStep>
+            <testStep testStepId="9" name="Execute_Reboot_Command" action="externalFnCall" delay="30" rebootStep="yes">
+                <resultGeneration useMethodTag="executeRebootCmd"/>
+            </testStep>
+            <testStep testStepId="10" name="Get_Image_Version" action="externalFnCall" delay="10" >
+                <resultGeneration useMethodTag="getImageVersion" >
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="change_image_version" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="FWC_02" testCaseName="Upgrade_Firmware_Without_Memory_RollBack_Feature" desc="Upgrade the device to the given firmware without memory bank toggling">
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="SUPPORTED_PLUGINS" useMethodTag="firmwarecontrol_check_feature_applicability" arguments="FirmwareControl"/>
+            <testStep testStepId="1" name="GetCurrentImageVersion" action="externalFnCall" saveResult="true" >
+                <resultGeneration useMethodTag="getImageVersion" arguments="get"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Download_Size" method="Get_Download_Size">
+                <resultGeneration useMethodTag="fwc_get_download_size" />
+            </testStep>
+            <testStep testStepId="3" name="Upgrade" method="Upgrade" >
+                <params>
+                  <param tag="name" useConfigFile="true" key="FWC_FIRMWARE_NAME"/>
+                  <param tag="location" useConfigFile="true" key="FWC_FIRMWARE_LOCATION"/>
+                  <param tag="type" useConfigFile="true" key="FWC_FIRMWARE_TYPE"/>
+                  <param tag="progressinterval" useConfigFile="true" key="FWC_PROGRESS_INTERVAL"/>
+                  <param tag="hmac" useConfigFile="true" key="FWC_FIRMWARE_HMAC"/>
+                </params>
+            </testStep>
+            <testStep testStepId="4" name="Get_Status" method="Get_Status" delay="30">
+                <resultGeneration useMethodTag="fwc_get_status" />
+            </testStep>
+            <testStep testStepId="5" name="Check_Upgrade_Progress_Event" event="Upgrade_Progress_Event" action="eventListener" delay="30">
+                <resultGeneration useMethodTag="fwc_check_upgrade_progress_event" expectedValues="1"/>
+            </testStep>
+            <testStep testStepId="6" name="Execute_Reboot_Command" action="externalFnCall" rebootStep="yes">
+                <resultGeneration useMethodTag="executeRebootCmd"/>
+            </testStep>
+            <testStep testStepId="7" name="Get_Image_Version" action="externalFnCall" delay="10" >
+                <resultGeneration useMethodTag="getImageVersion">
+                    <expectedValues useConfigFile="true" key="FWC_FIRMWARE_VERSION"/>
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="8" name="Revert_Existing_Image" method="Upgrade" delay="10" >
+                <params>
+                  <param tag="name" useConfigFile="true" key="FWC_EXISTING_FIRMWARE_NAME"/>
+                  <param tag="location" useConfigFile="true" key="FWC_FIRMWARE_LOCATION"/>
+                  <param tag="type" useConfigFile="true" key="FWC_FIRMWARE_TYPE"/>
+                  <param tag="progressinterval" useConfigFile="true" key="FWC_PROGRESS_INTERVAL"/>
+                  <param tag="hmac" useConfigFile="true" key="FWC_EXISTING_FIRMWARE_HMAC"/>
+                </params>
             </testStep>
             <testStep testStepId="9" name="Execute_Reboot_Command" action="externalFnCall" delay="30" rebootStep="yes">
                 <resultGeneration useMethodTag="executeRebootCmd"/>
