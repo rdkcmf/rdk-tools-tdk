@@ -133,10 +133,14 @@ if "SUCCESS" in loadmodulestatus.upper():
             if expectedresult in actualresult:
                 tdkTestObj.setResultStatus("SUCCESS");
                 neighborAPInfo = details.split("|")
-                neighborSSID = [ neighbor.split(",")[0].split("=")[1] for neighbor in neighborAPInfo]
+                print "List of SSIDs and Details:", neighborAPInfo
+                neighborSSID=[];
+                for neighbor in neighborAPInfo:
+                    if str(neighbor.split(",")[1].split("=")[1]) == "5GHz":
+                        neighborSSID.append(neighbor.split(",")[0].split("=")[1])
                 neighborSSID = [ ssid for ssid in neighborSSID if str(ssid).strip()]
                 print "ACTUAL RESULT : No of Neighboring SSIDs  : ",len(neighborSSID)
-                print "List of Neighboring SSID : ",neighborSSID
+                print "List of Neighboring SSID matching with 5GHz : ",neighborSSID
                 print "\nTEST STEP 3: To invoke the api wifi_getSpecificSSIDInfo() to get info for all the neighbor ssid";
                 print "EXPECTED RESULT : Should get details of Neighbor AP whose ssid matches with provided ssid";
                 ssidCount = 0
