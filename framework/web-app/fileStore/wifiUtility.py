@@ -19,6 +19,11 @@
 # limitations under the License.
 ##########################################################################
 
+#Secure 2.4Ghz Public Wifi Access Point index
+apIndex_2G_Public_Wifi = 8;
+#Secure 5Ghz Public Wifi Access Point index
+apIndex_5G_Public_Wifi = 9;
+
 # A utility function to invoke WiFi hal apis based on the method name received
 #
 # Syntax       : ExecuteWIFIHalCallMethod(obj, primitive, radioIndex, param, methodname)
