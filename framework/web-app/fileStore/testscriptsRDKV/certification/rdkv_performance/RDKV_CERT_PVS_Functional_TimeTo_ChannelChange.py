@@ -260,6 +260,7 @@ if expectedResult in result.upper():
             print "Unable to get the current URL loaded in webkit"
     else:
         print "Pre conditions are not met"
+        obj.setLoadModuleStatus("FAILURE")
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"
