@@ -247,7 +247,8 @@ def executeTestCases(testCaseID="all"):
     testPluginInfo = getTestPluginInfo(testPlugin)
     print "\n####################################################################################"
     print "              PLUGIN NAME :  %s   " %(testPluginInfo.get("pluginName").upper())
-    print "####################################################################################\n"
+    print "####################################################################################"
+    print "PLUGIN TOTAL TEST CASES: %d\n" %(len(testPlugin.findall("testCase")))
 
     global testStepJSONCmd
     global testStepResults
