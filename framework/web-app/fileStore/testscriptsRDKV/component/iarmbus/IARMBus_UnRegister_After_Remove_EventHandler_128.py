@@ -69,7 +69,7 @@ IARM_Bus_Disconnect : None
 IARM_Bus_Term : None</input_parameters>
     <automation_approch>1.TM loads the IARMBUS_Agent via the test agent
 2.The IARMBUS_Agent initializes and registers with IARM Bus Daemon (First Application).
-3.TM loads(initializes and registers) another application with IARM Daemon(second application which broadcasts the Dummy events) .
+3.The IARMBUS_Agent will broadcast the IARM_BUS_EVENT_RESOLUTIONCHANGE event using IARMBUS_BroadcastEvent API.
 4.IARMBUS_Agent will register for “IARM_BUS_EVENT_RESOLUTIONCHANGE” event and waits on event using a  event handler.(should pass)
 5.IARMBUS_Agent will unregister the event handler for “IARM_BUS_EVENT_RESOLUTIONCHANGE” event .
 6.IARMBUS_Agent should not be able to remove a NULL event handler 
@@ -86,8 +86,7 @@ Checkpoint 2. Check for  the print  message.</except_output>
 5.TestMgr_IARMBUS_BroadcastEvent
 6.TestMgr_IARMBUS_RegisterEventHandler
 7.TestMgr_IARMBUS_UnRegisterEventHandler
-8.TestMgr_IARMBUS_InvokeSecondApplication
-9.TestMgr_IARMBUS_RemoveEventHandler</priority>
+8.TestMgr_IARMBUS_RemoveEventHandler</priority>
     <test_stub_interface>IARMBus_UnRegister_After_Remove_EventHandler_128.py</test_stub_interface>
     <test_script>IARMBus_UnRegister_After_Remove_EventHandler_128</test_script>
     <skipped>No</skipped>
@@ -158,19 +157,21 @@ if "SUCCESS" in loadmodulestatus.upper():
                                 if expectedresult in actualresult:
                                         tdkTestObj.setResultStatus("SUCCESS");
                                         print "SUCCESS :Event Handler registered successfully";
-                                        #Call second application to check for resource available event
-                                        tdkTestObj = obj.createTestStep('IARMBUS_InvokeSecondApplication');
+                                        #Broadcast the event registered
+                                        tdkTestObj = obj.createTestStep('IARMBUS_BroadcastEvent');
+                                        tdkTestObj.addParameter("owner_name","Daemon");
+                                        tdkTestObj.addParameter("event_id",0);
                                         expectedresult="SUCCESS"
                                         tdkTestObj.executeTestCase(expectedresult);
                                         actualresult = tdkTestObj.getResult();
                                         if expectedresult in actualresult:
                                                 tdkTestObj.setResultStatus("SUCCESS");
-                                                print "SUCCESS:InvokeSecondApplication success";
+                                                print "SUCCESS:Event Broadcast success";
                                         else:
                                                 tdkTestObj.setResultStatus("FAILURE");
-                                                print "FAILURE:InvokeSecondApplication fails";
+                                                print "FAILURE:Event Broadcast fails";
 
-                                        #wait for 2 sec to receive event that is broadcasted from second app
+                                        #wait for 2 sec to receive event that is broadcasted
                                         sleep(2);
 
                                         #Get last received event details

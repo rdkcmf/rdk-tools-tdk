@@ -140,7 +140,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
                 print "DSHal_SetStereoMode failed for invalid stereomode as expected";
                 
                 tdkTestObj = dshalObj.createTestStep('DSHal_GetStereoMode');
-                expectedResult="FAILURE";
+                expectedResult="SUCCESS";
                 #Execute the test case in STB
                 tdkTestObj.executeTestCase(expectedResult);
                 actualResult = tdkTestObj.getResult();
