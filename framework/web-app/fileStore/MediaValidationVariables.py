@@ -36,7 +36,7 @@ webkit_instance_html = "HtmlApp"
 # If the webkit_instance is "WebKitBrowser", then preferable web-inspect
 # page port is 9998 for thunder builds and 9224 for rdkservice builds.
 # If the webkit_instance is "LightningApp", then preferable port is 10002
-webinspect_port = "9998"
+webinspect_port = "9224"
 #webinspect_port = "10002"
 
 
