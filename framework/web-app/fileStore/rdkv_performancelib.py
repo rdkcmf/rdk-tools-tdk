@@ -692,7 +692,7 @@ def rdkservice_validatePluginFunctionality(plugin,operations,validation_details)
                             method = validation_check
                             expected_value = validation_details[1]
                             value = rdkservice_getValue(method)
-                            if value != "EXCEPTION OCCURRED" and expected_value in value:
+                            if value not in ("EXCEPTION OCCURRED", None) and expected_value in value:
                                 print "\n The value:{} set for {} plugin".format(value,plugin)
                                 result = "SUCCESS"
                             else:

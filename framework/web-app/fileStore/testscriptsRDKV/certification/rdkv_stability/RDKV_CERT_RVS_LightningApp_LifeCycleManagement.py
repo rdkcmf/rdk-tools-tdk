@@ -109,13 +109,14 @@ if expectedResult in (result.upper() and pre_condition_status) :
     revert="NO"
     max_iterations = StabilityTestVariables.lifecycle_max_count
     lightning_app_test_url = obj.url+'/fileStore/lightning-apps/VideoResizeTest.html'
-    if lightning_app_test_url == "":
-        print "\n Please configure the lightning_app_test_url in Config file"
     plugins_list = ["LightningApp","DeviceInfo"]
     print "\n Check Pre conditions"
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
     plugin_status_needed = {"LightningApp":"deactivated","DeviceInfo":"activated"}
-    if curr_plugins_status_dict != plugin_status_needed:
+    if any(curr_plugins_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
+	print "\n Error while getting the status of plugins"
+	status = "FAILURE"
+    elif curr_plugins_status_dict != plugin_status_needed:
         revert = "YES"
         status = set_plugins_status(obj,plugin_status_needed)
         new_plugins_status = get_plugins_status(obj,plugins_list)
