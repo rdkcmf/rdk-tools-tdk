@@ -198,6 +198,7 @@ class DeviceSettingsAgent : public RDKTestStubInterface , public AbstractServer<
                   this->bindAndAddMethod(Procedure("TestMgr_DS_HOST_getVideoOutputPortFromId", PARAMS_BY_NAME, JSON_STRING, "port_id", JSON_INTEGER, NULL), &DeviceSettingsAgent::HOST_getVideoOutputPortFromId);
                   this->bindAndAddMethod(Procedure("TestMgr_DS_HOST_getVideoOutputPortFromName", PARAMS_BY_NAME, JSON_STRING, "port_name", JSON_STRING, NULL), &DeviceSettingsAgent::HOST_getVideoOutputPortFromName);
                   this->bindAndAddMethod(Procedure("TestMgr_DS_HOST_getAudioOutputPortFromName", PARAMS_BY_NAME, JSON_STRING, "port_name", JSON_STRING, NULL), &DeviceSettingsAgent::HOST_getAudioOutputPortFromName);
+                  this->bindAndAddMethod(Procedure("TestMgr_DS_ReInitializeAudioOutputPort", PARAMS_BY_NAME, JSON_STRING, "port_name", JSON_STRING, NULL), &DeviceSettingsAgent::ReInitializeAudioOutputPort);
                 }
 
 		/*inherited functions*/
@@ -304,6 +305,7 @@ class DeviceSettingsAgent : public RDKTestStubInterface , public AbstractServer<
                 void VDCONFIG_getDefaultDFC(IN const Json::Value& req, OUT Json::Value& response);
                 void VR_isInterlaced(IN const Json::Value& req, OUT Json::Value& response);
                 void VOP_getAspectRatio(IN const Json::Value& req, OUT Json::Value& response);
+                void ReInitializeAudioOutputPort(IN const Json::Value& req, OUT Json::Value& response);
 
                 bool cleanup(IN const char* szVersion);
 

@@ -4227,6 +4227,42 @@ void DeviceSettingsAgent::VR_isInterlaced(IN const Json::Value& req, OUT Json::V
         return;
 }
 
+void DeviceSettingsAgent::ReInitializeAudioOutputPort(IN const Json::Value& req, OUT Json::Value& response)
+{
+        DEBUG_PRINT(DEBUG_TRACE,"ReInitializeAudioOutputPort ---->Entry\n");
+        if(&req["port_name"]==NULL)
+        {
+                return;
+        }
+        std::string portName=req["port_name"].asCString();
+        char details[70]={'\0'};
+        dsError_t  err_code = dsERR_GENERAL;
+
+        DEBUG_PRINT(DEBUG_LOG," Getting audioPort Instance for %s", portName.c_str());
+        /*getting instance for audio ports*/
+        device::AudioOutputPort aPort = device::Host::getInstance().getAudioOutputPort(portName);
+        DEBUG_PRINT(DEBUG_LOG," AudioPort Instance acquired for %s", portName.c_str());
+        DEBUG_PRINT(DEBUG_LOG,"\nCalling reInitializeAudioOutputPort\n");
+        DEBUG_PRINT(DEBUG_LOG,"ERR_CODE before ReInitialization %d",err_code);
+        err_code = aPort.reInitializeAudioOutputPort();
+        DEBUG_PRINT(DEBUG_LOG,"ERR_CODE after ReInitialization %d",err_code);
+        if (err_code == dsERR_NONE)
+        {
+                DEBUG_PRINT(DEBUG_LOG,"\nReInitialization of audioOutputPort completed\n");
+                sprintf(details,"ReInitialization of audioOutputPort completed");
+                response["details"]= details;
+                response["result"]= "SUCCESS";
+        }
+        else
+        {
+                DEBUG_PRINT(DEBUG_LOG,"\nReInitialization of audioOutputPort not completed successfully\n");
+                sprintf(details,"ReInitialization of audioOutputPort not completed successfully\n");
+                response["details"]= details;
+                response["result"]= "FAILURE";
+        }
+        DEBUG_PRINT(DEBUG_TRACE,"ReInitializeAudioOutputPort ---->Exit\n");
+        return;
+}
 
 /**************************************************************************
  * Function Name: CreateObject

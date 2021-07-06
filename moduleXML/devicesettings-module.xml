@@ -130,6 +130,7 @@
       <function name='TestMgr_DS_VOP_getEDIDBytes' />
       <function name='TestMgr_DS_VOP_getDefaultResolution' />
       <function name='TestMgr_DS_VD_getHDRCapabilities' />
+      <function name='TestMgr_DS_ReInitializeAudioOutputPort' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -240,6 +241,7 @@
       <parameter funName='TestMgr_DS_VOP_hasSurround' parameterName='port_name' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_DS_VOP_getEDIDBytes' parameterName='port_name' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_DS_VOP_getDefaultResolution' parameterName='port_name' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_DS_ReInitializeAudioOutputPort' parameterName='port_name' parameterType='STRING' range='A-Z' />
     </parameters>
   </module>
 </xml>

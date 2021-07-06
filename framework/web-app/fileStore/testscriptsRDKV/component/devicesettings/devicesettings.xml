@@ -588,6 +588,12 @@
         <function>TestMgr_DS_VD_getHDRCapabilities</function>
         <parameters/>
       </primitiveTest>
+      <primitiveTest name="DS_ReInitializeAudioPort" id=" " version="1">
+        <function>TestMgr_DS_ReInitializeAudioOutputPort</function>
+        <parameters>
+          <parameter name="port_name" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
