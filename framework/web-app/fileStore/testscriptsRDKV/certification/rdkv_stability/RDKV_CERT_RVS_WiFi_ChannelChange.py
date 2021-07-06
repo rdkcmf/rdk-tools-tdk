@@ -147,7 +147,7 @@ if expectedResult in (result.upper() and pre_condition_status):
         revert = "YES"
         plugin_required_status = set_plugins_status(obj,plugin_status_needed)
         plugins_status_after_set = get_plugins_status(obj,plugin_list)
-        if plugin_status_after_set == plugin_status_needed:
+        if plugins_status_after_set == plugin_status_needed:
             plugin_required_status = "SUCCESS"
         else:
             plugin_required_status = "FAILURE"
