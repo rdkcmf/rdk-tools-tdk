@@ -127,10 +127,16 @@
                   <param tag="hmac" useConfigFile="true" key="FWC_EXISTING_FIRMWARE_HMAC"/>
                 </params>
             </testStep>
-            <testStep testStepId="9" name="Execute_Reboot_Command" action="externalFnCall" delay="30" rebootStep="yes">
+            <testStep testStepId="9" name="Get_Status" method="Get_Status" delay="30">
+                <resultGeneration useMethodTag="fwc_get_status" />
+            </testStep>
+            <testStep testStepId="10" name="Check_Upgrade_Progress_Event" event="Upgrade_Progress_Event" action="eventListener" delay="30">
+                <resultGeneration useMethodTag="fwc_check_upgrade_progress_event" expectedValues="1"/>
+            </testStep>
+            <testStep testStepId="11" name="Execute_Reboot_Command" action="externalFnCall" delay="30" rebootStep="yes">
                 <resultGeneration useMethodTag="executeRebootCmd"/>
             </testStep>
-            <testStep testStepId="10" name="Get_Image_Version" action="externalFnCall" delay="10" >
+            <testStep testStepId="12" name="Get_Image_Version" action="externalFnCall" delay="10" >
                 <resultGeneration useMethodTag="getImageVersion" >
                   <expectedValues usePreviousResult="true" Id="1" useMethodTag="change_image_version" />
                 </resultGeneration>
