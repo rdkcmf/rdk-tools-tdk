@@ -433,7 +433,7 @@ class BootStrap {
 	 * Method to remove duplicate certification scripts
 	 */
 	def removeDuplicateCertificationScripts(def realPath){
-		List moduleList = [Constants.RDKV_PERFORMANCE,Constants.RDKV_STABILITY,Constants.RDKV_MEDIA,Constants.RDKV_SECURITY,Constants.RDKV_MEDIAVALIDATION,Constants.RDKSERVICES]
+		List moduleList = [Constants.RDKV_PERFORMANCE,Constants.RDKV_STABILITY,Constants.RDKV_MEDIA,Constants.RDKV_SECURITY,Constants.RDKV_MEDIAVALIDATION,Constants.RDKV_PROFILING,Constants.RDKSERVICES]
 		ScriptFile.withTransaction {
 			def sFObjectList = []
 			try{

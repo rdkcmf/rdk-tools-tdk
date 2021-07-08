@@ -276,6 +276,7 @@ public final class Constants
     private static final String  RDKV_STABILITY="rdkv_stability";    
 	private static final String  RDKV_MEDIA="rdkv_media";
 	private static final String  RDKV_SECURITY="rdkv_security";
+	private static final String  RDKV_PROFILING="rdkv_profiling";
 	private static final String  RDKV_MEDIAVALIDATION="rdkv_mediavalidation";
     
 	private static final String SUCCESS ="SUCCESS";

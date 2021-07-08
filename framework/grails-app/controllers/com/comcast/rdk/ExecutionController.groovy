@@ -5168,5 +5168,262 @@ class ExecutionController {
 			e.printStackTrace()
 		}
 	}
-
+	
+	/**
+	 * Function to fetch data from grafana
+	 * @param executionResultId
+	 * @param parameter
+	 * @return
+	 */
+	def fetchDataFromGrafana(String executionResultId,String parameter){
+		List dataArrayList = []
+		String basicUrl = getGrafanaConfigurations("grafanaUrl")
+		String prefix = getGrafanaConfigurations("prefix")
+		String datasourceId = getGrafanaConfigurations("datasourceId")
+		if(basicUrl != null && prefix != null && datasourceId != null ){
+			ExecutionResult execResult = ExecutionResult.findById(executionResultId)
+			if(execResult){
+				Date fromDate = execResult?.dateOfExecution
+				Device dev =  Device.findByStbName(execResult?.device?.toString())
+				String macAddress = dev?.serialNo
+				if(macAddress != null){
+					try{
+						if(macAddress?.contains(":")){
+							macAddress = macAddress?.replace(":","")
+						}					
+						long fromEpoch = fromDate?.getTime() / 1000;
+						Date toDate = new Date()
+						long toEpoch = System?.currentTimeMillis() / 1000;
+						String fromEpochTime = fromEpoch?.toString()
+						String toEpochTime = toEpoch?.toString()
+						
+						String prefixLastChar = prefix?.charAt(prefix?.length()-1)
+						if(!prefixLastChar?.equals(".")){
+							prefix = prefix + "."
+						}
+						String host = prefix + macAddress
+						String basicUrlLastChar = basicUrl?.charAt(basicUrl?.length()-1)
+						if(!basicUrlLastChar?.equals("/")){
+							basicUrl = basicUrl + "/"
+						}
+						basicUrl = basicUrl + "api/datasources/proxy/" + datasourceId +"/render?"
+						List parameterList = []
+						String targetString = ""
+						parameterList = parameter?.split(",")
+						parameterList?.each{ param ->
+							targetString = targetString + "&target="+host+"."+param
+						}
+						String url = basicUrl + "from="+fromEpochTime+"&until="+toEpochTime+""+targetString+"&format=json"
+						String command = "curl --insecure \""+url+"\""
+						ProcessBuilder pb;
+						Process p;
+						pb = new ProcessBuilder("bash", "-c", command);
+						p = pb.start();
+						String line;
+						BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+						line = input.readLine();
+						if((line != null) && (!line?.contains("message"))){
+							line = line?.substring(1, line?.length() - 1);
+							List dataArray = line?.split("},")
+							if(dataArray?.size() != 0){
+								JsonArray writeDataArray = new JsonArray()
+								for(int i = 0;i < dataArray?.size();i++){
+									Map dataMap = [:]
+									JsonObject dataNode = new JsonObject()
+									List dataList = []
+									List dataListForLogFile = []
+									String dataValue = dataArray[i]
+									if(dataValue != null && !dataValue?.isEmpty()){
+										String lastChar = dataValue?.charAt(dataValue?.length()-1)
+										if(!lastChar?.equals("}")){
+											dataValue = dataValue + "}"
+										}
+										JSONObject jsonObj = new JSONObject(dataValue);
+										String target
+										if(jsonObj.has('target')){
+											target = jsonObj.get('target')
+										}
+										if(jsonObj.has('datapoints')){
+											List datapoints = jsonObj.get('datapoints')
+											datapoints.each{ dataPoint ->
+												if(!(JSONObject.NULL?.equals(dataPoint[0]))){
+													List eachDataList = []
+													long epochTime = dataPoint[1]
+													epochTime = epochTime * 1000
+													SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+													def convertedTime = sdf.format(new Date(epochTime))
+													float dataPointFloat = (float)dataPoint[0];
+													if((target?.contains("memory")) || (target?.contains("processes-"))){
+														int divideNumber = 1000000
+														def result = dataPointFloat / divideNumber
+														result = result.round(2)
+														dataList.add(result)
+														eachDataList.addAll(convertedTime,result)
+													}else if(target?.contains("load") || (target?.contains("exec-"))){
+														dataList.add(dataPointFloat)
+														eachDataList.addAll(convertedTime,dataPointFloat)
+													}else if(target?.contains("cpu.percent-active")){
+														dataPointFloat = dataPointFloat.round(3)
+														dataList.add(dataPointFloat)
+														eachDataList.addAll(convertedTime,dataPointFloat)
+													}
+													dataListForLogFile?.add(eachDataList)
+												}
+											}
+											if(!dataListForLogFile.isEmpty()){
+												if((target?.contains("memory")) || (target?.contains("processes-"))){
+													String parameterForLog = target?.toString() + " (MB)"
+													dataNode.addProperty("parameter", parameterForLog)
+												}else if(target?.contains("load") || target?.contains("cpu.percent-active")){
+													String parameterForLog = target?.toString() + " (%)"
+													dataNode.addProperty("parameter", parameterForLog)
+												}else if(target?.contains("exec-")){
+													if(target?.contains("UsedCPU")){
+														String parameterForLog = target?.toString() + " (%)"
+														dataNode.addProperty("parameter", parameterForLog)
+													}else {
+														String parameterForLog = target?.toString() + " (KB)"
+														dataNode.addProperty("parameter", parameterForLog)
+													}
+												}else{
+													dataNode.addProperty("parameter", target?.toString())
+												}
+												dataNode.addProperty("datapoints", dataListForLogFile?.toString())
+												writeDataArray.add(dataNode)
+											}
+											if(!dataList.isEmpty()){
+												float sum = 0.0
+												for(int j = 0; j<dataList.size();j++ ){
+													sum =  sum + dataList[j]
+												}
+												def avg = 0.0
+												if(dataList.size() != 0){
+													avg = sum / dataList.size()
+												}
+												avg = avg.round(2)
+												if((target?.contains("memory")) || (target?.contains("processes-"))){
+													String parameterForLog = target?.toString() + " (MB)"
+													dataMap.put("parameter", parameterForLog)
+												}else if(target?.contains("load") || target?.contains("cpu.percent-active")){
+													String parameterForLog = target?.toString() + " (%)"
+													dataMap.put("parameter", parameterForLog)
+												}else if(target?.contains("exec-")){
+													if(target?.contains("UsedCPU")){
+														String parameterForLog = target?.toString() + " (%)"
+														dataMap.put("parameter", parameterForLog)
+													}else {
+														String parameterForLog = target?.toString() + " (KB)"
+														dataMap.put("parameter", parameterForLog)
+													}
+												}else{
+													dataMap.put("parameter", target?.toString())
+												}
+												dataMap.put("min",dataList.min())
+												dataMap.put("max",dataList.max())
+												dataMap.put("avg",avg)
+												dataArrayList.add(dataMap)
+												String processName = target?.split(host+".")[1]
+												List processNameSplit = processName?.split("\\.")
+												String processValueList = "min:"+dataList.min()+", max:"+dataList.max()+", avg:"+avg
+				
+												def performanceInstanceForMin = new Performance()
+												performanceInstanceForMin.executionResult = execResult
+												performanceInstanceForMin.performanceType = "GrafanaData"
+												if(target?.contains("load") || target?.contains("memory") || target?.contains("cpu.percent-active")){
+													performanceInstanceForMin.processName = "system " + processName?.split("\\.")[0]
+												}else{
+													if(target?.contains("exec-")){
+														String processNameForExec = processName?.split("\\.")[0]
+														processNameForExec = processNameForExec?.replace("exec-","processes-")
+														performanceInstanceForMin.processName = processNameForExec
+													}else{
+														performanceInstanceForMin.processName = processName?.split("\\.")[0]
+													}
+												}
+												performanceInstanceForMin.processValue = processValueList
+												if(target?.contains("load")){
+													String processType = processName?.split("\\.")[2] + " (%)"
+													performanceInstanceForMin.processType = processType
+												}else if(target?.contains("exec-")){
+													if(target?.contains("UsedCPU")){
+														String processType = processName?.split("\\.")[1]
+														String processTypeFinal = processType?.split("-")[1] + " (%)"
+														performanceInstanceForMin.processType = processTypeFinal
+													}else {
+														String processType = processName?.split("\\.")[1]
+														String processTypeFinal = processType?.split("-")[1] + " (KB)"
+														performanceInstanceForMin.processType = processTypeFinal
+													}
+												}else if(target?.contains("cpu.percent-active")){
+													String processType = processName?.split("\\.")[1] + " (%)"
+													performanceInstanceForMin.processType = processType
+												}else{
+													String processType = processName?.split("\\.")[1] + " (MB)"
+													performanceInstanceForMin.processType = processType
+												}
+												performanceInstanceForMin.category = "RDKV"
+												performanceInstanceForMin.save(flush:true)
+				
+											}
+										}
+									}
+								}
+								if(writeDataArray?.size() != 0){
+									def execId = execResult?.execution?.id
+									def execDeviceId = execResult?.executionDevice?.id
+									def logTransferFilePath = "${realPath}/logs/"+execId+"/"+execDeviceId+"/"+execResult?.id
+									new File(logTransferFilePath?.toString()).mkdirs()
+									FileWriter file = new FileWriter(logTransferFilePath+"/"+execId+"_profilingData.json",true)
+									BufferedWriter buffWriter = new BufferedWriter(file)
+									for(int i = 0;i < writeDataArray?.size();i++){
+										String dataValue = writeDataArray[i]
+										buffWriter.write(dataValue+NEW_LINE);
+										buffWriter.write(NEW_LINE);
+									}
+									buffWriter.flush()
+									buffWriter.close()
+									file.close();
+								}
+							}
+						}
+					}catch(Exception ex){
+						ex.printStackTrace();
+					}
+				}
+			}
+		}
+		render dataArrayList as JSON
+	}
+	
+	/**
+	 * Function to read grafana configurations from config file
+	 * @param key
+	 * @return
+	 */
+	def getGrafanaConfigurations(String key){
+		File configFile = grailsApplication.parentContext.getResource("/fileStore/grafana.config").file
+		Properties prop = new Properties();
+		InputStream is
+		try{
+			if (configFile.exists()) {
+				is = new FileInputStream(configFile);
+				prop.load(is);
+				String value = prop.getProperty(key);
+				if (value != null && !value.isEmpty()) {
+					return value;
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace()
+		}finally{
+			if(is){
+				try{
+					is.close()
+				}catch(Exception e){
+					e.printStackTrace()
+				}
+			}
+		}
+		return null;
+	}
 }

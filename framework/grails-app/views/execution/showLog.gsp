@@ -633,8 +633,9 @@ function triggerExecutionFromPopUp(){
 			<g:if test="${executionResultInstance.performance}">
 					<%
 					def cpuMemoryInfoPerformance = Performance.findAllByExecutionResultAndPerformanceType(executionResultInstance,"CPUMemoryInfo")
+					def grafanaDataPerformance = Performance.findAllByExecutionResultAndPerformanceType(executionResultInstance,"GrafanaData")
 					 %>
-					 <g:if test="${!cpuMemoryInfoPerformance}">
+					 <g:if test="${!cpuMemoryInfoPerformance && !grafanaDataPerformance}">
 						<table>
 							<tr class="scripthead" style=" background:#DFDFDF;">
 								<td colspan="4" class="tdhead">Performance</td>					
@@ -643,10 +644,19 @@ function triggerExecutionFromPopUp(){
 							</tr>
 						</table>
 					</g:if>
+					<g:if test="${grafanaDataPerformance}">
+						<table>
+							<tr class="scripthead" style=" background:#DFDFDF;">
+								<td colspan="4" class="tdhead">Profiling Metrics</td>					
+								<td>
+									<a href="#" id="expanderperf${k}_${i}" onclick="this.innerHTML='Hide';viewOnClickperf(this,${k},${i}); return false;">Show</a>
+							</tr>
+						</table>
+					</g:if>
 						<span id="allmessagesperf${k}_${i}"  style="display: none;">
 						<section class="round-border">
 						<%
-							def benchMarkPerformance = Performance.findAllByExecutionResultAndPerformanceTypeNotEqual(executionResultInstance,"CPUMemoryInfo")
+							def benchMarkPerformance = Performance.findAllByExecutionResultAndPerformanceTypeNotInList(executionResultInstance,["CPUMemoryInfo","GrafanaData"])
 							def utility = benchMarkPerformance.performanceType[0]
 						%>
 						<g:if test="${benchMarkPerformance}">	
@@ -669,6 +679,44 @@ function triggerExecutionFromPopUp(){
 								</tbody>
 							</table>	
 						</g:if>
+						
+						<%
+							def grafanaPerformance = Performance.findAllByExecutionResultAndPerformanceType(executionResultInstance,"GrafanaData")
+							def grafanautility = grafanaPerformance.performanceType[0]
+							List processNameList = []
+							grafanaPerformance.each{ grafana ->
+								if(!processNameList?.contains(grafana.processName)){
+									processNameList?.add(grafana.processName)
+								}
+							}
+						%>
+						<g:if test="${grafanaPerformance}">	
+							<g:each in="${processNameList}" var="processNameInstance">
+								<table>
+									<tbody >
+										<tr class="fnhead1">
+											<td class="tdhead" style="width:30%;">${processNameInstance}</td>
+											<td class="tdhead"></td>
+										</tr>
+										<tr class="fnhead1">												
+											<td class="tdhead" style="width:30%;">Parameter</td>
+											<td class="tdhead">Value</td>							
+										</tr>
+										<g:each in="${grafanaPerformance}" var="grafanaPerformanceInstance">
+											<g:if test="${grafanaPerformanceInstance.processName == processNameInstance}">	
+												<tr>																					
+													<td style="width:30%;">${grafanaPerformanceInstance?.processType}</td>												
+													<td>${grafanaPerformanceInstance?.processValue}</td>				
+												</tr>			
+											</g:if>
+										</g:each>						
+									</tbody>
+								</table>	
+							</g:each>					
+						</g:if>
+						
+						
+						
 						<%
 							def performance = Performance.findAllByExecutionResultAndPerformanceType(executionResultInstance,"BenchMark")							
 						%>
