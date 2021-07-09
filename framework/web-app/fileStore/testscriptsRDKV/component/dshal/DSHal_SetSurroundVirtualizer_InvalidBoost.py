@@ -81,7 +81,7 @@ CheckPoint 2. SurroundVirtualizer mode must be unhindered</expected_output>
     <test_stub_interface>libdshalstub.so.0.0.0</test_stub_interface>
     <test_script>DSHal_SetSurroundVirtualizer_InvalidBoost</test_script>
     <skipped>No</skipped>
-    <release_version>M89</release_version>
+    <release_version>M90</release_version>
     <remarks></remarks>
   </test_cases>
 </xml>

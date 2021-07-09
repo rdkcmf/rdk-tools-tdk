@@ -48,7 +48,6 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
-    <box_type>IPClient-Wifi</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -78,7 +77,7 @@ volLeveller - Audio port volume leveller</input_parameters>
     <test_stub_interface>libdshalstub.so.0.0.0</test_stub_interface>
     <test_script>DSHal_GetVolumeLeveller_Reboot</test_script>
     <skipped>No</skipped>
-    <release_version>M89</release_version>
+    <release_version>M90</release_version>
     <remarks></remarks>
   </test_cases>
 </xml>
