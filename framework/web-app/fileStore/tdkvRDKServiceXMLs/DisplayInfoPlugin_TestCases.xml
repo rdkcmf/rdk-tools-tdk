@@ -105,9 +105,10 @@
                   </params>
                   <resultGeneration useMethodTag="display_supported_resolutions" />
             </testStep>
-
+            
             <testStep testStepId="3" name="Getresolutionwidth" method="DisplayInfo_GetWidth">
-                <resultGeneration useMethodTag="displayinfo_validate_width_or_height" arguments="width" >
+                    <resultGeneration useMethodTag="displayinfo_validate_width_or_height" >
+                        <arguments value="width" useConfigFile="true"  key="RESOLUTION_WIDTH_HEIGHT_MAPPING"/>
                         <expectedValues usePreviousResult="true" Id="2" useMethodTag="display_info_get_supported_resolution_list" />
                 </resultGeneration>
             </testStep>
@@ -128,9 +129,10 @@
                 </params>
                 <resultGeneration useMethodTag="display_supported_resolutions" />
             </testStep>
-
+            
             <testStep testStepId="3" name="Getresolutionheight" method="DisplayInfo_GetHeight">
-                <resultGeneration useMethodTag="displayinfo_validate_width_or_height" arguments="height" >
+                    <resultGeneration useMethodTag="displayinfo_validate_width_or_height" >
+                        <arguments value="height" useConfigFile="true"  key="RESOLUTION_WIDTH_HEIGHT_MAPPING"/>
                         <expectedValues usePreviousResult="true" Id="2" useMethodTag="display_info_get_supported_resolution_list" />
                 </resultGeneration>
             </testStep>

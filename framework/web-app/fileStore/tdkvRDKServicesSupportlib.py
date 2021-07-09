@@ -856,8 +856,14 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             elif arg[0] == "height":
                 index = 1
             SupportingRes=expectedValues
+            Resolution_Details = {}
+            for values in range(1,len(arg)):
+                mapping_details = arg[values].split(":")
+                resolution = mapping_details[0]
+                width = mapping_details[1].split('|')[0].strip('[]')
+                height = mapping_details[1].split('|')[1].strip('[]')
+                Resolution_Details[resolution] = [int(width),int(height)]
             search_key = int(result)
-            Resolution_Details = {"480i":[720,480],"480p":[720,480],"480i60":[720,480],"480p60":[720,480],"576p50":[720,576],"720p":[1280,720],"720p50":[1280,720],"720p60":[1280,720],"1080p":[1920,1080],"1080p24":[1920,1080],"1080i":[1920,1080],"1080p30":[1920,1080],"1080p60":[1920,1080],"1080i50":[1920,1080],"1080i60":[1920,1080],"2160p30":[3840,2160],"2160p60":[3840,2160]}
             #Create a sub dictionary of width and height pair from the SupportingRes keys.
             subdict=dict([(x,Resolution_Details[x]) for x in SupportingRes])
 
