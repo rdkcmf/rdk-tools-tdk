@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>3</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>BluetoothHAL_Get_Supported_Services</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -43,9 +43,9 @@
   <!--  -->
   <advanced_script>false</advanced_script>
   <!-- execution_time is the time out time for test execution -->
-  <remarks></remarks>
+  <remarks>Api is not used actively  in bluez5 and was not developed. DELIA-49396</remarks>
   <!-- Reason for skipping the tests if marked to skip -->
-  <skip>false</skip>
+  <skip>true</skip>
   <!--  -->
   <box_types>
     <box_type>Video_Accelerator</box_type>

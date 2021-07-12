@@ -176,7 +176,7 @@ if "SUCCESS" in loadmodulestatus.upper():
                             details = tdkTestObj.getResultDetails();
                             if expectedresult in actualresult:
                                 tdkTestObj.setResultStatus("SUCCESS");
-                                print "ACTUAL RESULT  : Disconnected from End Point: SSID: %s" %(tdkvWifiUtility.tdkvWifiUtility.ssid_5ghz_name)
+                                print "ACTUAL RESULT  : Disconnected from End Point: SSID: %s" %(tdkvWifiUtility.ssid_5ghz_name)
                                 print "Value Returned : %s\n" %(details)
 
                                 print "TEST STEP 6 : Check wifi_lastConnected_Endpoint results"
