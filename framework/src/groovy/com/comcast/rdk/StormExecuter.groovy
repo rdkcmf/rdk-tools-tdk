@@ -411,31 +411,86 @@ class StormExecuter {
 	 * @return
 	 */
 	def static boolean createThunderVersionFile(def realPath, def executionInstanceId, def executionDeviceInstanceId, def stbIP){
-		boolean versionFilecreationSuccess = false
-		String folderPath = realPath+File.separator+"logs"+File.separator+"version"
-		String executionInstanceDirPath = folderPath+File.separator+executionInstanceId
-		File executionInstanceDir = new File(executionInstanceDirPath)
-		if(!executionInstanceDir.exists()){
-			if(executionInstanceDir.mkdir()){
-				String executionDeviceInstanceDirPath = executionInstanceDirPath+File.separator+executionDeviceInstanceId
-				File executionDeviceInstanceDir = new File(executionDeviceInstanceDirPath)
-				if(!executionDeviceInstanceDir.exists()){
-					if(executionDeviceInstanceDir.mkdir()){
-						String versionFileName = executionDeviceInstanceId+"_version.txt"
-						String versionFileAbsolutePath = executionDeviceInstanceDirPath +File.separator+versionFileName
-						File versionFile = new File(versionFileAbsolutePath)
-						String thunderversionDetails = retrieveThunderVersionDetails(stbIP)
-						if(versionFile.createNewFile()){
-							FileWriter fr = new FileWriter(versionFile)
-							fr.write(thunderversionDetails)
-							fr.close()
-							versionFilecreationSuccess = true
+		boolean versionFileStatus = false
+		try{
+			boolean versionFilecreationSuccess = false
+			boolean versionFileTransferredStatus = false
+			String folderPath = realPath+File.separator+"logs"+File.separator+"version"
+			String executionInstanceDirPath = folderPath+File.separator+executionInstanceId
+			File executionInstanceDir = new File(executionInstanceDirPath)
+			if(!executionInstanceDir.exists()){
+				if(executionInstanceDir.mkdir()){
+					String executionDeviceInstanceDirPath = executionInstanceDirPath+File.separator+executionDeviceInstanceId
+					File executionDeviceInstanceDir = new File(executionDeviceInstanceDirPath)
+					if(!executionDeviceInstanceDir.exists()){
+						if(executionDeviceInstanceDir.mkdir()){
+							String versionFileName = executionDeviceInstanceId+"_version.txt"
+							String versionFileAbsolutePath = executionDeviceInstanceDirPath +File.separator+versionFileName
+							File versionFile = new File(versionFileAbsolutePath)
+							versionFileTransferredStatus = transferVersionTxtFile(realPath,stbIP,executionDeviceInstanceDirPath,versionFileName)
+							if(versionFileTransferredStatus == false){
+								String thunderversionDetails = retrieveThunderVersionDetails(stbIP)
+								if(versionFile.createNewFile()){
+									FileWriter fr = new FileWriter(versionFile)
+									fr.write(thunderversionDetails)
+									fr.close()
+									versionFilecreationSuccess = true
+								}
+							}
 						}
 					}
 				}
 			}
+			versionFileStatus = versionFilecreationSuccess || versionFileTransferredStatus
+		}catch(Exception e){
+			e.printStackTrace()
 		}
-		return versionFilecreationSuccess
+		return versionFileStatus
+	}
+	
+	/**
+	 * Method to transfer version.txt file from STB to TM
+	 * @param stbIP
+	 * @param destinationPath
+	 * @param versionFileNameToBeSaved
+	 * @return
+	 */
+	def static boolean transferVersionTxtFile(def realPath, def stbIP, def destinationPath, def versionFileNameToBeSaved){
+		boolean versionFileTransferredStatus = false
+		boolean versionFileRenamedStatus = false
+		try{
+			String script = Constants.FILE_TRANSFER_SCRIPT_RDKSERVICE
+			def scriptFilePath = realPath+script
+			String fileToBeTransferred = Constants.SLASH_VERSION_TXT_FILE
+			def cmdList = [
+				Constants.PYTHON_COMMAND,
+				scriptFilePath,
+				stbIP,
+				Constants.ROOT_STRING,
+				Constants.NONE_STRING,
+				fileToBeTransferred,
+				destinationPath,
+				versionFileNameToBeSaved
+			]
+			String [] cmd = cmdList.toArray()
+			try {
+				ScriptExecutor scriptExecutor = new ScriptExecutor()
+				def outputData = scriptExecutor.executeScript(cmd,1)
+			}catch (Exception e) {
+				println " error >> "+e.getMessage()
+				e.printStackTrace()
+			}
+			def versionFileNameToBeSavedFullPath = destinationPath+File.separator+versionFileNameToBeSaved
+			def transferredFilePath = destinationPath+File.separator+fileToBeTransferred
+			File transferredFile = new File(transferredFilePath)
+			versionFileTransferredStatus = transferredFile.isFile()
+			if(versionFileTransferredStatus){
+				versionFileRenamedStatus = transferredFile.renameTo(versionFileNameToBeSavedFullPath)
+			}
+		}catch(Exception e){
+			println " ERROR "+e.getMessage()
+		}
+		return versionFileRenamedStatus
 	}
 	
 	/**
@@ -448,9 +503,7 @@ class StormExecuter {
 		Process p
 		boolean connectionSuccess = true
 		String[] thunderArray
-		String uptime
-		String devicename
-		String deviceid
+		String currentFWVersion
 		String thunderVersionDetailsFormatted = ""
 		def dev
 		def thunderPort = THUNDER_DEFAULT_PORT
@@ -466,7 +519,7 @@ class StormExecuter {
 			HttpURLConnection http = (HttpURLConnection)con;
 			http.setRequestMethod("POST");
 			http.setDoOutput(true);
-			byte[] out = "{\"jsonrpc\": \"2.0\",\"id\": 1234567890,\"method\": \"DeviceInfo.1.systeminfo\"}" .getBytes(StandardCharsets.UTF_8);
+			byte[] out = "{\"jsonrpc\": \"2.0\",\"id\": 1234567890,\"method\": \"org.rdk.System.1.getDownloadedFirmwareInfo\"}" .getBytes(StandardCharsets.UTF_8);
 			int length = out.length;
 			http.setFixedLengthStreamingMode(length);
 			http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -474,26 +527,14 @@ class StormExecuter {
 			con.getOutputStream().write(out);
 			http.connect();
 			InputStream iStream = new BufferedInputStream(con.getInputStream());
-				String result = org.apache.commons.io.IOUtils.toString(iStream, "UTF-8");
-				JSONObject jsonObject = new JSONObject(result);
-				iStream.close();
+			String result = org.apache.commons.io.IOUtils.toString(iStream, "UTF-8");
+			JSONObject jsonObject = new JSONObject(result);
+			iStream.close();
 			JSONObject resultJsonObject = new JSONObject(jsonObject.get('result'))
-			if(resultJsonObject?.has('uptime')){
-			    uptime = resultJsonObject.get('uptime')
-			}else{
-			    uptime = "Uptime not available"
+			if(resultJsonObject?.has(Constants.CURRENT_FW_VERSION)){
+				currentFWVersion = resultJsonObject.get(Constants.CURRENT_FW_VERSION)
+				thunderVersionDetailsFormatted = Constants.CURRENT_FW_VERSION+": "+currentFWVersion
 			}
-			if(resultJsonObject?.has('devicename')){
-				devicename = resultJsonObject.get('devicename')
-			}else{
-			    devicename = "Devicename not avaialble"
-			}
-			if(resultJsonObject?.has('deviceid')){
-				deviceid = resultJsonObject.get('deviceid')
-			}else{
-			    deviceid = "Device id not available"
-			}
-			thunderVersionDetailsFormatted = "uptime : "+uptime+"\ndevicename : "+devicename+"\ndeviceid : "+deviceid
 		}
 		catch(Exception e){
 			e.printStackTrace();

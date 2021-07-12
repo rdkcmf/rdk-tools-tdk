@@ -54,6 +54,7 @@ public final class Constants
     public static final String LOCALFILE            = "<localfile>";
     public static final String HTML_BR              = "<br/>";
     public static final String VERSIONTRANSFER_FILE = "versiontransfer.py";
+    public static final String SLASH_VERSION_TXT_FILE = "/version.txt";
     public static final String TEMP_VERSIONFILE_NAME= "Version_File.py";
     public static final String RESULT_TOKEN         = "[SCRIPTSTATUSRESULT]";
     public static final String PYTHON_EXTENSION     = ".py";
@@ -278,6 +279,7 @@ public final class Constants
 	private static final String  RDKV_SECURITY="rdkv_security";
 	private static final String  RDKV_PROFILING="rdkv_profiling";
 	private static final String  RDKV_MEDIAVALIDATION="rdkv_mediavalidation";
+	private static final String  CURRENT_FW_VERSION="currentFWVersion";
     
 	private static final String SUCCESS ="SUCCESS";
 	private static final String FAILED ="FAILED";
