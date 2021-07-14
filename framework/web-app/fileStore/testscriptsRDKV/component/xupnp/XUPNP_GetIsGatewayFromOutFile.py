@@ -60,7 +60,7 @@ Testcase ID: CT_XUPNP_11</synopsis>
 4. TM will receive and display the result.
 5. TM will create a list of Isgateway values.
 6. Again invoke the stub with parameter DevType
-7. After getting the values for DevType, TM will create a list of DevType values .
+7. After getting the values for recvDevType, TM will create a list of recvDevType values .
 8. TM will create a dictionary with the 2 lists and compare the key and values with the predefined dictionary.
 9. If values are same for the corresponding keys of each dictionary then test is success else failure. 
 </automation_approch>
@@ -120,24 +120,24 @@ if "SUCCESS" in xupnpLoadStatus.upper():
                         tdkTestObj.setResultStatus("SUCCESS");
                         details = details.replace('\\t','').replace('\\','').replace('\"','')
                         details_list = details.split(',')
-                        #removing the recvdevtype values from the list
-			for detail in details_list:
-                                if detail.split(':')[0]!= 'DevType':
+                        #removing the Devtype values from the list
+                        for detail in details_list:
+                                if detail.split(':')[0]!= 'recvDevType':
                                         details_list.remove(detail)
-                        devType_list = [ detail.split(':')[1] for detail in details_list]
+                        recvDevType_list = [ detail.split(':')[1] for detail in details_list]
                         #creating dictionary with key as devtype and isgateway value as the corresponding value
-			dictionary = dict(zip(devType_list, isgateway_list));
-                        dict_valid = {'XI3':'no','XI5':'no','XI6':'no','XG1':'yes'};
+                        dictionary = dict(zip(recvDevType_list, isgateway_list));
+                        dict_valid = {'mediaclient':'no','hybrid':'yes'};
 			for key in dictionary :
                         	if dictionary.get(key) == dict_valid.get(key):
                                 	tdkTestObj.setResultStatus("SUCCESS");
-                                	print "ACTUAL RESULT : isgateway value is %s for the corresponding DevType %s"%(dictionary.get(key),key);
+                                        print "ACTUAL RESULT : isgateway value is %s for the corresponding recvDevType %s"%(dictionary.get(key),key);
                         	else:
 					tdkTestObj.setResultStatus("FAILURE");
                                 	print "[TEST EXECUTION RESULT] : FAILURE";
                 else:
 			tdkTestObj.setResultStatus("FAILURE");
-			print "devtype not found"
+			print "recvDevtype not found"
 	else:
 		 tdkTestObj.setResultStatus("FAILURE");
                  print "isgateway parameter not found"
