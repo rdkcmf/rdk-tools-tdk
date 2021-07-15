@@ -65,7 +65,7 @@
     <test_type>Positive</test_type>
     <test_setup>RPI,Accelerator</test_setup>
     <pre_requisite>1. Sslscan tool should be installed in the TM machine
-2.  Configure the values supported SSL/TLS protocols (variable $SUPPORTED_SSL_TLS_PROTOCOLS), test URL (variable $TEST_URL)and SSLscan path (variable $SSL_SCAN_PATH) available in fileStore/tdkvRDKServiceConfig/device.config file</pre_requisite>
+2.  Configure the values supported SSL/TLS protocols (variable $SUPPORTED_SSL_TLS_PROTOCOLS), default SSL/TLS protocols (variable $DEFAULT_SSL_TLS_PROTOCOLS), test URL (variable $TEST_URL)and SSLscan path (variable $SSL_SCAN_PATH) available in fileStore/tdkvRDKServiceConfig/device.config file</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>None</input_parameters>
     <automation_approch>1. Execute the sslscan with parameters to list the protocols and renegotiation settings of the DUT
@@ -87,7 +87,7 @@
 import tdklib;
 from rdkv_securitylib import *;
 import rdkv_securitylib;
-
+import re;
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_security","1",standAlone=True);
@@ -105,7 +105,7 @@ obj.setLoadModuleStatus(result)
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    configKeyList = ["SSL_SCAN_PATH","SUPPORTED_SSL_TLS_PROTOCOLS","TEST_WEB_APP_URL"]
+    configKeyList = ["SSL_SCAN_PATH","SUPPORTED_SSL_TLS_PROTOCOLS","TEST_WEB_APP_URL","DEFAULT_SSL_TLS_PROTOCOLS"]
     configValues = {}
     tdkTestObj = obj.createTestStep('rdkvsecurity_getDeviceConfig')
     #Get each configuration from device config file
@@ -114,11 +114,16 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("configKey",configKey)
         tdkTestObj.executeTestCase(expectedResult)
         configValues[configKey] = tdkTestObj.getResultDetails()
-        if "FAILURE" not in configValues[configKey]:
-            print "Successfully retrieved %s configuration from device config file" %(configKey)
+        if "FAILURE" not in configValues[configKey] and configKey != "SUPPORTED_SSL_TLS_PROTOCOLS" and configValues[configKey] != "":
+            print "SUCCESS: Successfully retrieved %s configuration from device config file" %(configKey)
+            tdkTestObj.setResultStatus("SUCCESS")
+        elif "FAILURE" not in configValues[configKey] and configKey == "SUPPORTED_SSL_TLS_PROTOCOLS":
+            print "SUCCESS: Successfully retrieved %s configuration from device config file" %(configKey)
             tdkTestObj.setResultStatus("SUCCESS")
         else:
-            print "Failed to retrieve %s configuration from device config file" %(configKey)
+            print "FAILURE: Failed to retrieve %s configuration from device config file" %(configKey)
+            if configKey != "SUPPORTED_SSL_TLS_PROTOCOLS" and configValues[configKey] == "":
+                print "\n Please configure the %s key in the device config file" %(configKey)
             tdkTestObj.setResultStatus("FAILURE")
             result = "FAILURE"
             break
@@ -130,65 +135,102 @@ if expectedResult in result.upper():
         Result = tdkTestObj.getResultDetails()
         if "FAILURE" not in Result:
             tdkTestObj.setResultStatus("SUCCESS")
+            ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]')
             if not configValues["SUPPORTED_SSL_TLS_PROTOCOLS"]:
+                defaultProtocols = configValues["DEFAULT_SSL_TLS_PROTOCOLS"].split(",")
                 print "No supported protocols configured"
+                print "Checking any default protocols are enabled......"
+                print "[DEFAULT_PROTOCOLS: %s]" %(defaultProtocols)
                 tdkTestObj.setResultStatus("SUCCESS")
-                print "Checking TLS Renegotiation settings......"
-                for line in  Result.splitlines():
-                    Renegotiationfound = 0;
-                    if "renegotiation" in line and "not" not in line and "supported" in line:
-                        Renegotiationfound = 1;
-                        print "Renegotiation supported"
-                        tdkTestObj.setResultStatus("FAILURE");
-                        break;
-                    elif "renegotiation" in line and  "not supported" in line:
-                        Renegotiationfound = 1;
-                        print "Renegotiation not supported"
-                        tdkTestObj.setResultStatus("SUCCESS");
-                        break;
-                if Renegotiationfound == 0:
-                    print "Renegotiation settings not found"
-                    tdkTestObj.setResultStatus("FAILURE");
-            else:
-                supportedProtocols = configValues["SUPPORTED_SSL_TLS_PROTOCOLS"].split(",")
-                print "Supported protocols %s"  %(supportedProtocols)
-                print "Checking configured protocols are enabled......"
-                for protocol in supportedProtocols:
-                     for line in Result.splitlines():
-                         if protocol in line:
-                             if "enabled" in line:
-                                  print "%s - Enabled" %(protocol)
+                enabled=0;
+                for protocol in defaultProtocols:
+                      for line in Result.splitlines():
+                          if protocol in line:
+                              if "enabled" in line:
+                                  print "FAILURE: %s - Enabled but configured as disabled" %(protocol)
+                                  tdkTestObj.setResultStatus("FAILURE");
+                                  enabled = 1;
+                                  break;
+                              elif "disabled" in line:
+                                  print "SUCCESS: %s - disabled" %(protocol)
                                   tdkTestObj.setResultStatus("SUCCESS");
                                   break;
-                             elif "disabled" in line:
-                                  print "%s - disabled" %(protocol)
-                                  tdkTestObj.setResultStatus("FAILURE");
+                if enabled == 0:
+                      print "All the default protocols are disabled"
+                      tdkTestObj.setResultStatus("SUCCESS");
+                elif enabled == 1:
+                      print "Some of the protocols are enabled but configured as disabled"
+                      print "Checking TLS Renegotiation settings....."
+                      for line in  Result.splitlines():
+                        Renegotiationfound = 0;
+                        if "renegotiation" in line and "not" not in line and "supported" in line:
+                            Renegotiationfound = 1;
+                            line = ansi_escape.sub('', line)
+                            print "[RESPONSE FROM DEVICE]: %s" %(line)
+                            print "FAILURE : Renegotiation supported"
+                            tdkTestObj.setResultStatus("FAILURE");
+                            break;
+                        elif "renegotiation" in line and  "not supported" in line:
+                            Renegotiationfound = 1;
+                            line = ansi_escape.sub('', line)
+                            print "[RESPONSE FROM DEVICE]: %s" %(line)
+                            print "SUCCESS: Renegotiation not supported"
+                            tdkTestObj.setResultStatus("SUCCESS");
+                            break;
+                      if Renegotiationfound == 0:
+                          print "FAILURE: Renegotiation Settings not found"
+                          tdkTestObj.setResultStatus("FAILURE");
+            else:
+                 supportedProtocols = configValues["SUPPORTED_SSL_TLS_PROTOCOLS"].split(",")
+                 print "[CONFIGURED SUPPORTED PROTOCOLS: %s]"  %(supportedProtocols)
+                 print "Checking configured protocols are enabled or not......"
+                 disabled = 0;enabled = 0;
+                 for protocol in supportedProtocols:
+                      for line in Result.splitlines():
+                          if protocol in line:
+                              if "enabled" in line:
+                                  print "SUCCESS: %s - Enabled" %(protocol)
+                                  enabled = 1
+                                  tdkTestObj.setResultStatus("SUCCESS");
                                   break;
-                print "Checking TLS Renegotiation settings......"
-                for line in  Result.splitlines():
-                    Renegotiationfound = 0;
-                    if "renegotiation" in line and "not" not in line and "supported" in line:
-                        Renegotiationfound = 1;
-                        print "Renegotiation supported"
-                        tdkTestObj.setResultStatus("SUCCESS");
-                        break;
-                    elif "renegotiation" in line and  "not supported" in line:
-                        Renegotiationfound = 1;
-                        print "Renegotiation not supported"
-                        tdkTestObj.setResultStatus("FAILURE");
-                        break;
-                if Renegotiationfound == 0:
-                    print "Renegotiation settings not found"
-                    tdkTestObj.setResultStatus("FAILURE");
+                              elif "disabled" in line:
+                                  print "FAILURE: %s - disabled but configured as enabled" %(protocol)
+                                  tdkTestObj.setResultStatus("FAILURE");
+                                  disabled = 1
+                                  break;
+                 if disabled == 1 and enabled == 0:
+                     tdkTestObj.setResultStatus("FAILURE");
+                     print "FAILURE: Some of the protocols are disabled but configured as enabled"
+                 if enabled == 1:
+                     print "Checking TLS Renegotiation settings....."
+                     for line in  Result.splitlines():
+                         Renegotiationfound = 0;
+                         if "renegotiation" in line and "not" not in line and "supported" in line:
+                             Renegotiationfound = 1;
+                             line = ansi_escape.sub('', line)
+                             print "[RESPONSE FROM DEVICE]: %s" %(line)
+                             print "FAILURE : Renegotiation supported"
+                             tdkTestObj.setResultStatus("FAILURE");
+                             break;
+                         elif "renegotiation" in line and  "not supported" in line:
+                             Renegotiationfound = 1;
+                             line = ansi_escape.sub('', line)
+                             print "[RESPONSE FROM DEVICE]: %s" %(line)
+                             print "SUCCESS: Renegotiation not supported"
+                             tdkTestObj.setResultStatus("SUCCESS");
+                             break;
+                     if Renegotiationfound == 0:
+                         print "FAILURE: Renegotiation Settings not found"
+                         tdkTestObj.setResultStatus("FAILURE"); 
         else:
-            print "SSlScan failed"
+            print "FAILURE: SSlScan failed"
             tdkTestObj.setResultStatus("FAILURE");
     else:
-        print "Failed to retrieve configuration values from device config file"
+        print "FAILURE: Failed to retrieve configuration values from device config file"
         tdkTestObj.setResultStatus("FAILURE");
     obj.unloadModule("rdkv_security");
 else:
     obj.setLoadModuleStatus("FAILURE");
 
-    print "Failed to load module"
+    print "FAILURE: Failed to load module"
 

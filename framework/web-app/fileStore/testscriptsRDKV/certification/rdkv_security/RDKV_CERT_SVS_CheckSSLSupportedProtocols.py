@@ -111,7 +111,7 @@ if expectedResult in result.upper():
     tdkTestObj.addParameter("configKey","SSL_SCAN_PATH")
     tdkTestObj.executeTestCase(expectedResult)
     sslscanPath = tdkTestObj.getResultDetails()
-    if "FAILURE" not in sslscanPath:
+    if "FAILURE" not in sslscanPath and sslscanPath != "":
         tdkTestObj.setResultStatus("SUCCESS")
         tdkTestObj = obj.createTestStep('rdkvsecurity_getDeviceConfig')
         tdkTestObj.addParameter("basePath",obj.realpath)
@@ -125,7 +125,7 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("configKey","TEST_WEB_APP_URL")
             tdkTestObj.executeTestCase(expectedResult)
             testUrl = tdkTestObj.getResultDetails()
-            if "FAILURE" not in testUrl:
+            if "FAILURE" not in testUrl and testUrl != "":
                  tdkTestObj.setResultStatus("SUCCESS")
                  tdkTestObj = obj.createTestStep('rdkvsecurity_executeInTM');
                  command = sslscanPath+"/sslscan "+testUrl
@@ -141,7 +141,7 @@ if expectedResult in result.upper():
                          tdkTestObj.addParameter("configKey","DEFAULT_SSL_TLS_PROTOCOLS")
                          tdkTestObj.executeTestCase(expectedResult)
                          defaultProtocols = tdkTestObj.getResultDetails()
-                         if "FAILURE" not in defaultProtocols:
+                         if "FAILURE" not in defaultProtocols and defaultProtocols != "":
                               tdkTestObj.setResultStatus("SUCCESS");
                               defaultProtocols = defaultProtocols.split(",")
                               print "Default protocols %s"  %(defaultProtocols)
@@ -150,47 +150,53 @@ if expectedResult in result.upper():
                                   for line in Result.splitlines():
                                       if protocol in line:
                                           if "disabled" in line:
-                                              print "%s - disabled" %(protocol)
+                                              print "SUCCESS: %s - disabled" %(protocol)
                                               tdkTestObj.setResultStatus("SUCCESS");
                                               break;
                                           elif "enabled" in line:
-                                              print "%s - enabled" %(protocol)
+                                              print "FAILURE: %s - enabled" %(protocol)
                                               tdkTestObj.setResultStatus("FAILURE");
                                               break;
                          else:
-                             print "Failed to retrieve DEFAULT_SSL_TLS_PROTOCOLS configuration from device config file"
+                             print "FAILURE: Failed to retrieve DEFAULT_SSL_TLS_PROTOCOLS configuration from device config file"
+                             if defaultProtocols == "":
+                                 print "\n Please configure the DEFAULT_SSL_TLS_PROTOCOLS key in the device config file"
                              tdkTestObj.setResultStatus("FAILURE");
                      else:
                          supportedProtocols = supportedProtocols.split(",")
                          print "Supported protocols %s"  %(supportedProtocols)
-                         print "Checking configured protocols are enabled....."
+                         print "Checking configured supported protocols are enabled....."
                          for protocol in supportedProtocols:
                              for line in Result.splitlines():
                                  if protocol in line:
                                      if "enabled" in line:
-                                         print "%s - Enabled" %(protocol)
+                                         print "SUCCESS: %s - Enabled" %(protocol)
                                          tdkTestObj.setResultStatus("SUCCESS");
                                          break;
                                      elif "disabled" in line:
-                                         print "%s - disabled" %(protocol)
+                                         print "FAILURE: %s - disabled" %(protocol)
                                          tdkTestObj.setResultStatus("FAILURE");
                                          break;
                  else:
-                     print "SSlScan failed"
+                     print "FAILURE: SSlScan failed"
                      tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "Failed to retrieve TEST_URL configuration from device config file"
+                print "FAILURE: Failed to retrieve TEST_URL configuration from device config file"
+                if testUrl == "":
+                    print "\n Please configure the TEST_WEB_APP_URL key in the device config file"
                 tdkTestObj.setResultStatus("FAILURE");
         else:
-            print "Failed to retrieve SUPPORTED_SSL_TLS_PROTOCOLS configuration from device config file"
+            print "FAILURE: Failed to retrieve SUPPORTED_SSL_TLS_PROTOCOLS configuration from device config file"
             tdkTestObj.setResultStatus("FAILURE");
     else:
-        print "Failed to retrieve SSL_SCAN_PATH configuration from device config file"
+        print "FAILURE: Failed to retrieve SSL_SCAN_PATH configuration from device config file"
+        if sslscanPath == "":
+            print "\n Please configure the SSL_SCAN_PATH key in the device config file"
         tdkTestObj.setResultStatus("FAILURE");
     obj.unloadModule("rdkv_security");
 
 else:
     obj.setLoadModuleStatus("FAILURE");
 
-    print "Failed to load module"
+    print "FAILURE: Failed to load module"
 

@@ -108,11 +108,13 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("configKey",configKey)
         tdkTestObj.executeTestCase(expectedResult)
         configValues[configKey] = tdkTestObj.getResultDetails()
-        if "FAILURE" not in configValues[configKey]:
-            print "Successfully retrieved %s configuration from device config file" %(configKey)
+        if "FAILURE" not in configValues[configKey] and configValues[configKey] != "":
+            print "SUCCESS: Successfully retrieved %s configuration from device config file" %(configKey)
             tdkTestObj.setResultStatus("SUCCESS")
         else:
-            print "Failed to retrieve %s configuration from device config file" %(configKey)
+            print "FAILURE: Failed to retrieve %s configuration from device config file" %(configKey)
+            if configValues[configKey] == "":
+                print "\n Please configure the %s key in the device config file" %(configKey)
             tdkTestObj.setResultStatus("FAILURE")
             result = "FAILURE"
             break
@@ -122,7 +124,7 @@ if expectedResult in result.upper():
                 configValues["SSH_PASSWORD"] = ""
             credentials = obj.IP + ',' + configValues["SSH_USERNAME"] + ',' + configValues["SSH_PASSWORD"]
             command =  'for pem in ' + configValues["CERT_PATH"] + '/*.pem; do if [[ $( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 ) -lt "2048" && $( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 ) -ne "0" ]]; then printf \'%s-------%d is insecure\n\' "$pem" "$( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 )"; fi done'
-            #print "Command : %s" %(command)            
+            print "COMMAND : %s" %(command)            
             #Primitive test case which associated to this Script
             tdkTestObj = obj.createTestStep('rdkvsecurity_executeInDUT');
             #Add the parameters to ssh to the DUT and execute the command
@@ -140,15 +142,15 @@ if expectedResult in result.upper():
                         shortKeyCertList.append (line)
                 tdkTestObj.setResultStatus("FAILURE");
                
-                print "Test failed.\nFew Certificates are having public key length less than recommended key length 2048: \n%s" %(shortKeyCertList)
+                print "FAILURE: Few Certificates are having public key length less than recommended key length 2048: \n%s" %(shortKeyCertList)
             else:
                 tdkTestObj.setResultStatus("SUCCESS");
-                print "Test passed. All certificates are having recommended public key length"
+                print "SUCCESS: All certificates are having recommended public key length"
         else:
-            print "Currently only supports directSSH ssh method"
+            print "FAILURE: Currently only supports directSSH ssh method"
             tdkTestObj.setResultStatus("FAILURE");
     else:
-        print "Failed to get configuration values"
+        print "FAILURE: Failed to get configuration values"
         tdkTestObj.setResultStatus("FAILURE");
     #Unload the module
     obj.unloadModule("rdkv_security");
@@ -156,6 +158,6 @@ if expectedResult in result.upper():
 else:
     #Set load module status
     obj.setLoadModuleStatus("FAILURE");
-    print "Failed to load module"
+    print "FAILURE: Failed to load module"
 
                                      

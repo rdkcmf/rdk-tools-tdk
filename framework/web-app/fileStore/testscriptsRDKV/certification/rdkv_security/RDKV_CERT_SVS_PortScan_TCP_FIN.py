@@ -105,6 +105,7 @@ if expectedResult in result.upper():
     tdkTestObj = obj.createTestStep('rdkvsecurity_executeInTM');
     #command to be executed for scanning tcp ports
     command = "nmap -sF " + obj.IP
+    print "COMMAND : %s" %(command)
     tdkTestObj.addParameter("command", command);
 
     #Execute the test case in DUT
@@ -128,6 +129,7 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("configKey","TCP_PORTS")
         tdkTestObj.executeTestCase(expectedResult)
         expected_portList = tdkTestObj.getResultDetails()
+        print "Configured Open ports are: %s" %(expected_portList)
         if "FAILURE" not in expected_portList:
             additional_portList = []
             for port in portList:
@@ -135,22 +137,22 @@ if expectedResult in result.upper():
                     additional_portList.append (port)
             if not additional_portList:
                 tdkTestObj.setResultStatus("SUCCESS");
-                print "No additional TCP open ports detected"
+                print "SUCCESS: No additional TCP open ports detected"
             else:
                 tdkTestObj.setResultStatus("FAILURE");
-                print "Additional TCP open ports detected!!!\nPorts: %s" %(additional_portList)
+                print "FAILURE: Additional TCP open ports detected!!!\nPorts: %s" %(additional_portList)
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Failed to retrieve expected open ports list"
+            print "FAILURE: Failed to retrieve expected open ports list"
     else:
         tdkTestObj.setResultStatus("FAILURE");
-        print "Failed to execute nmap successfully"
+        print "FAILURE: Failed to execute nmap successfully"
 
     #Unload the module
     obj.unloadModule("rdkv_security");
 
 else:
     obj.setLoadModuleStatus("FAILURE");
-    print "Failed to load module"                                                                                                                                                                                               
+    print "FAILURE: Failed to load module"                                                                                                                                                                                               
                                                                                                                           
 

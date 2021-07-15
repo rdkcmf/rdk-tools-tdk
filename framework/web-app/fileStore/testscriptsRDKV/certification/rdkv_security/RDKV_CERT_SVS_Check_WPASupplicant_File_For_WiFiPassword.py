@@ -112,25 +112,25 @@ if expectedResult in result.upper():
                     status = tdkTestObj.getResultDetails()
                     if expectedResult in result and status == "activated":
                         Test_Step_Status = True
-                        print "\nActivated plugin : {}\n".format(plugin)
+                        print "SUCCESS: Activated plugin : {}\n".format(plugin)
                         tdkTestObj.setResultStatus("SUCCESS");
                     else:
                         Test_Step_Status = False
-                        print "plugin is not in activated state"
+                        print "FAILURE: Plugin is not in activated state"
                         tdkTestObj.setResultStatus("FAILURE");
                         break
                 else:
                     Test_Step_Status = False
-                    print "Plugin Activation Failed"
+                    print "FAILURE: Plugin Activation Failed"
                     tdkTestObj.setResultStatus("FAILURE");
                     break
             elif status == "activated":
                 Test_Step_Status = True
                 tdkTestObj.setResultStatus("SUCCESS");
-                print "%s Plugin is in Activated state" %(plugin)
+                print "SUCCESS: %s Plugin is in Activated state" %(plugin)
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Could not retrieve the status of the %s plugin" %(plugin)
+            print "FAILURE: Could not retrieve the status of the %s plugin" %(plugin)
             break
     if Test_Step_Status:
         print "Retrieving Configuration values from config file......."
@@ -143,11 +143,13 @@ if expectedResult in result.upper():
             tdkTestObj.addParameter("configKey",configKey)
             tdkTestObj.executeTestCase(expectedResult)
             configValues[configKey] = tdkTestObj.getResultDetails()
-            if "FAILURE" not in configValues[configKey]:
-                print "Successfully retrieved %s configuration from device config file" %(configKey)
+            if "FAILURE" not in configValues[configKey] and configValues[configKey] != "":
+                print "SUCCESS: Successfully retrieved %s configuration from device config file" %(configKey)
                 tdkTestObj.setResultStatus("SUCCESS")
             else:
-                 print "Failed to retrieve %s configuration from device config file" %(configKey)
+                 print "FAILURE: Failed to retrieve %s configuration from device config file" %(configKey)
+                 if configValues[configKey] == "":
+                     print "\n Please configure the %s key in the device config file" %(configKey)
                  tdkTestObj.setResultStatus("FAILURE")
                  result = "FAILURE"
                  break
@@ -157,7 +159,7 @@ if expectedResult in result.upper():
                     configValues["SSH_PASSWORD"] = ""
                 credentials = obj.IP + ',' + configValues["SSH_USERNAME"] + ',' + configValues["SSH_PASSWORD"]
                 command = configValues["PREFERRED_NETWORK_PARAMETER"]
-                print "Command : %s" %(command)
+                print "COMMAND: %s" %(command)
                 tdkTestObj = obj.createTestStep('rdkvsecurity_executeInDUT')
                 tdkTestObj.addParameter("sshMethod", configValues["SSH_METHOD"]);
                 tdkTestObj.addParameter("credentials", credentials);
@@ -166,7 +168,7 @@ if expectedResult in result.upper():
                 result = tdkTestObj.getResult()
                 if expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS");
-                    print "Successfully enabled preferred network type"
+                    print "SUCCESS: Successfully enabled preferred network type"
                     params = '{"incremental":false,"ssid":"","frequency":""}'
                     tdkTestObj = obj.createTestStep('rdkservice_setValue')
                     tdkTestObj.addParameter("method","org.rdk.Wifi.1.startScan")
@@ -196,11 +198,11 @@ if expectedResult in result.upper():
                                 connected_ssid = tdkTestObj.getResultDetails()
                                 print " \n Connected SSID Name: {}\n ".format(connected_ssid)
                                 if ssid == connected_ssid:
-                                    print "Successfully Connected to SSID \n "
-                                    print "Checking WPA_Supplicant present in DUT"
+                                    print "SUCCESS: Successfully Connected to SSID \n "
+                                    print "Checking WPA_Supplicant file present in DUT"
                                     tdkTestObj.setResultStatus("SUCCESS")
                                     command = '[ -f "/opt/wifi/wpa_supplicant.conf" ] && echo 1 || echo 0'
-                                    print "Command : %s" %(command)
+                                    print "COMMAND : %s" %(command)
                                     tdkTestObj = obj.createTestStep('rdkvsecurity_executeInDUT')
                                     tdkTestObj.addParameter("sshMethod", configValues["SSH_METHOD"]);
                                     tdkTestObj.addParameter("credentials", credentials);
@@ -209,10 +211,10 @@ if expectedResult in result.upper():
                                     output = tdkTestObj.getResultDetails();
                                     output = str(output).split("\n")[1] 
                                     if expectedResult in result and int(output) == 1:
-                                        print "WPA_Supplicant file exists checking whether it contains WiFi passphrase........"
+                                        print "SUCCESS: WPA_Supplicant file exists checking whether it contains WiFi passphrase........"
                                         tdkTestObj.setResultStatus("SUCCESS")
                                         command = 'grep -F '+str(configValues["WIFI_PASSPHRASE"])+' /opt/wifi/wpa_supplicant.conf'
-                                        print "Command : %s" %(command)
+                                        print "COMMAND: %s" %(command)
                                         tdkTestObj = obj.createTestStep('rdkvsecurity_executeInDUT');
                                         tdkTestObj.addParameter("sshMethod", configValues["SSH_METHOD"]);
                                         tdkTestObj.addParameter("credentials", credentials);
@@ -221,13 +223,13 @@ if expectedResult in result.upper():
                                         output = tdkTestObj.getResultDetails();
                                         output = str(output).split("\n")[1]
                                         if str(configValues["WIFI_PASSPHRASE"]) in output:
-                                            print "WPA_Supplicant file contains WiFi passphrase"
+                                            print "FAILURE: WPA_Supplicant file contains WiFi passphrase"
                                             tdkTestObj.setResultStatus("FAILURE")
                                         else:
-                                            print "WPA_Supplicant file does not contain WiFi passphrase"
+                                            print "SUCCESS: WPA_Supplicant file does not contain WiFi passphrase"
                                             tdkTestObj.setResultStatus("SUCCESS")
                                     else:
-                                        print "WPA_Supplicant file not exists in DUT"
+                                        print "FAILURE: WPA_Supplicant file not exists in DUT"
                                         tdkTestObj.setResultStatus("FAILURE")
                                         
                                     params = '{}'
@@ -238,39 +240,39 @@ if expectedResult in result.upper():
                                     result = tdkTestObj.getResult()  
                                     if expectedResult in result:
                                        tdkTestObj.setResultStatus("SUCCESS")
-                                       print "Successfully disconnected from Wifi"
+                                       print "SUCCESS: Successfully disconnected from Wifi"
                                     else:
-                                        print "\n Error while executing org.rdk.Wifi.1.disconnect method \n"
+                                        print "\nFAILURE: Error while executing org.rdk.Wifi.1.disconnect method \n"
                                         tdkTestObj.setResultStatus("FAILURE")
                                 else:
-                                    print "DUT is not connected to SSID"
+                                    print "\nFAILURE: DUT is not connected to SSID"
                                     tdkTestObj.setResultStatus("FAILURE")
                             else:
-                                print "\n Error while executing org.rdk.Wifi.1.getConnectedSSID method \n"
+                                print "\nFAILURE: Error while executing org.rdk.Wifi.1.getConnectedSSID method \n"
                                 tdkTestObj.setResultStatus("FAILURE")        
                         else:
-                            print "\n Error while executing org.rdk.Wifi.1.connect method \n"
+                            print "\nFAILURE: Error while executing org.rdk.Wifi.1.connect method \n"
                             tdkTestObj.setResultStatus("FAILURE")
                     else:
-                        print "\n Error while executing org.rdk.Wifi.1.startScan method \n"
+                        print "\nFAILURE: Error while executing org.rdk.Wifi.1.startScan method \n"
                         tdkTestObj.setResultStatus("FAILURE")        
 
                 else:
-                    print "Enabling preferred network type failed"
+                    print "FAILURE: Enabling preferred network type failed"
                     tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "Currently only supports directSSH ssh method"
+                print "FAILURE: Currently only supports directSSH ssh method"
                 tdkTestObj.setResultStatus("FAILURE");
         else:
-            print "Failed to get configuration values"
+            print "FAILURE: Failed to get configuration values"
             tdkTestObj.setResultStatus("FAILURE");
 
     else:
         tdkTestObj.setResultStatus("FAILURE")
-        print "Plugins activation step failed"
+        print "FAILURE: Plugins activation step failed"
 
     #Unload the module
     obj.unloadModule("rdkv_security");
 else:
     obj.setLoadModuleStatus("FAILURE");
-    print "Failed to load module"
+    print "FAILURE: Failed to load module"

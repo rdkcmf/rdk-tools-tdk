@@ -81,6 +81,7 @@
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
+import re;
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_security","1",standAlone=True);
@@ -107,11 +108,13 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("configKey",configKey)
         tdkTestObj.executeTestCase(expectedResult)
         configValues[configKey] = tdkTestObj.getResultDetails()
-        if "FAILURE" not in configValues[configKey]:
-            print "Successfully retrieved %s configuration from device config file" %(configKey)
+        if "FAILURE" not in configValues[configKey] and configValues[configKey] != "":
+            print "SUCCESS: Successfully retrieved %s configuration from device config file" %(configKey)
             tdkTestObj.setResultStatus("SUCCESS")
         else:
-            print "Failed to retrieve %s configuration from device config file" %(configKey)
+            print "FAILURE: Failed to retrieve %s configuration from device config file" %(configKey)
+            if configValues[configKey] == "":
+                print "\n Please configure the %s key in the device config file" %(configKey)
             tdkTestObj.setResultStatus("FAILURE")
             result = "FAILURE"
             break
@@ -121,7 +124,7 @@ if expectedResult in result.upper():
                 configValues["SSH_PASSWORD"] = ""
             credentials = obj.IP + ',' + configValues["SSH_USERNAME"] + ',' + configValues["SSH_PASSWORD"]
             command =  'systemctl is-enabled autofs'
-            print "Command : %s" %(command)
+            print "COMMAND : %s" %(command)
             #Primitive test case which associated to this Script
             tdkTestObj = obj.createTestStep('rdkvsecurity_executeInDUT');
             #Add the parameters to ssh to the DUT and execute the command
@@ -132,36 +135,40 @@ if expectedResult in result.upper():
             output = tdkTestObj.getResultDetails();
             output = str(output).split("\n")[1]
             print "Checking Autofs status"
+            print "[RESPONSE FROM DEVICE]: %s" %(output)
+            ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]')
             if "disabled" in output:
-                print "Auto mounting disabled in DUT"
+                print "SUCCESS: Auto mounting disabled,DUT will not allow automatic mounting of devices"
                 tdkTestObj.setResultStatus("SUCCESS");
             elif "enabled" in output:
-                print "Auto mounting enabled in DUT"
+                print "FAILURE: Auto mounting enabled in DUT,vulnerable to automatic mounting of external devices"
                 tdkTestObj.setResultStatus("FAILURE");
             elif "Failed to get unit file" in output:
                 command =  'systemctl status autofs'
-                print "Command : %s" %(command)  
+                print "COMMAND : %s" %(command)  
                 tdkTestObj = obj.createTestStep('rdkvsecurity_executeInDUT');
                 tdkTestObj.addParameter("sshMethod", configValues["SSH_METHOD"]);
                 tdkTestObj.addParameter("credentials", credentials);
                 tdkTestObj.addParameter("command", command);
                 tdkTestObj.executeTestCase(expectedResult);
                 output = tdkTestObj.getResultDetails();   
+                print "[RESPONSE FROM DEVICE]: %s" %(output)
                 if "autofs.service" and  "not found" or "could not be found" in output:
-                    print "Autofs service not available in DUT"
+                    print "SUCCESS: Autofs service not available in DUT"
                     tdkTestObj.setResultStatus("SUCCESS");         
                 else:
-                    print "Autofs status %s" %(output)
+                    print "FAILURE: Autofs status %s" %(output)
                     tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "Autofs status %s" %(output)
+                output = ansi_escape.sub('', output)
+                print "FAILURE: Autofs status %s" %(output)
                 tdkTestObj.setResultStatus("FAILURE");               
  
         else:
-            print "Currently only supports directSSH ssh method"
+            print "FAILURE: Currently only supports directSSH ssh method"
             tdkTestObj.setResultStatus("FAILURE");
     else:
-        print "Failed to get configuration values"
+        print "FAILURE: Failed to get configuration values"
         tdkTestObj.setResultStatus("FAILURE");
     #Unload the module
     obj.unloadModule("rdkv_security");
@@ -169,4 +176,4 @@ if expectedResult in result.upper():
 else:
     #Set load module status
     obj.setLoadModuleStatus("FAILURE");
-    print "Failed to load module"
+    print "FAILURE: Failed to load module"

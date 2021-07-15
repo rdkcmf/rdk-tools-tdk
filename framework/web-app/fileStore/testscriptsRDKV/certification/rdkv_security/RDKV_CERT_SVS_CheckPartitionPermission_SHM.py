@@ -110,11 +110,13 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter("configKey",configKey)
         tdkTestObj.executeTestCase(expectedResult)
         configValues[configKey] = tdkTestObj.getResultDetails()
-        if "FAILURE" not in configValues[configKey]:
-            print "Successfully retrieved %s configuration from device config file" %(configKey)
+        if "FAILURE" not in configValues[configKey] and configValues[configKey] != "":
+            print "SUCCESS: Successfully retrieved %s configuration from device config file" %(configKey)
             tdkTestObj.setResultStatus("SUCCESS")
         else:
-            print "Failed to retrieve %s configuration from device config file" %(configKey)
+            print "FAILURE: Failed to retrieve %s configuration from device config file" %(configKey)
+            if configValues[configKey] == "":
+                print "\n Please configure the %s key in the device config file" %(configKey)
             tdkTestObj.setResultStatus("FAILURE")
             result = "FAILURE"
             break
@@ -123,8 +125,9 @@ if expectedResult in result.upper():
             if configValues["SSH_PASSWORD"] == "None":
                 configValues["SSH_PASSWORD"] = ""
             credentials = obj.IP + ',' + configValues["SSH_USERNAME"] + ',' + configValues["SSH_PASSWORD"]
+            print "\nConfigured SHM partition permissions: %s\n" %(configValues["SHM_PARTITION_PERMISSION"])
             command = 'mount | grep /dev/shm'
-            print "Command : %s" %(command)
+            print "COMMAND : %s" %(command)
 
             #Primitive test case which associated to this Script
             tdkTestObj = obj.createTestStep('rdkvsecurity_executeInDUT');
@@ -138,19 +141,21 @@ if expectedResult in result.upper():
 
             #Get the result of execution
             output = tdkTestObj.getResultDetails();
+            print "[RESPONSE FROM DEVICE]: %s" %(output) 
+            print "Checking whether configured permissions are set on /dev/shm partition\n"
             permissions = configValues["SHM_PARTITION_PERMISSION"].split(",")
             for value in permissions:
                 if value in str(output):
-                    print "%s  permission is  set on /dev/shm partition" %(value)
+                    print "SUCCESS: %s  permission is  set on /dev/shm partition" %(value)
                     tdkTestObj.setResultStatus("SUCCESS");
                 else:
-                    print "%s permission are not set on /dev/shm partition" %(value)
+                    print "FAILURE: %s permission is not set on /dev/shm partition" %(value)
                     tdkTestObj.setResultStatus("FAILURE");
         else:
-            print "Currently only supports directSSH ssh method"
+            print "FAILURE: Currently only supports directSSH ssh method"
             tdkTestObj.setResultStatus("FAILURE");
     else:
-        print "Failed to get configuration values"
+        print "FAILURE: Failed to get configuration values"
         tdkTestObj.setResultStatus("FAILURE");
 
     #Unload the module
@@ -158,5 +163,5 @@ if expectedResult in result.upper():
 else:
     #Set load module status
     obj.setLoadModuleStatus("FAILURE");
-    print "Failed to load module"
+    print "FAILURE: Failed to load module"
 
