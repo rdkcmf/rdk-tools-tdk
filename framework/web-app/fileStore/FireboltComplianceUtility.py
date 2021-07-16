@@ -82,3 +82,28 @@ def setOperations (operation, *arguments):
 # Function to retrieve the saved trickplay operation string
 def getOperations ():
     return operations
+
+#Function to construct the mediapipelinetest command to be executed in the DUT
+def getMediaPipelineTestCommand (testName, testUrl, **arguments):
+    #First construct the command with mandatory arguments
+    command = "mediapipelinetests " + testName + " " + testUrl
+    #Based on the test, the arguments can vary, parse through the variabled arguments
+    #and add the available variables
+    for name, value in arguments.items ():
+        command += " " + name + "=" + value
+
+    return command
+
+#Function to check mediapipeline test execution status from output string
+#Returns 'SUCCESS'/'FAILURE' based on the analysis of the output string
+def checkMediaPipelineTestStatus (outputString):
+    #If the output string returned from 'mediapipelinetests' contains strings "Failures: 0" and "Errors: 0"  or it contains string "failed: 0", then the test suite executed successfully otherwise the test failed
+    passStringList = ["Failures: 0", "Errors: 0"]
+    passString = "failed: 0"
+
+    if ((all (token in outputString for token in passStringList)) or (passString in outputString)):
+        result = "SUCCESS"
+    else:
+        result = "FAILURE"
+
+    return result

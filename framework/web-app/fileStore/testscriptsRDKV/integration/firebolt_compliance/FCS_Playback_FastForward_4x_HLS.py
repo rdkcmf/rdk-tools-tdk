@@ -77,8 +77,8 @@ operations=fastforward4x:&lt;timeout&gt; - a ":" seperated string to specify the
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
 3.Retrieve the video_src_url_hls variable from MediaValidationVariables library
 4. Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value, operation and timeout
-5.Execute the command in DUT
-6.Verify the output from the execute command and check if the  "Failures: 0" and "Errors: 0" string exists or "failed: 0" string exists
+5.Execute the command in DUT. During the execution, the DUT will start av playback, then do a fast forward operation with playback rate 4 and then continue playback  at rate 4 for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds. Then application exits by closing the pipeline
+6.Verify the output from the execute command and check if the  "Failures: 0" and "Errors: 0" string exists or "failed: 0" string exists in the returned output
 7.Based on the ExecuteCommand() return value and the output returned from the mediapipelinetests application, TM return SUCCESS/FAILURE status.</automation_approch>
     <expected_output>Checkpoint 1. Verify the API call is success
 Checkpoint 2. Verify that the output returned from mediapipelinetests contains the strings "Failures: 0" and "Errors: 0" or it contains the string "failed: 0"</expected_output>
@@ -131,20 +131,21 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
     if expectedResult in actualresult.upper() and check_av_status_flag == "yes":
         print "Video playback status check is added"
-        check_av_status = check_av_status_flag
+        checkAVStatus = check_av_status_flag
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT' that specifies the video playback timeout in seconds 
-    actualresult, timeout = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT')
+    actualresult, timeoutConfigValue = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT')
         
     #If the value of FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT is retrieved correctly and its value is not empty, timeout value should be passed to the test application
     #if the device config value is empty, default timeout(10sec) is passed
-    if expectedResult in actualresult.upper() and timeout != "":
-        timeoutInSeconds = timeout
+    if expectedResult in actualresult.upper() and timeoutConfigValue != "":
+        timeoutInSeconds = timeoutConfigValue
     #Construct the trickplay operation string
     #The operations specifies the operation(fastforward/rewind/seek/play/pause) to be executed from the mediapipeline trickplay test
     # Sample operations strings is "operations=fastforward4x:20"
     setOperations ("fastforward4x", timeoutInSeconds)
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
-    command = "mediapipelinetests " + test_name + " " + test_url + " checkavstatus=" + check_av_status_flag + " operations=" + getOperations ()
+    #Sample command = "mediapipelinetests test_trickplay <HLS_STREAM_URL> checkavstatus=yes operations=fastforward4x:20"
+    command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, operations = getOperations ()) 
     print "Executing command in DUT: ", command
     
     tdkTestObj.addParameter("command", command)
@@ -152,12 +153,13 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     actualresult = tdkTestObj.getResult()
     output = tdkTestObj.getResultDetails()
     print "OUTPUT: ", output
-    #If the output string returned from 'mediapipelinetests' contains "Failures: 0" and "Errors: 0"  or it contains "failed: 0", then the test suite executed successfully 
+
+    #Check if the command executed successfully
     if expectedResult in actualresult.upper() and output:
-        passStringList = ["Failures: 0", "Errors: 0"]
-        passString = "failed: 0"
+        #Check the output string returned from 'mediapipelinetests' to verify if the test suite executed successfully 
+        executionStatus = checkMediaPipelineTestStatus (output)
         
-        if ((all (token in output for token in passStringList)) or (passString in output)):
+        if expectedResult in executionStatus:
             tdkTestObj.setResultStatus("SUCCESS")
             print "Fastforward on HLS stream with 4x speed was successfull"
             print "Mediapipeline test executed successfully"

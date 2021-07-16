@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>Test to do multiple short duration play, pause operations on a HLS stream</synopsis>
   <groups_id/>
-  <execution_time>5</execution_time>
+  <execution_time>10</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -48,18 +48,19 @@
     <pre_requisite>1.TDK Agent should be up and running in the DUT
 2. Test stream url for a HLS stream should be updated in the config variable video_src_url_hls inside MediaValidationVariables.py library inside filestore
 3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file
-4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time in seconds for which each play, pause operation should be carried out</pre_requisite>
+4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time in seconds for which each play, pause operation should be carried out
+5. FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT configuration should be set to the number of times, the operations should be repeated</pre_requisite>
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>testcasename - "test_trickplay"
 test_url - HLS url from MediaValidationVariables library (MediaValidationVariables.video_src_url_hls)
 "checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
-operations=play:&lt;timeout&gt;,pause:&lt;timeout&gt;,play:&lt;timeout&gt;,pause:&lt;timeout&gt;,play:&lt;timeout&gt;,pause:&lt;timeout&gt; - a comma separated string of indivudual ply/pause &lt;operation:timeout&gt; string where operation could be string "play"/"pause" indication play/pause operations and timeout is time in seconds for which the operation should be performed. The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file. The same timeout value can be used for all operations</input_parameters>
+operations=play:&lt;timeout&gt;,pause:&lt;timeout&gt;,play:&lt;timeout&gt;,pause:&lt;timeout&gt;,play:&lt;timeout&gt;,pause:&lt;timeout&gt; (number of play:&lt;timeout&gt;,pause:&lt;timeout&gt; string depends on the parameter FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT) - a comma separated string of indivudual play/pause &lt;operation:timeout&gt; string where operation could be string "play"/"pause" indicating play/pause operations and timeout is time in seconds for which the operation should be performed. The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file. The same timeout value can be used for all operations.The play/pause operations are repeted FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT times</input_parameters>
     <automation_approch>1.Load the systemuitl module 
-2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
+2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS, FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT and FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT config values from Device config file.
 3.Retrieve the video_src_url_hls variable from MediaValidationVariables library
 4. Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value, operations
-5.Execute the command in DUT
-6.Verify the output from the execute command and check if the  "Failures: 0" and "Errors: 0" string exists or "failed: 0" string exists
+5.Execute the command in DUT. During the execution, the DUT will playback av for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds, then av is paused for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds.This sequence of play and pause operations are repeated for FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT times and then application exits by closing the pipeline
+6.Verify the output from the execute command and check if the  "Failures: 0" and "Errors: 0" string exists or "failed: 0" string exists in the returned output
 7.Based on the ExecuteCommand() return value and the output returned from the mediapipelinetests application, TM return SUCCESS/FAILURE status.</automation_approch>
     <expected_output>Checkpoint 1. Verify the API call is success
 Checkpoint 2. Verify that the output returned from mediapipelinetests contains the strings "Failures: 0" and "Errors: 0" or it contains the string "failed: 0"</expected_output>
@@ -93,6 +94,7 @@ sysUtilObj.configureTestCase(ip,port,'FCS_Playback_PlayPause_MultipleTimes_HLS')
 #Set device configurations to default values
 checkAVStatus = "no"
 timeoutInSeconds = "10"
+repeatCount = 3
 
 #Load the systemutil library
 sysutilloadModuleStatus =sysUtilObj.getLoadModuleResult()
@@ -113,26 +115,33 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
     if expectedResult in actualresult.upper() and check_av_status_flag == "yes":
         print "Video playback status check is added"
-        check_av_status = check_av_status_flag
+        checkAVStatus = check_av_status_flag
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT' that specifies the video playback timeout in seconds 
-    actualresult, timeout = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT')
+    actualresult, timeoutConfigValue = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT')
         
     #If the value of FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT is retrieved correctly and its value is not empty, timeout value should be passed to the test application
     #if the device config value is empty, default timeout(10sec) is passed
-    if expectedResult in actualresult.upper() and timeout != "":
-        timeoutInSeconds = timeout
+    if expectedResult in actualresult.upper() and timeoutConfigValue != "":
+        timeoutInSeconds = timeoutConfigValue
+    #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT' that specifies the number of times the operations should be reapeted 
+    actualresult, repeatCountConfigValue = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT')
+        
+    #If the value of FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT is retrieved correctly and its value is not empty, repeatCount value should be set as the retrieved vale
+    #if the device config value is empty, default repeatCount(3) is passed
+    if expectedResult in actualresult.upper() and repeatCountConfigValue != "":
+        repeatCount = int(repeatCountConfigValue)
     #Construct the trickplay operation string by calling the setOperations() separately for each play/pause operation along with the timeout argument
     #The operations specifies the operation(fastforward/rewind/seek/play/pause) to be executed from the mediapipeline trickplay test
-    #Sample oprations strings is "operations=play:10,pause:10,play:10,pause:10"
-    setOperations ("play", timeoutInSeconds)
-    setOperations ("pause", timeoutInSeconds)
-    setOperations ("play", timeoutInSeconds)
-    setOperations ("pause", timeoutInSeconds)
-    setOperations ("play", timeoutInSeconds)
-    setOperations ("pause", timeoutInSeconds)
+    #Sample oprations strings is "operations=play:10,pause:10,play:10,pause:10,play:10,pause:10,play:10,pause:10,play:10,pause:10,play:10,pause:10"
+    #The play and pause operations are added FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT or 3(default) times
+    #TODO Repeat operations should be handled as an argument
+    for iterator in range (repeatCount):
+        setOperations ("play", timeoutInSeconds)
+        setOperations ("pause", timeoutInSeconds)
 
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
-    command = "mediapipelinetests " + test_name + " " + test_url + " checkavstatus=" + check_av_status_flag + " operations=" + getOperations ()
+    #Sample command = "mediapipelinetests test_trickplay <HLS_STREAM_URL> checkavstatus=yes operations=play:30,pause:30,play:30,pause:30,play:30,pause:30,play:30,pause:30,play:30,pause:30,play:30,pause:30"
+    command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, operations = getOperations ()) 
     print "Executing command in DUT: ", command
     
     tdkTestObj.addParameter("command", command)
@@ -140,12 +149,13 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     actualresult = tdkTestObj.getResult()
     output = tdkTestObj.getResultDetails()
     print "OUTPUT: ", output
-    #If the output string returned from 'mediapipelinetests' contains "Failures: 0" and "Errors: 0"  or it contains "failed: 0", then the test suite executed successfully 
+
+    #Check if the command executed successfully
     if expectedResult in actualresult.upper() and output:
-        passStringList = ["Failures: 0", "Errors: 0"]
-        passString = "failed: 0"
+        #Check the output string returned from 'mediapipelinetests' to verify if the test suite executed successfully 
+        executionStatus = checkMediaPipelineTestStatus (output)
         
-        if ((all (token in output for token in passStringList)) or (passString in output)):
+        if expectedResult in executionStatus:
             tdkTestObj.setResultStatus("SUCCESS")
             print "Multiple play,pause operations on HLS stream was successfull"
             print "Mediapipeline test executed successfully"

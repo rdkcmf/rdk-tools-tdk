@@ -73,11 +73,11 @@ timeout - a string to specify the time in seconds for which the videoplayback sh
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
 3.Retrieve the video_src_url_vp9 variable from MediaValidationVariables library
 4.Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value and timeout
-5.Execute the command in DUT
-6.Verify the output from the execute command and check if the  "Failures: 0" and "Errors: 0" string exists
+5.Execute the command in DUT. During the execution, the DUT will playback av for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds then application exits by closing the pipeline
+6.Verify the output from the execute command and check if the strings "Failures: 0" and "Errors: 0", or "failed: 0" exists in the returned output
 7.Based on the ExecuteCommand() return value and the output returned from the mediapipelinetests application, TM return SUCCESS/FAILURE status.</automation_approch>
     <expected_output>Checkpoint 1. Verify the API call is success
-Checkpoint 2. Verify that the output returned from mediapipelinetests contains the strings "Failures: 0" and "Errors: 0"</expected_output>
+Checkpoint 2. Verify that the output returned from mediapipelinetests contains the strings "Failures: 0" and "Errors: 0", or "failed: 0"</expected_output>
     <priority>High</priority>
     <test_stub_interface>libsystemutilstub.so.0</test_stub_interface>
     <test_script>FCS_Playback_VP9</test_script>
@@ -91,7 +91,7 @@ Checkpoint 2. Verify that the output returned from mediapipelinetests contains t
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
 import MediaValidationVariables
-from rdkv_performancelib import *
+from FireboltComplianceUtility import *
 
 #Test component to be tested
 fcObj = tdklib.TDKScriptingLibrary("firebolt_compliance","1")
@@ -107,46 +107,6 @@ sysUtilObj.configureTestCase(ip,port,'FCS_Playback_VP9')
 #Set device configurations to default values
 checkAVStatus = "no"
 timeoutInSeconds = "10"
-#Method to retrieve the device configuration from device config file
-def getDeviceConfigValue (configKey):
-    try:
-        result = "SUCCESS"
-        configValue = ""
-
-        #Retrieve the device details(device name) and device type from tdk library
-        deviceDetails = sysUtilObj.getDeviceDetails()
-        deviceType = sysUtilObj.getDeviceBoxType()
-
-        #Construct the tdkvRDKServiceConfig path in TM
-        configPath = sysUtilObj.realpath+ "/" + "fileStore/tdkvRDKServiceConfig"
-
-        #Construct the device configuration file path
-        #The device configuration file can be either <device-name>.config or <box-type>.config, so we are checking for both
-        deviceNameConfigFile = configPath + "/" + deviceDetails["devicename"] + ".config"
-        deviceTypeConfigFile = configPath + "/" + deviceType + ".config"
-
-        # Check whether device / platform config files are present
-        if os.path.exists (deviceNameConfigFile) == True:
-            deviceConfigFile = deviceNameConfigFile
-        elif os.path.exists (deviceTypeConfigFile) == True:
-            deviceConfigFile = deviceTypeConfigFile
-        else:
-            print "FAILURE : No Device config file found : " + deviceNameConfigFile + " or " + deviceTypeConfigFile
-            result = "FAILURE"
-
-        #Continue only if the device config file exists 
-        if (len (deviceConfigFile) != 0):
-            configParser = ConfigParser.ConfigParser()
-            configParser.read(r'%s' % deviceConfigFile)
-            #Retrieve the value of config key from device config file
-            configValue = configParser.get('device.config', configKey)
-        else:
-            print "DeviceConfig file not available"
-            result = "FAILURE"
-    except Exception as e:
-        print "Exception occurred while retrieving device configuration  : " + e
-        result = "FAILURE"
-    return result, configValue
 
 #Load the systemutil library
 sysutilloadModuleStatus =sysUtilObj.getLoadModuleResult()
@@ -166,21 +126,22 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     test_url = MediaValidationVariables.video_src_url_vp9
 
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS' that specifies whether SOC level playback verification check should be done or not 
-    actualresult, check_av_status_flag = getDeviceConfigValue('FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
+    actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
     if expectedResult in actualresult.upper() and check_av_status_flag == "yes":
         print "Video playback status check is added"
-        check_av_status = check_av_status_flag
+        checkAVStatus = check_av_status_flag
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT' that specifies the video playback timeout in seconds 
-    actualresult, timeout = getDeviceConfigValue('FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT')
+    actualresult, timeoutConfigValue = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT')
         
     #If the value of FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT is retrieved correctly and its value is not empty, timeout value should be passed to the test application
     #if the device config value is empty, default timeout(10sec) is passed
-    if expectedResult in actualresult.upper() and timeout != "":
-        timeoutInSeconds = timeout
+    if expectedResult in actualresult.upper() and timeoutConfigValue != "":
+        timeoutInSeconds = timeoutConfigValue
 
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
-    command = "mediapipelinetests " + test_name + " " + test_url + " checkavstatus=" + check_av_status_flag + " timeout=" + timeoutInSeconds
+    #Sample command = "mediapipelinetests test_generic_playback <VP9_STREAM_URL> checkavstatus=yes timeout=20"
+    command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, timeout = timeoutInSeconds) 
     print "Executing command in DUT: ", command
     
     tdkTestObj.addParameter("command", command)
@@ -189,12 +150,12 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     output = tdkTestObj.getResultDetails()
     print "OUTPUT: ", output
 
-    #If the output string returned from 'mediapipelinetests' contains "Failures: 0" and "Errors: 0", then the test suite executed successfully 
+    #Check if the command executed successfully
     if expectedResult in actualresult.upper() and output:
-        passStringList = ["Failures: 0", "Errors: 0"]
-        passString = "failed: 0"
+        #Check the output string returned from 'mediapipelinetests' to verify if the test suite executed successfully 
+        executionStatus = checkMediaPipelineTestStatus (output)
         
-        if ((all (token in output for token in passStringList)) or (passString in output)):
+        if expectedResult in executionStatus:
             tdkTestObj.setResultStatus("SUCCESS")
             print "VP9 Playback using 'playbin' and 'westeros-sink' was successfull"
             print "Mediapipeline test executed successfully"

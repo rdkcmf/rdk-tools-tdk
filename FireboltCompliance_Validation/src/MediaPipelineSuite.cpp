@@ -39,6 +39,7 @@ using namespace std;
 #define BUFFER_SIZE_LONG		1024
 #define BUFFER_SIZE_SHORT		264
 #define NORMAL_PLAYBACK_RATE		1.0
+#define FCS_MICROSECONDS		1000000
 
 
 char tcname[BUFFER_SIZE_SHORT] = {'\0'};
@@ -71,6 +72,22 @@ typedef enum {
   FASTFORWARD4x_RATE    = 4,
   FASTFORWARD16x_RATE  	= 16
 } PlaybackRates;
+
+
+/* 
+ * Structure to pass arguments to/from the message handling method
+ */
+typedef struct CustomData {
+    GstElement *playbin;  		/* Playbin element handle */
+    GstState cur_state;         	/* Variable to store the current state of pipeline */
+    gint64 seekPosition;		/* Variable to store the position to be seeked */
+    gint64 currentPosition; 		/* Variable to store the current position of pipeline */
+    gboolean terminate;    		/* Variable to indicate whether execution should be terminated in case of an error */
+    gboolean seeked;    		/* Variable to indicate if seek to requested position is completed */
+    gboolean eosDetected;		/* Variable to indicate if EOS is detected */
+} MessageHandlerData;
+
+
 /*
  * Methods
  */
@@ -147,6 +164,55 @@ static void firstFrameCallback(GstElement *sink, guint size, void *context, gpoi
     * Set the Value to global variable once the first frame signal is received
     */
    *gotFirstFrameSignal = true;
+}
+
+
+/********************************************************************************************************************
+Purpose:               Method to handle the different messages from gstreamer bus
+Parameters:
+message [IN]          - GstMessage* handle to the message recieved from bus
+data [OUT]	      - MessageHandlerData* handle to the custom structure to pass arguments between calling function
+Return:               - None
+*********************************************************************************************************************/
+static void handleMessage (MessageHandlerData *data, GstMessage *message) 
+{
+    GError *err;
+    gchar *debug_info;
+
+    switch (GST_MESSAGE_TYPE (message)) 
+    {
+        case GST_MESSAGE_ERROR:
+            gst_message_parse_error (message, &err, &debug_info);
+            printf ("Error received from element %s: %s\n", GST_OBJECT_NAME (message->src), err->message);
+            printf ("Debugging information: %s\n", debug_info ? debug_info : "none");
+            g_clear_error (&err);
+            g_free (debug_info);
+            data->terminate = TRUE;
+            break;
+        case GST_MESSAGE_EOS:
+            printf ("End-Of-Stream reached.\n");
+            data->eosDetected = TRUE;
+            data->terminate = TRUE;
+            break;
+        case GST_MESSAGE_STATE_CHANGED:
+            /*
+             * In case of seek event, state change of various gst elements occur asynchronously
+	     * We can check if the seek event happened in between by qerying the current position
+             * If the current position is not updated, we will wait until bus is clear or error/eos occurs
+             */
+            fail_unless (gst_element_query_position (data->playbin, GST_FORMAT_TIME, &(data->currentPosition)), 
+                                                     "Failed to querry the current playback position");
+            if (data->currentPosition == data->seekPosition)
+            {
+                data->seeked = TRUE;
+            }
+            break;
+        default:
+            printf ("Unexpected message received.\n");
+            data->terminate = TRUE;
+            break;
+    }
+    gst_message_unref (message);
 }
 
 
@@ -238,34 +304,81 @@ static gdouble getRate (GstElement* playbin)
 Purpose:               To seek to a particular position in pipeline
 Parameters:
 playbin [IN]          - GstElement* 'playbin' for which the seek should be done
-rate [IN]             - gint value for the playback rate to be set
+seekSeconds [IN]      - double value for the position to seek to
 Return:               - None
 *********************************************************************************************************************/
-static void seek (GstElement* playbin, int seekSeconds)
+static void seek (GstElement* playbin, double seekSeconds)
 {
     gint64 seekPosition = GST_SECOND * seekSeconds;
     gint64 currentPosition = GST_CLOCK_TIME_NONE;
+    GstMessage *message;
+    GstBus *bus;
+    MessageHandlerData data;
     /*
      * Set the playback position to the seekSeconds position
      */
-    fail_unless (gst_element_seek(playbin, NORMAL_PLAYBACK_RATE, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
-                        GST_SEEK_TYPE_SET, seekPosition, GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE), 
-                        "Failed to seek");
+    fail_unless (gst_element_seek (playbin, NORMAL_PLAYBACK_RATE, GST_FORMAT_TIME, 
+                                   GST_SEEK_FLAG_FLUSH, GST_SEEK_TYPE_SET, seekPosition, 
+                                   GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE), "Failed to seek");
+
     /*
-     * Wait for 2 seconds for the seek operation to happen before retrieving the current position
+     * During seek, the state of various gstreamer elements changes,
+     * so we are polling the bus to wait till the bus is clear of state change events 
+     * before verifying the success of seek operation. We are exiting the loop if the position change happens in between
+     * or if an error/eos is recieved
      */
-    sleep (2);
+    bus = gst_element_get_bus (playbin);
+    /*
+     * Set all the required variables before polling for the message
+     */
+    data.terminate = FALSE;
+    data.seeked = FALSE;
+    data.playbin = playbin;
+    data.seekPosition = seekPosition;
+    data.currentPosition = GST_CLOCK_TIME_NONE;
+
+    do 
+    {
+	/*
+	 * TODO Shall try with gst_bus_pop_filtered()
+	 */
+        message = gst_bus_timed_pop_filtered (bus, 2 * GST_SECOND, 
+                                             (GstMessageType) ((GstMessageType) GST_MESSAGE_STATE_CHANGED | 
+                                             (GstMessageType) GST_MESSAGE_ERROR | (GstMessageType) GST_MESSAGE_EOS));
+
+        /* 
+         * Parse message 
+         */
+        if (NULL != message) 
+        {
+            handleMessage (&data, message);
+        } 
+        else 
+        {
+            printf ("All messages are clear. No more message after seek\n");
+            break;
+        }
+    } while (!data.terminate && !data.seeked);
+    
+    /*
+     * Verify that ERROR/EOS messages are not recieved
+     */
+    fail_unless (FALSE == data.terminate, "Unexpected error or End of Stream recieved\n");
     /*
      * Get the current playback position
      */
     fail_unless (gst_element_query_position (playbin, GST_FORMAT_TIME, &currentPosition), "Failed to querry the current playback position");
+    printf ("Current position : %lld\nSeek position : %lld\n", currentPosition, seekPosition);
+    
     /*
      * Check if current position is greater than the seeked position
      */ 
-    fail_unless (currentPosition > seekPosition, "Failed to seek to the requested position");
+    fail_unless ((currentPosition >= seekPosition) && ((currentPosition - seekPosition) < (2 * GST_SECOND)), "Failed to seek to the requested position");
 
     printf ("Seeked successfully to %lld\n", seekPosition);
     GST_LOG ("Seeked successfully to %lld\n", seekPosition);
+    
+    gst_object_unref (bus);
 }
 
 /********************************************************************************************************************
@@ -314,10 +427,10 @@ Purpose:               To perform fastforward/rewind operation on playbin
 Parameters:
 playbin [IN]          - GstElement* 'playbin' for which the fastforward/rewind operation should be done
 rate [IN]             - gdouble value for the playback rate to be set 
-timeout [IN]          - int time in seconds for which the fastforward/rewind operation should be performed
+timeout [IN]          - double time in seconds for which the fastforward/rewind operation should be performed
 Return:               - None
 *********************************************************************************************************************/
-static void trickplayOperation (GstElement* playbin, gdouble rate, int timeout)
+static void trickplayOperation (GstElement* playbin, gdouble rate, double timeout)
 {
     gdouble currentRate = 0.0;
     bool is_av_playing = false;
@@ -355,7 +468,7 @@ static void trickplayOperation (GstElement* playbin, gdouble rate, int timeout)
             /*
              * Seek to the required position
              */
-            printf ("There is not enough duration for rewinding the pipeline, so seeking to %d before rewind\n", 
+            printf ("There is not enough duration for rewinding the pipeline, so seeking to %f before rewind\n", 
             	    ((int)abs (rate) * timeout));
             seek (playbin, ((int)abs (rate) * timeout));
         }
@@ -367,7 +480,7 @@ static void trickplayOperation (GstElement* playbin, gdouble rate, int timeout)
     /*
      * Sleep for the requested time
      */
-    sleep (timeout);
+    usleep (timeout * FCS_MICROSECONDS);
     /*
      * Retrieve the current playback rate of pipeline and verify that its same as rate
      */
@@ -387,10 +500,58 @@ static void trickplayOperation (GstElement* playbin, gdouble rate, int timeout)
         printf ("DETAILS: SUCCESS, Video playing successfully \n");
     }
 
-    printf ("Successfully executed %s %dx speed for %d seconds\n", (rate > 0)?"fastforward":"rewind", (int)abs (rate), timeout); 
+    printf ("Successfully executed %s %dx speed for %f seconds\n", (rate > 0)?"fastforward":"rewind", (int)abs (rate), timeout); 
 
 }
 
+/********************************************************************************************************************
+ * Purpose     	: Test to do basic initialisation and shutdown of gst pipeline with playbin element and westeros-sink
+ * Parameters   : Playback url
+ ********************************************************************************************************************/
+GST_START_TEST (test_init_shutdown)
+{
+    GstElement *playbin;
+    GstElement *westerosSink;
+    gint flags;
+
+    /*
+     * Create the playbin element
+     */
+    playbin = gst_element_factory_make(PLAYBIN_ELEMENT, NULL);
+    fail_unless (playbin != NULL, "Failed to create 'playbin' element");
+    /*
+     * Set the url received from argument as the 'uri' for playbin
+     */
+    fail_unless (m_play_url != NULL, "Playback url should not be NULL"); 
+    g_object_set (playbin, "uri", m_play_url, NULL);
+    /*
+     * Update the current playbin flags to enable Video and Audio Playback
+     */
+    g_object_get (playbin, "flags", &flags, NULL);
+    flags |= GST_PLAY_FLAG_VIDEO | GST_PLAY_FLAG_AUDIO;
+    g_object_set (playbin, "flags", flags, NULL);
+
+    /*
+     * Set westros-sink
+     */
+    westerosSink = gst_element_factory_make(WESTEROS_SINK, NULL);
+    fail_unless (westerosSink != NULL, "Failed to create 'westerossink' element");
+
+    /*
+     * Link the westeros-sink to playbin
+     */
+    g_object_set (playbin, "video-sink", westerosSink, NULL);
+
+    if (playbin)
+    {
+       gst_element_set_state (playbin, GST_STATE_NULL);
+    }
+    /*
+     * Cleanup after use
+     */
+    gst_object_unref (playbin);
+}
+GST_END_TEST;
 
 /********************************************************************************************************************
  * Purpose     	: Test to do generic playback using playbin element and westeros-sink
@@ -698,13 +859,12 @@ GST_START_TEST (test_trickplay)
     vector<string>::iterator operationItr;
     char* operationBuffer = NULL;
     string operation;
-    int operationTimeout = 10;
+    double operationTimeout = 10.0;
     int seekSeconds = 0;
     gint flags;
     GstState cur_state;
     GstElement *playbin;
     GstElement *westerosSink;
-    //gint64 currentPosition = GST_CLOCK_TIME_NONE;
 
     /*
      * Create the playbin element
@@ -782,7 +942,7 @@ GST_START_TEST (test_trickplay)
 	 */   
         operationBuffer = strdup ((*operationItr).c_str());
         operation = strtok (operationBuffer, ":");
-	operationTimeout = atoi (strtok (NULL, ":"));
+	operationTimeout = atof (strtok (NULL, ":"));
 
 	if (!operation.empty())
 	{
@@ -871,15 +1031,15 @@ GST_START_TEST (test_trickplay)
 	    		/*
 	    		 * Sleep for the requested time
 	    		 */
-	    		sleep (operationTimeout);
+	    		usleep (operationTimeout * FCS_MICROSECONDS);
 		    }
 		    /*
 		     * If playback is already happening wait for the requested time
 		     */
 		    else
 	 	    {
-                        printf ("Playbin is already playing, so waiting for %d seconds\n", operationTimeout);
-			sleep (operationTimeout);
+                        printf ("Playbin is already playing, so waiting for %f seconds\n", operationTimeout);
+			usleep (operationTimeout * FCS_MICROSECONDS);
 		    }
 		    /*
                      * Ensure that playback is happening properly
@@ -907,7 +1067,7 @@ GST_START_TEST (test_trickplay)
 	    	    /*
 	    	     * Sleep for the requested time
 	    	     */
-	    	    sleep (operationTimeout);
+	    	    usleep (operationTimeout * FCS_MICROSECONDS);
 		}
 	        /*
                  * If the operation is to do seek in the pipeline
@@ -924,10 +1084,9 @@ GST_START_TEST (test_trickplay)
 		     */
 	    	    seek (playbin, seekSeconds);		    
                     /*
-                     * Sleep for the (requested time - 2) seconds, since we are waiting 2 seconds to retrieve
-		     * current position for verification
+                     * Sleep for the requested time seconds
                      */
-                    sleep (operationTimeout - 2);
+                    usleep (operationTimeout * FCS_MICROSECONDS);
 		    /*
                      * Ensure that playback is happening properly
                      */
@@ -978,6 +1137,7 @@ media_pipeline_suite (void)
     suite_add_tcase (gstPluginsSuite, tc_chain);
 
     GST_INFO ("Test Case name is %s\n", tcname);
+    printf ("Test Case name is %s\n", tcname);
     
     if (strcmp ("test_generic_playback", tcname) == 0)
     {
@@ -1000,6 +1160,12 @@ media_pipeline_suite (void)
     else if (strcmp ("test_trickplay", tcname) == 0)
     {
        tcase_add_test (tc_chain, test_trickplay);
+       GST_INFO ("tc %s run successfull\n", tcname);
+       GST_INFO ("SUCCESS\n");
+    }
+    else if (strcmp ("test_init_shutdown", tcname) == 0)
+    {
+       tcase_add_test (tc_chain, test_init_shutdown);
        GST_INFO ("tc %s run successfull\n", tcname);
        GST_INFO ("SUCCESS\n");
     }
@@ -1026,18 +1192,22 @@ int main (int argc, char **argv)
     else
     {
     	GST_ERROR ("Environment variable TDK_PATH should be set!!!!");
+    	printf ("Environment variable TDK_PATH should be set!!!!");
 	returnValue = 0;
 	goto exit;
     }
     if (argc == 2)
     {
     	strcpy (tcname, argv[1]);
+
     	GST_INFO ("\nArg 2: TestCase Name: %s \n", tcname);
+    	printf ("\nArg 2: TestCase Name: %s \n", tcname);
     }
     else if (argc >= 3)
     {
         strcpy (tcname, argv[1]);
-	if ((strcmp ("test_play_pause_pipeline", tcname) == 0) || 
+	if ((strcmp ("test_init_shutdown", tcname) == 0) || 
+	    (strcmp ("test_play_pause_pipeline", tcname) == 0) || 
             (strcmp ("test_generic_playback", tcname) == 0) ||
             (strcmp ("test_EOS", tcname) == 0) ||
             (strcmp("test_trickplay", tcname) == 0))
@@ -1074,20 +1244,18 @@ int main (int argc, char **argv)
 	}
 
 
-        GST_INFO ("\nArg : TestCase Name: %s \n", tcname);
-        GST_INFO ("\nArg : Playback url: %s \n", m_play_url);
+        printf ("\nArg : TestCase Name: %s \n", tcname);
+        printf ("\nArg : Playback url: %s \n", m_play_url);
     }
     else
     {
-        GST_ERROR ("FALIURE : Insufficient arguments\n");
+        printf ("FALIURE : Insufficient arguments\n");
         returnValue = 0;
 	goto exit;
     }
     gst_check_init (&argc, &argv);
     testSuite = media_pipeline_suite ();
-
     returnValue =  gst_check_run_suite (testSuite, "playbin_plugin_test", __FILE__);
-
 exit:
     return returnValue;
-}    
+}

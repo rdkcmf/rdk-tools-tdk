@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>18</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>FCS_Playback_Rewind_2x_HLS</name>
+  <name>FCS_Playback_Same_Asset_Twice_DASH</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test to do rewind of a HLS stream with playback rate -2</synopsis>
+  <synopsis>Test to verify that the pipeline can initialise and shutdown correctly without doing av playback</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>3</execution_time>
+  <execution_time>5</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -60,33 +60,35 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>FCS_PLAYBACK_17</test_case_id>
-    <test_objective>Test to do rewind of a HLS stream with playback rate -2</test_objective>
+    <test_case_id>FCS_PLAYBACK_52</test_case_id>
+    <test_objective>Test to verify that the pipeline can initialise and shutdown correctly without doing av playback</test_objective>
     <test_type>Positive</test_type>
     <test_setup>Video Accelerator, RPI</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
-2. Test stream url for a HLS stream should be updated in the config variable video_src_url_hls inside MediaValidationVariables.py library inside filestore
+2. Test stream url for an DASH stream should be updated in the config variable video_src_url_dash inside MediaValidationVariables.py library inside filestore(We are initialising the pipeline and setting the url, but won't do playback)
 3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file
-4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time in seconds for which the rewind operation should be carried out</pre_requisite>
+4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time to wait before checking for AV playback</pre_requisite>
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
-    <input_parameters>testcasename - "test_trickplay"
-test_url - HLS url from MediaValidationVariables library (MediaValidationVariables.video_src_url_hls)
+    <input_parameters>testcasename - "test_generic_playback"
+test_url - dash url from MediaValidationVariables library (MediaValidationVariables.video_src_url_dash)
 "checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
-operations=rewind2x:&lt;timeout&gt; - a ":" seperated string to specify the rewind operation to be executed and the time in seconds for which the operation should be continued. The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
+timeout - a string to specify the time in seconds for which the videoplayback should be done . This argument is the value of device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
     <automation_approch>1.Load the systemuitl module 
-2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
-3.Retrieve the video_src_url_hls variable from MediaValidationVariables library
-4. Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value, operation and timeout
-5.Execute the command in DUT. During the execution, the DUT will playback av for 2*FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT+30 seconds so that there is enough duration for rewind, then do a rewind operation with playback rate -2 and then continue playback  at rate -2 for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds. Then application exits by closing the pipeline
-6.Verify the output from the execute command and check if the  "Failures: 0" and "Errors: 0" string exists or "failed: 0" string exists in the returned output
-7.Based on the ExecuteCommand() return value and the output returned from the mediapipelinetests application, TM return SUCCESS/FAILURE status.</automation_approch>
+2.Retrieve the video_src_url_dash variable from MediaValidationVariables library
+3.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
+4.Construct the mediapipelinetests command based on the retrieved video url, testcasename("test_generic_playback"), value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS flag and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT timeout value
+5.Execute the command in DUT. During the execution, the DUT will playback the stream for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds and then the application exits by closing the pipeline
+6.Verify the output from the execute command and check if the strings "Failures: 0" and "Errors: 0", or "failed: 0" exists in the returned output
+7.Execute the command in DUT again. During the execution, the DUT will playback the stream for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds and then the application exits by closing the pipeline
+8.Verify the output from the execute command and check if the strings "Failures: 0" and "Errors: 0", or "failed: 0" exists in the returned output
+9.Based on the ExecuteCommand() return values and the outputs returned from the mediapipelinetests application, TM return SUCCESS/FAILURE status.</automation_approch>
     <expected_output>Checkpoint 1. Verify the API call is success
-Checkpoint 2. Verify that the output returned from mediapipelinetests contains the strings "Failures: 0" and "Errors: 0" or it contains the string "failed: 0"</expected_output>
+Checkpoint 2. Verify that the outputs returned from mediapipelinetests during both command executions, contains the strings "Failures: 0" and "Errors: 0", or "failed: 0"</expected_output>
     <priority>High</priority>
     <test_stub_interface>libsystemutilstub.so.0</test_stub_interface>
-    <test_script>FCS_Playback_Rewind_2x_HLS</test_script>
+    <test_script>FCS_Playback_Same_Asset_Twice_DASH</test_script>
     <skipped>No</skipped>
-    <release_version>M90</release_version>
+    <release_version>M91</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -106,7 +108,7 @@ sysUtilObj = tdklib.TDKScriptingLibrary("systemutil","1")
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-sysUtilObj.configureTestCase(ip,port,'FCS_Playback_Rewind_2x_HLS');
+sysUtilObj.configureTestCase(ip,port,'FCS_Playback_Same_Asset_Twice_DASH')
 
 #Set device configurations to default values
 checkAVStatus = "no"
@@ -116,6 +118,7 @@ timeoutInSeconds = "10"
 sysutilloadModuleStatus =sysUtilObj.getLoadModuleResult()
 print "[System Util LIB LOAD STATUS]  :  %s" %sysutilloadModuleStatus
 sysUtilObj.setLoadModuleStatus(sysutilloadModuleStatus)
+
 if "SUCCESS" in sysutilloadModuleStatus.upper():
     expectedResult="SUCCESS"
     
@@ -123,9 +126,11 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     tdkTestObj = sysUtilObj.createTestStep('ExecuteCommand')
     
     #The test name specifies the test case to be executed from the mediapipeline test suite
-    test_name = "test_trickplay"
+    test_name = "test_generic_playback"
+
     #Test url for the stream to be played is retrieved from MediaValidationVariables library
-    test_url = MediaValidationVariables.video_src_url_hls
+    test_url = MediaValidationVariables.video_src_url_dash
+
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS' that specifies whether SOC level playback verification check should be done or not 
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
@@ -139,16 +144,10 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #if the device config value is empty, default timeout(10sec) is passed
     if expectedResult in actualresult.upper() and timeoutConfigValue != "":
         timeoutInSeconds = timeoutConfigValue
-    #Construct the trickplay operation string
-    #The operations specifies the operation(fastforward/rewind/seek/play/pause) to be executed from the mediapipeline trickplay test
-    # There should be enough duration available for rewind operation to perform correctly, so playing the stream for 2 * timeoutInSeconds + 30(buffer) duration. Ensure that the straem being tested is having adequate duration
-    # Sample operations strings is "operations=play:70,rewind2x:20"
-    playduration = (2 * int (timeoutInSeconds)) + 30
-    setOperations ("play", str (playduration))
-    setOperations ("rewind2x", timeoutInSeconds)
+
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
-    #Sample command = "mediapipelinetests test_trickplay <HLS_STREAM_URL> checkavstatus=yes operations=play:70,rewind2x:20"
-    command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, operations = getOperations ()) 
+    #Sample command = "mediapipelinetests test_generic_playback <DASH_STREAM_URL> checkavstatus=yes timeout=20"
+    command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, timeout = timeoutInSeconds)
     print "Executing command in DUT: ", command
     
     tdkTestObj.addParameter("command", command)
@@ -164,15 +163,47 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
         
         if expectedResult in executionStatus:
             tdkTestObj.setResultStatus("SUCCESS")
-            print "Rewind on HLS stream with 2x speed was successfull"
-            print "Mediapipeline test executed successfully"
+            print "DASH Playback using 'playbin' and 'westeros-sink' was successfull in first attempt"
+
+            #Now try to check if playback is happening properly for the same asset for second time
+            print "Trying to verify the playback second time"
+            #Construct the command with the url and execute the command in DUT
+            tdkTestObj = sysUtilObj.createTestStep('ExecuteCommand')
+            
+            #Execute the same command with same parameters for the second time 
+            print "Executing command in DUT: ", command
+            
+            tdkTestObj.addParameter("command", command)
+            tdkTestObj.executeTestCase(expectedResult)
+            actualresult = tdkTestObj.getResult()
+            output = tdkTestObj.getResultDetails()
+            print "OUTPUT: ", output
+
+            #Check if the command executed successfully
+            if expectedResult in actualresult.upper() and output:
+                #Check the output string returned from 'mediapipelinetests' to verify if the test suite executed successfully 
+                executionStatus = checkMediaPipelineTestStatus (output)
+                
+                if expectedResult in executionStatus:
+                    tdkTestObj.setResultStatus("SUCCESS")
+                    print "DASH Playback using 'playbin' and 'westeros-sink' was successfull in second attempt"
+                    print "Second Mediapipeline test executed successfully"
+                else:
+                    tdkTestObj.setResultStatus("FAILURE")
+                    print "DASH Playback using 'playbin' and 'westeros-sink' failed during second attempt"
+            else:
+                tdkTestObj.setResultStatus("FAILURE")
+                print "Second Mediapipeline test execution failed"
+
         else:
             tdkTestObj.setResultStatus("FAILURE")
-            print "Rewind on HLS stream with 2x speed failed"
+            print "DASH Playback using 'playbin' and 'westeros-sink' failed in first attempt"
     else:
         tdkTestObj.setResultStatus("FAILURE")
-        print "Mediapipeline test execution failed"
+        print "First Mediapipeline test execution failed"
+
     #Unload the modules
     sysUtilObj.unloadModule("systemutil")
+
 else:
     print "Module load failed"
