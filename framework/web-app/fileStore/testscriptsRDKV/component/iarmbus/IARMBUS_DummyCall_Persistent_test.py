@@ -95,16 +95,20 @@ import tdklib;
 import time;
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("iarmbus","1.3");
+sysUtilObj = tdklib.TDKScriptingLibrary("systemutil","1");
 #Ip address of the selected STB for testing
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'Dummy');
+sysUtilObj.configureTestCase(ip,port,'Dummy');
+sysUtilLoadStatus = sysUtilObj.getLoadModuleResult();
 loadmodulestatus =obj.getLoadModuleResult();
 print "Iarmbus module loading status :  %s" %loadmodulestatus ;
-if "SUCCESS" in loadmodulestatus.upper():
+print "System module loading status : %s" %sysUtilLoadStatus;
+if "SUCCESS" in loadmodulestatus.upper() and "SUCCESS" in sysUtilLoadStatus.upper():
         #Set the module loading status
         obj.setLoadModuleStatus("SUCCESS");
-
+        sysUtilObj.setLoadModuleStatus("SUCCESS");
         #calling IARM_Bus_Init API
         tdkTestObj = obj.createTestStep('IARMBUS_Init');
         expectedresult="SUCCESS"
@@ -128,14 +132,15 @@ if "SUCCESS" in loadmodulestatus.upper():
                         i=0
                         for i in range(0,100):
                                 print "**************** Iteration ", (i+1), " ****************";
-                                tdkTestObj = obj.createTestStep('IARMBUS_InvokeSecondApplication');
-                                tdkTestObj.addParameter("appname","DUMMYMgr");
-                                tdkTestObj.addParameter("argv1","");
-                                tdkTestObj.addParameter("apptype","background");
-                                expectedresult="SUCCESS"
+                                tdkTestObj = sysUtilObj.createTestStep('SystemUtilAgent_ExecuteBinary');
+                                tdkTestObj.addParameter("shell_script", "RunAppInBackground.sh");
+                                tdkTestObj.addParameter("log_file", "BackgroundApp.txt");
+                                #App name to be executed
+                                tdkTestObj.addParameter("tool_path", "DUMMYMgr");
+                                tdkTestObj.addParameter("timeout", "15");
+                                #Execute the test case in STB
                                 tdkTestObj.executeTestCase(expectedresult);
                                 actualresult = tdkTestObj.getResult();
-                                #details=tdkTestObj.getResultDetails();
                                 #Check for SUCCESS/FAILURE return value
                                 if expectedresult in actualresult:
                                         tdkTestObj.setResultStatus("SUCCESS");
@@ -266,7 +271,9 @@ if "SUCCESS" in loadmodulestatus.upper():
         print "[TEST EXECUTION RESULT] : %s" %actualresult;
         #Unload the iarmbus module
         obj.unloadModule("iarmbus");
+        sysUtilObj.unloadModule("systemutil");
 else:
         print"Load module failed";
         #Set the module loading status
         obj.setLoadModuleStatus("FAILURE");
+        sysUtilObj.setLoadModuleStatus("FAILURE");
