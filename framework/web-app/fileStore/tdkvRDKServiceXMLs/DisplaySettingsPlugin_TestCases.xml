@@ -2309,5 +2309,67 @@
                 </resultGeneration>
             </testStep>
         </testCase>
+        <testCase testCaseId="DS_86" testCaseName= "Set_And_Get_Volume_Leveller2_Modes_HDMI0" desc="Check whether able to enables or disables volume leveling for HDMI0 port" >
+            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="VolumeLevellerModes,HDMI0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Volume_Leveller2_Modes" method="Get_Volume_Leveller2" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0"  />
+                  </params>
+              <resultGeneration useMethodTag="check_volume_leveller" arguments = "check_volume_leveller_mode"/>
+            </testStep>
+            <testStep testStepId="3" name="Set_Volume_Leveller2_Modes" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Volume_Leveller2_Modes" method="Set_Volume_Leveller2" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="HDMI0"  />
+                    <param tag="mode" value="0,1,2" iteration="true" revertParam="yes" />
+                    <param tag="level" value="10" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Volume_Leveller2_Modes" method="Get_Volume_Leveller2" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0"  />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments = "check_volume_leveller_mode" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_87" testCaseName= "Set_And_Get_Surround_Virtualizer_Modes_HDMI0" desc="Check whether able to enables or disables modes for HDMI0 port" >
+            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="SurroundVirtualizerModes,HDMI0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"  expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Surround_Virtualizer_Modes" method="Get_Surround_Virtualizer2" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                  </params>
+              <resultGeneration useMethodTag="check_surround_virtualizer" arguments="check_surround_virtualizer_mode" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Surround_Virtualizer_Modes" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Surround_Virtualizer_Modes" method="Set_Surround_Virtualizer2" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                    <param tag="mode" value="0,1,2" iteration="true" revertParam="yes" />
+                    <param tag="boost" value="2" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Surround_Virtualizer_Modes" method="Get_Surround_Virtualizer2" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_surround_virtualizer" arguments="check_surround_virtualizer_mode" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
 </testPlugin>  
 

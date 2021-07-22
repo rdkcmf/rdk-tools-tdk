@@ -670,7 +670,28 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
+        elif tag == "system_check_telemetry_optout_status":
+            success = str(result.get("success")).lower() == "true"
+            info["Opt-Out"] = result.get("Opt-Out")
+            if success and str(result.get("Opt-Out")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "system_get_downloaded_firmware_info":
+            currentFWVersion = result.get("currentFWVersion")
+            info["current_FW_version"] = currentFWVersion
+            status = checkNonEmptyResultData(result.get("currentFWVersion"))
+            success = str(result.get("success")).lower() == "true"
+            if len(arg) and arg[0] == "check_image":
+                if success and status == "TRUE" and currentFWVersion in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                if  success and status == "TRUE":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         # User Preferces Plugin Response result parser steps
         elif tag == "userpreferences_get_ui_language":
@@ -823,6 +844,14 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "rdkshell_check_key_repeats_status":
+            success = str(result.get("success")).lower() == "true"
+            info["enable"] = result.get("keyRepeat")
+            if success and str(result.get("keyRepeat")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"        
 
         # DisplayInfo Plugin Response result parser steps
         elif tag == "displayinfo_get_general_info":
@@ -1227,10 +1256,18 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "check_volume_leveller":
             info["level"] = result.get('level');
-            if str(result.get("success")).lower() == "true" and str(result.get('level')) in expectedValues:
-                info["Test_Step_Status"] = "SUCCESS"
+            if len(arg) and arg[0] == "check_volume_leveller_mode":
+                info["mode"] = result.get('mode');
+                print expectedValues
+                if str(result.get("success")).lower() == "true" and str(result.get('mode')) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
-                info["Test_Step_Status"] = "FAILURE"
+                if str(result.get("success")).lower() == "true" and str(result.get('level')) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_bass_enhancer":
             info["bassBoost"] = result.get('bassBoost');
@@ -1249,6 +1286,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             info["boost"] = result.get('boost');
             if len(arg) and arg[0] == "check_surround_virtualizer_range":
                 if 0 <= int(result.get('boost')) <= 96 :
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif len(arg) and arg[0] == "check_surround_virtualizer_mode":
+                info["mode"] = result.get('mode')
+                print  expectedValues
+                if str(result.get("success")).lower() == "true" and str(result.get('mode')) in expectedValues:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
@@ -1634,6 +1678,28 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+        
+        elif tag == "framerate_check_auto_framerate_mode":
+            success = str(result.get("success")).lower() == "true"
+            info["frmmode"] = result.get("auto-frm-mode")
+            if success and str(result.get("auto-frm-mode")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "framerate_check_display_framerate":
+            success = str(result.get("success")).lower() == "true"
+            status = checkNonEmptyResultData(result.get("framerate"))
+            info["framerate"] = result.get("framerate")
+            if success and status == "TRUE":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+            if len(arg) and  arg[0] == "check_framerate_values":
+                if success and str(result.get("framerate")) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
 
         # Warehouse Plugin Response result parser steps
@@ -2207,6 +2273,14 @@ def CheckAndGenerateConditionalExecStatus(testStepResults,methodTag,arguments):
                 else:
                     result = "FALSE"
 
+        elif tag == "system_check_disk_partition":
+            testStepResults = testStepResults[0].values()[0]
+            partition_count = testStepResults[0].get("partition_count")
+            if int(partition_count) < int(arg[0]):
+                result = "TRUE"
+            else:
+                result = "FALSE"
+
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)
             status = "FAILURE"
@@ -2378,6 +2452,16 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["is24Hour"] = False
 
 
+        # FrameRate Plugin Response result parser steps
+        elif tag == "framerate_set_display_framerate":
+            FramerateList = []
+            testStepResults = testStepResults[0].values()[0]
+            test_list = testStepResults[0].get("DisplayFrameRate")
+            for value in test_list:
+                if value not in FramerateList:
+                    FramerateList.append(value)
+            info["framerate"] = FramerateList
+
         # WebkitBrowser Plugin Response result parser steps
         elif tag == "webkitbrowser_toggle_visibility":
             testStepResults = testStepResults[0].values()[0]
@@ -2463,6 +2547,14 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag == "system_get_powerstate_before_reboot":
             testStepResults = testStepResults[0].values()[0]
             info["powerState"] = testStepResults[0].get("powerState")
+
+        elif tag == "system_get_estb_mac":
+            testStepResults = testStepResults[0].values()[0]
+            info["estb_mac"] = testStepResults[0].get("estb_mac")
+
+        elif tag == "system_get_current_image_name":
+            testStepResults = testStepResults[0].values()[0]
+            info["image_name"] = testStepResults[0].get("current_FW_version")
 
         # user Preferences result parser steps
         elif tag == "userpreferences_switch_ui_language":
@@ -2966,7 +3058,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
     # USER CAN ADD N NUMBER OF FUNCTION CALL STEPS BELOW
 
     try:
-        print "---------- Executing Function ------------"
+        print "\n\n---------- Executing Function ------------"
         print "FUNCTION TAG     :", tag
         if tag == "executeBluetoothCtl":
             info["Test_Step_Status"] = executeBluetoothCtl(deviceConfigFile,arg)
@@ -3003,6 +3095,122 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             base64_data = hex_code.decode("hex").encode("base64")
             info["Hex_Data"] = hex_code
             info["message"] = base64_data.strip()
+
+        elif tag == "Check_Version_File":
+            command = '[ -f "/version.txt" ] && echo 1 || echo 0'
+            output = executeCommand(deviceConfigFile, deviceIP, command)
+            output = str(output).split("\n")
+            if int(output[1]) == 1:
+                print "Version.txt File Exists"
+                command = '[ -s "/version.txt" ] && echo 1 ||  echo 0'
+                output = executeCommand(deviceConfigFile, deviceIP, command)
+                output = str(output).split("\n")
+                if int(output[1]) == 1:
+                    print "Version.txt File Is not Empty"
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    print "Version.txt File Is Empty"
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                print "Version.txt File doesn't Exists"
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_include.properties_file":
+            xconfurl = arg[0]
+            print "include.properties file exist,checking whether xconf url is updated"
+            command = 'grep -q '+xconfurl+' /etc/include.properties  && echo 1 || echo 0'
+            output = executeCommand(deviceConfigFile, deviceIP, command)
+            output = str(output).split("\n")
+            if int(output[1]) == 1:
+                print "File is updated with xconf url"
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                print "File is not updated with xconf url,Updating file with xconf url"
+                command = 'sed -i \'s~^CLOUDURL=.*$~CLOUDURL='+xconfurl+'~g\' /etc/include.properties;grep -q '+xconfurl+' /etc/include.properties  && echo 1 || echo 0'
+                output = executeCommand(deviceConfigFile, deviceIP, command)
+                output = str(output).split("\n")
+                if int(output[1]) == 1:
+                    print "Successfully updated file with xconf url"
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    print "File is not updated with xconf url"
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_swupdate_file":
+            xconfurl = arg[0]
+            command = '[ -f "/opt/swupdate.conf" ] && echo 1 || echo 0'
+            output = executeCommand(deviceConfigFile, deviceIP, command)
+            output = str(output).split("\n")
+            if int(output[1]) == 1:
+                print "swupdate.conf file exist,checking whether xconf url is updated"
+                command = 'grep -q '+xconfurl+' /opt/swupdate.conf  && echo 1 || echo 0'
+                output = executeCommand(deviceConfigFile, deviceIP, command)
+                output = str(output).split("\n")
+                if int(output[1]) == 1:
+                    print "File is updated with xconf url"
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    print "File is not updated with xconf url,Updating file with xconf url"
+                    command = 'echo '+xconfurl+' >> /opt/swupdate.conf;grep -q '+xconfurl+' /opt/swupdate.conf  && echo 1 || echo 0'
+                    output = executeCommand(deviceConfigFile, deviceIP, command)
+                    output = str(output).split("\n")
+                    if int(output[1]) == 1:
+                        print "Successfully updated file with xconf url"
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        print "File is not updated with xconf url"
+                        info["Test_Step_Status"] = "FAILURE"
+            else:
+                print "swupdate.conf file does not exist. Creating the file...."
+                command = 'touch /opt/swupdate.conf;[ -f "/opt/swupdate.conf" ] && echo 1 || echo 0'
+                output = executeCommand(deviceConfigFile, deviceIP, command)
+                output = str(output).split("\n")
+                if int(output[1]) == 1:
+                    print "File created"
+                    command = 'echo '+xconfurl+' >> /opt/swupdate.conf;grep -q '+xconfurl+' /opt/swupdate.conf  && echo 1 || echo 0'
+                    output = executeCommand(deviceConfigFile, deviceIP, command)
+                    output = str(output).split("\n")
+                    if int(output[1]) == 1:
+                        print "Successfully updated file with xconf url"
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        print "File is not updated with xconf url"
+                        info["Test_Step_Status"] = "FAILURE"
+
+                else:
+                    print "File doesn't created"
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "Check_disk_partition":
+            command = 'ls /dev/mmcblk0*'
+            output = executeCommand(deviceConfigFile, deviceIP, command)
+            output = output.splitlines()
+            partition_list = output[1].split()
+            partition_count = len(partition_list)-1
+            info["partition_count"] = partition_count
+            if len(arg) and arg[0] == "after_reboot":
+                if str(partition_count) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "Set_xconfServerConfigurations":
+            configParser = ConfigParser.ConfigParser()
+            configParser.read(r'%s' % deviceConfigFile)
+            firmwareDownloadProtocol = configParser.get('device.config', 'FIRMWARE_DOWNLOAD_PROTOCOL')
+            firmwareLocation = configParser.get('device.config', 'FIRMWARE_LOCATION')
+            xconfurl = configParser.get('device.config', 'XCONF_SERVER_URL')
+            if len(arg) and arg[0]=="upgrade_image":
+                firmwareFilename = configParser.get('device.config', 'FIRMWARE_FILENAME')
+            elif len(arg) and arg[0]=="revert_image":
+                firmwareFilename = configParser.get('device.config', 'EXISTING_FIRMWARE_FILENAME')
+            command = 'curl -X PUT -H \'Content-Type: application/json\' -d \'{"eStbMac": "'+arg[1]+'","xconfServerConfig": {"firmwareDownloadProtocol": "'+firmwareDownloadProtocol+'","firmwareFilename": "'+firmwareFilename+'","firmwareVersion": "'+firmwareFilename+'","firmwareLocation": "'+firmwareLocation+'","rebootImmediately": false}}\' '+xconfurl
+            output = executeCommandInTM(command)
+            info["RESULT"] = output
+            if "Successfully added configuration" in output:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "Create_File":
             command = "mkdir "+arguments[0]+"Controller;[ -d "+arguments[0]+"Controller ] && echo 1 || echo 0"
@@ -3069,6 +3277,16 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             else:
                 info["RESULT"] = "File exist"
                 info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "Framerate_Get_Width_And_Height":
+            DisplayFrameRate_values = []
+            for values in range(1,len(arg)):
+                mapping_details = arg[values].split(":")
+                width = mapping_details[1].split('|')[0].strip('[]')
+                height = mapping_details[1].split('|')[1].strip('[]')
+                DisplayFrameRate = width+'x'+height+'x40'
+                DisplayFrameRate_values.append(DisplayFrameRate)
+            info["DisplayFrameRate"] = DisplayFrameRate_values
 
         elif tag == "executeRebootCmd":
             command = "reboot"
@@ -3235,3 +3453,17 @@ def executeCommand(deviceConfigFile, deviceIP, command, device="test-device"):
         print e
     return output
 
+def executeCommandInTM(command):
+    output = ""
+    try:
+        if "" == command:
+            status = "FAILURE"
+            print "[ERROR]: Command to be executed cannot be empty"
+        else:
+            print "Going to execute %s..." %(command)
+            output = subprocess.check_output (command, shell=True)
+    except Exception, e:
+        print e
+        status = "FAILURE"
+        print "Unable to execute %s successfully" %(command)
+    return output

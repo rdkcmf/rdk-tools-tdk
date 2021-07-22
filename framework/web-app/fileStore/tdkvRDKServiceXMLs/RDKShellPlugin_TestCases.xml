@@ -553,6 +553,12 @@
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
+            <testStep testStepId="2" name="Remove_Animation" method="Remove_Animation" delay="3">
+              <params>
+                <param tag="client"  usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_connected_client" arguments="0" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
         </testCase>
 
         <!-- Test case 27 -->
@@ -968,10 +974,30 @@
               </resultGeneration>
             </testStep>
         </testCase>
-
-        <!-- Test case 43 -->
         
-        <testCase testCaseId="RDKShell_43" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
+        <!-- Test case 43 -->
+	<testCase testCaseId="RDKShell_43" testCaseName="Enable_And_Disable_Key_Repeats"  desc="Checks whether able to enable and disable the key repeats">
+            <testCaseInfo testCaseType="loop" revert="true"/>
+            <testStep testStepId="1" name="Get_KeyRepeats_Enabled" method="Get_KeyRepeats_Enabled"  saveResult="true" revertGet="yes">
+              <resultGeneration useMethodTag="rdkshell_check_key_repeats_status" />
+            </testStep>
+            <testStep testStepId="2" name="Enable_And_Disable_Key_Repeats" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Enable_KeyRepeats" method="Enable_KeyRepeats" revertSet="yes">
+                  <params>
+                    <param tag="enable" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="rdkshell_get_result_status" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_KeyRepeats_Enabled" method="Get_KeyRepeats_Enabled" revertFlag="yes" >
+                  <resultGeneration useMethodTag="rdkshell_check_key_repeats_status" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <!-- Test case 44 -->
+        <testCase testCaseId="RDKShell_44" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
@@ -995,9 +1021,9 @@
               <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
             </testStep>
         </testCase> 
-        <!-- Test case 44 -->
-        
-        <testCase testCaseId="RDKShell_44" testCaseName= "RDKShell_System_Resource_Info" desc="Gets the system resource info">
+
+        <!-- Test case 45 -->
+        <testCase testCaseId="RDKShell_45" testCaseName= "RDKShell_System_Resource_Info" desc="Gets the system resource info">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_System_Resource_Info" method="Get_System_Resource_Info" >
               <resultGeneration useMethodTag="rdkshell_check_for_results"/>

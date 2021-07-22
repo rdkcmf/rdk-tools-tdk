@@ -515,4 +515,109 @@
               <resultGeneration useMethodTag="system_check_reboot_reason_event" expectedValues= "API Validation" />
             </testStep>
        </testCase>
+       <testCase testCaseId="SYS_37" testCaseName="Enable_And_Disable_Telemetry_OptOut_Status"  desc="Checks whether able to enable and disable the telemetry opt-out status">
+            <testCaseInfo testCaseType="loop" revert="true"/>
+            <testStep testStepId="1" name="Get_OptOut_Telemetry_Status" method="Get_OptOut_Telemetry_Status"  saveResult="true" revertGet="yes">
+              <resultGeneration useMethodTag="system_check_telemetry_optout_status" />
+            </testStep>
+            <testStep testStepId="2" name="Enable_And_Disable_Telemetry_OptOut_Status" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_OptOut_Telemetry_Status" method="Set_OptOut_Telemetry_Status" revertSet="yes">
+                  <params>
+                    <param tag="Opt-Out" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="system_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_OptOut_Telemetry_Status" method="Get_OptOut_Telemetry_Status" revertFlag="yes" >
+                  <resultGeneration useMethodTag="system_check_telemetry_optout_status" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+       </testCase>
+       <testCase testCaseId="SYS_38" testCaseName= "System_Upgrade_Image" desc="Upgrades to specified firmware version" >
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="XCONF_SERVER_SUPPORT" useMethodTag="system_check_feature_applicability" arguments="yes" />
+            <testStep testStepId="1" name="Check_Version_File" action="externalFnCall" >
+             <resultGeneration useMethodTag="Check_Version_File"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Downloaded_Firmware_Info"  method="Get_Downloaded_Firmware_Info" saveResult="true" >
+             <resultGeneration useMethodTag="system_get_downloaded_firmware_info" />
+            </testStep>
+            <testStep testStepId="3" name="Check_include.properties_File" action="externalFnCall" >
+             <resultGeneration useMethodTag="check_include.properties_file">
+                  <arguments useConfigFile="true" key="XCONF_SERVER_URL" />
+             </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Check_SWupdate_File" action="externalFnCall" >
+             <resultGeneration useMethodTag="check_swupdate_file">
+                  <arguments useConfigFile="true" key="XCONF_SERVER_URL" />
+             </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Get_ESTB_MAC" method="Get_Device_Info" saveResult="true" >
+              <params>
+                  <param tag="params"  useConfigFile="true" key="SYSTEM_DEVICE_PARAMS" />
+              </params>
+             <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+            <testStep testStepId="6" name="Set_xconfServerConfigurations" action="externalFnCall" >
+             <resultGeneration useMethodTag="Set_xconfServerConfigurations" >
+                  <arguments value="upgrade_image" usePreviousResult="true" Id="5" useMethodTag="system_get_estb_mac" />
+             </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Check_disk_partition" action="externalFnCall" saveResult="true" >
+             <resultGeneration useMethodTag="Check_disk_partition" />
+            </testStep>
+            <testStep testStepId="8" name="Update_Firmware"  method="Update_Firmware" rebootStep="yes">
+             <conditionalExecution enable="true" Id="7" useMethodTag="system_check_disk_partition" arguments="4" />
+             <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="9" name="Check_disk_partition" action="externalFnCall" >
+             <conditionalExecution enable="true" Id="7" useMethodTag="system_check_disk_partition" arguments="4"/>
+             <resultGeneration useMethodTag="Check_disk_partition" expectedValues="4" arguments="after_reboot"/>
+            </testStep>
+            <testStep testStepId="10" name="Update_Firmware"  method="Update_Firmware" >
+             <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="11" name="Check_Current_Version"  method="Get_Downloaded_Firmware_Info" delay="1800" PluginOnStep="yes">
+             <resultGeneration useMethodTag="system_get_downloaded_firmware_info" arguments="check_image" >
+                <expectedValues useConfigFile="true" key="FIRMWARE_VERSION"/>
+             </resultGeneration>
+            </testStep>
+            <testStep testStepId="12" name="Check_Version_File" action="externalFnCall" >
+             <resultGeneration useMethodTag="Check_Version_File"/>
+            </testStep>
+            <testStep testStepId="13" name="Check_include.properties_File" action="externalFnCall" >
+             <resultGeneration useMethodTag="check_include.properties_file">
+                  <arguments useConfigFile="true" key="XCONF_SERVER_URL" />
+             </resultGeneration>
+            </testStep>
+            <testStep testStepId="14" name="Check_SWupdate_File" action="externalFnCall" >
+             <resultGeneration useMethodTag="check_swupdate_file">
+                  <arguments useConfigFile="true" key="XCONF_SERVER_URL" />
+             </resultGeneration>
+            </testStep>
+            <testStep testStepId="15" name="Set_xconfServerConfigurations" action="externalFnCall" >
+             <resultGeneration useMethodTag="Set_xconfServerConfigurations" >
+                  <arguments value="revert_image" usePreviousResult="true" Id="5" useMethodTag="system_get_estb_mac" />
+             </resultGeneration>
+            </testStep>
+            <testStep testStepId="16" name="Check_disk_partition" action="externalFnCall" saveResult="true" >
+             <resultGeneration useMethodTag="Check_disk_partition" />
+            </testStep>
+            <testStep testStepId="17" name="Update_Firmware"  method="Update_Firmware" rebootStep="yes">
+             <conditionalExecution enable="true" Id="16" useMethodTag="system_check_disk_partition" arguments="4" />
+             <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="18" name="Check_disk_partition" action="externalFnCall" >
+             <conditionalExecution enable="true" Id="16" useMethodTag="system_check_disk_partition" arguments="4"/>
+             <resultGeneration useMethodTag="Check_disk_partition" expectedValues="4" arguments="after_reboot"/>
+            </testStep>
+            <testStep testStepId="19" name="Update_Firmware"  method="Update_Firmware">
+             <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="20" name="Check_Current_Version"  method="Get_Downloaded_Firmware_Info" delay="1800" PluginOnStep="yes">
+             <resultGeneration useMethodTag="system_get_downloaded_firmware_info" arguments="check_image" >
+                <expectedValues usePreviousResult="true" Id="2" useMethodTag="system_get_current_image_name"/>
+             </resultGeneration>
+            </testStep>
+       </testCase>
 </testPlugin>

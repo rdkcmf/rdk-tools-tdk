@@ -451,6 +451,16 @@
 
             <expectedValues>true,false</expectedValues>
         </method>
+        <method name="Get_OptOut_Telemetry_Status" api="isOptOutTelemetry" type="method" desc="Checks the telemetry opt-out status" >
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Set_OptOut_Telemetry_Status" api="setOptOutTelemetry" type="method" desc="Sets the telemetry opt-out status" >
+            <params>
+                <param tag="Opt-Out" type="bool" />
+            </params>
+        </method>
+        <method name="Update_Firmware" api="updateFirmware" type="method" desc="Initiates a firmware update" />
+        <method name="Get_Downloaded_Firmware_Info" api="getDownloadedFirmwareInfo" type="method" desc="Returns information about firmware downloads" />
         <method name="Reboot" api="reboot" type="method" desc="system perform a reboot of the set-top box" />
         <method name="Get_Power_State_Before_Reboot" api="getPowerStateBeforeReboot" type="method" desc="Gets the power state before reboot" />
         <event name="Event_MacAddresses_Retreived" eventName="onMacAddressesRetreived" eventId="client.events.1" type="event" desc="MacAddressesRetreived" />
@@ -740,6 +750,19 @@
                 <param tag="topmost" type="bool"/>
             </params>
         </method>
+        <method name="Remove_Animation" api="removeAnimation" type="method" desc="Removes the current animation for the specified client" >
+            <params>
+                <param tag="client" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_KeyRepeats_Enabled" api="getKeyRepeatsEnabled" type="method" desc="Returns whether key repeating is enabled or disabled" >
+             <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Enable_KeyRepeats" api="enableKeyRepeats" type="method" desc="Enables or disables key repeats" >
+            <params>
+                <param tag="enable" type="bool" />
+            </params>
+        </method>
         <event name="Event_On_Launched" eventName="onLaunched" eventId="client.events.1" type="event" desc="Fired on launching the client" />
         <event name="Event_On_Suspended" eventName="onSuspended" eventId="client.events.1" type="event" desc="Fired on Suspending the client" />
         <event name="Event_On_Destroyed" eventName="onDestroyed" eventId="client.events.1" type="event" desc="Fired on destroying the client"/>
@@ -856,6 +879,20 @@
         <method name="Set_Collection_Frequency_Default" api="setCollectionFrequency" type="method" desc="Set 10 milliseconds per collection interval"/>
         <method name="Start_FPS_Collection" api="startFpsCollection" type="method" desc="Starts the fps collection"/>
         <method name="Stop_FPS_Collection"  api="stopFpsCollection"  type="method" desc="Stops the fps collection"/>
+        <method name="Get_Frm_Mode"  api="getFrmMode"  type="method" version="2" desc="Returns the current auto framerate mode" >
+            <expectedValues>0,1</expectedValues>
+        </method>
+        <method name="Set_Frm_Mode"  api="setFrmMode"  type="method" version="2" desc="Sets the auto framerate mode" >
+            <params>
+                <param tag="frmmode" type="int"/>
+            </params>
+        </method>
+        <method name="Get_Display_FrameRate"  api="getDisplayFrameRate"  type="method" version="2" desc="Returns the current display frame rate values" />
+        <method name="Set_Display_FrameRate"  api="setDisplayFrameRate"  type="method" version="2" desc="Sets the display framerate values" >
+            <params>
+                <param tag="framerate" defaultValue="null"/>
+            </params>
+        </method>
         <event name="Event_On_FPS" eventName="onFpsEvent" eventId="client.events.1" type="event" desc="Fired at given interval and after stopFpsCollection" />
     </plugin>
 
@@ -1335,6 +1372,57 @@
                 <param tag="audioPort" defaultValue="null"/>
             </params>
         </method>
+	<method name="Set_Volume_Leveller2" api="setVolumeLeveller2" type="method" desc="Sets the  Volume Leveller setting" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="mode" type="int" />
+                <param tag="level" type="int" />
+            </params>
+        </method>
+        <method name="Get_Volume_Leveller2" api="getVolumeLeveller2" type="method" desc="Get the volume leveller setting" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+            <expectedValues>0,1,2</expectedValues>
+        </method>
+        <method name="Set_Surround_Virtualizer2" api="setSurroundVirtualizer2" type="method" desc="Sets the Surround Virtualizer boost setting" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="mode" type="int"/>
+                <param tag="boost"  type="int"/>
+            </params>
+        </method>
+        <method name="Get_Surround_Virtualizer2" api="getSurroundVirtualizer2" type="method" desc="Returns the current surround virtualizer boost settings." >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+            <expectedValues>0,1,2</expectedValues>
+        </method><method name="Set_Volume_Leveller2" api="setVolumeLeveller2" type="method" desc="Sets the  Volume Leveller setting" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="mode" type="int" />
+                <param tag="level" type="int" />
+            </params>
+        </method>
+        <method name="Get_Volume_Leveller2" api="getVolumeLeveller2" type="method" desc="Get the volume leveller setting" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+            <expectedValues>0,1,2</expectedValues>
+        </method>
+        <method name="Set_Surround_Virtualizer2" api="setSurroundVirtualizer2" type="method" desc="Sets the Surround Virtualizer boost setting" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="mode" type="int"/>
+                <param tag="boost"  type="int"/>
+            </params>
+        </method>
+        <method name="Get_Surround_Virtualizer2" api="getSurroundVirtualizer2" type="method" desc="Returns the current surround virtualizer boost settings." >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+            <expectedValues>0,1,2</expectedValues>
+        </method>     
         <event name="Event_Zoom_Settings_Updated" eventName="zoomSettingUpdated" eventId="client.events.1" type="event" desc="Zoom settings updated event "/>
 	<event name="Event_Resolution_Changed" eventName="resolutionChanged" eventId="client.events.1" type="event" desc="Fires on changing resolution"/>
 	<event name="Event_Audio_Mute_Status_Changed" eventName="audioMuteStatusChanged" eventId="client.events.1" type="event" desc="Fires on changing audio mute status"/>

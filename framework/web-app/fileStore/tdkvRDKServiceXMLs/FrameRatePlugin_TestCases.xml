@@ -132,5 +132,47 @@
               <resultGeneration useMethodTag="framerate_check_fps_event" />
             </testStep>
         </testCase>
-
+        <testCase testCaseId="FR_02" testCaseName="FrameRate_Enable_And_Disable_FrameRate_Mode"  desc="Checks whether able to enable and disable the framerate mode">
+            <testCaseInfo testCaseType="loop" revert="true"/>
+            <testStep testStepId="1" name="Get_Frm_Mode" method="Get_Frm_Mode"  saveResult="true" revertGet="yes">
+              <resultGeneration useMethodTag="framerate_check_auto_framerate_mode" />
+            </testStep>
+            <testStep testStepId="2" name="Enable_And_Disable_FrameRate_Mode" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Frm_Mode" method="Set_Frm_Mode" revertSet="yes">
+                  <params>
+                    <param tag="frmmode" value="0,1" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="framerate_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Frm_Mode" method="Get_Frm_Mode" revertFlag="yes" >
+                  <resultGeneration useMethodTag="framerate_check_auto_framerate_mode" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="FR_03" testCaseName="FrameRate_Set_And_Get_Display_FrameRate"  desc="Checks whether able to set and get display framerate">
+            <testCaseInfo testCaseType="loop" revert="true"/>
+            <testStep testStepId="1" name="Get_Display_FrameRate" method="Get_Display_FrameRate"  saveResult="true" revertGet="yes">
+              <resultGeneration useMethodTag="framerate_check_display_framerate" />
+            </testStep>
+            <testStep testStepId="2" name="Framerate_Get_Width_And_Height" action="externalFnCall" saveResult="true">
+              <resultGeneration useMethodTag="Framerate_Get_Width_And_Height" >
+                 <arguments useConfigFile="true" key="RESOLUTION_WIDTH_HEIGHT_MAPPING"/>
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_and_Get_DisplayFramerate" testStepType="loop">
+              <subtestStep subtestStepId="1" name="Set_Display_FrameRate" method="Set_Display_FrameRate" revertSet="yes">
+                  <params>
+                      <param tag="framerate" usePreviousResult="true" Id="2" useMethodTag="framerate_set_display_framerate" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="framerate_check_set_operation" />
+              </subtestStep>
+              <subtestStep testStepId="2" name="Get_Display_FrameRate" method="Get_Display_FrameRate" revertFlag="yes">
+                  <resultGeneration useMethodTag="framerate_check_display_framerate" arguments="check_framerate_value">
+                     <expectedValues useIterableValue="true"/>
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
 </testPlugin>
