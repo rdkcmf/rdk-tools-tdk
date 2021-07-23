@@ -341,7 +341,7 @@ class ExecutedbService {
 					String imagename = "imagename:"
 					int indx = deviceDetails.indexOf(imagename)
 					int endIndx = deviceDetails.indexOf("\n",indx)
-					if(indx >0 && endIndx > 0){
+					if(indx >=0 && endIndx > 0){
 						indx = indx + imagename.length()
 						image = deviceDetails.substring(indx, endIndx)
 					}
@@ -490,7 +490,7 @@ class ExecutedbService {
 		def newScriptCount = 0;
 		def newTimedOutCount = 0;
 		int rate = 0;
-		def image = ""
+		def image = "Image name not available"
 		def baseExecutionResultList = ExecutionResult.findAllByExecution(baseExecution)
 		baseExecutionResultList.each {executionResult ->
 			def moduleName
@@ -503,11 +503,12 @@ class ExecutedbService {
 		}
 		def comparisonExecutionResultList = ExecutionResult.findAllByExecution(comparisonExecution)
 		ExecutionDevice comparisonExecutionDevice = ExecutionDevice.findByExecution(comparisonExecution)
-		if(comparisonExecutionDevice){
-			if(comparisonExecutionDevice?.buildName){
-				image = comparisonExecutionDevice?.buildName
-			}else{
-				image = "Image name not available"
+		if(comparisonExecutionDevice?.buildName && !comparisonExecutionDevice?.buildName?.isEmpty() && !comparisonExecutionDevice?.buildName?.equals("Image name not available")){
+			image = comparisonExecutionDevice?.buildName
+		}else if(realPath && comparisonExecution?.id && comparisonExecutionDevice?.id){
+			String imageNameFromVersionFile = getImageNameFromVersionFile(realPath,comparisonExecution?.id,comparisonExecutionDevice?.id)
+			if(imageNameFromVersionFile != null && !imageNameFromVersionFile.isEmpty()){
+				image = imageNameFromVersionFile
 			}
 		}
 		def scriptNameList = []
@@ -794,6 +795,7 @@ class ExecutedbService {
 			def executionInstanceForImage;
 			int totalPassRate = 0;
 			List executionDeviceList = [];
+			List executionList = [];
 			detailsMap.put("Execution Names ", executionNames)
 			detailsMap.put("Device", deviceNameList)
 			detailsMap.put("DeviceIP", deviceIpList)
@@ -802,13 +804,22 @@ class ExecutedbService {
 			List imageList = [];
 			for(int i=0;i<selectedRows.size();i++){
 				executionInstanceForImage = Execution.findById(selectedRows[i])
-				def executionDevice = ExecutionDevice.findAllByExecution(executionInstanceForImage)
-				executionDeviceList.add(executionDevice)
+				if(executionInstanceForImage != null){
+					executionList.add(executionInstanceForImage)
+				}
 			}
-			executionDeviceList.each{ executionDeviceInstanceForImage ->
-				imageList.add(executionDeviceInstanceForImage.buildName[0])
+			executionList?.each{ executionObjectForImage ->
+				def executionDevice = ExecutionDevice.findByExecution(executionObjectForImage)
+				if(executionDevice?.buildName && !executionDevice?.buildName?.isEmpty() && !executionDevice?.buildName?.equals("Image name not available")){
+					imageList.add(executionDevice?.buildName)
+				}else if(realPath && executionObjectForImage?.id && executionDevice?.id){
+					String imageNameFromVersionFile = getImageNameFromVersionFile(realPath,executionObjectForImage?.id,executionDevice?.id)
+					if(imageNameFromVersionFile != null && !imageNameFromVersionFile.isEmpty()){
+						imageList.add(imageNameFromVersionFile)
+					}
+				}
 			}
-			imageList.each{ imageInstance ->
+			imageList?.each{ imageInstance ->
 				if (!imageInstance.equals(imageList.get(0))){
 					if(!imageInstance.equals("NULL")){
 						image = image + "  " +imageInstance
@@ -1032,10 +1043,14 @@ class ExecutedbService {
 		def executionTime = executionInstance?.realExecutionTime
 		executionTime = executionTimeFormat (executionTime)
 		detailsMap.put("Execution Time (min)", executionTime)
-		if(executionDevice?.buildName){
+		image = "Image name not available"
+		if(executionDevice?.buildName && !executionDevice?.buildName?.isEmpty() && !executionDevice?.buildName?.equals("Image name not available")){
 			image = executionDevice?.buildName
-		}else{
-			image = "Image name not available"
+		}else if(realPath && executionInstance?.id && executionDevice?.id){
+			String imageNameFromVersionFile = getImageNameFromVersionFile(realPath,executionInstance?.id,executionDevice?.id)
+			if(imageNameFromVersionFile != null && !imageNameFromVersionFile.isEmpty()){
+				image = imageNameFromVersionFile
+			}
 		}
 		detailsMap.put("Image", image)
 		coverPageMap.put("Details",detailsMap)
@@ -2203,5 +2218,43 @@ class ExecutedbService {
 			status = exResult?.status
 		}
 		return status
+	}
+	
+	/**
+	 * Method to get image name from version file
+	 */
+	def getImageNameFromVersionFile(def realPath, def executionId, def executionDeviceId){
+		String image = ""
+		String deviceDetails
+		String filePath = ""
+		String fileContents = ""
+		filePath = "${realPath}//logs//version//${executionId}//${executionDeviceId}//${executionDeviceId}_version.txt"
+		if(filePath){
+			File file = new File(filePath)
+			if(file.isFile()){
+				file.eachLine { line ->
+					if(!(line.isEmpty())){
+						if(!(line.startsWith( LINE_STRING ))){
+							fileContents = fileContents + line + HTML_BR
+						}
+					}
+				}
+				deviceDetails = fileContents.replace(HTML_BR, NEW_LINE)
+			}
+		}
+		try {
+			if(deviceDetails != null && deviceDetails.contains("imagename:")){
+				String imagename = "imagename:"
+				int indx = deviceDetails.indexOf(imagename)
+				int endIndx = deviceDetails.indexOf("\n",indx)
+				if(indx >=0 && endIndx > 0){
+					indx = indx + imagename.length()
+					image = deviceDetails.substring(indx, endIndx)
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace()
+		}
+		return image
 	}
 }
