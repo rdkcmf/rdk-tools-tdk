@@ -32,6 +32,7 @@ from datetime import datetime
 import importlib
 import PerformanceTestVariables
 import sys
+import socket
 
 deviceIP=""
 devicePort=""
@@ -120,10 +121,10 @@ def rdkservice_getAllPluginStatus():
 #------------------------------------------------------------------
 #SET PLUGIN STATUS
 #------------------------------------------------------------------
-def rdkservice_setPluginStatus(plugin,status):
+def rdkservice_setPluginStatus(plugin,status,uri=''):
     if plugin in graphical_plugins_list:
         if status in "activate":
-            data = '"method":"org.rdk.RDKShell.1.launch", "params":{"callsign": "'+plugin+'", "type":"", "uri":""}'
+            data = '"method":"org.rdk.RDKShell.1.launch", "params":{"callsign": "'+plugin+'", "type":"", "uri":"'+uri+'"}'
         else:
             data = '"method":"org.rdk.RDKShell.1.destroy", "params":{"callsign": "'+plugin+'"}}'
     else:
@@ -642,7 +643,10 @@ def rdkservice_validatePluginFunctionality(plugin,operations,validation_details)
     movedToFront = False
     #Activate plugin
     print "\n Activating plugin : {}".format(plugin)
-    status = rdkservice_setPluginStatus(plugin,"activate")
+    if plugin == "ResidentApp":
+        status = rdkservice_setPluginStatus(plugin,"activate",validation_details[1])
+    else:
+        status = rdkservice_setPluginStatus(plugin,"activate")
     time.sleep(5)
     #Check status
     if status != "EXCEPTION OCCURRED":
@@ -707,3 +711,29 @@ def rdkservice_validatePluginFunctionality(plugin,operations,validation_details)
     else:
         print "\n Error while activating the plugin"
     return result
+
+#-------------------------------------------------------------------
+#VALIDATE IPV4 ADDRESS
+#-------------------------------------------------------------------
+def is_valid_ipv4_address(address):
+    try:
+        socket.inet_pton(socket.AF_INET, address)
+    except AttributeError:  # no inet_pton available
+        try:
+            socket.inet_aton(address)
+        except socket.error:
+            return False
+        return address.count('.') == 3
+    except socket.error:  # not a valid address
+        return False
+    return True
+
+#-------------------------------------------------------------------
+#VALIDATE IPV6 ADDRESS
+#-------------------------------------------------------------------
+def is_valid_ipv6_address(address):
+    try:
+        socket.inet_pton(socket.AF_INET6, address)
+    except socket.error:  # not a valid address
+        return False
+    return True

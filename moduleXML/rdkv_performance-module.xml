@@ -59,6 +59,7 @@
       <parameter funName='rdkservice_setPluginState' parameterName='plugin' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_setPluginStatus' parameterName='plugin' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_setPluginStatus' parameterName='status' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_setPluginStatus' parameterName='uri' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getRequiredLog' parameterName='ssh_method' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getRequiredLog' parameterName='credentials' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_getRequiredLog' parameterName='command' parameterType='STRING' range='a-z' />

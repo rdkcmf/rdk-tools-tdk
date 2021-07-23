@@ -41,5 +41,8 @@ video_src_url = ""
 #Type of the video url configured above, give hls for .m3u8 and dash for .mpd
 video_src_url_type = ""
 
+#Webinspect port for LightningApp plugin
+lightning_app_webinspect_port = "10002"
+
 #List of Graphical plugins available for test
-graphical_plugins_list = ["Cobalt","WebKitBrowser","LightningApp"]
+graphical_plugins_list = ["Cobalt","WebKitBrowser","LightningApp","ResidentApp"]

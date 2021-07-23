@@ -58,7 +58,8 @@
         <function>rdkservice_setPluginStatus</function>
         <parameters>
           <parameter name="plugin" value=""/>
-          <parameter name="status" value=""/>
+	  <parameter name="status" value=""/>
+	  <parameter name="uri" value=""/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="rdkservice_setValue" id=" " version="1">
