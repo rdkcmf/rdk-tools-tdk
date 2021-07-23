@@ -42,7 +42,7 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_STABILITY_02</test_case_id>
-    <test_objective>To reboot the device for the given number of times and check the status of device after each reboot.</test_objective>
+    <test_objective>To reboot the device for the given number of times and check the status of device after each reboot. The script will check whether plugins with autostart as true are in activated/resumed state after each reboot.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI,Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -53,7 +53,8 @@
     <automation_approch>1. As a pre requisite, reboot the device once
 2. Get the current status of all plugins
 3. Reboot the device for given number of times.
-4. Check for uptime, interface status, plugin status and controller UI status after each reboot.</automation_approch>
+4. Check for uptime, interface status, plugin status and controller UI status after each reboot.
+5. Check whether plugins with autostart: true are in activated/resumed state.</automation_approch>
     <expected_output>The device should come online properly after each reboot.</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_stability</test_stub_interface>
@@ -71,7 +72,7 @@ import tdklib;
 from StabilityTestVariables import *
 import rebootTestUtility
 from rebootTestUtility import *
-
+from ast import literal_eval
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_stability","1",standAlone=True);
@@ -177,7 +178,15 @@ if expectedResult in result.upper():
                                             tdkTestObj.setResultStatus("SUCCESS")
                                         else:
                                             tdkTestObj.setResultStatus("FAILURE")
-
+                                        
+                                        #CHECK PLUGINS WITH AUTOSTART AS TRUE ARE ACTIVATED
+                                        PluginStatusAfterReboot = literal_eval(PluginStatusAfterReboot)
+                                        activated_status = checkPluginsActivated(PluginStatusAfterReboot,ValidateActivatedPlugins)
+                                        if activated_status == "SUCCESS":
+                                            tdkTestObj.setResultStatus("SUCCESS")
+                                        else:
+                                            tdkTestObj.setResultStatus("FAILURE")
+                                            
                                         #GET THE STATUS OF ETHERNET INTERFACE
                                         if_status = getIFStatus(EthernetInterface,ValidateInterface)
                                         if if_status != "FAILURE":
@@ -202,6 +211,7 @@ if expectedResult in result.upper():
                                                 logger.info( "->CONTROLLER UI : %s", ui_status)
                                                 logger.info( "->No. OF PLUGINS : %s", no_of_plugins)
                                                 logger.info( "->PLUGIN STATUS : %s", plugin_status)
+                                                logger.info( "->PLUGINS WITH AUTOSTART AS TRUE ARE ACTIVATED: %s", activated_status)
 
                                                 time.sleep(10);
                                                 count = count +1

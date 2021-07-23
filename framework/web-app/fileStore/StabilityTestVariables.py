@@ -52,6 +52,7 @@ ValidateInterface = "No"
 ValidatePluginStatus = "No"
 ValidateControllerUI = "No"
 ValidateNoOfPlugins = "No"
+ValidateActivatedPlugins = "No"
 #Give the value in seconds to wait for device to come online after reboot.
 rebootwaitTime = 150
 

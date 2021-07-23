@@ -31,6 +31,7 @@ StatusInterface= [];
 StatusControllerUI= [];
 StatusNoOfPlugins= [];
 StatusPlugin= [];
+StatusActivatedPlugins = []
 
 #--------------------------------------------------------
 # OPEN A LOG FILE TO REDIRECT THE LOGS
@@ -200,6 +201,23 @@ def getUIStatus(validate):
         return "FAILURE"
 
 #------------------------------------------------------
+#CHECK PLUGINS WITH AUTOSTART AS TRUE ARE ACTIVATED
+#------------------------------------------------------
+def checkPluginsActivated(statusList,validate):
+    result = "FAILURE"
+    plugins_not_activated = [plugin_details for plugin_details in statusList if plugin_details[2] and plugin_details[1]  not in ('activated','resumed')]
+    if not plugins_not_activated:
+        result = "SUCCESS"
+    else:
+        logger.info("\n Details of plugins which are not in activated/resumed state after reboot:")
+        logger.info(plugins_not_activated)
+    if result == "FAILURE" and validate.lower() == "yes":
+        exitScript(StatusActivatedPlugins,iter_no)
+    elif result == "FAILURE":
+        StatusActivatedPlugins.append(iter_no)
+    return result
+    
+#------------------------------------------------------
 #EXITING THE SCRIPT IF VALIDATION FAILS
 #------------------------------------------------------
 def exitScript(StatusList,status):
@@ -224,6 +242,8 @@ def getSummary(count):
         logger.info("Iterations where there is mismatch in no of plugins: %s",StatusNoOfPlugins);
     if len(StatusPlugin) > 0:
         logger.info( "Iterations where status of plugins are different: %s", StatusPlugin);
+    if len(StatusActivatedPlugins) > 0:
+        logger.info( "Iterations where plugins with autostart:true are not in activated/resumed state: %s", StatusActivatedPlugins )
 
     logger.info( "\nNumber of reboots:%d/%d"%(count,repeatCount))
     logger.info( "Number of failures in Uptime status: %s", ("NIL" if len(StatusUptime)== 0 else len(StatusUptime)))
@@ -231,3 +251,4 @@ def getSummary(count):
     logger.info( "Number of failures in controller ui status: %s", ("NIL" if len(StatusControllerUI)== 0 else len(StatusControllerUI)))
     logger.info( "Number of failures in plugin count: %s", ("NIL" if len(StatusNoOfPlugins)== 0 else len(StatusNoOfPlugins)))
     logger.info( "Number of failures in plugin status: %s", ("NIL" if len(StatusPlugin)== 0 else len(StatusPlugin)))
+    logger.info( "Number of failures in activated plugin status: %s", ("NIL" if len(StatusActivatedPlugins) == 0 else len(StatusActivatedPlugins)))
