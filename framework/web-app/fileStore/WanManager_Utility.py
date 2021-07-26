@@ -21,6 +21,15 @@ from time import sleep;
 from tdkbVariables import *;
 from tdkutility import *;
 
+#Setting the below values to
+#1 -the expected policy to be set priorily
+#0 -script will do policy change and reboot
+DUT_Mode_Fixed_Mode_OnBootup = 0;
+DUT_Mode_Fixed_Mode = 0;
+DUT_Mode_Primary_Priority_OnBootup = 0;
+DUT_Mode_Primary_Priority= 0;
+#log file location for VLAN MANAGER
+VLANLOG ="/rdklogs/logs/VLANIFACEMGRLog.txt.0"
 #The Expected Wan Manager Policies
 ExpectedPolicyList = "FIXED_MODE_ON_BOOTUP, FIXED_MODE, PRIMARY_PRIORITY, PRIMARY_PRIORITY_ON_BOOTUP, MULTIWAN_MODE";
 #The Expected Wan Manager interface names
@@ -594,8 +603,34 @@ def SetWANTypethenPriority(tdkTestObj,wanDSL,wanWANOE,priDSL,priWANOE):
         Setresult = tdkTestObj.getResultDetails();
         index =index +1;
         if expectedresult in actualresult:
-           print "Set operation sucesss for %s" %item;
+           print "Set operation successs for %s" %item;
         else:
             print "Set operation failed for %s" %item;
+            break;
+    return actualresult;
+
+#################################################################################
+# Function to Disable and Enable DSL and WANOE interfaces
+# Syntax       : ToggleDSLAndWANOEInterfaces(tdkTestObj_Set,setValue)
+# Parameter    : tdkTestObj_Set,setValue
+# Return Value : return the actualresult
+###############################################################################
+
+def ToggleDSLAndWANOEInterfaces(tdkTestObj_Set,setValue):
+    paramlist = ["Device.X_RDK_WanManager.CPEInterface.1.Wan.Enable","Device.X_RDK_WanManager.CPEInterface.2.Wan.Enable"];
+    for item in paramlist:
+        tdkTestObj = tdkTestObj_Set;
+        tdkTestObj.addParameter("ParamName",item);
+        tdkTestObj.addParameter("ParamValue",setValue);
+        tdkTestObj.addParameter("Type","bool");
+        #Execute testcase on DUT
+        expectedresult ="SUCCESS";
+        tdkTestObj.executeTestCase(expectedresult);
+        actualresult = tdkTestObj.getResult();
+        Setresult = tdkTestObj.getResultDetails();
+        if expectedresult in actualresult:
+           print "%s set to %s successfully" %(item,setValue);
+        else:
+            print "%s set to %s failed"  %(item,setValue);
             break;
     return actualresult;
