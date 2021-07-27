@@ -51,8 +51,8 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>1. The URL of the application to be launched.
 </input_parameters>
-    <automation_approch>1. As a pre requisite disable all other plugins and enable webkitbrowser plugin.
-2. Set the application URL in webkitbrowser
+    <automation_approch>1. As a pre requisite disable all other plugins and enable WebKitBrowser/LightningApp plugin based on configuration.
+2. Set the application URL.
 3. Get the time taken to load the application</automation_approch>
     <expected_output>The application should launch within 60 seconds.</expected_output>
     <priority>High</priority>
@@ -106,52 +106,64 @@ if expectedResult in result.upper():
     appArguments = getURLArguments()
     # Getting the complete test app URL
     video_test_url = getTestURL(appURL,appArguments)
-    print "Check Pre conditions"
+    print "\n Check Pre conditions"
+    webkit_instance = PerformanceTestVariables.webkit_instance
+    set_method = webkit_instance+'.1.url'
+    if webkit_instance in "WebKitBrowser":
+        webinspect_port = PerformanceTestVariables.webinspect_port
+    else:
+        webinspect_port = PerformanceTestVariables.lightning_app_webinspect_port
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    plugins_list = ["WebKitBrowser","Cobalt"]
+    plugins_list = ["Cobalt",webkit_instance]
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
+    time.sleep(20)
     status = "SUCCESS"
-    plugin_status_needed = {"WebKitBrowser":"resumed","Cobalt":"deactivated"}
-    if curr_plugins_status_dict != plugin_status_needed:
+    plugin_status_needed = {webkit_instance:"resumed","Cobalt":"deactivated"}
+    if any(curr_plugins_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
+        print "\n Error while getting plugin status"
         status = "FAILURE"
+    elif curr_plugins_status_dict != plugin_status_needed:
         revert = "YES"
         status = set_plugins_status(obj,plugin_status_needed)
+        new_plugins_status = get_plugins_status(obj,plugins_list)
+        if new_plugins_status != plugin_status_needed:
+            status = "FAILURE"
     if status == "SUCCESS":
-        print "\nPre conditions for the test are set successfully";
-        print "\nGet the URL in WebKitBrowser"
+        print "\n Pre conditions for the test are set successfully";
+        print "\n Get the URL in {}".format(webkit_instance)
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
-        tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+        tdkTestObj.addParameter("method",set_method);
         tdkTestObj.executeTestCase(expectedResult);
         result = tdkTestObj.getResult() 
         current_url = tdkTestObj.getResultDetails();
         if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
-            webkit_console_socket = createEventListener(ip,PerformanceTestVariables.webinspect_port,[],"/devtools/page/1",False)
+            webkit_console_socket = createEventListener(ip,webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
-            print "Current URL:",current_url
-            print "\nSet Lightning Application URL"
+            print "\n Current URL:",current_url
+            print "\n Set Lightning Application URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+            tdkTestObj.addParameter("method",set_method);
             tdkTestObj.addParameter("value",video_test_url);
 	    start_time = str(datetime.utcnow()).split()[1]
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
             if expectedResult in result:
-                print "\nValidate if the URL is set successfully or not"
+                print "\n Validate if the URL is set successfully or not"
                 tdkTestObj = obj.createTestStep('rdkservice_getValue');
-                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                tdkTestObj.addParameter("method",set_method);
                 tdkTestObj.executeTestCase(expectedResult);
                 result = tdkTestObj.getResult()
                 new_url = tdkTestObj.getResultDetails();
                 if new_url in video_test_url and expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS");
-                    print "URL(",new_url,") is set successfully"
+                    print "\n URL(",new_url,") is set successfully"
                     continue_count = 0
                     test_result = ""
                     while True:
                         if continue_count > 60:
-                            print "app not launched in 60 seconds"
+                            print "Lightning Application is not launched within 60 seconds"
                             break
                         if (len(webkit_console_socket.getEventsBuffer())== 0):
                             time.sleep(1)
@@ -162,20 +174,21 @@ if expectedResult in result.upper():
                             test_result = getConsoleMessage(console_log)
                             break;
                     webkit_console_socket.disconnect()
+                    time.sleep(5)
                     if "URL Info:" in test_result:
                         micosec_frm_start_time = int(start_time.split(".")[-1])
                         start_time = start_time.replace(start_time.split(".")[-1],"")
                         start_time = start_time.replace(".",":")
                         start_time = start_time + str(micosec_frm_start_time/1000)
-                        print "\nApplication URL set in webkit browser at :{} (UTC)".format(start_time)
+                        print "\n Application URL set in {} at :{} (UTC)".format(webkit_instance,start_time)
                         start_time_millisec = getTimeInMilliSeconds(start_time)
                         end_time = getTimeFromMsg(test_result)
-                        print "\nApplication launched at: {} (UTC)".format(end_time)
+                        print "\n Application launched at: {} (UTC)".format(end_time)
                         end_time_millisec = getTimeInMilliSeconds(end_time)
                         app_launch_time = end_time_millisec - start_time_millisec
-                        print "\nTime taken to launch the application: {} milliseconds \n".format(app_launch_time)
+                        print "\n Time taken to launch the application: {} milliseconds \n".format(app_launch_time)
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                        result1, app_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"APP_LAUNCH_THRESHOLD VALUE")
+                        result1, app_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"APP_LAUNCH_THRESHOLD_VALUE")
                         result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
                         if all (value != "" for value in (app_launch_threshold_value,offset)): 
                             if 0 < int(app_launch_time) < (int(app_launch_threshold_value) + int(offset)):
@@ -186,40 +199,40 @@ if expectedResult in result.upper():
                                 print "\n The time taken to launch the app is not within the expected limit \n"
                         else:
                             tdkTestObj.setResultStatus("FAILURE");
-                            print "Failed to get the threshold value from config file"
+                            print "\n Failed to get the threshold value from config file"
                     else:
                         tdkTestObj.setResultStatus("FAILURE");
-                        print "error occured during application launch"
+                        print "\n Error occured during application launch"
                     #Set the URL back to previous
                     tdkTestObj = obj.createTestStep('rdkservice_setValue');
-                    tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                    tdkTestObj.addParameter("method",set_method);
                     tdkTestObj.addParameter("value",current_url);
                     tdkTestObj.executeTestCase(expectedResult);
                     result = tdkTestObj.getResult();
                     if result == "SUCCESS":
-                        print "URL is reverted successfully"
+                        print "\n URL is reverted successfully"
                         tdkTestObj.setResultStatus("SUCCESS");
                     else:
-                        print "Failed to revert the URL"
+                        print "\n Failed to revert the URL"
                         tdkTestObj.setResultStatus("FAILURE");
                 else:
-                    print "Failed to load the URL %s" %(new_url)
+                    print "\n Failed to load the URL, new URL: %s" %(new_url)
                     tdkTestObj.setResultStatus("FAILURE");
             else:
-                print "Failed to set the URL"
+                print "\n Failed to set the URL"
                 tdkTestObj.setResultStatus("FAILURE");
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Unable to get the current URL loaded in webkit"
+            print "\n Unable to get the current URL loaded"
     else:
-        print "Pre conditions are not met"
+        print "\n Pre conditions are not met"
         obj.setLoadModuleStatus("FAILURE");
     #Revert the values
     if revert=="YES":
-        print "Revert the values before exiting"
+        print "\n Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
 else:
     obj.setLoadModuleStatus("FAILURE");
-    print "Failed to load module"
+    print "\n Failed to load module"
 

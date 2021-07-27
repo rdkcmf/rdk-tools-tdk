@@ -320,11 +320,11 @@ def connect_wifi(obj,ap_freq):
                         result = tdkTestObj.getResult()
                         if result == "SUCCESS":
                             tdkTestObj.setResultStatus("SUCCESS")
-                            time.sleep(20)
+                            time.sleep(30)
                             device_ip = get_curr_device_ip(obj.url)
                             if obj.IP != device_ip:
                                 obj.IP = device_ip
-                                time.sleep(50)
+                                time.sleep(30)
                             #check wthether connected
                             print "\n Checking whether DUT is connected to SSID \n"
                             tdkTestObj = obj.createTestStep('rdkservice_getReqValueFromResult')
@@ -426,8 +426,7 @@ def check_cur_ssid_freq(obj):
     return_val = "FAILURE"
     conf_file,conf_status = getConfigFileName(obj.realpath)
     result1,ssid = getDeviceConfigKeyValue(conf_file,"WIFI_SSID_NAME")
-    result2,ssid_5ghz = getDeviceConfigKeyValue(conf_file,"WIFI_SSID_NAME_5GHZ")
-    if all(value != "" for value in (ssid,ssid_5ghz)):
+    if ssid != "":
         tdkTestObj = obj.createTestStep('rdkservice_getReqValueFromResult')
         tdkTestObj.addParameter("method","org.rdk.Wifi.1.getConnectedSSID")
         tdkTestObj.addParameter("reqValue","ssid")
@@ -439,11 +438,13 @@ def check_cur_ssid_freq(obj):
             print " \n Connected SSID Name: {}\n ".format(connected_ssid)
             if ssid == connected_ssid:
                 return_val = "2.4"
-            elif ssid_5ghz == connected_ssid:
-                return_val = "5"
             else:
-                print "\n DUT is not connected to any of the SSIDs configured in device specific config file \n"
-                tdkTestObj.setResultStatus("FAILURE")
+                result2,ssid_5ghz = getDeviceConfigKeyValue(conf_file,"WIFI_SSID_NAME_5GHZ")
+                if ssid_5ghz == connected_ssid:
+                    return_val = "5"
+                else:
+                    print "\n DUT is not connected to any of the SSIDs configured in device specific config file, please check \n"
+                    tdkTestObj.setResultStatus("FAILURE")
         else:
             print "\n Error while checking connected SSID \n"
             tdkTestObj.setResultStatus("FAILURE")

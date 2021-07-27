@@ -141,7 +141,7 @@ if expectedResult in (result.upper() and pre_condition_status):
         tdkTestObj.executeTestCase(expectedResult);
         sc_result = tdkTestObj.getResult();
         sc_status = tdkTestObj.getResultDetails();
-        if expectedResult in sc_result:
+        if expectedResult in sc_result and sc_status != None:
             tdkTestObj.setResultStatus("SUCCESS")
             if sc_status not in "activated":
                 curr_plugins_status_dict["org.rdk.ScreenCapture"] = "deactivated"
@@ -160,7 +160,7 @@ if expectedResult in (result.upper() and pre_condition_status):
             else:
                print"org.rdk.ScreenCapture is in activated state"
         else:
-            print "\n Error while getting org.rdk.ScreenCapture status"
+            print "\n Error while getting org.rdk.ScreenCapture status,current status :",sc_status
             tdkTestObj.setResultStatus("FAILURE")
             status = "FAILURE"
         upload_url_status,sc_upload_url = getDeviceConfigKeyValue(conf_file,"SC_UPLOAD_URL")

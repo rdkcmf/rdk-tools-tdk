@@ -221,6 +221,7 @@ if expectedResult in result.upper():
             tdkTestObj.setResultStatus("FAILURE")
     else:
         print "\n Preconditions are not met \n"
+        obj.setLoadModuleStatus("FAILURE")
     if revert_if == "YES" and status == "SUCCESS":
         activate_status = set_plugins_status(obj,plugins_status_needed)
         url_status,complete_url = get_lightning_app_url(obj)
