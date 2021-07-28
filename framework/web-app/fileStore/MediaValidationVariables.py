@@ -310,3 +310,14 @@ path_of_browser_executable = ""
 
 #The directory to which CGI server will upload the images,same as given in the CGI script
 image_upload_dir = ""
+
+
+#************************************************************************
+#            CONFIGURATIONS FOR MSE/EME TESTS
+#************************************************************************
+#MSE conformance test URL
+mse_conformance_test_app_url = "https://ytlr-cert.appspot.com/2020/main.html?test_type=conformance-test"
+
+#Key codes to navigate and start the test. Values must follow the pattern KeyName:KeyCode seperated by comma
+mse_key_sequence = "ArrowLeft:37,ArrowDown:40,ArrowDown:40,ArrowUp:38,ArrowLeft:37,Enter:13"
+

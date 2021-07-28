@@ -131,9 +131,22 @@ def updateLibOptions(val):
 
 # Function to parser the web inspect json message and display the
 # console log
+def dispConsoleMessage(log):
+    try:
+       log_info = log.split(",")
+       for data in log_info:
+          if "\"text\"" in data:
+            print(data.split("\"text\":")[1].replace("\"",""))
+    except:
+       print("An exception occurred")
+       print str(log).replace('\\n','\n').replace("\\","")
+
 def dispConsoleLog(log):
    console_methods = ["Console.messagesCleared","Console.messageRepeatCountUpdated"]
    try:
+
+       #if "Console.messageAdded" in log:
+       #    dispConsoleMessage(log)
        if "%" not in log:
            log_data = json.loads(log)
            if log_data.get("method") not in console_methods:
@@ -348,6 +361,30 @@ def moveToFrontClient(obj,client):
         print "Unable to move %s plugin to front" %(client)
         tdkTestObj.setResultStatus("FAILURE");
         return "FAILURE"
+
+# Function to send key code inputs to the RDKShell client
+# Values must follow the pattern KeyName:KeyCode seperated by comma. Eg [ArrowLeft:37,ArrowDown:40]
+def sendKeysToClient(obj,client,key_sequence):
+    status = "SUCCESS"
+    for key_info in key_sequence.split(","):
+        key_name = key_info.split(":")[0]
+        key_code = key_info.split(":")[1]
+        time.sleep(10)
+        tdkTestObj = obj.createTestStep('rdkservice_setValue')
+        params = '{"keys":[{"keyCode":'+key_code+',"modifiers": ["'+key_name+'"],"delay": 1.0,"callsign": "'+client+'"}]}'
+        tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
+        tdkTestObj.addParameter("value",params)
+        tdkTestObj.executeTestCase(expectedResult);
+        result = tdkTestObj.getResult();
+        if "SUCCESS" in result:
+            print "Key: %s KeyCode: %s sent successfully" %(key_name,key_code)
+            tdkTestObj.setResultStatus("SUCCESS");
+        else:
+            print "Key: %s KeyCode: %s sending failed" %(key_name,key_code)
+            tdkTestObj.setResultStatus("FAILURE");
+            status = "FAILURE"
+    return status
+
 
 def getConnectedVideoDisplay(obj):
     global video_port
@@ -875,6 +912,67 @@ def monitorAnimationTest(obj,webkit_console_socket,check_pattern,timeout=60):
 
     return animation_test_result,diagnosis_info
 
+
+
+
+# Function to monitor conformance test app progress and get the result
+def monitorConformanceTest(obj,webkit_console_socket,timeout=60):
+    wait_time = timeout/60
+    continue_count = 0
+    hang_detected = 0
+    test_result = "SUCCESS"
+    total_test_count = 0
+    test_completed_flag = 0
+    failed_test_list = []
+    conformance_test_result = ""
+    while True:
+        if continue_count > timeout:
+            hang_detected = 1
+            print "\nApp not proceeding for %d min. Exiting..." %(wait_time)
+            break
+        if (len(webkit_console_socket.getEventsBuffer())== 0):
+            time.sleep(1)
+            continue_count += 1
+            continue
+        else:
+            continue_count = 0
+        console_log = webkit_console_socket.getEventsBuffer().pop(0)
+        if "Console.messageAdded" in console_log:
+            dispConsoleMessage(console_log)
+        else:
+            dispConsoleLog(console_log)
+        if "All tests are completed" in console_log:
+            test_completed_flag = 1
+        if "FAILED" in console_log and test_completed_flag != 1:
+            failed_test_list.append(console_log)
+        if "STARTED" in console_log and test_completed_flag != 1:
+            total_test_count += 1
+        if "Device Status:" in console_log or "Connection refused" in console_log:
+            break;
+    webkit_console_socket.disconnect();
+    time.sleep(3);
+    if len(failed_test_list) != 0:
+        print "\n\n====================== FAILED TESTS =========================="
+        for test_info in failed_test_list:
+            if "Console.messageAdded" in test_info:
+                dispConsoleMessage(test_info)
+            else:
+                print test_info
+        test_result = "FAILURE"
+    if "SUCCESS" in test_result and hang_detected == 0:
+        conformance_test_result = "SUCCESS"
+    else:
+        conformance_test_result = "FAILURE"
+    print "\n\n====================== SUMMARY  =========================="
+    print "TOTAL TESTS: %d"    %(total_test_count)
+    print "PASSED TEST(S): %d" %(total_test_count - len(failed_test_list))
+    print "FAILED TEST(S): %d" %(len(failed_test_list))
+    print "TEST STATUS: %s\n"  %(conformance_test_result)
+    return conformance_test_result,failed_test_list
+
+
+
+
 # Function to set the primary post-requisites
 def setMediaTestPostRequisites(obj,webkit_browser_instance):
     post_requisite_status = "SUCCESS"
@@ -890,6 +988,7 @@ def setMediaTestPostRequisites(obj,webkit_browser_instance):
         post_requisite_status = "FAILURE"
 
     return post_requisite_status
+
 
 
 
