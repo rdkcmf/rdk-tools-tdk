@@ -192,10 +192,12 @@ class ExcelExporter extends AbstractExporter {
 							}
 						}else{
 							WritableSheet summarySheet = workbook.getSheet("Summary")
-							eachSheet.mergeCells(0,0,5,0);
-							def link = new WritableHyperlink(0,0,"",summarySheet,0,0)
-							link.setDescription("Go to Summary");
-							eachSheet.addHyperlink(link);
+							if(summarySheet){
+								eachSheet.mergeCells(0,0,5,0);
+								def link = new WritableHyperlink(0,0,"",summarySheet,0,0)
+								link.setDescription("Go to Summary");
+								eachSheet.addHyperlink(link);
+							}
 						}
 					}
 				}
@@ -347,9 +349,11 @@ class ExcelExporter extends AbstractExporter {
 							}
 						}else{
 							WritableSheet summarySheet = workbook.getSheet("Summary")
-							def link = new WritableHyperlink(0,0,"",summarySheet,0,0)
-							link.setDescription("Go to Summary");
-							eachSheet.addHyperlink(link);
+							if(summarySheet){
+								def link = new WritableHyperlink(0,0,"",summarySheet,0,0)
+								link.setDescription("Go to Summary");
+								eachSheet.addHyperlink(link);
+							}
 						}
 					}
 				}
@@ -860,10 +864,12 @@ class ExcelExporter extends AbstractExporter {
 							}
 						}else{
 							WritableSheet summarySheet = workbook.getSheet("Summary")
-							eachSheet.mergeCells(0,0,4,0);
-							def link = new WritableHyperlink(0,0,"",summarySheet,0,0)
-							link.setDescription("Go to Summary");
-							eachSheet.addHyperlink(link);
+							if(summarySheet){
+								eachSheet.mergeCells(0,0,4,0);
+								def link = new WritableHyperlink(0,0,"",summarySheet,0,0)
+								link.setDescription("Go to Summary");
+								eachSheet.addHyperlink(link);
+							}
 						}
 					}
 				}
