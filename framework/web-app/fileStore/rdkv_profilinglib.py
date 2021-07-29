@@ -89,7 +89,8 @@ def compare_metric_threshold_values(deviceConfigFile,configParam, metricValue):
 #----------------------------------------------------------------------------
 
 def rdkv_profiling_collectd_check_system_memory(tmUrl, resultId, deviceConfig, thresholdCheck="true"):
-    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+ str("&") + "parameter=memory.memory-used,memory.memory-free,memory.memory-cached,memory.memory-buffered"
+    url_param = "actualUnit=Bytes"+str("&")+"preferredUnit=MB"+str("&")+"isSystemMetric=true"+str("&")+"parameter=memory.memory-used,memory.memory-free,memory.memory-cached,memory.memory-buffered"
+    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+ str("&") + url_param
     #print url
     result_details = {}
     try:
@@ -100,13 +101,13 @@ def rdkv_profiling_collectd_check_system_memory(tmUrl, resultId, deviceConfig, t
         if response != []:
             print "\n********** Metric From GRAFANA **************"
             for params in response:
-                # TODO As of now avg value is taken. Need to confirm on this.Validating memory-used as of now, other metrics the threshold value will vary
+                # TODO As of now max value is taken. Need to confirm on this.Validating memory-used as of now, other metrics the threshold value will vary
                 if "memory-used" in params.get("parameter"):
-                    memory_metric_list.append(float(params.get("avg")))
+                    memory_metric_list.append(float(params.get("max")))
                 print "%s : min:%s , max:%s , avg:%s \n" %(params.get("parameter").split(".")[-1],params.get("min"),params.get("max"),params.get("avg"))
             print "********************************************\n"
             if thresholdCheck == "true":
-                status = compare_metric_threshold_values(deviceConfig,"PROFILING_SYSTEM_MEM_THRESHOLD",memory_metric_list)
+                status = compare_metric_threshold_values(deviceConfig,"PROFILING_SYSTEM_MEMORY_THRESHOLD",memory_metric_list)
                 if status == "SUCCESS":
                     result_details["test_step_status"] = "SUCCESS"
                     print "System wide memory-used metric is within the expected threshold level"
@@ -151,7 +152,8 @@ def rdkv_profiling_collectd_check_system_memory(tmUrl, resultId, deviceConfig, t
 #----------------------------------------------------------------------------
 
 def rdkv_profiling_collectd_check_system_loadavg(tmUrl, resultId, deviceConfig, thresholdCheck="true"):
-    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+str("&")+"parameter=load.load.longterm,load.load.midterm,load.load.shortterm"
+    url_param = "actualUnit=%25"+str("&")+"preferredUnit=%25"+str("&")+"isSystemMetric=true"+str("&")+"parameter=load.load.longterm,load.load.midterm,load.load.shortterm"
+    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+str("&")+url_param
     result_details = {}
     try:
         response = urllib.urlopen(url).read()
@@ -160,9 +162,9 @@ def rdkv_profiling_collectd_check_system_loadavg(tmUrl, resultId, deviceConfig, 
         if response != []:
             print "\n********** Metric From GRAFANA **************"
             for params in response:
-                # TODO As of now avg value is taken. Need to confirm on this. Validating shortterm as of now, other metrics the threshold value will vary
+                # TODO As of now max value is taken. Need to confirm on this. Validating shortterm as of now, other metrics the threshold value will vary
                 if "shortterm" in params.get("parameter"):
-                    load_metric_list.append(float(params.get("avg")))
+                    load_metric_list.append(float(params.get("max")))
                 print "%s : min:%s , max:%s , avg:%s \n" %(params.get("parameter").split(".")[-1],params.get("min"),params.get("max"),params.get("avg"))
             print "********************************************\n"
             if thresholdCheck == "true":
@@ -209,7 +211,8 @@ def rdkv_profiling_collectd_check_system_loadavg(tmUrl, resultId, deviceConfig, 
 #----------------------------------------------------------------------------
 
 def rdkv_profiling_collectd_check_system_CPU(tmUrl, resultId, deviceConfig, thresholdCheck="true"):
-    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+str("&")+"parameter=cpu.percent-active"
+    url_param = "actualUnit=%25"+str("&")+"preferredUnit=%25"+str("&")+"isSystemMetric=true"+str("&")+"parameter=cpu.percent-active"
+    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+str("&")+url_param
     result_details = {}
     try:
         response = urllib.urlopen(url).read()
@@ -218,8 +221,8 @@ def rdkv_profiling_collectd_check_system_CPU(tmUrl, resultId, deviceConfig, thre
         if response != []:
             print "\n********** Metric From GRAFANA **************"
             for params in response:
-                # TODO As of now avg value is taken. Need to confirm on this
-                cpu_metric_list.append(float(params.get("avg")))
+                # TODO As of now max value is taken. Need to confirm on this
+                cpu_metric_list.append(float(params.get("max")))
                 print "%s : min:%s , max:%s , avg:%s \n" %(params.get("parameter").split(".")[-1],params.get("min"),params.get("max"),params.get("avg"))
             print "********************************************\n"
             if thresholdCheck == "true":
@@ -269,8 +272,8 @@ def rdkv_profiling_collectd_check_system_CPU(tmUrl, resultId, deviceConfig, thre
 #----------------------------------------------------------------------------
 
 def rdkv_profiling_collectd_check_process_metrics(tmUrl, resultId, processName, deviceConfig, thresholdCheck="true"):
-    url_param = str("&")+"parameter=processes-"+processName+".ps_rss,processes-"+processName+".ps_vm"
-    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+url_param
+    url_param = "actualUnit=Bytes"+str("&")+"preferredUnit=MB"+str("&")+"isSystemMetric=false"+str("&")+"parameter=processes-"+processName+".ps_rss,processes-"+processName+".ps_vm"
+    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+str("&")+url_param
     result_details = {}
     try:
         response = urllib.urlopen(url).read()
@@ -280,14 +283,15 @@ def rdkv_profiling_collectd_check_process_metrics(tmUrl, resultId, processName, 
             print "\n********** Metric From GRAFANA **************"
             print "Process Name: ",processName
             for params in response:
-                # TODO As of now avg value is taken. Need to confirm on this
+                # TODO As of now max value is taken. Need to confirm on this
                 if "ps_rss" in params.get("parameter"):
-                    process_metric_list.append(float(params.get("avg")))
+                    process_metric_list.append(float(params.get("max")))
                 print "%s : min:%s , max:%s , avg:%s \n" %(params.get("parameter").split(".")[-1],params.get("min"),params.get("max"),params.get("avg"))
             print "********************************************\n"
             if thresholdCheck == "true":
                 # TODO: This check will be added for process specific in up coming releases
-                status = compare_metric_threshold_values(deviceConfig,"PROFILING_PROCESS_RSS_THRESHOLD",process_metric_list)
+                process_config_param = "PROFILING_PROCESSES_" + processName.upper() + "_PS_RSS_THRESHOLD"
+                status = compare_metric_threshold_values(deviceConfig,process_config_param,process_metric_list)
                 if status == "SUCCESS":
                     result_details["test_step_status"] = "SUCCESS"
                     print "Process rss metric is within the expected threshold level"
@@ -331,8 +335,8 @@ def rdkv_profiling_collectd_check_process_metrics(tmUrl, resultId, processName, 
 # Return Value : status and REST API response dict in string format
 #----------------------------------------------------------------------------
 def rdkv_profiling_collectd_check_process_usedCPU(tmUrl, resultId, processName, deviceConfig, thresholdCheck="true"):
-    url_param = str("&") + "parameter=exec-"+processName+".gauge-"+processName+"_UsedCPU"
-    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+url_param
+    url_param = "actualUnit=%25"+str("&")+"preferredUnit=%25"+str("&")+"isSystemMetric=false"+str("&")+"parameter=exec-"+processName+".gauge-"+processName+"_UsedCPU"
+    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+str("&")+url_param
     result_details = {}
     try:
         response = urllib.urlopen(url).read()
@@ -342,12 +346,13 @@ def rdkv_profiling_collectd_check_process_usedCPU(tmUrl, resultId, processName, 
             print "\n********** Metric From GRAFANA **************"
             print "Process Name: ",processName
             for params in response:
-                # TODO As of now avg value is taken. Need to confirm on this
-                process_metric_list.append(float(params.get("avg")))
+                # TODO As of now max value is taken. Need to confirm on this
+                process_metric_list.append(float(params.get("max")))
                 print "%s : min:%s , max:%s , avg:%s \n" %(params.get("parameter").split(".")[-1],params.get("min"),params.get("max"),params.get("avg"))
             print "********************************************\n"
             if thresholdCheck == "true":
-                status = compare_metric_threshold_values(deviceConfig,"PROFILING_PROCESS_CPU_THRESHOLD",process_metric_list)
+                process_config_param = "PROFILING_PROCESSES_" + processName.upper() + "_USEDCPU_THRESHOLD"
+                status = compare_metric_threshold_values(deviceConfig,process_config_param,process_metric_list)
                 if status == "SUCCESS":
                     result_details["test_step_status"] = "SUCCESS"
                     print "Process used CPU metric is within the expected threshold level"
@@ -392,8 +397,8 @@ def rdkv_profiling_collectd_check_process_usedCPU(tmUrl, resultId, processName, 
 #----------------------------------------------------------------------------
 
 def rdkv_profiling_collectd_check_process_usedSHR(tmUrl, resultId, processName, deviceConfig, thresholdCheck="false"):
-    url_param = str("&") + "parameter=exec-"+processName+".counter-"+processName+"_UsedSHR"
-    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+url_param
+    url_param = "actualUnit=KB"+str("&")+"preferredUnit=KB"+str("&")+"isSystemMetric=false"+str("&")+"parameter=exec-"+processName+".counter-"+processName+"_UsedSHR"
+    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+str("&")+url_param
     result_details = {}
     try:
         response = urllib.urlopen(url).read()
@@ -403,13 +408,14 @@ def rdkv_profiling_collectd_check_process_usedSHR(tmUrl, resultId, processName, 
             print "\n********** Metric From GRAFANA **************"
             print "Process Name: ",processName
             for params in response:
-                # TODO As of now avg value is taken. Need to confirm on this
-                process_metric_list.append(float(params.get("avg")))
+                # TODO As of now max value is taken. Need to confirm on this
+                process_metric_list.append(float(params.get("max")))
                 print "%s : min:%s , max:%s , avg:%s \n" %(params.get("parameter").split(".")[-1],params.get("min"),params.get("max"),params.get("avg"))
             print "********************************************\n"
             # TODO As of now SHR memory validation is disabled. Need to confirm on this
             if thresholdCheck == "true":
-                status = compare_metric_threshold_values(deviceConfig,"PROFILING_PROCESS_SHR_THRESHOLD",process_metric_list)
+                process_config_param = "PROFILING_PROCESSES_" + processName.upper() + "_USEDSHR_THRESHOLD"
+                status = compare_metric_threshold_values(deviceConfig,process_config_param,process_metric_list)
                 if status == "SUCCESS":
                     result_details["test_step_status"] = "SUCCESS"
                     print "Process used SHR metric is within the expected threshold level"
@@ -431,6 +437,7 @@ def rdkv_profiling_collectd_check_process_usedSHR(tmUrl, resultId, processName, 
     finally:
         result_details = json.dumps(result_details)
         return result_details
+
 
 
 
