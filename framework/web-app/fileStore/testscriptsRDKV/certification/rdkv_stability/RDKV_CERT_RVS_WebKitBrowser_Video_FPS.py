@@ -25,7 +25,7 @@
   <primitive_test_name>rdkservice_validateCPULoad</primitive_test_name>
   <primitive_test_version>2</primitive_test_version>
   <status>FREE</status>
-  <synopsis>The objective of this test is to play a YouTube URL in WebKitBowser and validate FPS for 6 hrs.</synopsis>
+  <synopsis>The objective of this test is to play a video URL in WebKitBowser and validate FPS for 6 hrs.</synopsis>
   <groups_id/>
   <execution_time>380</execution_time>
   <long_duration>false</long_duration>
@@ -39,14 +39,14 @@
   </box_types>
   <test_cases>
     <test_case_id>RDKV_STABILITY_36</test_case_id>
-    <test_objective>The objective of this test is to play a YouTube URL in WebKitBowser and validate FPS for 6 hrs.</test_objective>
+    <test_objective>The objective of this test is to play a video URL in WebKitBowser and validate FPS for 6 hrs.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI,Accelerator</test_setup>
     <pre_requisite>Wpeframework process should be up and running in the device.</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>None</input_parameters>
     <automation_approch>1. Launch WebkitBrowser using RDKShell
-2. Set URL of a YouTube video using url method.
+2. Set a test URL using url method.
 3. Check the fps value using the fps method of WebKitBrowser.
 4. Validate the average fps value in every 1hr for total 6hrs
  </automation_approch>
@@ -117,7 +117,7 @@ if expectedResult in (result.upper() and pre_condition_status):
     conf_file,file_status = getConfigFileName(obj.realpath)
     fps_config_status,fps_threshold = getDeviceConfigKeyValue(conf_file,"EXPECTED_FPS")
     offset_status,offset = getDeviceConfigKeyValue(conf_file,"FPS_THRESHOLD")
-    video_url = StabilityTestVariables.cobalt_test_url
+    video_url = StabilityTestVariables.fps_test_url
     if status == "SUCCESS" and all(value != "" for value in (fps_threshold,offset,video_url)):
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"

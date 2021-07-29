@@ -57,6 +57,9 @@ ValidateActivatedPlugins = "No"
 rebootwaitTime = 150
 
 ####Webkit stress test details
+# webkit_instance can be "WebKitBrowser" or "LightningApp" plugin
+webkit_instance = "LightningApp"
+
 #test duration in minutes till webkit stress test should be performed.
 stress_test_duration = 600
 
@@ -135,6 +138,9 @@ cobalt_search_and_play_max_count = 1000
 video_resize_max_count = 300
 
 ##FPS validation test details
+fps_test_url = ""
+
+#fps test duration in minutes
 fps_test_duration = 360
 
 ##Toggle SSID test details

@@ -32,6 +32,9 @@ cobalt_test_url = ""
 #Thunder port for listening to events
 thunder_port = "9998"
 
+# webkit_instance can be "WebKitBrowser" or "LightningApp" plugin
+webkit_instance = "LightningApp"
+
 #Video player app URL, sample URL: http://<TM-IP>:8080/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html
 lightning_video_test_app_url = ""
 
