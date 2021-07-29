@@ -152,7 +152,7 @@ def openChromeBrowser(url):
 #-------------------------------------------------------------------
 def rdkv_media_readUIData(elementExpandXpath,dataXpath,count):
    try:
-        webinspectURL = 'http://' + deviceIP + ':' + MediaValidationVariables.webinspect_port + '/Main.html?page=1'
+        webinspectURL = 'http://' + deviceIP + ':' + MediaValidationVariables.webinspect_port_lightning + '/Main.html?page=1'
         print "url:",webinspectURL
         driver = openChromeBrowser(webinspectURL);
         if driver != "EXCEPTION OCCURRED":

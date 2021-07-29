@@ -119,8 +119,14 @@ export default class App extends Lightning.Component {
   stop() {
       this.player.stop();
   }
+  playNow(){
+    this.playbackRateIndex = this.playbackSpeeds.indexOf(1)
+    var rate = this.playbackSpeeds[this.playbackRateIndex]
+    this.setPlaybackRate(rate)
+  }
   setPlaybackRate(rate, overshoot = 0) {
       this.expectedEvents = ["ratechange"]
+      this.expectedRate = rate
       logMsg("Expected Rate : " + this.expectedRate)
       logMsg("Expected Event: " + this.expectedEvents)
       this.player.setPlaybackRate(rate, overshoot);
@@ -145,6 +151,15 @@ export default class App extends Lightning.Component {
   getVideoRectangle() {
      return this.player.getVideoRectangle();
   }
+  getAvailableAudioTracks() {
+     return this.player.getAvailableAudioTracks();
+  }
+  getAudioTrack() {
+      return this.player.getAudioTrack();
+  }
+  setAudioTrack(track) {
+      this.player.setAudioTrack(track);
+  }
 
 
   // AAMP Event Listerner and Handlers
@@ -164,12 +179,14 @@ export default class App extends Lightning.Component {
     var position = (event.positionMiliseconds / 1000.0);
     if ( tag.init == 0 ){
           var dur = tag.getDurationSec();
+          tag.vidDuration = dur.toFixed(2)
           logMsg("******************* VIDEO STARTED PLAYING !!! *******************")
           logMsg("VIDEO AUTOPLAY: " + tag.autoplay)
-          logMsg("VIDEO DURATION: " + dur.toFixed(2))
+          logMsg("VIDEO DURATION: " + tag.vidDuration)
+          //logMsg("Available Audio tracks: " + tag.getAvailableAudioTracks())
+          //logMsg("Current Audio track: " + tag.getAudioTrack())
           tag.checkAndStartAutoTesting()
           tag.init = 1 //inited
-          tag.vidDuration = dur.toFixed(2)
           /*tag.progressLogger = setInterval(()=>{
               tag.dispProgressLog()
           },1000);*/
@@ -245,7 +262,7 @@ export default class App extends Lightning.Component {
       logMsg(this.message1 + " !!!")
   }
   setExpPlayBackEvents(){
-    this.expectedEvents = ["playing","ended"]
+    this.expectedEvents = ["ended"]
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Observed Event: " + this.observedEvents)
   }
@@ -336,6 +353,12 @@ export default class App extends Lightning.Component {
             else if (action == "playtillend"){
                 setTimeout(()=> {
                     this.setExpPlayBackEvents()
+                },actionInterval);
+            }
+            else if (action == "playnow"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.playNow()
                 },actionInterval);
             }
             else if (action == "fastfwd4x" || action == "fastfwd16x" || action == "fastfwd32x"){
@@ -468,6 +491,7 @@ export default class App extends Lightning.Component {
     this.init     = 0
     this.interval = 1000
     this.checkInterval= 3000
+    this.vidDuration  = 0
     this.errorFlag      = 0
     this.eventFlowFlag  = 1
     this.observedEvents = []
@@ -513,5 +537,6 @@ export default class App extends Lightning.Component {
   }
 
 }
+
 
 
