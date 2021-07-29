@@ -1820,8 +1820,15 @@ class ExecutionController {
 			rate = ((success * 100)/(total - na))
 		}
 		tDataMap.put(Constants.PASS_RATE_SMALL,rate)
-		
-		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus, statusListForPopUpExecution : statusListForPopUpExecution]
+		boolean isProfilingDataPresent = false
+		List executionResultList =  ExecutionResult.findAllByExecution(executionInstance)
+		executionResultList.each{ executionResult ->
+			List performanceList = Performance.findAllByExecutionResultAndPerformanceType(executionResult,GRAFANA_DATA)
+			if(!performanceList.isEmpty()){
+				isProfilingDataPresent = true
+			}
+		}
+		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus, statusListForPopUpExecution : statusListForPopUpExecution,isProfilingDataPresent:isProfilingDataPresent]
 	}
 
 	/**
@@ -2282,6 +2289,45 @@ class ExecutionController {
 			return
 		}
 
+	}
+	
+	/**
+	 * Method to export profiling data to excel
+	 */
+	def exportProfilingMetricsToExcel = {
+		if(!params.max) params.max = 100000
+		Map dataMap = [:]
+		List fieldLabels = []
+		Map fieldMap = [:]
+		Map parameters = [:]
+		List columnWidthList = [0.2,0.5,0.3,0.2,0.15,0.15,0.15,0.2,0.2,0.8]
+		Execution executionInstance = Execution.findById(params.id)
+		String executionInstanceStatus ;
+		executionInstanceStatus =executedbService?.isValidExecutionAvailable(executionInstance)
+		if(executionInstanceStatus?.equals(Constants.SUCCESS_STATUS)){
+			if(executionInstance){
+					dataMap = executedbService.getDataForProfilingMetricsExcelReportGeneration(executionInstance, getRealPath(),getApplicationUrl())
+					fieldMap = ["C1":" Sl.No ", "C2":" Script Name ","C3":"Executed","C4":" Status ", "C5":"Executed On ","C6":"Log Data","C7":"Jira #","C8":"Issue Type","C9":"Remarks","C10":" Agent Console Log"]
+					parameters = [ title: EXPORT_SHEET_NAME, "column.widths": columnWidthList]
+			}
+			else{
+				log.error "Invalid excution instance......"
+			}
+
+			params.format = EXPORT_EXCEL_FORMAT
+			params.extension = EXPORT_EXCEL_EXTENSION
+			response.contentType = grailsApplication.config.grails.mime.types[params.format]
+			def fileName = executionInstance.name
+			fileName = fileName?.replaceAll(" ","_")
+			response.setHeader("Content-disposition", "attachment; filename=ProfilingMetricsData-"+ fileName +".${params.extension}")
+			excelExportService.exportProfilingMetrics(params.format, response.outputStream,dataMap, null,fieldMap,[:], parameters)
+			log.info "Completed excel export............. "
+		}
+		else{
+			redirect(action: "create");
+			flash.message= "No valid execution reports are available."
+			return
+		}
 	}
 	
 	/**
@@ -5175,7 +5221,7 @@ class ExecutionController {
 	 * @param parameter
 	 * @return
 	 */
-	def fetchDataFromGrafana(String executionResultId,String parameter){
+	def fetchDataFromGrafana(String executionResultId,String parameter,String actualUnit,String preferredUnit, boolean isSystemMetric){
 		List dataArrayList = []
 		String basicUrl = getGrafanaConfigurations("grafanaUrl")
 		String prefix = getGrafanaConfigurations("prefix")
@@ -5188,6 +5234,10 @@ class ExecutionController {
 				String macAddress = dev?.serialNo
 				if(macAddress != null){
 					try{
+						boolean unitsSame = true
+						if(!actualUnit?.equals(preferredUnit)){
+							unitsSame = false
+						}
 						if(macAddress?.contains(":")){
 							macAddress = macAddress?.replace(":","")
 						}					
@@ -5244,6 +5294,10 @@ class ExecutionController {
 											target = jsonObj.get('target')
 										}
 										if(jsonObj.has('datapoints')){
+											String displayUnit = ""
+											if((preferredUnit != null) && (!preferredUnit?.equals(""))){
+												displayUnit = " ("+preferredUnit +")"
+											}
 											List datapoints = jsonObj.get('datapoints')
 											datapoints.each{ dataPoint ->
 												if(!(JSONObject.NULL?.equals(dataPoint[0]))){
@@ -5253,41 +5307,30 @@ class ExecutionController {
 													SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 													def convertedTime = sdf.format(new Date(epochTime))
 													float dataPointFloat = (float)dataPoint[0];
-													if((target?.contains("memory")) || (target?.contains("processes-"))){
-														int divideNumber = 1000000
+													if(unitsSame){
+														dataPointFloat = dataPointFloat.round(3)
+														dataList.add(dataPointFloat)
+														eachDataList.addAll(convertedTime,dataPointFloat)
+													}else{
+														int divideNumber =  1
+														if((actualUnit?.equals("Bytes") && preferredUnit?.equals("MB"))){
+															divideNumber = 1000000
+														}else if((actualUnit?.equals("Bytes") && preferredUnit?.equals("KB"))){
+															divideNumber = 1000
+														}else if((actualUnit?.equals("KB") && preferredUnit?.equals("MB"))){
+															divideNumber = 1000
+														}
 														def result = dataPointFloat / divideNumber
 														result = result.round(2)
 														dataList.add(result)
 														eachDataList.addAll(convertedTime,result)
-													}else if(target?.contains("load") || (target?.contains("exec-"))){
-														dataList.add(dataPointFloat)
-														eachDataList.addAll(convertedTime,dataPointFloat)
-													}else if(target?.contains("cpu.percent-active")){
-														dataPointFloat = dataPointFloat.round(3)
-														dataList.add(dataPointFloat)
-														eachDataList.addAll(convertedTime,dataPointFloat)
 													}
 													dataListForLogFile?.add(eachDataList)
 												}
 											}
 											if(!dataListForLogFile.isEmpty()){
-												if((target?.contains("memory")) || (target?.contains("processes-"))){
-													String parameterForLog = target?.toString() + " (MB)"
-													dataNode.addProperty("parameter", parameterForLog)
-												}else if(target?.contains("load") || target?.contains("cpu.percent-active")){
-													String parameterForLog = target?.toString() + " (%)"
-													dataNode.addProperty("parameter", parameterForLog)
-												}else if(target?.contains("exec-")){
-													if(target?.contains("UsedCPU")){
-														String parameterForLog = target?.toString() + " (%)"
-														dataNode.addProperty("parameter", parameterForLog)
-													}else {
-														String parameterForLog = target?.toString() + " (KB)"
-														dataNode.addProperty("parameter", parameterForLog)
-													}
-												}else{
-													dataNode.addProperty("parameter", target?.toString())
-												}
+												String parameterForLog = target?.toString() + displayUnit
+												dataNode.addProperty("parameter", parameterForLog)
 												dataNode.addProperty("datapoints", dataListForLogFile?.toString())
 												writeDataArray.add(dataNode)
 											}
@@ -5301,23 +5344,9 @@ class ExecutionController {
 													avg = sum / dataList.size()
 												}
 												avg = avg.round(2)
-												if((target?.contains("memory")) || (target?.contains("processes-"))){
-													String parameterForLog = target?.toString() + " (MB)"
-													dataMap.put("parameter", parameterForLog)
-												}else if(target?.contains("load") || target?.contains("cpu.percent-active")){
-													String parameterForLog = target?.toString() + " (%)"
-													dataMap.put("parameter", parameterForLog)
-												}else if(target?.contains("exec-")){
-													if(target?.contains("UsedCPU")){
-														String parameterForLog = target?.toString() + " (%)"
-														dataMap.put("parameter", parameterForLog)
-													}else {
-														String parameterForLog = target?.toString() + " (KB)"
-														dataMap.put("parameter", parameterForLog)
-													}
-												}else{
-													dataMap.put("parameter", target?.toString())
-												}
+
+												String parameterForRest = target?.toString() + displayUnit
+												dataMap.put("parameter", parameterForRest)
 												dataMap.put("min",dataList.min())
 												dataMap.put("max",dataList.max())
 												dataMap.put("avg",avg)
@@ -5325,42 +5354,65 @@ class ExecutionController {
 												String processName = target?.split(host+".")[1]
 												List processNameSplit = processName?.split("\\.")
 												String processValueList = "min:"+dataList.min()+", max:"+dataList.max()+", avg:"+avg
-				
+												String thresholdVariable = ""
+												
 												def performanceInstanceForMin = new Performance()
 												performanceInstanceForMin.executionResult = execResult
-												performanceInstanceForMin.performanceType = "GrafanaData"
-												if(target?.contains("load") || target?.contains("memory") || target?.contains("cpu.percent-active")){
-													performanceInstanceForMin.processName = "system " + processName?.split("\\.")[0]
+												performanceInstanceForMin.performanceType = GRAFANA_DATA
+												if(isSystemMetric){
+													performanceInstanceForMin.processName = "system " + processNameSplit[0]
+													thresholdVariable = PROFILING_SYSTEM + processNameSplit[0] + PROFILING_THRESHOLD
 												}else{
 													if(target?.contains("exec-")){
-														String processNameForExec = processName?.split("\\.")[0]
+														String processNameForExec = processNameSplit[0]
 														processNameForExec = processNameForExec?.replace("exec-","processes-")
 														performanceInstanceForMin.processName = processNameForExec
+														thresholdVariable = PROFILING_PROCESSES + processNameForExec
 													}else{
-														performanceInstanceForMin.processName = processName?.split("\\.")[0]
+														performanceInstanceForMin.processName = processNameSplit[0]
+														thresholdVariable = PROFILING_PROCESSES + processNameSplit[0]
 													}
 												}
 												performanceInstanceForMin.processValue = processValueList
-												if(target?.contains("load")){
-													String processType = processName?.split("\\.")[2] + " (%)"
-													performanceInstanceForMin.processType = processType
-												}else if(target?.contains("exec-")){
-													if(target?.contains("UsedCPU")){
-														String processType = processName?.split("\\.")[1]
-														String processTypeFinal = processType?.split("-")[1] + " (%)"
-														performanceInstanceForMin.processType = processTypeFinal
-													}else {
-														String processType = processName?.split("\\.")[1]
-														String processTypeFinal = processType?.split("-")[1] + " (KB)"
-														performanceInstanceForMin.processType = processTypeFinal
-													}
-												}else if(target?.contains("cpu.percent-active")){
-													String processType = processName?.split("\\.")[1] + " (%)"
-													performanceInstanceForMin.processType = processType
+												String processType = ""
+												if(target?.contains("exec-")){
+													String processTypeInitial = processNameSplit[processNameSplit.size() - 1]
+													processType = processTypeInitial?.split("-")[1]  
+													processType = processType?.split("_")[1]  
 												}else{
-													String processType = processName?.split("\\.")[1] + " (MB)"
-													performanceInstanceForMin.processType = processType
+													if(processNameSplit.size() == 3){
+														if(!processNameSplit[0]?.equals(processNameSplit[1])){
+															processType = processNameSplit[1]+"." + processNameSplit[2] 
+														}else{
+															processType = processNameSplit[processNameSplit.size() - 1]
+														}
+													}else{
+														processType = processNameSplit[processNameSplit.size() - 1]
+													}
 												}
+												if(!isSystemMetric){
+													thresholdVariable = thresholdVariable +UNDERSCORE + processType+ PROFILING_THRESHOLD
+												}
+												thresholdVariable = thresholdVariable?.replace("-","_")
+												thresholdVariable = thresholdVariable?.replace(".","_")
+												thresholdVariable = thresholdVariable?.toUpperCase()
+												String finalConfigFile = ""
+												File deviceConfigFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+dev?.stbName+".config")
+												File boxTypeConfigFile = new File( "${realPath}//fileStore//tdkvRDKServiceConfig//"+dev?.boxType?.name+".config")
+												if(deviceConfigFile?.exists()){
+													finalConfigFile = dev?.stbName+".config"
+												}else if(boxTypeConfigFile?.exists()){
+													finalConfigFile = dev?.boxType?.name+".config"
+												}
+												if(finalConfigFile != ""){
+													String thresholdValue = getThresholdFromConfigFile(thresholdVariable,finalConfigFile)
+													if(thresholdValue == null){
+														thresholdValue = ""
+													}
+													performanceInstanceForMin.processValue1 = thresholdValue?.trim()
+												}
+												processType = processType + displayUnit
+												performanceInstanceForMin.processType = processType
 												performanceInstanceForMin.category = "RDKV"
 												performanceInstanceForMin.save(flush:true)
 				
@@ -5402,6 +5454,38 @@ class ExecutionController {
 	 */
 	def getGrafanaConfigurations(String key){
 		File configFile = grailsApplication.parentContext.getResource("/fileStore/grafana.config").file
+		Properties prop = new Properties();
+		InputStream is
+		try{
+			if (configFile.exists()) {
+				is = new FileInputStream(configFile);
+				prop.load(is);
+				String value = prop.getProperty(key);
+				if (value != null && !value.isEmpty()) {
+					return value;
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace()
+		}finally{
+			if(is){
+				try{
+					is.close()
+				}catch(Exception e){
+					e.printStackTrace()
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Function to read threshold values from device config file for rdk profiling
+	 * @param key
+	 * @return
+	 */
+	def getThresholdFromConfigFile(String key, String fileName){
+		File configFile = grailsApplication.parentContext.getResource("/fileStore/tdkvRDKServiceConfig/"+fileName).file
 		Properties prop = new Properties();
 		InputStream is
 		try{

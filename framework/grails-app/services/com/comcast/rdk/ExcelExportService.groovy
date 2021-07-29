@@ -140,5 +140,27 @@ class ExcelExportService {
 		exporter.exportRDKServiceData(outputStream, dataMap)
 	}
 	
+	/**
+	 * Method to export profiling data in excel report for RDK profiling executions
+	 * @param type
+	 * @param outputStream
+	 * @param dataMap
+	 * @param fields
+	 * @param labels
+	 * @param formatters
+	 * @param parameters
+	 * @throws ExportingException
+	 */
+	public void exportProfilingMetrics(String type, OutputStream outputStream, Map dataMap, List fields, Map labels, Map formatters, Map parameters) throws ExportingException {
+		ExcelExporter exporter = new ExcelExporter()
+		if(labels){
+			exporter.setLabels(labels)
+		}
+		if(parameters){
+			exporter.setParameters(parameters)
+		}
+		exporter.exportProfilingMetricsData(outputStream, dataMap)
+	}
+	
 	
 }

@@ -286,7 +286,10 @@ function triggerExecutionFromPopUp(){
 		<g:link action="exportConsolidatedToExcel" params="[id:"${executionInstance?.id}"]" >Download Consolidated Report(Excel)</g:link>
 		<br>
 		<g:link action="downloadLogs" params="[id:"${executionInstance?.id}"]" >Download Execution Logs(Zip)</g:link>
-		
+		<br>
+		<g:if test="${isProfilingDataPresent}">
+			<g:link action="exportProfilingMetricsToExcel" params="[id:"${executionInstance?.id}"]" >Download Profiling Metrics Report(Excel)</g:link>
+		</g:if>
 		</td>		
 	</tr>		
 	<tr class="trborder even">
@@ -697,16 +700,24 @@ function triggerExecutionFromPopUp(){
 										<tr class="fnhead1">
 											<td class="tdhead" style="width:30%;">${processNameInstance}</td>
 											<td class="tdhead"></td>
+											<td class="tdhead"></td>
 										</tr>
 										<tr class="fnhead1">												
 											<td class="tdhead" style="width:30%;">Parameter</td>
+											<td class="tdhead">Threshold</td>		
 											<td class="tdhead">Value</td>							
 										</tr>
 										<g:each in="${grafanaPerformance}" var="grafanaPerformanceInstance">
 											<g:if test="${grafanaPerformanceInstance.processName == processNameInstance}">	
 												<tr>																					
-													<td style="width:30%;">${grafanaPerformanceInstance?.processType}</td>												
-													<td>${grafanaPerformanceInstance?.processValue}</td>				
+													<td style="width:30%;">${grafanaPerformanceInstance?.processType}</td>	
+													<g:if test="${grafanaPerformanceInstance?.processValue1}">	
+														<td>${grafanaPerformanceInstance?.processValue1}</td>	
+													</g:if>
+													<g:else>
+														<td>NIL</td>	
+													</g:else>				
+													<td>${grafanaPerformanceInstance?.processValue}</td>	
 												</tr>			
 											</g:if>
 										</g:each>						

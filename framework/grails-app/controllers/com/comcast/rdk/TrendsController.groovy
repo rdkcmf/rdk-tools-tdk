@@ -1751,8 +1751,8 @@ class TrendsController {
 				benchMarkPerformanceTypeList?.add(performanceType)
 			}
 		}
-		if(benchMarkPerformanceTypeList?.contains("GrafanaData")){
-			benchMarkPerformanceTypeList?.remove("GrafanaData")
+		if(benchMarkPerformanceTypeList?.contains(GRAFANA_DATA)){
+			benchMarkPerformanceTypeList?.remove(GRAFANA_DATA)
 		}
 		if(benchMarkPerformanceTypeList?.contains("CPUMemoryInfo")){
 			benchMarkPerformanceTypeList?.remove("CPUMemoryInfo")

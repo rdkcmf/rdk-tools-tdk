@@ -396,5 +396,8 @@ public final class Constants
 	public static final String MODULE_DATA = "moduleData";
 	public static final String DEFECT_DATA = "defectData";
 	
-	
+	public static final String GRAFANA_DATA = "GrafanaData";
+	public static final String PROFILING_SYSTEM = "PROFILING_SYSTEM_";
+	public static final String PROFILING_PROCESSES = "PROFILING_";
+	public static final String PROFILING_THRESHOLD = "_THRESHOLD";
 }

@@ -1026,6 +1026,120 @@ class ExecutedbService {
 	}
 
 	/**
+	 * Method to generate the data for creating the profiling data report in excel format.
+	 */
+	def getDataForProfilingMetricsExcelReportGeneration(Execution executionInstance, String realPath,String appUrl) {
+		List executionResultList = []
+		def detailDataMap = [:]
+		def coverPageMap = [:]
+		List fieldList = ["C1", "C2", "C3", "C4","C5","C6","C7","C8"]
+		ExecutionDevice executionDevice  = ExecutionDevice.findByExecution(executionInstance)
+		executionResultList =  ExecutionResult.findAllByExecutionAndExecutionDevice(executionInstance,executionDevice)
+		Map detailsMap = [:]
+		String image = ""
+		detailsMap.put("Device", executionDevice?.device)
+		detailsMap.put("DeviceIP", executionDevice?.deviceIp)
+		def executionTime = executionInstance?.realExecutionTime
+		executionTime = executionTimeFormat (executionTime)
+		detailsMap.put("Execution Time (min)", executionTime)
+		if(executionDevice?.buildName){
+			image = executionDevice?.buildName
+		}else{
+			image = "Image name not available"
+		}
+		detailsMap.put("Image", image)
+		coverPageMap.put("Details",detailsMap)
+		detailDataMap.put("CoverPage", coverPageMap)
+		int scriptCounter = 1
+		List scriptList = []
+		Map scriptNameSheetNameMap = [:]
+		executionResultList.each{ executionResult ->
+			def dataList = []
+			Map dataMapList = [:]
+			String scriptName = executionResult?.script
+			String status = executionResult?.status
+			def sMap = scriptService.getScriptNameModuleNameMapping(realPath)
+			def moduleName = sMap.get(scriptName)
+			if(moduleName){
+				ScriptFile script = ScriptFile.findByScriptName(scriptName)
+				if(script){
+					Map scriptContent = scriptService.getScript(realPath, script?.moduleName, script?.scriptName, "RDKV")
+					Map testCaseDetails = scriptContent.get("testCaseDetails")
+					def testCaseId = testCaseDetails.get("testCaseId")
+					if(testCaseId != "" && testCaseId != null){
+						Map toolDetailsMap = [:]
+						Map profilingDetailsMap = [:]
+						List toolNames = []
+						List performanceList = Performance.findAllByExecutionResultAndPerformanceType(executionResult,GRAFANA_DATA)
+						if(!performanceList.isEmpty()){
+							//For summary sheet
+							Map scriptMap =["C1":scriptCounter,"C2":executionResult?.script,"C3":executionResult?.status,"C4":""]
+							coverPageMap.put(executionResult?.script,scriptMap)
+							scriptNameSheetNameMap.put(executionResult?.script,testCaseId)
+							scriptCounter++
+							//For profiling sheets
+							String output = executionResult?.executionOutput
+							String executionOutput
+							if(output){
+								executionOutput = output.replace(HTML_BR, NEW_LINE)
+								if(executionOutput && executionOutput.length() > 10000){
+									executionOutput = executionOutput.substring(0, 10000)
+								}
+							}
+							def countOfExecutionOutput = executionOutput?.size()
+							String executionLogData = executionOutput
+							if(countOfExecutionOutput >= 1000 ){
+								executionLogData = executionOutput+"\n More data use this link ....... \n " +appUrl+"/execution/getExecutionOutput?execResId="+executionResult?.id
+							}
+							Map scriptDetailsMap = ["C1":executionResult?.script,"C2":executionResult?.status,"C3":executionLogData]
+							profilingDetailsMap.put("scriptDetails", scriptDetailsMap)
+							if(!performanceList.isEmpty()){
+								Map parameterMap = [:]
+								String performanceType = performanceList[0]?.performanceType
+								String toolName = ""
+								if(performanceType?.equals(GRAFANA_DATA)){
+									toolName = "collectd"
+								}
+								toolNames.add(toolName)
+								performanceList.each{ performance ->
+									List metricList = []
+									if(parameterMap.containsKey(performance?.processName)){
+										metricList = parameterMap.get(performance?.processName)
+									}
+									Map metricMap = [:]
+									metricMap.put("Metrics",performance?.processType )
+									if(performance?.processValue1){
+										def thresholdValue = Integer.parseInt(performance?.processValue1?.trim())
+										metricMap.put("Threshold",thresholdValue )
+									}else{
+										metricMap.put("Threshold","NIL" )
+									}
+									String processValue = performance?.processValue
+									List processValueList = processValue?.split(",")
+									processValueList.each{ process ->
+										def value = process?.split(":")[1]
+										def valueDouble = Double.parseDouble(value)
+										metricMap.put(process?.split(":")[0], valueDouble)
+									}
+									metricList.add(metricMap)
+									parameterMap.put(performance?.processName, metricList)
+								}
+								toolDetailsMap.put(toolName, parameterMap)
+							}
+						}
+						profilingDetailsMap.put("toolNames", toolNames)
+						profilingDetailsMap.put("profilingData", toolDetailsMap)
+						profilingDetailsMap.put("fieldsList", fieldList)
+						detailDataMap.put(executionResult?.script, profilingDetailsMap)
+					}
+				}
+			}
+		}
+		detailDataMap.put("scriptNameSheetNameMap", scriptNameSheetNameMap)
+		return detailDataMap
+	}
+	
+	/**
 	 * Method to generate the data for creating the consolidated report for RDK service
 	 * executions in excel format.
 	 */

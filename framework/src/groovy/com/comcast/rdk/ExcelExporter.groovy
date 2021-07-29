@@ -881,4 +881,209 @@ class ExcelExporter extends AbstractExporter {
 			throw new ExportingException("Error during export", e)
 		}
 	}
+	
+	/**
+	 * Method to export profiling data in excel report for RDK profiling executions
+	 * @param outputStream
+	 * @param dataMap
+	 * @return
+	 */
+	def exportProfilingMetricsData(OutputStream outputStream, Map dataMap){
+		try {
+			def builder = new ExcelBuilder()
+			boolean isHeaderEnabled = true
+			if(getParameters().containsKey("header.enabled")){
+				isHeaderEnabled = getParameters().get("header.enabled")
+			}
+			def sheetsList = dataMap.keySet()
+			builder {
+				workbook(outputStream: outputStream){
+					sheetsList.each { sheetName ->
+						if(sheetName.equals("CoverPage")){
+							Map coverPageMap = dataMap.get(sheetName)
+							List columnWidthList = [0.05,0.05,0.05,0.05,0.08,0.8,0.2,0.6,0.2,0.2,0.2,0.2,0.15,0.15,0.15,0.15,0.2,0.2,0.2]
+							sheet(name: "Summary" ?: "Export", widths: columnWidthList){
+								int rowIndex = 0
+								//Default format
+								format(name: "header"){
+									font(name: "arial", bold: true)
+								}
+
+								format(name: "titlecell"){
+									font(name: "arial", bold: true)
+								}
+								
+								format(name: "cell"){
+									font(name: "arial", bold: false)
+								}
+
+								
+								Set keySet = coverPageMap.keySet()
+								if(keySet.size() > 0){
+									def key = keySet.first()
+									Map resultMap = coverPageMap.get("Details")
+									Set kSet = resultMap.keySet()
+									kSet.eachWithIndex { field, index ->
+										String label = getLabel(field)
+										cell(row: rowIndex, column: 5, value: label, format: "header")
+										String value = resultMap.get(field)
+										cell(row: rowIndex, column: 5 +1, value: value, format: "cell")
+										rowIndex ++
+									}
+								}
+								for(int i = 0 ; i < 4 ; i ++ ){
+									cell(row: rowIndex, column: 5 +1, value: "", format: "cell")
+									rowIndex ++
+								}
+								cell(row: rowIndex, column: 4, value: "Sl No", format: "header")
+								cell(row: rowIndex, column: 5, value: "Script Name", format: "header")
+								cell(row: rowIndex, column: 6, value: "Status", format: "header")
+								cell(row: rowIndex, column: 7, value: "Profiling Data", format: "header")
+								
+								keySet.eachWithIndex {  object, k ->
+									if(!object.equals("Details") && !object.equals(Constants.OVERALL_PASS_RATE)){
+										Map resultMap = coverPageMap.get(object)
+										Set kSet = resultMap.keySet()
+										kSet.eachWithIndex {field, i ->
+											Object value = resultMap.get(field)
+											String formatString = "cell"
+											if(i == 1){
+												formatString = "titlecell"
+											}
+											cell(row: k + rowIndex, column: 4+i, value: value , format :formatString)
+										}
+									}
+								}
+							}
+						}else{
+							int rowIndex = 1
+							Map tabMap = dataMap.get(sheetName)
+							Map sheetFromMap = dataMap.get("scriptNameSheetNameMap")
+							String sheetNameTruncated = sheetFromMap.get(sheetName)
+							List fields = tabMap?.get("fieldsList")
+							if(tabMap != null && fields != null){
+								Map data = tabMap?.get("scriptDetails")
+								Map profilingData = tabMap?.get("profilingData")
+								List toolNames = tabMap?.get("toolNames")
+								if(data != null && profilingData != null){
+									sheet(name: sheetNameTruncated ?: "Export", widths: getParameters().get("column.widths")){
+										format(name: "header"){
+											font(name: "arial", bold: true)
+										}
+
+										format(name: "cell"){
+											font(name: "arial", bold: false)
+										}
+
+										cell(row: 1, column: 0, value: "Script Name", format: "header")
+										cell(row: 2, column: 0, value: "Status", format: "header")
+										cell(row: 3, column: 0, value: "Script Log", format: "header")
+										if(!(data.isEmpty())){
+											Set keySet = data.keySet();
+											keySet.each { key ->
+												def value = data.get(key)
+												def columnNo = data.findIndexOf{it.key==key}
+												cell(row: rowIndex, column: 1, value: value , format :"cell")
+												rowIndex ++
+											}
+											rowIndex ++
+										}
+										cell(row: 3, column: 3, value: "", format: "cell")
+										rowIndex ++
+										if(!(toolNames.isEmpty())){
+											cell(row: rowIndex, column: 0, value:"Tool Names" , format: "header")
+											int counter = 1
+											toolNames.each { toolName ->
+												cell(row: rowIndex, column: counter, value: toolName , format :"cell")
+												counter++
+											}
+										}
+										rowIndex ++
+										rowIndex ++
+										if(!(profilingData.isEmpty())){
+											Set keySet = profilingData.keySet();
+											keySet.each { key ->
+												cell(row: rowIndex, column: 0, value:key , format: "header")
+												rowIndex ++												
+												cell(row: rowIndex, column: 1, value:"Parameter" , format: "header")
+												cell(row: rowIndex, column: 2, value:"Metrics" , format: "header")
+												cell(row: rowIndex, column: 3, value:"Threshold" , format: "header")
+												cell(row: rowIndex, column: 4, value:"Min Value" , format: "header")
+												cell(row: rowIndex, column: 5, value:"Max Value" , format: "header")
+												cell(row: rowIndex, column: 6, value:"Avg Value" , format: "header")
+												rowIndex ++												
+												Map parameterMap = profilingData.get(key)
+												Set parameterMapKeySet = parameterMap.keySet();
+												parameterMapKeySet.each { parameterKey ->
+													cell(row: rowIndex, column: 1, value:parameterKey , format: "header")
+													rowIndex ++
+													def metricsList = parameterMap.get(parameterKey)
+													metricsList.each { metric ->
+														int i = 0
+														metric.each { metricKey,metricValue ->
+															cell(row: rowIndex, column: 2+i, value: metricValue , format :"cell")
+															i++
+														}
+														rowIndex ++
+													}
+													rowIndex ++
+												}
+											}
+											rowIndex ++
+										}
+									}
+								}
+							}
+						}
+					}
+					Map sheetFromMap = dataMap.get("scriptNameSheetNameMap")
+					WritableSheet[] workbookSheets = workbook.getSheets()
+					workbookSheets.each { eachSheet ->
+						String sheetName = eachSheet.getName()
+						if(sheetName.equals("Summary")){
+							for(int row=9;row < eachSheet?.getRows();row ++){
+								WritableCell cell = eachSheet.getWritableCell(5,row)
+								def contents = cell.getContents()
+								String sheetNameTruncated = sheetFromMap.get(contents)
+								WritableSheet contentSheet = workbook.getSheet(sheetNameTruncated)
+								if(contentSheet){
+									def link = new WritableHyperlink(7,row,"",contentSheet,0,0)
+									link.setDescription("Profiling Data in " +sheetNameTruncated + " sheet");
+									eachSheet.addHyperlink(link);
+								}
+							}
+						}else{
+							WritableSheet summarySheet = workbook.getSheet("Summary")
+							if(summarySheet){
+								eachSheet.mergeCells(0,0,4,0);
+								def link = new WritableHyperlink(0,0,"",summarySheet,0,0)
+								link.setDescription("Go to Summary");
+								eachSheet.addHyperlink(link);
+							}
+							for(int col=1;col < eachSheet?.getColumns();col ++){
+								WritableCell horizontalCell = eachSheet.getWritableCell(col,6)
+								def horizontalCellContents = horizontalCell.getContents()
+								if(horizontalCellContents != "" && horizontalCellContents != null){
+									for(int row=7;row < eachSheet?.getRows();row ++){
+										WritableCell verticalCell = eachSheet.getWritableCell(0,row)
+										def verticalCellContents = verticalCell.getContents()
+										if(horizontalCellContents?.equals(verticalCellContents)){
+											def linkForTools = new WritableHyperlink(col,6,"",eachSheet,0,row)
+											linkForTools.setDescription(horizontalCellContents);
+											eachSheet.addHyperlink(linkForTools);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			builder.write()
+		}
+		catch(Exception e){
+			throw new ExportingException("Error during export", e)
+		}
+	}
 }
