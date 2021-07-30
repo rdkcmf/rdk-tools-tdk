@@ -93,7 +93,7 @@ if expectedResult in result.upper():
     process_wise_methods = ['rdkv_profiling_collectd_check_process_metrics','rdkv_profiling_collectd_check_process_usedCPU','rdkv_profiling_collectd_check_process_usedSHR']
     process_wise_method_names_dict = {'rdkv_profiling_collectd_check_process_metrics':'metrics','rdkv_profiling_collectd_check_process_usedCPU':'used CPU','rdkv_profiling_collectd_check_process_usedSHR':'used shared memory'}
     resident_app = "ResidentApp"
-    rebootwaitTime = 90
+    rebootwaitTime = 150
     tdkTestObj = obj.createTestStep('rdkservice_rebootDevice')
     tdkTestObj.addParameter("waitTime",rebootwaitTime)
     #get the current system time before reboot
@@ -109,7 +109,7 @@ if expectedResult in result.upper():
         result = tdkTestObj.getResult()
         if expectedResult in result:
             uptime = int(tdkTestObj.getResultDetails())
-            if uptime < 240:
+            if uptime < 300:
                 tdkTestObj.setResultStatus("SUCCESS")
                 tdkTestObj = obj.createTestStep('rdkservice_getValue')
                 tdkTestObj.addParameter("method","org.rdk.RDKShell.1.getZOrder")
