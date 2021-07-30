@@ -90,24 +90,24 @@
             <event pluginName="WebKitBrowser" eventName="Event_Load_Finished" />
           </prerequisite>
         </pluginPreRequisite>
-        <testCase testCaseId="FR_01" testCaseName="FrameRate_Collect_FPS" desc="Launches playback url using webkit browser and gets fps using onFpsEvent Event">
+        <testCase testCaseId="FR_01" testCaseName="FrameRate_Collect_FPS" desc="Launches graphics url using webkit browser and gets fps using onFpsEvent Event">
             <testCaseInfo testCaseType="stress" configurableRepeat="true" repeatKey="WEBKIT_FPS_REPEAT_COUNT"/>
             <testStep testStepId="1" name="Set_Collection_Frequency_Default_10Sec" method="Set_Collection_Frequency_Default" >
               <resultGeneration useMethodTag="framerate_check_set_operation" />
             </testStep>
             <testStep testStepId="2" name="Set_Browser_Test_URL" method="Set_Browser_URL" pluginName="WebKitBrowser">
               <params>
-                <param tag="url" useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
+                <param tag="url" useConfigFile="true" key="WEBKIT_GRAPHICS_URL" />
               </params>
             </testStep>
             <testStep testStepId="3" name="Check_Load_Finished_Event" event="Event_Load_Finished" action="eventListener" delay="20" pluginName="WebKitBrowser">
               <resultGeneration useMethodTag="webkitbrowser_check_load_finished_event" >
-                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
+                <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_GRAPHICS_URL" />
               </resultGeneration>
             </testStep>
             <testStep testStepId="4" name="Get_Browser_Test_URL" method="Get_Browser_URL" pluginName="WebKitBrowser">
               <resultGeneration useMethodTag="webkitbrowser_check_url" >
-                <expectedValues useConfigFile="true" key="WEBKIT_PLAYBACK_URL" />
+                <expectedValues useConfigFile="true" key="WEBKIT_GRAPHICS_URL" />
               </resultGeneration>
             </testStep>
             <testStep testStepId="5" name="Get_Browser_FPS_Value"  delay="60" testStepType="repeat">
