@@ -138,6 +138,8 @@ cobalt_search_and_play_max_count = 1000
 video_resize_max_count = 300
 
 ##FPS validation test details
+# TDK object animations Lightning App can be used
+# eg: "http://<TM-IP>:8080/rdk-test-tool/fileStore/lightning-apps/tdkobjectanimations/build/index.html?count=100&showfps=false&object=Rect&autotest=true&duration=21600"
 fps_test_url = ""
 
 #fps test duration in minutes
