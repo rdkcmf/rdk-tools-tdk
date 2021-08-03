@@ -409,12 +409,12 @@ def close_lightning_app(obj):
         tdkTestObj.executeTestCase(expectedResult);
         new_url = tdkTestObj.getResultDetails();
         result = tdkTestObj.getResult()
-        if new_url == current_url and expectedResult in result:
+        if current_url in new_url and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             print "URL(",new_url,") is set successfully"
             status = "SUCCESS"
         else:
-            print "\n Unable to set URL: {} in WebKitBrowser \n".format(url)
+            print "\n Unable to set URL: {} in WebKitBrowser \n".format(current_url)
             tdkTestObj.setResultStatus("FAILURE")
     else:
         print "\n Error while executing WebKitBrowser.1.url method \n"

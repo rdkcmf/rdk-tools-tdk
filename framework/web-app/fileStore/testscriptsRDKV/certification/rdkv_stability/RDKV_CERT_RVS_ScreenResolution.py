@@ -325,6 +325,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                                     else:
                                         print "\n[ERROR] Resolutions are not set properly \n"
                                         tdkTestObj.setResultStatus("FAILURE")
+                                        break
                                     for image in image_files:
                                         if image not in base_file_name:
                                             os.remove(image)
