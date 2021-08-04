@@ -31,6 +31,7 @@ from base64 import b64encode, b64decode
 import codecs
 from time import sleep
 import re
+import subprocess
 
 #-----------------------------------------------------------------------------------------------
 #               ***  RDK SERVICES VALIDATION FRAMEWORK SUPPORTING FUNCTIONS ***
