@@ -17,63 +17,80 @@
 # limitations under the License.
 ##########################################################################
 '''
-<?xml version="1.0" encoding="UTF-8"?><xml>
-  <id/>
+<?xml version='1.0' encoding='utf-8'?>
+<xml>
+  <id></id>
+  <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>2</version>
-  <name>FCS_Playback_PlayPause_MultipleTimes_DASH</name>
-  <primitive_test_id/>
+  <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
+  <name>FCS_Playback_FastForward_4x_AAC</name>
+  <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
+  <primitive_test_id></primitive_test_id>
+  <!-- Do not change primitive_test_id if you are editing an existing script. -->
   <primitive_test_name>FireboltCompliance_DoNothing</primitive_test_name>
+  <!--  -->
   <primitive_test_version>1</primitive_test_version>
+  <!--  -->
   <status>FREE</status>
-  <synopsis>Test to do multiple short duration play, pause operations on a DASH stream</synopsis>
-  <groups_id/>
-  <execution_time>10</execution_time>
+  <!--  -->
+  <synopsis>Test to do fast forward of a AAC stream with playback rate 4</synopsis>
+  <!--  -->
+  <groups_id />
+  <!--  -->
+  <execution_time>3</execution_time>
+  <!--  -->
   <long_duration>false</long_duration>
+  <!--  -->
   <advanced_script>false</advanced_script>
-  <remarks/>
+  <!-- execution_time is the time out time for test execution -->
+  <remarks></remarks>
+  <!-- Reason for skipping the tests if marked to skip -->
   <skip>false</skip>
+  <!--  -->
   <box_types>
     <box_type>RPI-Client</box_type>
+    <!--  -->
     <box_type>RPI-HYB</box_type>
+    <!--  -->
     <box_type>Video_Accelerator</box_type>
+    <!--  -->
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>
+    <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>FCS_PLAYBACK_24</test_case_id>
-    <test_objective>Test to do multiple short duration play, pause operations on a DASH stream</test_objective>
+    <test_case_id>FCS_PLAYBACK_44</test_case_id>
+    <test_objective>Test to do fast forward of a AAC stream with playback rate 4</test_objective>
     <test_type>Positive</test_type>
     <test_setup>Video Accelerator, RPI</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
-2. Test stream url for a DASH stream should be updated in the config variable video_src_url_dash inside MediaValidationVariables.py library inside filestore
+2. Test stream url for a AAC stream should be updated in the config variable video_src_url_aac inside MediaValidationVariables.py library inside filestore
 3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file
-4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time in seconds for which each play, pause operation should be carried out
-5. FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT configuration should be set to the number of times, the operations should be repeated</pre_requisite>
+4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time in seconds for which the fastforward operation should be carried out</pre_requisite>
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>testcasename - "test_trickplay"
-test_url - DASH url from MediaValidationVariables library (MediaValidationVariables.video_src_url_dash)
+test_url - AAC url from MediaValidationVariables library (MediaValidationVariables.video_src_url_aac)
 "checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
-operations=play:&lt;timeout&gt;,pause:&lt;timeout&gt;,play:&lt;timeout&gt;,pause:&lt;timeout&gt;,play:&lt;timeout&gt;,pause:&lt;timeout&gt; (number of play:&lt;timeout&gt;,pause:&lt;timeout&gt; string depends on the parameter FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT) - a comma separated string of indivudual play/pause &lt;operation:timeout&gt; string where operation could be string "play"/"pause" indicating play/pause operations and timeout is time in seconds for which the operation should be performed. The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file. The same timeout value can be used for all operations.The play/pause operations are repeted FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT times</input_parameters>
+operations=fastforward4x:&lt;timeout&gt; - a ":" seperated string to specify the fastforwad operation to be executed and the time in seconds for which the operation should be continued. The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
     <automation_approch>1.Load the systemuitl module 
-2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS, FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT and FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT config values from Device config file.
-3.Retrieve the video_src_url_dash variable from MediaValidationVariables library
-4. Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value, operations
-5.Execute the command in DUT. During the execution, the DUT will playback av for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds, then av is paused for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds.This sequence of play and pause operations are repeated for FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT times and then application exits by closing the pipeline
+2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
+3.Retrieve the video_src_url_aac variable from MediaValidationVariables library
+4. Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value, operation and timeout
+5.Execute the command in DUT. During the execution, the DUT will start av playback, then do a fast forward operation with playback rate 4 and then continue playback  at rate 4 for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds. Then application exits by closing the pipeline
 6.Verify the output from the execute command and check if the  "Failures: 0" and "Errors: 0" string exists or "failed: 0" string exists in the returned output
 7.Based on the ExecuteCommand() return value and the output returned from the mediapipelinetests application, TM return SUCCESS/FAILURE status.</automation_approch>
     <expected_output>Checkpoint 1. Verify the API call is success
 Checkpoint 2. Verify that the output returned from mediapipelinetests contains the strings "Failures: 0" and "Errors: 0" or it contains the string "failed: 0"</expected_output>
     <priority>High</priority>
     <test_stub_interface>libsystemutilstub.so.0</test_stub_interface>
-    <test_script>FCS_Playback_PlayPause_MultipleTimes_DASH</test_script>
+    <test_script>FCS_Playback_FastForward_4x_AAC</test_script>
     <skipped>No</skipped>
-    <release_version>M90</release_version>
-    <remarks/>
+    <release_version>M92</release_version>
+    <remarks></remarks>
   </test_cases>
-  <script_tags/>
+  <script_tags />
 </xml>
-
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
@@ -89,12 +106,11 @@ sysUtilObj = tdklib.TDKScriptingLibrary("systemutil","1")
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-sysUtilObj.configureTestCase(ip,port,'FCS_Playback_PlayPause_MultipleTimes_DASH');
+sysUtilObj.configureTestCase(ip,port,'FCS_Playback_FastForward_4x_AAC');
 
 #Set device configurations to default values
 checkAVStatus = "no"
 timeoutInSeconds = "10"
-repeatCount = 3
 
 #Load the systemutil library
 sysutilloadModuleStatus =sysUtilObj.getLoadModuleResult()
@@ -109,7 +125,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #The test name specifies the test case to be executed from the mediapipeline test suite
     test_name = "test_trickplay"
     #Test url for the stream to be played is retrieved from MediaValidationVariables library
-    test_url = MediaValidationVariables.video_src_url_dash
+    test_url = MediaValidationVariables.video_src_url_aac
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS' that specifies whether SOC level playback verification check should be done or not 
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
@@ -123,29 +139,12 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #if the device config value is empty, default timeout(10sec) is passed
     if expectedResult in actualresult.upper() and timeoutConfigValue != "":
         timeoutInSeconds = timeoutConfigValue
-    #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT' that specifies the number of times the operations should be reapeted 
-    actualresult, repeatCountConfigValue = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT')
-        
-    #If the value of FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT is retrieved correctly and its value is not empty, repeatCount value should be set as the retrieved vale
-    #if the device config value is empty, default repeatCount(3) is passed
-    if expectedResult in actualresult.upper() and repeatCountConfigValue != "":
-        repeatCount = int(repeatCountConfigValue)
-    #Construct the trickplay operation string by calling the setOperations() separately for each play/pause operation along with the timeout argument
+    #Construct the trickplay operation string
     #The operations specifies the operation(fastforward/rewind/seek/play/pause) to be executed from the mediapipeline trickplay test
-    #Sample oprations strings is "operations=play:10,pause:10,play:10,pause:10,play:10,pause:10,play:10,pause:10,play:10,pause:10,play:10,pause:10"
-    #The play and pause operations are added FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT or 3(default) times
-    #For adding the operation to the trickplay operations string, execute setOperations (operation_name_string, arguments...)
-    #eg: setOperations ("play", 10)
-    #For repeating the previous operations, execute setOperations ("repeat", number of operations to be repeated, number of times the operations should be repeated)
-    #Eg: To repeat "play", "pause" operations 3 times, setOperations ("play", 10), setOperations ("pause", 10), setOperations ("repeat", 2, 2)
-    #for iterator in range (repeatCount):
-    setOperations ("play", timeoutInSeconds)
-    setOperations ("pause", timeoutInSeconds)
-    #Repeat the above operation for repeatCount-1 times more
-    setOperations ("repeat", 2, repeatCount-1)
-
+    # Sample operations strings is "operations=fastforward4x:20"
+    setOperations ("fastforward4x", timeoutInSeconds)
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
-    #Sample command = "mediapipelinetests test_trickplay <DASH_STREAM_URL> checkavstatus=yes operations=play:30,pause:30,play:30,pause:30,play:30,pause:30,play:30,pause:30,play:30,pause:30,play:30,pause:30"
+    #Sample command = "mediapipelinetests test_trickplay <AAC_STREAM_URL> checkavstatus=yes operations=fastforward4x:20"
     command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, operations = getOperations ()) 
     print "Executing command in DUT: ", command
     
@@ -162,11 +161,11 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
         
         if expectedResult in executionStatus:
             tdkTestObj.setResultStatus("SUCCESS")
-            print "Multiple play,pause operations on DASH stream was successfull"
+            print "Fastforward on AAC stream with 4x speed was successfull"
             print "Mediapipeline test executed successfully"
         else:
             tdkTestObj.setResultStatus("FAILURE")
-            print "Multiple play,pause operations on DASH stream failed"
+            print "Fastforward on AAC stream with 4x speed failed"
     else:
         tdkTestObj.setResultStatus("FAILURE")
         print "Mediapipeline test execution failed"

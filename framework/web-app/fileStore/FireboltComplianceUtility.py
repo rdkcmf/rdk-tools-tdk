@@ -70,14 +70,38 @@ def getDeviceConfigValue (tdklibObj, configKey):
 # Individual operation with arguments(timeout, position etc) should be passed as input (eg: setOperations (seek, 10, 20)
 # Separate operations(eg: play:10,pause:10)  should be added by calling the setOperations() separatley
 # (eg: setOperations (play, 10) , setOperations (pause, 10) etc)
+# For repeating the previous trickplay operations give operation argument as "repeat", followed by the number of operations to be repeated and the repeat count (eg: setOperations (repeat, 1, 2)- for repeating last operation 2 times or setOperations (repeat, 2, 6)- for repeating last 2 operations 6 times etc)
 def setOperations (operation, *arguments):
-    global operations
-    if operations != "":
-        operations += ","
-    operations += operation
-    #Add all the arguments
-    for argument in arguments:
-        operations += ":" + argument
+    try:
+        global operations
+        #if the repeat operation command is recieved, the previous operations should be repeated the number of times provided as the second argument to repeat
+        #Repeat operation will not proceed if there are no previous operations in the string
+        if operations and operation == "repeat":
+            #The first argument to repeat is the number of previous operation that needs to be repeated
+            numberOfOperations = arguments[0]
+            #From the operations string, extract the last 'numberOfOperations' number of operations
+            #since individual operations are seperated by ',', split the operations string to a list of strings
+            splitList = [idx for idx, ch in enumerate(operations) if ch == ',']
+            #If there are enough operations to be repeated, select the last 'numberOfOperations' number of operations
+            if (len(splitList) > (numberOfOperations - 1)):
+                splitIndex = splitList [-numberOfOperations]
+                operationsToBeRepeated = operations[splitIndex+1:]
+            else:
+                operationsToBeRepeated = operations
+                for indx in range (0, arguments[1]):
+                    operations += "," + operationsToBeRepeated
+        elif operation != "repeat":
+            if operations != "":
+                operations += ","
+            operations += operation
+            #Add all the arguments
+            for argument in arguments:
+                operations += ":" + argument
+        #If there are no operations to be repeated, then repeat command is invalid
+        else:
+            raise Exception("There are no operations to be repeated")
+    except Exception as e:
+        print ("Exception occurred while updating the operations string  : " , e)
 
 # Function to retrieve the saved trickplay operation string
 def getOperations ():

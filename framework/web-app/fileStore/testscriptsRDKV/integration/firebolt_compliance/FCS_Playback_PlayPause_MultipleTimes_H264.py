@@ -134,10 +134,15 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #The operations specifies the operation(fastforward/rewind/seek/play/pause) to be executed from the mediapipeline trickplay test
     #Sample oprations strings is "operations=play:10,pause:10,play:10,pause:10,play:10,pause:10,play:10,pause:10,play:10,pause:10,play:10,pause:10"
     #The play and pause operations are added FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT or 3(default) times
-    #TODO Repeat operations should be handled as an argument
-    for iterator in range (repeatCount):
-        setOperations ("play", timeoutInSeconds)
-        setOperations ("pause", timeoutInSeconds)
+    #For adding the operation to the trickplay operations string, execute setOperations (operation_name_string, arguments...)
+    #eg: setOperations ("play", 10)
+    #For repeating the previous operations, execute setOperations ("repeat", number of operations to be repeated, number of times the operations should be repeated)
+    #Eg: To repeat "play", "pause" operations 3 times, setOperations ("play", 10), setOperations ("pause", 10), setOperations ("repeat", 2, 2)
+    #for iterator in range (repeatCount):
+    setOperations ("play", timeoutInSeconds)
+    setOperations ("pause", timeoutInSeconds)
+    #Repeat the above operation for repeatCount-1 times more
+    setOperations ("repeat", 2, repeatCount-1)
 
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
     #Sample command = "mediapipelinetests test_trickplay <H264_STREAM_URL> checkavstatus=yes operations=play:30,pause:30,play:30,pause:30,play:30,pause:30,play:30,pause:30,play:30,pause:30,play:30,pause:30"
