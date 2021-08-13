@@ -108,8 +108,8 @@ if "SUCCESS" in loadmodulestatus.upper():
             output = details.split(":")[1].split(",gOnly")[0].split("=")[1].split(",");
             radioStds = [s.strip() for s in output];
             tdkTestObj.setResultStatus("SUCCESS");
-            print "TEST STEP 1: Get the Radio Standards for 5GHz";
-            print "EXPECTED RESULT 1: Should get the Radio Standards for 5GHz";
+            print "TEST STEP 1: Get the Radio Standards for 2.4GHz";
+            print "EXPECTED RESULT 1: Should get the Radio Standards for 2.4GHz";
             print "ACTUAL RESULT 1: %s" %output
             #Get the result of execution
             print "[TEST EXECUTION RESULT] : SUCCESS";
@@ -130,8 +130,8 @@ if "SUCCESS" in loadmodulestatus.upper():
                 SupportedStds = [s.strip() for s in List];
                 #Set the result status of execution
                 tdkTestObj.setResultStatus("SUCCESS");
-                print "TEST STEP 2: Get the Radio Supported Standards for 5GHz";
-                print "EXPECTED RESULT 2: Should get the Radio Supported Standards for 5GHz";
+                print "TEST STEP 2: Get the Radio Supported Standards for 2.4GHz";
+                print "EXPECTED RESULT 2: Should get the Radio Supported Standards for 2.4GHz";
                 print "ACTUAL RESULT 2: %s" %SupportedStds;
                 #Get the result of execution
                 print "[TEST EXECUTION RESULT] : SUCCESS";
@@ -157,8 +157,8 @@ if "SUCCESS" in loadmodulestatus.upper():
             else:
                 #Set the result status of execution
                 tdkTestObj.setResultStatus("FAILURE");
-                print "TEST STEP 1: Get the Radio Supported Standards for 5GHz";
-                print "EXPECTED RESULT 1: Should get the Radio Supported Standards for 5GHz";
+                print "TEST STEP 1: Get the Radio Supported Standards for 2.4GHz";
+                print "EXPECTED RESULT 1: Should get the Radio Supported Standards for 2.4GHz";
                 print "ACTUAL RESULT 1: %s" %SupportedStds;
                 #Get the result of execution
                 print "[TEST EXECUTION RESULT] : FAILURE";
