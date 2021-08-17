@@ -279,6 +279,9 @@ def executeTestCases(testCaseID="all"):
     global eventsBufferBackup
     eventsBufferBackup = []
 
+    global customTimeout
+    customTimeout = None
+
     # ------------------------------- PLUGIN PRE-REQUISITES ----------------------------------
     # Perform plugin pre-requisite steps such as activate or deactivate plugins common for all
     # the tests . Revert operations are not supported as part of pre/post requisite steps. If
@@ -1243,8 +1246,14 @@ def executeCommand(testMethod,testParams):
     executeStatus = "SUCCESS"
     jsonResponse = {}
     try:
+        global customTimeout
+        if customTimeout != None:
+            responseTimeout = customTimeout
+            customTimeout = None
+        else:
+            responseTimeout = 30
         if execMethod.upper() == "CURL":
-            req_post = requests.post(requestURL,data=jsonCmd,timeout=30)
+            req_post = requests.post(requestURL,data=jsonCmd,timeout=responseTimeout)
             jsonResponse = json.loads(req_post.content,strict=False)
         else:
             executeStatus = "FAILURE"
@@ -1654,6 +1663,16 @@ def getTestStepInfo(testStep):
         methodInfo = {}
         methodInfo = {"method":testStepInfo.get(apiType),"plugin":testStepInfo.get("pluginName")}
         testStepInfo["methodNotFound"] = methodInfo.copy()
+
+    # Get the details of custom response timeout configurations made
+    # for this particular test case if any
+    if testStepInfo.get("timeoutKey") != None:
+        status,keyData = readDeviceConfigKeys(testCaseInfo.get("timeoutKey"))
+        if status == "SUCCESS" and  keyData != "":
+            global customTimeout
+            customTimeout = int(keyData)
+        else:
+            print "Unable to get the custom timeout: %s, proceeding with default value" %(testStepInfo.get("timeoutKey"))
 
     # Get the details of all the test params one by one
     if testStep.find("params") is not None:
