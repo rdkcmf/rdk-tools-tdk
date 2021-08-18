@@ -118,6 +118,7 @@ def checkValue(parameter):
         'cableCardVersion': bool(re.match("^[0-9]{2}.[0-9]{2}$", Value)),
         'model': bool(re.match("[A-Z0-9]*", Value)),
         'imageVersion': bool(Value),
+        'friendly_id': bool(MANUFACTURER.lower() in Value.lower()),
     }[parameter]
 
 #Test component to be tested
@@ -140,14 +141,19 @@ if "SUCCESS" in sysUtilLoadStatus.upper():
     #print "%d parameters"%(int(parameters))
     failedparams = {};
 
-    #Check if wifi is present
-    tdkTestObj.addParameter("command", "ls /lib/systemd/system | grep wifi.service | wc -l");
+    #Check if wifi is supported
+    tdkTestObj.addParameter("command", "cat /etc/device.properties | grep WIFI_SUPPORT=true | wc -l");
     tdkTestObj.executeTestCase("SUCCESS");
     isWifipresent = tdkTestObj.getResultDetails().split("\\")[0];
     if not int(isWifipresent):
         print "Device doesnot have wifi\n"
     else:
         print "Device supports wifi\n"
+
+    #Get MANUFACTURER
+    tdkTestObj.addParameter("command", "cat /etc/device.properties  | grep  MFG | cut -d \"=\" -f 2");
+    tdkTestObj.executeTestCase("SUCCESS");
+    MANUFACTURER = tdkTestObj.getResultDetails().split("\\")[0];
 
     for parameter in range(1,int(parameters)+1):
         cmd = "awk 'NR==%d' /tmp/.deviceDetails.cache"%parameter
