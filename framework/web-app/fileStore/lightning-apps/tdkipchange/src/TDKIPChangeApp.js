@@ -122,23 +122,25 @@ export default class App extends Lightning.Component {
       thunder.on('org.rdk.Network', 'onIPAddressStatusChanged', (notification) => {
           if (notification.hasOwnProperty(ipAddressType) && notification.status.includes('ACQUIRED')){
             let DeviceIP = notification[ipAddressType]
-            logMsg('IP Changed to :'+ DeviceIP);
-	    this.dispUIMessage('MsgBox1','IP Changed to :'+ DeviceIP)
-            //Updating new IP to Test manager
-            fetch(url + new URLSearchParams({deviceName: deviceNameInTM,
+	    if (!DeviceIP.startsWith('169.')){
+            	logMsg('IP Changed to :'+ DeviceIP);
+	    	this.dispUIMessage('MsgBox1','IP Changed to :'+ DeviceIP)
+            	//Updating new IP to Test manager
+            	fetch(url + new URLSearchParams({deviceName: deviceNameInTM,
                           newDeviceIP: DeviceIP,
                           tmUserName: userName,
                           tmPassword: password
                         }))
-            .then(response => response.json())
-            .then((data) => {
-	      logMsg('Response from Test Manager: '+ JSON.stringify(data))
-	      this.dispUIMessage('MsgBox2','Response from Test Manager: '+JSON.stringify(data))
-            })
-            .catch(error =>{ 
-              console.error('Error while connecting to Test Manager: '+ error);
-              this.dispUIMessage('MsgBox2','Error while connecting to Test Manager: '+ error);
-	    })
+            	.then(response => response.json())
+            	.then((data) => {
+	      	     logMsg('Response from Test Manager: '+ JSON.stringify(data))
+	      	     this.dispUIMessage('MsgBox2','Response from Test Manager: '+JSON.stringify(data))
+            	})
+            	.catch(error =>{ 
+              	console.error('Error while connecting to Test Manager: '+ error);
+              	this.dispUIMessage('MsgBox2','Error while connecting to Test Manager: '+ error);
+	    	})
+	    } 
 	  }
           else{
 	    logMsg("Other event message: "+JSON.stringify(notification))
