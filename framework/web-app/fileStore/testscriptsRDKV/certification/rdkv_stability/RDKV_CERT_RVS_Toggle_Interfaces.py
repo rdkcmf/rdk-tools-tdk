@@ -112,7 +112,7 @@ obj.configureTestCase(ip,port,'RDKV_CERT_RVS_Toggle_Interfaces');
 #configured as "Yes".
 pre_requisite_reboot(obj)
 
-output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
+output_file = '{}{}_{}_{}_CPUMemoryInfo.json'.format(obj.logpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
 result_dict_list = []
 cpu_mem_info_dict = {}
@@ -134,16 +134,24 @@ if expectedResult in (result.upper() and pre_condition_status):
     plugin_status_needed = {"WebKitBrowser":"resumed","org.rdk.Wifi":"activated","DeviceInfo":"activated"}
     print "\n Get plugins status \n"
     current_plugin_status_dict = get_plugins_status(obj,plugins_list)
-    if plugin_status_needed != current_plugin_status_dict:
+    time.sleep(10)
+    if any(current_plugin_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
+        print "\n Error while getting the status of plugins"
+        status = "FAILURE"
+    elif plugin_status_needed != current_plugin_status_dict:
         print "\n Set plugins status \n"
         status = set_plugins_status(obj,plugin_status_needed)
+        time.sleep(10)
+        new_plugins_status_dict = get_plugins_status(obj,plugins_list)
+        if new_plugins_status_dict != plugin_status_needed:
+            status = "FAILURE"
     #Check current interface
     current_interface,revert_nw = check_current_interface(obj)
     initial_interface = current_interface
     url_status,complete_url = get_lightning_app_url(obj)
     if revert_nw == "YES":
         revert_plugins_dict["org.rdk.Network"] = "deactivated"
-    if current_interface != "EMPTY" and current_plugin_status_dict != {} and url_status == status == "SUCCESS":
+    if current_interface != "EMPTY" and url_status == status == "SUCCESS":
         revert_plugins_dict.update(current_plugin_status_dict)
         for count in range(0,max_iterations):
             result_dict = {}

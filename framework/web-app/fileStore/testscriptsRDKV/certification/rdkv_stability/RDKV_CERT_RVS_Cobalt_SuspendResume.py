@@ -88,7 +88,7 @@ obj.configureTestCase(ip,port,'RDKV_CERT_RVS_Cobalt_SuspendResume');
 #configured as "Yes".
 pre_requisite_reboot(obj)
 
-output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
+output_file = '{}{}_{}_{}_CPUMemoryInfo.json'.format(obj.logpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
 result_dict_list = []
 cpu_mem_info_dict = {}
@@ -109,11 +109,19 @@ if expectedResult in (result.upper() and pre_condition_status):
     revert="NO"
     plugins_list = ["WebKitBrowser","Cobalt","DeviceInfo"]
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
+    time.sleep(10)
     status = "SUCCESS"
     plugin_status_needed = {"WebKitBrowser":"deactivated","Cobalt":"resumed","DeviceInfo":"activated"}
-    if curr_plugins_status_dict != plugin_status_needed:
+    if any(curr_plugins_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
+        print "\n Error while getting the status of plugins"
+        status = "FAILURE"
+    elif curr_plugins_status_dict != plugin_status_needed:
         revert = "YES"
         status = set_plugins_status(obj,plugin_status_needed)
+        time.sleep(10)
+        new_plugins_status = get_plugins_status(obj,plugins_list)
+        if new_plugins_status != plugin_status_needed:
+            status = "FAILURE"
     if status == "SUCCESS":
         print "\nPre conditions for the test are set successfully"
         time.sleep(10)
@@ -139,7 +147,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                     tdkTestObj.setResultStatus("SUCCESS")
                     print "\nCobalt plugin Suspended Successfully\n"
                     print "\nResume the Cobalt plugin\n"
-                    params = '{"callsign": "Cobalt", "type":"", "uri":"", "x":0, "y":0, "w":1920, "h":1080}'
+                    params = '{"callsign": "Cobalt", "type":"", "uri":""}'
                     tdkTestObj = obj.createTestStep('rdkservice_setValue')
                     tdkTestObj.addParameter("method","org.rdk.RDKShell.1.launch")
                     tdkTestObj.addParameter("value",params)

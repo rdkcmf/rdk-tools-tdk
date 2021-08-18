@@ -108,7 +108,7 @@ obj.configureTestCase(ip,port,'RDKV_CERT_RVS_Toggle_PowerStates');
 #configured as "Yes".
 pre_requisite_reboot(obj)
 
-output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
+output_file = '{}{}_{}_{}_CPUMemoryInfo.json'.format(obj.logpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
 result_dict_list = []
 cpu_mem_info_dict = {}
@@ -132,11 +132,16 @@ if expectedResult in (result.upper() and pre_condition_status):
     revert="NO"
     plugins_list = ["org.rdk.System","DeviceInfo"]
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
+    time.sleep(10)
     status = set_status = "SUCCESS"
     plugin_status_needed = {"org.rdk.System":"activated","DeviceInfo":"activated"}
-    if curr_plugins_status_dict != plugin_status_needed:
+    if any(curr_plugins_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
+        print "\n Error while getting the status of plugins"
+        status = "FAILURE"
+    elif curr_plugins_status_dict != plugin_status_needed:
         revert = "YES"
         set_status = set_plugins_status(obj,plugin_status_needed)
+        time.sleep(10)
         plugins_status_dict = get_plugins_status(obj,plugins_list)
         if plugins_status_dict != plugin_status_needed:
             status = "FAILURE"
@@ -213,6 +218,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                                        continue_count = 61
                                 if continue_count > 60 :
                                     print "\n onSystemPowerStateChanged event is not triggered for power state: {} \n".format(new_power_state)
+                                    current_power_state = new_power_state
                                     tdkTestObj.setResultStatus("FAILURE")
                                     break
                                 tdkTestObj.setResultStatus("SUCCESS")

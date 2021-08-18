@@ -43,7 +43,7 @@ def open_logfile(obj):
     for handler in logger.handlers:
         if isinstance(handler, logging.StreamHandler):
             handler.setFormatter(formatter)
-    output_file = '{}logs/logs/{}_{}_{}_RebootScriptLog.txt'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
+    output_file = '{}{}_{}_{}_RebootScriptLog.txt'.format(obj.logpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
     logger.setLevel(logging.INFO)
     fh = logging.FileHandler(output_file, mode='w')
     logger.addHandler(fh)

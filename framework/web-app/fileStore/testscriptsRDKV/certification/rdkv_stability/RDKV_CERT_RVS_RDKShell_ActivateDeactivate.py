@@ -101,7 +101,7 @@ obj.configureTestCase(ip,port,'RDKV_CERT_RVS_RDKShell_ActivateDeactivate');
 #configured as "Yes".
 pre_requisite_reboot(obj)
 
-output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
+output_file = '{}{}_{}_{}_CPUMemoryInfo.json'.format(obj.logpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
 result_dict_list = []
 cpu_mem_info_dict = {}
@@ -122,7 +122,7 @@ if expectedResult in (result.upper() and pre_condition_status):
     status = "SUCCESS"
     plugins_list = ["org.rdk.RDKShell","DeviceInfo"]
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
-    if curr_plugins_status_dict != {}:
+    if all(curr_plugins_status_dict[plugin] != "FAILURE" for plugin in plugins_list):
         if curr_plugins_status_dict["DeviceInfo"] != "activated":
             revert = "YES"
             device_info_plugin = "DeviceInfo"

@@ -101,7 +101,7 @@ obj.configureTestCase(ip,port,'RDKV_CERT_RVS_SecondaryPlugins_ActivateDeactivate
 #configured as "Yes".
 pre_requisite_reboot(obj)
 
-output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
+output_file = '{}{}_{}_{}_CPUMemoryInfo.json'.format(obj.logpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
 result_dict_list = []
 cpu_mem_info_dict = {}
@@ -132,7 +132,7 @@ if expectedResult in (result.upper() and pre_condition_status):
         plugins_list.append(device_info)
         initial_status_dict = get_plugins_status(obj,plugins_list)
         curr_plugins_status_dict = dict(initial_status_dict)
-        if curr_plugins_status_dict != {}:
+        if all(initial_status_dict[plugin] != "FAILURE" for plugin in plugins_list):
             device_info_status = curr_plugins_status_dict[device_info]
             if device_info_status != "activated":
                 tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus');

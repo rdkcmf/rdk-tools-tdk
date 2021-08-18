@@ -101,7 +101,7 @@ pre_requisite_reboot(obj)
 webkit_console_socket = None
 channel_change_count = 1
 max_channel_change_count = StabilityTestVariables.max_channel_change_count
-output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
+output_file = '{}{}_{}_{}_CPUMemoryInfo.json'.format(obj.logpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
 result_dict_list = []
 cpu_mem_info_dict = {}
@@ -136,16 +136,20 @@ if expectedResult in (result.upper() and pre_condition_status):
             status = "FAILURE"
     else:
         print "\n Current interface is WIFI \n"
-
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
     plugin_list = ["WebKitBrowser","Cobalt","DeviceInfo"]
     plugins_cur_status_dict = get_plugins_status(obj,plugin_list)
+    time.sleep(10)
     plugin_required_status = "SUCCESS"
     plugin_status_needed = {"WebKitBrowser":"resumed","Cobalt":"deactivated","DeviceInfo":"activated"}
-    if plugin_status_needed != plugins_cur_status_dict :
+    if any(plugins_cur_status_dict[plugin] == "FAILURE" for plugin in plugin_list):
+        print "\n Error while getting the status of plugins"
+        status = "FAILURE"
+    elif plugin_status_needed != plugins_cur_status_dict :
         revert = "YES"
         plugin_required_status = set_plugins_status(obj,plugin_status_needed)
+        time.sleep(10)
         plugins_status_after_set = get_plugins_status(obj,plugin_list)
         if plugins_status_after_set == plugin_status_needed:
             plugin_required_status = "SUCCESS"

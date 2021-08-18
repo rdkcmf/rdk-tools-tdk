@@ -82,7 +82,7 @@ obj.configureTestCase(ip,port,'RDKV_CERT_RVS_PrimaryGraphicalPlugins_ActivateDea
 #configured as "Yes".
 pre_requisite_reboot(obj)
 
-output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
+output_file = '{}{}_{}_{}_CPUMemoryInfo.json'.format(obj.logpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
 result_dict_list = []
 cpu_mem_info_dict = {}
@@ -104,7 +104,7 @@ if expectedResult in (result.upper() and pre_condition_status):
     curr_plugins_status_dict = dict(initial_status_dict)
     device_info = "DeviceInfo"
     device_info_status = curr_plugins_status_dict[device_info]
-    if curr_plugins_status_dict != {}:
+    if all(initial_status_dict[plugin] != "FAILURE" for plugin in plugins_list):
         if device_info_status != "activated":
             tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus');
             tdkTestObj.addParameter("plugin",device_info);
@@ -136,7 +136,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                     if curr_plugins_status_dict[plugin] == "deactivated":
                         new_status_dict[plugin] = "activate"
                         method = "org.rdk.RDKShell.1.launch"
-                        params = '{"callsign": "'+plugin+'", "type":"", "uri":"", "x":0, "y":0, "w":1920, "h":1080}'
+                        params = '{"callsign": "'+plugin+'", "type":"", "uri":""}'
                         expected_status = ["activated","resumed"]
                     else:
                         new_status_dict[plugin] = "deactivate"

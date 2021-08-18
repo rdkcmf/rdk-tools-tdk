@@ -85,7 +85,7 @@ obj.configureTestCase(ip,port,'RDKV_CERT_RVS_MoveToFront');
 #configured as "Yes".
 pre_requisite_reboot(obj)
 
-output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
+output_file = '{}{}_{}_{}_CPUMemoryInfo.json'.format(obj.logpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
 result_dict_list = []
 cpu_mem_info_dict = {}
@@ -105,11 +105,16 @@ if expectedResult in (result.upper() and pre_condition_status):
     moveto_front_max_count = StabilityTestVariables.moveto_operation_max_count
     plugin_list = ["WebKitBrowser","Cobalt","DeviceInfo"]
     plugins_cur_status_dict = get_plugins_status(obj,plugin_list)
+    time.sleep(10)
     status = "SUCCESS"
     plugin_status_needed = {"WebKitBrowser":"deactivated","Cobalt":"deactivated","DeviceInfo":"activated"}
-    if plugin_status_needed != plugins_cur_status_dict :
+    if any(plugins_cur_status_dict[plugin] == "FAILURE" for plugin in plugin_list):
+        print "\n Error while getting the status of plugins"
+        status = "FAILURE"
+    elif plugin_status_needed != plugins_cur_status_dict :
         revert = "YES"
         status = set_plugins_status(obj,plugin_status_needed)
+        time.sleep(10)
         new_status_dict = get_plugins_status(obj,plugin_list)
         if new_status_dict != plugin_status_needed:
             status = "FAILURE"

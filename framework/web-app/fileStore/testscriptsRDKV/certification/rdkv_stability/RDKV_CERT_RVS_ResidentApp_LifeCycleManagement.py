@@ -90,7 +90,7 @@ obj.configureTestCase(ip,port,'RDKV_CERT_RVS_ResidentApp_LifeCycleManagement');
 #configured as "Yes".
 pre_requisite_reboot(obj)
 
-output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
+output_file = '{}{}_{}_{}_CPUMemoryInfo.json'.format(obj.logpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
 result_dict_list = []
 cpu_mem_info_dict = {}
@@ -183,21 +183,25 @@ if expectedResult in (result.upper() and pre_condition_status) :
     else:
         print "\n Preconditions are not met"
         obj.setLoadModuleStatus("FAILURE")
-    print "\n Launch ResidentApp"
-    tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
-    tdkTestObj.addParameter('plugin','ResidentApp')
-    tdkTestObj.addParameter('status','activate')
-    tdkTestObj.addParameter('uri',ui_app_url)
-    tdkTestObj.executeTestCase(expectedResult)
-    result = tdkTestObj.getResult()
-    if result == "SUCCESS":
-        print "\n Successfully launched ResidentApp"
-        tdkTestObj.setResultStatus("SUCCESS")
-        curr_plugins_status_dict.pop("ResidentApp")
-        status = set_plugins_status(obj,curr_plugins_status_dict)
+    if ui_app_url:
+        print "\n Launch ResidentApp"
+        tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
+        tdkTestObj.addParameter('plugin','ResidentApp')
+        tdkTestObj.addParameter('status','activate')
+        tdkTestObj.addParameter('uri',ui_app_url)
+        tdkTestObj.executeTestCase(expectedResult)
+        result = tdkTestObj.getResult()
+        if result == "SUCCESS":
+            print "\n Successfully launched ResidentApp"
+            tdkTestObj.setResultStatus("SUCCESS")
+            curr_plugins_status_dict.pop("ResidentApp")
+            status = set_plugins_status(obj,curr_plugins_status_dict)
+        else:
+            print "\n Error while launching ResidentApp"
+            tdkTestObj.setResultStatus("FAILURE")
     else:
-        print "\n Error while launching ResidentApp"
-        tdkTestObj.setResultStatus("FAILURE")
+        print "\n ResidentApp url is not available"
+        obj.setLoadModuleStatus("FAILURE")
     post_condition_status = check_device_state(obj)
     obj.unloadModule("rdkv_stability");
 else:
