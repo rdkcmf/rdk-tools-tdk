@@ -55,6 +55,19 @@ function viewOnClickperf(me,k,i)
   return false;
 }
 
+function viewOnProfilingClick(me,k,i)
+{ 
+  if(document.getElementById('allmessagesProfiling'+k+'_'+i).style.display == 'none') {
+    document.getElementById('allmessagesProfiling'+k+'_'+i).style.display = '';
+    $('#expanderProfiling'+k+'_'+i).text('Hide');  
+  }
+  else {
+    document.getElementById('allmessagesProfiling'+k+'_'+i).style.display = 'none';
+    $('#expanderProfiling'+k+'_'+i).text('Show');    
+  }
+  return false;
+}
+
 $(function() {
 	$('#longtext').more({length: 100});
 });
@@ -287,7 +300,7 @@ function triggerExecutionFromPopUp(){
 		<br>
 		<g:link action="downloadLogs" params="[id:"${executionInstance?.id}"]" >Download Execution Logs(Zip)</g:link>
 		<br>
-		<g:if test="${isProfilingDataPresent}">
+		<g:if test="${(isProfilingDataPresent) || (smemDataMap?.size() > 0) || (alertList?.size() > 0)}">
 			<g:link action="exportProfilingMetricsToExcel" params="[id:"${executionInstance?.id}"]" >Download Profiling Metrics Report(Excel)</g:link>
 		</g:if>
 		</td>		
@@ -633,6 +646,23 @@ function triggerExecutionFromPopUp(){
 				</tr>
 			</tbody>
 			</table>
+			<%
+				def grafanaPerformance = Performance.findAllByExecutionResultAndPerformanceType(executionResultInstance,"GrafanaData")
+			%>
+			<g:if test="${(grafanaPerformance) || (smemDataMap?.contains(executionResultInstance?.id)) || (alertList?.contains(executionResultInstance?.id))}">
+				<table>
+					<tr class="scripthead" style=" background:#DFDFDF;">
+						<td colspan="4" class="tdhead">Profiling Metrics</td>					
+						<td>
+							<g:remoteLink id="expanderProfiling${k}_${i}" action="getProfilingDetails" update="allmessagesProfiling${k}_${i}" onSuccess="this.innerHTML='Hide';viewOnProfilingClick(this,${k},${i}); return false;" params="[execResId : "${executionResultInstance?.id}",k: "${k}",i: "${i}"]" >Show</g:remoteLink>
+						</td>	
+					</tr>
+				</table>
+			</g:if>
+			<span id="allmessagesProfiling${k}_${i}"  style="display: none;">
+				<section class="round-border">
+				</section>		
+			</span>	
 			<g:if test="${executionResultInstance.performance}">
 					<%
 					def cpuMemoryInfoPerformance = Performance.findAllByExecutionResultAndPerformanceType(executionResultInstance,"CPUMemoryInfo")
@@ -642,15 +672,6 @@ function triggerExecutionFromPopUp(){
 						<table>
 							<tr class="scripthead" style=" background:#DFDFDF;">
 								<td colspan="4" class="tdhead">Performance</td>					
-								<td>
-									<a href="#" id="expanderperf${k}_${i}" onclick="this.innerHTML='Hide';viewOnClickperf(this,${k},${i}); return false;">Show</a>
-							</tr>
-						</table>
-					</g:if>
-					<g:if test="${grafanaDataPerformance}">
-						<table>
-							<tr class="scripthead" style=" background:#DFDFDF;">
-								<td colspan="4" class="tdhead">Profiling Metrics</td>					
 								<td>
 									<a href="#" id="expanderperf${k}_${i}" onclick="this.innerHTML='Hide';viewOnClickperf(this,${k},${i}); return false;">Show</a>
 							</tr>
@@ -682,51 +703,6 @@ function triggerExecutionFromPopUp(){
 								</tbody>
 							</table>	
 						</g:if>
-						
-						<%
-							def grafanaPerformance = Performance.findAllByExecutionResultAndPerformanceType(executionResultInstance,"GrafanaData")
-							def grafanautility = grafanaPerformance.performanceType[0]
-							List processNameList = []
-							grafanaPerformance.each{ grafana ->
-								if(!processNameList?.contains(grafana.processName)){
-									processNameList?.add(grafana.processName)
-								}
-							}
-						%>
-						<g:if test="${grafanaPerformance}">	
-							<g:each in="${processNameList}" var="processNameInstance">
-								<table>
-									<tbody >
-										<tr class="fnhead1">
-											<td class="tdhead" style="width:30%;">${processNameInstance}</td>
-											<td class="tdhead"></td>
-											<td class="tdhead"></td>
-										</tr>
-										<tr class="fnhead1">												
-											<td class="tdhead" style="width:30%;">Parameter</td>
-											<td class="tdhead">Threshold</td>		
-											<td class="tdhead">Value</td>							
-										</tr>
-										<g:each in="${grafanaPerformance}" var="grafanaPerformanceInstance">
-											<g:if test="${grafanaPerformanceInstance.processName == processNameInstance}">	
-												<tr>																					
-													<td style="width:30%;">${grafanaPerformanceInstance?.processType}</td>	
-													<g:if test="${grafanaPerformanceInstance?.processValue1}">	
-														<td>${grafanaPerformanceInstance?.processValue1}</td>	
-													</g:if>
-													<g:else>
-														<td>NIL</td>	
-													</g:else>				
-													<td>${grafanaPerformanceInstance?.processValue}</td>	
-												</tr>			
-											</g:if>
-										</g:each>						
-									</tbody>
-								</table>	
-							</g:each>					
-						</g:if>
-						
-						
 						
 						<%
 							def performance = Performance.findAllByExecutionResultAndPerformanceType(executionResultInstance,"BenchMark")							

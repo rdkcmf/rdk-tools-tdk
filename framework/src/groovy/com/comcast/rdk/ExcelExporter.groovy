@@ -1004,29 +1004,80 @@ class ExcelExporter extends AbstractExporter {
 											Set keySet = profilingData.keySet();
 											keySet.each { key ->
 												cell(row: rowIndex, column: 0, value:key , format: "header")
-												rowIndex ++												
-												cell(row: rowIndex, column: 1, value:"Parameter" , format: "header")
-												cell(row: rowIndex, column: 2, value:"Metrics" , format: "header")
-												cell(row: rowIndex, column: 3, value:"Threshold" , format: "header")
-												cell(row: rowIndex, column: 4, value:"Min Value" , format: "header")
-												cell(row: rowIndex, column: 5, value:"Max Value" , format: "header")
-												cell(row: rowIndex, column: 6, value:"Avg Value" , format: "header")
-												rowIndex ++												
+												rowIndex ++			
 												Map parameterMap = profilingData.get(key)
-												Set parameterMapKeySet = parameterMap.keySet();
-												parameterMapKeySet.each { parameterKey ->
-													cell(row: rowIndex, column: 1, value:parameterKey , format: "header")
-													rowIndex ++
-													def metricsList = parameterMap.get(parameterKey)
-													metricsList.each { metric ->
-														int i = 0
-														metric.each { metricKey,metricValue ->
-															cell(row: rowIndex, column: 2+i, value: metricValue , format :"cell")
-															i++
+												if(!key.equals("smem")){
+													Map alertsReceived = parameterMap.get("AlertsReceived")
+													cell(row: rowIndex, column: 1, value:"AlertsReceived" , format: "header")
+													if(!(alertsReceived.isEmpty()) && alertsReceived != null){
+														rowIndex ++
+														cell(row: rowIndex, column: 1, value:"Metric" , format: "header")
+														cell(row: rowIndex, column: 2, value:"Time" , format: "header")
+														cell(row: rowIndex, column: 3, value:"Threshold" , format: "header")
+														cell(row: rowIndex, column: 4, value:"Value" , format: "header")
+														cell(row: rowIndex, column: 5, value:"State" , format: "header")
+														rowIndex ++
+														Set alertsListMap = alertsReceived.keySet();
+														alertsListMap.each { alertsKey ->
+															def alertList = alertsReceived.get(alertsKey)
+															cell(row: rowIndex, column: 1, value: alertsKey , format :"header")
+															alertList.each { alert ->
+																int i = 0
+																def metric = alert.get('metric')
+																def systemTime = alert.get('system_time')
+																def threshold = alert.get('threshold')
+																def value = alert.get('value')
+																def state = alert.get('state')
+																cell(row: rowIndex, column: 2, value: systemTime , format :"cell")
+																cell(row: rowIndex, column: 3, value: threshold , format :"cell")
+																cell(row: rowIndex, column: 4, value: value , format :"cell")
+																cell(row: rowIndex, column: 5, value: state , format :"cell")
+																rowIndex ++
+															}
+															rowIndex ++
 														}
+													}else{
+														cell(row: rowIndex, column: 2, value:"NIL" , format: "cell")
 														rowIndex ++
 													}
 													rowIndex ++
+													cell(row: rowIndex, column: 1, value:"Metrics Data" , format: "header")
+													rowIndex ++
+													cell(row: rowIndex, column: 1, value:"Parameter" , format: "header")
+													cell(row: rowIndex, column: 2, value:"Metrics" , format: "header")
+													cell(row: rowIndex, column: 3, value:"Threshold" , format: "header")
+													cell(row: rowIndex, column: 4, value:"Min Value" , format: "header")
+													cell(row: rowIndex, column: 5, value:"Max Value" , format: "header")
+													cell(row: rowIndex, column: 6, value:"Avg Value" , format: "header")
+													rowIndex ++		
+													Set parameterMapKeySet = parameterMap.keySet();
+													parameterMapKeySet.each { parameterKey ->
+														if(!parameterKey.equals("AlertsReceived")){
+															cell(row: rowIndex, column: 1, value:parameterKey , format: "header")
+															rowIndex ++
+															def metricsList = parameterMap.get(parameterKey)
+															metricsList.each { metric ->
+																int i = 0
+																metric.each { metricKey,metricValue ->
+																	cell(row: rowIndex, column: 2+i, value: metricValue , format :"cell")
+																	i++
+																}
+																rowIndex ++
+															}
+															rowIndex ++
+														}
+													}
+												}else if(key.equals("smem")){
+													cell(row: rowIndex, column: 1, value:"File Name" , format: "header")
+													cell(row: rowIndex, column: 2, value:"Content" , format: "header")
+													rowIndex ++
+													Set parameterMapKeySet = parameterMap.keySet();
+													parameterMap.each { parameterKey, parameterValue ->
+														cell(row: rowIndex, column: 1, value: parameterKey , format :"cell")
+														cell(row: rowIndex, column: 2, value: parameterValue , format :"cell")
+														cell(row: rowIndex, column: 7, value: "", format: "cell")
+														rowIndex ++
+													}
 												}
 											}
 											rowIndex ++

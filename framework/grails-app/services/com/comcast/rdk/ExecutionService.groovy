@@ -35,6 +35,8 @@ import java.util.concurrent.FutureTask
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import com.google.gson.JsonObject
+
+import java.text.DateFormat
 /**
  * Service class for the Execution domain.
  * @author sreejasuma, praveenkp
@@ -2560,6 +2562,199 @@ class ExecutionService {
 		}
 		return null;
 	}
- 
 	
+	/**
+	 * Fetch the list of alerts received for a device between the timeframe
+	 * @param fromDate
+	 * @param toDate
+	 * @param macAddress
+	 * @param realPath
+	 * @return
+	 */
+	def fetchAlertData(Date fromDate,Date toDate,String macAddress,String realPath){
+		if(macAddress?.contains(":")){
+			macAddress = macAddress?.replace(":","")
+		}
+		List alertList = []
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		List allDates = new ArrayList();
+		Date fromDateTemp = fromDate
+		while( fromDateTemp.before(toDate) ){
+		   allDates.add( fromDateTemp );
+		   fromDateTemp = new Date(fromDateTemp.getTime() + (1000 * 60 * 60 * 24));
+		}
+		for (int day = 0; day < allDates.size(); day++){
+			String currentDate = format.format(allDates[day])
+			File file = new File("${realPath}/logs/grafanaAlerts/"+currentDate+"_alertData.json");
+			if(file?.exists()){
+				try{
+					def content = file.readLines();
+					for (int i = 0; i < content.size(); i++){
+						def eachLineContent = content[i]
+						if(eachLineContent != null && !eachLineContent?.isEmpty()){
+							JSONObject jsonObj = new JSONObject(eachLineContent);
+							def system_time
+							if(jsonObj.has('system_time')){
+								system_time = jsonObj.get('system_time')
+							}
+							Date systemDate = dateFormat.parse(system_time);
+							if((systemDate.before(toDate) && (systemDate.after(fromDate)))){
+								Map alertMap = [:]
+								if(jsonObj.has('alert_json')){
+									JSONObject alertJson = jsonObj.get('alert_json')
+									if(alertJson.has('dashboardId')){
+										def evalMatches = alertJson.get('evalMatches')
+										def ruleName = alertJson.get('ruleName')
+										def ruleId = alertJson.get('ruleId')
+										def state = alertJson.get('state')
+										JSONObject evalMatchJson = evalMatches[0]
+										if(evalMatchJson?.has('metric')){
+											String metric = evalMatchJson.get('metric')
+											def metricList = metric?.split("\\.")
+											String macAddressFromLog = metricList[1]
+											if(macAddressFromLog?.equals(macAddress)){
+												alertMap.put('system_time',system_time)
+												alertMap.put('ruleName',ruleName)
+												alertMap.put('ruleId',ruleId)
+												alertMap.put('state',state)
+												if(state?.equals('alerting')){
+													def value = evalMatchJson.get('value')
+													alertMap.put('value',value)
+												}
+												alertMap.put('macAddress',macAddressFromLog)
+												def secondOccuranceIndex = metric?.indexOf(".", metric?.indexOf(".") + 1)
+												def metricFromJson = metric?.substring(secondOccuranceIndex + 1, metric?.length());
+												alertMap.put('metric',metricFromJson)
+												if(alertJson?.has('threshold')){
+													def threshold = alertJson.get('threshold')
+													alertMap.put('threshold',threshold)
+												}
+											}
+										}
+									}
+								}
+								if(!alertMap?.isEmpty()){
+									alertList.add(alertMap)
+								}
+							}
+						}
+					}
+				}catch(Exception ex){
+					ex.printStackTrace();
+				}
+			}
+		}
+		return alertList
+	}
+	
+	/**
+	 * Fetch alert details from grafana rest api 
+	 * @param realPath
+	 * @param ruleId
+	 * @return
+	 */
+	def getAlertMapFromRest(String realPath, def ruleId){
+		Map alertMapFromRest = [:]
+		try{
+			String basicUrl = getGrafanaConfigurations("grafanaUrl",realPath)
+			def insecure = getGrafanaConfigurations("insecure",realPath)
+			def curlTimeout = getGrafanaConfigurations("curlTimeOutInSeconds",realPath)
+			String insecureString = ""
+			def curlTimeoutString = "10"
+			if(curlTimeout != null){
+				curlTimeoutString = curlTimeout
+			}
+			if(insecure != null){
+				if(insecure == "true"){
+					insecureString = " --insecure"
+				}
+			}
+			if(basicUrl != null){
+				String basicUrlLastChar = basicUrl?.charAt(basicUrl?.length()-1)
+				if(!basicUrlLastChar?.equals("/")){
+					basicUrl = basicUrl + "/"
+				}
+				basicUrl = basicUrl + "api/alerts/" + ruleId
+			}
+			String command = "curl" +insecureString+ " --connect-timeout "+ curlTimeoutString+ " \""+basicUrl+"\""
+			ProcessBuilder pb;
+			Process p;
+			pb = new ProcessBuilder("bash", "-c", command);
+			p = pb.start();
+			String line;
+			BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			line = input.readLine();
+			if((line != null) && (!line?.contains("message"))){
+				JSONObject jsonObj = new JSONObject(line);
+				if(jsonObj.has('Settings')){
+					JSONObject settings = jsonObj?.get('Settings')
+					if(settings?.has('conditions')){
+						def conditions = settings?.get('conditions')
+						JSONObject condition = conditions[0]
+						if(condition?.has('query')){
+							JSONObject query = condition?.get('query')
+							if(query?.has('model')){
+								JSONObject model = query?.get('model')
+								if(model?.has('target')){
+									String target = model?.get('target')
+									alertMapFromRest.put('fullMetric',target)
+									def metricList = target?.split("\\.")
+									String macAddressFromAlert = metricList[1]
+									alertMapFromRest?.put("macAddress",macAddressFromAlert)
+									def secondOccuranceIndex = target?.indexOf(".", target?.indexOf(".") + 1)
+									def metricFromRest = target?.substring(secondOccuranceIndex + 1, target?.length());
+									alertMapFromRest.put('metric',metricFromRest)
+								}
+							}
+						}
+						if(condition?.has('evaluator')){
+							JSONObject evaluator = condition?.get('evaluator')
+							if(evaluator?.has('params')){
+								def parameter = evaluator?.get('params')
+								def threshold = parameter[0]
+								alertMapFromRest.put('threshold',threshold)
+							}
+						}
+					}
+				}
+			}
+			input.close();
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		return alertMapFromRest
+	}
+	
+	/**
+	 * Function to read grafana configurations from config file
+	 * @param key
+	 * @return
+	 */
+	def getGrafanaConfigurations(String key, String realPath){
+		File configFile = new File("${realPath}/fileStore/grafana.config");
+		Properties prop = new Properties();
+		InputStream is
+		try{
+			if (configFile.exists()) {
+				is = new FileInputStream(configFile);
+				prop.load(is);
+				String value = prop.getProperty(key);
+				if (value != null && !value.isEmpty()) {
+					return value;
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace()
+		}finally{
+			if(is){
+				try{
+					is.close()
+				}catch(Exception e){
+					e.printStackTrace()
+				}
+			}
+		}
+		return null;
+	}	
 }

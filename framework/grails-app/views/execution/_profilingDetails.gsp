@@ -1,0 +1,212 @@
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+
+ Copyright 2021 RDK Management
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<%@ page import="java.io.*"%>
+<%@ page import="com.comcast.rdk.ExecutionResult"%>
+<%@ page import="com.comcast.rdk.Performance"%>
+
+<script type="text/javascript">
+
+function viewOnClickTool(me,k,i)
+{ 
+  if(document.getElementById('toolMetrics'+k+'_'+i).style.display == 'none') {
+    document.getElementById('toolMetrics'+k+'_'+i).style.display = '';
+    $('#expandertool'+k+'_'+i).text('Hide');  
+  }
+  else {
+    document.getElementById('toolMetrics'+k+'_'+i).style.display = 'none';
+    $('#expandertool'+k+'_'+i).text('Show');    
+  }
+  return false;
+}
+
+function viewOnClickToolSmem(me,k,i)
+{ 
+  if(document.getElementById('toolSmem'+k+'_'+i).style.display == 'none') {
+    document.getElementById('toolSmem'+k+'_'+i).style.display = '';
+    $('#expanderSmem'+k+'_'+i).text('Hide');  
+  }
+  else {
+    document.getElementById('toolSmem'+k+'_'+i).style.display = 'none';
+    $('#expanderSmem'+k+'_'+i).text('Show');    
+  }
+  return false;
+}
+
+function showSmemHideLink(m){
+	$('#hideSmemContents'+m).show();
+	$('#smemDetails'+m).show();
+	$('#showSmemContents'+m).hide();
+}
+
+
+function hideSmemLogs(m){
+	$('#showSmemContents'+m).show();
+	$('#smemDetails'+m).hide();
+	$('#hideSmemContents'+m).hide();
+}
+</script>
+
+<%
+	def grafanaPerformance = Performance.findAllByExecutionResultAndPerformanceType(executionResultInstance,"GrafanaData")
+	def grafanautility = grafanaPerformance.performanceType[0]
+	List processNameList = []
+	grafanaPerformance.each{ grafana ->
+		if(!processNameList?.contains(grafana.processName)){
+			processNameList?.add(grafana.processName)
+		}
+	}
+%>
+<g:if test="${profilingDetails}">	
+	<g:if test="${grafanaPerformance || alertListMap}">	
+		<table>
+			<tr class="scripthead" style=" background:#DFDFDF;">
+				<td colspan="4" class="tdhead">collectd</td>					
+				<td>
+					<a href="#" id="expandertool${k}_${i}" onclick="this.innerHTML='Hide';viewOnClickTool(this,${k},${i}); return false;">Show</a>
+			</tr>
+		</table>
+	</g:if>	
+	<span id="toolMetrics${k}_${i}"  style="display: none;">
+		<section class="round-border">
+				<g:if test="${alertListMap}">
+					<table>
+						<tbody >
+							<tr class="fnhead1">
+								<td class="tdhead" style="width:30%;">Alerts Received</td>
+								<td class="tdhead"></td>
+								<td class="tdhead"></td>
+								<td class="tdhead"></td>
+								<td class="tdhead"></td>
+							</tr>
+							<tr class="fnhead1">												
+								<td class="tdhead" style="width:30%;">Metric</td>
+								<td class="tdhead">Time</td>		
+								<td class="tdhead">Threshold</td>		
+								<td class="tdhead">Value</td>
+								<td class="tdhead">State</td>					
+							</tr>
+							<g:each in="${alertListMap?.keySet()}" status="metricStatus"  var="metricKey">					
+								<%
+									List alertList = alertListMap?.get(metricKey)
+									int alertListLength = alertList?.size() + 1
+								%>
+								<g:if test="${alertList?.size() > 0}">
+									<tr>																					
+										<td style="width:30%;" rowspan="${alertListLength}">${metricKey}</td>
+									</tr>
+									<g:each in="${alertList}" var="alertInstance">
+										<tr>																					
+											<td>${alertInstance?.get("system_time")}</td>
+											<td>${alertInstance?.get("threshold")}</td>
+											<td>${alertInstance?.get("value")}</td>
+											<td>${alertInstance?.get("state")}</td>
+										</tr>
+									</g:each>	
+								</g:if>	
+							</g:each>
+						</tbody>
+					</table>
+				</g:if>
+			<g:if test="${grafanaPerformance}">	
+				<g:each in="${processNameList}" var="processNameInstance">
+					<table>
+						<tbody >
+							<tr class="fnhead1">
+								<td class="tdhead" style="width:30%;">${processNameInstance}</td>
+								<td class="tdhead"></td>
+								<td class="tdhead"></td>
+							</tr>
+							<tr class="fnhead1">												
+								<td class="tdhead" style="width:30%;">Parameter</td>
+								<td class="tdhead">Threshold</td>		
+								<td class="tdhead">Value</td>							
+							</tr>
+							<g:each in="${grafanaPerformance}" var="grafanaPerformanceInstance">
+								<g:if test="${grafanaPerformanceInstance.processName == processNameInstance}">	
+									<tr>																					
+										<td style="width:30%;">${grafanaPerformanceInstance?.processType}</td>	
+										<g:if test="${grafanaPerformanceInstance?.processValue1}">	
+											<td>${grafanaPerformanceInstance?.processValue1}</td>	
+										</g:if>
+										<g:else>
+											<td>NIL</td>	
+										</g:else>				
+										<td>${grafanaPerformanceInstance?.processValue}</td>	
+									</tr>			
+								</g:if>
+							</g:each>						
+						</tbody>
+					</table>	
+				</g:each>
+			</g:if>	
+		</section>		
+	</span>	
+	<g:if test="${smemFileMap}">	
+		<table>
+			<tr class="scripthead" style=" background:#DFDFDF;">
+				<td colspan="4" class="tdhead">smem</td>					
+				<td>
+					<a href="#" id="expanderSmem${k}_${i}" onclick="this.innerHTML='Hide';viewOnClickToolSmem(this,${k},${i}); return false;">Show</a>
+			</tr>
+		</table>
+	</g:if>	
+	<span id="toolSmem${k}_${i}"  style="display: none;">
+		<section class="round-border">
+			<g:if test="${smemFileMap}">	
+				<table>
+					<tbody >
+						<tr class="fnhead1">
+								<td class="tdhead" style="width:5%;">File Name</td>
+								<td class="tdhead" >Contents</td>
+						</tr>
+						<g:each in="${smemFileMap}" status="m"  var="map">
+							<tr>
+								<td style="width:5%;">
+									<g:form controller="execution">
+										<g:link style="text-decoration:none;" action="downloadSmemFileContents" id="${execId+"_"+map.key}" 
+											 params="[execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]" >
+											<span class="customizedLink" >${map.key}</span>	
+										</g:link>
+									</g:form>	
+								</td>
+								<td >
+									
+										&emsp;<span id="showSmemContents${m}" >	
+										<a style="color:#7E2217;" href="#" onclick="showSmemHideLink(${m})">Show</a>	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+										<g:link action="showSmemFileContents" onSuccess="showSmemHideLink(${m});" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]"  target="_blank"> Log Link</g:link>						
+										</span>
+										<span id="hideSmemContents${m}" style="display:none;"><a style="color:#7E2217;" href="#" onclick="hideSmemLogs(${m})">Hide</a></span>
+										<br>
+									<pre>
+										<div id="smemDetails${m}" style="display:none;overflow: auto; height: 300px;width:550px;">${map.value}</div>	
+									</pre>
+								</td>
+							</tr>
+						</g:each>
+					</tbody>
+				</table>	
+			</g:if>
+		</section>
+	</span>
+</g:if>
+<g:else>
+<pre>
+	<div style="">${consoleFileData}</div>	
+</pre>
+</g:else>

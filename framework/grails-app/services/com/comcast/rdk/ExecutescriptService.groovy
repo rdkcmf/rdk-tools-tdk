@@ -393,6 +393,8 @@ class ExecutescriptService {
 			def totalTimeTaken = (endTime?.getTime() - startTime?.getTime()) / 1000
 	//		totalTimeTaken = totalTimeTaken?.round(2)
 			executionService.updateExecutionTime(totalTimeTaken?.toString(), executionResultId)
+			def alertTransferFilePath = "${realPath}//logs//${executionId}//${executionDevice?.id}//${executionResultId}"
+			saveAlertInfoInLogFile(executionResultId,executionId,alertTransferFilePath,startTime,endTime,realPath)
 		} catch (Exception e) {
 			e.printStackTrace()
 		}
@@ -2798,6 +2800,97 @@ class ExecutescriptService {
 			println("Error while saving HW Performance data")
 			e.printStackTrace()
 		}
+	}
+	
+	/**
+	 * Function to save alert received inside log file after each script execution
+	 * @param executionResultId
+	 * @param execId
+	 * @param logTransferFilePath
+	 * @param startTime
+	 * @param endTime
+	 * @param realPath
+	 * @return
+	 */
+	def saveAlertInfoInLogFile(final long executionResultId,final long execId,String logTransferFilePath,Date startTime,Date endTime,String realPath){
+		try{
+			ExecutionResult executionResult = ExecutionResult.findById(executionResultId)
+			if(executionResult){
+				def device = Device.findByStbName(executionResult?.device)
+				String macAddress = ""
+				if(device){
+					macAddress = device?.serialNo
+				}
+				List alertListFromService = executionService.fetchAlertData(startTime,endTime,macAddress,realPath)
+				if(!alertListFromService?.isEmpty()){
+					new File(logTransferFilePath?.toString()).mkdirs()
+					FileWriter file = new FileWriter(logTransferFilePath+"//"+execId+"_alertData.json",true)
+					BufferedWriter buffWriter = new BufferedWriter(file)
+					for(int i = 0;i < alertListFromService?.size();i++){
+						def dataValue = alertListFromService[i]
+						JSONObject dataJsonObject = new JSONObject(dataValue);
+						buffWriter.write(dataJsonObject?.toString());
+						buffWriter.write(NEW_LINE);
+					}
+					buffWriter.flush()
+					buffWriter.close()
+					file.close();
+				}
+			}
+		}catch (Exception e) {
+			e.printStackTrace()
+		}
+	}
+	
+	/**
+	 * Method to fetch the list of alerts for an execution result
+	 * @param execId
+	 * @param logTransferFilePath
+	 * @return
+	 */
+	def fetchAlertDataForExecResult(final long execId,String logTransferFilePath){
+		File file = new File(logTransferFilePath+"//"+execId+"_alertData.json");
+		List alertList = []
+		if(file?.exists()){
+			try{
+				def content = file.readLines();
+				for (int i = 0; i < content.size(); i++){
+					def eachLineContent = content[i]
+					if(eachLineContent != null && !eachLineContent?.isEmpty()){
+						JSONObject jsonObj = new JSONObject(eachLineContent);
+						Map alertMap = [:]
+						if(jsonObj.has('system_time') && jsonObj.has('metric')){
+							def system_time = jsonObj.get('system_time')			
+							def ruleName = jsonObj.get('ruleName')
+							def ruleId = jsonObj.get('ruleId')
+							def state = jsonObj.get('state')
+							def macAddress = jsonObj.get('macAddress')
+							def metric = jsonObj.get('metric')
+							alertMap.put('system_time',system_time)
+							alertMap.put('ruleName',ruleName)
+							alertMap.put('ruleId',ruleId)
+							alertMap.put('state',state)
+							if(jsonObj.has('value')){
+								def value = jsonObj.get('value')
+								alertMap.put('value',value)
+							}
+							alertMap.put('macAddress',macAddress)
+							alertMap.put('metric',metric)
+							if(jsonObj.has('threshold')){
+								def threshold = jsonObj.get('threshold')
+								alertMap.put('threshold',threshold)
+							}
+						}
+						if(!alertMap?.isEmpty()){
+							alertList.add(alertMap)
+						}
+					}
+				}
+			}catch(Exception ex){
+				ex.printStackTrace();
+			}
+		}		
+		return alertList
 	}
 	
 	/*def initiateLogTransfer(String executionName, String server, String logAppName, Device device){

@@ -1026,6 +1026,78 @@ class ExecutedbService {
 	}
 
 	/**
+	 * Method to fetch the list of alerts for a particular executionresult
+	 * @param executionResult
+	 * @param realPath
+	 * @return
+	 */
+	def getAlertListFrom(ExecutionResult executionResult, String realPath){
+		Map alertMapForExecRes = [:]
+		try{
+			Date fromDate = executionResult.dateOfExecution
+			String executionTime = executionResult.totalExecutionTime
+			if(executionTime != null && executionTime != ""){
+				def device = Device.findByStbName(executionResult?.device)
+				String macAddress = ""
+				if(device){
+					macAddress = device?.serialNo
+				}
+				Double totalExecutionTime =  Double.parseDouble(executionTime)
+				totalExecutionTime = totalExecutionTime * 1000
+				long totalExecutionTimeInLong = (long)totalExecutionTime;
+				Date toDate = new Date(fromDate.getTime() + totalExecutionTimeInLong);
+				def alertListFromService = executionService.fetchAlertData(fromDate,toDate,macAddress,realPath)
+				if(!alertListFromService?.isEmpty()){
+					alertListFromService.each{ alert ->
+						List metricList = []
+						def metric =  alert?.get('metric')
+						if(alertMapForExecRes.containsKey(metric)){
+							metricList = alertMapForExecRes.get(metric)
+						}
+						metricList?.add(alert)
+						alertMapForExecRes.put(metric, metricList)
+					}
+				}
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		return alertMapForExecRes
+	}
+	
+	/**
+	 * Function to get the smem details for a particular execution result
+	 * @param executionInstance
+	 * @param executionDevice
+	 * @param executionResult
+	 * @param realPath
+	 * @return
+	 */
+	def getSmemDetails(Execution executionInstance,ExecutionDevice executionDevice,ExecutionResult executionResult, String realPath){
+		def logPath = "${realPath}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
+		def finalLogparserFileName = ""
+		File logDir  = new File(logPath)
+		Map smemFileMap = [:]
+		try{
+			if(logDir?.exists() &&  logDir?.isDirectory()){
+				logDir.eachFile{ file->
+					def currentFileName = file?.getName()
+					if(file?.getName()?.contains("smemData")){
+						String fileContents = ""
+						file.eachLine { line ->
+							fileContents = fileContents + NEW_LINE+ line
+						}
+						currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
+						smemFileMap?.put(currentFileName,fileContents)
+					}
+				}
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		return smemFileMap
+	}
+	/**
 	 * Method to generate the data for creating the profiling data report in excel format.
 	 */
 	def getDataForProfilingMetricsExcelReportGeneration(Execution executionInstance, String realPath,String appUrl) {
@@ -1071,7 +1143,9 @@ class ExecutedbService {
 						Map profilingDetailsMap = [:]
 						List toolNames = []
 						List performanceList = Performance.findAllByExecutionResultAndPerformanceType(executionResult,GRAFANA_DATA)
-						if(!performanceList.isEmpty()){
+						Map smemDetails = getSmemDetails(executionInstance,executionDevice,executionResult,realPath)
+						Map alertMap = getAlertListFrom(executionResult,realPath);
+						if(!performanceList.isEmpty() || !smemDetails.isEmpty() || !alertMap.isEmpty()){
 							//For summary sheet
 							Map scriptMap =["C1":scriptCounter,"C2":executionResult?.script,"C3":executionResult?.status,"C4":""]
 							coverPageMap.put(executionResult?.script,scriptMap)
@@ -1093,7 +1167,7 @@ class ExecutedbService {
 							}
 							Map scriptDetailsMap = ["C1":executionResult?.script,"C2":executionResult?.status,"C3":executionLogData]
 							profilingDetailsMap.put("scriptDetails", scriptDetailsMap)
-							if(!performanceList.isEmpty()){
+							if(!performanceList.isEmpty() || !alertMap.isEmpty()){
 								Map parameterMap = [:]
 								String performanceType = performanceList[0]?.performanceType
 								String toolName = ""
@@ -1124,7 +1198,16 @@ class ExecutedbService {
 									metricList.add(metricMap)
 									parameterMap.put(performance?.processName, metricList)
 								}
+								parameterMap.put("AlertsReceived", alertMap)
 								toolDetailsMap.put(toolName, parameterMap)
+							}
+							
+							//for smem
+							if(!smemDetails.isEmpty()){
+								Map parameterMap = [:]
+								String toolName = "smem"
+								toolNames.add(toolName)
+								toolDetailsMap.put(toolName, smemDetails)
 							}
 						}
 						profilingDetailsMap.put("toolNames", toolNames)

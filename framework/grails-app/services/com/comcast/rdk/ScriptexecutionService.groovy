@@ -1030,6 +1030,8 @@ class ScriptexecutionService {
 			def totalTimeTaken = (endTime?.getTime() - startTime?.getTime()) / 1000
 	//		totalTimeTaken = totalTimeTaken?.round(2)
 			executionService.updateExecutionTime(totalTimeTaken?.toString(), executionResultId)
+			def alertTransferFilePath = "${realPath}//logs//${executionId}//${executionDeviceInstance?.id}//${executionResultId}"
+			executescriptService.saveAlertInfoInLogFile(executionResultId,executionId,alertTransferFilePath,startTime,endTime,realPath)
 		} catch (Exception e) {
 			e.printStackTrace()
 		}

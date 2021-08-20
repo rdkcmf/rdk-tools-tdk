@@ -400,4 +400,7 @@ public final class Constants
 	public static final String PROFILING_SYSTEM = "PROFILING_SYSTEM_";
 	public static final String PROFILING_PROCESSES = "PROFILING_";
 	public static final String PROFILING_THRESHOLD = "_THRESHOLD";
+	public static final String RDKV_PROFILING_ACTUAL_UNIT = "RDKV_PROFILING_ACTUAL_UNIT_";
+	public static final String RDKV_PROFILING_PREFERRED_UNIT = "RDKV_PROFILING_PREFERRED_UNIT_";
+	public static final String TDKV_RDKSERVICE_CONFIG_FOLDER_LOCATION = "//fileStore//tdkvRDKServiceConfig//";
 }

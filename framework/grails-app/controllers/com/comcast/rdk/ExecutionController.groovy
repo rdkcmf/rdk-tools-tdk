@@ -1628,6 +1628,109 @@ class ExecutionController {
 		render(template: "executionDetails", model: [executionResultInstance : exRes])
 	}
 
+	/**
+	 * Function to fetch the profiling details of show link is clicked corresponding to each Profiling Metrics row
+	 */
+	def getProfilingDetails(){
+		def executionResultId = params?.execResId
+		def exRes = ExecutionResult.get(params?.execResId)
+		def executionId = exRes.execution.id
+		def executionDeviceId = exRes.executionDevice.id
+		def device = Device.findByStbName(exRes?.device)
+		Map alertMapForExecRes = [:]
+		String macAddress = ""
+		if(device){
+			macAddress = device?.serialNo
+		}
+		def alertMap = [:]
+		Date fromDate = exRes.dateOfExecution
+		String executionTime = exRes.totalExecutionTime
+		def logPath = "${realPath}/logs//${executionId}//${executionDeviceId}//${executionResultId}//"
+		if(executionTime != null && executionTime != ""){
+			Double totalExecutionTime =  Double.parseDouble(executionTime)
+			totalExecutionTime = totalExecutionTime * 1000
+			long totalExecutionTimeInLong = (long)totalExecutionTime;
+			Date toDate = new Date(fromDate.getTime() + totalExecutionTimeInLong);
+			List alertListFromService = executescriptService.fetchAlertDataForExecResult(executionId,logPath);
+			if(!alertListFromService?.isEmpty()){
+				alertListFromService.each{ alert ->
+					List metricList = []
+					def metric =  alert?.get('metric')
+					if(alertMapForExecRes.containsKey(metric)){
+						metricList = alertMapForExecRes.get(metric)
+					}
+					metricList?.add(alert)
+					alertMapForExecRes.put(metric, metricList)
+				}
+			}
+		}
+		
+		def finalLogparserFileName = ""
+		File logDir  = new File(logPath)
+		Map smemFileMap = [:]
+		if(logDir?.exists() &&  logDir?.isDirectory()){
+			logDir.eachFile{ file->
+				def currentFileName = file?.getName()
+				if(file?.getName()?.contains("smemData")){
+					String fileContents = ""
+					file.eachLine { line ->
+						String lineData = line?.replaceAll("<","&lt;")
+						lineData = lineData?.replaceAll(">","&gt;")
+						fileContents = fileContents + "<br>"+ lineData
+					}
+					currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
+					smemFileMap?.put(currentFileName,fileContents)
+				}
+			}
+		}
+		render(template: "profilingDetails", model: [executionResultInstance : exRes,alertListMap:alertMapForExecRes,k:params?.k,i:params?.i,smemFileMap:smemFileMap,execId:executionId,execDeviceId:executionDeviceId,profilingDetails:true])
+	}
+	
+	/**
+	 * Function to download smem file from UI
+	 * @return
+	 */
+	def downloadSmemFileContents()  {
+		try {
+			String fileName = params?.id
+			String filePath = "${request.getRealPath('/')}//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.id
+			def file = new File(filePath)
+			response.setContentType("html/text")
+			response.setHeader("Content-disposition", "attachment;filename=${file.getName()}")
+			response.outputStream << file.newInputStream()
+		} catch (FileNotFoundException fnf) {
+			response.sendError 404
+		}
+	}
+	
+	/**
+	 * Function to display smem file contents in UI
+	 * @return
+	 */
+	def showSmemFileContents(){
+		def consoleFileData = ""
+		String filePath = "${request.getRealPath('/')}//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.fileName
+		def file = new File(filePath)
+		try{
+			if(file?.exists()){
+				def currentFileName = params?.fileName
+				if(currentFileName?.contains("smemData")){
+					file.eachLine { line ->
+						String lineData = line?.replaceAll("<","&lt;")
+						lineData = lineData?.replaceAll(">","&gt;")
+						consoleFileData = consoleFileData + "<br>"+ lineData
+					}
+				}
+			}
+		} catch (FileNotFoundException fnf) {
+			
+		}
+		if(consoleFileData.isEmpty() || consoleFileData == ""){
+			consoleFileData = "No Data"
+		}
+		render(template: "profilingDetails", model: [consoleFileData:consoleFileData,profilingDetails:false])
+	}
+	
 	def showLogFiles(){
 
 		def logFileNames = executionService.getLogFileNames(request.getRealPath('/'), params?.execId, params?.execDeviceId, params?.execResId )
@@ -1820,15 +1923,35 @@ class ExecutionController {
 			rate = ((success * 100)/(total - na))
 		}
 		tDataMap.put(Constants.PASS_RATE_SMALL,rate)
+		
 		boolean isProfilingDataPresent = false
 		List executionResultList =  ExecutionResult.findAllByExecution(executionInstance)
+		List smemDataMap = []
+		List alertList = []
 		executionResultList.each{ executionResult ->
 			List performanceList = Performance.findAllByExecutionResultAndPerformanceType(executionResult,GRAFANA_DATA)
 			if(!performanceList.isEmpty()){
 				isProfilingDataPresent = true
 			}
-		}
-		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus, statusListForPopUpExecution : statusListForPopUpExecution,isProfilingDataPresent:isProfilingDataPresent]
+			
+			def executionDeviceId = executionResult.executionDevice.id
+			def logPath = "${realPath}/logs//${executionInstance.id}//${executionDeviceId}//${executionResult.id}//"
+			List alertListFromFile = executescriptService.fetchAlertDataForExecResult(executionInstance.id,logPath);
+			if(!alertListFromFile.isEmpty()){
+				alertList?.add(executionResult.id)
+			}
+			
+			def finalLogparserFileName = ""
+			File logDir  = new File(logPath)
+			if(logDir?.exists() &&  logDir?.isDirectory()){
+				logDir.eachFile{ file->
+					if(file?.getName()?.contains("smemData")){
+						smemDataMap?.add(executionResult.id)
+					}
+				}
+			}
+		}		
+		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus, statusListForPopUpExecution : statusListForPopUpExecution,isProfilingDataPresent:isProfilingDataPresent,smemDataMap:smemDataMap,alertList:alertList]
 	}
 
 	/**
@@ -5226,6 +5349,8 @@ class ExecutionController {
 		String basicUrl = getGrafanaConfigurations("grafanaUrl")
 		String prefix = getGrafanaConfigurations("prefix")
 		String datasourceId = getGrafanaConfigurations("datasourceId")
+		def insecure = getGrafanaConfigurations("insecure")
+		def curlTimeout = getGrafanaConfigurations("curlTimeOutInSeconds")
 		if(basicUrl != null && prefix != null && datasourceId != null ){
 			ExecutionResult execResult = ExecutionResult.findById(executionResultId)
 			if(execResult){
@@ -5247,6 +5372,7 @@ class ExecutionController {
 						String fromEpochTime = fromEpoch?.toString()
 						String toEpochTime = toEpoch?.toString()
 						
+						
 						String prefixLastChar = prefix?.charAt(prefix?.length()-1)
 						if(!prefixLastChar?.equals(".")){
 							prefix = prefix + "."
@@ -5263,8 +5389,19 @@ class ExecutionController {
 						parameterList?.each{ param ->
 							targetString = targetString + "&target="+host+"."+param
 						}
+						
+						String insecureString = ""
+						def curlTimeoutString = "10"
+						if(curlTimeout != null){
+							curlTimeoutString = curlTimeout
+						}
+						if(insecure != null){
+							if(insecure == "true"){
+								insecureString = " --insecure"
+							}
+						}
 						String url = basicUrl + "from="+fromEpochTime+"&until="+toEpochTime+""+targetString+"&format=json"
-						String command = "curl --insecure \""+url+"\""
+						String command = "curl" +insecureString+ " --connect-timeout "+ curlTimeoutString+ " \""+url+"\""
 						ProcessBuilder pb;
 						Process p;
 						pb = new ProcessBuilder("bash", "-c", command);
@@ -5438,6 +5575,7 @@ class ExecutionController {
 								}
 							}
 						}
+						input.close();
 					}catch(Exception ex){
 						ex.printStackTrace();
 					}
@@ -5509,5 +5647,177 @@ class ExecutionController {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Function to receive alert notification from Grafana
+	 * @return
+	 */
+	def getAlertNotification(){
+		try{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()))
+			String dataFromSocket = reader.readLine()
+			reader.close()
+			if(dataFromSocket != null && !dataFromSocket?.isEmpty()){			
+				SimpleDateFormat formatForSystemTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				String systemTime = formatForSystemTime.format(new Date())
+				SimpleDateFormat formatForLogFile = new SimpleDateFormat("yyyy-MM-dd");
+				String systemTimeForLogFile = formatForLogFile.format(new Date())
+				JSONObject dataJsonObject = new JSONObject(dataFromSocket);
+				if(dataJsonObject.has('state') && dataJsonObject.has('evalMatches')){
+					def evalMatches = dataJsonObject.get('evalMatches')
+					def state = dataJsonObject.get('state')
+					def ruleId = dataJsonObject.get('ruleId')
+					Map alertMapFromRest =  executionService.getAlertMapFromRest(realPath, ruleId)
+					Double threshold = alertMapFromRest?.get('threshold')
+					JSONObject evalMatchJson =  new JSONObject()
+					String metric = ""
+					if(state?.equals('alerting')){
+						evalMatchJson = evalMatches[0]
+						metric = evalMatchJson.get('metric')
+					}else{
+						metric = alertMapFromRest?.get('fullMetric')
+					}
+					if(metric != null && metric != ""){
+						def metricList = metric?.split("\\.")
+						if(metric?.contains("exec-")){
+							String processName = metric?.substring(0,metric?.lastIndexOf("."));
+							processName = processName?.replace("exec-","processes-")
+							String lastMetricString = metric?.substring(metric?.lastIndexOf("_") + 1,metric?.length())
+							metric = processName +"." +lastMetricString
+						}
+						Device dev =  Device.findBySerialNo(metricList[1])
+						String finalConfigFile = ""
+						File deviceConfigFile = new File( "${realPath}"+TDKV_RDKSERVICE_CONFIG_FOLDER_LOCATION+dev?.stbName+CONFIG_EXTN)
+						File boxTypeConfigFile = new File( "${realPath}"+TDKV_RDKSERVICE_CONFIG_FOLDER_LOCATION+dev?.boxType?.name+CONFIG_EXTN)
+						if(deviceConfigFile?.exists()){
+							finalConfigFile = dev?.stbName+CONFIG_EXTN
+						}else if(boxTypeConfigFile?.exists()){
+							finalConfigFile = dev?.boxType?.name+CONFIG_EXTN
+						}
+						if(finalConfigFile != ""){
+							String unitVariable = metricList[2]
+							String actualUnitVariable = RDKV_PROFILING_ACTUAL_UNIT 
+							String preferredUnitVariable = RDKV_PROFILING_PREFERRED_UNIT 
+							if(!unitVariable?.contains("-")){
+								actualUnitVariable = actualUnitVariable + unitVariable?.toUpperCase()
+								preferredUnitVariable = preferredUnitVariable + unitVariable?.toUpperCase()
+							}else{
+								if(unitVariable?.contains("exec-")){
+									unitVariable = metricList[3]
+									unitVariable = unitVariable?.substring(unitVariable?.lastIndexOf("_") + 1,unitVariable?.length())
+									actualUnitVariable = actualUnitVariable + unitVariable?.toUpperCase()
+									preferredUnitVariable = preferredUnitVariable + unitVariable?.toUpperCase()
+								}else{
+									unitVariable = metricList[3]
+									actualUnitVariable = actualUnitVariable + unitVariable?.toUpperCase()
+									preferredUnitVariable = preferredUnitVariable + unitVariable?.toUpperCase()
+								}
+							}
+							String actualUnitValue = getThresholdFromConfigFile(actualUnitVariable,finalConfigFile)
+							String preferredUnitValue = getThresholdFromConfigFile(preferredUnitVariable,finalConfigFile)
+							if(actualUnitValue != null && preferredUnitValue != null){
+								actualUnitValue = actualUnitValue?.trim()
+								preferredUnitValue = preferredUnitValue?.trim()
+								if(!actualUnitValue?.equals(preferredUnitValue)){
+									int divideNumber =  1
+									if((actualUnitValue?.equals("Bytes") && preferredUnitValue?.equals("MB"))){
+										divideNumber = 1000000
+									}else if((actualUnitValue?.equals("Bytes") && preferredUnitValue?.equals("KB"))){
+										divideNumber = 1000
+									}else if((actualUnitValue?.equals("KB") && preferredUnitValue?.equals("MB"))){
+										divideNumber = 1000
+									}
+									if(state?.equals('alerting')){
+										Double value = evalMatchJson.get('value')
+										def result = value / divideNumber
+										result = result.round(3)
+										evalMatchJson.put('value',result)
+									}
+									if(divideNumber == 1){
+										evalMatchJson.put('metric',metric)
+									}else{
+										evalMatchJson.put('metric',metric+ " " +LEFT_PARANTHESIS+preferredUnitValue+RIGHT_PARANTHESIS)
+									}
+									if(threshold != null){
+										def thresholdAfterConversion = threshold / divideNumber
+										thresholdAfterConversion = thresholdAfterConversion.round(3)
+										dataJsonObject.put('threshold',thresholdAfterConversion)
+									}
+									if(state?.equals('ok') || state?.equals('no_data')){
+										evalMatches.add(evalMatchJson)
+									}
+								}else{
+									if(state?.equals('alerting')){
+										Double value = evalMatchJson.get('value')
+										value = value?.round(3)
+										evalMatchJson.put('value',value)
+									}
+									evalMatchJson.put('metric',metric+ " " +LEFT_PARANTHESIS+preferredUnitValue+RIGHT_PARANTHESIS)
+									if(threshold != null){
+										threshold = threshold.round(3)
+										dataJsonObject.put('threshold',threshold)
+									}
+									if(state?.equals('ok') || state?.equals('no_data')){
+										evalMatches.add(evalMatchJson)
+									}
+								}
+							}else{
+								evalMatchJson.put('metric',metric)
+								if(threshold != null){
+									dataJsonObject.put('threshold',threshold)
+								}
+								if(state?.equals('ok') || state?.equals('no_data')){
+									evalMatches.add(evalMatchJson)
+								}
+							}
+						}
+					}
+				}				
+				JSONObject jsonObj = new JSONObject();
+				jsonObj.put("system_time",systemTime);
+				jsonObj.put("alert_json",dataJsonObject);
+				def logTransferFilePath = "${realPath}/logs/grafanaAlerts"
+				new File(logTransferFilePath?.toString()).mkdirs()
+				FileWriter file = new FileWriter(logTransferFilePath+"/"+systemTimeForLogFile+"_alertData.json",true)
+				BufferedWriter buffWriter = new BufferedWriter(file)
+				buffWriter.write(jsonObj?.toString());
+				buffWriter.write(NEW_LINE);
+				buffWriter.flush()
+				buffWriter.close()
+				file.close();
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		render "Received request in getAlertNotification"
+	}
+	
+	/**
+	 * Fetch the list of alerts received for a device between the timeframe
+	 * @param fromDateString
+	 * @param toDateString
+	 * @param macAddress
+	 * @return
+	 */
+	def fetchAlertDataForMemoryProfiling(String executionResultId){
+		List alertList = []
+		try{
+			ExecutionResult execResult = ExecutionResult.findById(executionResultId)
+			if(execResult){
+				Date fromDate = execResult?.dateOfExecution
+				Date toDate = new Date()
+				def device = Device.findByStbName(execResult?.device)
+				String macAddress = ""
+				if(device){
+					macAddress = device?.serialNo
+				}
+				alertList = executionService.fetchAlertData(fromDate,toDate,macAddress,realPath)
+			}
+			
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		render alertList as JSON
 	}
 }
