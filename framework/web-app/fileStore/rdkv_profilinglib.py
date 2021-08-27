@@ -19,8 +19,10 @@
 
 import json
 import time
-import sys
+import sys,os
 import urllib
+import importlib
+from datetime import datetime
 from rdkv_performancelib import getConfigFileName
 from rdkv_performancelib import getDeviceConfigKeyValue
 
@@ -91,7 +93,6 @@ def compare_metric_threshold_values(deviceConfigFile,configParam, metricValue):
 def rdkv_profiling_collectd_check_system_memory(tmUrl, resultId, deviceConfig, thresholdCheck="true"):
     url_param = "actualUnit=Bytes"+str("&")+"preferredUnit=MB"+str("&")+"isSystemMetric=true"+str("&")+"parameter=memory.memory-used,memory.memory-free,memory.memory-cached,memory.memory-buffered"
     url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+ str("&") + url_param
-    #print url
     result_details = {}
     try:
         response = urllib.urlopen(url).read()
@@ -272,7 +273,7 @@ def rdkv_profiling_collectd_check_system_CPU(tmUrl, resultId, deviceConfig, thre
 #----------------------------------------------------------------------------
 
 def rdkv_profiling_collectd_check_process_metrics(tmUrl, resultId, processName, deviceConfig, thresholdCheck="true"):
-    url_param = "actualUnit=Bytes"+str("&")+"preferredUnit=MB"+str("&")+"isSystemMetric=false"+str("&")+"parameter=processes-"+processName+".ps_rss,processes-"+processName+".ps_vm"
+    url_param = "actualUnit=KB"+str("&")+"preferredUnit=MB"+str("&")+"isSystemMetric=false"+str("&")+"parameter=processes-"+processName+".ps_rss,processes-"+processName+".ps_vm"
     url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+str("&")+url_param
     result_details = {}
     try:
@@ -286,7 +287,7 @@ def rdkv_profiling_collectd_check_process_metrics(tmUrl, resultId, processName, 
                 # TODO As of now max value is taken. Need to confirm on this
                 if "ps_rss" in params.get("parameter"):
                     process_metric_list.append(float(params.get("max")))
-                print "%s : min:%s , max:%s , avg:%s \n" %(params.get("parameter").split(".")[-1],params.get("min"),params.get("max"),params.get("avg"))
+                print "%s : min:%s , max:%s , avg:%s \n" %(params.get("parameter").split(".")[-1].split("_",1)[1],params.get("min"),params.get("max"),params.get("avg"))
             print "********************************************\n"
             if thresholdCheck == "true":
                 # TODO: This check will be added for process specific in up coming releases
@@ -348,7 +349,7 @@ def rdkv_profiling_collectd_check_process_usedCPU(tmUrl, resultId, processName, 
             for params in response:
                 # TODO As of now max value is taken. Need to confirm on this
                 process_metric_list.append(float(params.get("max")))
-                print "%s : min:%s , max:%s , avg:%s \n" %(params.get("parameter").split(".")[-1],params.get("min"),params.get("max"),params.get("avg"))
+                print "%s : min:%s , max:%s , avg:%s \n" %(params.get("parameter").split(".")[-1].split("_",1)[1],params.get("min"),params.get("max"),params.get("avg"))
             print "********************************************\n"
             if thresholdCheck == "true":
                 process_config_param = "PROFILING_PROCESSES_" + processName.upper() + "_USEDCPU_THRESHOLD"
@@ -410,7 +411,7 @@ def rdkv_profiling_collectd_check_process_usedSHR(tmUrl, resultId, processName, 
             for params in response:
                 # TODO As of now max value is taken. Need to confirm on this
                 process_metric_list.append(float(params.get("max")))
-                print "%s : min:%s , max:%s , avg:%s \n" %(params.get("parameter").split(".")[-1],params.get("min"),params.get("max"),params.get("avg"))
+                print "%s : min:%s , max:%s , avg:%s \n" %(params.get("parameter").split(".")[-1].split("_",1)[1],params.get("min"),params.get("max"),params.get("avg"))
             print "********************************************\n"
             # TODO As of now SHR memory validation is disabled. Need to confirm on this
             if thresholdCheck == "true":
@@ -439,5 +440,92 @@ def rdkv_profiling_collectd_check_process_usedSHR(tmUrl, resultId, processName, 
         return result_details
 
 
+#----------------------------------------------------------------------------
+# To execute the smem tool in DUT and transfer the smem log from DUT to TM
+#
+#
+# Syntax       : rdkv_profiling_smem_execute(deviceIP,deviceConfig,realPath,execId,execDeviceId,execResultId)
+#
+# Parameters   : deviceIP - IP of the device
+#                deviceConfig - DUT config file
+#                execId - execution ID
+#                realPath - TM location
+#                execResultId - execution result ID
+#                execDeviceId - execution device ID
+#
+# Return Value : SUCCESS/FAILURE.
+#                SUCCESS - smem tool execution & log transfer done
+#                FAILURE - smem tool execution/log transfer failed
+#----------------------------------------------------------------------------
+def rdkv_profiling_smem_execute(deviceIP,deviceConfig,realPath,execId,execDeviceId,execResultId):
+    result_val = "SUCCESS"
+    host_name = deviceIP
+    result,smem_support = getDeviceConfigKeyValue(deviceConfig,"PROFILING_SMEM_SUPPORT")
+    if smem_support != "" and smem_support.upper() == "YES":
+        result,ssh_method = getDeviceConfigKeyValue(deviceConfig,"SSH_METHOD")
+        result,user_name  = getDeviceConfigKeyValue(deviceConfig,"SSH_USERNAME")
+        result,password   = getDeviceConfigKeyValue(deviceConfig,"SSH_PASSWORD")
+        file_name = "/tmp/smemData.txt"
+        command = "python3 /usr/bin/smem.py -tk > " + file_name
+        if ssh_method == "" or user_name == "" or password == "":
+            print "Please configure the SSH details in device config file"
+            result_val = "FAILURE"
+        else:
+            if password == "None":
+                ssh_password = ""
+            else:
+                ssh_password = password
+            try:
+                lib = importlib.import_module("SSHUtility")
+                if ssh_method == "directSSH":
+                     method = "ssh_and_execute"
+                else:
+                     method = "ssh_and_execute_" + ssh_method
+                method_to_call = getattr(lib, method)
+                if ssh_method == "directSSH":
+                     output = method_to_call(ssh_method,host_name,user_name,ssh_password,command)
+                else:
+                     output = method_to_call(host_name,user_name,password,command)
 
+                dest_path = realPath + "/logs/" + str(execId) + "/" + str(execDeviceId) + "/" + str(execResultId)
+                now = datetime.now()
+                timing_info = str(now.strftime("%Y%m%d%H%M%S"))
+                dest_file_name = str(execId) + "_" + "smemData" + "_" + timing_info
+                result_val = transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_path,dest_file_name)
+            except Exception as e:
+                result_val = "FAILURE"
+    else:
+         print "\nDevice does not have smem support. Skipping smem execution"
+
+    return result_val
+
+
+#----------------------------------------------------------------------------
+# Transfer file from DUT to TM path
+#----------------------------------------------------------------------------
+def transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_path,dest_file_name):
+    result_val = "SUCCESS"
+    try:
+        if not os.path.exists(dest_path):
+            print "\nCreating file transfer path..."
+            os.makedirs(dest_path)
+        if os.path.exists(dest_path):
+            print "\nFile transfer path available. Tranferring the log..."
+        log_transfer_file = realPath + "fileStore/transfer_thunderdevice_logs.py"
+
+        command = "python "+log_transfer_file+" "+deviceIP+" "+user_name+" "+password+" "+file_name+" "+dest_path+" "+dest_file_name
+        #print command
+        os.system(command)
+        time.sleep(1)
+        src_log_file  = dest_path + "/" + "smemData.txt"
+        dest_log_file = dest_path + "/" + dest_file_name
+        os.rename(src_log_file,dest_log_file)
+        if os.path.exists(dest_log_file):
+            print "Log file %s transferred successfully" %(dest_file_name)
+        else:
+            result_val = "FAILURE"
+
+    except Exception as e:
+        print "\nException Occurred : %s" %(e)
+        result_val = "FAILURE"
 
