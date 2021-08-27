@@ -19,13 +19,13 @@
 '''
 <?xml version="1.0" encoding="UTF-8"?><xml>
   <id/>
-  <version>2</version>
-  <name>RDKV_Profiling_Load_LightningApp</name>
+  <version>1</version>
+  <name>RDKV_Profiling_LaunchAppFromUI</name>
   <primitive_test_id/>
   <primitive_test_name>rdkv_profiling_collectd_check_system_memory</primitive_test_name>
   <primitive_test_version>2</primitive_test_version>
   <status>FREE</status>
-  <synopsis>The objective of this test is to validate profiling data from Grafana tool after launching a Lightning App.</synopsis>
+  <synopsis>The objective of this test is to launch an application from app store and validate the profiling metrics after that.</synopsis>
   <groups_id/>
   <execution_time>6</execution_time>
   <long_duration>false</long_duration>
@@ -41,111 +41,136 @@
     <rdk_version>RDK2.0</rdk_version>
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_PROFILING_02</test_case_id>
-    <test_objective>The objective of this test is to validate profiling data from Grafana tool after launching a Lightning App.</test_objective>
+    <test_case_id>RDKV_PROFILING_09</test_case_id>
+    <test_objective>The objective of this test is to launch an application from app store and validate the profiling metrics after that.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>RPI, Accelerator</test_setup>
-    <pre_requisite>1. wpeframework should be running.
-2. User should configure the input parameters in PerformanceTestVariables.py file</pre_requisite>
+    <test_setup>RPI,Accelerator</test_setup>
+    <pre_requisite>1. wpeframework should be up and running</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
-    <input_parameters>lightning_app_instance: string
-lightning_app_url : string</input_parameters>
-    <automation_approch>1. Launch LightningApp plugin using RDKShell.
-2. Set the URL of Lightning App.
-3. Check whether application is launched.
-4. Validate the profiling data from Grafana tool based on threshold values.
-5. Execute the smem tool and collect the log
-6. Check for alerts from Grafana tool
-7. Revert the URL and plugin status.</automation_approch>
-    <expected_output>Lightning App should be launched and profiling data should be within the expected limit</expected_output>
+    <input_parameters>app_launch_key_sequence: List of strings
+post_app_launch_key_sequence: List of strings</input_parameters>
+    <automation_approch>1. Launch vimeo application from app store by keypress using generateKey method of RDKShell plugin
+2. Validate the profiling data from Grafana tool based on threshold value
+3. Execute the smem tool and collect the log
+4. Check for alerts from Grafana tool
+5. Close the application by pressing home button</automation_approch>
+    <expected_output>Profiling data should be within the expected limit</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_profiling</test_stub_interface>
-    <test_script>RDKV_Profiling_Load_LightningApp</test_script>
+    <test_script>RDKV_Profiling_LaunchAppFromUI</test_script>
     <skipped>No</skipped>
-    <release_version>M91</release_version>
+    <release_version>M92</release_version>
     <remarks/>
   </test_cases>
-  <script_tags/>
 </xml>
 
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
-import tdklib; 
-from StabilityTestUtility import *
+import tdklib
+import ast
 from RDKVProfilingVariables import *
+from rdkv_performancelib import *
 
 #Test component to be tested
-obj = tdklib.TDKScriptingLibrary("rdkv_profiling","1",standAlone=True);
+obj = tdklib.TDKScriptingLibrary("rdkv_profiling","1",standAlone=True)
 
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_Profiling_Load_LightningApp');
+obj.configureTestCase(ip,port,'RDKV_Profiling_LaunchAppFromUI')
 
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
-print "[LIB LOAD STATUS]  :  %s" %result;
-obj.setLoadModuleStatus(result);
+print "[LIB LOAD STATUS]  :  %s" %result
+obj.setLoadModuleStatus(result)
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    print "Check Pre conditions"
     status = "SUCCESS"
-    url_method = lightning_app_instance + '.1.url'
-    #No need to revert any values if the pre conditions are already set.
-    revert="NO"
-    #WebKitBrowser will be changed to LightningApp in the upcoming releases.
-    plugins_list = [lightning_app_instance,"Cobalt"]
-    plugin_status_needed = {lightning_app_instance:"resumed","Cobalt":"deactivated"}
+    resident_app = "ResidentApp"
+    is_front = False
     process_list = ['WPEFramework','WPEWebProcess','WPENetworkProcess','tr69hostif']
     system_wide_methods_list = ['rdkv_profiling_collectd_check_system_memory','rdkv_profiling_collectd_check_system_loadavg','rdkv_profiling_collectd_check_system_CPU']
     system_wide_method_names_dict = {'rdkv_profiling_collectd_check_system_memory':'system memory','rdkv_profiling_collectd_check_system_loadavg':'system load avg','rdkv_profiling_collectd_check_system_CPU':'system cpu'}
     process_wise_methods = ['rdkv_profiling_collectd_check_process_metrics','rdkv_profiling_collectd_check_process_usedCPU','rdkv_profiling_collectd_check_process_usedSHR']
     process_wise_method_names_dict = {'rdkv_profiling_collectd_check_process_metrics':'metrics','rdkv_profiling_collectd_check_process_usedCPU':'used CPU','rdkv_profiling_collectd_check_process_usedSHR':'used shared memory'}
-    curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
-    time.sleep(20)
-    if any(curr_plugins_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
-        print "\n Error while getting the status of plugins"
-        status = "FAILURE"
-    elif curr_plugins_status_dict != plugin_status_needed:
-        revert = "YES"
-        status = set_plugins_status(obj,plugin_status_needed)
-        time.sleep(10)
-        new_status_dict = get_plugins_status(obj,plugins_list)
-        if new_status_dict != plugin_status_needed:
-            status = "FAILURE"
-    if status == "SUCCESS":
-        print "\nPre conditions for the test are set successfully";
-        print "\nGet the URL in ",lightning_app_instance
-        tdkTestObj = obj.createTestStep('rdkservice_getValue');
-        tdkTestObj.addParameter("method",url_method);
-        tdkTestObj.executeTestCase(expectedResult);
-        current_url = tdkTestObj.getResultDetails();
-        result = tdkTestObj.getResult();
-        if current_url != None and expectedResult in result:
-            tdkTestObj.setResultStatus("SUCCESS");
-            time.sleep(10)
-            print "\nCurrent URL:",current_url
-            print "\nSet Lightning Application URL"
-            tdkTestObj = obj.createTestStep('rdkservice_setValue');
-            tdkTestObj.addParameter("method",url_method);
-            tdkTestObj.addParameter("value",lightning_app_url);
-            tdkTestObj.executeTestCase(expectedResult);
-            result = tdkTestObj.getResult();
+    #Check zorder to check ResidentApp is in the front
+    tdkTestObj = obj.createTestStep('rdkservice_getValue')
+    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.getZOrder")
+    tdkTestObj.executeTestCase(expectedResult)
+    zorder = tdkTestObj.getResultDetails()
+    zorder_status = tdkTestObj.getResult()
+    if expectedResult in zorder_status :
+        tdkTestObj.setResultStatus("SUCCESS")
+        zorder = ast.literal_eval(zorder)["clients"]
+        if resident_app.lower() in zorder and zorder[0].lower() == resident_app.lower():
+            is_front = True
+            print "\n ResidentApp is in front"
+        elif resident_app.lower() in zorder and zorder[0].lower() != resident_app.lower():
+            param_val = '{"client": "'+resident_app+'"}'
+            tdkTestObj = obj.createTestStep('rdkservice_setValue')
+            tdkTestObj.addParameter("method","org.rdk.RDKShell.1.moveToFront")
+            tdkTestObj.addParameter("value",param_val)
+            tdkTestObj.executeTestCase(expectedResult)
+            result = tdkTestObj.getResult()
             if expectedResult in result:
                 tdkTestObj.setResultStatus("SUCCESS")
-                time.sleep(10)
-                print "\nValidate if the URL is set successfully or not"
-                tdkTestObj = obj.createTestStep('rdkservice_getValue');
-                tdkTestObj.addParameter("method",url_method);
-                tdkTestObj.executeTestCase(expectedResult);
-                new_url = tdkTestObj.getResultDetails();
-                result = tdkTestObj.getResult();
-                if new_url in lightning_app_url and expectedResult in result:
-                    tdkTestObj.setResultStatus("SUCCESS");
-                    print "\n URL(",new_url,") is set successfully \n"
+                #Check zorder to check ResidentApp is in the front
+                tdkTestObj = obj.createTestStep('rdkservice_getValue')
+                tdkTestObj.addParameter("method","org.rdk.RDKShell.1.getZOrder")
+                tdkTestObj.executeTestCase(expectedResult)
+                zorder = tdkTestObj.getResultDetails()
+                zorder_status = tdkTestObj.getResult()
+                if expectedResult in zorder_status :
+                    zorder = ast.literal_eval(zorder)["clients"]
+                    if zorder[0].lower() != resident_app.lower():
+                        print "\n Successfully moved ResidentApp to front"
+                        is_front = True
+                        tdkTestObj.setResultStatus("SUCCESS")
+                    else:
+                        print "\n Unable to move ResidentApp to front"
+                        tdkTestObj.setResultStatus("FAILURE")
+                else:
+                    print "\n Error while getting the zorder"
+                    tdkTestObj.setResultStatus("FAILURE")
+            else:
+                print "\n Error while executing moveToFront method"
+                tdkTestObj.setResultStatus("FAILURE")
+        else:
+            print "\n ResidentApp is not present in zorder"
+            tdkTestObj.setResultStatus("FAILURE")
+        if is_front:
+            #Set focus to ResidentApp
+            print "\n Set focus to ResidentApp"
+            client = '{"client": "ResidentApp"}'
+            tdkTestObj = obj.createTestStep('rdkservice_setValue')
+            tdkTestObj.addParameter("method","org.rdk.RDKShell.1.setFocus")
+            tdkTestObj.addParameter("value",client)
+            tdkTestObj.executeTestCase(expectedResult)
+            result = tdkTestObj.getResult()
+            if expectedResult in result:
+                tdkTestObj.setResultStatus("SUCCESS")
+                #Navigate in ResidentApp UI
+                for key in app_launch_key_sequence:
+                    params = '{"keys":[ {"keyCode": '+str(navigation_key_dictionary[key])+',"modifiers": [],"delay":1.0}]}'
+                    tdkTestObj = obj.createTestStep('rdkservice_setValue')
+                    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
+                    tdkTestObj.addParameter("value",params)
+                    tdkTestObj.executeTestCase(expectedResult)
+                    result = tdkTestObj.getResult()
+                    if expectedResult in result:
+                        print "Pressed {} key".format(key)
+                        tdkTestObj.setResultStatus("SUCCESS")
+                        time.sleep(5)
+                    else:
+                        print "\n Error while pressing {} key".format(key)
+                        tdkTestObj.setResultStatus("FAILURE")
+                        break
+                else:
+                    print "\n Successfully completed navigations in ResidentApp UI"
                     time.sleep(60)
+                    print "\n Validate data from Grafana"
                     conf_file,result = getConfigFileName(obj.realpath)
                     if result == "SUCCESS":
                         for method in system_wide_methods_list:
@@ -178,7 +203,7 @@ if expectedResult in result.upper():
                                     print "Successfully validated the {} process {}\n".format(process,process_wise_method_names_dict[method])
                                     tdkTestObj.setResultStatus("SUCCESS")
                                 else:
-                                    print "Error while validating the {} process {}\n".format(process,process_wise_method_names_dict[method])
+                                    print "\n Error while validating the {} process {}\n".format(process,process_wise_method_names_dict[method])
                                     tdkTestObj.setResultStatus("FAILURE")
                         #smem data collection
                         tdkTestObj = obj.createTestStep("rdkv_profiling_smem_execute")
@@ -213,35 +238,46 @@ if expectedResult in result.upper():
                     else:
                         print "\n Error while getting device config file"
                         tdkTestObj.setResultStatus("FAILURE")
-                    #Set the URL back to previous
-                    tdkTestObj = obj.createTestStep('rdkservice_setValue');
-                    tdkTestObj.addParameter("method",url_method);
-                    tdkTestObj.addParameter("value",current_url);
-                    tdkTestObj.executeTestCase(expectedResult);
-                    result = tdkTestObj.getResult();
-                    if result == "SUCCESS":
-                        print "URL is reverted successfully \n"
-                        tdkTestObj.setResultStatus("SUCCESS");
-                    else:
-                        print "Failed to revert the URL"
-                        tdkTestObj.setResultStatus("FAILURE");
+                #Close the Application
+                home_key_params = '{"keys":[ {"keyCode": 36,"modifiers": [],"delay":1.0}]}'
+                tdkTestObj = obj.createTestStep('rdkservice_setValue')
+                tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
+                tdkTestObj.addParameter("value",home_key_params)
+                tdkTestObj.executeTestCase(expectedResult)
+                result = tdkTestObj.getResult()
+                if expectedResult in result:
+                    print "\n Pressed home button"
+                    tdkTestObj.setResultStatus("SUCCESS")
+                    time.sleep(10)
+                    #Post condition
+                    for key in post_app_launch_key_sequence:
+                        params = '{"keys":[ {"keyCode": '+str(navigation_key_dictionary[key])+',"modifiers": [],"delay":1.0}]}'
+                        tdkTestObj = obj.createTestStep('rdkservice_setValue')
+                        tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
+                        tdkTestObj.addParameter("value",params)
+                        tdkTestObj.executeTestCase(expectedResult)
+                        result = tdkTestObj.getResult()
+                        if expectedResult in result:
+                            print "\n Pressed {} key".format(key)
+                            tdkTestObj.setResultStatus("SUCCESS")
+                            time.sleep(5)
+                        else:
+                            print "\n Error while pressing {} key".format(key)
+                            tdkTestObj.setResultStatus("FAILURE")
+                            break
                 else:
-                    print "Failed to load the URL, current URL: %s" %(new_url)
-                    tdkTestObj.setResultStatus("FAILURE");
+                    print "\n Error while pressing home button"
+                    tdkTestObj.setResultStatus("FAILURE")
             else:
-                print "Failed to set the URL"
-                tdkTestObj.setResultStatus("FAILURE");
+                print "\n Error while setting focus to ResidentApp"
+                tdkTestObj.setResultStatus("FAILURE")
         else:
-            tdkTestObj.setResultStatus("FAILURE");
-            print "Unable to get the current URL loaded in WebKitBrowser"
+            print "\n Unable to move ResidentApp to front"
+            tdkTestObj.setResultStatus("FAILURE")
     else:
-        print "Pre conditions are not met"
-        obj.setLoadModuleStatus("FAILURE");
-    #Revert the values
-    if revert=="YES":
-        print "Revert the values before exiting"
-        status = set_plugins_status(obj,curr_plugins_status_dict)
-    obj.unloadModule("rdkv_profiling");
+        print "\n Error while getting zorder"
+        tdkTestObj.setResultStatus("FAILURE")
+    obj.unloadModule("rdkv_profiling")
 else:
-    obj.setLoadModuleStatus("FAILURE");
+    obj.setLoadModuleStatus("FAILURE")
     print "Failed to load module"

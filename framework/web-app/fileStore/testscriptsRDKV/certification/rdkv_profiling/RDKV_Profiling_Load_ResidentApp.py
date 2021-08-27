@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>The objective of this test is to validate profiling data from Grafana tool after loading ResidentApp.</synopsis>
   <groups_id/>
-  <execution_time>5</execution_time>
+  <execution_time>6</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -53,6 +53,8 @@
 3. Check the uptime
 4. Check the zorder from RDKShell to see ResidenApp is loaded.
 5. Validate the profiling data from Grafana tool based on threshold values.
+6. Execute the smem tool and collect the log
+7. Check for alerts from Grafana tool.
 </automation_approch>
     <expected_output>ResidentApp should be launched successfully and profiling data should be within the expected limit</expected_output>
     <priority>High</priority>
@@ -87,13 +89,13 @@ obj.setLoadModuleStatus(result)
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    process_list = ['WPEFramework','WPEWebProcess','WPENetworkProcess']
+    process_list = ['WPEFramework','WPEWebProcess','WPENetworkProcess','tr69hostif']
     system_wide_methods_list = ['rdkv_profiling_collectd_check_system_memory','rdkv_profiling_collectd_check_system_loadavg','rdkv_profiling_collectd_check_system_CPU']
     system_wide_method_names_dict = {'rdkv_profiling_collectd_check_system_memory':'system memory','rdkv_profiling_collectd_check_system_loadavg':'system load avg','rdkv_profiling_collectd_check_system_CPU':'system cpu'}
     process_wise_methods = ['rdkv_profiling_collectd_check_process_metrics','rdkv_profiling_collectd_check_process_usedCPU','rdkv_profiling_collectd_check_process_usedSHR']
     process_wise_method_names_dict = {'rdkv_profiling_collectd_check_process_metrics':'metrics','rdkv_profiling_collectd_check_process_usedCPU':'used CPU','rdkv_profiling_collectd_check_process_usedSHR':'used shared memory'}
     resident_app = "ResidentApp"
-    rebootwaitTime = 150
+    rebootwaitTime = 180
     tdkTestObj = obj.createTestStep('rdkservice_rebootDevice')
     tdkTestObj.addParameter("waitTime",rebootwaitTime)
     #get the current system time before reboot
@@ -132,10 +134,10 @@ if expectedResult in result.upper():
                                 result = tdkTestObj.getResult()
                                 validation_result = json.loads(details).get("test_step_status")
                                 if expectedResult in (result and validation_result):
-                                    print "\n Successfully validated the {}".format(system_wide_method_names_dict[method])
+                                    print "Successfully validated the {} \n".format(system_wide_method_names_dict[method])
                                     tdkTestObj.setResultStatus("SUCCESS")
                                 else:
-                                    print "\n Error while validating the {}".format(system_wide_method_names_dict[method])
+                                    print "Error while validating the {} \n".format(system_wide_method_names_dict[method])
                                     tdkTestObj.setResultStatus("FAILURE")
                             for process in process_list:
                                 for method in process_wise_methods:
@@ -149,11 +151,41 @@ if expectedResult in result.upper():
                                     result = tdkTestObj.getResult()
                                     validation_result = json.loads(details).get("test_step_status")
                                     if expectedResult in (result and validation_result):
-                                        print "\n Successfully validated the {} process {}".format(process,process_wise_method_names_dict[method])
+                                        print "Successfully validated the {} process {}\n".format(process,process_wise_method_names_dict[method])
                                         tdkTestObj.setResultStatus("SUCCESS")
                                     else:
-                                        print "\n Error while validating the {} process {}".format(process,process_wise_method_names_dict[method])
+                                        print "Error while validating the {} process {}\n".format(process,process_wise_method_names_dict[method])
                                         tdkTestObj.setResultStatus("FAILURE")
+                            #smem data collection
+                            tdkTestObj = obj.createTestStep("rdkv_profiling_smem_execute")
+                            tdkTestObj.addParameter('deviceIP',ip)
+                            tdkTestObj.addParameter('deviceConfig',conf_file)
+                            tdkTestObj.addParameter('realPath',obj.realpath)
+                            tdkTestObj.addParameter('execId',obj.execID)
+                            tdkTestObj.addParameter('execDeviceId',obj.execDevId)
+                            tdkTestObj.addParameter('execResultId',obj.resultId)
+                            tdkTestObj.executeTestCase(expectedResult)
+                            details = tdkTestObj.getResultDetails()
+                            result = tdkTestObj.getResult()
+                            if "SUCCESS" in result:
+                                print "\nSMEM tool execution success and transferred the log"
+                                tdkTestObj.setResultStatus("SUCCESS")
+                            else:
+                                print "\nSMEM tool execution or log transfer failed"
+                                tdkTestObj.setResultStatus("FAILURE")
+                            #check for alerts from Grafana tool
+                            print "\nCheck for profiling alerts...."
+                            tdkTestObj = obj.createTestStep("rdkv_profiling_get_alerts")
+                            tdkTestObj.addParameter('tmUrl',obj.url)
+                            tdkTestObj.addParameter('resultId',obj.resultId)
+                            tdkTestObj.executeTestCase(expectedResult)
+                            details = tdkTestObj.getResultDetails()
+                            result = tdkTestObj.getResult()
+                            validation_result = json.loads(details).get("test_step_status")
+                            if expectedResult in (result and validation_result):
+                                tdkTestObj.setResultStatus("SUCCESS")
+                            else:
+                                tdkTestObj.setResultStatus("FAILURE")
                         else:
                             print "\n Error while getting device config file"
                             tdkTestObj.setResultStatus("FAILURE")

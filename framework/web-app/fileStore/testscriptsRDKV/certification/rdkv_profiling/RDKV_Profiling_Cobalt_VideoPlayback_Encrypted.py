@@ -19,49 +19,49 @@
 '''
 <?xml version="1.0" encoding="UTF-8"?><xml>
   <id/>
-  <version>3</version>
-  <name>RDKV_Profiling_SwitchTo_MainUI</name>
+  <version>4</version>
+  <name>RDKV_Profiling_Cobalt_VideoPlayback_Encrypted</name>
   <primitive_test_id/>
-  <primitive_test_name>rdkv_profiling_collectd_check_system_memory</primitive_test_name>
-  <primitive_test_version>2</primitive_test_version>
+  <primitive_test_name>rdkv_profiling_collectd_check_system_CPU</primitive_test_name>
+  <primitive_test_version>1</primitive_test_version>
   <status>FREE</status>
-  <synopsis>The objective of this test is to launch Cobalt, switch back to home screen then validate profiling data from Grafana tool.</synopsis>
+  <synopsis>The objective of this test is to play an encrypted video in Cobalt and validate the profiling metrics after few minutes of playback</synopsis>
   <groups_id/>
-  <execution_time>5</execution_time>
+  <execution_time>11</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
   <skip>false</skip>
   <box_types>
-    <box_type>RPI-Client</box_type>
-    <box_type>RPI-HYB</box_type>
     <box_type>Video_Accelerator</box_type>
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_PROFILING_04</test_case_id>
-    <test_objective>The objective of this test is to launch Cobalt, switch back to home screen then validate profiling data from Grafana tool.</test_objective>
+    <test_case_id>RDKV_PROFILING_10</test_case_id>
+    <test_objective>The objective of this test is to play an encrypted video in Cobalt and validate the profiling metrics after few minutes of playback</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>RPI, Accelerator</test_setup>
-    <pre_requisite>1. wpeframework should be running</pre_requisite>
+    <test_setup>Accelerator</test_setup>
+    <pre_requisite>1.  wpeframework should be running
+2. Device should have DRM support
+3. User should sign in to Cobalt before executing the test and the video URL used must be the URL of a paid content.
+4. Video validation related details should be given in the device config file</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
-    <input_parameters>None</input_parameters>
+    <input_parameters>cobalt_encrypted_test_url: string</input_parameters>
     <automation_approch>1. Launch Cobalt using RDKShell.
-2. Press home button to switch back to main UI.
-3. Check zorder to see home screen is reached.
+2. Set a video DRM protected test URL
+3. Check video playback using decoder entries
 4. Validate the profiling data from Grafana tool based on threshold values.
-5. Execute the smem tool and collect the log 
+5. Execute the smem tool and collect the log
 6. Check for alerts from Grafana tool.
-7. Revert Cobalt status.</automation_approch>
-    <expected_output>Home screen should be reached.
-Profiling data should be within the expected limit.</expected_output>
+7. Revert the plugin status.</automation_approch>
+    <expected_output>Video should be playing and profiling data should be within the expected limit</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_profiling</test_stub_interface>
-    <test_script>RDKV_Profiling_SwitchTo_MainUI</test_script>
+    <test_script>RDKV_Profiling_Cobalt_VideoPlayback_Encrypted</test_script>
     <skipped>No</skipped>
-    <release_version>M91</release_version>
+    <release_version>M92</release_version>
     <remarks/>
   </test_cases>
   <script_tags/>
@@ -71,6 +71,7 @@ Profiling data should be within the expected limit.</expected_output>
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
 from StabilityTestUtility import *
+import RDKVProfilingVariables
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_profiling","1",standAlone=True);
@@ -79,72 +80,102 @@ obj = tdklib.TDKScriptingLibrary("rdkv_profiling","1",standAlone=True);
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_Profiling_SwitchTo_MainUI');
+obj.configureTestCase(ip,port,'RDKV_Profiling_Cobalt_VideoPlayback_Encrypted');
 
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
-obj.setLoadModuleStatus(result);
-
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    print "\n Check Pre conditions"
     status = "SUCCESS"
-    #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    plugins_list = ["WebKitBrowser","Cobalt"]
-    plugin_status_needed = {"WebKitBrowser":"deactivated","Cobalt":"deactivated"}
-    process_list = ['WPEFramework','WPEWebProcess','WPENetworkProcess','Cobalt','tr69hostif']
+    cobalt_test_url = RDKVProfilingVariables.cobalt_encrypted_test_url
+    if cobalt_test_url == "":
+        print "\n Please configure the cobalt_test_url in Config file"
+    plugins_list = ["Cobalt","WebKitBrowser"]
+    plugin_status_needed = {"Cobalt":"deactivated","WebKitBrowser":"deactivated"}
+    process_list = ['WPEFramework','WPEWebProcess','WPENetworkProcess','Cobalt','OCDM','tr69hostif']
     system_wide_methods_list = ['rdkv_profiling_collectd_check_system_memory','rdkv_profiling_collectd_check_system_loadavg','rdkv_profiling_collectd_check_system_CPU']
     system_wide_method_names_dict = {'rdkv_profiling_collectd_check_system_memory':'system memory','rdkv_profiling_collectd_check_system_loadavg':'system load avg','rdkv_profiling_collectd_check_system_CPU':'system cpu'}
     process_wise_methods = ['rdkv_profiling_collectd_check_process_metrics','rdkv_profiling_collectd_check_process_usedCPU','rdkv_profiling_collectd_check_process_usedSHR']
     process_wise_method_names_dict = {'rdkv_profiling_collectd_check_process_metrics':'metrics','rdkv_profiling_collectd_check_process_usedCPU':'used CPU','rdkv_profiling_collectd_check_process_usedSHR':'used shared memory'}
-    resident_app = "ResidentApp"
+    print "\n Check Pre conditions"
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
     if any(curr_plugins_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
-        print "\n Error while getting the status of plugins"
+        print "\n Error while getting plugin status"
         status = "FAILURE"
     elif curr_plugins_status_dict != plugin_status_needed:
         revert = "YES"
         status = set_plugins_status(obj,plugin_status_needed)
-        new_status_dict = get_plugins_status(obj,plugins_list)
-        if new_status_dict != plugin_status_needed:
+        new_plugins_status = get_plugins_status(obj,plugins_list)
+        if new_plugins_status != plugin_status_needed:
             status = "FAILURE"
-    if status == "SUCCESS":
-        cobal_launch_status,launch_start_time = launch_plugin(obj,"Cobalt")
-        if cobal_launch_status == "SUCCESS":
+    validation_dict = get_validation_params(obj)
+    if status == "SUCCESS" and cobalt_test_url != "" and validation_dict != {}:
+        plugin = "Cobalt"
+        if validation_dict["validation_required"]:
+            if validation_dict["password"] == "None":
+                password = ""
+            else:
+                password = validation_dict["password"]
+            credentials = validation_dict["host_name"]+','+validation_dict["user_name"]+','+password
+        launch_status,launch_start_time = launch_plugin(obj,plugin)
+        if expectedResult in launch_status:
             time.sleep(20)
             tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus')
-            tdkTestObj.addParameter("plugin","Cobalt")
+            tdkTestObj.addParameter("plugin",plugin)
             tdkTestObj.executeTestCase(expectedResult)
             cobalt_status = tdkTestObj.getResultDetails()
             result = tdkTestObj.getResult()
             if cobalt_status == 'resumed' and expectedResult in result:
                 print "\nCobalt Resumed Successfully\n"
                 tdkTestObj.setResultStatus("SUCCESS")
-                print "\n Pressing Home button \n"
-                params = '{"keys":[ {"keyCode": 36,"modifiers": [],"delay":1.0}]}'
+                print "\n Set the URL : {} using Cobalt deeplink method".format(cobalt_test_url)
                 tdkTestObj = obj.createTestStep('rdkservice_setValue')
-                tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
-                tdkTestObj.addParameter("value",params)
+                tdkTestObj.addParameter("method","Cobalt.1.deeplink")
+                tdkTestObj.addParameter("value",cobalt_test_url)
                 tdkTestObj.executeTestCase(expectedResult)
-                rdkshell_result = tdkTestObj.getResult()
-                if expectedResult in rdkshell_result:
-                    print "\n Successfully pressed home button"
-                    time.sleep(10)
+                cobalt_result = tdkTestObj.getResult()
+                time.sleep(20)
+                if(cobalt_result in expectedResult):
                     tdkTestObj.setResultStatus("SUCCESS")
-                    tdkTestObj = obj.createTestStep('rdkservice_getValue')
-                    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.getZOrder")
+                    print "Clicking OK to play video"
+                    params = '{"keys":[ {"keyCode": 13,"modifiers": [],"delay":1.0}]}'
+                    tdkTestObj = obj.createTestStep('rdkservice_setValue')
+                    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
+                    tdkTestObj.addParameter("value",params)
                     tdkTestObj.executeTestCase(expectedResult)
-                    zorder = tdkTestObj.getResultDetails()
-                    zorder_status = tdkTestObj.getResult()
-                    if expectedResult in zorder_status :
-                        zorder = ast.literal_eval(zorder)["clients"]
-                        print "zorder: ",zorder
-                        if zorder[0].lower() == resident_app.lower():
-                            print "\n Home screen is reached"
-                            tdkTestObj.setResultStatus("SUCCESS")
-                            time.sleep(30)
+                    result1 = tdkTestObj.getResult()
+                    time.sleep(40)
+                    #Clicking OK to skip Ad
+                    tdkTestObj = obj.createTestStep('rdkservice_setValue')
+                    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
+                    tdkTestObj.addParameter("value",params)
+                    tdkTestObj.executeTestCase(expectedResult)
+                    result2 = tdkTestObj.getResult()
+                    time.sleep(40)
+                    if "SUCCESS" == (result1 and result2):
+                        #TODO
+                        #Add gstplayer logs validation
+
+                        result_val = "SUCCESS"
+                        if validation_dict["validation_required"]:
+                            tdkTestObj = obj.createTestStep('rdkservice_validateProcEntry')
+                            tdkTestObj.addParameter("sshmethod",validation_dict["ssh_method"])
+                            tdkTestObj.addParameter("credentials",credentials)
+                            tdkTestObj.addParameter("video_validation_script",validation_dict["video_validation_script"])
+                            tdkTestObj.executeTestCase(expectedResult)
+                            result_val = tdkTestObj.getResultDetails()
+                            if result_val == "SUCCESS" :
+                                tdkTestObj.setResultStatus("SUCCESS")
+                                print "\nVideo playback is happening\n"
+                            else:
+                                tdkTestObj.setResultStatus("FAILURE")
+                                print "Video playback is not happening"
+                        else:
+                            print "\n Validation is not needed, proceeding the test"
+                        if result_val == "SUCCESS":
+                            time.sleep(300)
                             conf_file,result = getConfigFileName(obj.realpath)
                             if result == "SUCCESS":
                                 for method in system_wide_methods_list:
@@ -160,7 +191,7 @@ if expectedResult in result.upper():
                                         print "Successfully validated the {}\n".format(system_wide_method_names_dict[method])
                                         tdkTestObj.setResultStatus("SUCCESS")
                                     else:
-                                        print "Error while validating the {}\n".format(system_wide_method_names_dict[method])
+                                        print "\n Error while validating the {}\n".format(system_wide_method_names_dict[method])
                                         tdkTestObj.setResultStatus("FAILURE")
                                 for process in process_list:
                                     for method in process_wise_methods:
@@ -213,17 +244,18 @@ if expectedResult in result.upper():
                                 print "\n Error while getting device config file"
                                 tdkTestObj.setResultStatus("FAILURE")
                         else:
-                            print "\n Home screen is not reached"
+                            print "\n Error while playing video in Cobalt"
                             tdkTestObj.setResultStatus("FAILURE")
                     else:
-                        print "\n Error while getting zorder value"
+                        print "\n Error while pressing OK button"
                         tdkTestObj.setResultStatus("FAILURE")
                 else:
-                    print "\n Error while executing org.rdk.RDKShell.1.generateKey method"
+                    print "\n Unable to set URL in Cobalt"
                     tdkTestObj.setResultStatus("FAILURE")
             else:
-                print "\n Cobalt is not in resumed state, current state: ",cobalt_status
+                print "\n Cobalt is not in resumed state"
                 tdkTestObj.setResultStatus("FAILURE")
+            #Deactivate cobalt
             print "\n Exiting from Cobalt"
             tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
             tdkTestObj.addParameter("plugin","Cobalt")
@@ -233,13 +265,16 @@ if expectedResult in result.upper():
             if result == "SUCCESS":
                 tdkTestObj.setResultStatus("SUCCESS")
             else:
-                print "Unable to deactivate Cobalt"
+                print "\n Unable to deactivate Cobalt"
                 tdkTestObj.setResultStatus("FAILURE")
         else:
-            print "\n Error while launching Cobalt"
+            print "\n Unable to launch Cobalt"
     else:
-        print "\nPreconditions are not met"
-        tdkTestObj.setResultStatus("FAILURE")
+        print "\n Preconditions are not met"
+        obj.setLoadModuleStatus("FAILURE")
+    if revert=="YES":
+        print "\n Revert the values before exiting"
+        status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_profiling")
 else:
     obj.setLoadModuleStatus("FAILURE")
