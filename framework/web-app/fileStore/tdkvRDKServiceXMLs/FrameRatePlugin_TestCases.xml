@@ -88,6 +88,7 @@
           <prerequisite requisiteId="4" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
             <event pluginName="FrameRate"     eventName="Event_On_FPS" />
             <event pluginName="WebKitBrowser" eventName="Event_Load_Finished" />
+            <event pluginName="FrameRate" eventName="Event_On_Display_FrameRate_Changed" />
           </prerequisite>
         </pluginPreRequisite>
         <testCase testCaseId="FR_01" testCaseName="FrameRate_Collect_FPS" desc="Launches graphics url using webkit browser and gets fps using onFpsEvent Event">
@@ -171,6 +172,11 @@
               <subtestStep testStepId="2" name="Get_Display_FrameRate" method="Get_Display_FrameRate" revertFlag="yes">
                   <resultGeneration useMethodTag="framerate_check_display_framerate" arguments="check_framerate_value">
                      <expectedValues useIterableValue="true"/>
+                  </resultGeneration>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Check_Display_FrameRate_Changed_Event" event="Event_On_Display_FrameRate_Changed" action="eventListener" delay="3" >
+                  <resultGeneration useMethodTag="framerate_check_display_framerate_changed_event" >
+                    <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>

@@ -345,6 +345,13 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "SUCCESS"
 
+        elif tag == "framerate_check_display_framerate_changed_event":
+            result = result[0]
+            info = result
+            if result:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # Bluetooth Events response result parser steps
         elif tag == "bluetooth_check_discovered_device_event":

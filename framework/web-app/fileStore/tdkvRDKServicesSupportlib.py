@@ -1476,6 +1476,14 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "validate_supported_resolutions":
+            supportedResolutions = result.get('supportedResolutions')
+            info["supportedResolutions"] = supportedResolutions
+            status = all(item in expectedValues for item in supportedResolutions)
+            if status is True:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_check_adapter_state":
             info = result.copy()
@@ -2618,13 +2626,20 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             else:
                 info["sx"] = float(testStepResults[0].get("sx")) + 1
                 info["sy"] = float(testStepResults[0].get("sy")) + 1
+
         elif tag =="rdkshell_get_last_client_zorder":
             testStepResults = testStepResults[0].values()[0]
             clients = testStepResults[0].get("clients")
-            print clients
-            print len(clients)
-            print str(clients[(len(clients)-1)])
             info["client"] = str(clients[(len(clients)-1)])
+  
+        elif tag == "rdkshell_get_zorder":
+            testStepResults = testStepResults[0].values()[0]
+            clients = testStepResults[0].get("clients")
+            index = int(arg[0])
+            if len(clients):
+                info["client"] = clients[index]
+            else:
+                info["client"] = ""
 
         #Display info plugin result parser steps
         elif tag == "display_info_get_supported_resolution_list":
@@ -2725,6 +2740,14 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                     soundModes.append(mode)
             info["soundMode"] = ",".join(soundModes)
             
+        elif tag =="get_settop_and_tv_resolutions":
+            testStepResults1 = testStepResults[0].values()[0]
+            testStepResults2 = testStepResults[1].values()[0]
+            supportedTvResolutions = testStepResults1[0].get("supportedTvResolutions")
+            supportedSettopResolutions = testStepResults2[0].get("supportedSettopResolutions")
+            commonResolutions = list(set(supportedTvResolutions) & set(supportedSettopResolutions))
+            info["commonResolutions"] = ",".join(commonResolutions)
+
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_toggle_adapter_state":
             testStepResults = testStepResults[0].values()[0]
@@ -2998,6 +3021,10 @@ def generateComplexTestInputParam(methodTag,testParams):
             userGeneratedParam = { "callsign": testParams.get("callsign"), "restart": { "limit": testParams.get("limit") ,  "window": testParams.get("window") }}
         elif tag == "rdkshell_set_keys_params":
             userGeneratedParam = {"keys":[testParams]}
+        elif tag == "rdkshell_set_keylistener_params":
+            newtestParams = testParams.copy()
+            newtestParams.pop("client")
+            userGeneratedParam = {"keys": [newtestParams],"client": testParams.get("client") }
         elif tag == "rdkshell_set_animations_params":
             userGeneratedParam = {"animations":[testParams]}
         elif tag == "cobalt_set_accessibility_params":

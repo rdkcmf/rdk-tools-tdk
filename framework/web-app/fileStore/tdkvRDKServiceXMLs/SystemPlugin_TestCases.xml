@@ -464,7 +464,7 @@
                 <resultGeneration useMethodTag="system_check_mac_address" arguments="wifi_mac" />
             </testStep>
        </testCase>
-       <!--testCase testCaseId="SYS_35" testCaseName="Check_Power_State_Before_Reboot" desc="Checks the powerstate before reboot" >
+       <testCase testCaseId="SYS_35" testCaseName="Check_Power_State_Before_Reboot" desc="Checks the powerstate before reboot" >
             <testCaseInfo testCaseType="direct" revert="true" />
             <testStep testStepId="1" name="Get_Power_State" method="Get_Power_State" saveResult="true" >
                 <resultGeneration useMethodTag="system_get_power_state"/>
@@ -477,8 +477,8 @@
                   <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_get_powerstate_before_reboot"/>
                 </resultGeneration>
             </testStep>
-       </testCase-->
-       <testCase testCaseId="SYS_35" testCaseName="System_Check_On_SystemMode_Changed" desc="Checks for the system mode changed event" >
+       </testCase>
+       <testCase testCaseId="SYS_36" testCaseName="System_Check_On_SystemMode_Changed" desc="Checks for the system mode changed event" >
            <testCaseInfo testCaseType="direct" revert="true" />
             <testStep testStepId="1" name="Get_STB_Mode" method="Get_Mode" >
                 <resultGeneration useMethodTag="system_validate_modes"/>
@@ -503,7 +503,7 @@
                 <resultGeneration useMethodTag="system_validate_modes" expectedValues="NORMAL" />
             </testStep>
        </testCase>
-       <testCase testCaseId="SYS_36" testCaseName= "System_Check_Reboot_Reason_Event" desc="Retrieve basic information about a reboot">
+       <testCase testCaseId="SYS_37" testCaseName= "System_Check_Reboot_Reason_Event" desc="Retrieve basic information about a reboot">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="System_reboot" method="Reboot" closeConn="false" rebootStep="yes">
                <params>
@@ -515,7 +515,7 @@
               <resultGeneration useMethodTag="system_check_reboot_reason_event" expectedValues= "API Validation" />
             </testStep>
        </testCase>
-       <testCase testCaseId="SYS_37" testCaseName="Enable_And_Disable_Telemetry_OptOut_Status"  desc="Checks whether able to enable and disable the telemetry opt-out status">
+       <testCase testCaseId="SYS_38" testCaseName="Enable_And_Disable_Telemetry_OptOut_Status"  desc="Checks whether able to enable and disable the telemetry opt-out status">
             <testCaseInfo testCaseType="loop" revert="true"/>
             <testStep testStepId="1" name="Get_OptOut_Telemetry_Status" method="Get_OptOut_Telemetry_Status"  saveResult="true" revertGet="yes">
               <resultGeneration useMethodTag="system_check_telemetry_optout_status" />
@@ -534,7 +534,7 @@
               </subtestStep>
             </testStep>
        </testCase>
-       <testCase testCaseId="SYS_38" testCaseName= "System_Upgrade_Image" desc="Upgrades to specified firmware version" >
+       <testCase testCaseId="SYS_39" testCaseName= "System_Upgrade_Image" desc="Upgrades to specified firmware version" >
             <testCaseInfo testCaseType="direct" configurableTest="true" testKey="XCONF_SERVER_SUPPORT" useMethodTag="system_check_feature_applicability" arguments="yes" />
             <testStep testStepId="1" name="Check_Version_File" action="externalFnCall" >
              <resultGeneration useMethodTag="Check_Version_File"/>
