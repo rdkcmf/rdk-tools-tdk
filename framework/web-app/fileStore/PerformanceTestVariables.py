@@ -48,4 +48,4 @@ video_src_url_type = ""
 lightning_app_webinspect_port = "10002"
 
 #List of Graphical plugins available for test
-graphical_plugins_list = ["Cobalt","WebKitBrowser","LightningApp","ResidentApp"]
+graphical_plugins_list = ["Cobalt","WebKitBrowser","LightningApp","ResidentApp","HtmlApp"]
