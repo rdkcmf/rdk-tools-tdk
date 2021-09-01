@@ -292,6 +292,24 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        # Controller Events response result parser steps
+        elif tag == "controller_check_state_change_event":
+            info["Test_Step_Status"] = "FAILURE"
+            for eventResult in result:
+                if str(eventResult.get("callsign")).lower() == expectedValues[0] and str(eventResult.get("state")).lower() == expectedValues[1] and str(eventResult.get("reason")).lower() == expectedValues[2]:
+                    info = eventResult
+                    info["Test_Step_Status"] = "SUCCESS"
+                    break;
+        elif tag == "controller_check_all_event":
+            info["Test_Step_Status"] = "FAILURE"
+            for eventResult in result:
+                if str(eventResult.get("callsign")).lower() == expectedValues[0] and str(eventResult.get("data")["state"]).lower() == expectedValues[1] and str(eventResult.get("data")["reason"]).lower() == expectedValues[2]:
+                    info["callsign"] = eventResult.get("callsign")
+                    info["state"] = eventResult.get("data")["state"]
+                    info["reason"] = eventResult.get("data")["reason"]
+                    info["Test_Step_Status"] = "SUCCESS"
+                    break;
+
         # Wifi Events response result parser steps
         elif tag == "wifi_check_state_change_event":
             info["Test_Step_Status"] = "FAILURE"
@@ -573,8 +591,7 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
         elif tag == "warehouse_check_device_reset_event":
             result=result[0]
             info = result
-            print str(result.get("status"))
-            if str(result.get("status")) in expectedValues:
+            if str(result.get("success")) in expectedValues:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"

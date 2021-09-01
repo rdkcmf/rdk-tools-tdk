@@ -57,6 +57,8 @@
         <method name="Configuration" api="configuration" type="property" desc="Provides access to the configuration object of a service">
             <expectedValues>null</expectedValues>
         </method>
+        <event name="Event_Controller_State_Changed" eventName="statechange" eventId="client.events.1" type="event" desc="Signals a plugin state change" />
+        <event name="Event_Controller_All" eventName="all" eventId="client.events.1" type="event" desc="Signals each and every event in the system" />
     </plugin>
 
 
@@ -367,7 +369,7 @@
         </method>
         <method name="Get_Temperature_Thresholds" api="getTemperatureThresholds" type="method" desc="Gets temperature thresholds" />
         <method name="Set_Temperature_Thresholds" api="setTemperatureThresholds" type="method" desc="Sets temperature thresholds">
-            <params paramKey="thresholds" paramType="userGenerate" useMethodTag="system_set_thresholds_params">
+            <params paramKey="Thresholds" paramType="userGenerate" useMethodTag="system_set_thresholds_params">
                 <param tag="WARN" defaultValue="null" />
                 <param tag="MAX"  defaultValue="null" />
             </params>
@@ -1034,6 +1036,7 @@
         <method name="Reset_Device" api="resetDevice" type="method" desc="Resets the STB to the warehouse state">
             <params>
                 <param tag="suppressReboot" defaultValue="true" type="bool" />
+                <param tag="resetType" defaultValue="null" />
             </params>
         </method>
         <method name="Internal_Reset" api="internalReset" type="method" desc="Invokes the internal reset script, which reboots the WarehouseService">
@@ -1677,6 +1680,20 @@
         </method>
     </plugin>
 
+    <!-- LightningApp Plugin Information -->
+    <plugin pluginName="LightningApp" serviceName="LightningApp" serviceVersion="1">
+        <method name="Get_FPS_Value" api="fps" type="property" desc="Gets No of frames per second the browser is rendering" />
+        <method name="Get_LightningApp_URL" api="url" type="property" desc="Gets browser load URL" />
+        <method name="Set_LightningApp_URL" api="url" type="property" desc="Sets browser load URL" >
+           <params paramType="directString" >
+                <param tag="url" defaultValue="null"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
+        <event name="Event_LightningApp_Load_Finished" eventName="loadfinished" eventId="client.events.1" type="event" desc="URL loaded event" >
+            <expectedValues>200</expectedValues>
+        </event>
+    </plugin>
 </thunderPlugins>
 
 

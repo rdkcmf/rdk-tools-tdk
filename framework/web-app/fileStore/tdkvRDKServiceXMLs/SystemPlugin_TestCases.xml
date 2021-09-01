@@ -374,24 +374,25 @@
         <testCase testCaseId="SYS_26" testCaseName= "System_SetAndGet_Temperature_Thresholds" desc="Set and get temperature thresholds">
             <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="TemperatureThreshold"/>
             <testStep testStepId="1" name="Get_Temperature_Thresholds" method="Get_Temperature_Thresholds" saveResult="true" revertGet="yes">
-                <resultGeneration useMethodTag="system_get_state_info"  />
+                <resultGeneration useMethodTag="system_verify_thresholds_params"  />
             </testStep>
-            <testStep testStepId="2" name="Set_Temperature_Thresholds" method="Set_Temperature_Thresholds" revertSet="yes">
-                <params paramKey="thresholds">
-                  <param tag="WARN"   usePreviousResult="true" Id="1" useMethodTag="system_generate_new_temperature_thresholds" arguments="warn" revertParam="yes" />
-                  <param tag="MAX"   usePreviousResult="true" Id="1" useMethodTag="system_generate_new_temperature_thresholds" arguments="max" revertParam="yes" />
+            <testStep testStepId="2" name="Set_Temperature_Thresholds" method="Set_Temperature_Thresholds"  saveResult="true" revertSet="yes">
+                <params paramKey="Thresholds">
+                  <param tag="WARN"   usePreviousResult="true" Id="1" useMethodTag="system_generate_new_temperature_thresholds" arguments="warn,max" revertParam="yes" />
+                  <param tag="MAX"   usePreviousResult="true" Id="1" useMethodTag="system_generate_new_temperature_thresholds" arguments="warn,max" revertParam="yes" />
                 </params>
                 <resultGeneration useMethodTag="system_get_state_info"  />
             </testStep>
             <testStep testStepId="3" name="Get_Temperature_Thresholds" method="Get_Temperature_Thresholds"  revertFlag="yes" >
-                <resultGeneration useMethodTag="system_verify_thresholds_params"  >
-                  <expectedValues  usePreviousResult="true" Id="2" useMethodTag="system_generate_new_temperature_thresholds" />
+                <resultGeneration useMethodTag="system_verify_thresholds_params" arguments="validate_thresholds_params" >
+                  <expectedValues  usePreviousResult="true" Id="1" useMethodTag="system_generate_new_temperature_thresholds" arguments="warn,max"/>
                 </resultGeneration>
             </testStep>
             <testStep testStepId="4" name="Check_Temperature_Thresholds_Change_Event" event="Event_Temperature_Threshold_Changed" action="eventListener" delay="3"  >
               <resultGeneration useMethodTag="system_check_temperature_threshold_change_event"/>
             </testStep>
         </testCase>
+
         <testCase testCaseId="SYS_27" testCaseName= "System_Get_Image_Version" desc="Gets the image version">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Device_Image_Version" method="Get_Device_Info">

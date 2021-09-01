@@ -1667,7 +1667,7 @@ def getTestStepInfo(testStep):
     # Get the details of custom response timeout configurations made
     # for this particular test case if any
     if testStepInfo.get("timeoutKey") != None:
-        status,keyData = readDeviceConfigKeys(testCaseInfo.get("timeoutKey"))
+        status,keyData = readDeviceConfigKeys(testStepInfo.get("timeoutKey"))
         if status == "SUCCESS" and  keyData != "":
             global customTimeout
             customTimeout = int(keyData)

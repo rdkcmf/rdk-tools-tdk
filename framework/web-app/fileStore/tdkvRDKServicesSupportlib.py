@@ -641,10 +641,21 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "system_verify_thresholds_params":
-            if float(result.get("WARN")) == float(expectedValues[0]) and float(result.get("MAX")) == float(expectedValues[1]):
-                info["Test_Step_Status"] = "SUCCESS"
+            success = str(result.get("success")).lower() == "true"
+            result = result.get("temperatureThresholds")
+            info["WARN"] = result.get("WARN")
+            info["MAX"] =  result.get("MAX")
+            if len(arg) and arg[0] == "validate_threshold_params":
+                if success and float(result.get("WARN")) == float(expectedValues[0]) and float(result.get("MAX")) == float(expectedValues[1]):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
-                info["Test_Step_Status"] = "FAILURE"
+                if success:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
         elif tag== "system_check_mac_address":
             if arg[0] == "bluetooth_mac":
                 info["bluetooth_mac"] = result.get("bluetooth_mac")
@@ -1740,6 +1751,18 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "warehouse_validate_reset":
+            info["success"] = result.get("success")
+            success = str(result.get("success")).lower() == "true"
+            if "error" in result and len(result.get("error")) > 0:
+                info["error"] = result.get("error")
+                info["Test_Step_Status"] = "FAILURE"
+            else:
+                if success:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
         # LoggingPreferences Plugin Response result parser steps
         elif tag == "loggingpreferences_check_keystroke_mask_state":
             info["keystrokeMaskEnabled"] = result.get("keystrokeMaskEnabled")
@@ -2542,12 +2565,11 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             info["standbyMode"] = testStepResults[0].get("supportedStandbyModes")
   
         elif tag == "system_generate_new_temperature_thresholds":
-            testStepResults = testStepResults[0].values()[0]
-            testStepResults[0] = testStepResults[0].get("temperatureThresholds")
+            testStepResults_list = testStepResults[0].values()[0]
             if str(arg[0]) == "warn":
-                info["WARN"] = float(testStepResults[0].get("WARN")) + 10
-            if str(arg[0]) == "max":
-                info["MAX"] = float(testStepResults[0].get("MAX")) + 10
+                info["WARN"] = float(testStepResults_list[0].get("WARN")) + 10
+            if str(arg[1]) == "max":
+                info["MAX"] = float(testStepResults_list[0].get("MAX")) + 10
 
         elif tag == "system_get_bluetooth_mac":
             testStepResults = testStepResults[0].values()[0]

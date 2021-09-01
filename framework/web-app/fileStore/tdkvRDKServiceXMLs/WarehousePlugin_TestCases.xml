@@ -93,7 +93,7 @@
         <testCase testCaseId="WH_06" testCaseName="WareHouse_Light_Reset" desc="Performs a light reset of application data">
             <testCaseInfo testCaseType="direct" />
             <testStep testStepId="1" name="Light_Reset" method="Light_Reset" >
-                <resultGeneration useMethodTag="warehouse_set_operation" />
+                <resultGeneration useMethodTag="warehouse_validate_reset" />
             </testStep>
         </testCase>
 
@@ -107,26 +107,31 @@
         <testCase testCaseId="WH_08" testCaseName="WareHouse_Reset_Device" desc="Resets the STB to the warehouse state">
             <testCaseInfo testCaseType="direct" configurableTest="true" testKey="WAREHOUSE_NA_TESTS" useMethodTag="warehouse_na_tests" arguments="reset"/>
             <testStep testStepId="1" name="Reset_Device" method="Reset_Device" >
-                <resultGeneration useMethodTag="warehouse_set_operation" />
+                <resultGeneration useMethodTag="warehouse_validate_reset" />
             </testStep>
         </testCase>
 
         <testCase testCaseId="WH_09" testCaseName="WareHouse_Internal_Reset" desc="Resets the STB to the warehouse state">
             <testCaseInfo testCaseType="direct" configurableTest="true" testKey="WAREHOUSE_NA_TESTS" useMethodTag="warehouse_na_tests" arguments="reset"/>
-            <testStep testStepId="1" name="Internal_Reset" method="Internal_Reset" >
-                <resultGeneration useMethodTag="warehouse_set_operation" />
+            <testStep testStepId="1" name="Internal_Reset" method="Internal_Reset" rebootStep="yes">
+                <params>
+                  <param tag="passPhrase"  value="FOR TEST PURPOSES ONLY" />
+                </params>
+                <resultGeneration useMethodTag="warehouse_validate_reset" />
             </testStep>
         </testCase>
 
-        <testCase testCaseId="WH_08" testCaseName="WareHouse_Check_Event_On_Device_Reset" desc="Checks if event is received on device reset">
+        <testCase testCaseId="WH_10" testCaseName="WareHouse_Check_Event_On_Device_Reset" desc="Checks if event is received on device reset" delay="60" >
             <testCaseInfo testCaseType="direct" configurableTest="true" testKey="WAREHOUSE_NA_TESTS" useMethodTag="warehouse_na_tests" arguments="reset"/>
             <testStep testStepId="1" name="Reset_Device" method="Reset_Device" >
-                <resultGeneration useMethodTag="warehouse_set_operation" />
+                <params>
+                  <param tag="resetType"  value="USERFACTORY" />
+                </params>
+                <resultGeneration useMethodTag="warehouse_validate_reset" />
             </testStep>
-            <testStep testStepId="2" name="Check_Event_Reset_Done" event="Event_Reset_Done" action="eventListener" delay="10">
+            <testStep testStepId="2" name="Check_Event_Reset_Done" event="Event_Reset_Done" action="eventListener" delay="5">
                 <resultGeneration useMethodTag="warehouse_check_device_reset_event" expectedValues="True"/>
             </testStep>
         </testCase>
-
 </testPlugin>
 

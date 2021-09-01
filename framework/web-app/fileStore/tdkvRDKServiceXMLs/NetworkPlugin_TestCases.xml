@@ -119,9 +119,9 @@
             </testStep>
         </testCase>
 
-        <testCase testCaseId="NW_04" testCaseName="Network_Ping_Host" desc="Pings the specified end point" >
+        <testCase testCaseId="NW_04" testCaseName="Network_Ping_Host"  desc="Pings the specified end point" >
            <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Ping_Host" method="Ping">
+            <testStep testStepId="1" name="Ping_Host" method="Ping" timeoutKey="CUSTOM_TIMEOUT_FOR_PING_AND_TRACE">
                 <params>
                   <param tag="endpoint"  useConfigFile="true" key="PING_IP" />
                   <param tag="packets"   useDefault="true" />
@@ -150,7 +150,7 @@
 
         <testCase testCaseId="NW_06" testCaseName="Network_Trace_Host" desc="Traces the specified endpoint host IP" >
            <testCaseInfo testCaseType="direct"/>
-            <testStep testStepId="1" name="Trace_Host" method="Trace">
+            <testStep testStepId="1" name="Trace_Host" method="Trace" timeoutKey="CUSTOM_TIMEOUT_FOR_PING_AND_TRACE">
                 <params>
                   <param tag="endpoint"  useConfigFile="true" key="TRACE_IP" />
                   <param tag="packets"   useDefault="true" />
