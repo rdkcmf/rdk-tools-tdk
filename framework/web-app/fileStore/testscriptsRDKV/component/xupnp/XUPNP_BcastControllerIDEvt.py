@@ -28,7 +28,7 @@
   <synopsis>To broadcast ControllerID event and check if xcal-device process receives it.
 Testcase ID: CT_XUPNP_36</synopsis>
   <groups_id/>
-  <execution_time>10</execution_time>
+  <execution_time>12</execution_time>
   <long_duration>false</long_duration>
   <remarks/>
   <skip>false</skip>
@@ -152,6 +152,8 @@ if "SUCCESS" in iarmLoadStatus.upper():
         iarmObj.unloadModule("iarmbus");
         print "Rebooting the setup to revert the changes in output.json"
         iarmObj.initiateReboot();
+        #Waiting for 2 mins for repopulation in output.json
+        sleep(120)
         #Loading and unloading module to exit the test properly
         iarmObj = tdklib.TDKScriptingLibrary("iarmbus","2.0");
         iarmObj.configureTestCase(ip,port,'XUPNP_BcastControllerIDEvt');

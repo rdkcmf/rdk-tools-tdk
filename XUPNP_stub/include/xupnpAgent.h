@@ -33,7 +33,8 @@
 
 #define STR_LEN                128
 #define LINE_LEN               1024
-#define MAX_DATA_LEN           8192
+//TODO: MAX_DATA_LEN Should be dynamically decided based on the UPDATED event, this will be done in future.
+#define MAX_DATA_LEN           16384
 #define XCALDEVICE             "xcal-device"
 #define XDISCOVERY             "xdiscovery"
 #define XDISC_LOG_FILE         "/opt/logs/xdiscovery.log"

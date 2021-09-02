@@ -376,7 +376,7 @@ void TR069Agent::TR069Agent_VerifyParameterValue(IN const Json::Value& req, OUT 
 	else if(profilePath == "Device.IP.InterfaceNumberOfEntries")
 	{
 		int noOfIPInterfaces = 0;
-		string cmd="ifconfig | grep \"Link encap\" | wc -l";
+		string cmd="ifconfig -a| grep \"Link encap\" | wc -l";
 		char buffer[128];
 		std::string result = "";
 		FILE* pipe = popen(cmd.c_str(), "r");
