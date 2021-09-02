@@ -17,29 +17,51 @@
 # limitations under the License.
 ##########################################################################
 '''
-<?xml version="1.0" encoding="UTF-8"?><xml>
-  <id/>
-  <version>2</version>
-  <name>RDKV_CERT_RVS_WebKitBrowser_Video_FPS</name>
-  <primitive_test_id/>
+<?xml version='1.0' encoding='utf-8'?>
+<xml>
+  <id></id>
+  <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
+  <version>6</version>
+  <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
+  <name>RDKV_CERT_RVS_WebKitBrowser_Load_GraphicsApp</name>
+  <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
+  <primitive_test_id> </primitive_test_id>
+  <!-- Do not change primitive_test_id if you are editing an existing script. -->
   <primitive_test_name>rdkservice_validateCPULoad</primitive_test_name>
+  <!--  -->
   <primitive_test_version>2</primitive_test_version>
+  <!--  -->
   <status>FREE</status>
-  <synopsis>The objective of this test is to play a video URL in WebKitBowser and validate FPS for 6 hrs.</synopsis>
-  <groups_id/>
-  <execution_time>380</execution_time>
+  <!--  -->
+  <synopsis>The objective of this test is to play graphics application URL in WebKitBowser and validate resource usage for 6 hrs.</synopsis>
+  <!--  -->
+  <groups_id />
+  <!--  -->
+  <execution_time>370</execution_time>
+  <!--  -->
   <long_duration>false</long_duration>
+  <!--  -->
   <advanced_script>false</advanced_script>
-  <remarks/>
+  <!-- execution_time is the time out time for test execution -->
+  <remarks></remarks>
+  <!-- Reason for skipping the tests if marked to skip -->
   <skip>false</skip>
+  <!--  -->
   <box_types>
-    <box_type>RPI-Client</box_type>
     <box_type>RPI-HYB</box_type>
+    <!--  -->
+    <box_type>RPI-Client</box_type>
+    <!--  -->
     <box_type>Video_Accelerator</box_type>
+    <!--  -->
   </box_types>
+  <rdk_versions>
+    <rdk_version>RDK2.0</rdk_version>
+    <!--  -->
+  </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_STABILITY_36</test_case_id>
-    <test_objective>The objective of this test is to play a video URL in WebKitBowser and validate FPS for 6 hrs.</test_objective>
+    <test_objective>The objective of this test is to play a graphics application URL in WebKitBowser and validate resouce usage for 6 hrs.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI,Accelerator</test_setup>
     <pre_requisite>Wpeframework process should be up and running in the device.</pre_requisite>
@@ -47,23 +69,18 @@
     <input_parameters>None</input_parameters>
     <automation_approch>1. Launch WebkitBrowser using RDKShell
 2. Set a test URL using url method.
-3. Check the fps value using the fps method of WebKitBrowser.
-4. Validate the average fps value in every 1hr for total 6hrs
+3. Validate the resource usage in every 30 seconds.
  </automation_approch>
-    <expected_output>The average fps value must be greater than the expected limit</expected_output>
+    <expected_output>The resource usage must be within the expected limit and DUT must be stable after execution</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_stability</test_stub_interface>
-    <test_script>RDKV_CERT_RVS_WebKitBrowser_Video_FPS</test_script>
+    <test_script>RDKV_CERT_RVS_WebKitBrowser_Load_GraphicsApp</test_script>
     <skipped>No</skipped>
     <release_version>M89</release_version>
-    <remarks/>
+    <remarks></remarks>
   </test_cases>
-  <rdk_versions>
-    <rdk_version>RDK2.0</rdk_version>
-  </rdk_versions>
-  <script_tags/>
+  <script_tags />
 </xml>
-
 '''
  # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib
@@ -78,17 +95,17 @@ obj = tdklib.TDKScriptingLibrary("rdkv_stability","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_RVS_WebKitBrowser_Video_FPS');
+obj.configureTestCase(ip,port,'RDKV_CERT_RVS_WebKitBrowser_Load_GraphicsApp');
 
 #The device will reboot before starting the stability testing if "pre_req_reboot" is
 #configured as "Yes".
 pre_requisite_reboot(obj)
 
-output_file = '{}logs/logs/{}_{}_{}_CPUMemoryInfo.json'.format(obj.realpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
+output_file = '{}{}_{}_{}_CPUMemoryInfo.json'.format(obj.logpath,str(obj.execID),str(obj.execDevId),str(obj.resultId))
 json_file = open(output_file,"w")
 result_dict_list = []
 cpu_mem_info_dict = {}
-test_interval = 120
+test_interval = 30
 
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
@@ -105,20 +122,22 @@ if expectedResult in (result.upper() and pre_condition_status):
     revert="NO"
     plugins_list = ["WebKitBrowser","Cobalt","DeviceInfo"]
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
+    time.sleep(20)
     status = "SUCCESS"
     plugin_status_needed = {"WebKitBrowser":"resumed","Cobalt":"deactivated","DeviceInfo":"activated"}
-    if curr_plugins_status_dict != plugin_status_needed:
+    if any(curr_plugins_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
+        print "\n Error while getting the status of plugins"
+        status = "FAILURE"
+    elif curr_plugins_status_dict != plugin_status_needed:
         revert = "YES"
         status = set_plugins_status(obj,plugin_status_needed)
+        time.sleep(10)
         new_plugin_status = get_plugins_status(obj,plugins_list)
         if new_plugin_status != plugin_status_needed:
             status = "FAILURE"
-    test_duration = StabilityTestVariables.fps_test_duration
-    conf_file,file_status = getConfigFileName(obj.realpath)
-    fps_config_status,fps_threshold = getDeviceConfigKeyValue(conf_file,"EXPECTED_FPS")
-    offset_status,offset = getDeviceConfigKeyValue(conf_file,"FPS_THRESHOLD")
-    video_url = StabilityTestVariables.fps_test_url
-    if status == "SUCCESS" and all(value != "" for value in (fps_threshold,offset,video_url)):
+    test_duration = StabilityTestVariables.load_graphics_app_test_duration
+    test_url = StabilityTestVariables.graphics_app_url
+    if status == "SUCCESS" and test_url != "":
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
         tdkTestObj = obj.createTestStep('rdkservice_getValue')
@@ -130,81 +149,55 @@ if expectedResult in (result.upper() and pre_condition_status):
             tdkTestObj.setResultStatus("SUCCESS")
             tdkTestObj = obj.createTestStep('rdkservice_setValue')
             tdkTestObj.addParameter("method","WebKitBrowser.1.url")
-            tdkTestObj.addParameter("value",video_url)
+            tdkTestObj.addParameter("value",test_url)
             tdkTestObj.executeTestCase(expectedResult)
             result = tdkTestObj.getResult()
             if result == "SUCCESS":
                 tdkTestObj.setResultStatus("SUCCESS")
                 time.sleep(60)
-                print "\n Check whether URL is set"
-                tdkTestObj = obj.createTestStep('rdkservice_getValue')
-                tdkTestObj.addParameter("method","WebKitBrowser.1.url")
-                tdkTestObj.executeTestCase(expectedResult)
-                webkit_url = tdkTestObj.getResultDetails()
-		print webkit_url
-                result = tdkTestObj.getResult()
-                if video_url in webkit_url  and expectedResult in result:
-                    tdkTestObj.setResultStatus("SUCCESS")
-                    print "\n URL: {} is set successfully".format(video_url)
-                    test_time_in_mins = int(StabilityTestVariables.fps_test_duration)
-                    test_time_in_millisec = test_time_in_mins * 60 * 1000
-                    time_limit = int(round(time.time() * 1000)) + test_time_in_millisec
-                    iteration = 0
-                    completed = True
-                    total_fps = 0
-                    frequency = 30
-                    while int(round(time.time() * 1000)) < time_limit:
-                        tdkTestObj = obj.createTestStep('rdkservice_getValue')
-                        tdkTestObj.addParameter("method","WebKitBrowser.1.fps")
+                test_time_in_mins = int(test_duration)
+                test_time_in_millisec = test_time_in_mins * 60 * 1000
+                time_limit = int(round(time.time() * 1000)) + test_time_in_millisec
+                iteration = 1
+                while int(round(time.time() * 1000)) < time_limit:
+                    print "\n Check whether URL is loaded"
+                    tdkTestObj = obj.createTestStep('rdkservice_getValue')
+                    tdkTestObj.addParameter("method","WebKitBrowser.1.url")
+                    tdkTestObj.executeTestCase(expectedResult)
+                    webkit_url = tdkTestObj.getResultDetails()
+                    result = tdkTestObj.getResult()
+                    if webkit_url and test_url in webkit_url and expectedResult in result:
+                        tdkTestObj.setResultStatus("SUCCESS")
+                        print "\n URL: {} is present in WebKitBrowser".format(test_url)
+                        result_dict = {}
+                        print "\n ##### Validating CPU load and memory usage #####\n"
+                        print "Iteration : ", iteration
+                        tdkTestObj = obj.createTestStep('rdkservice_validateResourceUsage')
                         tdkTestObj.executeTestCase(expectedResult)
-                        fps = tdkTestObj.getResultDetails()
-                        result = tdkTestObj.getResult()
-                        if expectedResult in result:
+                        status = tdkTestObj.getResult()
+                        result = tdkTestObj.getResultDetails()
+                        if expectedResult in status and result != "ERROR":
                             tdkTestObj.setResultStatus("SUCCESS")
-                            print "\n FPS value : {}".format(fps)
-                            total_fps += int(fps)
-                            result_dict = {}
+                            cpuload = result.split(',')[0]
+                            memory_usage = result.split(',')[1]
+                            result_dict["iteration"] = iteration
+                            result_dict["cpu_load"] = float(cpuload)
+                            result_dict["memory_usage"] = float(memory_usage)
+                            result_dict_list.append(result_dict)
                             iteration += 1
-			    print "\n ##### Validating CPU load and memory usage #####\n"
-            		    print "Iteration : ", iteration
-            		    tdkTestObj = obj.createTestStep('rdkservice_validateResourceUsage')
-            		    tdkTestObj.executeTestCase(expectedResult)
-            		    status = tdkTestObj.getResult()
-            		    result = tdkTestObj.getResultDetails()
-            		    if expectedResult in status and result != "ERROR":
-            		        tdkTestObj.setResultStatus("SUCCESS")
-            		        cpuload = result.split(',')[0]
-            		        memory_usage = result.split(',')[1]
-                                result_dict["iteration"] = iteration
-                                result_dict["cpu_load"] = float(cpuload)
-                                result_dict["memory_usage"] = float(memory_usage)
-                                result_dict_list.append(result_dict)
-			    else:
-				print "\n Error while validating Resource usage"
-                		tdkTestObj.setResultStatus("FAILURE")
-                		break
-                            time.sleep(test_interval)
-                            if iteration % frequency == 0:
-                                avg_fps = total_fps / frequency
-                                total_fps = 0
-                                if avg_fps < ( int(fps_threshold) - int(offset)):
-                                    print "\n Average FPS value is : {} which is less than threshold value".format(avg_fps)
-                                    tdkTestObj.setResultStatus("FAILURE")
-                                    break
-                                else:
-                                    print "\n Average FPS value is : {} which is greater than threshold value".format(avg_fps)
                         else:
-                            print "\n Error while getting fps value"
+                            print "\n Error while validating Resource usage"
                             tdkTestObj.setResultStatus("FAILURE")
                             break
+                        time.sleep(test_interval)
                     else:
-                        print "\n Successfully completed {} iterations in {} minutes".format(iteration,test_time_in_mins)
-                    cpu_mem_info_dict["cpuMemoryDetails"] = result_dict_list
-                    json.dump(cpu_mem_info_dict,json_file)
-                    json_file.close()
+                        print "\n Unable to set the video URL in WebkitBrowser, current URL: ",webkit_url
+                        tdkTestObj.setResultStatus("FAILURE")
                 else:
-                    print "\n Unable to set the video URL in WebkitBrowser"
-                    tdkTestObj.setResultStatus("FAILURE")
+                    print "\n Successfully completed {} iterations in {} minutes".format(iteration,test_time_in_mins)
+                cpu_mem_info_dict["cpuMemoryDetails"] = result_dict_list
+                json.dump(cpu_mem_info_dict,json_file)
+                json_file.close()
             else:
                 print "\n Error while setting video URL in WebKitBrowser"
                 tdkTestObj.setResultStatus("FAILURE")

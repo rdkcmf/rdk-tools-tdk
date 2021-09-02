@@ -137,13 +137,13 @@ cobalt_search_and_play_max_count = 1000
 ##Video resize test details
 video_resize_max_count = 300
 
-##FPS validation test details
+##Load graphics app test details
 # TDK object animations Lightning App can be used
 # eg: "http://<TM-IP>:8080/rdk-test-tool/fileStore/lightning-apps/tdkobjectanimations/build/index.html?count=100&showfps=false&object=Rect&autotest=true&duration=21600"
-fps_test_url = ""
+graphics_app_url = ""
 
-#fps test duration in minutes
-fps_test_duration = 360
+#test duration in minutes
+load_graphics_app_test_duration = 360
 
 ##Toggle SSID test details
 #maximum number of Wi-Fi SSID changes
@@ -159,3 +159,20 @@ webkit_test_url = "https://www.google.com/"
 #Life cycle management test details
 #Maximum number of complete lifecycle iterations needed
 lifecycle_max_count = 1000
+
+##TDK Video player long duration test details
+#Video player app URL, sample URL: http://<TM-IP>:8080/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html
+lightning_video_test_app_url = ""
+
+#Use video stream URL of minimum 10 hour duration or a live HLS video URL
+video_src_url_hls = ""
+
+#Webinspect port for LightningApp plugin
+lightning_app_webinspect_port = "10002"
+
+##ResidentApp navigation test details
+# test duration in minutes
+navigation_test_duration = 600
+
+# Key sequence used for the test
+navigation_key_sequence = ["ArrowRight","ArrowRight","ArrowLeft","ArrowLeft","ArrowDown","ArrowRight","ArrowRight","ArrowLeft","ArrowLeft","ArrowDown","ArrowRight","ArrowRight","ArrowLeft","ArrowLeft","ArrowUp","ArrowUp"]
