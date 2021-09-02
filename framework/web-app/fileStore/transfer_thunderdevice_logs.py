@@ -36,7 +36,7 @@ else:
     dest_file_name = sys.argv[6]
     #COPY FILES FROM DEVICE
     try:
-        scp_command = 'sshpass -p '+password+' scp -o StrictHostKeyChecking=no '+ username + '@' +host_ip +':'+file_name+' '+dest_path+'/'
+        scp_command = 'sshpass -p '+password+' scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null '+ username + '@' +host_ip +':'+file_name+' '+dest_path+'/'
         p = subprocess.Popen(scp_command,shell=True)
         sts = p.wait()
     except Exception as error:
