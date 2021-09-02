@@ -640,16 +640,20 @@
         </method>
 
         <method name="AddKeyListener" api="addKeyListener" type="method" desc="Adds a key listener to an app.  The keys are bubbled up based on their z-order" >
-            <params>
-                <param tag="keys" defaultValue="null"/>
+            <params paramKey="keys"  paramType="userGenerate" useMethodTag="rdkshell_set_keylistener_params">
                 <param tag="client" defaultValue="null"/>
+                <param tag="keyCode" type="int"  />
+                <param tag="activate" type="bool" />
+                <param tag="propagate" type="bool" />
+                <param tag="modifiers" defaultValue="" type="list" />
             </params>
         </method>
 
         <method name="RemoveKeyListener" api="removeKeyListener" type="method" desc="Removes a key listener for an app" >
-            <params>
-                <param tag="keys" defaultValue="null"/>
+            <params paramKey="keys"  paramType="userGenerate" useMethodTag="rdkshell_set_keylistener_params">
+                <param tag="keyCode" type="int" />
                 <param tag="client" defaultValue="null"/>
+                <param tag="modifiers" defaultValue="" type="list" />
             </params>
         </method>
 
@@ -767,6 +771,7 @@
         <event name="Event_On_Suspended" eventName="onSuspended" eventId="client.events.1" type="event" desc="Fired on Suspending the client" />
         <event name="Event_On_Destroyed" eventName="onDestroyed" eventId="client.events.1" type="event" desc="Fired on destroying the client"/>
         <event name="Event_On_UserInactivity" eventName="onUserInactivity" eventId="client.events.1" type="event" desc="Fired on user inactive"/>
+        <event name="Event_On_Application_Activated" eventName="onApplicationActivated" eventId="client.events.1" type="event" desc="Triggered when an application is activated"/>
     </plugin>
 
 
@@ -894,6 +899,7 @@
             </params>
         </method>
         <event name="Event_On_FPS" eventName="onFpsEvent" eventId="client.events.1" type="event" desc="Fired at given interval and after stopFpsCollection" />
+        <event name="Event_On_Display_FrameRate_Changed" eventName="onDisplayFrameRateChanged" eventId="client.events.1" type="event" desc="Triggered when the user changes the framerate" />
     </plugin>
 
 

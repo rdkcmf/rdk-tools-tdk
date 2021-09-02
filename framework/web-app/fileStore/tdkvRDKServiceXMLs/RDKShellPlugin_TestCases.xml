@@ -80,6 +80,7 @@
             <event pluginName="RDKShell" eventName="Event_On_Suspended" />
             <event pluginName="RDKShell" eventName="Event_On_Destroyed" />
             <event pluginName="RDKShell" eventName="Event_On_UserInactivity" />
+            <event pluginName="RDKShell" eventName="Event_On_Application_Activated" />
           </prerequisite>
 
         </pluginPreRequisite>
@@ -997,7 +998,255 @@
         </testCase>
 
         <!-- Test case 44 -->
-        <testCase testCaseId="RDKShell_44" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
+        <testCase testCaseId="RDKShell_44" testCaseName="RDKShell_Launch_LightningApp" desc="Checks if able to launch Lightning app" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Launch_Application" method="LaunchApplication">
+              <params>
+                <param tag="callsign" value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "lightningapp" />
+            </testStep>
+        </testCase>        
+
+        <!-- Test case 45 -->
+	<testCase testCaseId="RDKShell_45" testCaseName="RDKShell_Launch_HtmlApp" desc="Checks if able to launch Html App" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Launch_Application" method="LaunchApplication">
+              <params>
+                <param tag="callsign" value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "htmlapp" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 46 -->
+        <testCase testCaseId="RDKShell_46" testCaseName= "RDKShell_Suspend_Resume_LightningApp_Check_State" desc="Checks lightning app suspend resume states">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "lightningapp" />
+            </testStep>
+            <testStep testStepId="2" name="Suspend_Application" method="SuspendApplication" >
+              <params>
+                <param tag="callsign"  value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Is_LightningApp_Suspended" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="LightningApp" expectedValues="suspended" />
+            </testStep>
+            <testStep testStepId="4" name="Resume_LightningApp" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Is_LightningApp_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="LightningApp" expectedValues="resumed" />
+            </testStep>
+        </testCase>        
+
+        <!-- Test case 47 -->
+        <testCase testCaseId="RDKShell_47" testCaseName= "RDKShell_Suspend_Resume_HtmlApp_Check_State" desc="Checks Html app suspend resume states">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "htmlapp" />
+            </testStep>
+            <testStep testStepId="2" name="Suspend_Application" method="SuspendApplication" >
+              <params>
+                <param tag="callsign"  value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Is_HtmlApp_Suspended" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="HtmlApp" expectedValues="suspended" />
+            </testStep>
+            <testStep testStepId="4" name="Resume_HtmlApp" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Is_HtmlApp_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="HtmlApp" expectedValues="resumed" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 48 -->
+	<testCase testCaseId="RDKShell_48" testCaseName= "RDKShell_Destroy_Resume_LightningApp" desc="Destroy and resumes Lightning application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "lightningapp" />
+            </testStep>
+            <testStep testStepId="2" name="Destroy_Application" method="DestroyApplication" >
+              <params>
+                <param tag="callsign"  value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application"  arguments= "check_not_exists" expectedValues= "lightningapp" />
+            </testStep>
+            <testStep testStepId="4" name="Resume_LightningApp" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Is_LightningApp_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="LightningApp" expectedValues="resumed" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 49 -->
+	<testCase testCaseId="RDKShell_49" testCaseName= "RDKShell_Destroy_Resume_HtmlApp" desc="Destroy and resumes Html application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "htmlapp" />
+            </testStep>
+            <testStep testStepId="2" name="Destroy_Application" method="DestroyApplication" >
+              <params>
+                <param tag="callsign"  value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application"  arguments= "check_not_exists" expectedValues= "htmlapp" />
+            </testStep>
+            <testStep testStepId="4" name="Resume_HtmlApp" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Is_HtmlApp_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="HtmlApp" expectedValues="resumed" />
+            </testStep>
+        </testCase>
+
+	<!-- Test case 50 -->
+	<testCase testCaseId="RDKShell_50" testCaseName="Enable_And_Disable_Hole_Punch_LightningApp"  desc="Checks whether able to enable and disable hole punch for client lightning app">
+            <testCaseInfo testCaseType="loop" revert="true"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <params>
+                  <param tag="client" value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "lightningapp" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Hole_Punch" method="Get_Hole_Punch" saveResult="true" revertGet="yes" >
+              <params>
+                  <param tag="client" value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_hole_punch" expectedValues="True" />
+            </testStep>
+            <testStep testStepId="3" name="Enable_And_Disable_Hole_Punch" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Hole_Punch" method="Set_Hole_Punch" revertSet="yes">
+                  <params>
+                    <param tag="client" value="LightningApp" />
+                    <param tag="holePunch" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="rdkshell_get_result_status" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Hole_Punch" method="Get_Hole_Punch" revertFlag="yes" >
+                  <params>
+                      <param tag="client" value="LightningApp" />
+                  </params>
+                  <resultGeneration useMethodTag="rdkshell_check_hole_punch" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+	<!-- Test case 51 -->
+        <testCase testCaseId="RDKShell_51" testCaseName="Enable_And_Disable_Hole_Punch_HtmlApp"  desc="Checks whether able to enable and disable hole punch for client html app">
+            <testCaseInfo testCaseType="loop" revert="true"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <params>
+                  <param tag="client" value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "htmlapp" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Hole_Punch" method="Get_Hole_Punch" saveResult="true" revertGet="yes" >
+              <params>
+                  <param tag="client" value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_hole_punch" expectedValues="True" />
+            </testStep>
+            <testStep testStepId="3" name="Enable_And_Disable_Hole_Punch" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Hole_Punch" method="Set_Hole_Punch" revertSet="yes">
+                  <params>
+                    <param tag="client" value="HtmlApp" />
+                    <param tag="holePunch" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="rdkshell_get_result_status" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Hole_Punch" method="Get_Hole_Punch" revertFlag="yes" >
+                  <params>
+                      <param tag="client" value="HtmlApp" />
+                  </params>
+                  <resultGeneration useMethodTag="rdkshell_check_hole_punch" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+	<!-- Test case 52 -->
+	<testCase testCaseId="RDKShell_52" testCaseName= "RDKShell_Check_On_Application_Activated_Event" desc="Checks for the Application activated event" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
+              <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
+            </testStep>
+            <testStep testStepId="2" name="getZorder" method="GetZOrder" saveResult="true" >
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="3" name="setfocus" method="SetFocus">
+              <params>
+                <param tag="client" usePreviousResult="true" Id="2" useMethodTag="rdkshell_get_zorder" arguments="0"/>
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="4" name="Add_Key_Listener" method="AddKeyListener">
+              <params paramKey="keys" >
+                <param tag="client" usePreviousResult="true" Id="2" useMethodTag="rdkshell_get_zorder" arguments="1" />
+                <param tag="keyCode" value ="16" />
+                <param tag="activate" value ="true" />
+                <param tag="propagate" value ="true" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="5"   name="Generate_Key" method="GenerateKey">
+              <params paramKey="keys">
+                <param tag="keyCode" value="16" />
+                <param tag="modifiers" useDefault="true" />
+                <param tag="delay" value="1.0"/>
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="6" name="Check_On_Application_Activated_Event" event="Event_On_Application_Activated" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" >
+                   <expectedValues usePreviousResult="true" Id="2" useMethodTag="rdkshell_get_zorder" arguments="1" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Remove_Key_Listener" method="RemoveKeyListener">
+              <params paramKey="keys" >
+                <param tag="client" usePreviousResult="true" Id="2" useMethodTag="rdkshell_get_zorder" arguments="1" />
+                <param tag="keyCode" value ="16" />
+                <param tag="activate" value ="true" />
+                <param tag="propagate" value ="true" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 53 -->
+        <testCase testCaseId="RDKShell_53" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
@@ -1022,8 +1271,60 @@
             </testStep>
         </testCase> 
 
-        <!-- Test case 45 -->
-        <testCase testCaseId="RDKShell_45" testCaseName= "RDKShell_System_Resource_Info" desc="Gets the system resource info">
+	<!-- Test case 54 -->
+	<testCase testCaseId="RDKShell_54" testCaseName= "RDKShell_Application_Kill_LightningApp" desc="Kill LightningApp Application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "lightningapp" />
+            </testStep>
+            <testStep testStepId="2" name="kill_LightningApp" method="Kill">
+              <params>
+                <param tag="client"  value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_not_exists" expectedValues= "lightningapp" />
+            </testStep>
+            <testStep testStepId="4" name="Launch_Application_LightningApp" method="LaunchApplication" delay="5" >
+              <params>
+                <param tag="callsign" value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Is_LightningApp_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="LightningApp" expectedValues="resumed" />
+            </testStep>
+        </testCase>
+
+	<!-- Test case 55 -->
+	<testCase testCaseId="RDKShell_55" testCaseName= "RDKShell_Application_Kill_HtmlApp" desc="Kill HtmlApp Application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "htmlapp" />
+            </testStep>
+            <testStep testStepId="2" name="kill_HtmlApp" method="Kill">
+              <params>
+                <param tag="client"  value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_not_exists" expectedValues= "htmlapp" />
+            </testStep>
+            <testStep testStepId="4" name="Launch_Application_HtmlApp" method="LaunchApplication" delay="5" >
+              <params>
+                <param tag="callsign" value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Is_Html_Resumed" method="Get_Application_State" delay="2">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="HtmlApp" expectedValues="resumed" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 56 -->
+        <testCase testCaseId="RDKShell_56" testCaseName= "RDKShell_System_Resource_Info" desc="Gets the system resource info">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_System_Resource_Info" method="Get_System_Resource_Info" >
               <resultGeneration useMethodTag="rdkshell_check_for_results"/>

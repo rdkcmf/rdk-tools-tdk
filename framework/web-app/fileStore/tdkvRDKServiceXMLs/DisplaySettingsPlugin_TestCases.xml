@@ -2371,5 +2371,30 @@
               </subtestStep>
             </testStep>
         </testCase>
+        <testCase testCaseId="DS_88" testCaseName= "Check_Supported_Resolutions" desc="Checks whether the supported resolutions list contains the common resolutions present in the supported TV and Settop resolutions">
+            <testCaseInfo testCaseType="direct" revert="true" />
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true">
+                <resultGeneration useMethodTag="display_connected_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_Tv_Resolutions" method="Get_Supported_Tv_Resolutions" saveResult="true">
+                  <params>
+                    <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display" />
+                  </params>
+                <resultGeneration useMethodTag="check_supported_tv_resolutions"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Settop_Supported_Resolutions" method="Get_Supported_Settop_Resolutions" saveResult="true" >
+                <resultGeneration useMethodTag="check_settop_supported_resolutions">
+                  <expectedValues useConfigFile="true" key="SETTOP_SUPPORTED_RESOLUTIONS" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Get_Supported_Resolutions" method="Get_Supported_Resolutions" >
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="validate_supported_resolutions">
+                        <expectedValues usePreviousResult="true" Id="2,3" useMethodTag="get_settop_and_tv_resolutions" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
 </testPlugin>  
 
