@@ -74,6 +74,17 @@
           <parameter name="thresholdCheck" value="false"/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkv_profiling_smem_execute" id=" " version="1">
+        <function>rdkv_profiling_smem_execute</function>
+        <parameters>
+          <parameter name="deviceConfig" value=""/>
+          <parameter name="deviceIP" value=""/>
+          <parameter name="execDeviceId" value=""/>
+          <parameter name="execId" value=""/>
+          <parameter name="execResultId" value=""/>
+          <parameter name="realPath" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
