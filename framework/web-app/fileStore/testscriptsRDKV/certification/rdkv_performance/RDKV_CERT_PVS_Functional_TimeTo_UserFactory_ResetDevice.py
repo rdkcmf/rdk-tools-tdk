@@ -97,6 +97,7 @@ if expectedResult in result.upper():
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
     event_listener = None
+    reset_done_time = ""
     thunder_port = PerformanceTestVariables.thunder_port
     plugins_list = ["org.rdk.Warehouse","org.rdk.System"]
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
@@ -168,8 +169,8 @@ if expectedResult in result.upper():
                             print "\n Error while resetting Device using resetDevice method"
                             tdkTestObj.setResultStatus("FAILURE")
                             break
+                    time.sleep(150)
                     if reset_done_time:
-                        time.sleep(150)
                         print "\n Check reboot info"
                         status = "SUCCESS"
                         new_plugins_status_dict = get_plugins_status(obj,plugins_list)

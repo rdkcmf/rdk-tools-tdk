@@ -101,6 +101,7 @@ if expectedResult in result.upper():
     print "Check Pre conditions"
     continue_count = 0
     event_listener = None
+    power_state = ""
     thunder_port = PerformanceTestVariables.thunder_port
     cobalt_test_url = PerformanceTestVariables.cobalt_test_url;
     if cobalt_test_url == "":

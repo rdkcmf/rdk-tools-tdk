@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>The objective of this test is to validate the resource usage while playing a video in video player Lightning application for a minimum of 10 hours.</synopsis>
   <groups_id/>
-  <execution_time>610</execution_time>
+  <execution_time>630</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -177,10 +177,13 @@ if expectedResult in (result.upper() and pre_condition_status):
                     count = 0
                     while True:
                         result_dict = {}
-                        if continue_count > 60:
-                            print "\n Not able to launch the video player application"
+                        if continue_count > 180:
+                            print "\n Not able to play the video"
+                            print "\n Current webkit console logs: ",webkit_console_socket.getEventsBuffer()
+                            tdkTestObj.setResultStatus("FAILURE")
                             break
                         if (len(webkit_console_socket.getEventsBuffer())== 0):
+                            print "\n Waiting for video plaback"
                             time.sleep(1)
                             continue_count += 1
                             continue
@@ -189,6 +192,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                                 started = True
                                 print "\n Video playback is started"
                                 webkit_console_socket.clearEventsBuffer()
+                                continue_count = 0
                             elif [True for element in webkit_console_socket.getEventsBuffer() if "TEST RESULT:" in str(element)]:
                                 if [True for element in webkit_console_socket.getEventsBuffer() if "TEST RESULT: SUCCESS" in str(element)] :
                                     print "\n Successfully completed video playback"
@@ -202,6 +206,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                                 tdkTestObj.setResultStatus("FAILURE")
                                 break
                             if started:
+                                continue_count = 0
                                 if not [True for element in webkit_console_socket.getEventsBuffer() if "TEST RESULT:" in str(element)]:
                                     webkit_console_socket.clearEventsBuffer()
                                     #Validate resource usage
@@ -225,10 +230,12 @@ if expectedResult in (result.upper() and pre_condition_status):
                                         tdkTestObj.setResultStatus("FAILURE")
                                         break
                                 else:
+                                    print "\n Video player is stopped"
                                     continue
                             else:
+                                print "\n Video playback is not happening"
                                 time.sleep(20)
-                                continue_count += 20
+                                continue_count += 5
                     webkit_console_socket.disconnect()
                     time.sleep(5)
                     cpu_mem_info_dict["cpuMemoryDetails"] = result_dict_list
