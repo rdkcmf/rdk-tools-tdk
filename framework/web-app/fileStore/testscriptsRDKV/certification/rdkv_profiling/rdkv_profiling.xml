@@ -15,7 +15,7 @@
 
 <?xml version="1.0" encoding="UTF-8"?>
 <xml>
-  <module testGroup="Certification" name="rdkv_profiling">
+  <module name="rdkv_profiling" testGroup="Certification">
     <primitiveTests>
       <primitiveTest name="rdkv_profiling_collectd_check_system_memory" id=" " version="2">
         <function>rdkv_profiling_collectd_check_system_memory</function>
@@ -83,6 +83,13 @@
           <parameter name="execId" value=""/>
           <parameter name="execResultId" value=""/>
           <parameter name="realPath" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkv_profiling_get_alerts" id=" " version="1">
+        <function>rdkv_profiling_get_alerts</function>
+        <parameters>
+          <parameter name="resultId" value=""/>
+          <parameter name="tmUrl" value=""/>
         </parameters>
       </primitiveTest>
     </primitiveTests>

@@ -440,6 +440,53 @@ def rdkv_profiling_collectd_check_process_usedSHR(tmUrl, resultId, processName, 
         return result_details
 
 
+
+#----------------------------------------------------------------------------
+# To query alert details from grafana server for the given test execution ID.
+#
+# Syntax       : rdkv_profiling_collectd_check_system_CPU(tmUrl, resultId, deviceConfig, thresholdCheck="true")
+#
+# Parameters   : tmUrl - Test manager URL
+#                resultId - execution ID
+#                deviceConfig - DUT config file
+#                thresholdcheck - if thresholdcheck is set to true, threshold value will be retrieved from the config file
+#                                 and compared against the parameter. Based on comparison,if value is greater than threshold
+#                                 then result is set as success/failure.Default value for thresholdcheck is "true"
+#
+# Return Value : status and REST API response dict in string format
+#----------------------------------------------------------------------------
+def rdkv_profiling_get_alerts(tmUrl, resultId):
+    url = tmUrl + '/execution/fetchAlertDataForMemoryProfiling?executionResultId='+str(resultId)
+    result_details = {}
+    try:
+        # Grafana updates alerts for every 1 min. So waiting to get the alerts
+        time.sleep(60)
+        response = urllib.urlopen(url).read()
+        response=json.loads(response)
+        alert_status = False
+        if response != []:
+            print "\n********** Alerts From GRAFANA **************"
+            for params in response:
+                print params
+                if params.get("state") == "alerting":
+                    alert_status = True
+            print "********************************************\n"
+            if not alert_status:
+                result_details["test_step_status"] = "SUCCESS"
+            else:
+                result_details["test_step_status"] = "FAILURE"
+            result_details["response"] = response
+        else:
+            print "No Alerts received"
+            result_details["test_step_status"] = "SUCCESS"
+    except:
+        result_details["test_step_status"] = "FAILURE"
+        print "Unable to get details from grafana server using REST !!!"
+    finally:
+        result_details = json.dumps(result_details)
+        return result_details
+
+
 #----------------------------------------------------------------------------
 # To execute the smem tool in DUT and transfer the smem log from DUT to TM
 #
@@ -466,10 +513,10 @@ def rdkv_profiling_smem_execute(deviceIP,deviceConfig,realPath,execId,execDevice
         result,user_name  = getDeviceConfigKeyValue(deviceConfig,"SSH_USERNAME")
         result,password   = getDeviceConfigKeyValue(deviceConfig,"SSH_PASSWORD")
         file_name = "/tmp/smemData.txt"
-        command = "python3 /usr/bin/smem.py -tk > " + file_name
+        command = "python3 /usr/bin/smem -tk > " + file_name
         if ssh_method == "" or user_name == "" or password == "":
             print "Please configure the SSH details in device config file"
-            result_val = "FAILURE"
+            result_val = ""
         else:
             if password == "None":
                 ssh_password = ""
@@ -493,7 +540,7 @@ def rdkv_profiling_smem_execute(deviceIP,deviceConfig,realPath,execId,execDevice
                 dest_file_name = str(execId) + "_" + "smemData" + "_" + timing_info
                 result_val = transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_path,dest_file_name)
             except Exception as e:
-                result_val = "FAILURE"
+                result_val = "EXCEPTION OCCURRED"
     else:
          print "\nDevice does not have smem support. Skipping smem execution"
 
@@ -523,9 +570,11 @@ def transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_pat
         if os.path.exists(dest_log_file):
             print "Log file %s transferred successfully" %(dest_file_name)
         else:
-            result_val = "FAILURE"
+            print "Log file transfer failed"
+            result_val = ""
 
     except Exception as e:
         print "\nException Occurred : %s" %(e)
-        result_val = "FAILURE"
+        result_val = "EXCEPTION OCCURRED"
+    return result_val
 
