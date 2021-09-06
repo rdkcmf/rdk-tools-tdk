@@ -3328,6 +3328,24 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
                 info["RESULT"] = "File exist"
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "Delete_Test_File":
+            command = "[ -d "+arguments[0]+"Controller ] && echo 1 || echo 0"
+            status = executeCommand(deviceConfigFile, deviceIP, command)
+            status = str(status).split("\n")
+            if int(status[1]) == 0:
+                info["RESULT"] = "File does not exist"
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                command = "rm -rf "+arguments[0]+"Controller ; [ -d "+arguments[0]+"Controller ] && echo 1 || echo 0"
+                status = executeCommand(deviceConfigFile, deviceIP, command)
+                status = str(status).split("\n")
+                if int(status[1]) == 0:
+                    info["Message"] = "Test file deleted"
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Message"] = "Test file not deleted"
+                    info["Test_Step_Status"] = "FAILURE"
+
         elif tag == "Framerate_Get_Width_And_Height":
             DisplayFrameRate_values = []
             for values in range(1,len(arg)):

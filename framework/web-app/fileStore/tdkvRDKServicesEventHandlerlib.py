@@ -496,13 +496,12 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
         elif tag == "network_connection_status_change_event":
-            result = result[0]
-            info = result
-            if str(result.get("status")) in  expectedValues:
-                info["Test_Step_Status"] = "SUCCESS"
-            else:
-                info["Test_Step_Status"] = "FAILURE"
-  
+            info["Test_Step_Status"] = "FAILURE"
+            for eventResult in result:
+                if str(eventResult.get("interface")) == "WIFI" and str(eventResult.get("status")) in  expectedValues:
+                    info = eventResult
+                    info["Test_Step_Status"] = "SUCCESS"
+                    break; 
         # DataCapture Events response result parser steps
         elif tag == "datacapture_check_on_audioclip_ready_event":
             result = result[0]

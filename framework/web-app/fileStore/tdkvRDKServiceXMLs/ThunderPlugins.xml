@@ -1690,6 +1690,15 @@
             </params>
             <expectedValues>null</expectedValues>
         </method>
+        <method name="Get_LightningApp_State" api="state" type="method" desc="Gives running state of the service">
+            <expectedValues>resumed,suspended</expectedValues>
+        </method>
+        <method name="Set_LightningApp_State" api="state" type="method" desc="Set service state">
+            <params paramType="directString" >
+                <param tag="state" defaultValue="resumed"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
         <event name="Event_LightningApp_Load_Finished" eventName="loadfinished" eventId="client.events.1" type="event" desc="URL loaded event" >
             <expectedValues>200</expectedValues>
         </event>

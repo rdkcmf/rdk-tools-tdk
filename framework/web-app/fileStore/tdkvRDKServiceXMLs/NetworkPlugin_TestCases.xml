@@ -319,17 +319,22 @@
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
-            <testStep testStepId="5" name="Set_Default_Interface_WiFi" method="Set_Default_Interface" ipChangeStep="yes">
+            <testStep testStepId="5" pluginName="Wifi" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="5"  >
+                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
+                    <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="6" name="Set_Default_Interface_WiFi" method="Set_Default_Interface" ipChangeStep="yes">
                 <params>
                   <param tag="interface" value="WIFI" />
                   <param tag="persist"   useDefault= "true"/>
                 </params>
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true" />
             </testStep>
-            <testStep testStepId="6" name="Get_Default_Interface" method="Get_Default_Interface" delay="50">
+            <testStep testStepId="7" name="Get_Default_Interface" method="Get_Default_Interface" delay="50">
                 <resultGeneration useMethodTag="network_get_default_interface" arguments="check_interface" expectedValues="WIFI" />
             </testStep>
-            <testStep testStepId="7" name="Check_STB_IP" method="Get_STB_IP"  >
+            <testStep testStepId="8" name="Check_STB_IP" method="Get_STB_IP"  >
                 <resultGeneration useMethodTag="network_check_device_ip_changed" >
                     <expectedValues usePreviousResult="true" Id="3" useMethodTag="network_get_stb_ip"/>
             </resultGeneration>

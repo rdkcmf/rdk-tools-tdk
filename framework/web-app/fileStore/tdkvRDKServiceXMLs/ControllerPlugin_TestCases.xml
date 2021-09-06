@@ -142,6 +142,15 @@
           <arguments useConfigFile="true" key="CONTROLLER_FILE_DELETE_PATH" />
         </resultGeneration>
       </testStep>
+    <testCasePostRequisite>
+         <postrequisite requisiteId="1" requisiteName="Delete_Test_files">
+            <testStep testStepId="1" name="Execute_Command" action="externalFnCall">
+                <resultGeneration useMethodTag="Delete_Test_File" >
+                    <arguments useConfigFile="true" key="CONTROLLER_FILE_DELETE_PATH" />
+                </resultGeneration>
+            </testStep>
+         </postrequisite>
+    </testCasePostRequisite>
     </testCase>
 
     <testCase testCaseId="Controller_10" testCaseName="Check_Plugins_State"  desc="Checks the plugin status" >

@@ -69,17 +69,17 @@
             </testStep>
           </prerequisite>
 
-          <prerequisite requisiteId="3" requisiteName="Check_And_Resume_WebKitBrowser">
-            <testStep testStepId="1" name="Is_WebKitBrowser_Resumed" method="Get_WebKitBrowser_State" pluginName="WebKitBrowser" saveResult="true" >
+          <prerequisite requisiteId="3" requisiteName="Check_And_Resume_LightningApp">
+            <testStep testStepId="1" name="Is_LightningApp_Resumed" method="Get_LightningApp_State" pluginName="LightningApp" saveResult="true" >
                 <resultGeneration useMethodTag="webkitbrowser_get_state" />
             </testStep>
-            <testStep testStepId="2" name="Resume_WebKitBrowser" method="Set_WebKitBrowser_State" pluginName="WebKitBrowser" >
+            <testStep testStepId="2" name="Resume_LightningApp" method="Set_LightningApp_State" pluginName="LightningApp" >
                 <conditionalExecution enable="true" Id="1" useMethodTag="webkitbrowser_check_state" arguments="isSuspended" />
                 <params>
                   <param tag="state" useDefault="true" />
                 </params>
             </testStep>
-            <testStep testStepId="3" name="Is_WebKitBrowser_Resumed" method="Get_WebKitBrowser_State" pluginName="WebKitBrowser" delay="5">
+            <testStep testStepId="3" name="Is_LightningApp_Resumed" method="Get_LightningApp_State" pluginName="LightningApp" delay="5">
                 <conditionalExecution enable="true" Id="1" useMethodTag="webkitbrowser_check_state" arguments="isSuspended" />
                 <resultGeneration useMethodTag="webkitbrowser_get_state" expectedValues="resumed" />
             </testStep>
@@ -87,32 +87,32 @@
 
           <prerequisite requisiteId="4" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
             <event pluginName="FrameRate"     eventName="Event_On_FPS" />
-            <event pluginName="WebKitBrowser" eventName="Event_Load_Finished" />
+            <event pluginName="LightningApp" eventName="Event_LightningApp_Load_Finished" />
             <event pluginName="FrameRate" eventName="Event_On_Display_FrameRate_Changed" />
           </prerequisite>
         </pluginPreRequisite>
-        <testCase testCaseId="FR_01" testCaseName="FrameRate_Collect_FPS" desc="Launches graphics url using webkit browser and gets fps using onFpsEvent Event">
+        <testCase testCaseId="FR_01" testCaseName="FrameRate_Collect_FPS" desc="Launches graphics url using lightning app and gets fps using onFpsEvent Event">
             <testCaseInfo testCaseType="stress" configurableRepeat="true" repeatKey="WEBKIT_FPS_REPEAT_COUNT"/>
             <testStep testStepId="1" name="Set_Collection_Frequency_Default_10Sec" method="Set_Collection_Frequency_Default" >
               <resultGeneration useMethodTag="framerate_check_set_operation" />
             </testStep>
-            <testStep testStepId="2" name="Set_Browser_Test_URL" method="Set_Browser_URL" pluginName="WebKitBrowser">
+            <testStep testStepId="2" name="Set_Test_URL" method="Set_LightningApp_URL" pluginName="LightningApp">
               <params>
                 <param tag="url" useConfigFile="true" key="WEBKIT_GRAPHICS_URL" />
               </params>
             </testStep>
-            <testStep testStepId="3" name="Check_Load_Finished_Event" event="Event_Load_Finished" action="eventListener" delay="20" pluginName="WebKitBrowser">
+            <testStep testStepId="3" name="Check_Load_Finished_Event" event="Event_LightningApp_Load_Finished" action="eventListener" delay="20" pluginName="LightningApp" >
               <resultGeneration useMethodTag="webkitbrowser_check_load_finished_event" >
                 <expectedValues useDefault="true" useConfigFile="true" key="WEBKIT_GRAPHICS_URL" />
               </resultGeneration>
             </testStep>
-            <testStep testStepId="4" name="Get_Browser_Test_URL" method="Get_Browser_URL" pluginName="WebKitBrowser">
+            <testStep testStepId="4" name="Get_Test_URL" method="Get_LightningApp_URL" pluginName="LightningApp" >
               <resultGeneration useMethodTag="webkitbrowser_check_url" >
                 <expectedValues useConfigFile="true" key="WEBKIT_GRAPHICS_URL" />
               </resultGeneration>
             </testStep>
-            <testStep testStepId="5" name="Get_Browser_FPS_Value"  delay="60" testStepType="repeat">
-              <subtestStep subtestStepId="1" name="Get_Browser_FPS_Value" method="Get_Browser_FPS" saveResult="true" pluginName="WebKitBrowser" delay="2">
+            <testStep testStepId="5" name="Get_FPS_Value"  delay="60" testStepType="repeat" >
+              <subtestStep subtestStepId="1" name="Get_FPS_Value" method="Get_FPS_Value" saveResult="true" pluginName="LightningApp" delay="2">
                 <resultGeneration useMethodTag="webkitbrowser_check_fps" >
                 </resultGeneration>
               </subtestStep>
