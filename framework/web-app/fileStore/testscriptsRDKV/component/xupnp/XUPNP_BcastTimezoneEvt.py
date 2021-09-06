@@ -79,6 +79,7 @@ string eventLog</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import time;
 from iarmbus import IARMBUS_Init,IARMBUS_Connect,IARMBUS_DisConnect,IARMBUS_Term;
 
 #IP and Port of box, No need to change,
@@ -152,7 +153,7 @@ if "SUCCESS" in iarmLoadStatus.upper():
         print "Rebooting the setup to revert the changes in output.json"
         iarmObj.initiateReboot();
         #Waiting for 2 mins for repopulation in output.json
-        sleep(120)
+        time.sleep(120)
         #Loading and unloading module to exit the test properly
         iarmObj = tdklib.TDKScriptingLibrary("iarmbus","2.0");
         iarmObj.configureTestCase(ip,port,'XUPNP_BcastTimezoneEvt');
