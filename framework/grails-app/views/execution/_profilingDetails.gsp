@@ -48,17 +48,17 @@ function viewOnClickToolSmem(me,k,i)
   return false;
 }
 
-function showSmemHideLink(m){
-	$('#hideSmemContents'+m).show();
-	$('#smemDetails'+m).show();
-	$('#showSmemContents'+m).hide();
+function showSmemHideLink(m,k,i){
+	$('#hideSmemContents'+m+'_'+k+'_'+i).show();
+	$('#smemDetails'+m+'_'+k+'_'+i).show();
+	$('#showSmemContents'+m+'_'+k+'_'+i).hide();
 }
 
 
-function hideSmemLogs(m){
-	$('#showSmemContents'+m).show();
-	$('#smemDetails'+m).hide();
-	$('#hideSmemContents'+m).hide();
+function hideSmemLogs(m,k,i){
+	$('#showSmemContents'+m+'_'+k+'_'+i).show();
+	$('#smemDetails'+m+'_'+k+'_'+i).hide();
+	$('#hideSmemContents'+m+'_'+k+'_'+i).hide();
 }
 </script>
 
@@ -187,14 +187,14 @@ function hideSmemLogs(m){
 								</td>
 								<td >
 									
-										&emsp;<span id="showSmemContents${m}" >	
-										<a style="color:#7E2217;" href="#" onclick="showSmemHideLink(${m})">Show</a>	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-										<g:link action="showSmemFileContents" onSuccess="showSmemHideLink(${m});" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]"  target="_blank"> Log Link</g:link>						
+										&emsp;<span id="showSmemContents${m}_${k}_${i}" >	
+										<a style="color:#7E2217;" href="#" onclick="showSmemHideLink(${m},${k},${i})">Show</a>	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+										<g:link action="showSmemFileContents" onSuccess="showSmemHideLink(${m},${k},${i});" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]"  target="_blank"> Log Link</g:link>						
 										</span>
-										<span id="hideSmemContents${m}" style="display:none;"><a style="color:#7E2217;" href="#" onclick="hideSmemLogs(${m})">Hide</a></span>
+										<span id="hideSmemContents${m}_${k}_${i}" style="display:none;"><a style="color:#7E2217;" href="#" onclick="hideSmemLogs(${m},${k},${i})">Hide</a></span>
 										<br>
 									<pre>
-										<div id="smemDetails${m}" style="display:none;overflow: auto; height: 300px;width:550px;">${map.value}</div>	
+										<div id="smemDetails${m}_${k}_${i}" style="display:none;overflow: auto; height: 300px;width:550px;">${map.value}</div>	
 									</pre>
 								</td>
 							</tr>
