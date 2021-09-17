@@ -88,6 +88,13 @@
           <parameter name="validation_details" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkservice_launchAndDestroy" id=" " version="1">
+        <function>rdkservice_launchAndDestroy</function>
+        <parameters>
+          <parameter name="plugin" value=""/>
+          <parameter name="uri" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>

@@ -356,7 +356,47 @@ def rdkservice_executeLifeCycle(plugin,operations,validation_details):
     #Destroy the plugin
     print "\n Deactivate {} plugin".format(plugin)
     status = rdkv_performancelib.rdkservice_setPluginStatus(plugin,"deactivate")
-    if status == "EXCEPTION OCCURRED":
+    if status != "EXCEPTION OCCURRED":
+        #Get the status
+        time.sleep(10)
+        plugin_status = rdkv_performancelib.rdkservice_getPluginStatus(plugin)
+        if plugin_status != 'deactivated':
+            print "\n {} plugin is not in deactivated state, current status:{}".format(plugin,plugin_status)
+            result = "FAILURE"
+        else:
+            print "\n Successfully deactivated {} plugin".format(plugin)
+    else:
         print "\n Error while deactivating {} plugin".format(plugin)
         result = "FAILURE"
+    return result
+
+#-------------------------------------------------------------------
+#LAUNCH AND DESTROY A GIVEN GRAPHICAL PLUGIN
+#-------------------------------------------------------------------
+def rdkservice_launchAndDestroy(plugin,uri=""):
+    result = "FAILURE"
+    print "\n Launching {} plugin".format(plugin)
+    launch_status = rdkv_performancelib.rdkservice_setPluginStatus(plugin,"activate",uri)
+    time.sleep(5)
+    if launch_status != "EXCEPTION OCCURRED":
+        curr_status = rdkv_performancelib.rdkservice_getPluginStatus(plugin)
+        if curr_status in ("activated","resumed"):
+            print "\n Successfully launched {} plugin".format(plugin)
+            time.sleep(5)
+            print "\n Destroying {} plugin".format(plugin)
+            destroy_status = rdkv_performancelib.rdkservice_setPluginStatus(plugin,"deactivate")
+            if destroy_status != "EXCEPTION OCCURRED":
+                time.sleep(5)
+                new_status = rdkv_performancelib.rdkservice_getPluginStatus(plugin)
+                if new_status == "deactivated":
+                    print "\n Destroyed {} plugin".format(plugin)
+                    result = "SUCCESS"
+                else:
+                    print "\n Unable to destroy {} plugin, current status".format(plugin,new_status)
+            else:
+                print "\n Error while destroying {} plugin".format(plugin)
+        else:
+            print "\n Unable to launch {} plugin, current status".format(plugin,curr_status)
+    else:
+        print "\n Error while launching {} plugin".format(plugin)
     return result

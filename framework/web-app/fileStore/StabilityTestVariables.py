@@ -176,3 +176,11 @@ navigation_test_duration = 600
 
 # Key sequence used for the test
 navigation_key_sequence = ["ArrowRight","ArrowRight","ArrowLeft","ArrowLeft","ArrowDown","ArrowRight","ArrowRight","ArrowLeft","ArrowLeft","ArrowDown","ArrowRight","ArrowRight","ArrowLeft","ArrowLeft","ArrowUp","ArrowUp"]
+
+#Launch and Destroy test details
+#maximum number of launch and destroy operations needed
+launch_and_destroy_max_count = 1000
+
+#Bluetooth Pair and Unpair test details
+pair_unpair_max_count = 1000
+
