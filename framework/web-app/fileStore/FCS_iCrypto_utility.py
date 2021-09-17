@@ -1,0 +1,182 @@
+##########################################################################
+# If not stated otherwise in this file or this component's Licenses.txt
+# file the following copyright and licenses apply:
+#
+# Copyright 2021 RDK Management
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#########################################################################
+
+import re
+import tdklib;
+import ConfigParser
+
+#Define the search term:
+pattern1 = "========"
+pattern2 = "FAILED|ERROR"
+
+#TestApps predefined
+TESTAPP = {"interfaceTest":"cgfacetests","implementationTest":"cgimptests","nfSecurityTest":"cgnfsecuritytests"}
+
+#Create an empty list:
+tests = []
+expectedResult="SUCCESS";
+
+def getLogFile(obj):
+    #Get iCrypto configuration file
+    try:
+        iCryptoConfigFile = obj.realpath+'fileStore/iCrypto_log.config'
+        configParser = ConfigParser.ConfigParser()
+        configParser.read(r'%s' % iCryptoConfigFile )
+        #iCrypto execution log file
+        iCrypto_log = configParser.get('iCryptoTestApp-config', 'logfile')
+        logFile = iCrypto_log.split('/')
+        logFile = logFile[-1]
+        print "iCrypto Execution Log File Name : " , logFile
+        return logFile,iCrypto_log
+    except:
+        print "\nUnable to acquire log file from iCrypto_log.config\nConfigure the log file in iCrypto_log.config to proceed with the testcase"
+        exit()
+
+#Prints the given string in title format
+def PrintTitle(string=" ",title=0):
+    print "#"*50
+    print string
+    if title:
+        print "#"*50
+
+#Filters the test name from the parsed line
+def getTestName(line):
+    testName = line.split('-')[0].strip(pattern1).strip()
+    return testName
+
+#Lists the list of tests performed along with number of PASSED and FAILED testcases
+
+################################ Sample Output ####################################
+##################################################
+#Summary of Test Results
+##################################################
+#Vault::ImportExport - 5 PASSED, 5 FAILED
+#Vault::SetGet - 6 PASSED, 6 FAILED
+#Hash::Hash - 9 PASSED, 0 FAILED
+##################################################
+###################################################################################
+def Summary(fileName):
+    PrintTitle("Summary of Test Results",1)
+    for line in open(fileName):
+        if line !='':
+            word = re.findall(pattern1, line)
+            if word:
+                if "PASSED" and "FAILED" in line:
+                    print line.strip(pattern1).strip()
+
+#Lists the number of failures observed as part of the execution
+#Parses the output from the iCrypto test app and returns the total number of failures
+def getNumberOfFailures(fileName):
+    for line in open(fileName):
+        if line !='':
+            word = re.findall("TOTAL", line)
+            if word:
+                try:
+                    if "FAILED" in line:
+                       failed = line.split(',')[1]
+                       failed = int(filter(lambda x: x.isdigit(), failed))
+                       print "Number of FAILED testcases:",failed
+                       return failed
+                except:
+                    print "Unexpected error in parsing number of failures"
+                    return "error"
+    print "Execution is not completed, due to unknown error"
+    return "error"
+
+#Lists the testcases performed as part of this execution
+################# Sample Output ########################
+#======== Vault::ImportExport
+#======== Hash::Hash
+########################################################
+def testnames(fileName):
+    for line in open(fileName):
+        if line !='':
+            word = re.findall(pattern1, line)
+            if word:
+                tests.append(getTestName(line))
+    testlist = list(set(tests))
+    return testlist
+
+#Lists the failure details of the testcases performed in the execution
+################################# Sample Output #####################################
+##################################################
+#======== Hash::HMAC
+#FAILED: hashImpl->Ingest(sizeof(data) - 1, data) == sizeof(data) - 1, actual: 0
+#FAILED: hashImpl->Calculate(128, output) == sizeof(hash_sha256), actual: 0
+#FAILED: ::memcmp(output, hash_sha256, sizeof(hash_sha256)) == 0, actual: 4294967251
+#FAILED: vault->Delete(keyId) != false, actual: 0
+#======== Hash::HMAC - 4 PASSED, 4 FAILED
+##################################################
+#####################################################################################
+def FailureSummary(fileName):
+    for line in open(fileName):
+        testNames = testnames(fileName)
+        if line !='':
+            word1 = re.findall(pattern1, line)
+            word2 = re.findall(pattern2, line)
+            if word1 and pattern1 in line and not word2:
+                PrintTitle(line.strip('\n'))
+            if word2:
+                print line.strip('\n')
+                if pattern1 in line:
+                    PrintTitle();
+
+
+#Deletes the logFile present in DUT
+def deleteLogFile(obj,iCrypto_log,iCryptoExecutionStatus):
+    print "\nDelete the iCrypto Execution log file from STB"
+    tdkTestObj = obj.createTestStep('ExecuteCommand');
+    cmd = "rm " + iCrypto_log
+    print cmd;
+    #configre the command
+    tdkTestObj.addParameter("command", cmd);
+    tdkTestObj.executeTestCase(expectedResult);
+    actualResult = tdkTestObj.getResult();
+    if expectedResult in actualResult:
+        print "iCrypto Execution log file deleted from STB"
+        tdkTestObj.setResultStatus("SUCCESS");
+        if "FAILURE" in iCryptoExecutionStatus:
+            PrintTitle("iCryptoExecution Status is FAILURE",1);
+            tdkTestObj.setResultStatus("FAILURE");
+    else:
+        print "Unable to delete iCrypto Execution log file from STB"
+        tdkTestObj.setResultStatus("FAILURE");
+
+
+#Executes the configured Test APP
+def RunTest(obj,Test,logFile):
+    #Prmitive test case which associated to this Script
+    print "\nStarting iCrypto interface test Execution\n"
+    tdkTestObj = obj.createTestStep('SystemUtilAgent_ExecuteBinary');
+    tdkTestObj.addParameter("shell_script", "RunAppInBackground.sh");
+    tdkTestObj.addParameter("log_file", logFile);
+    #Test to be executed
+    test = TESTAPP[Test];
+    tdkTestObj.addParameter("tool_path", test);
+    tdkTestObj.addParameter("timeout", "30");
+    #Execute the test case in STB
+    tdkTestObj.executeTestCase("SUCCESS");
+    #Get the result of execution
+    actualResult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    print "[TEST EXECUTION RESULT] : %s" %actualResult;
+    if expectedResult not in actualResult:
+        print "Unable to execute %s" %(test);
+        tdkTestObj.setResultStatus("FAILURE");
+    return details
