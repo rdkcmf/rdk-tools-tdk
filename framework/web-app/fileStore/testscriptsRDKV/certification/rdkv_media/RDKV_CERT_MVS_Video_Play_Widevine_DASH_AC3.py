@@ -112,10 +112,16 @@ if expectedResult in result.upper():
     print "\nCheck Pre conditions..."
     tdkTestObj = obj.createTestStep('rdkv_media_pre_requisites');
     tdkTestObj.executeTestCase(expectedResult);
+    # Checking whether widevine DRM is supported
     # Setting the pre-requites for media test. Launching the wekit instance via RDKShell and
     # moving it to the front, openning a socket connection to the webkit inspect page and
     # getting the details for proc validation from config file
-    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,webkit_instance)
+    drm_pre_requisite_status = checkDRMSupported(obj,"Widevine")
+    if drm_pre_requisite_status:
+        pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,webkit_instance)
+    else:
+        pre_requisite_status = "FAILURE"
+
     if pre_requisite_status == "SUCCESS":
         tdkTestObj.setResultStatus("SUCCESS");
         print "Pre conditions for the test are set successfully"

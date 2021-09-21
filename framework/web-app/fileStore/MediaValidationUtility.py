@@ -386,6 +386,40 @@ def sendKeysToClient(obj,client,key_sequence):
     return status
 
 
+def checkDRMSupported(obj,drm):
+    result,ocdm_status = checkPluginStatus(obj,"OCDM");    
+    if str(ocdm_status) != "None":
+        if "FAILURE" in result or ocdm_status != "activated":
+            setPluginState(obj,"OCDM","activate");
+            time.sleep(3)
+            result,ocdm_status = checkPluginStatus(obj,"OCDM");
+        if "SUCCESS" in result and "activated" in ocdm_status:    
+            print "\nChecking Supported DRMs..."
+            tdkTestObj = obj.createTestStep('rdkservice_getValue');
+            tdkTestObj.addParameter("method","OCDM.1.drms");
+            tdkTestObj.executeTestCase("SUCCESS");
+            result  = tdkTestObj.getResult();
+            details = tdkTestObj.getResultDetails();
+            details = ast.literal_eval(details)
+            drm_list = []
+            for drm_info in details:
+                drm_list.append(drm_info.get("name"))
+            print "Supported DRMs : %s" %(drm_list)
+            drm_list = [ drm_name.lower() for drm_name in drm_list ]
+            if drm.lower() in drm_list:
+                print "%s DRM is supported" %(drm)
+                return True
+            else:
+                print "%s DRM not supported" %(drm)
+                return False
+        else:
+            print "Unable to activate OCDM plugin to check DRM info"
+            return False
+    else:
+        print "OCDM plugin not available. DRM not supported"
+        return False
+
+
 def getConnectedVideoDisplay(obj):
     global video_port
     print "\nChecking Connected video displays..."
