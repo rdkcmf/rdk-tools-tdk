@@ -85,6 +85,7 @@ Checkpoint 2 Verify that the value is not retrieved</expected_output>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
+import deviceCapabilities;
 from dshalUtility import *;
 
 #Test component to be tested
@@ -100,9 +101,12 @@ dshalObj.configureTestCase(ip,port,'DSHal_GetAudioCompression_UnSupported_PortTy
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
-dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
+#Get Compression un supported port from config file and check if device supports Compression
+Compression_not_supported_port = deviceCapabilities.getconfig(obj,"CompressionDisabledPort","getValue");
+capable =  deviceCapabilities.getconfig(obj,"audioCompression");
 
-if "SUCCESS" in dshalloadModuleStatus.upper():
+if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
+    dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
     expectedResult="SUCCESS";
     #Prmitive test case which associated to this Script
     #Only HDMI port type is supported
@@ -138,6 +142,11 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
         print "AudioPort handle not retrieved";
 
     dshalObj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in dshalloadModuleStatus.upper():
+    print "Exiting from script";
+    obj.setLoadModuleStatus("FAILURE");
+    obj.unloadModule("devicesettings");
 
 else:
     print "Module load failed";

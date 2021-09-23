@@ -83,6 +83,7 @@ Checkpoint 2 Verify that the hdmiiin status is retrieved</expected_output>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
+import deviceCapabilities;
 from dshalUtility import *;
 
 #Test component to be tested
@@ -98,9 +99,11 @@ dshalObj.configureTestCase(ip,port,'DSHal_HdmiIn_GetCurrentVideoMode');
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
-dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
+#Check if HDMIIn is supported by the DUT
+capable = deviceCapabilities.getconfig(dshalObj,"HdmiIn");
 
-if "SUCCESS" in dshalloadModuleStatus.upper():
+if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
+    dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
     expectedResult="SUCCESS";
     #Prmitive test case which associated to this Script
     tdkTestObj = dshalObj.createTestStep('DSHal_GetHdmiInCurrentVideoMode');
@@ -154,6 +157,11 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
         tdkTestObj.setResultStatus("FAILURE");
         print "HdmiInCurrentVideoMode call failure";
 
+    dshalObj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in dshalloadModuleStatus.upper():
+    print "Exiting from script";
+    dshalObj.setLoadModuleStatus("FAILURE");
     dshalObj.unloadModule("dshal");
 
 else:

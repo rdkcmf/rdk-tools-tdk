@@ -1226,6 +1226,22 @@ class TDKScriptingLibrary:
 
 	########## End of Function ##########
 
+        def setAsNotApplicable(self):
+
+        #Invokes setExecutionResultStatus for setting script as Not Applicable
+
+        # Syntax      : OBJ.setAsNotApplicable();
+        # Description : Sets the execution as Not Applicable (N/A)
+        # Parameters  : NIL
+        # Return Value: NIL
+
+                setURL = self.url + "/execution/setExecutionResultStatus?execResult=" \
+                       + str(self.resultId) + "&resultStatus=NA&reason="
+                data = setURL.split("&")
+                #print setURL
+                loadstring = urllib.urlopen(setURL).read()
+                return
+
 	def readConfigFile(self,configFile):
 
 	# Reads config file and returns list of steps to be performed in script.

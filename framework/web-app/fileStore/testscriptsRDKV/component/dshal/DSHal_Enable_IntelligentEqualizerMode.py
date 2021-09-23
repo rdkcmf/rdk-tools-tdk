@@ -89,6 +89,7 @@ Checkpoint 2 Verify that the mode is set</expected_output>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
+import deviceCapabilities;
 from dshalUtility import *;
 
 #Test component to be tested
@@ -104,10 +105,12 @@ dshalObj.configureTestCase(ip,port,'DSHal_Enable_IntelligentEqualizerMode');
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
-dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
+#Check if HDMI port and IntelligentEqualizerMode is supported by the DUT
+capable = deviceCapabilities.getconfig(dshalObj,"audioPort","HDMI") and deviceCapabilities.getconfig(dshalObj,"IntelligentEqualizerMode");
 
-if "SUCCESS" in dshalloadModuleStatus.upper():
+if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
     expectedResult="SUCCESS";
+    dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
     #Prmitive test case which associated to this Script
     tdkTestObj = dshalObj.createTestStep('DSHal_GetAudioPort');
     tdkTestObj.addParameter("portType", audioPortType["HDMI"]);
@@ -164,5 +167,9 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
 
     dshalObj.unloadModule("dshal");
 
+elif not capable and "SUCCESS" in dshalloadModuleStatus.upper():
+    print "Exiting from script";
+    dshalObj.setLoadModuleStatus("FAILURE");
+    dshalObj.unloadModule("dshal");
 else:
     print "Module load failed";

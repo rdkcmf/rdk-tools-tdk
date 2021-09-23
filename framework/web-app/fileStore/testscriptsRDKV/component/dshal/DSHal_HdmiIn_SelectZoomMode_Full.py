@@ -82,6 +82,7 @@
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
+import deviceCapabilities;
 from dshalUtility import *;
 
 #Test component to be tested
@@ -97,9 +98,11 @@ dshalObj.configureTestCase(ip,port,'DSHal_HdmiIn_SelectZoomMode_Full');
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
-dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
+#Check if HDMIIn is supported by the DUT
+capable = deviceCapabilities.getconfig(dshalObj,"HdmiIn");
 
-if "SUCCESS" in dshalloadModuleStatus.upper():
+if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
+    dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
     expectedResult="SUCCESS";
     mode = 0; #For dsVIDEO_ZOOM_NONE
     tdkTestObj = dshalObj.createTestStep('DSHal_HdmiInSelectZoomMode');
@@ -117,6 +120,11 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
         tdkTestObj.setResultStatus("FAILURE");
         print "DSHal_HdmiInSelectZoomMode call failed";
 
+    dshalObj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in dshalloadModuleStatus.upper():
+    print "Exiting from script";
+    dshalObj.setLoadModuleStatus("FAILURE");
     dshalObj.unloadModule("dshal");
 
 else:
