@@ -111,7 +111,7 @@ def GetPublicWiFiParamValues(obj):
 
     actualresult= [];
     orgValue = [];
-    paramList = ["Device.X_COMCAST-COM_GRE.Tunnel.1.DSCPMarkPolicy","Device.X_COMCAST-COM_GRE.Tunnel.1.PrimaryRemoteEndpoint","Device.X_COMCAST-COM_GRE.Tunnel.1.SecondaryRemoteEndpoint","Device.WiFi.SSID.5.SSID","Device.WiFi.SSID.6.SSID","Device.WiFi.SSID.5.Enable","Device.WiFi.SSID.6.Enable","Device.WiFi.AccessPoint.5.SSIDAdvertisementEnabled","Device.WiFi.AccessPoint.6.SSIDAdvertisementEnabled","Device.WiFi.SSID.10.SSID","Device.WiFi.SSID.10.Enable","Device.WiFi.AccessPoint.10.SSIDAdvertisementEnabled","Device.WiFi.AccessPoint.10.Security.ModeEnabled","Device.WiFi.AccessPoint.10.X_CISCO_COM_BssMaxNumSta","Device.WiFi.AccessPoint.10.Security.X_CISCO_COM_EncryptionMethod","Device.WiFi.AccessPoint.10.Security.RadiusServerIPAddr","Device.WiFi.AccessPoint.10.Security.RadiusServerPort","Device.WiFi.AccessPoint.10.Security.SecondaryRadiusServerIPAddr","Device.WiFi.AccessPoint.10.Security.SecondaryRadiusServerPort","Device.DeviceInfo.X_COMCAST_COM_xfinitywifiEnable"];
+    paramList = ["Device.X_COMCAST-COM_GRE.Tunnel.1.DSCPMarkPolicy","Device.X_COMCAST-COM_GRE.Tunnel.1.PrimaryRemoteEndpoint","Device.X_COMCAST-COM_GRE.Tunnel.1.SecondaryRemoteEndpoint","Device.WiFi.SSID.5.SSID","Device.WiFi.SSID.6.SSID","Device.WiFi.SSID.5.Enable","Device.WiFi.SSID.6.Enable","Device.WiFi.AccessPoint.5.SSIDAdvertisementEnabled","Device.WiFi.AccessPoint.6.SSIDAdvertisementEnabled","Device.WiFi.SSID.10.SSID","Device.WiFi.SSID.10.Enable","Device.WiFi.AccessPoint.10.SSIDAdvertisementEnabled","Device.WiFi.AccessPoint.10.Security.ModeEnabled","Device.WiFi.AccessPoint.10.X_CISCO_COM_BssMaxNumSta","Device.WiFi.AccessPoint.10.Security.X_CISCO_COM_EncryptionMethod","Device.WiFi.AccessPoint.10.Security.RadiusServerIPAddr","Device.WiFi.AccessPoint.10.Security.RadiusServerPort","Device.WiFi.AccessPoint.10.Security.SecondaryRadiusServerIPAddr","Device.WiFi.AccessPoint.10.Security.SecondaryRadiusServerPort","Device.WiFi.SSID.9.SSID","Device.WiFi.SSID.9.Enable","Device.WiFi.AccessPoint.9.SSIDAdvertisementEnabled","Device.WiFi.AccessPoint.9.Security.ModeEnabled","Device.WiFi.AccessPoint.9.X_CISCO_COM_BssMaxNumSta","Device.WiFi.AccessPoint.9.Security.X_CISCO_COM_EncryptionMethod","Device.WiFi.AccessPoint.9.Security.RadiusServerIPAddr","Device.WiFi.AccessPoint.9.Security.RadiusServerPort","Device.WiFi.AccessPoint.9.Security.SecondaryRadiusServerIPAddr","Device.WiFi.AccessPoint.9.Security.SecondaryRadiusServerPort","Device.DeviceInfo.X_COMCAST_COM_xfinitywifiEnable"];
     #Parse and store the values retrieved in a list
     for index in range(len(paramList)):
         tdkTestObj = obj.createTestStep("WIFIAgent_Get");
@@ -157,7 +157,15 @@ def SetPublicWiFiParamValues(obj,paramList):
 
         paramList7 = "Device.WiFi.AccessPoint.10.Security.SecondaryRadiusServerPort|%s|unsignedint"%paramList[18]
 
-        paramList8 = "Device.DeviceInfo.X_COMCAST_COM_xfinitywifiEnable|%s|bool" %paramList[19];
+        paramList8 = "Device.WiFi.SSID.9.SSID|%s|string|Device.WiFi.SSID.9.Enable|%s|bool|Device.WiFi.AccessPoint.9.SSIDAdvertisementEnabled|%s|bool" %(paramList[19],paramList[20],paramList[21])
+
+        paramList9 = "Device.WiFi.AccessPoint.9.Security.ModeEnabled|%s|string|Device.WiFi.AccessPoint.9.X_CISCO_COM_BssMaxNumSta|%s|int|Device.WiFi.AccessPoint.9.Security.X_CISCO_COM_EncryptionMethod|%s|string" %(paramList[22],paramList[23],paramList[24])
+
+        paramList10 = "Device.WiFi.AccessPoint.9.Security.RadiusServerIPAddr|%s|string|Device.WiFi.AccessPoint.9.Security.RadiusServerPort|%s|unsignedint|Device.WiFi.AccessPoint.9.Security.SecondaryRadiusServerIPAddr|%s|string"%(paramList[25],paramList[26],paramList[27])
+
+        paramList11 = "Device.WiFi.AccessPoint.10.Security.SecondaryRadiusServerPort|%s|unsignedint"%paramList[28]
+
+        paramList12 = "Device.DeviceInfo.X_COMCAST_COM_xfinitywifiEnable|%s|bool" %paramList[29];
 
         expectedresult="SUCCESS";
         tdkTestObj.addParameter("paramList",paramList1);
@@ -195,12 +203,36 @@ def SetPublicWiFiParamValues(obj,paramList):
         actualresult7 = tdkTestObj.getResult();
         details7 = tdkTestObj.getResultDetails();
 
+
         tdkTestObj.addParameter("paramList",paramList8);
         tdkTestObj.executeTestCase(expectedresult);
         actualresult8 = tdkTestObj.getResult();
         details8 = tdkTestObj.getResultDetails();
 
-        if expectedresult in actualresult1 and expectedresult in actualresult2 and expectedresult in actualresult3 and expectedresult in actualresult4 and expectedresult in actualresult5 and expectedresult in actualresult6 and  expectedresult in actualresult7 and  expectedresult in actualresult8:
+
+        tdkTestObj.addParameter("paramList",paramList9);
+        tdkTestObj.executeTestCase(expectedresult);
+        actualresult9 = tdkTestObj.getResult();
+        details9 = tdkTestObj.getResultDetails();
+
+
+        tdkTestObj.addParameter("paramList",paramList10);
+        tdkTestObj.executeTestCase(expectedresult);
+        actualresult10 = tdkTestObj.getResult();
+        details10 = tdkTestObj.getResultDetails();
+
+
+        tdkTestObj.addParameter("paramList",paramList11);
+        tdkTestObj.executeTestCase(expectedresult);
+        actualresult11 = tdkTestObj.getResult();
+        details11 = tdkTestObj.getResultDetails();
+
+        tdkTestObj.addParameter("paramList",paramList12);
+        tdkTestObj.executeTestCase(expectedresult);
+        actualresult12 = tdkTestObj.getResult();
+        details12 = tdkTestObj.getResultDetails();
+
+        if expectedresult in actualresult1 and expectedresult in actualresult2 and expectedresult in actualresult3 and expectedresult in actualresult4 and expectedresult in actualresult5 and expectedresult in actualresult6 and  expectedresult in actualresult7 and  expectedresult in actualresult8 and  expectedresult in actualresult9 and  expectedresult in actualresult10 and  expectedresult in actualresult11 and  expectedresult in actualresult12:
             actualresult = "SUCCESS"
             details = "setPublicWiFiParamValues success"
         else:
