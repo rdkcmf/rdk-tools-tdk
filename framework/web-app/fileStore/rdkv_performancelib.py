@@ -560,14 +560,14 @@ def suspend_plugin(obj,plugin):
 #-------------------------------------------------------------------
 #LAUNCH A GIVEN PLUGIN USING RDKSHELL
 #-------------------------------------------------------------------
-def launch_plugin(obj,plugin):
+def launch_plugin(obj,plugin,uri=''):
     status = expectedResult = "SUCCESS"
     print "\n Resuming {} \n".format(plugin)
-    params = '{"callsign":"'+plugin+'", "type":"", "uri":""}'
+    params = '{"callsign":"'+plugin+'", "type":"", "uri":"' + uri + '"}'
     tdkTestObj = obj.createTestStep('rdkservice_setValue')
     tdkTestObj.addParameter("method","org.rdk.RDKShell.1.launch")
     tdkTestObj.addParameter("value",params)
-    start_lauch = str(datetime.utcnow()).split()[1] 
+    start_launch = str(datetime.utcnow()).split()[1] 
     tdkTestObj.executeTestCase(expectedResult);
     result = tdkTestObj.getResult();
     if result == "SUCCESS":
@@ -577,7 +577,7 @@ def launch_plugin(obj,plugin):
         print "\n Unable to Resume {} plugin \n".format(plugin)
         tdkTestObj.setResultStatus("FAILURE")
         status = "FAILURE"
-    return status,start_lauch
+    return status,start_launch
 
 #-------------------------------------------------------------------
 #GET BLUETOOTH MAC OF DUT
@@ -737,3 +737,45 @@ def is_valid_ipv6_address(address):
     except socket.error:  # not a valid address
         return False
     return True
+
+#-------------------------------------------------------------------
+#GET DEVICE UPTIME
+#-------------------------------------------------------------------
+def get_device_uptime(obj):
+    uptime = -1
+    expectedResult = 'SUCCESS'
+    device_info = 'DeviceInfo'
+    tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
+    tdkTestObj.addParameter('plugin',device_info)
+    tdkTestObj.addParameter("status",'activate')
+    tdkTestObj.executeTestCase(expectedResult)
+    result = tdkTestObj.getResult()
+    if expectedResult in result:
+        tdkTestObj.setResultStatus("SUCCESS")
+        time.sleep(5)
+        tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus')
+        tdkTestObj.addParameter('plugin',device_info)
+        tdkTestObj.executeTestCase(expectedResult)
+        result = tdkTestObj.getResult()
+        device_info_status = tdkTestObj.getResultDetails()
+        if device_info_status in 'activated':
+            tdkTestObj.setResultStatus("SUCCESS")
+            time.sleep(5)
+            tdkTestObj = obj.createTestStep('rdkservice_getReqValueFromResult')
+            tdkTestObj.addParameter("method","DeviceInfo.1.systeminfo")
+            tdkTestObj.addParameter("reqValue","uptime")
+            tdkTestObj.executeTestCase(expectedResult);
+            result = tdkTestObj.getResult()
+            if expectedResult in result:
+                uptime = int(tdkTestObj.getResultDetails())
+                tdkTestObj.setResultStatus("SUCCESS")
+            else:
+                print '\n Error while executing DeviceInfo.1.systeminfo method'
+                tdkTestObj.setResultStatus("FAILURE")
+        else:
+            print '\n Unable to activate DeviceInfo plugin, current status: ',device_info_status
+            tdkTestObj.setResultStatus("FAILURE")
+    else:
+        print '\n Error while activating DeviceInfo'
+        tdkTestObj.setResultStatus("FAILURE")
+    return uptime
