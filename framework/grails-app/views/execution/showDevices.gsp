@@ -31,6 +31,7 @@ $(document).ready(function() {
 	document.getElementById("rdkCertificationDiagnosisId").disabled = true;
 	document.getElementById("rdkCertificationPerformanceId").disabled = true;
 	document.getElementById("rdkCertificationStbLogTransferId").disabled = true;
+	document.getElementById("rdkProfilingAlertCheckBoxId").disabled = true;
 });
 
 </script>
@@ -177,9 +178,14 @@ $(document).ready(function() {
 		<g:else>
 			<tr>
 				<td>Execution Options</td>
-				<td><g:checkBox id="rdkCertificationDiagnosisId" name="rdkCertificationDiagnosis" checked="false"  />&nbsp;Rdk Certification Diagnosis
-				&emsp;&emsp;<g:checkBox id="rdkCertificationPerformanceId" name="rdkCertificationPerformance" checked="false"  />&nbsp;Rdk Certification Performance
-				&emsp;&emsp;<g:checkBox id="rdkCertificationStbLogTransferId" name="rdkCertificationStbLogTransfer" checked="false"  />&nbsp;Rdk Certification STB Log Transfer
+				<td><g:checkBox id="rdkCertificationDiagnosisId" name="rdkCertificationDiagnosis" checked="false"  />&nbsp;RDK Certification Diagnosis
+				&emsp;&emsp;<g:checkBox id="rdkCertificationPerformanceId" name="rdkCertificationPerformance" checked="false"  />&nbsp;RDK Certification Performance
+				&emsp;&emsp;<g:checkBox id="rdkCertificationStbLogTransferId" name="rdkCertificationStbLogTransfer" checked="false"  />&nbsp;RDK Certification STB Log Transfer
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><g:checkBox id="rdkProfilingAlertCheckBoxId" name="rdkProfilingAlertCheckBox" checked="false"  />&nbsp;RDK Profiling Alert 
 				</td>
 			</tr>
 		</g:else>

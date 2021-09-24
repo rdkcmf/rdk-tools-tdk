@@ -124,7 +124,7 @@ class Execution {
 	 */
 	boolean rerunOnFailure = false
 	
-	
+	boolean isAlertEnabled =  false
 	
 	/**
 	 * Object to save the third party execution details for the execution(optional)
@@ -162,6 +162,7 @@ class Execution {
 		isAborted(nullable:true, blank:true)
 		isRerunRequired(nullable:true, blank:true)
 		isStbLogRequired(nullable:true, blank:true)
+		isAlertEnabled(nullable:true, blank:true)
 		applicationUrl(nullable:true, blank:true)
 		rerunOnFailure(nullable:true, blank:true)
 		scriptCount(nullable:true, blank:true)

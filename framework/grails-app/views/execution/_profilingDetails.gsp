@@ -97,8 +97,8 @@ function hideSmemLogs(m,k,i){
 							<tr class="fnhead1">												
 								<td class="tdhead" style="width:30%;">Metric</td>
 								<td class="tdhead">Time</td>		
-								<td class="tdhead">Threshold</td>		
-								<td class="tdhead">Value</td>
+								<td class="tdhead">Threshold Value</td>		
+								<td class="tdhead">Metric Value</td>
 								<td class="tdhead">State</td>					
 							</tr>
 							<g:each in="${alertListMap?.keySet()}" status="metricStatus"  var="metricKey">					
@@ -115,7 +115,18 @@ function hideSmemLogs(m,k,i){
 											<td>${alertInstance?.get("system_time")}</td>
 											<td>${alertInstance?.get("threshold")}</td>
 											<td>${alertInstance?.get("value")}</td>
-											<td>${alertInstance?.get("state")}</td>
+											<g:if test="${alertInstance?.get("state") == "alerting"}">
+												<td title="Alert with state as 'alerting' is received from Grafana
+when the collectd metric value went above the threshold value">${alertInstance?.get("state")}</td>
+											</g:if>
+											<g:elseif test="${alertInstance?.get("state") == "ok"}">
+												<td title="Alert with state as 'ok' is received from Grafana
+when the collectd metric value went below the threshold value">${alertInstance?.get("state")}</td>
+											</g:elseif>
+											<g:elseif test="${alertInstance?.get("state") == "no_data"}">
+												<td title="Alert with state as 'no_data' is received from Grafana
+if no metric data is received from the device">${alertInstance?.get("state")}</td>
+											</g:elseif>
 										</tr>
 									</g:each>	
 								</g:if>	

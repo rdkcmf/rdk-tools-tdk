@@ -81,6 +81,8 @@ class JobDetails {
 	
 	String isStbLogRequired
 	
+	String isAlertEnabled
+	
 	Category category = Category.RDKV
 	/**
 	 * Rerun on failure
@@ -116,6 +118,7 @@ class JobDetails {
 		isSystemDiagnostics(nullable:true, blank:true)
 		isBenchMark(nullable:true, blank:true)
 		isStbLogRequired(nullable:true, blank:true)
+		isAlertEnabled(nullable:true, blank:true)
 		rerun(nullable:true, blank:true)
 		repeatCount(nullable:true, blank:true)
 		groups(nullable:true, blank:true)

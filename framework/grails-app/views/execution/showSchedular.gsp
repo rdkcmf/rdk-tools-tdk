@@ -28,6 +28,7 @@
 	<g:hiddenField name="devices" id="repeatCount" value="${devices}" />
 	<g:hiddenField name="isStbLogRequired" id="transferLogs" value="${isStbLogRequired}" />
 	<g:hiddenField name="category" id="category" value="${category}"/>
+	<g:hiddenField name="isAlertEnabled" id="isAlertEnabled" value="${isAlertEnabled}"/>
 	
 	<table id="scheduletable">
 	<tr>

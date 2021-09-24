@@ -214,7 +214,9 @@
 					code="device.serialNo.label" default="Mac Addr" />
 			</label>
 			<g:textField name="serialNo" id="serialNo"
-				value="${deviceInstance?.serialNo}" class="textwidth" />
+				value="${deviceInstance?.serialNo}" class="textwidth" title="For RDK Profiling, Mac Address field must not be left blank.MAC address should be 12 digit hexadecimal number as shown below. 
+eg : ABCDEFGHIJKL or AB:CD:EF:GH:IJ:KL " />
+				
 		</div>
 	</g:if>
 	<div

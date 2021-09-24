@@ -104,10 +104,10 @@ class ScriptexecutionService {
 
 	def executeScriptGroup(ScriptGroup scriptGroup, final String boxType,  final String execName, final String execDeviceId,
 		Device deviceInstance, final String url, final String filePath, final String realPath, final String callbackUrl, final String imageName,
-		final String isBenchMark, final String isSystemDiagnostics, final String rerun, final String isLogReqd, final String category){ // issue fix -category type changed in to string
+		final String isBenchMark, final String isSystemDiagnostics, final String rerun, final String isLogReqd, final String category, final String isAlertEnabled){ // issue fix -category type changed in to string
 		
 		Future<String> future =  executorService.submit( { executeScriptGrp(scriptGroup, boxType, execName, execDeviceId, deviceInstance,
-			url, filePath, realPath, callbackUrl, imageName, isBenchMark,isSystemDiagnostics,rerun,isLogReqd, category)} as Callable< String > )
+			url, filePath, realPath, callbackUrl, imageName, isBenchMark,isSystemDiagnostics,rerun,isLogReqd, category,isAlertEnabled)} as Callable< String > )
 	}
 		
 	def String getCurlCommand(final String jsonString, final String callbackUrl){
@@ -176,7 +176,7 @@ class ScriptexecutionService {
 		
 	def executeScriptGrp(ScriptGroup scriptGroup, final String boxType, final String execName, final String execDeviceId,
 		Device deviceInstance, final String url, final String filePath, final String realPath, final String callbackUrl, final String imageName,
-		final String isBenchMark, final String isSystemDiagnostics, final String rerun, final String isLogReqd, final String category){ 
+		final String isBenchMark, final String isSystemDiagnostics, final String rerun, final String isLogReqd, final String category,final String isAlertEnabled){ 
 		// Issue fix - category type changed as String 
 		boolean aborted = false
 		boolean pause = false
@@ -276,7 +276,7 @@ class ScriptexecutionService {
 					def startExecutionTime = new Date()
 					try {
 						executionStarted = true
-						def htmlData = executeScripts(execName, execDeviceId, scriptInstance , deviceInstance , url, filePath, realPath, isMultiple, isBenchMark,isSystemDiagnostics,isLogReqd,rerun, category)
+						def htmlData = executeScripts(execName, execDeviceId, scriptInstance , deviceInstance , url, filePath, realPath, isMultiple, isBenchMark,isSystemDiagnostics,isLogReqd,rerun, category, isAlertEnabled)
 						if(isMultiple.equals("false")){
 							Execution.withTransaction {
 								Execution executionInstance = Execution.findByName(execName)
@@ -690,7 +690,7 @@ class ScriptexecutionService {
 	 * @return
 	 */
 	def String executeScripts(String executionName, String execDeviceId, def scriptInstance,
-			Device deviceInstance, final String url, final String filePath, final String realPath, final String isMultiple, final String isBenchMark,final String  isSystemDiagnostics, final String isLogReqd, final String rerun, final String category ) {
+			Device deviceInstance, final String url, final String filePath, final String realPath, final String isMultiple, final String isBenchMark,final String  isSystemDiagnostics, final String isLogReqd, final String rerun, final String category , final String isAlertEnabled) {
 		String htmlData = ""
 		Date startTime = new Date()
 		String scriptData = convertScriptFromHTMLToPython(scriptInstance.scriptContent)
@@ -881,6 +881,40 @@ class ScriptexecutionService {
 		def logPath = "${realPath}/logs//${executionId}//${execDeviceId}//${executionResultId}//"
 		executescriptService.copyLogsIntoDir(realPath,logPath, executionId,execDeviceId,executionResultId)
 
+		List alertList = []
+		boolean failureAlertCheck = false
+		Date toDate = new Date()
+		if(isAlertEnabled?.equals(TRUE)){
+			try{
+				String moduleName = scriptInstance?.primitiveTest?.module?.name
+				if(!moduleName?.equals("rdkv_profiling")){
+					alertList = executionService.fetchAlertData(startTime,toDate,deviceInstance?.serialNo,realPath)
+					
+					htmlData += ("Checking for Grafana alerts" + HTML_BR )
+					String grafanaPrint = "********** Alerts From GRAFANA **************"
+					htmlData += (grafanaPrint + HTML_BR )
+					if(!alertList?.isEmpty()){
+						alertList?.each { alert ->
+							htmlData += (alert?.toString() + HTML_BR )
+							if(alert?.get("state")?.equals("alerting")){
+								failureAlertCheck =  true
+							}
+						}
+					}else{
+						htmlData += ("No Alerts Received" + HTML_BR )
+					}
+					if(failureAlertCheck){
+						executionService.updateAlertExecutionResults(executionResultId,executionId,executionDevice?.id)
+						htmlData += ("Since valid alerts(state:alerting) are received from Grafana, test step for checking alerts is made as FAILURE" + HTML_BR )
+					}
+				}
+			}catch (Exception e) {
+				e.printStackTrace()
+			}
+		}
+		def alertTransferFilePath = "${realPath}//logs//${executionId}//${executionDeviceInstance?.id}//${executionResultId}"
+		executescriptService.saveAlertInfoInLogFile(executionResultId,executionId,alertTransferFilePath,startTime,toDate,realPath)
+		
 		String outputData = htmlData
 		
 		Date execEndDate = new Date()
@@ -1030,8 +1064,6 @@ class ScriptexecutionService {
 			def totalTimeTaken = (endTime?.getTime() - startTime?.getTime()) / 1000
 	//		totalTimeTaken = totalTimeTaken?.round(2)
 			executionService.updateExecutionTime(totalTimeTaken?.toString(), executionResultId)
-			def alertTransferFilePath = "${realPath}//logs//${executionId}//${executionDeviceInstance?.id}//${executionResultId}"
-			executescriptService.saveAlertInfoInLogFile(executionResultId,executionId,alertTransferFilePath,startTime,endTime,realPath)
 		} catch (Exception e) {
 			e.printStackTrace()
 		}

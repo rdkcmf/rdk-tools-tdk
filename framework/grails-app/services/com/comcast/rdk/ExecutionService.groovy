@@ -1579,6 +1579,22 @@ class ExecutionService {
 		
 	}
 	
+	/**
+	 * Function to update the execution, executionDevice, executionResult as FAILURE if valid alerts are received
+	 * @param executionResultId
+	 * @param executionId
+	 * @param executionDeviceId
+	 */
+	public void updateAlertExecutionResults(final long executionResultId, final long executionId, final long executionDeviceId){
+			ExecutionResult.executeUpdate("update ExecutionResult c set c.status = :newStatus where c.id = :execResId",
+					[newStatus: "FAILURE", execResId: executionResultId])
+			Execution.executeUpdate("update Execution c set c.result = :result where c.id = :execId",
+					[result: "FAILURE", execId: executionId.toLong()])
+			ExecutionDevice.executeUpdate("update ExecutionDevice c set c.status = :newStat where c.id = :execDevId",
+					[newStat: "FAILURE", execDevId: executionDeviceId.toLong()])
+			
+	}
+	
 	def Groups getGroup(){
 		def user = User.findByUsername(SecurityUtils.subject.principal)
 		def group = Groups.findById(user?.groupName?.id)
@@ -1602,7 +1618,7 @@ class ExecutionService {
 	 * @return
 	 */
 	public boolean saveExecutionDetailsOnMultipleScripts(final String execName, String scriptName, String deviceName,
-		String scriptGroupInstance , String appUrl,String isBenchMark , String isSystemDiagnostics,String rerun,String isLogReqd, final int scriptCount, final String category, final String rerunOnFailure){
+		String scriptGroupInstance , String appUrl,String isBenchMark , String isSystemDiagnostics,String rerun,String isLogReqd, final int scriptCount, final String category, final String rerunOnFailure, String isAlertEnabled){
 		   def executionSaveStatus = true
 		   try {
 			   Execution execution = new Execution()
@@ -1619,7 +1635,8 @@ class ExecutionService {
 			   execution.isBenchMarkEnabled = isBenchMark?.equals("true")
 			   execution.isStbLogRequired = isLogReqd?.equals("true")
 			   execution.isSystemDiagnosticsEnabled = isSystemDiagnostics?.equals("true")
-			   execution.rerunOnFailure=rerunOnFailure?.equals("true") 
+			   execution.isAlertEnabled=isAlertEnabled?.equals("true") 
+			   execution.rerunOnFailure=rerunOnFailure?.equals("true")
 			   execution.scriptCount = scriptCount
 			   execution.category = Utility.getCategory(category)
 			   if(! execution.save(flush:true)) {
@@ -1666,6 +1683,7 @@ class ExecutionService {
 				execution.isBenchMarkEnabled = map.isBenchMark?.equals("true")
 				execution.isStbLogRequired = map.isLogReqd?.equals("true")
 				execution.isSystemDiagnosticsEnabled = map.isSystemDiagnostics?.equals("true")
+				execution.isAlertEnabled= map.isAlertEnabled?.equals("true")
 				execution.rerunOnFailure= map.rerunOnFailure?.equals("true")
 				execution.scriptCount = map.scriptCount
 				execution.category = Utility.getCategory(map.category)
@@ -1732,6 +1750,7 @@ class ExecutionService {
 			execution.isBenchMarkEnabled = map.isBenchMark?.equals("true")
 			execution.isStbLogRequired = map.isLogReqd?.equals("true")
 			execution.isSystemDiagnosticsEnabled = map.isSystemDiagnostics?.equals("true")
+			execution.isAlertEnabled= map.isAlertEnabled?.equals("true")
 			execution.rerunOnFailure= map.rerunOnFailure?.equals("true")			
 			execution.scriptCount = scriptCnt
 			execution.category = Utility.getCategory(map.category)
@@ -2575,6 +2594,10 @@ class ExecutionService {
 		if(macAddress?.contains(":")){
 			macAddress = macAddress?.replace(":","")
 		}
+		if(macAddress?.contains("_")){
+			macAddress = macAddress?.replace("_","")
+		}
+		macAddress = macAddress?.toUpperCase()
 		List alertList = []
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -2613,6 +2636,7 @@ class ExecutionService {
 											String metric = evalMatchJson.get('metric')
 											def metricList = metric?.split("\\.")
 											String macAddressFromLog = metricList[1]
+											macAddressFromLog = macAddressFromLog?.toUpperCase()
 											if(macAddressFromLog?.equals(macAddress)){
 												alertMap.put('system_time',system_time)
 												alertMap.put('ruleName',ruleName)

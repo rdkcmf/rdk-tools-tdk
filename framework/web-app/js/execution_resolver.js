@@ -167,6 +167,7 @@ function jsExecution(){
 	thunderPythonDiagnosisCheckBox.disabled = true;
 	var thunderPythonPerformanceCheckBox = document.getElementById("rdkCertificationPerformanceId");
 	thunderPythonPerformanceCheckBox.disabled = true;	
+	document.getElementById("rdkProfilingAlertCheckBoxId").disabled = true;
 	thunderJavascriptExecuteButtons.style.display = "block";
 	thunderPythonExecuteButtons.style.display = "none";
 	document.getElementById("thunderExecutionType").value = "javascript";
@@ -202,6 +203,7 @@ function pythonExecution(){
 	thunderPythonDiagnosisCheckBox.disabled = false;
 	var thunderPythonPerformanceCheckBox = document.getElementById("rdkCertificationPerformanceId");
 	thunderPythonPerformanceCheckBox.disabled = false;
+	document.getElementById("rdkProfilingAlertCheckBoxId").disabled = false;
 	thunderJavascriptExecuteButtons.style.display = "none";
 	thunderPythonExecuteButtons.style.display = "block";
 	document.getElementById("category").value = "RDKV";
@@ -463,12 +465,16 @@ function showSchedulerRdkService(id, category){
 	var benchmark = "false";
 	var systemDiag = "false"
 	var isLogReqd =" false"
+	var isAlertChecked =" false"
     if ($("#rerunId").prop('checked')==true){     	
     	reRun = "true";
     }
-	
 	if ($("#rdkCertificationStbLogTransferId").prop('checked')==true){  
 		isLogReqd = "true";
+	}
+	
+	if ($("#rdkProfilingAlertCheckBoxId").prop('checked')==true){  
+		isAlertChecked = "true";
 	}
 	
 	if( (deviceList =="" || deviceList == null ) ){
@@ -496,7 +502,7 @@ function showSchedulerRdkService(id, category){
 	if(scriptGroup){
 		scriptGroupVals = scriptGroup.toString()
 	}
-	$.get('showSchedular', {deviceId : id, devices : deviceList.toString(), scriptGroup : scriptGroupVals, scripts:scriptVals, repeatId:repeatid, rerun:reRun, systemDiagnostics : systemDiag , benchMarking : benchmark  ,isLogReqd :isLogReqd, category:category }, function(data) { $("#scheduleJobPopup").html(data); });		
+	$.get('showSchedular', {deviceId : id, devices : deviceList.toString(), scriptGroup : scriptGroupVals, scripts:scriptVals, repeatId:repeatid, rerun:reRun, systemDiagnostics : systemDiag , benchMarking : benchmark  ,isLogReqd :isLogReqd, category:category, isAlertChecked:isAlertChecked }, function(data) { $("#scheduleJobPopup").html(data); });		
 	$("#scheduleJobPopup").modal({ opacity : 40, overlayCss : {
 		  backgroundColor : "#c4c4c4" }, containerCss: {
 	            width: 800,

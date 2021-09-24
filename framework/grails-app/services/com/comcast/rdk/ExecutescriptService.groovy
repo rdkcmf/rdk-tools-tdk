@@ -95,7 +95,7 @@ class ExecutescriptService {
 	 */
 	
 	def String executeScript(final String executionName, final ExecutionDevice executionDevice, final def scriptInstance,
-			final Device deviceInstance, final String url, final String filePath, final String realPath, final String isBenchMark, final String isSystemDiagnostics,final String uniqueExecutionName,final String isMultiple, def executionResult,def isLogReqd, final def category) {
+			final Device deviceInstance, final String url, final String filePath, final String realPath, final String isBenchMark, final String isSystemDiagnostics,final String uniqueExecutionName,final String isMultiple, def executionResult,def isLogReqd, final def category,final String isAlertEnabled) {
 				Date startTime = new Date()
 		String htmlData = ""
 		String scriptData = executionService.convertScriptFromHTMLToPython(scriptInstance?.scriptContent)
@@ -207,7 +207,45 @@ class ExecutescriptService {
 		outData?.eachLine { line ->
 			htmlData += (line + HTML_BR )
 		}
-
+		List alertList = []
+		boolean failureAlertCheck = false
+		Date toDate = new Date()
+		if(isAlertEnabled?.equals(TRUE)){
+			try{
+				String moduleName = scriptInstance?.primitiveTest?.module?.name
+				if(!moduleName?.equals("rdkv_profiling")){
+					alertList = executionService.fetchAlertData(startTime,toDate,deviceInstance?.serialNo,realPath)
+					
+					htmlData += ("Checking for Grafana alerts" + HTML_BR )
+					String grafanaPrint = "********** Alerts From GRAFANA **************"
+					htmlData += (grafanaPrint + HTML_BR )
+					if(!alertList?.isEmpty()){
+						alertList?.each { alert ->
+							htmlData += (alert?.toString() + HTML_BR )
+							if(alert?.get("state")?.equals("alerting")){
+								failureAlertCheck =  true
+							}
+						}
+					}else{
+						htmlData += ("No Alerts Received" + HTML_BR )
+					}
+					if(failureAlertCheck){
+						executionService.updateAlertExecutionResults(executionResultId,executionId,executionDevice?.id)
+						htmlData += ("Since valid alerts(state:alerting) are received from Grafana, test step for checking alerts is made as FAILURE" + HTML_BR )
+					}
+					//writing the alerts to outputFile
+					String pathName = realPath+"//"+Constants.SCRIPT_OUTPUT_FILE_PATH+executionName+Constants.SCRIPT_OUTPUT_FILE_EXTN
+					File opFile = new File(pathName)
+					if(opFile.exists()){
+						writeToOutputFile(opFile,alertList)
+					}
+				}
+			}catch (Exception e) {
+				e.printStackTrace()
+			}
+		}
+		def alertTransferFilePath = "${realPath}//logs//${executionId}//${executionDevice?.id}//${executionResultId}"
+		saveAlertInfoInLogFile(executionResultId,executionId,alertTransferFilePath,startTime,toDate,realPath)
 		try
 		{
 			def cumulativeTime
@@ -393,8 +431,6 @@ class ExecutescriptService {
 			def totalTimeTaken = (endTime?.getTime() - startTime?.getTime()) / 1000
 	//		totalTimeTaken = totalTimeTaken?.round(2)
 			executionService.updateExecutionTime(totalTimeTaken?.toString(), executionResultId)
-			def alertTransferFilePath = "${realPath}//logs//${executionId}//${executionDevice?.id}//${executionResultId}"
-			saveAlertInfoInLogFile(executionResultId,executionId,alertTransferFilePath,startTime,endTime,realPath)
 		} catch (Exception e) {
 			e.printStackTrace()
 		}
@@ -910,7 +946,10 @@ class ExecutescriptService {
 						ExecutionResult.withTransaction {
 							executionResultList = ExecutionResult.findAllByExecutionAndExecutionDeviceAndStatusNotEqual(executionInstance,execDeviceInstance,SUCCESS_STATUS)
 						}
-
+						def isAlertEnabled = FALSE
+						if(executionInstance?.isAlertEnabled && deviceInstance?.isThunderEnabled == 1){
+							isAlertEnabled  = TRUE
+						}
 						def resultSize = executionResultList.size()
 						if(cnt == 0){
 							if(executionInstance?.scriptGroup == MULTIPLESCRIPTGROUPS){
@@ -923,7 +962,7 @@ class ExecutescriptService {
 								deviceName = MULTIPLE
 							}
 							//executionSaveStatus = executionService.saveExecutionDetails(newExecName, scriptName, deviceName, scriptGroupInstance,appUrl,"false","false","false","false",category])
-							executionSaveStatus = executionService.saveExecutionDetails(newExecName,[scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:scriptGroupInstance,appUrl:appUrl, isBenchMark:"false", isSystemDiagnostics:"false", rerun:"false", isLogReqd:"false",category:category, rerunOnFailure:FALSE,groups:executionInstance.groups])
+							executionSaveStatus = executionService.saveExecutionDetails(newExecName,[scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:scriptGroupInstance,appUrl:appUrl, isBenchMark:"false", isSystemDiagnostics:"false", rerun:"false", isLogReqd:"false",category:category, rerunOnFailure:FALSE,groups:executionInstance.groups,isAlertEnabled:isAlertEnabled])
 							cnt++
 							Execution.withTransaction{
 								rerunExecutionInstance = Execution.findByName(newExecName)
@@ -993,7 +1032,7 @@ class ExecutescriptService {
 											//aborted = executionService.abortList.contains(exeId?.toString())
 											aborted = executionService.abortList?.toString().contains(executionName?.id?.toString())
 											if(!aborted && !(deviceStatus?.toString().equals(Status.NOT_FOUND.toString()) || deviceStatus?.toString().equals(Status.HANG.toString())) && !pause){
-												htmlData = executeScript(newExecName, executionDevice, scriptInstance, deviceInstance, appUrl, filePath, realPath,"false","false",uniqueExecutionName,isMultiple,null,"false", category)
+												htmlData = executeScript(newExecName, executionDevice, scriptInstance, deviceInstance, appUrl, filePath, realPath,"false","false",uniqueExecutionName,isMultiple,null,"false", category,isAlertEnabled)
 											}else{
 												if(!aborted && (deviceStatus.equals(Status.NOT_FOUND.toString()) ||  deviceStatus.equals(Status.HANG.toString()))){
 													pause = true
@@ -1226,7 +1265,7 @@ class ExecutescriptService {
 	 * @return
 	 */
 	def executescriptsOnDevice(boolean singleScriptGroup, String execName, String device, ExecutionDevice executionDevice, def scripts, def scriptGrp,
-			def executionName, def filePath, def realPath, def groupType, def url, def isBenchMark, def isSystemDiagnostics, def rerun,def isLogReqd, def category, def repeatBackToBackCount)
+			def executionName, def filePath, def realPath, def groupType, def url, def isBenchMark, def isSystemDiagnostics, def rerun,def isLogReqd, def category, def repeatBackToBackCount, def isAlertEnabled)
 	{
 		boolean aborted = false
 		boolean pause = false
@@ -1385,7 +1424,7 @@ class ExecutescriptService {
 					executionStarted = true
 					def startExecutionTime = new Date()
 					try {
-						htmlData = executeScript(execName, executionDevice, scriptObj, deviceInstance, url, filePath, realPath, isBenchMark, isSystemDiagnostics, executionName, isMultiple,null,isLogReqd, category)
+						htmlData = executeScript(execName, executionDevice, scriptObj, deviceInstance, url, filePath, realPath, isBenchMark, isSystemDiagnostics, executionName, isMultiple,null,isLogReqd, category,isAlertEnabled)
 
 					} catch (Exception e) {
 					
@@ -1483,7 +1522,7 @@ class ExecutescriptService {
 				isMultiple = FALSE
 				def startExecutionTime = new Date()
 				try {
-					htmlData = executeScript(execName, executionDevice, script1, deviceInstance, url, filePath, realPath, isBenchMark, isSystemDiagnostics,executionName,isMultiple,null,isLogReqd, category)
+					htmlData = executeScript(execName, executionDevice, script1, deviceInstance, url, filePath, realPath, isBenchMark, isSystemDiagnostics,executionName,isMultiple,null,isLogReqd, category,isAlertEnabled)
 					
 				def exeInstance = Execution.findByName(execName)
 				if(executionService.abortList.contains(exeInstance?.id?.toString())){
@@ -1577,7 +1616,7 @@ class ExecutescriptService {
 							if(!aborted && !(devStatus.equals(Status.NOT_FOUND.toString()) || devStatus.equals(Status.HANG.toString()))){								
 							
 								try{
-									htmlData = executeScript(execName, executionDevice, script, deviceInstance, url, filePath, realPath, isBenchMark, isSystemDiagnostics,executionName,isMultiple,null,isLogReqd,category)
+									htmlData = executeScript(execName, executionDevice, script, deviceInstance, url, filePath, realPath, isBenchMark, isSystemDiagnostics,executionName,isMultiple,null,isLogReqd,category,isAlertEnabled)
 								}catch(Exception e){
 									e.printStackTrace()
 								}
@@ -1770,10 +1809,10 @@ class ExecutescriptService {
 	 * @return
 	 */
 	def executeScriptInThread(boolean singleScriptGroup, String execName, String device, ExecutionDevice executionDevice, def scripts, def scriptGrp,
-			def executionName, def filePath, def realPath, def groupType, def url, def isBenchMark, def isSystemDiagnostics, def rerun,def isLogReqd, def category, def repeatBackToBackCount){
+			def executionName, def filePath, def realPath, def groupType, def url, def isBenchMark, def isSystemDiagnostics, def rerun,def isLogReqd, def category, def repeatBackToBackCount, def isAlertEnabled){
 		Future<String> future =  executorService.submit( {
 			executescriptsOnDevice(singleScriptGroup, execName, device, executionDevice, scripts, scriptGrp,
-					executionName, filePath, realPath, groupType, url, isBenchMark, isSystemDiagnostics, rerun,isLogReqd, category, repeatBackToBackCount)} as Callable< String > )
+					executionName, filePath, realPath, groupType, url, isBenchMark, isSystemDiagnostics, rerun,isLogReqd, category, repeatBackToBackCount, isAlertEnabled)} as Callable< String > )
 		
 	}
 			
@@ -1930,8 +1969,12 @@ class ExecutescriptService {
 									def startExecutionTime = new Date()
 									// ISSUE FIX related to restart execution not happening append category at the end.
 									if(!tclScript){
-										htmlData = executeScript(exResult?.execution?.name, execDevice, script1 , executionDevice , url, filePath, realPath ,execution?.isBenchMarkEnabled.toString(), execution?.isSystemDiagnosticsEnabled?.toString(),exResult?.execution?.name,isMultiple,exResult,execution?.isStbLogRequired, scriptFile?.category?.toString())
-									}else{	// For TCL script execution																		
+										String isAlertEnabled = FALSE
+										if(execution?.isAlertEnabled && executionDevice?.isThunderEnabled == 1){
+											isAlertEnabled  = TRUE
+										}
+										htmlData = executeScript(exResult?.execution?.name, execDevice, script1 , executionDevice , url, filePath, realPath ,execution?.isBenchMarkEnabled.toString(), execution?.isSystemDiagnosticsEnabled?.toString(),exResult?.execution?.name,isMultiple,exResult,execution?.isStbLogRequired, scriptFile?.category?.toString(),isAlertEnabled)
+									}else{	// For TCL script execution
 										htmlData = tclExecutionService?.executeScript(exResult?.execution?.name, execDevice, scriptFile , executionDevice , url, filePath, realPath ,execution?.isBenchMarkEnabled.toString(), execution?.isSystemDiagnosticsEnabled?.toString(),exResult?.execution?.name,isMultiple?.toString(),exResult,execution?.isStbLogRequired, execution?.category,combinedScript)
 										
 									}
@@ -2082,6 +2125,7 @@ class ExecutescriptService {
 		def isSystemDiagnostics = execution.isSystemDiagnosticsEnabled ? "true" : "false"
 		def isLogReqd = execution.isStbLogRequired ? "true" : "false"
 		def rerun = execution.isRerunRequired ? "true" : "false"
+		def isAlertEnabled = execution.isAlertEnabled ? "true" : "false"
 		def htmlData
 		int scriptCnt
 		def scriptGroupInstance 
@@ -2106,7 +2150,7 @@ class ExecutescriptService {
 
 		boolean executionSaveStatus 
 		
-			executionSaveStatus = saveRepeatExecutionDetails(execName, "", deviceName, scriptGroupInstance,url,isBenchMark,isSystemDiagnostics,rerun,groups,scriptCnt,isLogReqd)
+			executionSaveStatus = saveRepeatExecutionDetails(execName, "", deviceName, scriptGroupInstance,url,isBenchMark,isSystemDiagnostics,rerun,groups,scriptCnt,isLogReqd,isAlertEnabled)
 		
 		def executionDevice
 		if(executionSaveStatus){
@@ -2132,7 +2176,7 @@ class ExecutescriptService {
 			executionService.executeVersionTransferScript(realPath,filePath,execName, executionDevice?.id, deviceInstance?.stbName, deviceInstance?.logTransferPort,url)
 			try {
 				htmlData = repeatExecutionOnDevice(execName,deviceID , executionDevice, "", scriptGroupInstance?.id, execName,
-					filePath, realPath, TEST_SUITE, url, isBenchMark, isSystemDiagnostics, rerun,isLogReqd)
+					filePath, realPath, TEST_SUITE, url, isBenchMark, isSystemDiagnostics, rerun,isLogReqd,isAlertEnabled)
 
 			} catch (Exception e) {
 				e.printStackTrace()
@@ -2150,7 +2194,7 @@ class ExecutescriptService {
 	 * Method to save the repeat execution details
 	 */
 	public boolean saveRepeatExecutionDetails(final String execName, String scriptName, String deviceName,
-		ScriptGroup scriptGroupInstance , String appUrl,String isBenchMark , String isSystemDiagnostics,String rerun,Groups groups, int scriptCnt, String isLogReqd){
+		ScriptGroup scriptGroupInstance , String appUrl,String isBenchMark , String isSystemDiagnostics,String rerun,Groups groups, int scriptCnt, String isLogReqd, String isAlertEnabled){
 		   def executionSaveStatus = true
 		   try {
 			   Execution.withTransaction {
@@ -2169,6 +2213,7 @@ class ExecutescriptService {
 			   execution.isBenchMarkEnabled = isBenchMark?.equals("true")
 			   execution.isSystemDiagnosticsEnabled = isSystemDiagnostics?.equals("true")
 			   execution.isStbLogRequired = isLogReqd?.equals("true")
+			   execution.isAlertEnabled = isAlertEnabled?.equals("true")
 			   if(! execution.save(flush:true)) {
 				   executionSaveStatus = false
 			   }
@@ -2187,7 +2232,7 @@ class ExecutescriptService {
 	 * @return
 	 */
 	def repeatExecutionOnDevice(String execName, String device, ExecutionDevice executionDevice, def scripts, def scriptGrp,
-			def executionName, def filePath, def realPath, def groupType, def url, def isBenchMark, def isSystemDiagnostics, def rerun, def isLogReqd)
+			def executionName, def filePath, def realPath, def groupType, def url, def isBenchMark, def isSystemDiagnostics, def rerun, def isLogReqd, def isAlertEnabled)
 	{
 		boolean aborted = false
 		boolean pause = false
@@ -2308,7 +2353,7 @@ class ExecutescriptService {
 				if(!aborted && !devStatus.equals(Status.NOT_FOUND.toString()) && !pause){
 					def startExecutionTime = new Date()
 					executionStarted = true
-					htmlData = executeScript(execName, executionDevice, scriptObj, deviceInstance, url, filePath, realPath, isBenchMark, isSystemDiagnostics, executionName, isMultiple,null,isLogReqd,scriptObj?.category)
+					htmlData = executeScript(execName, executionDevice, scriptObj, deviceInstance, url, filePath, realPath, isBenchMark, isSystemDiagnostics, executionName, isMultiple,null,isLogReqd,scriptObj?.category,isAlertEnabled)
 					output.append(htmlData)
 					Thread.sleep(6000)
 					def endExecutionTime = new Date()
@@ -2893,6 +2938,40 @@ class ExecutescriptService {
 		return alertList
 	}
 	
+	/**
+	 * Function to write the alerts to the execution output file to be displayed in TM ui
+	 * @param opFile
+	 * @param alertList
+	 * @return
+	 */
+	def writeToOutputFile(File opFile,List alertList){
+		try {
+			boolean append = true
+			boolean failureAlertCheck = false
+			FileWriter fileWriter = new FileWriter(opFile, append)
+			BufferedWriter buffWriter = new BufferedWriter(fileWriter)
+			buffWriter.write("Checking for Grafana alerts" + HTML_BR);
+			buffWriter.write("********** Alerts From GRAFANA **************" + HTML_BR);
+			if(!alertList?.isEmpty()){
+				alertList?.each { alert ->
+					buffWriter.write(alert?.toString() + HTML_BR )
+					if(alert?.get("state")?.equals("alerting")){
+						failureAlertCheck =  true
+					}
+				}
+			}else{
+				buffWriter.write("No Alerts Received" + HTML_BR);
+			}
+			if(failureAlertCheck){
+				buffWriter.write("Since valid alerts(state:alerting) are received from Grafana, test step for checking alerts is made as FAILURE" + HTML_BR);
+			}
+			buffWriter.write(HTML_BR);
+			buffWriter.flush()
+			buffWriter.close()
+		} catch(Exception ex) {
+			ex.printStackTrace();
+		}
+	}
 	/*def initiateLogTransfer(String executionName, String server, String logAppName, Device device){
 				int count = 3
 				boolean logTransferInitiated = false

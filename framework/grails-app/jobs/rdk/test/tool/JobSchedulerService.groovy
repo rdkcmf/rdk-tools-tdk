@@ -331,6 +331,7 @@ class JobSchedulerService implements Job{
 										execution.isSystemDiagnosticsEnabled = jobDetails?.isSystemDiagnostics?.equals("true")
 										execution.isStbLogRequired= jobDetails.isStbLogRequired?.equals("true")
 										execution.rerunOnFailure = jobDetails.rerunOnFailure?.equals("true")
+										execution.isAlertEnabled = jobDetails.isAlertEnabled?.equals("true")
 										execution.category = category
 										execution.scriptCount = scriptCnt
 										if(! execution.save(flush:true)) {
@@ -552,7 +553,7 @@ class JobSchedulerService implements Job{
 											
 											def startExecutionTime = new Date()
 											if(category != Category.RDKB_TCL) {
-												htmlData = executeScript(execName, executionDevice, scriptObj , deviceInstance , url, filePath, realpath, jobDetails?.isBenchMark,jobDetails?.isSystemDiagnostics,jobDetails?.isStbLogRequired,executionName,isMultiple, category)
+												htmlData = executeScript(execName, executionDevice, scriptObj , deviceInstance , url, filePath, realpath, jobDetails?.isBenchMark,jobDetails?.isSystemDiagnostics,jobDetails?.isStbLogRequired,executionName,isMultiple, category,jobDetails?.isAlertEnabled)
 											}
 											else{
 												def combainedTcl = [:]
@@ -663,7 +664,7 @@ class JobSchedulerService implements Job{
 										if(category != Category.RDKB_TCL){
 											def moduleName= ScriptService.scriptMapping.get(scripts)
 											scriptInstance = getScript(realpath,moduleName, scripts, category)
-											htmlData = executeScript(execName, executionDevice, scriptInstance , deviceInstance , url, filePath, realpath, jobDetails?.isBenchMark, jobDetails?.isSystemDiagnostics,jobDetails?.isStbLogRequired,executionName,isMultiple, catgory)
+											htmlData = executeScript(execName, executionDevice, scriptInstance , deviceInstance , url, filePath, realpath, jobDetails?.isBenchMark, jobDetails?.isSystemDiagnostics,jobDetails?.isStbLogRequired,executionName,isMultiple, catgory,jobDetails?.isAlertEnabled)
 
 										}
 										else{
@@ -844,7 +845,7 @@ class JobSchedulerService implements Job{
 											if(!aborted && !(deviceStatus.equals(Status.NOT_FOUND.toString()) || deviceStatus.equals(Status.HANG.toString()))){
 												def scpt = ScriptFile.findByScriptName(script.name?script.name:script.scriptName)
 												if(scpt?.category != Category.RDKB_TCL && jobDetails?.category != Category.RDKB_TCL ){
-													htmlData = executeScript(execName, executionDevice, script , deviceInstance , url, filePath, realpath, jobDetails?.isBenchMark, jobDetails?.isSystemDiagnostics,jobDetails?.isStbLogRequired, executionName,isMultiple, scpt?.category)
+													htmlData = executeScript(execName, executionDevice, script , deviceInstance , url, filePath, realpath, jobDetails?.isBenchMark, jobDetails?.isSystemDiagnostics,jobDetails?.isStbLogRequired, executionName,isMultiple, scpt?.category,jobDetails?.isAlertEnabled)
 												}
 												else{
 													def combinedTcl  = [:]
@@ -976,6 +977,7 @@ class JobSchedulerService implements Job{
 								execution1.isSystemDiagnosticsEnabled = jobDetails?.isSystemDiagnostics?.equals(TRUE)
 								execution1.isStbLogRequired= jobDetails.isStbLogRequired?.equals(TRUE)
 								execution1.rerunOnFailure = jobDetails.rerunOnFailure?.equals(TRUE)
+								execution1.isAlertEnabled= jobDetails.isAlertEnabled?.equals(TRUE)
 								//	execution1.outputData = "Execution failed due to the unavailability of box"
 								execution1.outputData = outData
 								execution1.category = category
@@ -1001,7 +1003,7 @@ class JobSchedulerService implements Job{
 				def executionDeviceObj = ExecutionDevice.findAllByExecutionAndStatusNotEqual(executionObj, SUCCESS_STATUS)
 				if(!abortedExecution && !pause && (executionDeviceObj.size() > 0 ) && (jobDetails?.rerun?.toString()?.equals("true"))){
 					try{
-						htmlData = reRunOnFailure(realpath?.toString(),filePath?.toString(),url?.toString(),execName?.toString(),executionName?.toString(),jobDetails?.isBenchMark?.toString(), jobDetails?.isSystemDiagnostics?.toString(),jobDetails?.isStbLogRequired?.toString(), jobDetails?.rerunOnFailure?.toString(),jobDetails.rerun?.toString(), jobDetails?.groups)
+						htmlData = reRunOnFailure(realpath?.toString(),filePath?.toString(),url?.toString(),execName?.toString(),executionName?.toString(),jobDetails?.isBenchMark?.toString(), jobDetails?.isSystemDiagnostics?.toString(),jobDetails?.isStbLogRequired?.toString(), jobDetails?.rerunOnFailure?.toString(),jobDetails.rerun?.toString(), jobDetails?.groups,jobDetails?.isAlertEnabled?.toString())
 					}catch(Exception e){
 						println e.getMessage()
 						e.printStackTrace()
@@ -1064,7 +1066,7 @@ class JobSchedulerService implements Job{
 	 * @return
 	 */
 	def reRunOnFailure(final String realPath, final String filePath, String url, final String execName,final String uniqueExecutionName,
-			final String isBenchMark, final String isSystemDiagnostics,final String islogReqd, final String rerunOnFailure, final String rerun, final def groups){
+			final String isBenchMark, final String isSystemDiagnostics,final String islogReqd, final String rerunOnFailure, final String rerun, final def groups,final String isAlertEnabled){
 		try{
 			boolean pause= false
 			List pendingScripts =[]
@@ -1143,6 +1145,7 @@ class JobSchedulerService implements Job{
 									execution.isSystemDiagnosticsEnabled = isSystemDiagnostics?.equals(TRUE)
 									execution.isBenchMarkEnabled = isBenchMark?.equals(TRUE)
 									execution.isStbLogRequired = islogReqd?.equals(TRUE)
+									execution.isAlertEnabled = isAlertEnabled?.equals(TRUE)
 									execution?.rerunOnFailure = rerunOnFailure?.equals(TRUE)
 									execution.isRerunRequired = "false"
 									execution.scriptCount = scriptCnt
@@ -1259,7 +1262,7 @@ class JobSchedulerService implements Job{
 									if(!aborted && !(deviceStatus?.toString().equals(Status.NOT_FOUND.toString()) || deviceStatus?.toString().equals(Status.HANG.toString())) && !pause){
 										if(!tclScript){
 
-											htmlData = executeScript(newExecName, executionDevice, scriptInstance, deviceInstance, url, filePath, realPath,isBenchMark,isSystemDiagnostics,islogReqd,uniqueExecutionName,isMultiple,executionResult.category?.toString() )
+											htmlData = executeScript(newExecName, executionDevice, scriptInstance, deviceInstance, url, filePath, realPath,isBenchMark,isSystemDiagnostics,islogReqd,uniqueExecutionName,isMultiple,executionResult.category?.toString(),isAlertEnabled )
 										}else {
 											htmlData = executeTclScript(newExecName, executionDevice, scriptFile, deviceInstance, url, filePath, realPath,isBenchMark,isSystemDiagnostics,islogReqd,uniqueExecutionName,isMultiple,executionResult.category, combinedScript )
 
@@ -1502,7 +1505,7 @@ class JobSchedulerService implements Job{
 	 */
 
 	def String executeScript(final String executionName, final ExecutionDevice executionDevice, final def scriptInstance,
-			final Device deviceInstance, final String url, final String filePath, final String realPath, final String isBenchMark, final String isSystemDiagnostics,final String isLogReqd,final String uniqueExecutionName,final String isMultiple, def category) {
+			final Device deviceInstance, final String url, final String filePath, final String realPath, final String isBenchMark, final String isSystemDiagnostics,final String isLogReqd,final String uniqueExecutionName,final String isMultiple, def category,final String isAlertEnabled) {
 		String htmlData = ""
 		Date startTime = new Date()
 		String scriptData = convertScriptFromHTMLToPython(scriptInstance.scriptContent)
@@ -1621,6 +1624,41 @@ class JobSchedulerService implements Job{
 		String timeDiff =  String.valueOf(timeDifference)
 		def resultArray = Execution.executeQuery("select a.executionTime from Execution a where a.name = :exName",[exName: executionName])
 		String singleScriptExecTime = timeDifference
+		
+		List alertList = []
+		boolean failureAlertCheck = false
+		Date toDate = new Date()
+		if(isAlertEnabled?.equals(TRUE)){
+			try{
+				String moduleName = scriptInstance?.primitiveTest?.module?.name
+				if(!moduleName?.equals("rdkv_profiling")){
+					alertList = fetchAlertData(startTime,toDate,deviceInstance?.serialNo,realPath)
+					
+					htmlData += ("Checking for Grafana alerts" + HTML_BR )
+					String grafanaPrint = "********** Alerts From GRAFANA **************"
+					htmlData += (grafanaPrint + HTML_BR )
+					if(!alertList?.isEmpty()){
+						alertList?.each { alert ->
+							htmlData += (alert?.toString() + HTML_BR )
+							if(alert?.get("state")?.equals("alerting")){
+								failureAlertCheck =  true
+							}
+						}
+					}else{
+						htmlData += ("No Alerts Received" + HTML_BR )
+					}
+					if(failureAlertCheck){
+						updateAlertExecutionResults(executionResultId,executionId,executionDevice?.id)
+						htmlData += ("Since valid alerts(state:alerting) are received from Grafana, test step for checking alerts is made as FAILURE" + HTML_BR )
+					}
+				}
+			}catch (Exception e) {
+				e.printStackTrace()
+			}
+		}
+		def alertTransferFilePath = "${realPath}//logs//${executionId}//${executionDevice?.id}//${executionResultId}"
+		saveAlertInfoInLogFile(executionResultId,executionId,alertTransferFilePath,startTime,toDate,realPath)
+		
 		try
 		{
 			def cumulativeTime
@@ -3871,5 +3909,150 @@ class JobSchedulerService implements Job{
 		   }
 		   return output
 	   }
-
+	   
+	   /**
+		* Fetch the list of alerts received for a device between the timeframe
+		* @param fromDate
+		* @param toDate
+		* @param macAddress
+		* @param realPath
+		* @return
+		*/
+	   def fetchAlertData(Date fromDate,Date toDate,String macAddress,String realPath){
+		   if(macAddress?.contains(":")){
+			   macAddress = macAddress?.replace(":","")
+		   }
+		   if(macAddress?.contains("_")){
+			   macAddress = macAddress?.replace("_","")
+		   }
+		   macAddress = macAddress?.toUpperCase()
+		   List alertList = []
+		   DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		   SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		   List allDates = new ArrayList();
+		   Date fromDateTemp = fromDate
+		   while( fromDateTemp.before(toDate) ){
+			  allDates.add( fromDateTemp );
+			  fromDateTemp = new Date(fromDateTemp.getTime() + (1000 * 60 * 60 * 24));
+		   }
+		   for (int day = 0; day < allDates.size(); day++){
+			   String currentDate = format.format(allDates[day])
+			   File file = new File("${realPath}/logs/grafanaAlerts/"+currentDate+"_alertData.json");
+			   if(file?.exists()){
+				   try{
+					   def content = file.readLines();
+					   for (int i = 0; i < content.size(); i++){
+						   def eachLineContent = content[i]
+						   if(eachLineContent != null && !eachLineContent?.isEmpty()){
+							   JSONObject jsonObj = new JSONObject(eachLineContent);
+							   def system_time
+							   if(jsonObj.has('system_time')){
+								   system_time = jsonObj.get('system_time')
+							   }
+							   Date systemDate = dateFormat.parse(system_time);
+							   if((systemDate.before(toDate) && (systemDate.after(fromDate)))){
+								   Map alertMap = [:]
+								   if(jsonObj.has('alert_json')){
+									   JSONObject alertJson = jsonObj.get('alert_json')
+									   if(alertJson.has('dashboardId')){
+										   def evalMatches = alertJson.get('evalMatches')
+										   def ruleName = alertJson.get('ruleName')
+										   def ruleId = alertJson.get('ruleId')
+										   def state = alertJson.get('state')
+										   JSONObject evalMatchJson = evalMatches[0]
+										   if(evalMatchJson?.has('metric')){
+											   String metric = evalMatchJson.get('metric')
+											   def metricList = metric?.split("\\.")
+											   String macAddressFromLog = metricList[1]
+											   macAddressFromLog = macAddressFromLog?.toUpperCase()
+											   if(macAddressFromLog?.equals(macAddress)){
+												   alertMap.put('system_time',system_time)
+												   alertMap.put('ruleName',ruleName)
+												   alertMap.put('ruleId',ruleId)
+												   alertMap.put('state',state)
+												   if(state?.equals('alerting')){
+													   def value = evalMatchJson.get('value')
+													   alertMap.put('value',value)
+												   }
+												   alertMap.put('macAddress',macAddressFromLog)
+												   def secondOccuranceIndex = metric?.indexOf(".", metric?.indexOf(".") + 1)
+												   def metricFromJson = metric?.substring(secondOccuranceIndex + 1, metric?.length());
+												   alertMap.put('metric',metricFromJson)
+												   if(alertJson?.has('threshold')){
+													   def threshold = alertJson.get('threshold')
+													   alertMap.put('threshold',threshold)
+												   }
+											   }
+										   }
+									   }
+								   }
+								   if(!alertMap?.isEmpty()){
+									   alertList.add(alertMap)
+								   }
+							   }
+						   }
+					   }
+				   }catch(Exception ex){
+					   ex.printStackTrace();
+				   }
+			   }
+		   }
+		   return alertList
+	   }
+	   
+	   /**
+	    * Function to update the execution, executionDevice, executionResult as FAILURE if valid alerts are received
+	    * @param executionResultId
+	    * @param executionId
+	    * @param executionDeviceId
+	    */
+	   public void updateAlertExecutionResults(final long executionResultId, final long executionId, final long executionDeviceId){
+		   ExecutionResult.executeUpdate("update ExecutionResult c set c.status = :newStatus where c.id = :execResId",
+				   [newStatus: "FAILURE", execResId: executionResultId])
+		   Execution.executeUpdate("update Execution c set c.result = :result where c.id = :execId",
+				   [result: "FAILURE", execId: executionId.toLong()])
+		   ExecutionDevice.executeUpdate("update ExecutionDevice c set c.status = :newStat where c.id = :execDevId",
+				   [newStat: "FAILURE", execDevId: executionDeviceId.toLong()])
+		   
+	   }
+	   
+	   /**
+		* Function to save alert received inside log file after each script execution
+		* @param executionResultId
+		* @param execId
+		* @param logTransferFilePath
+		* @param startTime
+		* @param endTime
+		* @param realPath
+		* @return
+		*/
+	   def saveAlertInfoInLogFile(final long executionResultId,final long execId,String logTransferFilePath,Date startTime,Date endTime,String realPath){
+		   try{
+			   ExecutionResult executionResult = ExecutionResult.findById(executionResultId)
+			   if(executionResult){
+				   def device = Device.findByStbName(executionResult?.device)
+				   String macAddress = ""
+				   if(device){
+					   macAddress = device?.serialNo
+				   }
+				   List alertListFromService = fetchAlertData(startTime,endTime,macAddress,realPath)
+				   if(!alertListFromService?.isEmpty()){
+					   new File(logTransferFilePath?.toString()).mkdirs()
+					   FileWriter file = new FileWriter(logTransferFilePath+"//"+execId+"_alertData.json",true)
+					   BufferedWriter buffWriter = new BufferedWriter(file)
+					   for(int i = 0;i < alertListFromService?.size();i++){
+						   def dataValue = alertListFromService[i]
+						   JSONObject dataJsonObject = new JSONObject(dataValue);
+						   buffWriter.write(dataJsonObject?.toString());
+						   buffWriter.write(NEW_LINE);
+					   }
+					   buffWriter.flush()
+					   buffWriter.close()
+					   file.close();
+				   }
+			   }
+		   }catch (Exception e) {
+			   e.printStackTrace()
+		   }
+	   }
 }

@@ -34,6 +34,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.codehaus.groovy.grails.web.json.JSONArray
 import org.custommonkey.xmlunit.*
 import org.quartz.JobBuilder
 import org.quartz.JobDetail
@@ -281,7 +282,6 @@ class ExecutionController {
 	 * @return
 	 */
 	def scheduleOneOff() {
-
 		String cronschedule
 		String startDateString = (params?.startdate).toString()
 		String endDateString = (params?.enddate).toString()
@@ -393,6 +393,7 @@ class ExecutionController {
 				jobDetails.rerun = params?.rerun
 				jobDetails.repeatCount = repeatCount
 				jobDetails.rerunOnFailure= FALSE
+				jobDetails.isAlertEnabled= params?.isAlertEnabled
 				jobDetails.groups = utilityService.getGroup()
 				jobDetails.category = Utility.getCategory(params?.category)
 				if(!jobDetails.save(flush:true)){
@@ -414,7 +415,6 @@ class ExecutionController {
 	 * @return
 	 */
 	def showSchedular(Integer max){
-
 		params.max = Math.min(max ?: 10, 100)
 		def repeatCount = (params?.repeatId)
 		def rerun = params?.rerun
@@ -437,7 +437,7 @@ class ExecutionController {
 		}
 		[scripts : params?.scripts, devices : params?.devices, device : params?.deviceId, scriptGroup : params?.scriptGroup, jobDetailList : JobDetails.list(),
 			jobInstanceTotal : JobDetails.count(), isSystemDiagnostics : params?.systemDiagnostics, isBenchMark : params?.benchMarking, rerun : rerun,
-			repeatCount : repeatCount,isStbLogRequired : params?.isLogReqd, category : params?.category]
+			repeatCount : repeatCount,isStbLogRequired : params?.isLogReqd, category : params?.category, isAlertEnabled: params?.isAlertChecked]
 	}
 
 	/**
@@ -674,7 +674,7 @@ class ExecutionController {
 	 * @param suiteName
 	 * @return
 	 */
-	def thirdPartyTest(final String stbName, final String boxType, final String imageName, final String suiteName, final String test_request, final String callbackUrl, final String timeInfo,final String  performance, final String isLogReqd, final String reRunOnFailure ){
+	def thirdPartyTest(final String stbName, final String boxType, final String imageName, final String suiteName, final String test_request, final String callbackUrl, final String timeInfo,final String  performance, final String isLogReqd, final String reRunOnFailure , final String isAlert){
 		JsonObject jsonOutData = new JsonObject()
 		try {
 			String htmlData = ""
@@ -684,6 +684,7 @@ class ExecutionController {
 			def isBenchMark1 = FALSE
 			def isSystemDiagnostics1 = FALSE
 			def isLogReqd1 = FALSE
+			def isAlertEnabled = FALSE
 			def rerun1 = FALSE
 			def deviceInstanceIsThunder = Device.findByStbName(stbName)
 			if(deviceInstanceIsThunder?.isThunderEnabled != 1){
@@ -700,6 +701,9 @@ class ExecutionController {
 			if(isLogReqd != null ){
 				isLogReqd1  = isLogReqd
 
+			}
+			if(isAlert != null && deviceInstanceIsThunder?.isThunderEnabled == 1){
+				isAlertEnabled  = isAlert
 			}
 			String filePath = "${request.getRealPath('/')}//fileStore"
 			if(test_request && deviceInstanceIsThunder?.isThunderEnabled != 1){
@@ -821,10 +825,10 @@ class ExecutionController {
 												//executionSaveStatus = executionService.saveExecutionDetails(execName, scriptname, deviceName, scriptGroup,url,isBenchMark1,isSystemDiagnostics1,rerun1,isLogReqd1)
 												if(deviceInstance?.isThunderEnabled != 1){
 													executionSaveStatus = executionService.saveExecutionDetails(execName,[scriptName:scriptname, deviceName:deviceName, scriptGroupInstance:scriptGroup,
-														appUrl:url, isBenchMark:isBenchMark1, isSystemDiagnostics:isSystemDiagnostics1, rerun:rerun1, isLogReqd:isLogReqd1,category:category.toString(), rerunOnFailure:FALSE  ])
+														appUrl:url, isBenchMark:isBenchMark1, isSystemDiagnostics:isSystemDiagnostics1, rerun:rerun1, isLogReqd:isLogReqd1,category:category.toString(), rerunOnFailure:FALSE , isAlertEnabled:FALSE ])
 												}else{
 												    executionSaveStatus = executionService.saveExecutionDetails(execName,[scriptName:scriptname, deviceName:deviceName, scriptGroupInstance:scriptGroup,
-													    appUrl:url, isBenchMark:isBenchMark1, isSystemDiagnostics:isSystemDiagnostics1, rerun:rerun1, isLogReqd:isLogReqd1,category:Category.RDKV.toString(), rerunOnFailure:FALSE  ])
+													    appUrl:url, isBenchMark:isBenchMark1, isSystemDiagnostics:isSystemDiagnostics1, rerun:rerun1, isLogReqd:isLogReqd1,category:Category.RDKV.toString(), rerunOnFailure:FALSE ,isAlertEnabled:isAlertEnabled ])
 												}
 												//
 												//	executionSaveStatus = scriptexecutionService.saveExecutionDetails(execName, scriptname, deviceName, scriptGroup,url, category)
@@ -861,9 +865,9 @@ class ExecutionController {
 													}
 													else{
 														if(deviceInstance?.isThunderEnabled != 1){
-															scriptexecutionService.executeScriptGroup(scriptGroup, boxType, execName, executionDevice?.id.toString(), deviceInstance, url, filePath, getRealPathString, callbackUrl, imageName, isBenchMark1,isSystemDiagnostics1,rerun,isLogReqd1, category?.toString())
+															scriptexecutionService.executeScriptGroup(scriptGroup, boxType, execName, executionDevice?.id.toString(), deviceInstance, url, filePath, getRealPathString, callbackUrl, imageName, isBenchMark1,isSystemDiagnostics1,rerun,isLogReqd1, category?.toString(), FALSE)
 														}else{
-														    scriptexecutionService.executeScriptGroup(scriptGroup, boxType, execName, executionDevice?.id.toString(), deviceInstance, url, filePath, getRealPathString, callbackUrl, imageName, isBenchMark1,isSystemDiagnostics1,rerun,isLogReqd1, Category.RDKV.toString())
+														    scriptexecutionService.executeScriptGroup(scriptGroup, boxType, execName, executionDevice?.id.toString(), deviceInstance, url, filePath, getRealPathString, callbackUrl, imageName, isBenchMark1,isSystemDiagnostics1,rerun,isLogReqd1, Category.RDKV.toString(), isAlertEnabled)
 														}
 													}
 												}
@@ -1196,6 +1200,7 @@ class ExecutionController {
 					def isBenchMark = FALSE
 					def isSystemDiagnostics = FALSE
 					def isLogReqd = FALSE
+					def isAlertEnabled = FALSE
 					def rerun = FALSE
 					if(params?.systemDiagnostics.equals(KEY_ON) || params?.rdkCertificationDiagnosis?.equals(KEY_ON)){
 						isSystemDiagnostics = TRUE
@@ -1206,7 +1211,9 @@ class ExecutionController {
 					if(params?.rdkCertificationStbLogTransfer?.equals(KEY_ON) || params?.transferLogs?.equals(KEY_ON)){
 						isLogReqd = TRUE
 					}
-
+					if(params?.rdkProfilingAlertCheckBox?.equals(KEY_ON)){
+						isAlertEnabled = TRUE
+					}
 					if(params?.rerun.equals(KEY_ON)){
 						rerun = TRUE
 					}
@@ -1393,14 +1400,14 @@ class ExecutionController {
 											// Test case count include in the multiple scripts executions
 											if(scriptName.equals(MULTIPLESCRIPT)){
 												def  scriptCount = paramsScripts?.size()
-												executionSaveStatus = executionService.saveExecutionDetailsOnMultipleScripts(execName, scriptName, deviceName, scriptGroupInstance,url,isBenchMark,isSystemDiagnostics,rerun,isLogReqd,scriptCount, params?.category,rerunOnFailure)
+												executionSaveStatus = executionService.saveExecutionDetailsOnMultipleScripts(execName, scriptName, deviceName, scriptGroupInstance,url,isBenchMark,isSystemDiagnostics,rerun,isLogReqd,scriptCount, params?.category,rerunOnFailure,isAlertEnabled)
 											}else if(scriptName.equals(MULTIPLESCRIPTGROUPS)){
 												executionSaveStatus = executionService.saveExecutionDetailsOnMultipleScriptgroups(execName,[scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:scriptGroupInstance,
-													appUrl:url, isBenchMark:isBenchMark, isSystemDiagnostics:isSystemDiagnostics, rerun:rerun, isLogReqd:isLogReqd,category:params?.category , rerunOnFailure:rerunOnFailure, scriptCount:scriptCountMultipleSuite])
+													appUrl:url, isBenchMark:isBenchMark, isSystemDiagnostics:isSystemDiagnostics, rerun:rerun, isLogReqd:isLogReqd,category:params?.category , rerunOnFailure:rerunOnFailure, scriptCount:scriptCountMultipleSuite, isAlertEnabled:isAlertEnabled])
 											}else{
 												//executionSaveStatus = executionService.saveExecutionDetails(execName, scriptName, deviceName, scriptGroupInstance,url,isBenchMark,isSystemDiagnostics,rerun,isLogReqd)
 												executionSaveStatus = executionService.saveExecutionDetails(execName,[scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:scriptGroupInstance,
-													appUrl:url, isBenchMark:isBenchMark, isSystemDiagnostics:isSystemDiagnostics, rerun:rerun, isLogReqd:isLogReqd,category:params?.category , rerunOnFailure:rerunOnFailure])
+													appUrl:url, isBenchMark:isBenchMark, isSystemDiagnostics:isSystemDiagnostics, rerun:rerun, isLogReqd:isLogReqd,category:params?.category , rerunOnFailure:rerunOnFailure,isAlertEnabled:isAlertEnabled])
 											}
 
 											//	executionSaveStatus = executionService.saveExecutionDetails(execName, [scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:scriptGroupInstance, url : url, isBenchMark : isBenchMark, isSystemDiagnostics: isSystemDiagnostics,, rerun : rerun, isLogReqd:isLogReqd, category: params?.category])
@@ -1449,14 +1456,14 @@ class ExecutionController {
 											}
 											if(deviceList.size() > 1){
 												    executescriptService.executeScriptInThread(singleScriptGroup, execName, device, executionDevice, paramsScripts, paramsScriptGrp, executionName,
-														filePath, getRealPath(), scriptType, url, isBenchMark, isSystemDiagnostics, params?.rerun,isLogReqd, params?.category, repeatBackToBackCount)
+														filePath, getRealPath(), scriptType, url, isBenchMark, isSystemDiagnostics, params?.rerun,isLogReqd, params?.category, repeatBackToBackCount,isAlertEnabled)
 												    htmlData=" <br> " + deviceName+"  :   Execution triggered "
 												    output.append(htmlData)
 
 
 											}else{
 												    htmlData = executescriptService.executescriptsOnDevice(singleScriptGroup, execName, device, executionDevice, paramsScripts, paramsScriptGrp, executionName,
-														filePath, getRealPath(), scriptType, url, isBenchMark, isSystemDiagnostics, params?.rerun,isLogReqd, params?.category, repeatBackToBackCount)
+														filePath, getRealPath(), scriptType, url, isBenchMark, isSystemDiagnostics, params?.rerun,isLogReqd, params?.category, repeatBackToBackCount,isAlertEnabled)
 												    output.append(htmlData)
 												    Execution exe = Execution.findByName(execName)
 												    if(exe){
@@ -1545,6 +1552,7 @@ class ExecutionController {
 												execution.isBenchMarkEnabled = isBenchMark?.equals(TRUE)
 												execution.isSystemDiagnosticsEnabled = isSystemDiagnostics?.equals(TRUE)
 												execution.isStbLogRequired = isLogReqd?.equals(TRUE)
+												execution.isAlertEnabled = isAlertEnabled?.equals(TRUE)
 												execution.rerunOnFailure = rerunOnFailure?.equals(TRUE)
 												execution.outputData = "Execution failed due to the unavailability of box"
 												if(! execution.save(flush:true)) {
@@ -2084,12 +2092,11 @@ class ExecutionController {
 		try {
 			Execution.withTransaction{
 				Execution execution = Execution.findById(execId)
-
 				if(execution && !(execution?.result?.equals( FAILURE_STATUS ))){
 					execution?.result = statusData?.toUpperCase().trim()
 					execution?.save(flush:true)
 				}
-
+				
 				ExecutionDevice execDeviceInstance = ExecutionDevice.findByExecutionAndId(execution,execDevice)
 				if(execDeviceInstance && !(execDeviceInstance?.status.equals( FAILURE_STATUS ))){
 					execDeviceInstance?.status = statusData?.toUpperCase().trim()
@@ -3303,7 +3310,7 @@ class ExecutionController {
 	 * @return - Return JSON with status of REST call
 	 */
 
-	def thirdPartySingleTestExecution(final String stbName, final String boxType, final String scriptName , final String executionCount, final String reRunOnFailure, final String timeInfo,final String performance,final String isLogRequired){
+	def thirdPartySingleTestExecution(final String stbName, final String boxType, final String scriptName , final String executionCount, final String reRunOnFailure, final String timeInfo,final String performance,final String isLogRequired, final String isAlert){
 		int exeCount = 1
 		if(executionCount ){
 			try {
@@ -3333,9 +3340,13 @@ class ExecutionController {
 			isLog = TRUE
 		}
 		
+		String isAlertEnabled = FALSE
+		if(isAlert && isAlert?.equals(TRUE)){
+			isAlertEnabled = TRUE
+		}
 		def deviceInstance = Device.findByStbName(stbName)
 		if(deviceInstance && deviceInstance?.isThunderEnabled == 1){
-			singleTestRestExecutionRdkService(stbName,boxType,scriptName,exeCount,rerun,isLog)
+			singleTestRestExecutionRdkService(stbName,boxType,scriptName,exeCount,rerun,isLog,isAlertEnabled)
 		}else{
 			singleTestRestExecution(stbName,boxType,scriptName,exeCount,rerun,time,perfo,isLog)
 		}
@@ -3486,7 +3497,7 @@ class ExecutionController {
 						//									executionSaveStatus = scriptexecutionService.saveExecutionDetails(execName, scriptName, deviceName, null,url)
 						//executionSaveStatus =  executionService.saveExecutionDetails(execName, scriptName, deviceName, null,url,timeInfo,performance,reRunOnFailure,FALSE)
 						executionSaveStatus =  executionService.saveExecutionDetails(execName,[scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:null,
-							appUrl:url, isBenchMark:timeInfo, isSystemDiagnostics:performance, rerun:reRunOnFailure, isLogReqd:FALSE,category:category?.toString(),rerunOnFailure:FALSE])
+							appUrl:url, isBenchMark:timeInfo, isSystemDiagnostics:performance, rerun:reRunOnFailure, isLogReqd:FALSE,category:category?.toString(),rerunOnFailure:FALSE,isAlertEnabled:FALSE])
 					} catch (Exception e) {
 						executionSaveStatus = false
 					}
@@ -3516,7 +3527,7 @@ class ExecutionController {
 								}else{
 									if(!TCL ){
 										htmlData = executescriptService.executeScriptInThread(true,execName, ""+deviceInstance?.id, executionDevice, scriptName, "", execName,
-												filePath, getRealPath(), SINGLE_SCRIPT, url, timeInfo, performance, rerun,isLog,category?.toString(),1)
+												filePath, getRealPath(), SINGLE_SCRIPT, url, timeInfo, performance, rerun,isLog,category?.toString(),1,FALSE)
 
 										// The Execution is done through only one device
 										//											htmlData = executescriptService.executescriptsOnDevice(execName, ""+deviceInstance?.id, executionDevice, scriptName, "", execName,
@@ -3618,7 +3629,7 @@ class ExecutionController {
 	 * @return - Return JSON with status of REST call
 	 */
 	
-	def singleTestRestExecutionRdkService(final String stbName, final String boxType, final String scriptName , final int repeat, final String reRunOnFailure, final String isLog){
+	def singleTestRestExecutionRdkService(final String stbName, final String boxType, final String scriptName , final int repeat, final String reRunOnFailure, final String isLog,final String isAlert){
 		String timeInfo = FALSE
 		String performance = FALSE
 		def deviceInstance = Device.findByStbName(stbName)
@@ -3735,7 +3746,7 @@ class ExecutionController {
 
 					try {
 						executionSaveStatus =  executionService.saveExecutionDetails(execName,[scriptName:scriptName, deviceName:deviceName, scriptGroupInstance:null,
-							appUrl:url, isBenchMark:timeInfo, isSystemDiagnostics:performance, rerun:reRunOnFailure, isLogReqd:FALSE,category:category?.toString(),rerunOnFailure:FALSE])
+							appUrl:url, isBenchMark:timeInfo, isSystemDiagnostics:performance, rerun:reRunOnFailure, isLogReqd:FALSE,category:category?.toString(),rerunOnFailure:FALSE,isAlertEnabled:isAlert])
 					} catch (Exception e) {
 						executionSaveStatus = false
 					}
@@ -3765,7 +3776,7 @@ class ExecutionController {
 								}else{
 									if(!TCL ){
 										htmlData = executescriptService.executeScriptInThread(true,execName, ""+deviceInstance?.id, executionDevice, scriptName, "", execName,
-												filePath, getRealPath(), SINGLE_SCRIPT, url, timeInfo, performance, rerun,isLog,category?.toString(),1)
+												filePath, getRealPath(), SINGLE_SCRIPT, url, timeInfo, performance, rerun,isLog,category?.toString(),1,isAlert)
                                         executed = true
 										url = url + "/execution/thirdPartyJsonResult?execName=${execName}"
 										jsonOutData.addProperty("status", "RUNNING")
@@ -4073,6 +4084,7 @@ class ExecutionController {
 				def isBenchMark = FALSE
 				def isSystemDiagnostics = FALSE
 				def isLogReqd = FALSE
+				String isAlertEnabled = FALSE
 				def rerun = FALSE
 				boolean aborted = false
 				def scriptGroupInstance
@@ -4084,6 +4096,11 @@ class ExecutionController {
 				}
 				if(executionInstance?.isStbLogRequired){
 					isLogReqd = TRUE
+				}
+				if(executionInstance?.isAlertEnabled){
+					if(deviceInstance?.isThunderEnabled == 1){
+						isAlertEnabled = TRUE
+					}
 				}
 				String url = getApplicationUrl()
 				String filePath = "${request.getRealPath('/')}//fileStore"
@@ -4152,15 +4169,15 @@ class ExecutionController {
 							//For multiple script execution
 							//saveExecutionDetails = executionService.saveExecutionDetailsOnMultipleScripts(execName?.toString(), MULTIPLESCRIPT, deviceInstance?.toString(), scriptGroupInstance,url?.toString(),isBenchMark?.toString(),isSystemDiagnostics?.toString(),rerun?.toString(),isLogReqd?.toString(),scriptCount,)
 							saveExecutionDetails= executionService.saveExecutionDetails(execName?.toString(),[scriptName:MULTIPLESCRIPT, deviceName:deviceInstance?.toString(), scriptGroupInstance:scriptGroupInstance,
-														appUrl:url?.toString(), isBenchMark:isBenchMark?.toString(), isSystemDiagnostics:isSystemDiagnostics?.toString(), rerun:rerun?.toString(), isLogReqd:isLogReqd?.toString(),category:executionInstance1?.category?.toString(), rerunOnFailure : FALSE])
+														appUrl:url?.toString(), isBenchMark:isBenchMark?.toString(), isSystemDiagnostics:isSystemDiagnostics?.toString(), rerun:rerun?.toString(), isLogReqd:isLogReqd?.toString(),category:executionInstance1?.category?.toString(), rerunOnFailure : FALSE,isAlertEnabled:isAlertEnabled])
 						}else if(params?.scriptGroup?.toString().equals(MULTIPLESCRIPTGROUPS)){
 							int scriptCount  = execResult?.size()
 							saveExecutionDetails= executionService.saveExecutionDetails(execName?.toString(),[scriptName:MULTIPLESCRIPTGROUPS, deviceName:deviceInstance?.toString(), scriptGroupInstance:scriptGroupInstance,
-								appUrl:url?.toString(), isBenchMark:isBenchMark?.toString(), isSystemDiagnostics:isSystemDiagnostics?.toString(), rerun:rerun?.toString(), isLogReqd:isLogReqd?.toString(),category:executionInstance1?.category?.toString(), rerunOnFailure : FALSE])
+								appUrl:url?.toString(), isBenchMark:isBenchMark?.toString(), isSystemDiagnostics:isSystemDiagnostics?.toString(), rerun:rerun?.toString(), isLogReqd:isLogReqd?.toString(),category:executionInstance1?.category?.toString(), rerunOnFailure : FALSE,isAlertEnabled:isAlertEnabled])
 						}else{
 							//saveExecutionDetails = executionService.saveExecutionDetails(execName?.toString(), scripts, deviceInstance?.toString(), scriptGroupInstance ,url?.toString(),isBenchMark?.toString(),isSystemDiagnostics?.toString(),rerun?.toString(),isLogReqd?.toString())
 						saveExecutionDetails= executionService.saveExecutionDetails(execName?.toString(),[scriptName:scripts, deviceName:deviceInstance?.toString(), scriptGroupInstance:scriptGroupInstance,
-							appUrl:url?.toString(), isBenchMark:isBenchMark?.toString(), isSystemDiagnostics:isSystemDiagnostics?.toString(), rerun:rerun?.toString(), isLogReqd:isLogReqd?.toString(),category:executionInstance1?.category?.toString(), rerunOnFailure:FALSE])
+							appUrl:url?.toString(), isBenchMark:isBenchMark?.toString(), isSystemDiagnostics:isSystemDiagnostics?.toString(), rerun:rerun?.toString(), isLogReqd:isLogReqd?.toString(),category:executionInstance1?.category?.toString(), rerunOnFailure:FALSE,isAlertEnabled:isAlertEnabled])
 						}
 						if(saveExecutionDetails){
 							try {
@@ -4186,7 +4203,7 @@ class ExecutionController {
 										filePath, getRealPath(),myGroup?.toString(), url?.toString(), isBenchMark?.toString(), isSystemDiagnostics?.toString(),rerun?.toString(),isLogReqd?.toString(),executionInstance1?.category?.toString())
 								}else{
 									executescriptService.executescriptsOnDevice(singleScriptGroup, execName?.toString(), deviceId?.toString(), executionDevice, scripts, scriptGroupInstance?.name, executionName?.toString(),
-										filePath, getRealPath(),myGroup?.toString(), url?.toString(), isBenchMark?.toString(), isSystemDiagnostics?.toString(),rerun?.toString(),isLogReqd?.toString(),executionInstance1?.category?.toString(),1)
+										filePath, getRealPath(),myGroup?.toString(), url?.toString(), isBenchMark?.toString(), isSystemDiagnostics?.toString(),rerun?.toString(),isLogReqd?.toString(),executionInstance1?.category?.toString(),1,isAlertEnabled)
 								}
 								/*executescriptService.executescriptsOnDevice(execName?.toString(), deviceId?.toString(), executionDevice, scripts, scriptGroupInstance?.id.toString(), executionName?.toString(),
 										filePath, getRealPath(),myGroup?.toString(), url?.toString(), isBenchMark?.toString(), isSystemDiagnostics?.toString(),rerun?.toString(),isLogReqd?.toString(),deviceInstance.category?.toString())*/
@@ -4430,7 +4447,7 @@ class ExecutionController {
 	 *  	- isLogRequired
 	 */
 
-	def thirdPartyMultipleScriptExecution(final String scripts, final String stbName ,final String reRunOnFailure, final String timeInfo,final String performance,final String isLogRequired ){
+	def thirdPartyMultipleScriptExecution(final String scripts, final String stbName ,final String reRunOnFailure, final String timeInfo,final String performance,final String isLogRequired, final String isAlert){
 		String rerun = FALSE
 		if(reRunOnFailure && reRunOnFailure?.equals(TRUE)){
 			rerun = TRUE
@@ -4439,6 +4456,7 @@ class ExecutionController {
 		String time = FALSE
 		String perfo = FALSE
 		String isLog = FALSE
+		String isAlertEnabled = FALSE
 		if(deviceInstanceIsThunder?.isThunderEnabled != 1){
 			if(timeInfo && timeInfo?.equals(TRUE)){
 				time = TRUE
@@ -4449,6 +4467,9 @@ class ExecutionController {
 		}
 		if(isLogRequired && isLogRequired?.equals(TRUE)){
 			isLog = TRUE
+		}
+		if(isAlert && isAlert?.equals(TRUE) && deviceInstanceIsThunder?.isThunderEnabled == 1){
+			isAlertEnabled = TRUE
 		}
 		JsonObject jsonOutData = new JsonObject()
 		boolean validScript = false
@@ -4584,7 +4605,7 @@ class ExecutionController {
 								def newExecName = execName
 								if(scriptType.equals(MULTIPLESCRIPT)){
 									def  scriptCount = newScriptList?.size()
-									executionSaveStatus = executionService.saveExecutionDetailsOnMultipleScripts(execName?.toString(), MULTIPLESCRIPT, deviceName, null,url,time,perfo,rerun,isLog,scriptCount, newCategory?.toString(),FALSE)
+									executionSaveStatus = executionService.saveExecutionDetailsOnMultipleScripts(execName?.toString(), MULTIPLESCRIPT, deviceName, null,url,time,perfo,rerun,isLog,scriptCount, newCategory?.toString(),FALSE,isAlertEnabled)
 								}
 								if(executionSaveStatus){
 									try{
@@ -4608,7 +4629,7 @@ class ExecutionController {
 											}
 											if(!TCL){
 												htmlData = executescriptService.executeScriptInThread(true,execName, ""+deviceInstance?.id, executionDevice, newScriptList, "", execName,
-														filePath, getRealPath(), SINGLE_SCRIPT, url, time, perfo, rerun,isLog,newCategory?.toString(),1)
+														filePath, getRealPath(), SINGLE_SCRIPT, url, time, perfo, rerun,isLog,newCategory?.toString(),1,isAlertEnabled)
 												executed = true
 												url = url + "/execution/thirdPartyJsonResult?execName=${execName}"
 												jsonOutData.addProperty("Status", "RUNNING")
@@ -5220,8 +5241,12 @@ class ExecutionController {
 		}else{
 			scriptName = MULTIPLESCRIPT
 		}
+		def isAlertEnabled = FALSE
+		if(baseExecution?.isAlertEnabled && deviceInstance?.isThunderEnabled == 1){
+			isAlertEnabled  = TRUE
+		}
 		try{
-			executionSaveStatus = executionService.saveExecutionDetails(executionName,[scriptName:scriptName, deviceName:params?.device, scriptGroupInstance:null, appUrl:appUrl, isBenchMark:"false", isSystemDiagnostics:"false", rerun:"false", isLogReqd:"false", category:category, rerunOnFailure:FALSE, groups:baseExecution?.groups])
+			executionSaveStatus = executionService.saveExecutionDetails(executionName,[scriptName:scriptName, deviceName:params?.device, scriptGroupInstance:null, appUrl:appUrl, isBenchMark:"false", isSystemDiagnostics:"false", rerun:"false", isLogReqd:"false", category:category, rerunOnFailure:FALSE, groups:baseExecution?.groups, isAlertEnabled:isAlertEnabled])
 			if(executionSaveStatus){
 				Execution.withTransaction{
 					executionInstance = Execution.findByName(executionName)
@@ -5273,7 +5298,7 @@ class ExecutionController {
 							def startExecutionTime = new Date()
 							aborted = executionService.abortList?.toString().contains(executionInstance?.id?.toString())
 							if(!aborted && !(deviceStatus?.toString().equals(Status.NOT_FOUND.toString()) || deviceStatus?.toString().equals(Status.HANG.toString())) && !pause){
-								htmlData = executescriptService.executeScript(executionName, executionDevice, scriptInstance, deviceInstance, appUrl, filePath, realPath,"false","false",executionName,FALSE,null,"false", category)
+								htmlData = executescriptService.executeScript(executionName, executionDevice, scriptInstance, deviceInstance, appUrl, filePath, realPath,"false","false",executionName,FALSE,null,"false", category,isAlertEnabled)
 							}else{
 								if(!aborted && (deviceStatus.equals(Status.NOT_FOUND.toString()) ||  deviceStatus.equals(Status.HANG.toString()))){
 									pause = true
@@ -5365,7 +5390,11 @@ class ExecutionController {
 						}
 						if(macAddress?.contains(":")){
 							macAddress = macAddress?.replace(":","")
-						}					
+						}	
+						if(macAddress?.contains("_")){
+							macAddress = macAddress?.replace("_","")
+						}
+						macAddress = macAddress?.toUpperCase()
 						long fromEpoch = fromDate?.getTime() / 1000;
 						Date toDate = new Date()
 						long toEpoch = System?.currentTimeMillis() / 1000;
@@ -5410,8 +5439,7 @@ class ExecutionController {
 						BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 						line = input.readLine();
 						if((line != null) && (!line?.contains("message"))){
-							line = line?.substring(1, line?.length() - 1);
-							List dataArray = line?.split("},")
+							JSONArray dataArray = new JSONArray(line)
 							if(dataArray?.size() != 0){
 								JsonArray writeDataArray = new JsonArray()
 								for(int i = 0;i < dataArray?.size();i++){
@@ -5421,11 +5449,8 @@ class ExecutionController {
 									List dataListForLogFile = []
 									String dataValue = dataArray[i]
 									if(dataValue != null && !dataValue?.isEmpty()){
-										String lastChar = dataValue?.charAt(dataValue?.length()-1)
-										if(!lastChar?.equals("}")){
-											dataValue = dataValue + "}"
-										}
 										JSONObject jsonObj = new JSONObject(dataValue);
+										
 										String target
 										if(jsonObj.has('target')){
 											target = jsonObj.get('target')
@@ -5694,6 +5719,9 @@ class ExecutionController {
 							finalConfigFile = dev?.stbName+CONFIG_EXTN
 						}else if(boxTypeConfigFile?.exists()){
 							finalConfigFile = dev?.boxType?.name+CONFIG_EXTN
+						}
+						if(finalConfigFile == ""){
+							finalConfigFile = "sample"+CONFIG_EXTN
 						}
 						if(finalConfigFile != ""){
 							String unitVariable = metricList[2]
