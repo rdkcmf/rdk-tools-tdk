@@ -16,5 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ##########################################################################
-SUBDIRS = playback graphics_validation
-DIST_SUBDIRS = @SUBDIRS@
+
+bin_PROGRAMS = Essos_TDKTestApp
+
+Essos_TDKTestApp_SOURCES = src/EssosValidationSuite.cpp
+
+Essos_TDKTestApp_CXXFLAGS = ${AM_CXXFLAGS}
+if HAVE_EGL
+Essos_TDKTestApp_CXXFLAGS += ${EGL_CFLAGS}
+endif
+Essos_TDKTestApp_LDFLAGS = $(AM_FLAGS) -lessos -lGLESv2

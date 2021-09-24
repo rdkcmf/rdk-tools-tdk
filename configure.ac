@@ -78,6 +78,7 @@ SUBDIR_CLIENT=" "
 SM_STUB_CFLAG_HYBRID=" "
 BLUETOOTH_LIBS=" "
 MFRHAL_LIBS=" "
+HAVE_EGL=" "
 
 AC_ARG_ENABLE([hybrid],
         AS_HELP_STRING([--enable-hybrid],[enable hybrid build]),
@@ -259,6 +260,7 @@ AC_ARG_ENABLE([fireboltcompliance],
          [
            case "${enableval}" in
               yes) FIREBOLTCOMPLIANCE=true
+		   PKG_CHECK_MODULES([EGL], [egl >= 0.0], [HAVE_EGL=true], [HAVE_EGL=false])
                    AS_IF([test x$HYBRID = xtrue], [SUBDIR_HYBRID+=" FireboltCompliance_Validation "],
                           [echo "FireboltCompliance enabled in Hybrid"])
                    AS_IF([test x$CLIENT = xtrue], [SUBDIR_CLIENT+=" FireboltCompliance_Validation "],
@@ -268,6 +270,7 @@ AC_ARG_ENABLE([fireboltcompliance],
              esac
             ],
            [echo "FireboltCompliance is not enabled"])
+AM_CONDITIONAL([HAVE_EGL], [test x$HAVE_EGL = xtrue])
 AM_CONDITIONAL([FIREBOLTCOMPLIANCE], [test x$FIREBOLTCOMPLIANCE = xtrue])
 
 AC_ARG_ENABLE([deepsleephal],
@@ -368,6 +371,7 @@ AC_SUBST(SUBDIR_CLIENT)
 AC_SUBST(SM_STUB_CFLAG_HYBRID)
 AC_SUBST(BLUETOOTH_LIBS)
 AC_SUBST(MFRHAL_LIBS)
+AC_SUBST(HAVE_EGL)
 AC_CONFIG_FILES([Makefile
          cfg/Makefile
          agent/Makefile
@@ -385,6 +389,8 @@ AC_CONFIG_FILES([Makefile
          BluetoothHal_stub/Makefile
          MfrHal_stub/Makefile
          FireboltCompliance_Validation/Makefile
+	 FireboltCompliance_Validation/playback/Makefile
+	 FireboltCompliance_Validation/graphics_validation/Makefile
 	 AudioCaptureMgr_stub/Makefile
 	 USBCtrl_stub/Makefile
 	 SystemUtil_stub/Makefile

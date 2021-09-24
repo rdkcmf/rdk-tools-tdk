@@ -85,6 +85,7 @@ typedef struct CustomData {
     gboolean terminate;    		/* Variable to indicate whether execution should be terminated in case of an error */
     gboolean seeked;    		/* Variable to indicate if seek to requested position is completed */
     gboolean eosDetected;		/* Variable to indicate if EOS is detected */
+    gboolean stateChanged;              /* Variable to indicate if stateChange is occured */
 } MessageHandlerData;
 
 
@@ -194,17 +195,21 @@ static void handleMessage (MessageHandlerData *data, GstMessage *message)
             data->eosDetected = TRUE;
             data->terminate = TRUE;
             break;
-        case GST_MESSAGE_STATE_CHANGED:
             /*
-             * In case of seek event, state change of various gst elements occur asynchronously
-	     * We can check if the seek event happened in between by qerying the current position
-             * If the current position is not updated, we will wait until bus is clear or error/eos occurs
-             */
+            * In case of seek event, state change of various gst elements occur asynchronously
+            * We can check if the seek event happened in between by querying the current position while ASYNC_DONE message is retrieved
+            * If the current position is not updated, we will wait until bus is clear or error/eos occurs
+            */
+        case GST_MESSAGE_STATE_CHANGED:
+            data->stateChanged = TRUE;
+        case GST_MESSAGE_ASYNC_DONE:
             fail_unless (gst_element_query_position (data->playbin, GST_FORMAT_TIME, &(data->currentPosition)), 
                                                      "Failed to querry the current playback position");
-            if (data->currentPosition == data->seekPosition)
+
+            //Added GST_SECOND buffer time between currentPosition and seekPosition
+            if (abs( data->currentPosition - data->seekPosition) <= (GST_SECOND))
             {
-                data->seeked = TRUE;
+               data->seeked = TRUE;
             }
             break;
         default:
@@ -336,16 +341,14 @@ static void seek (GstElement* playbin, double seekSeconds)
     data.playbin = playbin;
     data.seekPosition = seekPosition;
     data.currentPosition = GST_CLOCK_TIME_NONE;
+    data.stateChanged = FALSE;
 
     do 
     {
-	/*
-	 * TODO Shall try with gst_bus_pop_filtered()
-	 */
-        message = gst_bus_timed_pop_filtered (bus, 2 * GST_SECOND, 
+        message = gst_bus_timed_pop_filtered (bus, 2 * GST_SECOND,
                                              (GstMessageType) ((GstMessageType) GST_MESSAGE_STATE_CHANGED | 
-                                             (GstMessageType) GST_MESSAGE_ERROR | (GstMessageType) GST_MESSAGE_EOS));
-
+                                             (GstMessageType) GST_MESSAGE_ERROR | (GstMessageType) GST_MESSAGE_EOS |
+                                             (GstMessageType) GST_MESSAGE_ASYNC_DONE ));
         /* 
          * Parse message 
          */
@@ -364,20 +367,24 @@ static void seek (GstElement* playbin, double seekSeconds)
      * Verify that ERROR/EOS messages are not recieved
      */
     fail_unless (FALSE == data.terminate, "Unexpected error or End of Stream recieved\n");
-    /*
-     * Get the current playback position
-     */
-    fail_unless (gst_element_query_position (playbin, GST_FORMAT_TIME, &currentPosition), "Failed to querry the current playback position");
-    printf ("Current position : %lld\nSeek position : %lld\n", currentPosition, seekPosition);
-    
-    /*
-     * Check if current position is greater than the seeked position
-     */ 
-    fail_unless ((currentPosition >= seekPosition) && ((currentPosition - seekPosition) < (2 * GST_SECOND)), "Failed to seek to the requested position");
 
-    printf ("Seeked successfully to %lld\n", seekPosition);
-    GST_LOG ("Seeked successfully to %lld\n", seekPosition);
-    
+    /*
+     * Verify that SEEK message is received
+     */
+    fail_unless (TRUE == data.seeked, "Seek Unsuccessfull\n");
+
+    /*
+     * Verify that stateChanged message is received
+     */
+    fail_unless (TRUE == data.stateChanged, "State change message was not received\n");
+
+    //Convert time to seconds
+    data.currentPosition /= GST_SECOND;
+    data.seekPosition /= GST_SECOND;
+
+    printf("SEEK SUCCESSFULL :  CurrentPosition %lld seconds, SeekPosition %lld seconds\n", data.currentPosition, data.seekPosition);
+    GST_LOG ("SEEK SUCCESSFULL :  CurrentPosition %lld seconds, SeekPosition %lld seconds\n", data.currentPosition, data.seekPosition);
+
     gst_object_unref (bus);
 }
 
