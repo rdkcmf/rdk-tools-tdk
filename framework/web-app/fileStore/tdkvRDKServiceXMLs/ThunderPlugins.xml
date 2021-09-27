@@ -769,11 +769,42 @@
                 <param tag="enable" type="bool" />
             </params>
         </method>
+        <method name="Get_Virtual_Display_Enabled" api="getVirtualDisplayEnabled" type="method" desc="Enables or disables key repeats" >
+            <params>
+                <param tag="client" defaultValue="null" />
+            </params>
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Enable_Virtual_Display" api="enableVirtualDisplay" type="method" desc="Enables or disables key repeats" >
+            <params>
+                <param tag="client" defaultValue="null" />
+                <param tag="enable" type="bool" />
+            </params>
+        </method>
+        <method name="Get_Virtual_Resolution" api="getVirtualResolution" type="method" desc="Gets the virtual resolution for the specified client" >
+            <params>
+                <param tag="client" defaultValue="null" />
+            </params>
+        </method>
+        <method name="Set_Virtual_Resolution" api="setVirtualResolution" type="method" desc="Sets the virtual resolution for the specified client" >
+            <params>
+                <param tag="client" defaultValue="null" />
+                <param tag="width" type="int" />
+                <param tag="height" type="int" />
+            </params>
+        </method>
         <event name="Event_On_Launched" eventName="onLaunched" eventId="client.events.1" type="event" desc="Fired on launching the client" />
         <event name="Event_On_Suspended" eventName="onSuspended" eventId="client.events.1" type="event" desc="Fired on Suspending the client" />
         <event name="Event_On_Destroyed" eventName="onDestroyed" eventId="client.events.1" type="event" desc="Fired on destroying the client"/>
         <event name="Event_On_UserInactivity" eventName="onUserInactivity" eventId="client.events.1" type="event" desc="Fired on user inactive"/>
         <event name="Event_On_Application_Activated" eventName="onApplicationActivated" eventId="client.events.1" type="event" desc="Triggered when an application is activated"/>
+        <event name="Event_On_Application_Activated" eventName="onApplicationActivated" eventId="client.events.1" type="event" desc="Triggered when an application is activated"/>
+        <event name="Event_On_Application_Connected" eventName="onApplicationConnected" eventId="client.events.1" type="event" desc="Triggered when a connection to an application succeeds"/>
+        <event name="Event_On_Application_Disconnected" eventName="onApplicationDisconnected" eventId="client.events.1" type="event" desc="Triggered when an attempt to disconnect from an application succeeds"/>
+        <event name="Event_On_Application_FirstFrame" eventName="onApplicationFirstFrame" eventId="client.events.1" type="event" desc="Triggered when the first frame of an application is loaded"/>
+        <event name="Event_On_Application_Suspended" eventName="onApplicationSuspended" eventId="client.events.1" type="event" desc="Triggered when an application is suspended"/>
+        <event name="Event_On_Application_Resumed" eventName="onApplicationResumed" eventId="client.events.1" type="event" desc="Triggered when an application resumes from a suspended state"/>
+        <event name="Event_On_Application_Terminated" eventName="onApplicationTerminated" eventId="client.events.1" type="event" desc="Triggered when an application terminates"/>
     </plugin>
 
 
@@ -1137,6 +1168,9 @@
 	<method name="Read_EDID" api="readEDID" type="method" desc="Read the EDID of connected output device"/>
 	<method name="Read_Host_EDID" api="readHostEDID"  type="method" desc="Read the Host(STB) EDID details"/>
         <method name="Get_Active_Input" api="getActiveInput" type="method" desc="Get the active input status">
+            <params>
+                <param tag="videoDisplay" defaultValue="null"/>
+            </params>
             <expectedValues>True,False</expectedValues>
         </method>
         <method name="Get_Tv_HDR_Support" api="getTvHDRSupport" type="method" desc="Get the TV HDR support details">
@@ -1186,7 +1220,7 @@
             </params>
         </method>
         <method name="Get_Intelligent_Equalizer_Mode" api="getIntelligentEqualizerMode" type="method" desc="Get the intelligent equalizer modevalue" >
-            <expectedValues>1,2,3</expectedValues>
+            <expectedValues>0,1,2,3</expectedValues>
         </method>
         <method name="Set_Volume_Leveller" api="setVolumeLeveller" type="method" desc="Set the volume leveller values" >
             <params>
@@ -1203,7 +1237,7 @@
         <method name="Set_Bass_Enhancer" api="setBassEnhancer" type="method" desc="Enable or disable the bass enhancer" >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
-                <param tag="bassBoost" defaultValue="null" type="bool" />
+                <param tag="bassBoost" defaultValue="null" type="int" />
             </params>
         </method>
         <method name="Get_Bass_Enhancer" api="getBassEnhancer" type="method" desc="Get the bass enhancer status" >
@@ -1322,9 +1356,7 @@
         <method name="Get_Sink_Atmos_Capability" api="getSinkAtmosCapability" type="method" desc="Get the sink atmos capability" >
             <expectedValues>1,2,3</expectedValues>
         </method>
-        <method name="Get_TV_HDR_Capabilities" api="getTVHDRCapabilities" type="method" desc="Get the TV HDR  capability" >
-            <expectedValues>0,1,2,4,8</expectedValues>
-        </method>
+        <method name="Get_TV_HDR_Capabilities" api="getTVHDRCapabilities" type="method" desc="Get the TV HDR  capability" />
         <method name="Is_Connected_Device_Repeater" api="isConnectedDeviceRepeater" type="method" desc="Get the TV HDR capability" />
         <method name="Get_Default_Resolution" api="getDefaultResolution" type="method" desc="Get the default resolution value" />
         <method name="setScartParameter" api="setScartParameter" type="method" desc="Set Scart parameter values" >

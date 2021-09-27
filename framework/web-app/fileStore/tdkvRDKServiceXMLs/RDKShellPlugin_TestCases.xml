@@ -81,6 +81,12 @@
             <event pluginName="RDKShell" eventName="Event_On_Destroyed" />
             <event pluginName="RDKShell" eventName="Event_On_UserInactivity" />
             <event pluginName="RDKShell" eventName="Event_On_Application_Activated" />
+            <event pluginName="RDKShell" eventName="Event_On_Application_Connected" />
+            <event pluginName="RDKShell" eventName="Event_On_Application_Disconnected" />
+            <event pluginName="RDKShell" eventName="Event_On_Application_FirstFrame" />
+            <event pluginName="RDKShell" eventName="Event_On_Application_Resumed" />
+            <event pluginName="RDKShell" eventName="Event_On_Application_Suspended" />
+            <event pluginName="RDKShell" eventName="Event_On_Application_Terminated" />
           </prerequisite>
 
         </pluginPreRequisite>
@@ -907,7 +913,7 @@
               <params>
                   <param tag="client" value="webkitbrowser" />
               </params>
-              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "webkitbrowser" />
             </testStep>
             <testStep testStepId="2" name="Get_Hole_Punch" method="Get_Hole_Punch" saveResult="true" revertGet="yes" >
               <params>
@@ -1246,7 +1252,222 @@
         </testCase>
 
         <!-- Test case 53 -->
-        <testCase testCaseId="RDKShell_53" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
+        <testCase testCaseId="RDKShell_53" testCaseName= "RDKShell_Enable_Disable_Virtual_Display_Cobalt" desc="Checks whether able to enable and disable the virtual display for the cobalt client" >
+            <testCaseInfo testCaseType="setandget" revert="true"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Virtual_Display_Enabled" method="Get_Virtual_Display_Enabled" saveResult="true" revertGet="yes" >
+              <params>
+                <param tag="client" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_enabled_status" />
+            </testStep>
+            <testStep testStepId="3" name="Enable_Virtual_Display" method="Enable_Virtual_Display" revertSet="yes">
+              <params>
+                <param tag="client" value="Cobalt" />
+                <param tag="enable" usePreviousResult="true" Id="2" useMethodTag="rdkshell_toggle_enabled_status" revertParam="yes" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Virtual_Display_Enabled" method="Get_Virtual_Display_Enabled" revertFlag="yes">
+                <params>
+                   <param tag="client" value="Cobalt" />
+                </params>
+                <resultGeneration useMethodTag="rdkshell_get_enabled_status" >
+                   <expectedValues usePreviousResult="true" Id="2" useMethodTag="rdkshell_toggle_enabled_status" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <!-- Test case 54 -->
+        <testCase testCaseId="RDKShell_54" testCaseName= "RDKShell_Enable_Disable_Virtual_Display_WebKitBrowser" desc="Checks whether able to enable and disable the virtual display for the webkitbrowser client" >
+            <testCaseInfo testCaseType="setandget" revert="true"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "webkitbrowser" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Virtual_Display_Enabled" method="Get_Virtual_Display_Enabled" saveResult="true" revertGet="yes" >
+              <params>
+                <param tag="client" value="WebKitBrowser" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_enabled_status" />
+            </testStep>
+            <testStep testStepId="3" name="Enable_Virtual_Display" method="Enable_Virtual_Display" revertSet="yes">
+              <params>
+                <param tag="client" value="WebKitBrowser" />
+                <param tag="enable" usePreviousResult="true" Id="2" useMethodTag="rdkshell_toggle_enabled_status" revertParam="yes" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Virtual_Display_Enabled" method="Get_Virtual_Display_Enabled" revertFlag="yes">
+                <params>
+                   <param tag="client" value="WebKitBrowser" />
+                </params>
+                <resultGeneration useMethodTag="rdkshell_get_enabled_status" >
+                   <expectedValues usePreviousResult="true" Id="2" useMethodTag="rdkshell_toggle_enabled_status" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <!-- Test case 55 -->
+        <testCase testCaseId="RDKShell_55" testCaseName= "RDKShell_Set_And_Get_Virtual_Resolution_Cobalt" desc="Checks whether able to set and get the virtual resolution for the cobalt client" >
+            <testCaseInfo testCaseType="setandget" revert="true"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Virtual_Resolution" method="Get_Virtual_Resolution" saveResult="true" revertGet="yes" >
+              <params>
+                <param tag="client" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_virtual_resolution" />
+            </testStep>
+            <testStep testStepId="3" name="Get_Width_And_Height" action="externalFnCall" saveResult="true" >
+              <resultGeneration useMethodTag="RDKShell_Get_Width_And_Height" >
+                 <arguments useConfigFile="true" key="RESOLUTION_WIDTH_HEIGHT_MAPPING"/>
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Set_Virtual_Resolution" method="Set_Virtual_Resolution" revertSet="yes">
+              <params>
+                <param tag="client" value="Cobalt" />
+                <param tag="width" usePreviousResult="true" Id="3" useMethodTag="rdkshell_set_virtual_resolution" revertParam="yes" />
+                <param tag="height" usePreviousResult="true" Id="3" useMethodTag="rdkshell_set_virtual_resolution" revertParam="yes" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="5" name="Get_Virtual_Resolution" method="Get_Virtual_Resolution" revertFlag="yes">
+                <params>
+                   <param tag="client" value="Cobalt" />
+                </params>
+                <resultGeneration useMethodTag="rdkshell_get_virtual_resolution" arguments="check_virtual_resolutions">
+                   <expectedValues usePreviousResult="true"  Id="3" useMethodTag="rdkshell_set_virtual_resolution" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <!-- Test case 56 -->
+        <testCase testCaseId="RDKShell_56" testCaseName= "RDKShell_Set_And_Get_Virtual_Resolution_WebKitBrowser" desc="Checks whether able to set and get the virtual resolution for the webkitbrowser client" >
+            <testCaseInfo testCaseType="loop" revert="true"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "webkitbrowser" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Virtual_Resolution" method="Get_Virtual_Resolution" saveResult="true" revertGet="yes" >
+              <params>
+                <param tag="client" value="WebKitBrowser" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_virtual_resolution" />
+            </testStep>
+            <testStep testStepId="3" name="Get_Width_And_Height" action="externalFnCall" saveResult="true" >
+              <resultGeneration useMethodTag="RDKShell_Get_Width_And_Height" >
+                 <arguments useConfigFile="true" key="RESOLUTION_WIDTH_HEIGHT_MAPPING"/>
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Set_Virtual_Resolution" method="Set_Virtual_Resolution" revertSet="yes">
+                <params>
+                  <param tag="client" value="WebKitBrowser" />
+                  <param tag="width" usePreviousResult="true" Id="3" useMethodTag="rdkshell_set_virtual_resolution" revertParam="yes" />
+                  <param tag="height" usePreviousResult="true" Id="3" useMethodTag="rdkshell_set_virtual_resolution" revertParam="yes" />
+                </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="5" name="Get_Virtual_Resolution" method="Get_Virtual_Resolution" revertFlag="yes">
+                <params>
+                  <param tag="client" value="WebKitBrowser" />
+                </params>
+                <resultGeneration useMethodTag="rdkshell_get_virtual_resolution" arguments="check_virtual_resolutions">
+                   <expectedValues usePreviousResult="true"  Id="3" useMethodTag="rdkshell_set_virtual_resolution" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <!-- Test case 57 -->
+        <testCase testCaseId="RDKShell_57" testCaseName= "RDKShell_Check_Application_Life_Cycle_Events_For_Cobalt" desc="Checks the application life cycle events for the cobalt application">
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Destroy_Cobalt_Application">
+                   <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+                        <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
+                   </testStep>
+                   <testStep testStepId="2" name="Destroy_Cobalt_Application" method="DestroyApplication" >
+                      <params>
+                          <param tag="callsign" value="Cobalt" />
+                      </params>
+                      <resultGeneration useMethodTag="rdkshell_get_result_status" />
+                   </testStep>
+                 </prerequisite>
+            </testCasePreRequisite>
+
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application"  arguments= "check_not_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="2" name="Launch_Cobalt" method="LaunchApplication" delay="2" >
+              <params>
+                <param tag="callsign" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="3" name="Is_Cobalt_Resumed" method="GetClients" delay="2">
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_if_exists" expectedValues="cobalt" />
+            </testStep>
+            <testStep testStepId="4" name="Check_On_Application_Connected_Event" event="Event_On_Application_Connected" action="eventListener" clear="false" >
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+            </testStep>
+            <testStep testStepId="5" name="Check_On_Application_First_Frame_Event" event="Event_On_Application_FirstFrame" action="eventListener" >
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+            </testStep>
+            <testStep testStepId="6" name="Suspend_Application" method="SuspendApplication" >
+              <params>
+                <param tag="callsign"  value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="7" name="Check_On_Application_Suspended_Event" event="Event_On_Application_Suspended" action="eventListener"  delay="2">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+            </testStep>
+            <testStep testStepId="8" name="Launch_Cobalt" method="LaunchApplication" >
+              <params>
+                <param tag="callsign" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="9" name="Is_Cobalt_Resumed" method="GetClients" delay="2">
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_if_exists" expectedValues="cobalt" />
+            </testStep>
+            <testStep testStepId="10" name="Check_On_Application_Resumed_Event" event="Event_On_Application_Resumed" action="eventListener"  delay="2">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+            </testStep>
+            <testStep testStepId="11" name="Destroy_Application" method="DestroyApplication" >
+              <params>
+                <param tag="callsign"  value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="12" name="Get_connected_clients" method="GetClients" delay="2">
+              <resultGeneration useMethodTag="rdkshell_check_application"  arguments= "check_not_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="13" name="Check_On_Application_Disconnected_Event" event="Event_On_Application_Disconnected" action="eventListener"  clear="false">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+            </testStep>
+            <testStep testStepId="14" name="Check_On_Application_Terminated_Event" event="Event_On_Application_Terminated" action="eventListener" >
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+            </testStep>
+        <testCasePostRequisite>
+         <postrequisite requisiteId="1" requisiteName="Resuming_Cobalt_Application">
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
+              <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
+            </testStep>
+            <testStep testStepId="2" name="Launch_Cobalt" method="LaunchApplication" >
+              <conditionalExecution enable="true" Id="1" useMethodTag="rdkshell_check_application_state" arguments="cobalt" />
+              <params>
+                <param tag="callsign" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+         </postrequisite>
+        </testCasePostRequisite>
+        </testCase>
+
+        <!-- Test case 58 -->
+        <testCase testCaseId="RDKShell_58" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
@@ -1271,8 +1492,8 @@
             </testStep>
         </testCase> 
 
-	<!-- Test case 54 -->
-	<testCase testCaseId="RDKShell_54" testCaseName= "RDKShell_Application_Kill_LightningApp" desc="Kill LightningApp Application">
+	<!-- Test case 59 -->
+	<testCase testCaseId="RDKShell_59" testCaseName= "RDKShell_Application_Kill_LightningApp" desc="Kill LightningApp Application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "lightningapp" />
@@ -1297,8 +1518,8 @@
             </testStep>
         </testCase>
 
-	<!-- Test case 55 -->
-	<testCase testCaseId="RDKShell_55" testCaseName= "RDKShell_Application_Kill_HtmlApp" desc="Kill HtmlApp Application">
+	<!-- Test case 60 -->
+	<testCase testCaseId="RDKShell_60" testCaseName= "RDKShell_Application_Kill_HtmlApp" desc="Kill HtmlApp Application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "htmlapp" />
@@ -1323,11 +1544,98 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 56 -->
-        <testCase testCaseId="RDKShell_56" testCaseName= "RDKShell_System_Resource_Info" desc="Gets the system resource info">
+        <!-- Test case 61 -->
+        <testCase testCaseId="RDKShell_61" testCaseName= "RDKShell_System_Resource_Info" desc="Gets the system resource info">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_System_Resource_Info" method="Get_System_Resource_Info" >
               <resultGeneration useMethodTag="rdkshell_check_for_results"/>
             </testStep>
+        </testCase>
+        
+        <!-- Test case 62 -->
+        <testCase testCaseId="RDKShell_62" testCaseName= "RDKShell_SetandGet_Bound_For_Invalid_Application" desc="Set and Get application boundary for invalid client">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="getbounds" method="GetBounds" saveResult="true" revertGet="yes">
+              <params>
+                <param tag="client" value="dummy-client" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_error_message" expectedValues="failed to get bounds" />
+            </testStep>
+            <testStep testStepId="2" name="setbounds" method="SetBounds" revertSet="yes">
+              <params>
+                <param tag="x" value="50" />
+                <param tag="y" value="50" />
+                <param tag="w" value="400" />
+                <param tag="h" value="700"  />
+                <param tag="client"  value="dummy-client" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_error_message" expectedValues="failed to set bounds" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 63 -->
+        <testCase testCaseId="RDKShell_63" testCaseName= "RDKShell_SetandGet_Opacity_For_Invalid_Application" desc="Set and Get opacity Visibility for invalid client">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="getopacity" method="GetOpacity" saveResult="true" revertGet="yes">
+              <params>
+                <param tag="client" value="dummy-client"/>
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_error_message" expectedValues="failed to get opacity" />
+            </testStep>
+            <testStep testStepId="2" name="setopacity" method="SetOpacity" revertSet="yes">
+              <params>
+                <param tag="opacity" value="50" />
+                <param tag="client"  value="dummy-client" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_error_message" expectedValues="failed to set opacity" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 64 -->
+        <testCase testCaseId="RDKShell_64" testCaseName= "RDKShell_SetandGet_Visibility_For_Invalid_Application" desc="Set and Get application Visibility for invalid client">
+            <testCaseInfo testCaseType="setandget" revert="true" />
+            <testStep testStepId="1" name="getvisibility" method="GetVisibility" saveResult="true" revertGet="yes">
+              <params>
+                <param tag="client" value="dummy-client" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_error_message" expectedValues="failed to get visibility" />
+            </testStep>
+            <testStep testStepId="2" name="setvisibility" method="SetVisibility" revertSet="yes">
+              <params>
+                <param tag="visible" value ="true"/>
+                <param tag="client"  value="dummy-client" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_error_message" expectedValues="failed to set visibility" />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 65 -->
+        <testCase testCaseId="RDKShell_65" testCaseName= "RDKShell_Application_SetFocus_For_Invalid_Application" desc="Set focus to an invalid application ">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="setfocus" method="SetFocus">
+              <params>
+                <param tag="client" value="dummy-client" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_error_message" expectedValues="failed to set focus" />
+            </testStep>
         </testCase> 
+        
+        <!-- Test case 66 -->
+        <testCase testCaseId="RDKShell_66" testCaseName= "RDKShell_SetandGet_Application_Scale_For_Invalid_Application" desc="Set and Get application scaling params for invalid client">
+            <testCaseInfo testCaseType="direct" revert="true" />
+            <testStep testStepId="1" name="getscale" method="GetScale" saveResult="true" revertGet="yes">
+              <params>
+                <param tag="client" value="dummy-client"/>
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_error_message" expectedValues="failed to get scale"/>
+            </testStep>
+            <testStep testStepId="2" name="setscale" method="SetScale">
+              <params>
+                <param tag="sx" value="1.5" />
+                <param tag="sy"  value="1.5"/>
+                <param tag="client" value="dummy-client"/>
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_error_message" expectedValues="failed to set scale"/>
+            </testStep>
+        </testCase>
 </testPlugin>

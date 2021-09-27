@@ -865,6 +865,38 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"        
 
+        elif tag == "rdkshell_get_enabled_status":
+            success = str(result.get("success")).lower() == "true"
+            info["enabled"] = result.get("enabled")
+            if success and str(result.get("enabled")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "rdkshell_get_virtual_resolution":
+            success = str(result.get("success")).lower() == "true"
+            status = checkNonEmptyResultData(result)
+            info["width"] = result.get("width")
+            info["height"] = result.get("height")
+            if success and status == "TRUE":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+            if len(arg) and  arg[0] == "check_virtual_resolutions":
+                if success and str(result.get("width")) == str(expectedValues[0]) and  str(result.get("height")) == str(expectedValues[1]):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "rdkshell_check_error_message":
+            success = str(result.get("success")).lower() == "false"
+            info["message"] = result.get("message")
+            if success and result.get("message") in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+
         # DisplayInfo Plugin Response result parser steps
         elif tag == "displayinfo_get_general_info":
             if arg[0] == "get_all_info":
@@ -1118,6 +1150,21 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+            if len(arg) and arg[0] == "check_expected_resolution":
+                if result.get('resolution') in expectedValues and json.dumps(result.get("success")) == "true":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif len(arg) and arg[0] == "check_resolution_not_persisted":
+                defaultResolution = str(expectedValues[0])
+                info["defaultResolution"] = defaultResolution
+                if defaultResolution == str(expectedValues[1]):
+                    if str(result.get('resolution')) and json.dumps(result.get("success")) == "true":
+                        info["Test_Step_Status"] = "SUCCESS"
+                elif result.get('resolution') != str(expectedValues[1]) and json.dumps(result.get("success")) == "true":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_supported_video_displays":
             info["supportedVideoDisplays"] = result.get('supportedVideoDisplays')
@@ -1192,11 +1239,9 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 message = "Best sound mode of the device %s" %(soundMode)
                 info["Test_Step_Message"] = message
                 soundMode = re.search(r"\((.*?)\)",soundMode).group(1)
-            info["soundMode"] = soundMode
+            info["soundMode"] = str(soundMode).lower()
             if len(arg) and arg[0] == "check_expected_sound_mode":
                 expectedMode = str(expectedValues[0]).lower()
-                print expectedMode
-                print result.get('soundMode').lower()
                 if result.get('soundMode').lower() == expectedMode or expectedMode in result.get('soundMode').lower():
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
@@ -1222,14 +1267,21 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             if str(result.get("success")).lower() == "true" and result.get('colorSpace') in [0,1,2,3,4,5] and result.get('matrixCoefficients') in [0,1,2,3,4,5,6,7] :
                 info["Test_Step_Status"] = "SUCCESS"
             else:
-                info["Test_Step_Status"] = "FAILURE"        
-
+                info["Test_Step_Status"] = "FAILURE"    
+    
         elif tag == "check_active_input":
             info ["activeInput"] = result.get('activeInput')
-            if str(result.get("success")).lower() == "true" and str(result.get('activeInput')) in expectedValues:
-                info["Test_Step_Status"] = "SUCCESS"
+            info ["success"] = result.get('success')
+            if len(arg) and arg[0] == "check_for_invalid_port":
+                if str(result.get("success")).lower() == "false" and str(result.get('activeInput')) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
-                info["Test_Step_Status"] = "FAILURE"
+                if str(result.get("success")).lower() == "true" and result.get('activeInput') in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_MS12_audio_compression":
             info["compresionLevel"] = result.get('compressionlevel');
@@ -1419,7 +1471,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "check_tv_hdr_capabilities":
             info["capabilities"] = result.get('capabilities')
-            if str(result.get("success")).lower() == "true" and str(result.get('capabilities')) in expectedValues:
+            if str(result.get("success")).lower() == "true" and int(result.get('capabilities')) >= 0:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -1508,6 +1560,8 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 if arg[0] == "check_state_valid" and state not in [0,6]:
                     info["Test_Step_Status"] = "SUCCESS"
                 elif arg[0] == "check_state_enabled" and state not in [0,6,1]:
+                    info["Test_Step_Status"] = "SUCCESS"
+                elif arg[0] == "check_connection_status" and state == 5:
                     info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -2294,6 +2348,13 @@ def CheckAndGenerateConditionalExecStatus(testStepResults,methodTag,arguments):
                 result = "TRUE"
             else:
                 result = "FALSE"
+        elif tag == "rdkshell_check_application_state":
+            testStepResults = testStepResults[0].values()[0]
+            clients = testStepResults[0].get("clients")
+            if arg[0] not in clients:
+                result = "TRUE"
+            else:
+                result = "FALSE"
 
         # System Plugin Response result parser steps
         elif tag == "system_check_preferred_standby_mode":
@@ -2663,6 +2724,21 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             else:
                 info["client"] = ""
 
+        elif tag == "rdkshell_toggle_enabled_status":
+            testStepResults = testStepResults[0].values()[0]
+            enabled = testStepResults[0].get("enabled")
+            if str(enabled).lower() == "true":
+                info["enable"] = False
+            else:
+                info["enable"] = True
+
+        elif tag == "rdkshell_set_virtual_resolution":
+            testStepResults = testStepResults[0].values()[0]
+            width = testStepResults[0].get("width")
+            height = testStepResults[0].get("height")
+            info["width"] = width
+            info["height"] = height
+
         #Display info plugin result parser steps
         elif tag == "display_info_get_supported_resolution_list":
             testStepResults = testStepResults[0].values()[0]
@@ -2769,6 +2845,19 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             supportedSettopResolutions = testStepResults2[0].get("supportedSettopResolutions")
             commonResolutions = list(set(supportedTvResolutions) & set(supportedSettopResolutions))
             info["commonResolutions"] = ",".join(commonResolutions)
+        
+        elif tag =="get_selected_resolutions":
+            resolutionsList = []
+            testStepResults = testStepResults[0].values()[0]
+            supportedResolutions = testStepResults[0].get("supportedResolutions")
+            resolutionsList.append(supportedResolutions[0])
+            resolutionsList.append(supportedResolutions[len(supportedResolutions)/2])
+            resolutionsList.append(supportedResolutions[len(supportedResolutions)-1])
+            info["resolution"] = resolutionsList
+
+        elif tag == "get_default_resolution":
+            testStepResults = testStepResults[0].values()[0]
+            info["defaultResolution"] = testStepResults[0].get("defaultResolution")
 
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_toggle_adapter_state":
@@ -3355,6 +3444,11 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
                 DisplayFrameRate = width+'x'+height+'x40'
                 DisplayFrameRate_values.append(DisplayFrameRate)
             info["DisplayFrameRate"] = DisplayFrameRate_values
+        
+        elif tag == "RDKShell_Get_Width_And_Height":
+            mapping_details = arg[len(arg)-1].split(":")
+            info["width"] = mapping_details[1].split('|')[0].strip('[]')
+            info["height"] = mapping_details[1].split('|')[1].strip('[]')
 
         elif tag == "executeRebootCmd":
             command = "reboot"
