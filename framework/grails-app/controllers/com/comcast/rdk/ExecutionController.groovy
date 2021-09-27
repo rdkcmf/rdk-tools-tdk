@@ -2051,6 +2051,40 @@ class ExecutionController {
 			}
 		}
 	}
+
+	/**
+	 * REST API : To set the execution result status as Not Applicable
+	 * @param execResult
+	 * @param resultStatus
+	 * @param reason
+	 */
+	def setExecutionResultStatus(final String execResult, final String resultStatus, final String reason){
+		try{
+			if((resultStatus.equals(Constants.NOT_APPLICABLE_STATUS_NO_SLASH))){
+				ExecutionResult.withTransaction { resultstatus ->
+					try {
+						ExecutionResult executionResult = ExecutionResult.findById(execResult)
+						if(executionResult){
+							executionResult.status = Constants.NOT_APPLICABLE_STATUS
+							if(reason && reason != ""){
+								executionResult.executionOutput = Constants.TEST_NOT_EXECUTED_REASON+reason
+							}
+							if(!executionResult.save(flush:true)) {
+								log.error "Error saving executionResult instance : ${executionResult.errors}"
+							}
+							resultstatus.flush()
+						}
+					}
+					catch(Throwable th) {
+						resultstatus.setRollbackOnly()
+					}
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace()
+		}
+	}
+
 	/**
 	 * Check device is enable or not
 	 * 
@@ -2104,9 +2138,32 @@ class ExecutionController {
 				}
 
 				ExecutionResult executionResult = ExecutionResult.findById(execResult)
-				if(executionResult && !(executionResult?.status.equals( FAILURE_STATUS ))){
+				if(executionResult && !(executionResult?.status.equals( FAILURE_STATUS ))  && !(executionResult?.status.equals( NOT_APPLICABLE_STATUS ))){
 					executionResult?.status = statusData?.toUpperCase().trim()
 					executionResult?.save(flush:true)
+				}
+				if(execution && execution?.result?.equals( FAILURE_STATUS )){
+					def executionResults = []
+					boolean atleastOneFailureScript = false
+					executionResults = ExecutionResult.findAllByExecution(execution)
+					int totalScriptsCount = executionResults?.size()
+					int naScriptsCount = 0
+					for(executionResultObject in executionResults){
+						if(executionResultObject?.status?.equals(FAILURE_STATUS)){
+							atleastOneFailureScript = true
+						}
+						if(executionResultObject?.status?.equals(NOT_APPLICABLE_STATUS)){
+							naScriptsCount++
+						}
+					}
+					if(!atleastOneFailureScript && !(naScriptsCount == totalScriptsCount)){
+						if(execDeviceInstance && execDeviceInstance?.status.equals( FAILURE_STATUS )){
+							execDeviceInstance?.status = SUCCESS_STATUS
+							execDeviceInstance?.save(flush:true)
+						}
+						execution?.result = SUCCESS_STATUS
+						execution?.save(flush:true)
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -2123,7 +2180,6 @@ class ExecutionController {
 	def saveResultDetails(final String execId, final String resultData, final String execResult,
 			final String expectedResult, final String resultStatus, final String testCaseName, final String execDevice)
 	{
-
 		try{
 			if(resultData){
 				String actualResult = resultData

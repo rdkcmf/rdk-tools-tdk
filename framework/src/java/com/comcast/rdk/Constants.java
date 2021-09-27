@@ -74,7 +74,9 @@ public final class Constants
     public static final String ABORTED_STATUS    	= "ABORTED";
     public static final String COMPLETED_STATUS    	= "COMPLETED";
     public static final String NOT_APPLICABLE_STATUS= "N/A";
+	public static final String NOT_APPLICABLE_STATUS_NO_SLASH= "NA";
     public static final String SCRIPT_TIME_OUT      = "SCRIPT TIME OUT";
+	public static final String TEST_NOT_EXECUTED_REASON = "Test not executed. Reason : ";
     public static final String FILE_TRANSFER_SCRIPT_RDKSERVICE = "//fileStore//transfer_thunderdevice_logs.py";
     public static final String FILE_TRANSFER_SCRIPT = "//fileStore//filetransfer.py";
     public static final String FILE_UPLOAD_SCRIPT   = "//fileStore//fileupload.py";
