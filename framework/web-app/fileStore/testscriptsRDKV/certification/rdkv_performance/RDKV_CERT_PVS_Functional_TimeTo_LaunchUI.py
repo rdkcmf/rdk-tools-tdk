@@ -128,7 +128,7 @@ if expectedResult in result.upper():
                         ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
                         if ssh_param_dict != {} and expectedResult in result:
                             tdkTestObj.setResultStatus("SUCCESS")
-                            command = 'cat /opt/logs/wpeframework.log | grep -inr URLChanged.*url.*'+ui_app_url+'.*home.*| tail -1'
+                            command = 'cat /opt/logs/wpeframework.log | grep -inr URLChanged.*url.*'+ui_app_url+'| tail -1'
                             #get the log line containing the urlfinished info from wpeframework log
                             tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
                             tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])

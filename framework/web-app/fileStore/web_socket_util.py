@@ -77,16 +77,27 @@ class createEventListener(object):
 
     def on_open(self):
         def run(*args):
+            registerResponse = ''
             print("[INFO]: Registering Events...")
             for event in self.events:
+                count = 0
                 if self.trace:
                     print "\n Register Event %s" %(event)
                 self.clearEventsBuffer()
                 self.ws.send(event)
-                time.sleep(2)
-                registerResponse = json.loads(self.getEventsBuffer().pop(0))
-                if (registerResponse.get("result")) == {} and (json.loads(event).get("id")== registerResponse.get("id")):
-                    status = "SUCCESS"
+                while count < 3:
+                    if len(self.getEventsBuffer()) == 0:
+                        time.sleep(2)
+                        count +=1
+                    else:
+                        break
+                if count < 3:
+                    registerResponse = json.loads(self.getEventsBuffer().pop(0))
+                    if (registerResponse.get("result")) == {} and (json.loads(event).get("id")== registerResponse.get("id")):
+                        status = "SUCCESS"
+                    else:
+                        status = "FAILURE"
+                    self.clearEventsBuffer()
                 else:
                     status = "FAILURE"
                 eventinfo = {}
