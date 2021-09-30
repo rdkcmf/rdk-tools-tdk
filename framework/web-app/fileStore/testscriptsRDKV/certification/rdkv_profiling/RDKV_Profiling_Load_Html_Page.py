@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>The objective of this test is to validate profiling data from Grafana tool after loading a HTML page</synopsis>
   <groups_id/>
-  <execution_time>6</execution_time>
+  <execution_time>7</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -73,6 +73,7 @@ import tdklib
 import json
 from StabilityTestUtility import *
 from RDKVProfilingVariables import *
+from datetime import datetime
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_profiling","1",standAlone=True)
@@ -83,10 +84,13 @@ ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_Profiling_Load_Html_Page')
 
+start_datetime_string = str(datetime.utcnow()).split('.')[0]
+
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
 print "[LIB LOAD STATUS]  :  %s" %result
 obj.setLoadModuleStatus(result)
+
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
@@ -103,17 +107,42 @@ if expectedResult in result.upper():
     process_wise_methods = ['rdkv_profiling_collectd_check_process_metrics','rdkv_profiling_collectd_check_process_usedCPU','rdkv_profiling_collectd_check_process_usedSHR']
     process_wise_method_names_dict = {'rdkv_profiling_collectd_check_process_metrics':'metrics','rdkv_profiling_collectd_check_process_usedCPU':'used CPU','rdkv_profiling_collectd_check_process_usedSHR':'used shared memory'}
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
-    time.sleep(10)
-    if any(curr_plugins_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
-	print "\n Error while getting the status of plugins"
-	status = "FAILURE"
-    elif curr_plugins_status_dict != plugin_status_needed:
-        revert = "YES"
-        status = set_plugins_status(obj,plugin_status_needed)
-        time.sleep(20)
-        new_plugin_status = get_plugins_status(obj,plugins_list)
-        if new_plugin_status != plugin_status_needed:
+    time.sleep(20)
+    conf_file,result = getConfigFileName(obj.realpath)
+    if result == "SUCCESS":
+        if any(curr_plugins_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
+            print "\n Error while getting the status of plugins"
             status = "FAILURE"
+        elif curr_plugins_status_dict != plugin_status_needed:
+            revert = "YES"
+            #Validate system wide profiling data
+            end_datetime_string = str(datetime.utcnow()).split('.')[0]
+            print "\n Validating system wide profiling mettrics from grafana before launching HtmlApp\n"
+            for method in system_wide_methods_list:
+                tdkTestObj = obj.createTestStep(method)
+                tdkTestObj.addParameter('tmUrl',obj.url)
+                tdkTestObj.addParameter('resultId',obj.resultId)
+                tdkTestObj.addParameter('deviceConfig',conf_file)
+                tdkTestObj.addParameter('fromDateString',start_datetime_string)
+                tdkTestObj.addParameter('toDateString',end_datetime_string)
+                tdkTestObj.executeTestCase(expectedResult)
+                details = tdkTestObj.getResultDetails()
+                result = tdkTestObj.getResult()
+                validation_result = json.loads(details).get("test_step_status")
+                if expectedResult in (result and validation_result):
+                    print "Successfully validated the {}\n".format(system_wide_method_names_dict[method])
+                    tdkTestObj.setResultStatus("SUCCESS")
+                else:
+                    print "Error while validating the {}\n".format(system_wide_method_names_dict[method])
+                    tdkTestObj.setResultStatus("FAILURE")
+            status = set_plugins_status(obj,plugin_status_needed)
+            time.sleep(20)
+            new_plugin_status = get_plugins_status(obj,plugins_list)
+            if new_plugin_status != plugin_status_needed:
+                status = "FAILURE"
+    else:
+        print "\n Unable to get device config file"
+        status = "FAILURE"
     if status == "SUCCESS":
         print "\n Pre conditions for the test are set successfully"
         print "\n Get the URL in ",html_app_instance
@@ -145,74 +174,88 @@ if expectedResult in result.upper():
                     tdkTestObj.setResultStatus("SUCCESS")
                     print "\n Validate data from Grafana"
                     time.sleep(60)
-                    conf_file,result = getConfigFileName(obj.realpath)
-                    if result == "SUCCESS":
-                        #Validate system wide profiling data
-                        for method in system_wide_methods_list:
+                    #Validate system wide profiling data
+                    for method in system_wide_methods_list:
+                        tdkTestObj = obj.createTestStep(method)
+                        tdkTestObj.addParameter('tmUrl',obj.url)
+                        tdkTestObj.addParameter('resultId',obj.resultId)
+                        tdkTestObj.addParameter('deviceConfig',conf_file)
+                        tdkTestObj.executeTestCase(expectedResult)
+                        details = tdkTestObj.getResultDetails()
+                        result = tdkTestObj.getResult()
+                        validation_result = json.loads(details).get("test_step_status")
+                        if expectedResult in (result and validation_result):
+                            print "Successfully validated the {}\n".format(system_wide_method_names_dict[method])
+                            tdkTestObj.setResultStatus("SUCCESS")
+                        else:
+                            print "Error while validating the {}\n".format(system_wide_method_names_dict[method])
+                            tdkTestObj.setResultStatus("FAILURE")
+                    #Validate process wise profiling data
+                    for process in process_list:
+                        for method in process_wise_methods:
                             tdkTestObj = obj.createTestStep(method)
                             tdkTestObj.addParameter('tmUrl',obj.url)
                             tdkTestObj.addParameter('resultId',obj.resultId)
+                            tdkTestObj.addParameter('processName',process)
                             tdkTestObj.addParameter('deviceConfig',conf_file)
                             tdkTestObj.executeTestCase(expectedResult)
                             details = tdkTestObj.getResultDetails()
                             result = tdkTestObj.getResult()
                             validation_result = json.loads(details).get("test_step_status")
                             if expectedResult in (result and validation_result):
-                                print "Successfully validated the {}\n".format(system_wide_method_names_dict[method])
+                                print "Successfully validated the {} process {}\n".format(process,process_wise_method_names_dict[method])
                                 tdkTestObj.setResultStatus("SUCCESS")
                             else:
-                                print "Error while validating the {}\n".format(system_wide_method_names_dict[method])
+                                print "Error while validating the {} process {}\n".format(process,process_wise_method_names_dict[method])
                                 tdkTestObj.setResultStatus("FAILURE")
-                        #Validate process wise profiling data
-                        for process in process_list:
-                            for method in process_wise_methods:
-                                tdkTestObj = obj.createTestStep(method)
-                                tdkTestObj.addParameter('tmUrl',obj.url)
-                                tdkTestObj.addParameter('resultId',obj.resultId)
-                                tdkTestObj.addParameter('processName',process)
-                                tdkTestObj.addParameter('deviceConfig',conf_file)
-                                tdkTestObj.executeTestCase(expectedResult)
-                                details = tdkTestObj.getResultDetails()
-                                result = tdkTestObj.getResult()
-                                validation_result = json.loads(details).get("test_step_status")
-                                if expectedResult in (result and validation_result):
-                                    print "Successfully validated the {} process {}\n".format(process,process_wise_method_names_dict[method])
-                                    tdkTestObj.setResultStatus("SUCCESS")
-                                else:
-                                    print "Error while validating the {} process {}\n".format(process,process_wise_method_names_dict[method])
-                                    tdkTestObj.setResultStatus("FAILURE")
-                        #smem data collection
-                        tdkTestObj = obj.createTestStep("rdkv_profiling_smem_execute")
-                        tdkTestObj.addParameter('deviceIP',ip)
-                        tdkTestObj.addParameter('deviceConfig',conf_file)
-                        tdkTestObj.addParameter('realPath',obj.realpath)
-                        tdkTestObj.addParameter('execId',obj.execID)
-                        tdkTestObj.addParameter('execDeviceId',obj.execDevId)
-                        tdkTestObj.addParameter('execResultId',obj.resultId)
-                        tdkTestObj.executeTestCase(expectedResult)
-                        details = tdkTestObj.getResultDetails()
-                        result = tdkTestObj.getResult()
-                        if "SUCCESS" in result:
-                            print "\nSMEM tool execution success and transferred the log"
-                            tdkTestObj.setResultStatus("SUCCESS")
-                        else:
-                            print "\nSMEM tool execution or log transfer failed"
-                            tdkTestObj.setResultStatus("FAILURE")
-                        #check for alerts from Grafana tool
-                        print "\nCheck for profiling alerts...."
-                        tdkTestObj = obj.createTestStep("rdkv_profiling_get_alerts")
-                        tdkTestObj.addParameter('tmUrl',obj.url)
-                        tdkTestObj.addParameter('resultId',obj.resultId)
-                        tdkTestObj.executeTestCase(expectedResult)
-                        details = tdkTestObj.getResultDetails()
-                        result = tdkTestObj.getResult()
-                        validation_result = json.loads(details).get("test_step_status")
-                        if expectedResult in (result and validation_result):
-                            tdkTestObj.setResultStatus("SUCCESS")
-                        else:
-                            tdkTestObj.setResultStatus("FAILURE")
+                    #smem data collection
+                    tdkTestObj = obj.createTestStep("rdkv_profiling_smem_execute")
+                    tdkTestObj.addParameter('deviceIP',ip)
+                    tdkTestObj.addParameter('deviceConfig',conf_file)
+                    tdkTestObj.addParameter('realPath',obj.realpath)
+                    tdkTestObj.addParameter('execId',obj.execID)
+                    tdkTestObj.addParameter('execDeviceId',obj.execDevId)
+                    tdkTestObj.addParameter('execResultId',obj.resultId)
+                    tdkTestObj.executeTestCase(expectedResult)
+                    details = tdkTestObj.getResultDetails()
+                    result = tdkTestObj.getResult()
+                    if "SUCCESS" in result:
+                        print "\nSMEM tool execution success and transferred the log"
+                        tdkTestObj.setResultStatus("SUCCESS")
                     else:
-                        print "\n Error while getting device config file"
+                        print "\nSMEM tool execution or log transfer failed"
+                        tdkTestObj.setResultStatus("FAILURE")
+                    list_of_process = ' '.join(process_list)
+                    #pmap data collection
+                    tdkTestObj = obj.createTestStep("rdkv_profiling_pmap_execute")
+                    tdkTestObj.addParameter('deviceIP',ip)
+                    tdkTestObj.addParameter('deviceConfig',conf_file)
+                    tdkTestObj.addParameter('processes',list_of_process)
+                    tdkTestObj.addParameter('realPath',obj.realpath)
+                    tdkTestObj.addParameter('execId',obj.execID)
+                    tdkTestObj.addParameter('execDeviceId',obj.execDevId)
+                    tdkTestObj.addParameter('execResultId',obj.resultId)
+                    tdkTestObj.executeTestCase(expectedResult)
+                    details = tdkTestObj.getResultDetails()
+                    result = tdkTestObj.getResult()
+                    if "SUCCESS" in result:
+                        print "\npmap tool execution success and transferred the log"
+                        tdkTestObj.setResultStatus("SUCCESS")
+                    else:
+                        print "\npmap tool execution or log transfer failed"
+                        tdkTestObj.setResultStatus("FAILURE")
+                    #check for alerts from Grafana tool
+                    print "\nCheck for profiling alerts...."
+                    tdkTestObj = obj.createTestStep("rdkv_profiling_get_alerts")
+                    tdkTestObj.addParameter('tmUrl',obj.url)
+                    tdkTestObj.addParameter('resultId',obj.resultId)
+                    tdkTestObj.executeTestCase(expectedResult)
+                    details = tdkTestObj.getResultDetails()
+                    result = tdkTestObj.getResult()
+                    validation_result = json.loads(details).get("test_step_status")
+                    if expectedResult in (result and validation_result):
+                        tdkTestObj.setResultStatus("SUCCESS")
+                    else:
                         tdkTestObj.setResultStatus("FAILURE")
                 else:
                     print "\nFailed to load the URL ",html_page_url

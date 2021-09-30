@@ -23,7 +23,9 @@
           <parameter name="tmUrl" value=""/>
           <parameter name="resultId" value=""/>
           <parameter name="deviceConfig" value=""/>
-          <parameter name="thresholdCheck" value="true"/>
+	  <parameter name="thresholdCheck" value="true"/>
+	  <parameter name="fromDateString" value=""/>
+          <parameter name="toDateString" value=""/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="rdkv_profiling_collectd_check_system_loadavg" id=" " version="3">
@@ -32,7 +34,9 @@
           <parameter name="tmUrl" value=""/>
           <parameter name="resultId" value=""/>
           <parameter name="deviceConfig" value=""/>
-          <parameter name="thresholdCheck" value="true"/>
+	  <parameter name="thresholdCheck" value="true"/>
+	  <parameter name="fromDateString" value=""/>
+          <parameter name="toDateString" value=""/> 
         </parameters>
       </primitiveTest>
       <primitiveTest name="rdkv_profiling_collectd_check_process_metrics" id=" " version="2">
@@ -42,7 +46,7 @@
           <parameter name="resultId" value=""/>
           <parameter name="processName" value=""/>
           <parameter name="deviceConfig" value=""/>
-          <parameter name="thresholdCheck" value="true"/>
+	  <parameter name="thresholdCheck" value="true"/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="rdkv_profiling_collectd_check_system_CPU" id=" " version="1">
@@ -51,7 +55,9 @@
           <parameter name="deviceConfig" value=""/>
           <parameter name="resultId" value=""/>
           <parameter name="thresholdCheck" value="true"/>
-          <parameter name="tmUrl" value=""/>
+	  <parameter name="tmUrl" value=""/>
+          <parameter name="fromDateString" value=""/>
+          <parameter name="toDateString" value=""/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="rdkv_profiling_collectd_check_process_usedCPU" id=" " version="1">
@@ -90,6 +96,18 @@
         <parameters>
           <parameter name="resultId" value=""/>
           <parameter name="tmUrl" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="rdkv_profiling_pmap_execute" id=" " version="1">
+        <function>rdkv_profiling_pmap_execute</function>
+        <parameters>
+          <parameter name="deviceConfig" value=""/>
+          <parameter name="deviceIP" value=""/>
+          <parameter name="execDeviceId" value=""/>
+          <parameter name="execId" value=""/>
+          <parameter name="execResultId" value=""/>
+          <parameter name="processes" value=""/>
+          <parameter name="realPath" value=""/>
         </parameters>
       </primitiveTest>
     </primitiveTests>

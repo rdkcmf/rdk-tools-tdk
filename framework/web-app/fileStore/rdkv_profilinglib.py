@@ -90,9 +90,13 @@ def compare_metric_threshold_values(deviceConfigFile,configParam, metricValue):
 # Return Value : status and REST API response dict in string format
 #----------------------------------------------------------------------------
 
-def rdkv_profiling_collectd_check_system_memory(tmUrl, resultId, deviceConfig, thresholdCheck="true"):
-    url_param = "actualUnit=Bytes"+str("&")+"preferredUnit=MB"+str("&")+"isSystemMetric=true"+str("&")+"parameter=memory.memory-used,memory.memory-free,memory.memory-cached,memory.memory-buffered"
-    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+ str("&") + url_param
+def rdkv_profiling_collectd_check_system_memory(tmUrl, resultId, deviceConfig, fromDateString="", toDateString="", thresholdCheck="true"):
+    if not (fromDateString and toDateString):
+        url_param = "actualUnit=Bytes" + str("&") + "preferredUnit=MB" + str("&") + "isSystemMetric=true" + str("&") + "parameter=memory.memory-used,memory.memory-free,memory.memory-cached,memory.memory-buffered"
+        url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId=' + str(resultId) + str("&") + url_param
+    else:
+        url_param = "parameter=memory.memory-used,memory.memory-free,memory.memory-cached,memory.memory-buffered"
+        url = tmUrl + '/execution/fetchDataFromGrafanaMultiple?executionResultId=' + str(resultId)+ str("&") + url_param + str("&") + 'fromDateString=' + fromDateString + str("&") + 'toDateString=' + toDateString
     result_details = {}
     try:
         response = urllib.urlopen(url).read()
@@ -152,9 +156,13 @@ def rdkv_profiling_collectd_check_system_memory(tmUrl, resultId, deviceConfig, t
 # Return Value : status and REST API response dict in string format
 #----------------------------------------------------------------------------
 
-def rdkv_profiling_collectd_check_system_loadavg(tmUrl, resultId, deviceConfig, thresholdCheck="true"):
-    url_param = "actualUnit=%25"+str("&")+"preferredUnit=%25"+str("&")+"isSystemMetric=true"+str("&")+"parameter=load.load.longterm,load.load.midterm,load.load.shortterm"
-    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+str("&")+url_param
+def rdkv_profiling_collectd_check_system_loadavg(tmUrl, resultId, deviceConfig, fromDateString="", toDateString="", thresholdCheck="true"):
+    if not (fromDateString and toDateString):
+        url_param = "actualUnit=%25"+str("&")+"preferredUnit=%25"+str("&")+"isSystemMetric=true"+str("&")+"parameter=load.load.longterm,load.load.midterm,load.load.shortterm"
+        url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+str("&")+url_param
+    else:
+        url_param = "parameter=load.load.longterm,load.load.midterm,load.load.shortterm"
+        url = tmUrl + '/execution/fetchDataFromGrafanaMultiple?executionResultId='+str(resultId)+str("&")+url_param + str("&") + 'fromDateString=' + fromDateString + str("&") + 'toDateString=' + toDateString
     result_details = {}
     try:
         response = urllib.urlopen(url).read()
@@ -211,9 +219,13 @@ def rdkv_profiling_collectd_check_system_loadavg(tmUrl, resultId, deviceConfig, 
 # Return Value : status and REST API response dict in string format
 #----------------------------------------------------------------------------
 
-def rdkv_profiling_collectd_check_system_CPU(tmUrl, resultId, deviceConfig, thresholdCheck="true"):
-    url_param = "actualUnit=%25"+str("&")+"preferredUnit=%25"+str("&")+"isSystemMetric=true"+str("&")+"parameter=cpu.percent-active"
-    url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+str("&")+url_param
+def rdkv_profiling_collectd_check_system_CPU(tmUrl, resultId, deviceConfig, fromDateString="", toDateString="", thresholdCheck="true"):
+    if not (fromDateString and toDateString):
+        url_param = "actualUnit=%25"+str("&")+"preferredUnit=%25"+str("&")+"isSystemMetric=true"+str("&")+"parameter=cpu.percent-active"
+        url = tmUrl + '/execution/fetchDataFromGrafana?executionResultId='+str(resultId)+str("&")+url_param
+    else:
+        url_param = "parameter=cpu.percent-active"
+        url = tmUrl + '/execution/fetchDataFromGrafanaMultiple?executionResultId='+str(resultId)+str("&")+url_param + str("&") + 'fromDateString=' + fromDateString + str("&") + 'toDateString=' + toDateString
     result_details = {}
     try:
         response = urllib.urlopen(url).read()
@@ -537,8 +549,9 @@ def rdkv_profiling_smem_execute(deviceIP,deviceConfig,realPath,execId,execDevice
                 dest_path = realPath + "/logs/" + str(execId) + "/" + str(execDeviceId) + "/" + str(execResultId)
                 now = datetime.now()
                 timing_info = str(now.strftime("%Y%m%d%H%M%S"))
+                src_file_name = "smemData.txt"
                 dest_file_name = str(execId) + "_" + "smemData" + "_" + timing_info
-                result_val = transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_path,dest_file_name)
+                result_val = transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_path,dest_file_name,src_file_name)
             except Exception as e:
                 result_val = "EXCEPTION OCCURRED"
     else:
@@ -550,7 +563,7 @@ def rdkv_profiling_smem_execute(deviceIP,deviceConfig,realPath,execId,execDevice
 #----------------------------------------------------------------------------
 # Transfer file from DUT to TM path
 #----------------------------------------------------------------------------
-def transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_path,dest_file_name):
+def transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_path,dest_file_name,src_file_name):
     result_val = "SUCCESS"
     try:
         if not os.path.exists(dest_path):
@@ -564,7 +577,7 @@ def transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_pat
         #print command
         os.system(command)
         time.sleep(1)
-        src_log_file  = dest_path + "/" + "smemData.txt"
+        src_log_file  = dest_path + "/" + src_file_name
         dest_log_file = dest_path + "/" + dest_file_name
         os.rename(src_log_file,dest_log_file)
         if os.path.exists(dest_log_file):
@@ -578,3 +591,61 @@ def transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_pat
         result_val = "EXCEPTION OCCURRED"
     return result_val
 
+#----------------------------------------------------------------------------
+# To execute the pmap tool in DUT and transfer the pmap log from DUT to TM
+#
+#
+# Syntax       : rdkv_profiling_pmap_execute(deviceIP,deviceConfig,realPath,execId,execDeviceId,execResultId)
+#
+# Parameters   : deviceIP - IP of the device
+#                deviceConfig - DUT config file
+#                execId - execution ID
+#                realPath - TM location
+#                execResultId - execution result ID
+#                execDeviceId - execution device ID
+#
+# Return Value : SUCCESS/FAILURE.
+#                SUCCESS - smem tool execution & log transfer done
+#                FAILURE - smem tool execution/log transfer failed
+#----------------------------------------------------------------------------
+def rdkv_profiling_pmap_execute(deviceIP,deviceConfig,realPath,execId,execDeviceId,processes,execResultId):
+    result_val = "SUCCESS"
+    host_name = deviceIP
+    result,pmap_support = getDeviceConfigKeyValue(deviceConfig,"PROFILING_PMAP_SUPPORT")
+    if pmap_support != "" and pmap_support.upper() == "YES":
+        result,ssh_method = getDeviceConfigKeyValue(deviceConfig,"SSH_METHOD")
+        result,user_name  = getDeviceConfigKeyValue(deviceConfig,"SSH_USERNAME")
+        result,password   = getDeviceConfigKeyValue(deviceConfig,"SSH_PASSWORD")
+        file_name = "/tmp/pmapData.txt"
+        #list of processes for which pmap have to be executed are passed from script 
+        command = '''echo "" > '''+file_name+'''; var1="'''+processes+'''" ; IFS=' ' read -r -a arrayvar <<< "$var1";for a in "${arrayvar[@]}" ; do echo "Process Name : $a" >> '''+file_name +''';pidof $a | xargs pmap >> '''+file_name+'''; done'''
+        if ssh_method == "" or user_name == "" or password == "":
+            print "Please configure the SSH details in device config file"
+            result_val = ""
+        else:
+            if password == "None":
+                ssh_password = ""
+            else:
+                ssh_password = password
+            try:
+                lib = importlib.import_module("SSHUtility")
+                if ssh_method == "directSSH":
+                     method = "ssh_and_execute"
+                else:
+                     method = "ssh_and_execute_" + ssh_method
+                method_to_call = getattr(lib, method)
+                if ssh_method == "directSSH":
+                     output = method_to_call(ssh_method,host_name,user_name,ssh_password,command)
+                else:
+                     output = method_to_call(host_name,user_name,password,command)
+                dest_path = realPath + "/logs/" + str(execId) + "/" + str(execDeviceId) + "/" + str(execResultId)
+                now = datetime.now()
+                timing_info = str(now.strftime("%Y%m%d%H%M%S"))
+                src_file_name = "pmapData.txt"
+                dest_file_name = str(execId) + "_" + "pmapData" + "_" + timing_info
+                result_val = transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_path,dest_file_name,src_file_name)
+            except Exception as e:
+                result_val = "EXCEPTION OCCURRED"
+    else:
+         print "\nDevice does not have pmap support. Skipping pmap execution"
+    return result_val
