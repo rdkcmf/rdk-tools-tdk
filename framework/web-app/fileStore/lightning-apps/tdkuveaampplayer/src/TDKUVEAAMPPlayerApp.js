@@ -131,6 +131,31 @@ export default class App extends Lightning.Component {
       logMsg("Expected Event: " + this.expectedEvents)
       this.player.setPlaybackRate(rate, overshoot);
   }
+  setNegPlaybackRate(rate, overshoot = 0) {
+      this.expectedEvents = ["ratechange"]
+      this.expectedRates = [ rate, 1 ]
+      this.rewindFlag = 1
+      logMsg("Expected Rates: " + this.expectedRates)
+      logMsg("Expected Event: " + this.expectedEvents)
+      this.player.setPlaybackRate(rate, overshoot);
+  }
+  seek(timeSec, keepPause = false) {
+      this.player.seek(timeSec, keepPause);
+  }
+  seekfwd(pos){
+      this.expectedEvents   = ["seeking","seeked"]
+      this.expectedPos = Math.floor(this.getCurrentPosition() + pos )
+      logMsg("Expected Event: "   + this.expectedEvents)
+      logMsg("Expected Pos  : [ " + this.expectedPos + " - " + (this.expectedPos + 7) + " ]")
+      this.seek(this.expectedPos)
+  }
+  seekbwd(pos){
+      this.expectedEvents   = ["seeking","seeked"]
+      this.expectedPos = Math.floor(this.getCurrentPosition() - pos )
+      logMsg("Expected Event: "   + this.expectedEvents)
+      logMsg("Expected Pos  : [ " + this.expectedPos + " - " + (this.expectedPos + 7) + " ]")
+      this.seek(this.expectedPos)
+  }
   getPlaybackRate() {
      return this.player.getPlaybackRate();
   }
@@ -222,7 +247,7 @@ export default class App extends Lightning.Component {
             break;
         case tag.playerStates.Seeking:
             tag.observedEvents.push("seeking")
-            tag.checkAndLogEvents("paused","Video Player Seeking")
+            tag.checkAndLogEvents("seeking","Video Player Seeking")
             break;
         default:
             tag.handlePlayerStates(event.state);
@@ -231,6 +256,9 @@ export default class App extends Lightning.Component {
   }
   eventplaybackRateChanged(event) {
     tag.observedEvents.push("ratechange")
+    if (tag.rewindFlag == 1){
+        tag.observedRates.push(event.speed);
+    }
     tag.observedRate = event.speed;
     var rate_info = "Video Player Rate Change to " + tag.observedRate
     tag.checkAndLogEvents("ratechange",rate_info);
@@ -243,7 +271,13 @@ export default class App extends Lightning.Component {
     tag.errorFlag = 1
     tag.handlePlayerEvents("Video PlayBack Failed")
   }
-
+  eventplaybackSeeked(event){
+      tag.observedEvents.push("seeked")
+      tag.observedPos = Math.round(event.position / 1000);
+      var dur = tag.getDurationSec()
+      var seek_info = "Video Player Seeked " + tag.observedPos + "/" + dur.toFixed(2)
+      tag.checkAndLogEvents("seeked",seek_info);
+  }
   handlePlayerStates(id){
     if (this.playerStateIDs.includes(id)){
        for (var state in this.playerStates){
@@ -304,6 +338,7 @@ export default class App extends Lightning.Component {
     this.addEventListener("playbackCompleted",this.eventplaybackCompleted)
     this.addEventListener("playbackSpeedChanged",this.eventplaybackRateChanged)
     this.addEventListener("playbackFailed",this.eventplaybackFailed)
+    this.addEventListener("seeked", this.eventplaybackSeeked)
     logMsg("Event listeners added successfully...")
   }
 
@@ -361,6 +396,18 @@ export default class App extends Lightning.Component {
                     this.playNow()
                 },actionInterval);
             }
+	    else if (action == "seekfwd"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.seekfwd(this.seekInterval)
+                },actionInterval);
+            }
+	    else if (action == "seekbwd"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.seekbwd(this.seekInterval)
+                },actionInterval);
+            }
             else if (action == "fastfwd4x" || action == "fastfwd16x" || action == "fastfwd32x"){
                 if (action == "fastfwd32x"){
                 setTimeout(()=> {
@@ -376,6 +423,24 @@ export default class App extends Lightning.Component {
                 setTimeout(()=> {
                     this.clearEvents()
                     this.setPlaybackRate(16)
+                },actionInterval);
+                }
+            }
+            else if (action == "rewind4x" || action == "rewind16x" || action == "rewind32x"){
+                if (action == "rewind32x"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.setNegPlaybackRate(-32)
+                },actionInterval);
+                }else if (action == "rewind4x"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.setNegPlaybackRate(-4)
+                },actionInterval);
+                }else if (action == "rewind16x"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.setNegPlaybackRate(-16)
                 },actionInterval);
                 }
             }
@@ -434,6 +499,18 @@ export default class App extends Lightning.Component {
                 logMsg("video pause operation failure")
               }
           }
+          else if(this.expectedEvents.includes("seeked")){
+              var currTime = parseInt(this.observedPos)
+              //var currTime = parseInt(this.getCurrentPosition())
+	      var expTime  = parseInt(this.expectedPos)
+              if( currTime >= expTime && currTime <= (expTime+7) ){
+                logMsg("video seek operation success")
+              }else{
+                this.eventFlowFlag = 0
+                Status = "FAILURE"
+                logMsg("video seek operation failure")
+              }
+          }
           else if(this.expectedEvents.includes("playing")){
               var currState = this.getCurrentState();
               if (currState == this.playerStates.Playing){
@@ -445,16 +522,27 @@ export default class App extends Lightning.Component {
               }
           }
           else if(this.expectedEvents.includes("ratechange")){
-              var currRate = parseInt(this.observedRate)
-              //logMsg("Observed Rate : " + currRate)
-              if( currRate == this.expectedRate && currRate == parseInt(this.getPlaybackRate())){
-                logMsg("video rate change operation success")
+              if (this.rewindFlag == 1 ){
+                  this.rewindFlag = 0;
+                  if( ! this.expectedRates.every(e=> this.observedRates.indexOf(e) >= 0)){
+                    this.eventFlowFlag = 0
+                    Status = "FAILURE"
+                    logMsg("video rate change operation failure")
+                  }else{
+                    logMsg("video rate change operation success")
+                  }
               }else{
-                this.eventFlowFlag = 0
-                Status = "FAILURE"
-                logMsg("video rate change operation failure")
-              }
-           }
+                  var currRate = parseInt(this.observedRate)
+                  //logMsg("Observed Rate : " + currRate)
+                  if( currRate == this.expectedRate && currRate == parseInt(this.getPlaybackRate())){
+                    logMsg("video rate change operation success")
+                  }else{
+                    this.eventFlowFlag = 0
+                    Status = "FAILURE"
+                    logMsg("video rate change operation failure")
+                  }
+             }   
+          }
       }
       logMsg("Test step status: " + Status)
   }
@@ -491,7 +579,15 @@ export default class App extends Lightning.Component {
     this.init     = 0
     this.interval = 1000
     this.checkInterval= 3000
-    this.vidDuration  = 0
+    this.seekInterval = 10
+    this.expectedPos    = 0
+    this.observedPos    = 0
+    this.expectedRate   = 0
+    this.observedRate   = 0
+    this.expectedRates  = []
+    this.observedRates  = []
+    this.vidDuration    = 0
+    this.rewindFlag     = 0
     this.errorFlag      = 0
     this.eventFlowFlag  = 1
     this.observedEvents = []
@@ -513,7 +609,18 @@ export default class App extends Lightning.Component {
         if(item.split("=")[0] == "drmconfigs"){
             this.configs = GetURLParameter("drmconfigs").split(",");
         }
+        else if(item.split("=")[0] == "options"){
+            this.options = GetURLParameter("options").split(",");
+        }
     });
+    this.options.forEach(item => {
+	if(item.includes("seekInterval")){
+         this.seekInterval = parseInt(item.split('(')[1].split(')')[0]);
+        }
+        else if(item.includes("checkInterval")){
+         this.checkInterval = parseInt(item.split('(')[1].split(')')[0])*1000;
+       }
+     });
     // check the DRM options provided in the url and update the configs
     this.license_header = "";
     this.preferredDRM   = "";
