@@ -51,9 +51,9 @@
     <automation_approch>1.Activates the Wfi and Network plugin
 2. Connect the DUT to Wifi 
 3.Checks whether WPA supplicant file contains wifi password
-4.Pass/fail the test based on the availability of Wifi passwords in WPA_supplicant file
+4.Pass/fail the test based on the availability of Wifi passwords in WPA_supplicant file and password excryption status
 5. Disconnects from Wifi</automation_approch>
-    <expected_output>WPA supplicant file should not contain wifi password</expected_output>
+    <expected_output>WPA supplicant file should not contain wifi password if "encrypted_wifi_password_support" configured as "yes"</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_security</test_stub_interface>
     <test_script>RDKV_CERT_SVS_Check_WPASupplicant_File_For_WiFiPassword</test_script>
@@ -134,7 +134,7 @@ if expectedResult in result.upper():
             break
     if Test_Step_Status:
         print "Retrieving Configuration values from config file......."
-        configKeyList = ["PREFERRED_NETWORK_PARAMETER","WIFI_SSID_NAME","WIFI_PASSPHRASE","WIFI_SECURITY_MODE","SSH_METHOD", "SSH_USERNAME", "SSH_PASSWORD"]
+        configKeyList = ["PREFERRED_NETWORK_PARAMETER","WIFI_SSID_NAME","WIFI_PASSPHRASE","WIFI_SECURITY_MODE","SSH_METHOD", "SSH_USERNAME", "SSH_PASSWORD", "ENCRYPTED_WIFI_PASSWORD_SUPPORT"]
         configValues = {}
         tdkTestObj = obj.createTestStep('rdkvsecurity_getDeviceConfig')
         #Get each configuration from device config file
@@ -222,12 +222,24 @@ if expectedResult in result.upper():
                                         tdkTestObj.executeTestCase(expectedResult);
                                         output = tdkTestObj.getResultDetails();
                                         output = str(output).split("\n")[1]
-                                        if str(configValues["WIFI_PASSPHRASE"]) in output:
-                                            print "FAILURE: WPA_Supplicant file contains WiFi passphrase"
-                                            tdkTestObj.setResultStatus("FAILURE")
-                                        else:
-                                            print "SUCCESS: WPA_Supplicant file does not contain WiFi passphrase"
-                                            tdkTestObj.setResultStatus("SUCCESS")
+                                        if "no" in configValues["ENCRYPTED_WIFI_PASSWORD_SUPPORT"].lower():
+                                            if str(configValues["WIFI_PASSPHRASE"]) in output:
+                                                print "SUCCESS: WiFi passphrase is not encrypted and saved as a plain text in WPA_Supplicant file"
+                                                tdkTestObj.setResultStatus("SUCCESS")
+                                            elif str(configValues["WIFI_PASSPHRASE"]) not in output:
+                                                print "FAILURE: WiFi passphrase not saved as a plain text in WPA_Supplicant file"
+                                                tdkTestObj.setResultStatus("FAILURE") 
+                                            else:
+                                                tdkTestObj.setResultStatus("FAILURE")
+                                        elif "yes" in configValues["ENCRYPTED_WIFI_PASSWORD_SUPPORT"].lower():
+                                            if str(configValues["WIFI_PASSPHRASE"]) not in output:
+                                                print "SUCCESS: WiFi passphrase not saved as a plain text in WPA_Supplicant file"
+                                                tdkTestObj.setResultStatus("SUCCESS")
+                                            elif str(configValues["WIFI_PASSPHRASE"]) in output:    
+                                                print "FAILURE: WiFi passphrase is not encrypted and saved as a plain text in WPA_Supplicant file"
+                                                tdkTestObj.setResultStatus("FAILURE")
+                                            else:
+                                                tdkTestObj.setResultStatus("FAILURE")
                                     else:
                                         print "FAILURE: WPA_Supplicant file not exists in DUT"
                                         tdkTestObj.setResultStatus("FAILURE")

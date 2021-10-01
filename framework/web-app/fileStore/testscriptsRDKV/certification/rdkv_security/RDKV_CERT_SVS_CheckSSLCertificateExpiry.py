@@ -66,13 +66,14 @@
     <test_setup>RPI,Accelerator</test_setup>
     <pre_requisite>1. openssl tool must be available in the DUT
 2. The path for the SSL certificates folder and the expected expiry period(in seconds) within which to check should be specified in the device.config
-3. Credentials to ssh to the DUT should be available in device.config</pre_requisite>
+3. Credentials to ssh to the DUT should be available in device.config
+4. Expired certificates key should be configured in config file to mention device contains expired certificates or not</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>None</input_parameters>
-    <automation_approch>1. Retrieve the SSH credentials, expiry period and certificate path from device.config
+    <automation_approch>1. Retrieve the SSH credentials, expiry period, certificate path and expired certificate status from device.config
 2. Execute the openssl command to check the expiry of each certificate in the specified folder and return the command output which is a multiline string with the "Certificate will expire"/"Certificate will not expire" string and the name of certificates that are expected to expire along with their expiry date.
-3. From the output string, check if there are any certificates that are expected to expire within the specified time(with "Certificate will expire" string). The test pass/fail based on the absence/presence of "Certificate will expire" string.</automation_approch>
-    <expected_output>The multiline output string should not contain  "Certificate will expire" substring</expected_output>
+3. From the output string, check if there are any certificates that are expected to expire within the specified time(with "Certificate will expire" string). The test pass/fail based on the absence/presence of "Certificate will expire" string as well as expired certificates status.</automation_approch>
+    <expected_output>The multiline output string should not contain  "Certificate will expire" substring if "expired_certificates" key configured as "no"</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_security</test_stub_interface>
     <test_script>RdkvSecurity_CheckSSLCertificateExpiry</test_script>
@@ -104,7 +105,7 @@ obj.setLoadModuleStatus(result.upper());
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    configKeyList = ["EXPIRY_PERIOD" , "CERT_PATH", "SSH_METHOD", "SSH_USERNAME", "SSH_PASSWORD"]
+    configKeyList = ["EXPIRY_PERIOD" , "CERT_PATH", "SSH_METHOD", "SSH_USERNAME", "SSH_PASSWORD", "PRESENCE_OF_EXPIRED_CERTIFICATES"]
     configValues = {}
     tdkTestObj = obj.createTestStep('rdkvsecurity_getDeviceConfig')
     #Get each configuration from device config file
@@ -148,12 +149,20 @@ if expectedResult in result.upper():
                 for line in output.splitlines():
                     if (".pem" in line) and (line not in command):
                         certListToBeExpired.append (line)
-                tdkTestObj.setResultStatus("FAILURE");
                 months = int(configValues["EXPIRY_PERIOD"])/2630000
-                print "FAILURE: Few Certificates are expected to expire within %d months: %s\n" %(months,certListToBeExpired)
+                if "yes" in configValues["PRESENCE_OF_EXPIRED_CERTIFICATES"].lower():
+                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "SUCCESS: Few Certificates are expected to expire within %d months: %s\n" %(months,certListToBeExpired)
+                elif "no" in configValues["PRESENCE_OF_EXPIRED_CERTIFICATES"].lower():
+                    tdkTestObj.setResultStatus("FAILURE");
+                    print "FAILURE: Few Certificates are expected to expire within %d months: %s\n" %(months,certListToBeExpired)
             else:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "SUCCESS: No certificate expires within specified time"
+                if "yes" in configValues["PRESENCE_OF_EXPIRED_CERTIFICATES"].lower():
+                    tdkTestObj.setResultStatus("FAILURE");
+                    print "FAILURE: No certificate expires within specified time but configured as expired certificates are present in the device"
+                elif "no" in configValues["PRESENCE_OF_EXPIRED_CERTIFICATES"].lower():
+                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "SUCCESS: No certificate expires within specified time"
         else:
             print "FAILURE: Currently only supports directSSH ssh method"
             tdkTestObj.setResultStatus("FAILURE");

@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Checks whether all SSL certificate  public key length is greater than or equal to 2048</synopsis>
+  <synopsis>Checks whether all SSL certificate  public key length is greater than configured key length</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -61,16 +61,16 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_SECURITY_12</test_case_id>
-    <test_objective>Checks for the ssl certificates public key length is greater than or equal to recommended length 2048</test_objective>
+    <test_objective>Checks for the ssl certificates public key length is greater than configured key length</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI,Accelerator</test_setup>
-    <pre_requisite>1.Configure the certification path (variable $CERT_PATH) available in fileStore/tdkvRDKServiceConfig/device.config file</pre_requisite>
+    <pre_requisite>1.Configure the certification path (variable $CERT_PATH) and certificate public key length available in fileStore/tdkvRDKServiceConfig/device.config file</pre_requisite>
     <api_or_interface_used></api_or_interface_used>
     <input_parameters>None</input_parameters>
     <automation_approch>1. Retrieve the SSH credentials and certificate path from device.config
-2. Execute the openssl command to check the public key length of each certificate in the specified folder and return the command output which is a multiline string with the "insecure" string and the name of certificates having public key less than a recommended length 2048.
-3. From the output string, check if there are any certificates that are having public key less than a recommended length 2048(with "insecure" string). The test pass/fail based on the absence/presence of "insecure" string.</automation_approch>
-    <expected_output>All certificates should have  public key length less than a recommended length 2048</expected_output>
+2. Execute the openssl command to check the public key length of each certificate in the specified folder and return the command output which is a multiline string with the "insecure" string and the name of certificates having public key less than a configured key length.
+3. From the output string, check if there are any certificates that are having public key less than a configured public key length(with "insecure" string). The test pass/fail based on the absence/presence of "insecure" string.</automation_approch>
+    <expected_output>All certificates should have  public key length not less than a configured key length</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_security</test_stub_interface>
     <test_script>RDKV_CERT_SVS_CheckSSLCertificatePublicKeyLength</test_script>
@@ -99,7 +99,7 @@ obj.setLoadModuleStatus(result.upper());
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    configKeyList = ["EXPIRY_PERIOD" , "CERT_PATH", "SSH_METHOD", "SSH_USERNAME", "SSH_PASSWORD"]
+    configKeyList = ["CERT_PATH", "SSH_METHOD", "SSH_USERNAME", "SSH_PASSWORD", "SSL_CERTIFICATE_KEY_LENGTH"]
     configValues = {}
     tdkTestObj = obj.createTestStep('rdkvsecurity_getDeviceConfig')
     #Get each configuration from device config file
@@ -123,7 +123,7 @@ if expectedResult in result.upper():
             if configValues["SSH_PASSWORD"] == "None":
                 configValues["SSH_PASSWORD"] = ""
             credentials = obj.IP + ',' + configValues["SSH_USERNAME"] + ',' + configValues["SSH_PASSWORD"]
-            command =  'for pem in ' + configValues["CERT_PATH"] + '/*.pem; do if [[ $( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 ) -lt "2048" && $( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 ) -ne "0" ]]; then printf \'%s-------%d is insecure\n\' "$pem" "$( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 )"; fi done'
+            command =  'for pem in ' + configValues["CERT_PATH"] + '/*.pem; do if [[ $( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 ) -lt ' + configValues["SSL_CERTIFICATE_KEY_LENGTH"] + '&& $( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 ) -ne "0" ]]; then printf \'%s-------%d is insecure\n\' "$pem" "$( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 )"; fi done'
             print "COMMAND : %s" %(command)            
             #Primitive test case which associated to this Script
             tdkTestObj = obj.createTestStep('rdkvsecurity_executeInDUT');
@@ -135,17 +135,19 @@ if expectedResult in result.upper():
             tdkTestObj.executeTestCase(expectedResult);
             #Get the result of execution
             output = tdkTestObj.getResultDetails();
-            if "insecure" in output:
+            if output and "FAILURE" not in output:
                 shortKeyCertList = []
                 for line in output.splitlines():
                     if (".pem" in line) and (line not in command) and (configValues["CERT_PATH"]+"/*.pem" not in line):
                         shortKeyCertList.append (line)
-                tdkTestObj.setResultStatus("FAILURE");
-               
-                print "FAILURE: Few Certificates are having public key length less than recommended key length 2048: \n%s" %(shortKeyCertList)
+                if shortKeyCertList:
+                    tdkTestObj.setResultStatus("FAILURE");
+                    print "FAILURE: Few Certificates are having public key length less than configured key length %s: \n%s" %(configValues["SSL_CERTIFICATE_KEY_LENGTH"],shortKeyCertList)
+                else:
+                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "SUCCESS: All certificates are having public key length greater than configured key length"
             else:
-                tdkTestObj.setResultStatus("SUCCESS");
-                print "SUCCESS: All certificates are having recommended public key length"
+                tdkTestObj.setResultStatus("FAILURE")
         else:
             print "FAILURE: Currently only supports directSSH ssh method"
             tdkTestObj.setResultStatus("FAILURE");
