@@ -300,7 +300,7 @@ function triggerExecutionFromPopUp(){
 		<br>
 		<g:link action="downloadLogs" params="[id:"${executionInstance?.id}"]" >Download Execution Logs(Zip)</g:link>
 		<br>
-		<g:if test="${(isProfilingDataPresent) || (smemDataMap?.size() > 0) || (alertList?.size() > 0)}">
+		<g:if test="${(isProfilingDataPresent) || (smemDataMap?.size() > 0) || (alertList?.size() > 0) || (pmapDataMap?.size() > 0)}">
 			<g:link action="exportProfilingMetricsToExcel" params="[id:"${executionInstance?.id}"]" >Download Profiling Metrics Report(Excel)</g:link>
 		</g:if>
 		</td>		
@@ -649,7 +649,7 @@ function triggerExecutionFromPopUp(){
 			<%
 				def grafanaPerformance = Performance.findAllByExecutionResultAndPerformanceType(executionResultInstance,"GrafanaData")
 			%>
-			<g:if test="${(grafanaPerformance) || (smemDataMap?.contains(executionResultInstance?.id)) || (alertList?.contains(executionResultInstance?.id))}">
+			<g:if test="${(grafanaPerformance) || (smemDataMap?.contains(executionResultInstance?.id)) || (alertList?.contains(executionResultInstance?.id)) || (pmapDataMap?.contains(executionResultInstance?.id))}">
 				<table>
 					<tr class="scripthead" style=" background:#DFDFDF;">
 						<td colspan="4" class="tdhead">Profiling Metrics</td>					

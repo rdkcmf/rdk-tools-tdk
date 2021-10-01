@@ -1676,6 +1676,7 @@ class ExecutionController {
 		def finalLogparserFileName = ""
 		File logDir  = new File(logPath)
 		Map smemFileMap = [:]
+		Map pmapFileMap = [:]
 		if(logDir?.exists() &&  logDir?.isDirectory()){
 			logDir.eachFile{ file->
 				def currentFileName = file?.getName()
@@ -1689,9 +1690,14 @@ class ExecutionController {
 					currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
 					smemFileMap?.put(currentFileName,fileContents)
 				}
+				if(file?.getName()?.contains("pmapData")){
+					String fileContents = ""
+					currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
+					pmapFileMap?.put(currentFileName,fileContents)
+				}
 			}
 		}
-		render(template: "profilingDetails", model: [executionResultInstance : exRes,alertListMap:alertMapForExecRes,k:params?.k,i:params?.i,smemFileMap:smemFileMap,execId:executionId,execDeviceId:executionDeviceId,profilingDetails:true])
+		render(template: "profilingDetails", model: [executionResultInstance : exRes,alertListMap:alertMapForExecRes,k:params?.k,i:params?.i,smemFileMap:smemFileMap,execId:executionId,execDeviceId:executionDeviceId,profilingDetails:true,pmapFileMap:pmapFileMap])
 	}
 	
 	/**
@@ -1722,7 +1728,7 @@ class ExecutionController {
 		try{
 			if(file?.exists()){
 				def currentFileName = params?.fileName
-				if(currentFileName?.contains("smemData")){
+				if(currentFileName?.contains("smemData") || currentFileName?.contains("pmapData")){
 					file.eachLine { line ->
 						String lineData = line?.replaceAll("<","&lt;")
 						lineData = lineData?.replaceAll(">","&gt;")
@@ -1737,6 +1743,34 @@ class ExecutionController {
 			consoleFileData = "No Data"
 		}
 		render(template: "profilingDetails", model: [consoleFileData:consoleFileData,profilingDetails:false])
+	}
+	
+	/**
+	 * Method to get pmap contents to display in UI
+	 * @return
+	 */
+	def getPmapContents(){
+		def pmapFileData = ""
+		String filePath = "${request.getRealPath('/')}//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.fileName
+		def file = new File(filePath)
+		try{
+			if(file?.exists()){
+				def currentFileName = params?.fileName
+				if(currentFileName?.contains("pmapData")){
+					file.eachLine { line ->
+						String lineData = line?.replaceAll("<","&lt;")
+						lineData = lineData?.replaceAll(">","&gt;")
+						pmapFileData = pmapFileData + "<br>"+ lineData
+					}
+				}
+			}
+		} catch (FileNotFoundException fnf) {
+			
+		}
+		if(pmapFileData.isEmpty() || pmapFileData == ""){
+			pmapFileData = "No Data"
+		}
+		render pmapFileData
 	}
 	
 	def showLogFiles(){
@@ -1935,6 +1969,7 @@ class ExecutionController {
 		boolean isProfilingDataPresent = false
 		List executionResultList =  ExecutionResult.findAllByExecution(executionInstance)
 		List smemDataMap = []
+		List pmapDataMap = []
 		List alertList = []
 		executionResultList.each{ executionResult ->
 			List performanceList = Performance.findAllByExecutionResultAndPerformanceType(executionResult,GRAFANA_DATA)
@@ -1956,10 +1991,13 @@ class ExecutionController {
 					if(file?.getName()?.contains("smemData")){
 						smemDataMap?.add(executionResult.id)
 					}
+					if(file?.getName()?.contains("pmapData")){
+						pmapDataMap?.add(executionResult.id)
+					}
 				}
 			}
 		}		
-		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus, statusListForPopUpExecution : statusListForPopUpExecution,isProfilingDataPresent:isProfilingDataPresent,smemDataMap:smemDataMap,alertList:alertList]
+		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus, statusListForPopUpExecution : statusListForPopUpExecution,isProfilingDataPresent:isProfilingDataPresent,smemDataMap:smemDataMap,alertList:alertList,pmapDataMap:pmapDataMap]
 	}
 
 	/**
@@ -2486,7 +2524,7 @@ class ExecutionController {
 		List fieldLabels = []
 		Map fieldMap = [:]
 		Map parameters = [:]
-		List columnWidthList = [0.2,0.5,0.3,0.2,0.15,0.15,0.15,0.2,0.2,0.8]
+		List columnWidthList = [0.2,0.5,0.5,0.15,0.15,0.15,0.15,0.2,0.2,0.2]
 		Execution executionInstance = Execution.findById(params.id)
 		String executionInstanceStatus ;
 		executionInstanceStatus =executedbService?.isValidExecutionAvailable(executionInstance)
@@ -5903,5 +5941,205 @@ class ExecutionController {
 			ex.printStackTrace();
 		}
 		render alertList as JSON
+	}
+	
+	/**
+	 * Function to fetch data from grafana using from and to dates
+	 * @param executionResultId
+	 * @param parameter
+	 * @param fromDateString
+	 * @param toDateString
+	 * @return
+	 */
+	def fetchDataFromGrafanaMultiple(String executionResultId,String parameter, String fromDateString, String toDateString){
+		List dataArrayList = []
+		String basicUrl = getGrafanaConfigurations("grafanaUrl")
+		String prefix = getGrafanaConfigurations("prefix")
+		String datasourceId = getGrafanaConfigurations("datasourceId")
+		def insecure = getGrafanaConfigurations("insecure")
+		def curlTimeout = getGrafanaConfigurations("curlTimeOutInSeconds")
+		if(basicUrl != null && prefix != null && datasourceId != null ){
+			ExecutionResult execResult = ExecutionResult.findById(executionResultId)
+			if(execResult){
+				Device dev =  Device.findByStbName(execResult?.device?.toString())
+				String macAddress = dev?.serialNo
+				if(macAddress != null){
+					try{
+						if(macAddress?.contains(":")){
+							macAddress = macAddress?.replace(":","")
+						}
+						if(macAddress?.contains("_")){
+							macAddress = macAddress?.replace("_","")
+						}
+						macAddress = macAddress?.toUpperCase()
+						DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						Date fromDate = dateFormat.parse(fromDateString);
+						Date toDate = dateFormat.parse(toDateString);
+						
+						long fromEpoch = fromDate?.getTime() / 1000;
+						long toEpoch = toDate?.getTime() / 1000;
+						String fromEpochTime = fromEpoch?.toString()
+						String toEpochTime = toEpoch?.toString()
+						
+						
+						String prefixLastChar = prefix?.charAt(prefix?.length()-1)
+						if(!prefixLastChar?.equals(".")){
+							prefix = prefix + "."
+						}
+						String host = prefix + macAddress
+						String basicUrlLastChar = basicUrl?.charAt(basicUrl?.length()-1)
+						if(!basicUrlLastChar?.equals("/")){
+							basicUrl = basicUrl + "/"
+						}
+						basicUrl = basicUrl + "api/datasources/proxy/" + datasourceId +"/render?"
+						List parameterList = []
+						String targetString = ""
+						parameterList = parameter?.split(",")
+						parameterList?.each{ param ->
+							targetString = targetString + "&target="+host+"."+param
+						}
+						
+						String insecureString = ""
+						def curlTimeoutString = "10"
+						if(curlTimeout != null){
+							curlTimeoutString = curlTimeout
+						}
+						if(insecure != null){
+							if(insecure == "true"){
+								insecureString = " --insecure"
+							}
+						}
+						String url = basicUrl + "from="+fromEpochTime+"&until="+toEpochTime+""+targetString+"&format=json"
+						String command = "curl" +insecureString+ " --connect-timeout "+ curlTimeoutString+ " \""+url+"\""
+						ProcessBuilder pb;
+						Process p;
+						pb = new ProcessBuilder("bash", "-c", command);
+						p = pb.start();
+						String line;
+						BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+						line = input.readLine();
+						if((line != null) && (!line?.contains("message"))){
+							line = line?.substring(1, line?.length() - 1);
+							List dataArray = line?.split("},")
+							if(dataArray?.size() != 0){
+								for(int i = 0;i < dataArray?.size();i++){
+									Map dataMap = [:]
+									JsonObject dataNode = new JsonObject()
+									List dataList = []
+									String dataValue = dataArray[i]
+									if(dataValue != null && !dataValue?.isEmpty()){
+										String lastChar = dataValue?.charAt(dataValue?.length()-1)
+										if(!lastChar?.equals("}")){
+											dataValue = dataValue + "}"
+										}
+										JSONObject jsonObj = new JSONObject(dataValue);
+										String target
+										if(jsonObj.has('target')){
+											target = jsonObj.get('target')
+										}
+										if(jsonObj.has('datapoints')){
+											def metricList = target?.toString()?.split("\\.")
+											String finalConfigFile = ""
+											File deviceConfigFile = new File( "${realPath}"+TDKV_RDKSERVICE_CONFIG_FOLDER_LOCATION+dev?.stbName+CONFIG_EXTN)
+											File boxTypeConfigFile = new File( "${realPath}"+TDKV_RDKSERVICE_CONFIG_FOLDER_LOCATION+dev?.boxType?.name+CONFIG_EXTN)
+											if(deviceConfigFile?.exists()){
+												finalConfigFile = dev?.stbName+CONFIG_EXTN
+											}else if(boxTypeConfigFile?.exists()){
+												finalConfigFile = dev?.boxType?.name+CONFIG_EXTN
+											}
+											if(finalConfigFile == ""){
+												finalConfigFile = "sample"+CONFIG_EXTN
+											}
+											String actualUnit = ""
+											String preferredUnit = ""
+											if(finalConfigFile != ""){
+												String unitVariable = metricList[2]
+												String actualUnitVariable = RDKV_PROFILING_ACTUAL_UNIT
+												String preferredUnitVariable = RDKV_PROFILING_PREFERRED_UNIT
+												if(!unitVariable?.contains("-")){
+													actualUnitVariable = actualUnitVariable + unitVariable?.toUpperCase()
+													preferredUnitVariable = preferredUnitVariable + unitVariable?.toUpperCase()
+												}else{
+													if(unitVariable?.contains("exec-")){
+														unitVariable = metricList[3]
+														unitVariable = unitVariable?.substring(unitVariable?.lastIndexOf("_") + 1,unitVariable?.length())
+														actualUnitVariable = actualUnitVariable + unitVariable?.toUpperCase()
+														preferredUnitVariable = preferredUnitVariable + unitVariable?.toUpperCase()
+													}else{
+														unitVariable = metricList[3]
+														actualUnitVariable = actualUnitVariable + unitVariable?.toUpperCase()
+														preferredUnitVariable = preferredUnitVariable + unitVariable?.toUpperCase()
+													}
+												}
+												actualUnit = getThresholdFromConfigFile(actualUnitVariable,finalConfigFile)
+												preferredUnit = getThresholdFromConfigFile(preferredUnitVariable,finalConfigFile)
+											}
+											actualUnit = actualUnit?.trim()
+											preferredUnit = preferredUnit?.trim()						
+											boolean unitsSame = true
+											if(!actualUnit?.equals(preferredUnit)){
+												unitsSame = false
+											}
+											String displayUnit = ""
+											if((preferredUnit != null) && (!preferredUnit?.equals("")) && (actualUnit != null) && (!actualUnit?.equals(""))){
+												displayUnit = " ("+preferredUnit +")"
+											}
+											List datapoints = jsonObj.get('datapoints')
+											datapoints.each{ dataPoint ->
+												if(!(JSONObject.NULL?.equals(dataPoint[0]))){
+													long epochTime = dataPoint[1]
+													epochTime = epochTime * 1000
+													SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+													def convertedTime = sdf.format(new Date(epochTime))
+													float dataPointFloat = (float)dataPoint[0];
+													if(unitsSame){
+														dataPointFloat = dataPointFloat.round(3)
+														dataList.add(dataPointFloat)
+													}else{
+														int divideNumber =  1
+														if((actualUnit?.equals("Bytes") && preferredUnit?.equals("MB"))){
+															divideNumber = 1000000
+														}else if((actualUnit?.equals("Bytes") && preferredUnit?.equals("KB"))){
+															divideNumber = 1000
+														}else if((actualUnit?.equals("KB") && preferredUnit?.equals("MB"))){
+															divideNumber = 1000
+														}
+														def result = dataPointFloat / divideNumber
+														result = result.round(2)
+														dataList.add(result)
+													}
+												}
+											}
+											if(!dataList.isEmpty()){
+												float sum = 0.0
+												for(int j = 0; j<dataList.size();j++ ){
+													sum =  sum + dataList[j]
+												}
+												def avg = 0.0
+												if(dataList.size() != 0){
+													avg = sum / dataList.size()
+												}
+												avg = avg.round(2)
+
+												String parameterForRest = target?.toString() + displayUnit
+												dataMap.put("parameter", parameterForRest)
+												dataMap.put("min",dataList.min())
+												dataMap.put("max",dataList.max())
+												dataMap.put("avg",avg)
+												dataArrayList.add(dataMap)
+											}
+										}
+									}
+								}
+							}
+						}
+						input.close();
+					}catch(Exception ex){
+						ex.printStackTrace();
+					}
+				}
+			}
+		}
+		render dataArrayList as JSON
 	}
 }

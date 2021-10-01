@@ -1025,6 +1025,45 @@ class ExecutedbService {
 			return detailDataMap
 	}
 
+	
+	/**
+	 * Function to get the pmap details for a particular execution result
+	 * @param executionInstance
+	 * @param executionDevice
+	 * @param executionResult
+	 * @param realPath
+	 * @return
+	 */
+	def getPmapDetails(Execution executionInstance,ExecutionDevice executionDevice,ExecutionResult executionResult, String realPath,String appUrl){
+		def logPath = "${realPath}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
+		def finalLogparserFileName = ""
+		File logDir  = new File(logPath)
+		Map pmapFileMap = [:]
+		try{
+			if(logDir?.exists() &&  logDir?.isDirectory()){
+				logDir.eachFile{ file->
+					def currentFileName = file?.getName()
+					if(file?.getName()?.contains("pmapData")){
+						List fileContent = file?.readLines()
+						String fileContents = ""
+						for (int index = 0; index <= 400; index++) {
+							fileContents = fileContents + NEW_LINE+ fileContent[index]
+						}
+						if(fileContent?.size() > 400){
+							fileContents = fileContents + NEW_LINE
+							fileContents = fileContents+"\n More data use this link ....... \n " +appUrl+"/execution/showSmemFileContents?fileName="+file?.getName()+"&execId="+executionInstance?.id+"&execDeviceId="+executionDevice?.id+"&execResultId="+executionResult.id
+						}
+						currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
+						pmapFileMap?.put(currentFileName,fileContents)
+					}
+				}
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		return pmapFileMap
+	}
+	
 	/**
 	 * Method to fetch the list of alerts for a particular executionresult
 	 * @param executionResult
@@ -1144,8 +1183,9 @@ class ExecutedbService {
 						List toolNames = []
 						List performanceList = Performance.findAllByExecutionResultAndPerformanceType(executionResult,GRAFANA_DATA)
 						Map smemDetails = getSmemDetails(executionInstance,executionDevice,executionResult,realPath)
+						Map pmapDetails = getPmapDetails(executionInstance,executionDevice,executionResult,realPath,appUrl)
 						Map alertMap = getAlertListFrom(executionResult,realPath);
-						if(!performanceList.isEmpty() || !smemDetails.isEmpty() || !alertMap.isEmpty()){
+						if(!performanceList.isEmpty() || !smemDetails.isEmpty() || !alertMap.isEmpty() || !pmapDetails.isEmpty()){
 							//For summary sheet
 							Map scriptMap =["C1":scriptCounter,"C2":executionResult?.script,"C3":executionResult?.status,"C4":""]
 							coverPageMap.put(executionResult?.script,scriptMap)
@@ -1208,6 +1248,13 @@ class ExecutedbService {
 								String toolName = "smem"
 								toolNames.add(toolName)
 								toolDetailsMap.put(toolName, smemDetails)
+							}
+							//for pmap
+							if(!pmapDetails.isEmpty()){
+								Map parameterMap = [:]
+								String toolName = "pmap"
+								toolNames.add(toolName)
+								toolDetailsMap.put(toolName, pmapDetails)
 							}
 						}
 						profilingDetailsMap.put("toolNames", toolNames)
