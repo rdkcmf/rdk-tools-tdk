@@ -2396,5 +2396,93 @@
                 </resultGeneration>
             </testStep>
         </testCase>
+        <testCase testCaseId="DS_89" testCaseName= "Check_Resolution_Persisted_After_Reboot" desc="Checks whether resolution persisted after reboot if persist set as true">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true">
+                <resultGeneration useMethodTag="display_connected_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_Resolutions" method="Get_Supported_Resolutions" saveResult="true">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="display_supported_resolutions"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Current_Resolution"  method="Get_Current_Resolution" saveResult="true" revertGet="yes">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="check_current_resolution"/>
+            </testStep>
+            <testStep testStepId="4" name="Set_Resolution" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Resolution" method="Set_Current_Resolution" revertSet="yes">
+                  <params>
+                    <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                    <param tag="resolution" usePreviousResult="true" Id="2" iteration="true" useMethodTag="get_selected_resolutions" revertParam="yes"/>
+                    <param tag="persist" value="true"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Execute_Reboot_Command" action="externalFnCall" rebootStep="yes">
+                  <resultGeneration useMethodTag="executeRebootCmd"/>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Get_Current_Resolution"  method="Get_Current_Resolution" revertFlag="yes" >
+                  <resultGeneration useMethodTag="check_current_resolution" arguments="check_expected_resolution">
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_90" testCaseName= "Check_Resolution_Not_Persisted_After_Reboot" desc="Checks whether resolution not persisted after reboot if persist set as false">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true">
+                <resultGeneration useMethodTag="display_connected_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_Resolutions" method="Get_Supported_Resolutions" saveResult="true">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="display_supported_resolutions"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Current_Resolution"  method="Get_Current_Resolution" saveResult="true" revertGet="yes">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="check_current_resolution"/>
+            </testStep>
+            <testStep testStepId="4" name="Get_Default_Resolution" method="Get_Default_Resolution" saveResult="true">
+                <resultGeneration useMethodTag="check_default_resolution" >
+                  <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_resolutions" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Set_Resolution" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Resolution" method="Set_Current_Resolution" revertSet="yes">
+                  <params>
+                    <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                    <param tag="resolution" usePreviousResult="true" Id="2" iteration="true" useMethodTag="get_selected_resolutions" revertParam="yes"/>
+                    <param tag="persist" value="false"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Execute_Reboot_Command" action="externalFnCall" rebootStep="yes">
+                  <resultGeneration useMethodTag="executeRebootCmd"/>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Get_Current_Resolution"  method="Get_Current_Resolution" revertFlag="yes" >
+                    <resultGeneration useMethodTag="check_current_resolution" arguments="check_resolution_not_persisted">
+                      <expectedValues useIterableValue="true" usePreviousResult="true" Id="4" useMethodTag="get_default_resolution"/>
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_91" testCaseName= "Check_Active_Input_Value_For_Invalid_Display" desc="Checks the active input value for invalid video display">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Check_Get_Active_Input" method="Get_Active_Input">
+                <params>
+                   <param tag="videoDisplay" value="Invalid0"/>
+                </params>
+                <resultGeneration useMethodTag="check_active_input" arguments="check_for_invalid_port" expectedValues="False"/>
+            </testStep>
+        </testCase>
 </testPlugin>  
 
