@@ -151,7 +151,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
                             if expectedResult in actualResult:
                                 mode = tdkTestObj.getResultDetails();
                                 print "Surround mode: ", mode;
-                                if int(mode) == surroundMode["DD"] or int(mode) == surroundMode["DDPLUS"]:
+                                if int(mode) == surroundMode["DD"] or int(mode) == surroundMode["DDPLUS"] or int(mode) == surroundMode["DD|DDPLUS"]:
                                     tdkTestObj.setResultStatus("SUCCESS");
                                     print "Surround mode is valid";
                                 else:
