@@ -2181,20 +2181,29 @@ class ExecutionController {
 					executionResult?.save(flush:true)
 				}
 				if(execution && execution?.result?.equals( FAILURE_STATUS )){
-					def executionResults = []
-					boolean atleastOneFailureScript = false
-					executionResults = ExecutionResult.findAllByExecution(execution)
-					int totalScriptsCount = executionResults?.size()
+					def allExecutionResults = []
+					def naExecutionResults = []
+					def successExecutionResults = []
+					def skippedExecutionResults = []
+					int totalScriptsCount = 0
 					int naScriptsCount = 0
-					for(executionResultObject in executionResults){
-						if(executionResultObject?.status?.equals(FAILURE_STATUS)){
-							atleastOneFailureScript = true
-						}
-						if(executionResultObject?.status?.equals(NOT_APPLICABLE_STATUS)){
-							naScriptsCount++
-						}
+					int successScriptsCount = 0
+					int skippedScriptsCount = 0
+					int naAndSkippedAndSuccessSum = 0
+					allExecutionResults = ExecutionResult.findAllByExecution(execution)
+					naExecutionResults = ExecutionResult.findAllByExecutionAndStatus(execution,NOT_APPLICABLE_STATUS)
+					successExecutionResults = ExecutionResult.findAllByExecutionAndStatus(execution,SUCCESS_STATUS)
+					skippedExecutionResults = ExecutionResult.findAllByExecutionAndStatus(execution,SKIPPED_STATUS)
+					totalScriptsCount = allExecutionResults?.size()
+					naScriptsCount = naExecutionResults?.size()
+					successScriptsCount = successExecutionResults?.size()
+					skippedScriptsCount = skippedExecutionResults?.size()
+					boolean setAsSuccess = false
+					naAndSkippedAndSuccessSum = naScriptsCount + skippedScriptsCount + successScriptsCount
+					if( (successScriptsCount > 0) && (totalScriptsCount == naAndSkippedAndSuccessSum)){
+						setAsSuccess = true
 					}
-					if(!atleastOneFailureScript && !(naScriptsCount == totalScriptsCount)){
+					if(setAsSuccess == true){
 						if(execDeviceInstance && execDeviceInstance?.status.equals( FAILURE_STATUS )){
 							execDeviceInstance?.status = SUCCESS_STATUS
 							execDeviceInstance?.save(flush:true)
