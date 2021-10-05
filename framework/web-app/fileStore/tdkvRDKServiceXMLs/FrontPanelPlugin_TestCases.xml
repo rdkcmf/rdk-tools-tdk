@@ -165,6 +165,7 @@
                 <params>
                   <param tag="brightness" usePreviousResult="true" Id="1" useMethodTag="frontpanel_get_clock_brightness" revertParam="yes" />
                 </params>
+                <resultGeneration useMethodTag="frontpanel_set_operation_status" />
             </testStep>
             <testStep testStepId="3" name="Get_FP_Clock_Brightness" method="Get_Clock_Brightness" revertFlag="yes">
                 <resultGeneration useMethodTag="frontpanel_get_fp_or_clock_brightness" arguments="check_brightness_level">

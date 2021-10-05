@@ -1278,7 +1278,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             else:
-                if str(result.get("success")).lower() == "true" and result.get('activeInput') in expectedValues:
+                if str(result.get("success")).lower() == "true" and str(result.get('activeInput')) in expectedValues:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
