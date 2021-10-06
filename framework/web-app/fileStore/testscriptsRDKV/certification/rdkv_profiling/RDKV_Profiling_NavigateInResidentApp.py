@@ -122,7 +122,7 @@ if expectedResult in result.upper():
                 zorder_status = tdkTestObj.getResult()
                 if expectedResult in zorder_status :
                     zorder = ast.literal_eval(zorder)["clients"]
-                    if zorder[0].lower() != resident_app.lower():
+                    if zorder[0].lower() == resident_app.lower():
                         print "\n Successfully moved ResidentApp to front"
                         is_front = True
                         tdkTestObj.setResultStatus("SUCCESS")
