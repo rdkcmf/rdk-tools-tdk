@@ -85,6 +85,7 @@
       <parameter funName='TestMgr_BluetoothHal_StopDiscovery' parameterName='device_type' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_BluetoothHal_PairDevice' parameterName='device_id' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_BluetoothHal_UnPairDevice' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_GetListOfScannedDevices' parameterName='get_Address_and_Path' parameterType='INTEGER' range='0-1' /> 
       <parameter funName='TestMgr_BluetoothHal_IsDeviceConnectable' parameterName='device_id' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_BluetoothHal_ConnectDevice' parameterName='device_id' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_BluetoothHal_ConnectDevice' parameterName='device_type' parameterType='INTEGER' range='0-9' />

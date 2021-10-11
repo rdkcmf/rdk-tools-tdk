@@ -697,6 +697,9 @@ void BluetoothHalAgent::BluetoothHal_GetListOfScannedDevices (IN const Json::Val
    stBTRCoreScannedDevicesCount listOfScannedDevices;
    memset (&listOfScannedDevices, 0, sizeof (listOfScannedDevices));
 
+   //Get Address and Path of scanned device only if configured
+   int get_Address_and_Path = req["get_Address_and_Path"].asInt();
+
    gBTRCoreRet = BTRCore_GetListOfScannedDevices (gBTRCoreHandle, &listOfScannedDevices);
    if (enBTRCoreSuccess == gBTRCoreRet)
    {
@@ -712,8 +715,12 @@ void BluetoothHalAgent::BluetoothHal_GetListOfScannedDevices (IN const Json::Val
                // Retrieve the device details from the device structure list to a json object 
                jdevice ["deviceName"] = listOfScannedDevices.devices[deviceCount].pcDeviceName;
                jdevice ["deviceID"] = listOfScannedDevices.devices[deviceCount].tDeviceId;
-               jdevice ["deviceAddress"] = listOfScannedDevices.devices[deviceCount].pcDeviceAddress;
-               jdevice ["devicePath"] = listOfScannedDevices.devices[deviceCount].pcDevicePath;
+
+	       if (get_Address_and_Path)
+	       {
+                   jdevice ["deviceAddress"] = listOfScannedDevices.devices[deviceCount].pcDeviceAddress;
+                   jdevice ["devicePath"] = listOfScannedDevices.devices[deviceCount].pcDevicePath;
+	       }
 
                // Add the json object with device details to the json array
                jdeviceList [deviceCount] = jdevice;
