@@ -17,7 +17,7 @@
 # limitations under the License.
 ##########################################################################
 SUBDIRS = agent IARMBUS_stub DS_stub RDKLogger_stub \
-XUPNP_stub SystemUtil_stub DSHal_stub $(SUBDIR_HYBRID) $(SUBDIR_CLIENT) $(PLUGIN_SRC) $(SUBDIR_CLIENT_XI3V2) $(SUBDIR_CLIENT_XID) $(SUBDIR_XG1V3) $(SUBDIR_XI5) \
+SystemUtil_stub DSHal_stub $(SUBDIR_HYBRID) $(SUBDIR_CLIENT) $(PLUGIN_SRC) $(SUBDIR_CLIENT_XI3V2) $(SUBDIR_CLIENT_XID) $(SUBDIR_XG1V3) $(SUBDIR_XI5) \
 $(SUBDIR_CLIENT_XI5)
 DIST_SUBDIRS = @SUBDIRS@
 

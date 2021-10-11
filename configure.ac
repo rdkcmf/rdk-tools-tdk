@@ -319,6 +319,22 @@ AC_ARG_ENABLE([hdmicechal],
            [echo "hdmicechal component is not enabled"])
 AM_CONDITIONAL([HDMICECHAL], [test x$HDMICECHAL = xtrue])
 
+AC_ARG_ENABLE([xupnp],
+         AS_HELP_STRING([--enable-xupnp],[enable xupnp (default is no)]),
+         [
+           case "${enableval}" in
+              yes) XUPNP=true
+                   AS_IF([test x$HYBRID = xtrue], [SUBDIR_HYBRID+=" XUPNP_stub "],
+                          [echo Xupnp enabled in Hybrid])
+                   AS_IF([test x$CLIENT = xtrue], [SUBDIR_CLIENT+=" XUPNP_stub "],
+                          [echo Xupnp enabled in Client]) ;;
+             no) XUPNP=false ;;
+            *) AC_MSG_ERROR([bad value ${enableval} for --disable-xupnp ]) ;;
+             esac
+            ],
+           [echo "xupnp component is not enabled"])
+AM_CONDITIONAL([XUPNP], [test x$XUPNP = xtrue])
+
 AC_ARG_ENABLE([trace],
               AS_HELP_STRING([--enable-trace],[enable trace (default is no)]),
               [
