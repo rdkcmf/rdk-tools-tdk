@@ -34,8 +34,12 @@ VLANLOG ="/rdklogs/logs/VLANIFACEMGRLog.txt.0"
 ExpectedPolicyList = "FIXED_MODE_ON_BOOTUP, FIXED_MODE, PRIMARY_PRIORITY, PRIMARY_PRIORITY_ON_BOOTUP, MULTIWAN_MODE";
 #The Expected Wan Manager interface names
 interfaceName = ["dsl0", "eth3", "veip0"];
+#The Expected Wan Manager interface name for RPI
+intrName =["eth0"];
 #The Expected Wan Manager Display Names
 displayName =["DSL","WANOE","GPON"];
+#The Expected Wan Manager Display Name for RPI
+disName =["WanOE"];
 #The Reporting Period Prameter List
 ReportingparamList = ["Device.DSL.X_RDK_Report.DSL.Enabled", "Device.DSL.X_RDK_Report.DSL.ReportingPeriod", "Device.DSL.X_RDK_Report.DSL.Default.ReportingPeriod", "Device.DSL.X_RDK_Report.DSL.Default.OverrideTTL"];
 #DSL WAN Parameters
