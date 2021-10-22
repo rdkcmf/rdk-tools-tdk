@@ -25,12 +25,8 @@ if [ $# -eq 0 ]
   then
     echo "No arguments supplied"
 else
-  #Check if APP is executable
-  if which $TEST >/dev/null; then
-    #Execute APP in Background
-    $TEST &
   #Check if APP specified exists
-  elif [ -f $TEST ]; then
+  if [ -f $TEST ]; then
     $TEST 0 &
   else
     echo "No App present"

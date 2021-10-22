@@ -152,7 +152,7 @@ if "SUCCESS" in loadmodulestatus.upper() and "SUCCESS" in sysUtilLoadStatus.uppe
                                 tdkTestObj.addParameter("log_file", "BackgroundApp.txt");
                                 #App name to be executed
                                 tdkTestObj.addParameter("tool_path", "DUMMYMgr");
-                                tdkTestObj.addParameter("timeout", "15");
+                                tdkTestObj.addParameter("timeout", "0");
                                 #Execute the test case in STB
                                 tdkTestObj.executeTestCase(expectedresult);
                                 actualresult = tdkTestObj.getResult();
