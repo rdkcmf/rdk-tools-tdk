@@ -115,7 +115,7 @@ def readDeviceConfigKeys(keys):
 # Return Value: SUCCESS/FAILURE
 #-----------------------------------------------------------------------------------------------
 
-def executePluginTests(deviceIPAddress, devicePort, testDeviceName, testDeviceType, basePath, TMUrl, pluginName, testCaseID="all"):
+def executePluginTests(libobj, deviceIPAddress, devicePort, testDeviceName, testDeviceType, basePath, TMUrl, pluginName, testCaseID="all"):
 
     # This method is the entry-point to the RDK Services Testing
     # framework. API should be invoked from external lib/script
@@ -152,6 +152,17 @@ def executePluginTests(deviceIPAddress, devicePort, testDeviceName, testDeviceTy
     # TM Url
     global tmURL
     tmURL = TMUrl
+
+    # TDK lib object
+    global libObj
+    libObj = libobj.parentTestCase
+
+    # Check if performance enabled
+    global IsPerformanceSelected
+    IsPerformanceSelected = libObj.performanceBenchMarkingEnabled
+
+    # Response time threshold for performance measurement
+    global maxResponseTime
 
     # Form the path of the plugin XMLs
     global pluginXML
@@ -198,6 +209,15 @@ def executePluginTests(deviceIPAddress, devicePort, testDeviceName, testDeviceTy
         else:
             status = "FAILURE"
             print "[ERROR]: No proper test EXEC_METHOD input"
+
+    # If Performance measurement enabled, get the max response time
+    if status == "SUCCESS" and IsPerformanceSelected == "true":
+        status2,maxResponseTime = getDeviceConfigKeyValue("MAX_RESPONSE_TIME")
+        if status2 == "SUCCESS" and str(maxResponseTime).strip() != "":
+            print "[INFO]: Performance measurement Enabled, MAX_RESPONSE_TIME : %s" %(maxResponseTime)
+        else:
+            status = "FAILURE"
+            print "[ERROR]: No proper MAX_RESPONSE_TIME input for performance measurement"
 
 
     # Start the test execution and get the plugin test status
@@ -282,6 +302,9 @@ def executeTestCases(testCaseID="all"):
     global customTimeout
     customTimeout = None
 
+    global apiPerformanceInfo
+    apiPerformanceInfo = []
+
     # ------------------------------- PLUGIN PRE-REQUISITES ----------------------------------
     # Perform plugin pre-requisite steps such as activate or deactivate plugins common for all
     # the tests . Revert operations are not supported as part of pre/post requisite steps. If
@@ -294,6 +317,9 @@ def executeTestCases(testCaseID="all"):
             print "\nPlugin Pre-requisite Status: FAILURE"
             totalTests = len(testPlugin.findall("testCase"))
             dispTestSummary(testPluginInfo.get("pluginName").upper(),totalTests,0,0,0,0)
+            # Log API Performance data if enabled
+            if IsPerformanceSelected == "true":
+                performanceStatus = dispPerformanceSummary()
             return pluginPreRequisiteStatus
         else:
             print "\nPlugin Pre-requisite Status: SUCCESS"
@@ -581,6 +607,12 @@ def executeTestCases(testCaseID="all"):
 
     # Display PASSED / FAILED / N/A Test list and plugin Summary details
     dispPluginTestsSummary(testPluginInfo.get("pluginName").upper(),pluginTestsSummary)
+
+    # Log API Performance data if enabled
+    if IsPerformanceSelected == "true":
+        performanceStatus = dispPerformanceSummary()
+        combinedTestStatus.append(performanceStatus)
+
     return combinedTestStatus
 
 
@@ -1255,9 +1287,21 @@ def executeCommand(testMethod,testParams):
         if execMethod.upper() == "CURL":
             req_post = requests.post(requestURL,data=jsonCmd,timeout=responseTimeout)
             jsonResponse = json.loads(req_post.content,strict=False)
+            if IsPerformanceSelected == "true":
+                responseTime = req_post.elapsed.total_seconds()
         else:
             executeStatus = "FAILURE"
             print "\nError Occurred: Unknown method type for sending JSON Request"
+
+        #Getting the response time for performance metrics
+        if IsPerformanceSelected == "true" and execMethod.upper() in ["CURL","TTS"]:
+            print "\n\nResponse Time of %s : %s" %(testMethod,responseTime)
+            responseCheckStatus = "OK"
+            if (float(responseTime) <= 0 or float(responseTime) > float(maxResponseTime)):
+                print "Device took more than usual to respond"
+                responseCheckStatus = "HIGH"
+            apiResponseInfo = {"API":testMethod,"RESPONSE_TIME":responseTime,"STATUS":responseCheckStatus}
+            apiPerformanceInfo.append(apiResponseInfo)
 
     except Exception as e:
         executeStatus = "FAILURE"
@@ -2514,5 +2558,49 @@ def dispTestCaseList(testCaseList):
     for test in testCaseList:
         print "%d. %s" %((counter+1),test)
         counter += 1
+
+
+def dispPerformanceSummary():
+    global libObj
+    global apiPerformanceInfo
+
+    loggingStatus = "SUCCESS"
+    destPath = basePathLoc + "/logs/" + str(libObj.execID) + "/" + str(libObj.execDevId) + "/" + str(libObj.resultId)
+    performanceLogFile = '{}_{}_{}_RDKServices_API_ResponseTime.json'.format(str(libObj.execID),str(libObj.execDevId), str(libObj.resultId))
+    performanceLogPath = destPath + "/" + performanceLogFile
+    performanceStatus = "SUCCESS"
+    try:
+        print "\n\n======================== PERFORMANCE SUMMARY ======================"
+        # Set Performance status based on API response check status
+        performanceCheckStatus = "SUCCESS"
+        for api_info in apiPerformanceInfo:
+            if api_info.get("STATUS") == "HIGH":
+                print api_info
+                performanceCheckStatus = "FAILURE"
+        print "[PERPORMANCE CHECK STATUS]: ",performanceCheckStatus
+
+        if not os.path.exists(destPath):
+            print "\nCreating log directory..."
+            os.makedirs(destPath)
+        if os.path.exists(destPath):
+            print "Log directory available. Logging performance data..."
+            json_file = open(performanceLogPath,"w")
+            performanceInfo = {}
+            performanceInfo["RDKServices_API_ResponseTime"] = apiPerformanceInfo
+            json.dump(performanceInfo,json_file)
+            json_file.close()
+            print "Performance Log File: %s" %(performanceLogFile)
+            print "API Performance data logged successfully !!!"
+        else:
+            loggingStatus = "FAILURE"
+            print "[ERROR]: Dir path not available to log performance data"
+
+        if performanceCheckStatus == "FAILURE" or loggingStatus == "FAILURE":
+            performanceStatus = "FAILURE"
+
+    except Exception as e:
+        performanceStatus = "FAILURE"
+        print "\nException Occurred : %s" %(e)
+    return performanceStatus
 
 #-----------------------------------------------------------------------------------------------
