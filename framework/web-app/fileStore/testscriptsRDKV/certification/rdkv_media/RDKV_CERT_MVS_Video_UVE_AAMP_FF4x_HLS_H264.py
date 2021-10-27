@@ -127,6 +127,7 @@ if expectedResult in result.upper():
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_uve_test_app_url
         videoURL  = MediaValidationVariables.video_src_url_hls_h264_iframe
+        checkInterval = str(MediaValidationVariables.fastfwd_check_interval)
         # Setting VideoPlayer Operations
         setOperation("fastfwd4x","30")
         setOperation("playnow","10")
@@ -135,7 +136,7 @@ if expectedResult in result.upper():
         # Setting VideoPlayer test app URL arguments
         setURLArgument("url",videoURL)
         setURLArgument("operations",operations)
-        setURLArgument("options","checkInterval(5)")
+        setURLArgument("options","checkInterval("+checkInterval+")")
         setURLArgument("autotest","true")
         appArguments = getURLArguments()
         # Getting the complete test app URL

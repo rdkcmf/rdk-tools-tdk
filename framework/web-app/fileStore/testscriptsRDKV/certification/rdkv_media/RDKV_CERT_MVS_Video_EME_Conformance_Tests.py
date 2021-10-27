@@ -37,7 +37,7 @@
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>15</execution_time>
+  <execution_time>20</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -140,7 +140,8 @@ if expectedResult in result.upper():
                 print "All keys sent, Test started....\n"
                 # Monitoring the app progress, checking whether app runs tests properly or any hang detected in between,
                 # and getting the test result from the app
-                test_result,failed_test_list = monitorConformanceTest(obj,webkit_console_socket)
+                # Monitoring the EME test with hang detection time-out of 5 mins (300 seconds)
+                test_result,failed_test_list = monitorConformanceTest(obj,webkit_console_socket,300)
                 tdkTestObj = obj.createTestStep('rdkv_media_test');
                 tdkTestObj.executeTestCase(expectedResult);
                 if "SUCCESS" in test_result:

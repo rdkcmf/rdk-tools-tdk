@@ -21,7 +21,7 @@ import { Lightning, Log } from '@lightningjs/sdk';
 import { dispTime, logMsg, formatBytes, getAverage } from './MediaUtility.js'
 import ThunderJS from "ThunderJS";
 
-let tag = this;
+let tag;
 export class RDKServicesInterface extends Lightning.Component {
 
   _construct() {

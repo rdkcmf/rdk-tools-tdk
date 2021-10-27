@@ -22,7 +22,7 @@ import { Lightning, Utils, Log } from '@lightningjs/sdk'
 import { dispTime, logMsg, GetURLParameter} from './MediaUtility.js'
 import { RDKServicesInterface }  from './RDKServicesUtility';
 
-let tag = this;
+
 export default class App extends Lightning.Component {
   static getFonts() {
     return [{ family: 'Regular', url: Utils.asset('fonts/Roboto-Regular.ttf') }]

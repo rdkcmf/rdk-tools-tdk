@@ -270,7 +270,7 @@ pause_interval_stress = 10
 # This interval indicates after how much seconds video should start playing in playpause stress test
 play_interval_stress  = 10
 # This count indicates after how many times the oprations should repeat in stress tests
-repeat_count_stress = 15
+repeat_count_stress = 10
 
 # This interval indicates after how much seconds any video operations should take place
 operation_max_interval = 10
@@ -280,8 +280,10 @@ fastfwd_max_interval = 60
 # Default jump interval for seek forward or backward operations
 seekfwd_interval = 10
 seekbwd_interval = 20
-seekfwd_check_interval = 3
+seekfwd_check_interval = 5
 seekbwd_check_interval = 7
+# Default check interval for fast forward operations
+fastfwd_check_interval = 5
 
 # Provided time (seconds) is the duration after how much second, the player should be closed
 close_interval = 180

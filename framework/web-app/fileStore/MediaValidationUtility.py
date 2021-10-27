@@ -248,7 +248,7 @@ def launchPlugin(obj,plugin,url):
         result = tdkTestObj.getResult()
         new_url = tdkTestObj.getResultDetails();
         print "%s Plugin current url: %s" %(plugin,new_url)
-        if "SUCCESS" in result and new_url in url:
+        if "SUCCESS" in result and (new_url in url or url in new_url):
             tdkTestObj.setResultStatus("SUCCESS")
             return "SUCCESS"
         else:
@@ -958,6 +958,9 @@ def monitorConformanceTest(obj,webkit_console_socket,timeout=60):
     total_test_count = 0
     test_completed_flag = 0
     failed_test_list = []
+    passed_test_list = []
+    timeout_test_list = []
+    optional_failed_test_list = []
     conformance_test_result = ""
     while True:
         if continue_count > timeout:
@@ -977,34 +980,54 @@ def monitorConformanceTest(obj,webkit_console_socket,timeout=60):
             dispConsoleLog(console_log)
         if "All tests are completed" in console_log:
             test_completed_flag = 1
-        if "FAILED" in console_log and test_completed_flag != 1:
-            failed_test_list.append(console_log)
         if "STARTED" in console_log and test_completed_flag != 1:
             total_test_count += 1
+        if "PASSED" in console_log and test_completed_flag != 1:
+            passed_test_list.append(console_log)
+        if "FAILED" in console_log and test_completed_flag == 1:
+            if "TIMED OUT" not in console_log and "OPTIONAL_FAILED" not in console_log:
+                failed_test_list.append(console_log)
+        if "OPTIONAL_FAILED" in console_log and test_completed_flag == 1:
+            optional_failed_test_list.append(console_log)
+        if "TIMED OUT" in console_log and "OPTIONAL_FAILED" not in console_log and test_completed_flag == 1:
+            timeout_test_list.append(console_log)
         if "Device Status:" in console_log or "Connection refused" in console_log:
             break;
     webkit_console_socket.disconnect();
     time.sleep(3);
     if len(failed_test_list) != 0:
         print "\n\n====================== FAILED TESTS =========================="
-        for test_info in failed_test_list:
-            if "Console.messageAdded" in test_info:
-                dispConsoleMessage(test_info)
-            else:
-                print test_info
+        dispTestCaseInfo(failed_test_list)
         test_result = "FAILURE"
+    if len(timeout_test_list) != 0:
+        print "\n\n====================== TIME OUT TESTS =========================="
+        dispTestCaseInfo(timeout_test_list)
+        test_result = "FAILURE"
+    if len(optional_failed_test_list) != 0:
+        print "\n\n====================== OPTIONAL FAILED TESTS =========================="
+        dispTestCaseInfo(optional_failed_test_list)
+
     if "SUCCESS" in test_result and hang_detected == 0:
         conformance_test_result = "SUCCESS"
     else:
         conformance_test_result = "FAILURE"
     print "\n\n====================== SUMMARY  =========================="
-    print "TOTAL TESTS: %d"    %(total_test_count)
-    print "PASSED TEST(S): %d" %(total_test_count - len(failed_test_list))
-    print "FAILED TEST(S): %d" %(len(failed_test_list))
-    print "TEST STATUS: %s\n"  %(conformance_test_result)
+    print "Summary format is generated based on latest version MSE/EME (2021) test results"
+    print "TOTAL TESTS: %d"             %(total_test_count)
+    print "PASSED TEST(S): %d"          %(len(passed_test_list))
+    print "FAILED TEST(S): %d"          %(len(failed_test_list))
+    print "OPTIONAL FAILED TEST(S): %d" %(len(optional_failed_test_list))
+    print "TIMEOUT TEST(S): %d"         %(len(timeout_test_list))
+    print "TEST STATUS: %s\n"           %(conformance_test_result)
     return conformance_test_result,failed_test_list
 
-
+# Function to display the EME/MSE list of failed test details
+def dispTestCaseInfo(test_list):
+    for test_info in test_list:
+        if "Console.messageAdded" in test_info:
+            dispConsoleMessage(test_info)
+        else:
+            print test_info
 
 
 # Function to set the primary post-requisites

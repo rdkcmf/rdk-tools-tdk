@@ -126,6 +126,7 @@ if expectedResult in result.upper():
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_video_test_app_url
         videoURL  = MediaValidationVariables.video_src_url_vp9
+        checkInterval = str(MediaValidationVariables.fastfwd_check_interval)
         # Setting VideoPlayer Operations
         setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
         setOperation("repeat","3")
@@ -138,7 +139,7 @@ if expectedResult in result.upper():
         # Setting VideoPlayer test app URL arguments
         setURLArgument("url",videoURL)
         setURLArgument("operations",operations)
-        setURLArgument("options","checkInterval(5),loop")        
+        setURLArgument("options","checkInterval("+checkInterval+"),loop")
         setURLArgument("autotest","true")
         setURLArgument("type",MediaValidationVariables.vp9_url_type)
         appArguments = getURLArguments()
