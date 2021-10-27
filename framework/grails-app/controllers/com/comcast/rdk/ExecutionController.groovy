@@ -3162,7 +3162,7 @@ class ExecutionController {
 						def stbIps = Device.findAllByStbIp(newDeviceIP)
 						if(stbIps){
 							result.addProperty("Status", "FAILURE")
-							result.addProperty("Remarks", "Device IP already exists")
+							result.addProperty("Remarks", "Device IP "+newDeviceIP+" already exists")
 						}else{
 							deviceInstance.stbIp = newDeviceIP
 							if(!deviceInstance.save(flush:true)){
@@ -3173,7 +3173,7 @@ class ExecutionController {
 								}
 							}else{
 								result.addProperty("Status", "SUCCESS")
-								result.addProperty("Remarks", "Changed device IP")
+								result.addProperty("Remarks", "Changed device IP to "+newDeviceIP)
 							}
 						}
 					}else{
