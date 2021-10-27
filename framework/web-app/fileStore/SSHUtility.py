@@ -22,7 +22,7 @@ def ssh_and_execute(ssh_method, hostname, username, password, command):
     output = ""
     try:
 	if (ssh_method == "directSSH"):
-            session = pxssh.pxssh(options={
+            session = pxssh.pxssh(timeout = 2400,options={
                                     "StrictHostKeyChecking": "no",
                                     "UserKnownHostsFile": "/dev/null"})
             print "\nCreating ssh session"

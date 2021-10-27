@@ -92,14 +92,19 @@ close_interval: int</input_parameters>
 import tdklib
 import ast,time
 import json
+import RDKVProfilingVariables
 from datetime import datetime
 from web_socket_util import *
 from MediaValidationUtility import *
 from MediaValidationVariables import *
 from StabilityTestUtility import *
+from RDKVProfilingVariables import *
+from rdkv_profilinglib import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_profiling","1",standAlone=True);
+
+start_datetime_string = str(datetime.utcnow()).split('.')[0]
 
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
@@ -117,13 +122,27 @@ if expectedResult in result.upper():
     status = "SUCCESS"
     is_front = False
     process_list = ['WPEFramework','WPEWebProcess','WPENetworkProcess','tr69hostif']
-    system_wide_methods_list = ['rdkv_profiling_collectd_check_system_memory','rdkv_profiling_collectd_check_system_loadavg','rdkv_profiling_collectd_check_system_CPU']
-    system_wide_method_names_dict = {'rdkv_profiling_collectd_check_system_memory':'system memory','rdkv_profiling_collectd_check_system_loadavg':'system load avg','rdkv_profiling_collectd_check_system_CPU':'system cpu'}
-    process_wise_methods = ['rdkv_profiling_collectd_check_process_metrics','rdkv_profiling_collectd_check_process_usedCPU','rdkv_profiling_collectd_check_process_usedSHR']
-    process_wise_method_names_dict = {'rdkv_profiling_collectd_check_process_metrics':'metrics','rdkv_profiling_collectd_check_process_usedCPU':'used CPU','rdkv_profiling_collectd_check_process_usedSHR':'used shared memory'}
-
-
-
+    conf_file,result2 = get_configfile_name(obj)
+    time.sleep(30)
+    #Validate system wide profiling data before playing Dash 4k video
+    end_datetime_string = str(datetime.utcnow()).split('.')[0]
+    print "\n Validating system wide profiling mettrics from grafana before playing Dash 4k video \n"
+    for result,validation_result,system_wide_methods,tdkTestObj in get_systemwide_multiplerequest(obj,conf_file,start_datetime_string,end_datetime_string):
+        if expectedResult in (result and validation_result):
+            print "Successfully validated the {}\n".format(system_wide_methods)
+            tdkTestObj.setResultStatus("SUCCESS")
+        else:
+            print "Error while validating the {}\n".format(system_wide_methods)
+            tdkTestObj.setResultStatus("FAILURE")
+    #Validate process wise profiling data before playing Dash 4k video
+    print "\n Validating process wise profiling metrics from grafana before playing Dash 4k video \n"
+    for result,validation_result,process_wise_methods_list,tdkTestObj in get_processwise_multiplerequest(obj,conf_file,start_datetime_string,end_datetime_string,process_list):
+        if expectedResult in (result and validation_result):
+            print "Successfully validated the {}\n".format(process_wise_methods_list)
+            tdkTestObj.setResultStatus("SUCCESS")
+        else:
+            print "Error while validating the {}\n".format(process_wise_methods_list)
+            tdkTestObj.setResultStatus("FAILURE")
     plugin = webkit_instance
     url    = "about:blank"
     print "\nLaunching %s using RDKShell..." %(plugin)
@@ -144,7 +163,7 @@ if expectedResult in result.upper():
     result1 = tdkTestObj.getResult()
     ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
     validation_dict = get_validation_params(obj)
-    conf_file,result2 = getConfigFileName(obj.realpath)
+    #conf_file,result2 = getConfigFileName(obj.realpath)
     if result2 == "FAILURE":
         print "\nUnable to get the device config file"
     if result1 == "FAILURE" or result2 == "FAILURE" or ssh_param_dict == {} or validation_dict == {}:
@@ -297,57 +316,39 @@ if expectedResult in result.upper():
 
                     if video_play_status:
                         print "\n Validate data from Grafana"
-                        for method in system_wide_methods_list:
-                            tdkTestObj = obj.createTestStep(method)
-                            tdkTestObj.addParameter('tmUrl',obj.url)
-                            tdkTestObj.addParameter('resultId',obj.resultId)
-                            tdkTestObj.addParameter('deviceConfig',conf_file)
-                            tdkTestObj.executeTestCase(expectedResult)
-                            details = tdkTestObj.getResultDetails()
-                            result = tdkTestObj.getResult()
-                            validation_result = json.loads(details).get("test_step_status")
+                        #Validate system wide profiling data
+                        for result,validation_result,system_wide_methods,tdkTestObj in get_systemwidemethods(obj,conf_file):
                             if expectedResult in (result and validation_result):
-                                print "\n Successfully validated the {}".format(system_wide_method_names_dict[method])
+                                print "Successfully validated the {}\n".format(system_wide_methods)
                                 tdkTestObj.setResultStatus("SUCCESS")
                             else:
-                                print "\n Error while validating the {}".format(system_wide_method_names_dict[method])
+                                print "Error while validating the {}\n".format(system_wide_methods)
                                 tdkTestObj.setResultStatus("FAILURE")
-                        for process in process_list:
-                            for method in process_wise_methods:
-                                tdkTestObj = obj.createTestStep(method)
-                                tdkTestObj.addParameter('tmUrl',obj.url)
-                                tdkTestObj.addParameter('resultId',obj.resultId)
-                                tdkTestObj.addParameter('processName',process)
-                                tdkTestObj.addParameter('deviceConfig',conf_file)
-                                tdkTestObj.executeTestCase(expectedResult)
-                                details = tdkTestObj.getResultDetails()
-                                result = tdkTestObj.getResult()
-                                validation_result = json.loads(details).get("test_step_status")
-                                if expectedResult in (result and validation_result):
-                                    print "\n Successfully validated the {} process {}".format(process,process_wise_method_names_dict[method])
-                                    tdkTestObj.setResultStatus("SUCCESS")
-                                else:
-                                    print "\n Error while validating the {} process {}".format(process,process_wise_method_names_dict[method])
-                                    tdkTestObj.setResultStatus("FAILURE")
-
+                        #Validate process wise profiling data
+                        for result,validation_result,process,process_wise_methods_list,tdkTestObj in get_processwisemethods(obj,process_list,conf_file):
+                            if expectedResult in (result and validation_result):
+                                print "Successfully validated the {} process {}\n".format(process,process_wise_methods_list)
+                                tdkTestObj.setResultStatus("SUCCESS")
+                            else:
+                                print "Error while validating the {} process {}\n".format(process,process_wise_methods_list)
+                                tdkTestObj.setResultStatus("FAILURE")
                         #smem data collection
-                        tdkTestObj = obj.createTestStep("rdkv_profiling_smem_execute")
-                        tdkTestObj.addParameter('deviceIP',ip)
-                        tdkTestObj.addParameter('deviceConfig',conf_file)
-                        tdkTestObj.addParameter('realPath',obj.realpath)
-                        tdkTestObj.addParameter('execId',obj.execID)
-                        tdkTestObj.addParameter('execDeviceId',obj.execDevId)
-                        tdkTestObj.addParameter('execResultId',obj.resultId)
-                        tdkTestObj.executeTestCase(expectedResult)
-                        details = tdkTestObj.getResultDetails()
-                        result = tdkTestObj.getResult()
+                        result,tdkTestObj = get_smemdata(obj,ip,conf_file)
                         if "SUCCESS" in result:
                             print "\nSMEM tool execution success and transferred the log"
                             tdkTestObj.setResultStatus("SUCCESS")
                         else:
                             print "\nSMEM tool execution or log transfer failed"
                             tdkTestObj.setResultStatus("FAILURE")
-
+                        #pmap data collection
+                        #Automatic process selection to get pmap data will be added in the later releases
+                        result,tdkTestObj = get_pmapdata(obj,ip,conf_file,process_list)
+                        if "SUCCESS" in result:
+                            print "\npmap tool execution success and transferred the log"
+                            tdkTestObj.setResultStatus("SUCCESS")
+                        else:
+                            print "\npmap tool execution or log transfer failed"
+                            tdkTestObj.setResultStatus("FAILURE")
                         print "\nCheck for profiling alerts...."
                         tdkTestObj = obj.createTestStep("rdkv_profiling_get_alerts")
                         tdkTestObj.addParameter('tmUrl',obj.url)
