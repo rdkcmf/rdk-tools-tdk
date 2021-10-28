@@ -172,6 +172,12 @@ dolby_url_type = ""
 video_src_url_direct_ogg  = ""
 video_src_url_direct_webm = ""
 
+# Different MPD Variant streams
+video_src_url_dash_segement_base = ""
+video_src_url_dash_segement_list = ""
+video_src_url_dash_segement_timeline = ""
+video_src_url_dash_segement_template = ""
+
 
 #************************************************************************
 #                  DRM PROTECTED CONTENT STREAM URLs
