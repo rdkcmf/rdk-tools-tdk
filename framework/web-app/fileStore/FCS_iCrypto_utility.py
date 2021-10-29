@@ -28,6 +28,9 @@ pattern2 = "FAILED|ERROR"
 #TestApps predefined
 TESTAPP = {"interfaceTest":"cgfacetests","implementationTest":"cgimptests","nfSecurityTest":"cgnfsecuritytests"}
 
+#Define Module Tests
+Tests = {"Vault":[" Vault::ImportExport", " Vault::SetGet"], "Hash" : [" Hash::Hash", " Hash::HMAC"], "Cipher" : [" Cipher::AES"], "DH" : [" DH::Generate"]};
+
 #Create an empty list:
 tests = []
 expectedResult="SUCCESS";
@@ -82,10 +85,12 @@ def Summary(fileName):
 
 #Lists the number of failures observed as part of the execution
 #Parses the output from the iCrypto test app and returns the total number of failures
-def getNumberOfFailures(fileName):
+def getNumberOfFailures(fileName,options=""):
     for line in open(fileName):
         if line !='':
             word = re.findall("TOTAL", line)
+            if options in "ModuleTest":
+                word = True;
             if word:
                 try:
                     if "FAILED" in line:
@@ -169,7 +174,7 @@ def RunTest(obj,Test,logFile):
     #Test to be executed
     test = TESTAPP[Test];
     tdkTestObj.addParameter("tool_path", test);
-    tdkTestObj.addParameter("timeout", "30");
+    tdkTestObj.addParameter("timeout", "3");
     #Execute the test case in STB
     tdkTestObj.executeTestCase("SUCCESS");
     #Get the result of execution
@@ -180,3 +185,33 @@ def RunTest(obj,Test,logFile):
         print "Unable to execute %s" %(test);
         tdkTestObj.setResultStatus("FAILURE");
     return details
+
+###############################################################################################
+# Parses Module Test Result
+# Sample Input : GetTestResults(filepath,Cipher)
+# Sample Output:
+# ======== Cipher::AES
+# SUCCESS: key128Id != 0
+# SUCCESS: aes != nullptr
+# 4c 6f 6f 6b 20 62 65 68 69 6e 64 20 79 6f 75 2c 20 61 20 54 68 72 65 65 2d
+# 4d 6f 6e 6b 65 79 21
+# ======== Cipher::AES - 8 PASSED, 0 FAILED
+###############################################################################################
+
+def GetTestResults(fileName,Test):
+    check_pattern=[]
+    check_pattern = Tests[Test]
+    check_Pattern = [pattern1 + pattern for pattern in check_pattern];
+    TestScope = False
+    ReturnFile ='resultFile'
+    TestResult = open(ReturnFile, 'w')
+    for checkPattern in check_Pattern:
+        for line in open(fileName):
+            if line.startswith(checkPattern):
+               TestScope = True
+            if TestScope:
+               TestResult.write(line)
+            if TestScope and "PASSED" in line:
+               TestScope = False
+    TestResult.close()
+    return ReturnFile
