@@ -184,3 +184,9 @@ launch_and_destroy_max_count = 1000
 #Bluetooth Pair and Unpair test details
 pair_unpair_max_count = 1000
 
+#URL used to test HtmlApp plugin
+html_page_url = "https://vimeo.com/channels/premieres"
+
+#Cobalt navigation test details
+#maximum number of key navigations
+cobalt_max_navigations = 100

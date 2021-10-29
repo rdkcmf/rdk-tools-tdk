@@ -20,6 +20,7 @@ css3_test_url="https://css3test.com/#css3-background"
 octane_test_url ="http://chromium.github.io/octane/?auto=1"
 html5_test_url ="https://html5test.com/"
 sunspider_url = "https://webkit.org/perf/sunspider-1.0.2/sunspider-1.0.2/driver.html"
+strike_tool_url = "https://strike.lightningjs.io/"
 #https://askubuntu.com/questions/432255/what-is-the-display-environment-variable
 display_variable=":0"
 #Give the path where the chromedriver executable is available

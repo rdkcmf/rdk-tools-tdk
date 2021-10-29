@@ -33,6 +33,7 @@ import importlib
 import PerformanceTestVariables
 import sys
 import socket
+import ast
 
 deviceIP=""
 devicePort=""
@@ -126,7 +127,7 @@ def rdkservice_setPluginStatus(plugin,status,uri=''):
         if status in "activate":
             data = '"method":"org.rdk.RDKShell.1.launch", "params":{"callsign": "'+plugin+'", "type":"", "uri":"'+uri+'"}'
         else:
-            data = '"method":"org.rdk.RDKShell.1.destroy", "params":{"callsign": "'+plugin+'"}}'
+            data = '"method":"org.rdk.RDKShell.1.destroy", "params":{"callsign": "'+plugin+'"}'
     else:
         data = '"method": "Controller.1.'+status+'", "params": {"callsign": "'+plugin+'"}'
     result = execute_step(data)
@@ -779,3 +780,42 @@ def get_device_uptime(obj):
         print '\n Error while activating DeviceInfo'
         tdkTestObj.setResultStatus("FAILURE")
     return uptime
+
+#-------------------------------------------------------------------
+#MOVE THE PLUGIN TO FRONT OR BACK BASED ON ARGUMENTS
+#-------------------------------------------------------------------
+def move_plugin(obj,plugin,method):
+    result_val = "FAILURE"
+    expectedResult = "SUCCESS"
+    param_val = '{"client": "'+plugin+'"}'
+    tdkTestObj = obj.createTestStep('rdkservice_setValue')
+    tdkTestObj.addParameter("method","org.rdk.RDKShell.1."+method)
+    tdkTestObj.addParameter("value",param_val)
+    tdkTestObj.executeTestCase(expectedResult)
+    result = tdkTestObj.getResult()
+    if expectedResult in result:
+        tdkTestObj.setResultStatus("SUCCESS")
+        print "\n Check whether {} is in front".format(plugin)
+        time.sleep(5)
+        tdkTestObj = obj.createTestStep('rdkservice_getValue')
+        tdkTestObj.addParameter("method","org.rdk.RDKShell.1.getZOrder")
+        tdkTestObj.executeTestCase(expectedResult)
+        zorder = tdkTestObj.getResultDetails()
+        zorder_status = tdkTestObj.getResult()
+        if expectedResult in zorder_status :
+            zorder = ast.literal_eval(zorder)["clients"]
+            print "zorder: ",zorder
+            if  plugin.lower() in zorder and plugin.lower() == zorder[0]:
+                result_val = "SUCCESS"
+                print "\n {} is in front".format(plugin)
+                tdkTestObj.setResultStatus("SUCCESS")
+            else:
+                print "\n {} is not in front".format(plugin)
+                tdkTestObj.setResultStatus("FAILURE")
+        else:
+            print "\n Unable to get zorder"
+            tdkTestObj.setResultStatus("FAILURE")
+    else:
+        print "\n Error while executing {} method".format(method)
+        tdkTestObj.setResultStatus("FAILURE")
+    return result_val
