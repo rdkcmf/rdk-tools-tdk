@@ -156,12 +156,14 @@ if expectedResult in (result.upper() and pre_condition_status):
                     #Check zorder
                     zorder = ast.literal_eval(zorder)["clients"]
                     for count in range(0,moveto_back_max_count):
-                        print "\n zorder:",zorder
-                        result_dict = {}
-                        if zorder[-1].lower() == "cobalt":
-                            plugin = "WebKitBrowser"
-                        elif zorder[-1].lower() == "webkitbrowser" or zorder[-1].lower() == "residentapp":
-                            plugin = "Cobalt"
+                        print "\n Zorder:",zorder
+                        zorder = [plugin.lower() for plugin in zorder]
+                        if all(plugin in zorder for plugin in ["webkitbrowser","cobalt"]):
+                            result_dict = {}
+                            if zorder[-1].lower() == "cobalt":
+                                plugin = "WebKitBrowser"
+                            else:
+                                plugin = "Cobalt"
                         else:
                             print "\n Zorder is not having Cobalt or WebkitBrowser as last plugin, zorder: ",zorder
                             tdkTestObj.setResultStatus("FAILURE")
@@ -232,21 +234,13 @@ if expectedResult in (result.upper() and pre_condition_status):
         else:
             print "\n Error while executing WebKitBrowser.1.url method \n"
             tdkTestObj.setResultStatus("FAILURE")
-        #Deactivate Cobalt and WebKitBrowser
-        deactivate_plugins_dict = {"WebKitBrowser":"deactivated","Cobalt":"deactivated"}
-        deactivate_status = set_plugins_status(obj,deactivate_plugins_dict)
-        if deactivate_status == "SUCCESS":
-            print "\n Successfully deactivated the plugins \n"
-            tdkTestObj.setResultStatus("SUCCESS")
-        else:
-            print "\n Error while deactivating plugins \n"
-            tdkTestObj.setResultStatus("FAILURE")
     else:
         print "\n Preconditions are not met\n"
         obj.setLoadModuleStatus("FAILURE")
-    if revert == "YES":
-        print "\n Revert the values before exiting \n"
-        status = set_plugins_status(obj,plugins_cur_status_dict)
+    print "\n Revert the values before exiting \n"
+    status = set_plugins_status(obj,plugins_cur_status_dict)
+    if status == "FAILURE":
+        print "\n Error while reverting the status of plugins"
     post_condition_status = check_device_state(obj)
     obj.unloadModule("rdkv_stability");
 else:
