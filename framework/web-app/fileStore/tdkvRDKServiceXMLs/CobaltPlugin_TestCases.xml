@@ -94,6 +94,7 @@
 
 	  <prerequisite requisiteId="4" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
             <event pluginName="Cobalt" eventName="Event_Cobalt_State_Changed" />
+            <event pluginName="Cobalt" eventName="Event_Cobalt_Closure" />            
           </prerequisite>
         </pluginPreRequisite>
         <testCase testCaseId="CB_01" testCaseName="Cobalt_Launch_Youtube_URL" desc="Launches youtube link" delay="10" >
@@ -205,5 +206,41 @@
          </postrequisite>
         </testCasePostRequisite>
         </testCase>
+     
+        <testCase testCaseId="CB_04" testCaseName= "Cobalt_Check_Closure_Event" desc="Checks for the closure event" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" pluginName="RDKShell"  name="Launch_Application" method="LaunchApplication">
+              <params paramKey="configration" >
+                <param tag="callsign" value="Cobalt" />
+                <param tag="closurepolicy" value="suspend" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Cobalt_State" method="Get_Cobalt_State" >
+              <resultGeneration useMethodTag="cobalt_get_state" expectedValues="resumed"/>
+            </testStep>
+            <testStep testStepId="3" pluginName="RDKShell"  name="Exit_Cobalt" method="GenerateKey" delay="3" >
+              <params paramKey="keys">
+                <param tag="keyCode" value="8,8,40,13" />
+                <param tag="modifiers" useDefault="true" />
+                <param tag="delay" value="1.0"/>
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="4" name="Check_Closure_Event" event="Event_Cobalt_Closure" action="eventListener" delay="2">
+                <resultGeneration useMethodTag="cobalt_check_closure_event" />
+            </testStep>
+        <testCasePostRequisite>
+         <postrequisite requisiteId="1" requisiteName="Exit_Cobalt">
+            <testStep testStepId="1" name="Destroy_Application" method="DestroyApplication" pluginName="RDKShell" PluginOnStep="yes" >
+              <params>
+                <param tag="callsign"  value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+         </postrequisite>
+        </testCasePostRequisite>
+        </testCase>
+
 </testPlugin>
 

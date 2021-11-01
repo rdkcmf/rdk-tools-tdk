@@ -735,4 +735,107 @@
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
             </testStep>
        </testCase>
+
+       <testCase testCaseId="WIFI_18" testCaseName="WIFI_Connect_To_Wifi_With_Saved_Valid_Credentials" desc="Checks whether able to connect to wifi with saved credentials">
+            <testStep testStepId="1" name="Save_SSID_Info" method="Save_SSID_Info" >
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
+                  <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
+                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_save_clear_ssid" />
+            </testStep>
+            <testStep testStepId="2" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value=""/>
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value=""/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="3" name="Connect" method="Connect" delay="5">
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="4" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="3">
+                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
+                    <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Check_On_WIFI_State_Changed_Connected_Event" event="Event_On_WIFI_State_Changed" action="eventListener" delay="3">
+              <resultGeneration useMethodTag="wifi_check_state_change_event" expectedValues="5"/>
+            </testStep>
+            <testStep testStepId="6" name="Get_Connected_SSID" method="Get_Connect_SSID" delay="3">
+                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
+                    <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Disconnect" method="Disconnect" delay="3">
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="8" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase>
+
+       <testCase testCaseId="WIFI_19" testCaseName="WIFI_Connect_To_Wifi_With_Saved_Invalid_Credentials" desc="Checks the onError event by connecting to saved invalid credentials">
+            <testStep testStepId="1" name="Save_SSID_Info" method="Save_SSID_Info" >
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_INVALID_SSID_NAME"/>
+                  <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
+                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_save_clear_ssid" />
+            </testStep>
+            <testStep testStepId="2" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value=""/>
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value=""/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="3" name="Connect" method="Connect" delay="5">
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="4" name="Check_On_Error_Event" event="Event_On_Error" action="eventListener" delay="15">
+              <resultGeneration useMethodTag="wifi_check_on_error_event" expectedValues="5" />
+            </testStep>
+            <testStep testStepId="5" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase>
+ 
+       <testCase testCaseId="WIFI_20" testCaseName="WIFI_Check_Scanned_SSID_Frequency_2.4Ghz" desc="Scan for the 2.4 ghz SSID and check all the SSIDs listed in onAvailableSSIDs Event is 2.4 ghz">
+            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value="" />
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value="2.4" />
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Check_On_Available_SSIDs_Event" event="Event_On_Available_SSIDs" action="eventListener" delay="5">
+                <resultGeneration useMethodTag="wifi_check_available_ssids_event" arguments="check_scanned_ssid_frequency" expectedValues="2.4" />
+            </testStep>
+            <testStep testStepId="3" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase>
+
+       <testCase testCaseId="WIFI_21" testCaseName="WIFI_Check_Scanned_SSID_Frequency_5Ghz" desc="Scan for the 5 ghz SSID and check all the SSIDs listed in onAvailableSSIDs Event is 5 ghz">
+            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value="" />
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value="5" />
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Check_On_Available_SSIDs_Event" event="Event_On_Available_SSIDs" action="eventListener" delay="5">
+                <resultGeneration useMethodTag="wifi_check_available_ssids_event" arguments="check_scanned_ssid_frequency" expectedValues="5" />
+            </testStep>
+            <testStep testStepId="3" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase>
 </testPlugin>

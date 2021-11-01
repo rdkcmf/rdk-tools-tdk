@@ -1638,4 +1638,25 @@
               <resultGeneration useMethodTag="rdkshell_check_error_message" expectedValues="failed to set scale"/>
             </testStep>
         </testCase>
+         
+        <!-- Test case 67 -->
+        <testCase testCaseId="RDKShell_67" testCaseName= "RDKShell_Show_And_Hide_Splash_Screen" desc="Shows and hides splash screen logo">
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="RDKSHELL_SUPPORTED_FEATURES" useMethodTag="rdkshell_check_feature_applicability" arguments="splashscreen" />
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Check_Environment_Variable_In_Service_File">
+                  <testStep testStepId="1" name="Check_Environment_Variable_In_Service_File" action="externalFnCall" >
+                    <resultGeneration useMethodTag="Check_Environment_Variable_In_Service_File" expectedValues = "RDKSHELL_SPLASH_IMAGE_JPEG" />
+                  </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Show_Splash_Logo" method="Show_Splash_Logo" >
+              <params>
+                <param tag="displayTime" value="15"/>
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Hide_Splash_Logo" method="Hide_Splash_Logo" delay="10" >
+              <resultGeneration useMethodTag="rdkshell_get_result_status"/>
+            </testStep>
+        </testCase>
 </testPlugin>

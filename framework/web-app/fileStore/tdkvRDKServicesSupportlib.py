@@ -390,6 +390,15 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "frontpanel_get_preferences":
+            info["preferences"] = result.get("preferences")
+            success = str(result.get("success")).lower() == "true"
+            expectedValues = ",".join(expectedValues)
+            expectedValues = json.loads(str(expectedValues))
+            if success and expectedValues == result.get("preferences"):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # WebKitBrowser Plugin Response result parser steps
         elif tag == "webkitbrowser_get_state":
@@ -704,6 +713,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
+        elif tag == "system_check_custom_reboot_reason":
+            info = checkAndGetAllResultInfo(result.get(arg[0]),result.get("success"))
+            result = result.get(arg[0])
+            if result.get("customReason") in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # User Preferces Plugin Response result parser steps
         elif tag == "userpreferences_get_ui_language":
@@ -1105,16 +1121,40 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             status = checkNonEmptyResultData(result.get('connectedVideoDisplays'))
             if success and status == "TRUE":
                 info["is_connected"] = "true"
+                info["Test_Step_Status"] = "SUCCESS"
             elif success and status == "FALSE":
                 info["is_connected"] = "false"
-            info["Test_Step_Status"] = "SUCCESS"
-
-        elif tag == "display_settings_check_set_operation":
-            info["success"] = result.get("success")
-            if str(result.get("success")).lower() == "true":
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+            if len(arg) and arg[0] == "check_tv_connected":
+                if "true" in info["is_connected"]:
+                    info["Test_Step_Status"] = "FAILURE"
+                    message = "Please test after disconnecting the TV"
+                    info["Test_Step_Message"] = message
+                else:
+                    info["Test_Step_Status"] = "SUCCESS"
+            elif len(arg) and arg[0] == "check_tv_not_connected":
+                if "true" in info["is_connected"]:
+                    info["Test_Step_Status"] = "FAILURE"
+                    message = "Connected video displays list should be empty when TV is not connected"
+                    info["Test_Step_Message"] = message
+                else:
+                    info["Test_Step_Status"] = "SUCCESS"
+
+        elif tag == "display_settings_check_set_operation":
+            info["success"] = result.get("success")
+            if len(arg) and arg[0] == "check_set_failed":
+                if str(result.get("success")).lower() == "false":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+            else:
+                if str(result.get("success")).lower() == "true":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "display_connected_status":
             info["video_display"] = result.get('connectedVideoDisplays')
@@ -1204,12 +1244,18 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_connected_device_edid":
-            info["connected_device_edid"] = result.get('EDID')
-            if json.dumps(result.get('EDID')) and json.dumps(result.get("success")) == "true" :
-                info["Test_Step_Status"] = "SUCCESS"
+            if len(arg) and arg[0] == "check_edid_status_for_disconnected_device":
+                if str(result.get("success")).lower() == "false":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
-                info["Test_Step_Status"] = "FAILURE"
-                
+                info["connected_device_edid"] = result.get('EDID')
+                if json.dumps(result.get('EDID')) and json.dumps(result.get("success")) == "true" :
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+        
         elif tag == "check_connected_audio_ports":
             if len(arg) and arg[0] == "check_value":
                 info["connected_audio_port"] = result.get('connectedAudioPorts')
@@ -1232,7 +1278,20 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-                
+            if len(arg) and arg[0] == "check_hdmi0_audio_modes":
+                status = "TRUE"
+                expectedValues = [ str(mode).lower() for mode in expectedValues ]
+                for soundMode in  result.get('supportedAudioModes'):
+                    if "AUTO" in soundMode:
+                        soundMode = re.search(r"\((.*?)\)",soundMode).group(1)
+                    if str(soundMode).lower() not in expectedValues:
+                        status = "FALSE"
+                        break
+                if "FALSE" not in status:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+        
         elif tag == "check_sound_mode":
             soundMode = result.get('soundMode')
             if "AUTO" in soundMode:
@@ -1291,11 +1350,18 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_video_port_status_standby":
-            info["enabled"] = result.get('videoPortStatusInStandby');
-            if str(result.get("success")).lower() == "true" and str(result.get('videoPortStatusInStandby')) in expectedValues :
-                info["Test_Step_Status"] = "SUCCESS"
+            if len(arg) and arg[0] == "check_for_invalid_port":
+                info = checkAndGetAllResultInfo(result)
+                if str(result.get("success")).lower() == "false" and result.get('error_message') in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
-                info["Test_Step_Status"] = "FAILURE"
+                info["enabled"] = result.get('videoPortStatusInStandby');
+                if str(result.get("success")).lower() == "true" and str(result.get('videoPortStatusInStandby')) in expectedValues :
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_dolby_volume_mode":
             info["dolbyVolumeMode"] = result.get('dolbyVolumeMode');
@@ -2544,6 +2610,9 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             else:
                 info["is24Hour"] = False
 
+        elif tag == "frontpanel_set_led_info":
+            testStepResults = testStepResults[0].values()[0]
+            info["preferences"] = json.dumps(testStepResults[0].get("supported_leds_info")[0])
 
         # FrameRate Plugin Response result parser steps
         elif tag == "framerate_set_display_framerate":
@@ -2859,6 +2928,10 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             testStepResults = testStepResults[0].values()[0]
             info["defaultResolution"] = testStepResults[0].get("defaultResolution")
 
+        elif tag == "get_audio_delay":
+            testStepResults = testStepResults[0].values()[0]
+            info["audioDelay"] = testStepResults[0].get("audioDelay")
+
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_toggle_adapter_state":
             testStepResults = testStepResults[0].values()[0]
@@ -3063,6 +3136,12 @@ def checkTestCaseApplicability(methodTag,configKeyData,arguments):
             else:
                 result = "FALSE"
 
+        elif tag == "rdkshell_check_feature_applicability":
+            if arg[0] in str(keyData).lower():
+                result = "TRUE"
+            else:
+                result = "FALSE"
+
         elif tag == "firmwarecontrol_check_feature_applicability":
             if arg[0] in keyData:
                 result = "TRUE"
@@ -3131,7 +3210,13 @@ def generateComplexTestInputParam(methodTag,testParams):
         elif tag == "monitor_get_restart_params":
             userGeneratedParam = { "callsign": testParams.get("callsign"), "restart": { "limit": testParams.get("limit") ,  "window": testParams.get("window") }}
         elif tag == "rdkshell_set_keys_params":
-            userGeneratedParam = {"keys":[testParams]}
+            newtestParams = []
+            for value in testParams.get("keyCode"):
+                keysValue = {"keyCode" : int(value),"modifiers": testParams.get("modifiers"),"delay": testParams.get("delay")}
+                newtestParams.append(keysValue)
+            userGeneratedParam = {"keys":newtestParams}
+        elif tag == "rdkshell_set_launch_params":
+            userGeneratedParam = { "callsign": testParams.get("callsign"), "configuration": { "closurepolicy": testParams.get("closurepolicy") } }
         elif tag == "rdkshell_set_keylistener_params":
             newtestParams = testParams.copy()
             newtestParams.pop("client")
@@ -3352,13 +3437,13 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "Create_File":
-            command = "mkdir "+arguments[0]+"Controller;[ -d "+arguments[0]+"Controller ] && echo 1 || echo 0"
+            command = "mkdir "+arguments[0]+"/Controller;[ -d "+arguments[0]+"/Controller ] && echo 1 || echo 0"
             status = executeCommand(deviceConfigFile, deviceIP, command)
             status = str(status).split("\n")
             result = 1
             if int(status[1]) == result:
                 info["RESULT"] = "Controller directory created"
-                command = "touch "+arguments[0]+"Controller/TDK_TEST_FILE.txt;[ -f "+arguments[0]+"Controller/TDK_TEST_FILE.txt ] && echo 1 || echo 0"
+                command = "touch "+arguments[0]+"/Controller/TDK_TEST_FILE.txt;[ -f "+arguments[0]+"/Controller/TDK_TEST_FILE.txt ] && echo 1 || echo 0"
                 status = executeCommand(deviceConfigFile, deviceIP, command)
                 status = str(status).split("\n")
                 result = 1
@@ -3406,7 +3491,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             info["Test_Step_Message"] = message
 
         elif tag == "Check_If_File_Exists":
-            command = "[ -f "+arguments[0]+"Controller/TDK_TEST_FILE.txt ] && echo 1 || echo 0"
+            command = "[ -f "+arguments[0]+"/Controller/TDK_TEST_FILE.txt ] && echo 1 || echo 0"
             status = executeCommand(deviceConfigFile, deviceIP, command)
             status = str(status).split("\n")
             result = 0
@@ -3418,14 +3503,14 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "Delete_Test_File":
-            command = "[ -d "+arguments[0]+"Controller ] && echo 1 || echo 0"
+            command = "[ -d "+arguments[0]+"/Controller ] && echo 1 || echo 0"
             status = executeCommand(deviceConfigFile, deviceIP, command)
             status = str(status).split("\n")
             if int(status[1]) == 0:
                 info["RESULT"] = "File does not exist"
                 info["Test_Step_Status"] = "SUCCESS"
             else:
-                command = "rm -rf "+arguments[0]+"Controller ; [ -d "+arguments[0]+"Controller ] && echo 1 || echo 0"
+                command = "rm -rf "+arguments[0]+"/Controller ; [ -d "+arguments[0]+"/Controller ] && echo 1 || echo 0"
                 status = executeCommand(deviceConfigFile, deviceIP, command)
                 status = str(status).split("\n")
                 if int(status[1]) == 0:
@@ -3449,6 +3534,19 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             mapping_details = arg[len(arg)-1].split(":")
             info["width"] = mapping_details[1].split('|')[0].strip('[]')
             info["height"] = mapping_details[1].split('|')[1].strip('[]')
+
+        elif tag == "Check_Environment_Variable_In_Service_File":
+            command = 'grep -q '+str(expectedValues[0])+' /lib/systemd/system/wpeframework.service && echo 1 || echo 0'
+            output = executeCommand(deviceConfigFile, deviceIP, command)
+            output = str(output).split("\n")
+            if int(output[1]) == 1:
+                message = "\"RDKSHELL_SPLASH_IMAGE_JPEG\" Environment variable is present in the  wpeframework.service file"
+                info["Test_Step_Message"] = message
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                message = "\"RDKSHELL_SPLASH_IMAGE_JPEG\" Environment variable is not present in the wpeframework.service file but \"Splash Screen\" feature configured as supported feature in config file"
+                info["Test_Step_Message"] = message
+                info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "executeRebootCmd":
             command = "reboot"

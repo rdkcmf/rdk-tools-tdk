@@ -621,4 +621,17 @@
              </resultGeneration>
             </testStep>
        </testCase>
+       
+       <testCase testCaseId="SYS_40" testCaseName= "System_check_PreviousReboot_Info2_Custom_Reason" desc="Checks whether it returns custom reason provided in reboot API">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="System_reboot" method="Reboot" closeConn="false" rebootStep="yes" >
+              <params>
+                  <param tag="rebootReason" value="API_Validation" />
+              </params>
+              <resultGeneration useMethodTag="system_check_set_operation"  />
+            </testStep>
+            <testStep testStepId="2" name="Get_PreviousReboot_Info2" method="Get_PreviousReboot_Info2" >
+              <resultGeneration useMethodTag="system_check_custom_reboot_reason" arguments="rebootInfo" expectedValues= "API_Validation" />
+            </testStep>
+       </testCase>
 </testPlugin>

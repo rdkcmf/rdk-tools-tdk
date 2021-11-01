@@ -319,28 +319,60 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                     info["Test_Step_Status"] = "SUCCESS"
                     break;
 
-        
         elif tag == "wifi_check_available_ssids_event":
             ssids = []
+            frequencies = []
+            status = []
             for ssid_info in result:
-                for ssid_data in ssid_info.get("ssids"):
-                    if "\\x00" not in str(ssid_data.get("ssid")):
-                        ssids.append(str(ssid_data.get("ssid")))
-            if len(arg) and arg[0] == "get_ssid_names":
-                info["ssids"] = ssids
-                info["Test_Step_Status"] = "SUCCESS"
-            elif len(arg) and arg[0] == "check_scanned_ssid_name":
-                ssid_found = 0
-                for ssid in ssids:
-                    if ssid in expectedValues:
-                        info["ssid"] = ssid
-                        ssid_found = 1
-                        break
-                if ssid_found == 1:
-                    info["Test_Step_Status"] = "SUCCESS"
+                if ssid_info.get("ssids"):
+                    status.append("TRUE")
                 else:
+                    status.append("FALSE")
+            if "TRUE" in status:
+                for ssid_info in result:
+                    for ssid_data in ssid_info.get("ssids"):
+                        if "\\x00" not in str(ssid_data.get("ssid")):
+                            ssids.append(str(ssid_data.get("ssid")))
+                            frequencies.append(str(ssid_data.get("frequency")))
+            else:
+                message = "Available ssids list is empty"
+                info["Test_Step_Message"] = message
+                info["Test_Step_Status"] = "FAILURE"
+            if len(arg) and arg[0] == "get_ssid_names":
+                if not ssids and "TRUE" not in status:
                     info["Test_Step_Status"] = "FAILURE"
-
+                else:
+                    info["ssids"] = ssids
+                    info["Test_Step_Status"] = "SUCCESS"
+            elif len(arg) and arg[0] == "check_scanned_ssid_name":
+                if not ssids and "TRUE" not in status:
+                    info["Test_Step_Status"] = "FAILURE"
+                else:
+                    ssid_found = 0
+                    for ssid in ssids:
+                        if ssid in expectedValues:
+                            info["ssid"] = ssid
+                            ssid_found = 1
+                            break
+                    if ssid_found == 1:
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+            elif len(arg) and arg[0] == "check_scanned_ssid_frequency":
+                if not ssids and "TRUE" not in status:
+                    info["Test_Step_Status"] = "FAILURE"
+                else:
+                    info["result"] =  dict(zip(ssids,frequencies))
+                    resultStatus = "TRUE"
+                    for frequency in frequencies:
+                        if frequency not in expectedValues:
+                            resultstatus = "FALSE"
+                            break
+                    if "FALSE" not in resultStatus:
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+ 
         elif tag == "wifi_check_on_error_event":
             result = result[0]
             info = result
@@ -462,13 +494,6 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-        elif tag == "displaysettings_check_audio_mute_status_changed_event":
-            result = result[0]
-            info = result
-            if str(result.get("muteStatus")) in  expectedValues:
-                info["Test_Step_Status"] = "SUCCESS"
-            else:
-                info["Test_Step_Status"] = "FAILURE" 
 
         # Timer Events response result parser steps
         elif tag == "timer_check_timer_expired_event":
@@ -651,6 +676,13 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             result = result[0]
             info = result
             if str(result.get("suspended")).lower() in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        
+        elif tag == "cobalt_check_closure_event":
+            result = result[0]
+            if result == "":
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"

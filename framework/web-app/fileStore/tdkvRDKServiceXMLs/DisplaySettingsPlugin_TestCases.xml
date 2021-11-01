@@ -41,7 +41,6 @@
           <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" >
             <event pluginName="DisplaySettings" eventName="Event_Zoom_Settings_Updated" />
 	    <event pluginName="DisplaySettings" eventName="Event_Resolution_Changed" />
-	    <event pluginName="DisplaySettings" eventName="Event_Audio_Mute_Status_Changed" />
           </prerequisite>
         </pluginPreRequisite>
        
@@ -635,11 +634,6 @@
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
 	      </subtestStep>
-              <subtestStep subtestStepId="3" name="Check_Audio_Mute_Status_Changed_Event" event="Event_Audio_Mute_Status_Changed" action="eventListener" delay="3" >
-                  <resultGeneration useMethodTag="displaysettings_check_audio_mute_status_changed_event" >
-                    <expectedValues useIterableValue="true" />
-                  </resultGeneration>
-              </subtestStep>
             </testStep>
         </testCase>
 
@@ -1637,11 +1631,6 @@
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
 	      </subtestStep>
-              <subtestStep subtestStepId="3" name="Check_Audio_Mute_Status_Changed_Event" event="Event_Audio_Mute_Status_Changed" action="eventListener" delay="2" >
-                  <resultGeneration useMethodTag="displaysettings_check_audio_mute_status_changed_event" >
-                    <expectedValues useIterableValue="true" />
-                  </resultGeneration>
-              </subtestStep>
             </testStep>
         </testCase>
 
@@ -1673,11 +1662,6 @@
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
 	      </subtestStep>
-              <subtestStep subtestStepId="3" name="Check_Audio_Mute_Status_Changed_Event" event="Event_Audio_Mute_Status_Changed" action="eventListener" delay="2" >
-                  <resultGeneration useMethodTag="displaysettings_check_audio_mute_status_changed_event" >
-                    <expectedValues useIterableValue="true" />
-                  </resultGeneration>
-              </subtestStep>
             </testStep>
         </testCase>
         <testCase testCaseId="DS_64" testCaseName= "Mute_And_Unmute_Audio_SPEAKER0" desc="Check whether audio is able to mute and unmute for SPEAKER0 port" >
@@ -1708,11 +1692,6 @@
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
 	      </subtestStep>
-              <subtestStep subtestStepId="3" name="Check_Audio_Mute_Status_Changed_Event" event="Event_Audio_Mute_Status_Changed" action="eventListener" delay="2" >
-                  <resultGeneration useMethodTag="displaysettings_check_audio_mute_status_changed_event" >
-                    <expectedValues useIterableValue="true" />
-                  </resultGeneration>
-              </subtestStep>
             </testStep>
         </testCase>
 
@@ -2484,5 +2463,130 @@
                 <resultGeneration useMethodTag="check_active_input" arguments="check_for_invalid_port" expectedValues="False"/>
             </testStep>
         </testCase>
+
+        <testCase testCaseId="DS_92" testCaseName= "Check_VideoPort_Standby_Status_For_Invalid_Display" desc="Checks the video port standby status for invalid display" >
+            <testCaseInfo testCaseType="direct"  />
+            <testStep testStepId="1" name="Get_VideoPort_Status_InStandby"  method="Get_VideoPort_Status_InStandby" >
+                <params>
+                  <param tag="portName" value="Invalid0" />
+                </params>
+                <resultGeneration useMethodTag="check_video_port_status_standby" arguments="check_for_invalid_port" expectedValues="internal error" />
+            </testStep>
+            <testStep testStepId="2" name="Set_VideoPort_Status_InStandby" method="Set_VideoPort_Status_InStandby" >
+                <params>
+                  <param tag="portName" value="Invalid0"/>
+                  <param tag="enabled" value="True" />
+                </params>
+                <resultGeneration useMethodTag="check_video_port_status_standby" arguments="check_for_invalid_port" expectedValues="internal error" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_93" testCaseName= "Read_EDID_Without_TV" desc="Check the EDID status when TV is disconnected">
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" >
+                  <resultGeneration useMethodTag="display_is_connected" arguments="check_tv_connected"/>
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Check_EDID_Status_Of_Disconnected_Device" method="Read_EDID">
+                <resultGeneration useMethodTag="check_connected_device_edid" arguments="check_edid_status_for_disconnected_device"/>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_94" testCaseName= "Set_And_Get_Negative_Audio_Delay" desc="Check whether audio delay api accepts negative values" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="AudioDelay,HDMI0"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"  expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Audio_Delay" method="Get_Audio_Delay" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                  </params>
+              <resultGeneration useMethodTag="check_audio_delay" arguments="check_audio_delay_range" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Negative_Audio_Delay" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Audio_Delay"  method="Set_Audio_Delay" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" value="HDMI0"/>
+                    <param tag="audioDelay" value="-10,-50,-100" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation"  arguments="check_set_failed" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Audio_Delay" method="Get_Audio_Delay" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_delay" >
+                    <expectedValues  usePreviousResult="true" Id="2" useMethodTag="get_audio_delay"/>
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>        
+
+        <testCase testCaseId="DS_95" testCaseName= "Check_Supported_Audio_Modes"  desc="Validates the results of supported audio modes  with and without passing audio port">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="HDMI0"/>
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+            </testStep>
+            <testStep testStepId="2" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" >
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Get_Supported_Audio_Modes" method="Get_Supported_AudioModes" saveResult="true">
+                <resultGeneration useMethodTag="check_supported_audio_modes"/>
+            </testStep>
+            <testStep testStepId="4" name="Get_Supported_Audio_Modes" method="Get_Supported_AudioModes" >
+                <params>
+                   <param tag="audioPort" value="HDMI0"/>
+                </params>
+                <resultGeneration useMethodTag="check_supported_audio_modes" arguments="check_hdmi0_audio_modes" >
+                     <expectedValues usePreviousResult="true" Id="3" useMethodTag="get_supported_sound_modes"/>
+                </resultGeneration>
+            </testStep>
+        </testCase>       
+
+        <testCase testCaseId="DS_96" testCaseName= "Check_Audio_Delay_Offset_Persist_HDMI0" desc="Check whether audio delay offset values are persisting after reboot for HDMI0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS,AUDIO_DELAY_OFFSET_PERSISTENCE" useMethodTag="displaysetting_check_feature_applicability" arguments="AudioDelayOffset,HDMI0,yes"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"  expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Audio_Delay_Offset" method="Get_Audio_Delay_Offset" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+              <resultGeneration useMethodTag="check_audio_delay_offset" arguments="check_audio_delay_offset_range" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Audio_Delay_Offset" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Audio_Delay_Offset"  method="Set_Audio_Delay_Offset" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                    <param tag="audioDelayOffset" value="0,10,50,100" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+	      </subtestStep>
+              <subtestStep subtestStepId="2" name="Execute_Reboot_Command" action="externalFnCall" rebootStep="yes">
+                  <resultGeneration useMethodTag="executeRebootCmd"/>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Get_Audio_Delay_Offset" method="Get_Audio_Delay_Offset" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_delay_offset" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        
+        <testCase testCaseId="DS_97" testCaseName= "Check_Connected_Video_Displays_Without_TV_Connected"  desc="Checks whether getConnectedVideoDisplays API is returning empty list when TV is not connected">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" >
+                  <resultGeneration useMethodTag="display_is_connected" arguments="check_tv_not_connected" />
+                </testStep>
+        </testCase> 
 </testPlugin>  
 
