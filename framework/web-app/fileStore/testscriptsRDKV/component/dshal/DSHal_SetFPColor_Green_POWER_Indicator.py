@@ -70,6 +70,7 @@ eColor - Green</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import deviceCapabilities;
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("dshal","1");
@@ -84,7 +85,10 @@ obj.configureTestCase(ip,port,'DSHal_SetFPColor_Green_POWER_Indicator');
 loadModuleStatus = obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %loadModuleStatus;
 
-if "SUCCESS" in loadModuleStatus.upper():
+#Check whether setColor and Power Indicator is supported by DUT
+capable = deviceCapabilities.getconfig(obj,"SetColor") and deviceCapabilities.getconfig(obj,"Indicator","Power");
+
+if "SUCCESS" in loadModuleStatus.upper() and capable:
     obj.setLoadModuleStatus("SUCCESS");
     expectedResult="SUCCESS";
     print "\nTEST STEP1 : To set color of Power indicator in Front Panel to Green"
@@ -111,6 +115,12 @@ if "SUCCESS" in loadModuleStatus.upper():
         print "[TEST EXECUTION RESULT] : FAILURE\n"
 
     obj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in loadModuleStatus.upper():
+    print "Exiting from script";
+    obj.setLoadModuleStatus("FAILURE");
+    obj.unloadModule("dshal");
+
 else:
     print "Load module failed";
     obj.setLoadModuleStatus("FAILURE");

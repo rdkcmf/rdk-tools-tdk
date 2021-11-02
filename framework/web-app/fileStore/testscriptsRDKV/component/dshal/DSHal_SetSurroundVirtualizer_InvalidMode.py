@@ -88,6 +88,7 @@ CheckPoint 2. SurroundVirtualizer mode must be unhindered</expected_output>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import deviceCapabilities;
 from dshalUtility import *;
 
 #Test component to be tested
@@ -102,7 +103,11 @@ obj.configureTestCase(ip,port,'DSHal_SetSurroundVirtualizer_InvalidMode');
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
-if "SUCCESS" in result.upper():
+
+#Check if SurroundVirtualizer is supported by the DUT
+capable = deviceCapabilities.getconfig(obj,"SurroundVirtualizer")
+
+if "SUCCESS" in result.upper() and capable:
     expectedResult="SUCCESS";
  
     #Execute the test case in DUT
@@ -182,5 +187,11 @@ if "SUCCESS" in result.upper():
         print details
  
     obj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in result.upper():
+    print "Exiting from script";
+    obj.setLoadModuleStatus("FAILURE");
+    obj.unloadModule("dshal");
+
 else:
     print "Module load failed"

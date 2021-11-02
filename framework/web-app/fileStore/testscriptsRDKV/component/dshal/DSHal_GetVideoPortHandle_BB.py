@@ -85,6 +85,7 @@ Checkpoint 2 Verify that handle is retrieved</expected_output>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
+import deviceCapabilities;
 from dshalUtility import *;
 
 #Test component to be tested
@@ -100,9 +101,12 @@ dshalObj.configureTestCase(ip,port,'DSHal_GetVideoPortHandle_BB');
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
-dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
+#check if Baseband port is supported by the device
+capable = deviceCapabilities.getconfig(dshalObj,"videoPort","BB");
 
-if "SUCCESS" in dshalloadModuleStatus.upper():
+
+if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
+        dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
         expectedResult="SUCCESS";
         #Prmitive test case which associated to this Script
         tdkTestObj = dshalObj.createTestStep('DSHal_GetVideoPort');
@@ -122,6 +126,11 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
             print "VideoPort handle not retrieved for BB";
 
         dshalObj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in dshalloadModuleStatus.upper():
+    print "Exiting from script";
+    dshalObj.setLoadModuleStatus("FAILURE");
+    dshalObj.unloadModule("dshal");
 
 else:
     print "Module load failed";

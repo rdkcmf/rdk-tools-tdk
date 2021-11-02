@@ -87,6 +87,7 @@ handle - Audio port handle</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import deviceCapabilities;
 from dshalUtility import *;
 
 #Test component to be tested
@@ -102,9 +103,12 @@ dshalObj.configureTestCase(ip,port,'DSHal_GetAudioCompression_MS12_disabled');
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
-dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
+#Check if DUT is cpable of MS12 funcationalities
+capable = deviceCapabilities.getconfig(dshalObj,"MS12")
 
-if "SUCCESS" in dshalloadModuleStatus.upper():
+
+if "SUCCESS" in dshalloadModuleStatus.upper() and not capable:
+    dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
     expectedResult="SUCCESS";
     #Prmitive test case which associated to this Script
     tdkTestObj = dshalObj.createTestStep('DSHal_GetAudioPort');
@@ -166,6 +170,11 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
         print "Testcase not applicable as MS12 is enabled in this device";
         tdkTestObj.setResultStatus("FAILURE");
 
+    dshalObj.unloadModule("dshal");
+
+elif capable and "SUCCESS" in dshalloadModuleStatus.upper():
+    print "Exiting from script";
+    dshalObj.setLoadModuleStatus("FAILURE");
     dshalObj.unloadModule("dshal");
 
 else:

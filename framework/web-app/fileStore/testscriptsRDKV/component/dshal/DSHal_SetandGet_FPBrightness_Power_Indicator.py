@@ -73,7 +73,7 @@ Checkpoint 2 Verify that the brightness is set</expected_output>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
-
+import deviceCapabilities;
 #Test component to be tested
 dshalObj = tdklib.TDKScriptingLibrary("dshal","1");
 
@@ -87,8 +87,11 @@ dshalObj.configureTestCase(ip,port,'DSHal_SetandGet_FPBrightness_Power_Indicator
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
-dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
-if "SUCCESS" in dshalloadModuleStatus.upper():
+#Check if devicesupports PowerIndicator
+capable = deviceCapabilities.getconfig(dshalObj,"Indicator","Power");
+
+if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
+    dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
     expectedResult = "SUCCESS"
     #for power indicator the value is 1
     indicator_dict = {"Message":0,"Power":1,"Record":2,"Remote":3,"RFBypass":4}
@@ -142,6 +145,11 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
         tdkTestObj.setResultStatus("FAILURE");
         print "DSHal_GetFPBrightness failed"
 
+    dshalObj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in dshalloadModuleStatus.upper():
+    print "Exiting from script";
+    dshalObj.setLoadModuleStatus("FAILURE");
     dshalObj.unloadModule("dshal");
 
 else:

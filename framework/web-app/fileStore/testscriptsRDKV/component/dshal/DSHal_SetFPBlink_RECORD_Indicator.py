@@ -71,6 +71,7 @@ uBlinkIteration - number of times the LED should blink</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import deviceCapabilities;
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("dshal","1");
@@ -85,7 +86,10 @@ obj.configureTestCase(ip,port,'DSHal_SetFPBlink_RECORD_Indicator');
 loadModuleStatus = obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %loadModuleStatus;
 
-if "SUCCESS" in loadModuleStatus.upper():
+#Check if Blink and Record indicator is  supported by DUT
+capable = deviceCapabilities.getconfig(obj,"SetBlink") and deviceCapabilities.getconfig(obj,"Indicator","Record");
+
+if "SUCCESS" in loadModuleStatus.upper() and capable:
     obj.setLoadModuleStatus("SUCCESS");
     expectedResult="SUCCESS";
     print "\nTEST STEP1 : To set the Record indicator in Front Panel to Blink"
@@ -114,6 +118,12 @@ if "SUCCESS" in loadModuleStatus.upper():
         print "[TEST EXECUTION RESULT] : FAILURE\n"
 
     obj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in loadModuleStatus.upper():
+    print "Exiting from script";
+    obj.setLoadModuleStatus("FAILURE");
+    obj.unloadModule("dshal");
+
 else:
     print "Load module failed";
     obj.setLoadModuleStatus("FAILURE");

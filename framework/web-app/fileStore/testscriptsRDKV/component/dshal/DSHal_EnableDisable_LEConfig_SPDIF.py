@@ -91,6 +91,7 @@ Checkpoint 2 Verify that the status is set</expected_output>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
+import deviceCapabilities;
 from dshalUtility import *;
 
 #Test component to be tested
@@ -106,9 +107,11 @@ dshalObj.configureTestCase(ip,port,'DSHal_EnableDisable_LEConfig_SPDIF');
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
-dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
+#Check if LoudnessEquivalence and SPDIF is supported by DUT
+capable = deviceCapabilities.getconfig(dshalObj,"LEConfig") and deviceCapabilities.getconfig(dshalObj,"audioPort","SPDIF")
 
-if "SUCCESS" in dshalloadModuleStatus.upper():
+if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
+    dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
     expectedResult="SUCCESS";
     #Prmitive test case which associated to this Script
     tdkTestObj = dshalObj.createTestStep('DSHal_GetAudioPort');
@@ -205,6 +208,11 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
         tdkTestObj.setResultStatus("FAILURE");
         print "AudioPort handle not retrieved";
 
+    dshalObj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in dshalloadModuleStatus.upper():
+    print "Exiting from script";
+    dshalObj.setLoadModuleStatus("FAILURE");
     dshalObj.unloadModule("dshal");
 
 else:

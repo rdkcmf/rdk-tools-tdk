@@ -84,10 +84,23 @@ handle - Audio port handle
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import deviceCapabilities;
 from dshalUtility import *;
 
 #Test component to be tested
 dshalObj = tdklib.TDKScriptingLibrary("dshal","1");
+
+def getList(dict):
+    list = []
+    for key in dict.keys():
+        list.append(key)
+    return list
+
+def Get_UnsupportedPortType():
+    Ports = deviceCapabilities.getconfig(dshalObj,"audioPort","getValue");
+    for aPort in getList(audioPortType):
+        if aPort not in Ports and aPort not in "INVALID":
+            return str(aPort)
 
 #IP and Port of box, No need to change,
 #This will be replaced with correspoing Box Ip and port while executing script
@@ -99,12 +112,13 @@ dshalObj.configureTestCase(ip,port,'DSHal_GetAudioPort_UnSupportedPortType');
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
-dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
+UnSupportedPortType = Get_UnsupportedPortType();
 
 if "SUCCESS" in dshalloadModuleStatus.upper():
+    dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
     #Prmitive test case which associated to this Script
     tdkTestObj = dshalObj.createTestStep('DSHal_GetAudioPort');
-    tdkTestObj.addParameter("portType", audioPortType["SPEAKER"]);
+    tdkTestObj.addParameter("portType", audioPortType[str(UnSupportedPortType)]);
     expectedResult = "FAILURE";
     #Execute the test case in STB
     tdkTestObj.executeTestCase(expectedResult);

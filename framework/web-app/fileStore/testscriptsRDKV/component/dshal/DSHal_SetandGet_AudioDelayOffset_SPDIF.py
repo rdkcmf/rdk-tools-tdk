@@ -80,7 +80,7 @@ audioDelayOffsetMs - Audio delay offset in Ms</input_parameters>
 Checkpoint 2 Verify that the audio delay offset is set</expected_output>
     <priority>High</priority>
     <test_stub_interface>libdshalstub.so.0.0.0</test_stub_interface>
-    <test_script>DSHal_SetandGet_AudioDelayOffsetOffset_SPDIF</test_script>
+    <test_script>DSHal_SetandGet_AudioDelayOffset_SPDIF</test_script>
     <skipped>No</skipped>
     <release_version>M75</release_version>
     <remarks></remarks>
@@ -89,7 +89,8 @@ Checkpoint 2 Verify that the audio delay offset is set</expected_output>
 </xml>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
-import tdklib; 
+import tdklib;
+import deviceCapabilities;
 from dshalUtility import *;
 
 #Test component to be tested
@@ -105,9 +106,11 @@ dshalObj.configureTestCase(ip,port,'DSHal_SetandGet_AudioDelayOffset_SPDIF');
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
-dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
+#Check if SPDIF is supported by DUT
+capable = deviceCapabilities.getconfig(dshalObj,"audioPort","SPDIF")
 
-if "SUCCESS" in dshalloadModuleStatus.upper():
+if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
+    dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
     expectedResult="SUCCESS";
     #Prmitive test case which associated to this Script
     tdkTestObj = dshalObj.createTestStep('DSHal_GetAudioPort');
@@ -163,6 +166,11 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
         tdkTestObj.setResultStatus("FAILURE");
         print "AudioPort handle not retrieved";
 
+    dshalObj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in dshalloadModuleStatus.upper():
+    print "Exiting from script";
+    dshalObj.setLoadModuleStatus("FAILURE");
     dshalObj.unloadModule("dshal");
 
 else:

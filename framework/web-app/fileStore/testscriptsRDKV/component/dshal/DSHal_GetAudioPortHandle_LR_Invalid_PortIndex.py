@@ -88,6 +88,7 @@ Checkpoint 2 Verify that the handle is not retrieved</expected_output>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
+import deviceCapabilities;
 from dshalUtility import *;
 
 #Test component to be tested
@@ -103,9 +104,11 @@ dshalObj.configureTestCase(ip,port,'DSHal_GetAudioPortHandle_LR_Invalid_PortInde
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
-dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
+#Check if LR port is supported by DUT
+capable = deviceCapabilities.getconfig(dshalObj,"audioPort","LR");
 
-if "SUCCESS" in dshalloadModuleStatus.upper():
+if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
+	dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
         expectedResult="FAILURE";
         invalidIndex = 8;
         #Prmitive test case which associated to this Script
@@ -127,6 +130,11 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
             print "AudioPort handle retrieved for invalid port index for LR";
 
         dshalObj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in dshalloadModuleStatus.upper():
+    print "Exiting from script";
+    dshalObj.setLoadModuleStatus("FAILURE");
+    dshalObj.unloadModule("dshal");
 
 else:
     print "Module load failed";

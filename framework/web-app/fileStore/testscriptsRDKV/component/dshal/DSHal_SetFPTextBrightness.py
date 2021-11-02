@@ -86,6 +86,7 @@ eBrightness - brightness value</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import deviceCapabilities;
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("dshal","1");
@@ -100,7 +101,10 @@ obj.configureTestCase(ip,port,'DSHal_SetFPTextBrightness');
 loadModuleStatus = obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %loadModuleStatus;
 
-if "SUCCESS" in loadModuleStatus.upper():
+#check if  Text Display is supported by DUT
+capable = deviceCapabilities.getconfig(obj,"TextDisplay");
+
+if "SUCCESS" in loadModuleStatus.upper() and capable:
     obj.setLoadModuleStatus("SUCCESS");
     expectedResult="SUCCESS";
     print "\nTEST STEP1 : To set the brightness of Text display in Front Panel"
@@ -128,6 +132,12 @@ if "SUCCESS" in loadModuleStatus.upper():
         print "[TEST EXECUTION RESULT] : FAILURE\n"
 
     obj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in loadModuleStatus.upper():
+    print "Exiting from script";
+    obj.setLoadModuleStatus("FAILURE");
+    obj.unloadModule("dshal");
+
 else:
     print "Load module failed";
     obj.setLoadModuleStatus("FAILURE");

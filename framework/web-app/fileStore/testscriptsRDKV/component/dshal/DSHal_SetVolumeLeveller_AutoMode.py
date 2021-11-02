@@ -48,6 +48,8 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
+    <box_type>IPClient-Wifi</box_type>
+    <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -86,6 +88,7 @@ volLeveller - Audio port volume leveller</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import deviceCapabilities;
 from dshalUtility import *;
 
 #Test component to be tested
@@ -100,7 +103,11 @@ obj.configureTestCase(ip,port,'DSHal_SetVolumeLeveller_AutoMode');
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
-if "SUCCESS" in result.upper():
+
+#Check if VolumeLeveller is supported by the DUT
+capable = deviceCapabilities.getconfig(obj,"VolumeLeveller");
+
+if "SUCCESS" in result.upper() and capable:
     expectedResult="SUCCESS";
     #Prmitive test case which associated to this Script
     tdkTestObj = obj.createTestStep('DSHal_GetAudioPort');
@@ -176,5 +183,11 @@ if "SUCCESS" in result.upper():
         print details
 
     obj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in result.upper():
+    print "Exiting from script";
+    obj.setLoadModuleStatus("FAILURE");
+    obj.unloadModule("dshal");
+
 else:
     print "Module load failed"
