@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <sstream>
 extern "C"
 {
 #include <gst/check/gstcheck.h>
@@ -44,6 +45,7 @@ using namespace std;
 
 char tcname[BUFFER_SIZE_SHORT] = {'\0'};
 char m_play_url[BUFFER_SIZE_LONG] = {'\0'};
+char channel_url[BUFFER_SIZE_LONG] = {'\0'};
 char TDK_PATH[BUFFER_SIZE_SHORT] = {'\0'};
 vector<string> operationsList;
 /*
@@ -51,6 +53,8 @@ vector<string> operationsList;
  */
 bool checkAVStatus = false;
 int play_timeout = 10; 
+int SecondChannelTimeout =0;
+bool ChannelChangeTest = false;
 
 /* 
  * Playbin flags 
@@ -86,6 +90,7 @@ typedef struct CustomData {
     gboolean seeked;    		/* Variable to indicate if seek to requested position is completed */
     gboolean eosDetected;		/* Variable to indicate if EOS is detected */
     gboolean stateChanged;              /* Variable to indicate if stateChange is occured */
+    gboolean streamStart;               /* Variable to indicate start of new stream */
 } MessageHandlerData;
 
 
@@ -205,12 +210,14 @@ static void handleMessage (MessageHandlerData *data, GstMessage *message)
         case GST_MESSAGE_ASYNC_DONE:
             fail_unless (gst_element_query_position (data->playbin, GST_FORMAT_TIME, &(data->currentPosition)), 
                                                      "Failed to querry the current playback position");
-
             //Added GST_SECOND buffer time between currentPosition and seekPosition
             if (abs( data->currentPosition - data->seekPosition) <= (GST_SECOND))
             {
                data->seeked = TRUE;
             }
+            break;
+        case GST_MESSAGE_STREAM_START:
+            data->streamStart = TRUE;
             break;
         default:
             printf ("Unexpected message received.\n");
@@ -366,7 +373,7 @@ static void seek (GstElement* playbin, double seekSeconds)
     /*
      * Verify that ERROR/EOS messages are not recieved
      */
-    fail_unless (FALSE == data.terminate, "Unexpected error or End of Stream recieved\n");
+    fail_unless (FALSE == data.terminate, "Unexpected error or End of Stream received\n");
 
     /*
      * Verify that SEEK message is received
@@ -571,6 +578,10 @@ GST_START_TEST (test_generic_playback)
     GstElement *playbin;
     GstElement *westerosSink;
     gint flags;
+    GstState cur_state;
+    GstMessage *message;
+    GstBus *bus;
+    MessageHandlerData data;
 
     /*
      * Create the playbin element
@@ -636,7 +647,73 @@ GST_START_TEST (test_generic_playback)
 
     if (playbin)
     {
-       gst_element_set_state (playbin, GST_STATE_NULL);
+       fail_unless (gst_element_set_state (playbin, GST_STATE_NULL) !=  GST_STATE_CHANGE_FAILURE);
+    }
+    if (ChannelChangeTest)
+    {
+       /*
+        * Set the url received from argument as the 'channel_url' for playbin
+        */
+       fail_unless (channel_url != NULL, "Second Channel url should not be NULL");
+       g_object_set (playbin, "uri", channel_url, NULL);
+
+       /*
+        * Set all the required variables before polling for the message
+        */
+       data.streamStart= FALSE;
+       data.terminate = FALSE;
+       data.playbin = playbin;
+
+       printf("\nLoading Second Channel\n");
+
+       /*
+        * Set playbin to PLAYING
+        */
+       GST_LOG( "Setting Second Channel to Playing State\n");
+       fail_unless (gst_element_set_state (playbin, GST_STATE_PLAYING) !=  GST_STATE_CHANGE_FAILURE);
+       GST_LOG( "Second Channel Set to Playing State\n");
+
+       bus = gst_element_get_bus (playbin);
+       do
+       {
+           message = gst_bus_timed_pop_filtered(bus, 2 * GST_SECOND,(GstMessageType)((GstMessageType) GST_MESSAGE_STREAM_START|(GstMessageType) GST_MESSAGE_ERROR | (GstMessageType) GST_MESSAGE_EOS ));
+           if (NULL != message)
+           {
+               handleMessage (&data, message);
+           }
+           else
+           {
+               printf ("All messages are clear. No more message after seek\n");
+               break;
+           }
+       }while(!data.streamStart && !data.terminate);
+
+       /*
+        * Verify that ERROR/EOS messages are not recieved
+        */
+       fail_unless (FALSE == data.terminate, "Unexpected error or End of Stream recieved\n");
+       /*
+        * Verify that STREAM_START message is received
+        */
+       fail_unless (TRUE == data.streamStart, "Unable to obtain message indicating start of a new stream\n");
+       /*
+        * Check for AV status if its enabled
+        */
+       if (true == checkAVStatus)
+       {
+          is_av_playing = check_for_AV_status();
+          fail_unless (is_av_playing == true, "Video is not playing in TV");
+       }
+       GST_LOG("DETAILS: SUCCESS, Video playing successfully \n");
+       /*
+        * Wait for 'SecondChannelTimeout' seconds(received as the input argument) for video to play
+        */
+       sleep(SecondChannelTimeout);
+
+       if (playbin)
+       {
+          gst_element_set_state (playbin, GST_STATE_NULL);
+       }
     }
     /*
      * Cleanup after use
@@ -1176,7 +1253,13 @@ media_pipeline_suite (void)
        GST_INFO ("tc %s run successfull\n", tcname);
        GST_INFO ("SUCCESS\n");
     }
-
+    else if (strcmp ("test_channel_change_playback", tcname) == 0)
+    {
+       ChannelChangeTest = true;
+       tcase_add_test (tc_chain, test_generic_playback);
+       GST_INFO ("tc test_channel_change_playback run successfull\n");
+       GST_INFO ("SUCCESS\n");
+    }
     return gstPluginsSuite;
 }
 
@@ -1189,6 +1272,10 @@ int main (int argc, char **argv)
     int arg = 0;
     char *operationString = NULL;
     char* operation = NULL;
+    char *timeoutparser;
+    std::vector<int> TimeoutList;
+    char* timeout = NULL;
+
     /*
      * Get TDK path
      */
@@ -1248,11 +1335,42 @@ int main (int argc, char **argv)
 		   }
                 }
             }
-	}
 
+            printf ("\nArg : TestCase Name: %s \n", tcname);
+            printf ("\nArg : Playback url: %s \n", m_play_url);
 
-        printf ("\nArg : TestCase Name: %s \n", tcname);
-        printf ("\nArg : Playback url: %s \n", m_play_url);
+        }
+        else if (strcmp ("test_channel_change_playback", tcname) == 0)
+        {
+            strcpy(m_play_url,argv[2]);
+            strcpy(channel_url,argv[3]);
+
+            for (arg = 4; arg < argc; arg++)
+            {
+                if (strcmp ("checkavstatus=yes", argv[arg]) == 0)
+                {
+                    checkAVStatus = true;
+                }
+                if (strstr (argv[arg], "timeout=") != NULL)
+                {
+                    strtok (argv[arg], "=");
+                    timeoutparser = strtok(NULL, "=");
+                    timeout = strtok (timeoutparser, ",");
+                    while (timeout != NULL)
+                    {
+                        TimeoutList.push_back(atoi(timeout));
+                        timeout = strtok (NULL, ",");
+                    }
+                    SecondChannelTimeout  = TimeoutList[1];
+                    play_timeout = TimeoutList[0];
+                }
+            }
+            printf ("\nArg : TestCase Name: %s \n", tcname);
+            printf ("\nArg : First Channel: %s \n", m_play_url);
+            printf ("\nArg : FirstChannel timeout: %d \n", play_timeout);
+            printf ("\nArg : Second Channel : %s \n",channel_url);
+            printf ("\nArg : SecondChannel timeout: %d\n", SecondChannelTimeout);
+        }
     }
     else
     {

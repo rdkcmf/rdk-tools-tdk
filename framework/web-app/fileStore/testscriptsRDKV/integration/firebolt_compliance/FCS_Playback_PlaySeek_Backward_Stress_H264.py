@@ -60,7 +60,7 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>FCS_PLAYBACK_70</test_case_id>
+    <test_case_id>FCS_PLAYBACK_75</test_case_id>
     <test_objective>Test to do multiple backward seek on a H264 stream</test_objective>
     <test_type>Positive</test_type>
     <test_setup>Video Accelerator, RPI</test_setup>
