@@ -318,3 +318,154 @@ def checkProcessRestarted(tdkTestObj_Sys_ExeCmd,processname):
     return  actualresult,pid;
 
 ######### End of Function ##########
+
+#################################Pre-requisite and Post-requsite for OVS ##############################
+expectedresult ="SUCCESS";
+
+def ovs_PreRequisite(tdkTestObj_Tr181_Get,tdkTestObj_Tr181_Set):
+
+# ovs_PreRequisite
+
+# Syntax      : ovs_PreRequisite (tdkTestObj_Tr181_Get,tdkTestObj_Tr181_Set)
+# Description : Function to ovs Pre-requisite
+# Parameters  : tdkTestObj_Tr181_Get -getobject
+#             : tdkTestObj_Tr181_Set - setobject
+# Return Value: result- status of the function
+#             : default -returns default value
+
+    paramlist =["Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.CodeBigFirst.Enable","Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Mesh.Enable"];
+    default =[];
+    result ="SUCCESS";
+    for item in paramlist:
+        def_result,default_value = getTR181Value(tdkTestObj_Tr181_Get,item);
+        if expectedresult in def_result:
+           default.append(default_value);
+        else:
+             result ="FAILURE";
+             print "get operation failed for %s "%item;
+             break;
+
+    setValue = ["false","true"];
+    print "\nThe default Values of CodeBig First and  Mesh are ",default;
+
+    print "\n*****As a Pre-requisite Disabling CodeBig First and Enabling Mesh****";
+
+    index =0;
+    for item in paramlist:
+        set_result, set_details = setTR181Value(tdkTestObj_Tr181_Set,item,setValue[index],"bool");
+        if expectedresult in set_result:
+           print "%s set %s successfully\n" %(item,setValue[index]);
+           index = index + 1;
+        else:
+             result ="FAILURE";
+             print "%s set %s  failed \n" %(item,setValue[index]);
+             break;
+    return result,default;
+
+def ovs_PostProcess(tdkTestObj_Tr181_Get,tdkTestObj_Tr181_Set,setValue):
+
+# ovs_PostProcess
+
+# Syntax      : ovs_PostProcess(tdkTestObj_Tr181_Get,tdkTestObj_Tr181_Set,setValue):
+# Description : Function to ovs Pre-requisite
+# Parameters  : tdkTestObj_Tr181_Get -getobject
+#             : tdkTestObj_Tr181_Set - setobject
+#             : setValue - value to be set
+# Return Value: result- status of the function
+
+    result ="SUCCESS";
+    paramlist =["Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.CodeBigFirst.Enable","Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Mesh.Enable"];
+    index = 0;
+    for item in paramlist:
+        set_result, set_details = setTR181Value(tdkTestObj_Tr181_Set,item,setValue[index],"bool");
+        if expectedresult in set_result:
+           print "%s set %s successfully\n" %(item,setValue[index]);
+           index = index + 1;
+        else:
+             result ="FAILURE";
+             print "%s set %s  failed \n" %(item,setValue[index]);
+             break;
+    return result;
+
+
+def isOVSEnabled(tdkTestObj_Tr181_Get):
+
+# isOVSEnabled
+
+# Syntax      : isOVSEnabled(tdkTestObj_Tr181_Get):
+# Description : Function to check if ovs is enabled
+# Parameters  : tdkTestObj_Tr181_Get -getobject
+# Return Value: def_result- status of the function
+#             : default_value -returns default value
+
+    expectedresult="SUCCESS";
+    parameter_Name = "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OVS.Enable";
+    def_result,default_value = getTR181Value(tdkTestObj_Tr181_Get,parameter_Name);
+    return def_result,default_value;
+
+def doEnableDisableOVS(enableFlag,sysobj,tdkTestObj_Tr181_Get,tdkTestObj_Tr181_Set):
+# doEnableDisableOVS
+
+# Syntax      : doEnableDisableOVS(enableFlag,sysobj,tdkTestObj_Tr181_Get,tdkTestObj_Tr181_Set):
+# Description : Function to Toggle OVS
+# Parameters  : enableFlag-value
+#             : sysobj - sysutil object
+#             : tdkTestObj_Tr181_Get- get object
+#             : tdkTestObj_Tr181_Set- set object
+# Return Value: ovs_set - gives the status of set
+#             : revert_flag - tells wether set operation performed or not
+#             : default_value -returns default value
+
+    expectedresult="SUCCESS";
+    ovs_set = 0;
+    revert_flag = 0;
+    parameter_Name = "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OVS.Enable";
+    def_result,default_value = isOVSEnabled(tdkTestObj_Tr181_Get);
+
+    if  expectedresult in def_result:
+        if default_value == enableFlag:
+            ovs_set = 1;
+            print "OVS Enable status is already ",enableFlag
+        else:
+            set_result, set_details = setTR181Value(tdkTestObj_Tr181_Set,parameter_Name,enableFlag,"bool");
+
+            if expectedresult  in set_result:
+                revert_flag = 1;
+                print "TEST STEP : Set the OVS Enable status to ",enableFlag;
+                print "EXPECTED RESULT :  Set Operation should be success";
+                print "ACTUAL RESULT : Set operation was success";
+                print "[TEST EXECUTION RESULT] : SUCCESS";
+                tdkTestObj_Tr181_Set.setResultStatus("SUCCESS");
+
+                doRebootDUT(sysobj);
+
+                get_result,get_details = getTR181Value(tdkTestObj_Tr181_Get,parameter_Name);
+
+                if expectedresult  in get_result and get_details == enableFlag:
+                    ovs_set = 1;
+                    print "TEST STEP : Get the Enable Status of OVS ";
+                    print "EXPECTED RESULT : Get operation should be success";
+                    print "ACTUAL RESULT : OVS Enable status %s" %get_details;
+                    print "[TEST EXECUTION RESULT] : SUCCESS";
+                    tdkTestObj_Tr181_Get.setResultStatus("SUCCESS");
+                else:
+                    revert_flag  = 0;
+                    print "TEST STEP : Get the Enable Status of OVS ";
+                    print "EXPECTED RESULT : Get operation should be success";
+                    print "ACTUAL RESULT : Failed to get OVS Enable status";
+                    print "[TEST EXECUTION RESULT] : FAILURE";
+                    tdkTestObj_Tr181_Get.setResultStatus("FAILURE");
+            else:
+                ovs_set = 0;
+                print "TEST STEP : Set the OVS Enable status to ",enableFlag;
+                print "EXPECTED RESULT :  Set Operation should be success";
+                print "ACTUAL RESULT : Set operation Failed";
+                print "[TEST EXECUTION RESULT] : FAILURE";
+                tdkTestObj_Tr181_Set.setResultStatus("FAILURE");
+    else:
+        ovs_set = 0;
+        print "[TEST EXECUTION RESULT] : FAILURE";
+        tdkTestObj_Tr181_Get.setResultStatus("FAILURE");
+
+    #ovs_set = 1 - Successful operation and revert_flag = 1 - initial OVS enable value was disabled
+    return ovs_set,revert_flag;

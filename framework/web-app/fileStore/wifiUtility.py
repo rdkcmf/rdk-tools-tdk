@@ -28,7 +28,7 @@ apIndex_5G_Public_Wifi = 9;
 #
 # Syntax       : ExecuteWIFIHalCallMethod(obj, primitive, radioIndex, param, methodname)
 #
-# Parameters   : obj, primitive, radioIndex, param, methodname 
+# Parameters   : obj, primitive, radioIndex, param, methodname
 #
 # Return Value : Execution status of the hal api
 
@@ -65,7 +65,7 @@ def ExecuteWIFIHalCallMethod(obj, primitive, radioIndex, param, methodname):
 #
 # Syntax       : getIndex(obj, radio)
 #
-# Parameters   : obj, radio 
+# Parameters   : obj, radio
 #
 # Return Value : Index of the radio
 
@@ -114,3 +114,38 @@ def getIndex(obj, radio):
 		print "ACTUAL RESULT : %s " %details;
 
         return tdkTestObj, -1;
+
+# A utility function to get the private access point index for 6G radio
+#
+# Syntax       : getApIndexfor6G(sysobj, TDK_PATH)
+#
+# Parameters   : sysobj
+#
+# Return Value : tdkTestObj, apIndex
+
+def getApIndexfor6G(sysobj, TDK_PATH):
+    apIndex = -1;
+    cmd= "sh %s/tdk_utility.sh parseConfigFile PRIVATE_6G_AP_INDEX" %TDK_PATH;
+    print cmd;
+    expectedresult="SUCCESS";
+    tdkTestObj = sysobj.createTestStep('ExecuteCmd');
+    tdkTestObj.addParameter("command",cmd);
+    tdkTestObj.executeTestCase(expectedresult);
+    actualresult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails().strip().replace("\\n", "");
+
+    if expectedresult in actualresult and details.isdigit():
+        apIndex = int(details);
+        print "\nTEST STEP 1: Get PRIVATE_6G_AP_INDEX  from property file";
+        print "EXPECTED RESULT 1: Should  get PRIVATE_6G_AP_INDEX  from property file"
+        print "ACTUAL RESULT 1: PRIVATE_6G_AP_INDEX from property file :", apIndex ;
+        print "TEST EXECUTION RESULT :SUCCESS";
+        tdkTestObj.setResultStatus("SUCCESS");
+    else:
+        print "TEST STEP 1: Get PRIVATE_6G_AP_INDEX  from property file";
+        print "EXPECTED RESULT 1: Should  get PRIVATE_6G_AP_INDEX  from property file"
+        print "ACTUAL RESULT 1: PRIVATE_6G_AP_INDEX from property file :", details ;
+        print "TEST EXECUTION RESULT : FAILURE";
+        tdkTestObj.setResultStatus("FAILURE");
+    return tdkTestObj, apIndex;
+

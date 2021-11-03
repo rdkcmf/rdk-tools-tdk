@@ -28,3 +28,6 @@ TEL_CONFIG_URL=""
 DNS_SERVER_IP=""
 #if your wifi client has BTM capability, give value as "TRUE", otherwise as "FALSE"
 BTM_CLIENT_CAPABILITY=""
+#Give the Port Number to which LAN client is connected
+LAN_PORT_Number=""
+
