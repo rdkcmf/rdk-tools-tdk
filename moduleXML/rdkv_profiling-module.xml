@@ -38,6 +38,9 @@
       <function name='rdkv_profiling_smem_execute' />
       <function name='rdkv_profiling_get_alerts' />
       <function name='rdkv_profiling_pmap_execute' />
+      <function name='rdkv_profiling_systemd_analyze_execute' />
+      <function name='rdkv_profiling_systemd_bootchart_execute' />
+      <function name='rdkv_profiling_lmbench' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -57,6 +60,8 @@
       <parameter funName='rdkv_profiling_collectd_check_process_metrics' parameterName='resultId' parameterType='INTEGER' range='0-9' />
       <parameter funName='rdkv_profiling_collectd_check_process_metrics' parameterName='processName' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_collectd_check_process_metrics' parameterName='deviceConfig' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_collectd_check_process_metrics' parameterName='fromDateString' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_collectd_check_process_metrics' parameterName='toDateString' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_collectd_check_process_metrics' parameterName='thresholdCheck' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_collectd_check_system_CPU' parameterName='tmUrl' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_collectd_check_system_CPU' parameterName='resultId' parameterType='INTEGER' range='0-9' />
@@ -68,11 +73,15 @@
       <parameter funName='rdkv_profiling_collectd_check_process_usedCPU' parameterName='resultId' parameterType='INTEGER' range='0-9' />
       <parameter funName='rdkv_profiling_collectd_check_process_usedCPU' parameterName='processName' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_collectd_check_process_usedCPU' parameterName='deviceConfig' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_collectd_check_process_usedCPU' parameterName='fromDateString' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_collectd_check_process_usedCPU' parameterName='toDateString' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_collectd_check_process_usedCPU' parameterName='thresholdCheck' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_collectd_check_process_usedSHR' parameterName='tmUrl' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_collectd_check_process_usedSHR' parameterName='resultId' parameterType='INTEGER' range='0-9' />
       <parameter funName='rdkv_profiling_collectd_check_process_usedSHR' parameterName='processName' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_collectd_check_process_usedSHR' parameterName='deviceConfig' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_collectd_check_process_usedSHR' parameterName='fromDateString' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_collectd_check_process_usedSHR' parameterName='toDateString' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_collectd_check_process_usedSHR' parameterName='thresholdCheck' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_smem_execute' parameterName='deviceIP' parameterType='STRING' range='0-9' />
       <parameter funName='rdkv_profiling_smem_execute' parameterName='deviceConfig' parameterType='STRING' range='a-z' />
@@ -89,6 +98,24 @@
       <parameter funName='rdkv_profiling_pmap_execute' parameterName='execId' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_pmap_execute' parameterName='execDeviceId' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_profiling_pmap_execute' parameterName='execResultId' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_systemd_analyze_execute' parameterName='deviceConfig' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_systemd_analyze_execute' parameterName='realPath' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_systemd_analyze_execute' parameterName='execId' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_systemd_analyze_execute' parameterName='execDeviceId' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_systemd_analyze_execute' parameterName='execResultId' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_systemd_analyze_execute' parameterName='deviceIP' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_systemd_bootchart_execute' parameterName='deviceIP' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_systemd_bootchart_execute' parameterName='deviceConfig' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_systemd_bootchart_execute' parameterName='realPath' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_systemd_bootchart_execute' parameterName='execId' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_systemd_bootchart_execute' parameterName='execDeviceId' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_systemd_bootchart_execute' parameterName='execResultId' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_lmbench' parameterName='deviceIP' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_lmbench' parameterName='deviceConfig' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_lmbench' parameterName='realPath' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_lmbench' parameterName='execId' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_lmbench' parameterName='execDeviceId' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_profiling_lmbench' parameterName='execResultId' parameterType='STRING' range='a-z' />
     </parameters>
   </module>
 </xml>
