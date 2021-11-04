@@ -27,6 +27,7 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common import exceptions
 from SSHUtility import *
+import SSHUtility
 import re
 from datetime import datetime
 import importlib
@@ -39,6 +40,9 @@ deviceIP=""
 devicePort=""
 deviceName=""
 deviceType=""
+deviceMac=""
+realpath=""
+
 graphical_plugins_list = PerformanceTestVariables.graphical_plugins_list
 excluded_process_list = PerformanceTestVariables.excluded_process_list
 #METHODS
@@ -51,11 +55,20 @@ def init_module(libobj,port,deviceInfo):
     global deviceName
     global deviceType
     global libObj
+    global realpath
+    global deviceMac
     deviceIP = libobj.ip;
     devicePort = port
     deviceName = deviceInfo["devicename"]
     deviceType = deviceInfo["boxtype"]
     libObj = libobj
+    try:
+        deviceMac = deviceInfo["mac"]
+        SSHUtility.deviceMAC = deviceMac
+        SSHUtility.realpath = libobj.realpath
+    except Exception as e:
+       print "\nException Occurred while getting MAC \n"
+       print e
 
 #---------------------------------------------------------------
 #EXECUTE CURL REQUESTS

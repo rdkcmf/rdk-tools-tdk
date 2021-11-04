@@ -17,6 +17,8 @@
 # limitations under the License.
 #########################################################################
 from pexpect import pxssh
+import CertificationSuiteCommonVariables
+import requests
 
 def ssh_and_execute(ssh_method, hostname, username, password, command):
     output = ""
@@ -40,4 +42,32 @@ def ssh_and_execute(ssh_method, hostname, username, password, command):
     except pxssh.ExceptionPxssh as e:
 	print "Login to device failed"
     	print e
+    return output
+
+def ssh_and_execute_rest(hostname, username, password, command):
+    output = ""
+    auth_token= ""
+    rest_url = ""
+    try:
+        print "\nFetching config file values for REST api call"
+        rest_url = CertificationSuiteCommonVariables.rest_url
+        auth_method = CertificationSuiteCommonVariables.auth_method
+        if auth_method == "TOKEN":
+            auth_token =CertificationSuiteCommonVariables.auth_token
+            if auth_token =="" or rest_url == "":
+                print "\nPlease configure REST api configurations in device specific config file"
+            else:
+                headers = {'Content-Type': 'application/json', 'authToken': auth_token,}
+                url = str(rest_url.replace("mac",deviceMAC))
+                command = command.replace(" grep","grep").replace("|grep",'\|grep').replace("\"","\\\"")
+                if "awk" in command:
+                    command = command.replace("$","\$")
+                command = "\"" + command + "\"";
+                response = requests.post(url, headers=headers, data=command, timeout=20)
+                print response.content
+                output = response.content
+                output = command + '\n' + output;
+    except Exception as e:
+        print "\nLogin to device failed"
+        print e
     return output
