@@ -96,6 +96,7 @@ expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     print "Check Pre conditions"
     event_listener = None
+    continue_count = 0
     thunder_port = PerformanceTestVariables.thunder_port
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
@@ -158,7 +159,6 @@ if expectedResult in result.upper():
                         result = tdkTestObj.getResult();
                         if expectedResult in result:
                             time.sleep(10)
-                            continue_count = 0
                             while True:
                                 if (continue_count > 60):
                                     break

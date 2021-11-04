@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>The objective of this test is to continuously Launch LightningApp plugin, load a URL and exit for a minimum of 1000 times</synopsis>
   <groups_id/>
-  <execution_time>720</execution_time>
+  <execution_time>840</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
