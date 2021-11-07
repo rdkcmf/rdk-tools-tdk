@@ -78,15 +78,99 @@ function viewOnPmapClick(m,k,i)
 { 
   if(document.getElementById('pmapDetails'+m+'_'+k+'_'+i).style.display == 'none') {
     document.getElementById('pmapDetails'+m+'_'+k+'_'+i).style.display = '';
-    $('#pmapShow'+m+'_'+k+'_'+i).text('Hide');  
-    $('#pmapLinkShow'+m+'_'+k+'_'+i).hide();  
+    $('#showPmapContents'+m+'_'+k+'_'+i).hide();
+    $('#hidePmapContents'+m+'_'+k+'_'+i).show();
   }
   else {
-    document.getElementById('pmapDetails'+m+'_'+k+'_'+i).style.display = 'none';
-    $('#pmapShow'+m+'_'+k+'_'+i).text('Show');    
-    $('#pmapLinkShow'+m+'_'+k+'_'+i).show();
+    document.getElementById('pmapDetails'+m+'_'+k+'_'+i).style.display = 'none';  
+    $('#showPmapContents'+m+'_'+k+'_'+i).show();
+    $('#hidePmapContents'+m+'_'+k+'_'+i).hide(); 
   }
   return false;
+}
+
+function hidePmapLogs(m,k,i){
+	$('#showPmapContents'+m+'_'+k+'_'+i).show();
+	$('#pmapDetails'+m+'_'+k+'_'+i).hide();
+	$('#hidePmapContents'+m+'_'+k+'_'+i).hide();
+}
+
+function viewOnClickToolSystemdAnalyis(me,k,i)
+{ 
+  if(document.getElementById('toolSystemdAnalysis'+k+'_'+i).style.display == 'none') {
+    document.getElementById('toolSystemdAnalysis'+k+'_'+i).style.display = '';
+    $('#expanderSystemdAnalysis'+k+'_'+i).text('Hide');  
+  }
+  else {
+    document.getElementById('toolSystemdAnalysis'+k+'_'+i).style.display = 'none';
+    $('#expanderSystemdAnalysis'+k+'_'+i).text('Show');    
+  }
+  return false;
+}
+
+function showSystemdAnalysisHideLink(m,k,i){
+	$('#hideSystemdAnalysisContents'+m+'_'+k+'_'+i).show();
+	$('#SystemdAnalysisDetails'+m+'_'+k+'_'+i).show();
+	$('#showSystemdAnalysisContents'+m+'_'+k+'_'+i).hide();
+}
+
+
+function hideSystemdLogs(m,k,i){
+	$('#showSystemdAnalysisContents'+m+'_'+k+'_'+i).show();
+	$('#SystemdAnalysisDetails'+m+'_'+k+'_'+i).hide();
+	$('#hideSystemdAnalysisContents'+m+'_'+k+'_'+i).hide();
+}
+
+function viewOnClickToolSystemdBootchart(me,k,i)
+{ 
+  if(document.getElementById('toolSystemdBootchart'+k+'_'+i).style.display == 'none') {
+    document.getElementById('toolSystemdBootchart'+k+'_'+i).style.display = '';
+    $('#expanderSystemdBootchart'+k+'_'+i).text('Hide');  
+  }
+  else {
+    document.getElementById('toolSystemdBootchart'+k+'_'+i).style.display = 'none';
+    $('#expanderSystemdBootchart'+k+'_'+i).text('Show');    
+  }
+  return false;
+}
+
+function showSystemdBootchartHideLink(m,k,i){
+	$('#hideSystemdBootchartContents'+m+'_'+k+'_'+i).show();
+	$('#SystemdBootchartDetails'+m+'_'+k+'_'+i).show();
+	$('#showSystemdBootchartContents'+m+'_'+k+'_'+i).hide();
+}
+
+
+function hideSystemdBootchartLogs(m,k,i){
+	$('#showSystemdBootchartContents'+m+'_'+k+'_'+i).show();
+	$('#SystemdBootchartDetails'+m+'_'+k+'_'+i).hide();
+	$('#hideSystemdBootchartContents'+m+'_'+k+'_'+i).hide();
+}
+
+function viewOnClickToollmbench(me,k,i)
+{ 
+  if(document.getElementById('toollmbench'+k+'_'+i).style.display == 'none') {
+    document.getElementById('toollmbench'+k+'_'+i).style.display = '';
+    $('#expanderlmbench'+k+'_'+i).text('Hide');  
+  }
+  else {
+    document.getElementById('toollmbench'+k+'_'+i).style.display = 'none';
+    $('#expanderlmbench'+k+'_'+i).text('Show');    
+  }
+  return false;
+}
+
+function showlmbenchHideLink(m,k,i){
+	$('#hidelmbenchContents'+m+'_'+k+'_'+i).show();
+	$('#lmbenchDetails'+m+'_'+k+'_'+i).show();
+	$('#showlmbenchContents'+m+'_'+k+'_'+i).hide();
+}
+
+
+function hidelmbenchLogs(m,k,i){
+	$('#showlmbenchContents'+m+'_'+k+'_'+i).show();
+	$('#lmbenchDetails'+m+'_'+k+'_'+i).hide();
+	$('#hidelmbenchContents'+m+'_'+k+'_'+i).hide();
 }
 
 </script>
@@ -223,7 +307,7 @@ if no metric data is received from the device">${alertInstance?.get("state")}</t
 									<tr>
 										<td style="width:5%;">
 											<g:form controller="execution">
-												<g:link style="text-decoration:none;" action="downloadSmemFileContents" id="${execId+"_"+map.key}" 
+												<g:link style="text-decoration:none;" action="downloadFileContents" id="${execId+"_"+map.key}" 
 													 params="[execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]" >
 													<span class="customizedLink" >${map.key}</span>	
 												</g:link>
@@ -233,7 +317,7 @@ if no metric data is received from the device">${alertInstance?.get("state")}</t
 											
 												&emsp;<span id="showSmemContents${m}_${k}_${i}" >	
 												<a href="#" onclick="showSmemHideLink(${m},${k},${i})">Show</a>	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-												<g:link action="showSmemFileContents" onSuccess="showSmemHideLink(${m},${k},${i});" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]"  target="_blank"> Log Link</g:link>						
+												<g:link action="showFileContents" onSuccess="showSmemHideLink(${m},${k},${i});" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]"  target="_blank"> Log Link</g:link>						
 												</span>
 												<span id="hideSmemContents${m}_${k}_${i}" style="display:none;"><a href="#" onclick="hideSmemLogs(${m},${k},${i})">Hide</a></span>
 												<br>
@@ -270,7 +354,7 @@ if no metric data is received from the device">${alertInstance?.get("state")}</t
 									<tr>
 										<td style="width:5%;">
 											<g:form controller="execution">
-												<g:link style="text-decoration:none;" action="downloadSmemFileContents" id="${execId+"_"+map.key}" 
+												<g:link style="text-decoration:none;" action="downloadFileContents" id="${execId+"_"+map.key}" 
 													 params="[execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]" >
 													<span class="customizedLink" >${map.key}</span>	
 												</g:link>
@@ -279,13 +363,169 @@ if no metric data is received from the device">${alertInstance?.get("state")}</t
 										<td style="max-width: 450px;">
 											
 												&emsp;<span id="showPmapContents${m}_${k}_${i}" >	
-												<g:remoteLink id="pmapShow${m}_${k}_${i}" action="getPmapContents" update="pmapDetails${m}_${k}_${i}" onSuccess="this.innerHTML='Hide';viewOnPmapClick(${m},${k},${i}); return false;" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]" >Show</g:remoteLink>
+												<g:remoteLink id="pmapShow${m}_${k}_${i}" before="alert('Please wait, Fetching pmap file contents may take few seconds');" action="getPmapContents" update="pmapDetails${m}_${k}_${i}" onSuccess="viewOnPmapClick(${m},${k},${i}); return false;" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]" >Show</g:remoteLink>
 												&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-												<g:link id="pmapLinkShow${m}_${k}_${i}" action="showSmemFileContents" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]"  target="_blank"> Log Link</g:link>						
+												<g:link id="pmapLinkShow${m}_${k}_${i}" action="showFileContents" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]"  target="_blank"> Log Link</g:link>	
 												</span>
+												<span id="hidePmapContents${m}_${k}_${i}" style="display:none;"><a href="#" onclick="hidePmapLogs(${m},${k},${i})">Hide</a></span>					
 												<br>
 											<pre>
 												<div id="pmapDetails${m}_${k}_${i}" style="display:none;overflow: auto; height: 300px;width:540px;">${pmapFileData}</div>	
+											</pre>
+										</td>
+									</tr>
+								</g:each>
+							</tbody>
+						</table>	
+					</g:if>
+				</section>
+			</span>
+			<g:if test="${systemdanalysisFileMap}">	
+				<table>
+					<tr class="scripthead" style=" background:#DFDFDF;">
+						<td colspan="4" class="tdhead">systemd-analyze</td>					
+						<td>
+							<a href="#" id="expanderSystemdAnalysis${k}_${i}" onclick="this.innerHTML='Hide';viewOnClickToolSystemdAnalyis(this,${k},${i}); return false;">Show</a>
+					</tr>
+				</table>
+			</g:if>	
+			<span id="toolSystemdAnalysis${k}_${i}"  style="display: none;">
+				<section class="round-border">
+					<g:if test="${systemdanalysisFileMap}">	
+						<table>
+							<tbody >
+								<tr class="fnhead1">
+										<td class="tdhead" style="width:5%;">File Name</td>
+										<td class="tdhead" style="max-width: 450px;">Contents</td>
+								</tr>
+								<g:each in="${systemdanalysisFileMap}" status="m"  var="map">
+									<tr>
+										<td style="width:5%;">
+											<g:form controller="execution">
+												<g:link style="text-decoration:none;" action="downloadFileContents" id="${execId+"_"+map.key}" 
+													 params="[execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]" >
+													<span class="customizedLink" >${map.key}</span>	
+												</g:link>
+											</g:form>	
+										</td>
+										<g:if test="${map.key.contains('svg')}">	
+											<td style="max-width: 450px;">
+												
+													&emsp;<span id="showSystemdAnalysisContents${m}_${k}_${i}" >	
+													<a href="#" onclick="showSystemdAnalysisHideLink(${m},${k},${i})">Show</a>	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+													<g:link action="showSVGContents" onSuccess="showSystemdAnalysisHideLink(${m},${k},${i});" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]"  target="_blank"> Log Link</g:link>						
+													</span>
+													<span id="hideSystemdAnalysisContents${m}_${k}_${i}" style="display:none;"><a href="#" onclick="hideSystemdLogs(${m},${k},${i})">Hide</a></span>
+													<br>
+												<pre>
+													<div id="SystemdAnalysisDetails${m}_${k}_${i}" style="display:none;overflow: auto; height: 500px;width:500px;"><img src="${map.value}" /></div>	
+												</pre>
+											</td>
+										</g:if>
+										<g:else>
+											<td style="max-width: 450px;">
+													&emsp;<span id="showSystemdAnalysisContents${m}_${k}_${i}" >	
+													<a href="#" onclick="showSystemdAnalysisHideLink(${m},${k},${i})">Show</a>	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+													<g:link action="showFileContents" onSuccess="showSystemdAnalysisHideLink(${m},${k},${i});" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]"  target="_blank"> Log Link</g:link>						
+													</span>
+													<span id="hideSystemdAnalysisContents${m}_${k}_${i}" style="display:none;"><a href="#" onclick="hideSystemdLogs(${m},${k},${i})">Hide</a></span>
+													<br>
+												<pre>
+													<div id="SystemdAnalysisDetails${m}_${k}_${i}" style="display:none;overflow: auto; height: 300px;width:500px;">${map.value}</div>	
+												</pre>
+											</td>
+										</g:else>
+									</tr>
+								</g:each>
+							</tbody>
+						</table>	
+					</g:if>
+				</section>
+			</span>
+			<g:if test="${systemdBootchartFileMap}">	
+				<table>
+					<tr class="scripthead" style=" background:#DFDFDF;">
+						<td colspan="4" class="tdhead">systemd-bootchart</td>					
+						<td>
+							<a href="#" id="expanderSystemdBootchart${k}_${i}" onclick="this.innerHTML='Hide';viewOnClickToolSystemdBootchart(this,${k},${i}); return false;">Show</a>
+					</tr>
+				</table>
+			</g:if>	
+			<span id="toolSystemdBootchart${k}_${i}"  style="display: none;">
+				<section class="round-border">
+					<g:if test="${systemdBootchartFileMap}">	
+						<table>
+							<tbody >
+								<tr class="fnhead1">
+										<td class="tdhead" style="width:5%;">File Name</td>
+										<td class="tdhead" style="max-width: 450px;">Contents</td>
+								</tr>
+								<g:each in="${systemdBootchartFileMap}" status="m"  var="map">
+									<tr>
+										<td style="width:5%;">
+											<g:form controller="execution">
+												<g:link style="text-decoration:none;" action="downloadFileContents" id="${execId+"_"+map.key}" 
+													 params="[execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]" >
+													<span class="customizedLink" >${map.key}</span>	
+												</g:link>
+											</g:form>	
+										</td>	
+											<td style="max-width: 450px;">
+												&emsp;<span id="showSystemdBootchartContents${m}_${k}_${i}" >	
+													<a href="#" onclick="showSystemdBootchartHideLink(${m},${k},${i})">Show</a>	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+													<g:link action="showSVGContents" onSuccess="showSystemdBootchartHideLink(${m},${k},${i});" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]"  target="_blank"> Log Link</g:link>						
+												</span>
+												<span id="hideSystemdBootchartContents${m}_${k}_${i}" style="display:none;"><a href="#" onclick="hideSystemdBootchartLogs(${m},${k},${i})">Hide</a></span>
+												<br>
+											<pre>
+												<div id="SystemdBootchartDetails${m}_${k}_${i}" style="display:none;overflow: auto; height: 500px;width:500px;"><img src="${map.value}" /></div>	
+											</pre>
+										</td>
+									</tr>
+								</g:each>
+							</tbody>
+						</table>	
+					</g:if>
+				</section>
+			</span>	
+			<g:if test="${lmbenchFileMap}">	
+				<table>
+					<tr class="scripthead" style=" background:#DFDFDF;">
+						<td colspan="4" class="tdhead">lmbench</td>					
+						<td>
+							<a href="#" id="expanderlmbench${k}_${i}" onclick="this.innerHTML='Hide';viewOnClickToollmbench(this,${k},${i}); return false;">Show</a>
+					</tr>
+				</table>
+			</g:if>	
+			<span id="toollmbench${k}_${i}"  style="display: none;">
+				<section class="round-border">
+					<g:if test="${lmbenchFileMap}">	
+						<table>
+							<tbody >
+								<tr class="fnhead1">
+										<td class="tdhead" style="width:5%;">File Name</td>
+										<td class="tdhead" style="max-width: 450px;">Contents</td>
+								</tr>
+								<g:each in="${lmbenchFileMap}" status="m"  var="map">
+									<tr>
+										<td style="width:5%;">
+											<g:form controller="execution">
+												<g:link style="text-decoration:none;" action="downloadFileContents" id="${execId+"_"+map.key}" 
+													 params="[execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]" >
+													<span class="customizedLink" >${map.key}</span>	
+												</g:link>
+											</g:form>	
+										</td>
+										<td style="max-width: 450px;">
+											
+												&emsp;<span id="showlmbenchContents${m}_${k}_${i}" >	
+												<a href="#" onclick="showlmbenchHideLink(${m},${k},${i})">Show</a>	&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+												<g:link action="showFileContents" onSuccess="showlmbenchHideLink(${m},${k},${i});" params="[fileName: "${execId+"_"+map.key}", execId: "${execId}", execDeviceId: "${execDeviceId}", execResultId: "${executionResultInstance.id}" ]"  target="_blank"> Log Link</g:link>						
+												</span>
+												<span id="hidelmbenchContents${m}_${k}_${i}" style="display:none;"><a href="#" onclick="hidelmbenchLogs(${m},${k},${i})">Hide</a></span>
+												<br>
+											<pre>
+												<div id="lmbenchDetails${m}_${k}_${i}" style="display:none;overflow: auto; height: 300px;width:540px;">${map.value}</div>	
 											</pre>
 										</td>
 									</tr>
@@ -300,6 +540,9 @@ if no metric data is received from the device">${alertInstance?.get("state")}</t
 		</tbody>
 	</table>
 </g:if>
+<g:elseif test="${svgDetails}">
+	<img src="${logPath}" />
+</g:elseif>
 <g:else>
 <pre>
 	<div style="">${consoleFileData}</div>	

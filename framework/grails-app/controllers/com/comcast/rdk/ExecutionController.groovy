@@ -1677,6 +1677,9 @@ class ExecutionController {
 		File logDir  = new File(logPath)
 		Map smemFileMap = [:]
 		Map pmapFileMap = [:]
+		Map systemdanalysisFileMap = [:]
+		Map systemdBootchartFileMap = [:]
+		Map lmbenchFileMap = [:]
 		if(logDir?.exists() &&  logDir?.isDirectory()){
 			logDir.eachFile{ file->
 				def currentFileName = file?.getName()
@@ -1695,16 +1698,46 @@ class ExecutionController {
 					currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
 					pmapFileMap?.put(currentFileName,fileContents)
 				}
+				if(file?.getName()?.contains("systemdAnalyze")){
+					currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
+					if(file?.getName()?.contains("svg")){
+						String systemdAnalysisFilePath = "..//logs//${executionId}//${executionDeviceId}//${executionResultId}//"+file?.getName()
+						systemdanalysisFileMap?.put(currentFileName,systemdAnalysisFilePath)
+					}else{
+						String fileContents = ""
+						file.eachLine { line ->
+							String lineData = line?.replaceAll("<","&lt;")
+							lineData = lineData?.replaceAll(">","&gt;")
+							fileContents = fileContents + "<br>"+ lineData
+						}
+						systemdanalysisFileMap?.put(currentFileName,fileContents)
+					}
+				}
+				if(file?.getName()?.contains("systemdBootchart")){
+					currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
+					String systemdBootchartFilePath = "..//logs//${executionId}//${executionDeviceId}//${executionResultId}//"+file?.getName()
+					systemdBootchartFileMap?.put(currentFileName,systemdBootchartFilePath)
+				}
+				if(file?.getName()?.contains("lmbench")){
+					String fileContents = ""
+					file.eachLine { line ->
+						String lineData = line?.replaceAll("<","&lt;")
+						lineData = lineData?.replaceAll(">","&gt;")
+						fileContents = fileContents + "<br>"+ lineData
+					}
+					currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
+					lmbenchFileMap?.put(currentFileName,fileContents)
+				}
 			}
 		}
-		render(template: "profilingDetails", model: [executionResultInstance : exRes,alertListMap:alertMapForExecRes,k:params?.k,i:params?.i,smemFileMap:smemFileMap,execId:executionId,execDeviceId:executionDeviceId,profilingDetails:true,pmapFileMap:pmapFileMap])
+		render(template: "profilingDetails", model: [executionResultInstance : exRes,alertListMap:alertMapForExecRes,k:params?.k,i:params?.i,smemFileMap:smemFileMap,execId:executionId,execDeviceId:executionDeviceId,profilingDetails:true,pmapFileMap:pmapFileMap,systemdanalysisFileMap:systemdanalysisFileMap,systemdBootchartFileMap:systemdBootchartFileMap,lmbenchFileMap:lmbenchFileMap])
 	}
 	
 	/**
 	 * Function to download smem file from UI
 	 * @return
 	 */
-	def downloadSmemFileContents()  {
+	def downloadFileContents()  {
 		try {
 			String fileName = params?.id
 			String filePath = "${request.getRealPath('/')}//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.id
@@ -1721,14 +1754,14 @@ class ExecutionController {
 	 * Function to display smem file contents in UI
 	 * @return
 	 */
-	def showSmemFileContents(){
+	def showFileContents(){
 		def consoleFileData = ""
 		String filePath = "${request.getRealPath('/')}//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.fileName
 		def file = new File(filePath)
 		try{
 			if(file?.exists()){
 				def currentFileName = params?.fileName
-				if(currentFileName?.contains("smemData") || currentFileName?.contains("pmapData")){
+				if(currentFileName?.contains("smemData") || currentFileName?.contains("pmapData") || currentFileName?.contains("systemdAnalyze") || currentFileName?.contains("lmbench")){
 					file.eachLine { line ->
 						String lineData = line?.replaceAll("<","&lt;")
 						lineData = lineData?.replaceAll(">","&gt;")
@@ -1968,8 +2001,7 @@ class ExecutionController {
 		
 		boolean isProfilingDataPresent = false
 		List executionResultList =  ExecutionResult.findAllByExecution(executionInstance)
-		List smemDataMap = []
-		List pmapDataMap = []
+		List profilingFileList = []
 		List alertList = []
 		executionResultList.each{ executionResult ->
 			List performanceList = Performance.findAllByExecutionResultAndPerformanceType(executionResult,GRAFANA_DATA)
@@ -1988,16 +2020,13 @@ class ExecutionController {
 			File logDir  = new File(logPath)
 			if(logDir?.exists() &&  logDir?.isDirectory()){
 				logDir.eachFile{ file->
-					if(file?.getName()?.contains("smemData")){
-						smemDataMap?.add(executionResult.id)
-					}
-					if(file?.getName()?.contains("pmapData")){
-						pmapDataMap?.add(executionResult.id)
+					if(file?.getName()?.contains("smemData") || file?.getName()?.contains("pmapData") || file?.getName()?.contains("systemdAnalyze") || file?.getName()?.contains("systemdBootchart") || file?.getName()?.contains("lmbench")){
+						profilingFileList?.add(executionResult.id)
 					}
 				}
 			}
 		}		
-		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus, statusListForPopUpExecution : statusListForPopUpExecution,isProfilingDataPresent:isProfilingDataPresent,smemDataMap:smemDataMap,alertList:alertList,pmapDataMap:pmapDataMap]
+		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus, statusListForPopUpExecution : statusListForPopUpExecution,isProfilingDataPresent:isProfilingDataPresent,profilingFileList:profilingFileList,alertList:alertList]
 	}
 
 	/**
@@ -6150,5 +6179,15 @@ class ExecutionController {
 			}
 		}
 		render dataArrayList as JSON
+	}
+	
+	/**
+	 * Function to show SVG file contents
+	 * @return
+	 */
+	def showSVGContents(){
+		def consoleFileData = ""
+		String logPath = "..//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.fileName
+		render(template: "profilingDetails", model: [svgDetails:true,logPath:logPath])
 	}
 }

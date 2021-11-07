@@ -1006,7 +1006,7 @@ class ExcelExporter extends AbstractExporter {
 												cell(row: rowIndex, column: 0, value:key , format: "header")
 												rowIndex ++			
 												Map parameterMap = profilingData.get(key)
-												if(!key.equals("smem") && !key.equals("pmap")){
+												if(!key.equals("smem") && !key.equals("pmap") && !key.equals("lmbench") && !key.equals("systemdAnalyze") && !key.equals("systemdBootchart")){
 													Map alertsReceived = parameterMap.get("AlertsReceived")
 													cell(row: rowIndex, column: 1, value:"AlertsReceived" , format: "header")
 													if(!(alertsReceived.isEmpty()) && alertsReceived != null){
@@ -1067,19 +1067,7 @@ class ExcelExporter extends AbstractExporter {
 															rowIndex ++
 														}
 													}
-												}else if(key.equals("smem")){
-													cell(row: rowIndex, column: 1, value:"File Name" , format: "header")
-													cell(row: rowIndex, column: 2, value:"Content" , format: "header")
-													rowIndex ++
-													Set parameterMapKeySet = parameterMap.keySet();
-													parameterMap.each { parameterKey, parameterValue ->
-														cell(row: rowIndex, column: 1, value: parameterKey , format :"cell")
-														cell(row: rowIndex, column: 2, value: parameterValue , format :"cell")
-														cell(row: rowIndex, column: 7, value: "", format: "cell")
-														rowIndex ++
-													}
-												}else if(key.equals("pmap")){
-													rowIndex ++
+												}else if(key.equals("smem") || key.equals("pmap") || key.equals("systemdAnalyze") || key.equals("systemdBootchart") || key.equals("lmbench")){
 													cell(row: rowIndex, column: 1, value:"File Name" , format: "header")
 													cell(row: rowIndex, column: 2, value:"Content" , format: "header")
 													rowIndex ++

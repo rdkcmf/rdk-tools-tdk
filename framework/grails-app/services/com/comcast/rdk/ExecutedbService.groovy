@@ -1051,7 +1051,7 @@ class ExecutedbService {
 						}
 						if(fileContent?.size() > 400){
 							fileContents = fileContents + NEW_LINE
-							fileContents = fileContents+"\n More data use this link ....... \n " +appUrl+"/execution/showSmemFileContents?fileName="+file?.getName()+"&execId="+executionInstance?.id+"&execDeviceId="+executionDevice?.id+"&execResultId="+executionResult.id
+							fileContents = fileContents+"\n More data use this link ....... \n " +appUrl+"/execution/showFileContents?fileName="+file?.getName()+"&execId="+executionInstance?.id+"&execDeviceId="+executionDevice?.id+"&execResultId="+executionResult.id
 						}
 						currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
 						pmapFileMap?.put(currentFileName,fileContents)
@@ -1102,6 +1102,113 @@ class ExecutedbService {
 			ex.printStackTrace();
 		}
 		return alertMapForExecRes
+	}
+	
+	/**
+	 * Function to get the lmbench details for a particular execution result
+	 * @param executionInstance
+	 * @param executionDevice
+	 * @param executionResult
+	 * @param realPath
+	 * @return
+	 */
+	def getlmbenchDetails(Execution executionInstance,ExecutionDevice executionDevice,ExecutionResult executionResult, String realPath,String appUrl){
+		def logPath = "${realPath}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
+		def finalLogparserFileName = ""
+		File logDir  = new File(logPath)
+		Map lmbenchFileMap = [:]
+		try{
+			if(logDir?.exists() &&  logDir?.isDirectory()){
+				logDir.eachFile{ file->
+					def currentFileName = file?.getName()
+					if(file?.getName()?.contains("lmbench")){
+						List fileContent = file?.readLines()
+						String fileContents = ""
+						for (int index = 0; index <= 400; index++) {
+							fileContents = fileContents + NEW_LINE+ fileContent[index]
+						}
+						if(fileContent?.size() > 400){
+							fileContents = fileContents + NEW_LINE
+							fileContents = fileContents+"\n More data use this link ....... \n " +appUrl+"/execution/showFileContents?fileName="+file?.getName()+"&execId="+executionInstance?.id+"&execDeviceId="+executionDevice?.id+"&execResultId="+executionResult.id
+						}
+						currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
+						lmbenchFileMap?.put(currentFileName,fileContents)
+					}
+				}
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		return lmbenchFileMap
+	}
+	
+	/**
+	 * Function to get the systemdBootchart details for a particular execution result
+	 * @param executionInstance
+	 * @param executionDevice
+	 * @param executionResult
+	 * @param realPath
+	 * @return
+	 */
+	def getsystemdBootchartDetails(Execution executionInstance,ExecutionDevice executionDevice,ExecutionResult executionResult, String realPath,String appUrl){
+		def logPath = "${realPath}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
+		def finalLogparserFileName = ""
+		File logDir  = new File(logPath)
+		Map systemdBootchartMap = [:]
+		try{
+			if(logDir?.exists() &&  logDir?.isDirectory()){
+				logDir.eachFile{ file->
+					def currentFileName = file?.getName()
+					if(file?.getName()?.contains("systemdBootchart") && file?.getName()?.contains("svg")){
+						String fileContents = ""
+						fileContents = fileContents+"\n Use this link ....... \n " +appUrl+"/execution/showSVGContents?fileName="+file?.getName()+"&execId="+executionInstance?.id+"&execDeviceId="+executionDevice?.id+"&execResultId="+executionResult.id
+						currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
+						systemdBootchartMap?.put(currentFileName,fileContents)
+					}
+				}
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		return systemdBootchartMap
+	}
+	
+	/**
+	 * Function to get the systemdAnalyze details for a particular execution result
+	 * @param executionInstance
+	 * @param executionDevice
+	 * @param executionResult
+	 * @param realPath
+	 * @return
+	 */
+	def getsystemdAnalyzeDetails(Execution executionInstance,ExecutionDevice executionDevice,ExecutionResult executionResult, String realPath,String appUrl){
+		def logPath = "${realPath}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
+		def finalLogparserFileName = ""
+		File logDir  = new File(logPath)
+		Map systemdAnalyzeMap = [:]
+		try{
+			if(logDir?.exists() &&  logDir?.isDirectory()){
+				logDir.eachFile{ file->
+					def currentFileName = file?.getName()
+					if(file?.getName()?.contains("systemdAnalyze") && file?.getName()?.contains("svg")){
+						String fileContents = ""
+						fileContents = fileContents+"\n Use this link ....... \n " +appUrl+"/execution/showSVGContents?fileName="+file?.getName()+"&execId="+executionInstance?.id+"&execDeviceId="+executionDevice?.id+"&execResultId="+executionResult.id
+						currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
+						systemdAnalyzeMap?.put(currentFileName,fileContents)
+					}else if(file?.getName()?.contains("systemdAnalyze") && !(file?.getName()?.contains("svg"))){
+						String fileContents = ""
+						file.eachLine { line ->
+							fileContents = fileContents + NEW_LINE+ line
+						}
+						currentFileName = currentFileName?.substring(currentFileName?.indexOf("_") + 1,currentFileName?.length())
+						systemdAnalyzeMap?.put(currentFileName,fileContents)
+					}
+				}
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		return systemdAnalyzeMap
 	}
 	
 	/**
@@ -1184,8 +1291,11 @@ class ExecutedbService {
 						List performanceList = Performance.findAllByExecutionResultAndPerformanceType(executionResult,GRAFANA_DATA)
 						Map smemDetails = getSmemDetails(executionInstance,executionDevice,executionResult,realPath)
 						Map pmapDetails = getPmapDetails(executionInstance,executionDevice,executionResult,realPath,appUrl)
+						Map lmbenchDetails = getlmbenchDetails(executionInstance,executionDevice,executionResult,realPath,appUrl)
+						Map systemdAnalyzeDetails = getsystemdAnalyzeDetails(executionInstance,executionDevice,executionResult,realPath,appUrl)
+						Map systemdBootchartDetails = getsystemdBootchartDetails(executionInstance,executionDevice,executionResult,realPath,appUrl)
 						Map alertMap = getAlertListFrom(executionResult,realPath);
-						if(!performanceList.isEmpty() || !smemDetails.isEmpty() || !alertMap.isEmpty() || !pmapDetails.isEmpty()){
+						if(!performanceList.isEmpty() || !smemDetails.isEmpty() || !alertMap.isEmpty() || !pmapDetails.isEmpty() || !lmbenchDetails.isEmpty() || !systemdAnalyzeDetails.isEmpty() || !systemdBootchartDetails.isEmpty()){
 							//For summary sheet
 							Map scriptMap =["C1":scriptCounter,"C2":executionResult?.script,"C3":executionResult?.status,"C4":""]
 							coverPageMap.put(executionResult?.script,scriptMap)
@@ -1255,6 +1365,27 @@ class ExecutedbService {
 								String toolName = "pmap"
 								toolNames.add(toolName)
 								toolDetailsMap.put(toolName, pmapDetails)
+							}
+							//for systemdAnalyze
+							if(!systemdAnalyzeDetails.isEmpty()){
+								Map parameterMap = [:]
+								String toolName = "systemdAnalyze"
+								toolNames.add(toolName)
+								toolDetailsMap.put(toolName, systemdAnalyzeDetails)
+							}
+							// for systemdBootchart
+							if(!systemdBootchartDetails.isEmpty()){
+								Map parameterMap = [:]
+								String toolName = "systemdBootchart"
+								toolNames.add(toolName)
+								toolDetailsMap.put(toolName, systemdBootchartDetails)
+							}
+							//for lmbench
+							if(!lmbenchDetails.isEmpty()){
+								Map parameterMap = [:]
+								String toolName = "lmbench"
+								toolNames.add(toolName)
+								toolDetailsMap.put(toolName, lmbenchDetails)
 							}
 						}
 						profilingDetailsMap.put("toolNames", toolNames)
