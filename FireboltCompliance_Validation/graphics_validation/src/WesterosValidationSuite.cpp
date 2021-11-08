@@ -1581,6 +1581,11 @@ static void resizeSurface( AppCtx *ctx, int dx, int dy, int width, int height )
    }
 }
 
+/*
+ * Based on pxCore, CopyRight 2007-2009 John Robinson
+ * Licensed under the Apache License, Version 2.0
+ */
+
 static const char *vert_shader_text =
    "uniform mat4 rotation;\n"
    "attribute vec4 pos;\n"
