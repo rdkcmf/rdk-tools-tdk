@@ -174,13 +174,12 @@
             </testStep>
         </testCase>
 
-
         <testCase testCaseId="FP_07" testCaseName="FP_ON_OFF_Data_LED" desc="Turn ON/OFF LED Indicator" >
            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="FRONTPANEL_SUPPORTED_LEDS" useMethodTag="is_led_supported" arguments="data_led" />
             <testStep testStepId="1" name="Get_Data_LED_Info" method="Get_All_FP_LEDs" saveResult="true">
                 <resultGeneration useMethodTag="frontpanel_get_led_info" arguments="get_data_led_info" />
             </testStep>
-            <testStep testStepId="2" name="Get_Data_LED_Brightness" method="Get_LED_Brightness" revertGet="yes" >
+            <testStep testStepId="2" name="Get_Data_LED_Brightness" method="Get_LED_Brightness" saveResult="true" revertGet="yes" >
                 <params>
                   <param tag="index"    value="data_led" />
                 </params>
@@ -192,7 +191,7 @@
                 <conditionalExecution enable="true" Id="2" useMethodTag="frontpanel_check_led_brightness" arguments="isBrigtnessZero" />
                 <params>
                   <param tag="index"    value="data_led" />
-                  <param tag="brightness" Id="1" useMethodTag="frontpanel_get_brightness_levels" arguments="get_max" revertParam="yes" />
+                  <param tag="brightness" usePreviousResult="true" Id="1" useMethodTag="frontpanel_get_brightness_levels" arguments="get_max" revertParam="yes" />
                 </params>
                 <resultGeneration useMethodTag="frontpanel_set_operation_status" />
             </testStep>
@@ -202,7 +201,7 @@
                   <param tag="index"    value="data_led" />
                 </params>
                 <resultGeneration useMethodTag="frontpanel_get_led_brightness">
-                  <expectedValues Id="1" useMethodTag="frontpanel_get_brightness_levels" arguments="get_max" />
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="frontpanel_get_brightness_levels" arguments="get_max" />
                 </resultGeneration>
             </testStep>
             <testStep testStepId="5" name="Turn_OFF_Data_LED" method="Power_LED_OFF">
@@ -233,13 +232,12 @@
             </testStep>
         </testCase>
 
-
         <testCase testCaseId="FP_08" testCaseName="FP_ON_OFF_Record_LED" desc="Turn ON/OFF LED Indicator" >
            <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="FRONTPANEL_SUPPORTED_LEDS" useMethodTag="is_led_supported" arguments="record_led" />
             <testStep testStepId="1" name="Get_Record_LED_Info" method="Get_All_FP_LEDs" saveResult="true">
                 <resultGeneration useMethodTag="frontpanel_get_led_info" arguments="get_record_led_info" />
             </testStep>
-            <testStep testStepId="2" name="Get_Record_LED_Brightness" method="Get_LED_Brightness" revertGet="yes" >
+            <testStep testStepId="2" name="Get_Record_LED_Brightness" method="Get_LED_Brightness" saveResult="true" revertGet="yes" >
                 <params>
                   <param tag="index"    value="record_led" />
                 </params>
@@ -251,7 +249,7 @@
                 <conditionalExecution enable="true" Id="2" useMethodTag="frontpanel_check_led_brightness" arguments="isBrigtnessZero" />
                 <params>
                   <param tag="index"    value="record_led" />
-                  <param tag="brightness" Id="1" useMethodTag="frontpanel_get_brightness_levels" arguments="get_max" revertParam="yes" />
+                  <param tag="brightness" usePreviousResult="true" Id="1" useMethodTag="frontpanel_get_brightness_levels" arguments="get_max" revertParam="yes" />
                 </params>
                 <resultGeneration useMethodTag="frontpanel_set_operation_status" />
             </testStep>
@@ -261,7 +259,7 @@
                   <param tag="index"    value="record_led" />
                 </params>
                 <resultGeneration useMethodTag="frontpanel_get_led_brightness">
-                  <expectedValues Id="1" useMethodTag="frontpanel_get_brightness_levels" arguments="get_max" />
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="frontpanel_get_brightness_levels" arguments="get_max" />
                 </resultGeneration>
             </testStep>
             <testStep testStepId="5" name="Turn_OFF_Record_LED" method="Power_LED_OFF">
@@ -292,7 +290,6 @@
             </testStep>
         </testCase>
 
-
         <testCase testCaseId="FP_09" testCaseName="FP_Toggle_24_Hour_Clock_Mode" desc="Toggles clock version 12 or 24 Hr">
             <testCaseInfo testCaseType="setandget" revert="true"  />
             <testStep testStepId="1" name="Is_24_Hour_Clock" method="Is_24_Hour_Clock" saveResult="true" revertGet="yes">
@@ -321,7 +318,24 @@
                 <resultGeneration useMethodTag="frontpanel_set_operation_status"  />
             </testStep>
         </testCase>
-
+        
+        <testCase testCaseId="FP_11" testCaseName="FP_Set_And_Get_Preferences" desc="Sets and gets the preferences of the FP LED indicators">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Get_All_FP_LEDs" method="Get_All_FP_LEDs" saveResult="true" >
+                <resultGeneration useMethodTag="frontpanel_get_led_info" arguments="get_all_info" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Preferences" method="Set_Preferences" >
+                <params>
+                  <param tag="preferences" usePreviousResult="true" Id="1" useMethodTag="frontpanel_set_led_info" />
+                </params>
+                <resultGeneration useMethodTag="frontpanel_set_operation_status" />
+            </testStep>
+            <testStep testStepId="3" name="Get_Preferences" method="Get_Preferences" >
+                <resultGeneration useMethodTag="frontpanel_get_preferences">
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="frontpanel_set_led_info" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
 </testPlugin>
 
 

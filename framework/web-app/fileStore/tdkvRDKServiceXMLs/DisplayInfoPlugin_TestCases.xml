@@ -335,6 +335,20 @@
               </subtestStep>
             </testStep>
         </testCase> 
+     <!-- Test case 18 -->
+        <testCase testCaseId="DISP_18" testCaseName="DisplayInfo_Check_HDMI_Connection_Status_Without_TV" desc="Checks the HDMI connection status when TV is not connected" >
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings">
+                  <resultGeneration useMethodTag="display_is_connected" arguments="check_tv_connected"/>
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="IsHDMIConnected" method="DisplayInfo_Isconnected">
+                <resultGeneration useMethodTag="displayinfo_validate_boolean_result" expectedValues="False" />
+            </testStep>
+        </testCase>
 </testPlugin>
 
 

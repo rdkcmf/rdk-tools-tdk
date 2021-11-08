@@ -259,7 +259,12 @@
                 <param tag="timerInterval"  defaultValue="4" type="int"/>
             </params>
         </method>
-
+        <method name="Get_Preferences" api="getPreferences" type="method" desc="Returns the preferences that are saved in the fp_service_preferences.json file" />
+        <method name="Set_Preferences" api="setPreferences" type="method" desc="Sets preferences for Front Panel LED indicators" >
+            <params>
+                <param tag="preferences" defaultValue="null" />
+            </params>
+        </method>
     </plugin>
 
 
@@ -507,6 +512,7 @@
             </params>
         </method>
         <event name="Event_Cobalt_State_Changed" eventName="statechange" eventId="client.events.1" type="event" desc="cobalt state changed event" />
+        <event name="Event_Cobalt_Closure" eventName="closure" eventId="client.events.1" type="event" desc="Triggered when app requests to close its window" />
     </plugin>
 
 
@@ -675,7 +681,7 @@
 
         <method name="GenerateKey" api="generateKey" type="method" desc="Triggers key events like key press and release" >
             <params paramKey="keys" paramType="userGenerate" useMethodTag="rdkshell_set_keys_params">
-                <param tag="keyCode" defaultValue="0" type="int" />
+                <param tag="keyCode" defaultValue="" type="list" />
                 <param tag="modifiers" defaultValue="" type="list" />
                 <param tag="delay" defaultValue="0.0" type="float"/>
             </params>
@@ -691,6 +697,7 @@
                 <param tag="y" defaultValue="0" type="int" />
                 <param tag="w" defaultValue="0" type="int" />
                 <param tag="h" defaultValue="0" type="int" />
+                <param tag="closurepolicy" defaultValue="null" />
             </params>
         </method>
 
@@ -793,6 +800,12 @@
                 <param tag="height" type="int" />
             </params>
         </method>
+        <method name="Show_Splash_Logo" api="showSplashLogo" type="method" desc="Displays the splash screen" >
+            <params>
+                <param tag="displayTime" type="int" />
+            </params>
+        </method>
+        <method name="Hide_Splash_Logo" api="hideSplashLogo" type="method" desc="Removes the splash screen" />
         <event name="Event_On_Launched" eventName="onLaunched" eventId="client.events.1" type="event" desc="Fired on launching the client" />
         <event name="Event_On_Suspended" eventName="onSuspended" eventId="client.events.1" type="event" desc="Fired on Suspending the client" />
         <event name="Event_On_Destroyed" eventName="onDestroyed" eventId="client.events.1" type="event" desc="Fired on destroying the client"/>
@@ -1466,7 +1479,6 @@
         </method>     
         <event name="Event_Zoom_Settings_Updated" eventName="zoomSettingUpdated" eventId="client.events.1" type="event" desc="Zoom settings updated event "/>
 	<event name="Event_Resolution_Changed" eventName="resolutionChanged" eventId="client.events.1" type="event" desc="Fires on changing resolution"/>
-	<event name="Event_Audio_Mute_Status_Changed" eventName="audioMuteStatusChanged" eventId="client.events.1" type="event" desc="Fires on changing audio mute status"/>
     </plugin>
 
     <!-- Messenger Plugin Information -->
