@@ -50,6 +50,7 @@
   <box_types>
     <box_type>Video_Accelerator</box_type>
     <!--  -->
+    <box_type>IPClient-Wifi</box_type>
     <box_type>Hybrid-1</box_type>
     <!--  -->
   </box_types>
@@ -102,8 +103,13 @@ dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
 #Get Compression un supported port from config file and check if device supports Compression
-Compression_not_supported_port = deviceCapabilities.getconfig(obj,"CompressionDisabledPort","getValue");
-capable =  deviceCapabilities.getconfig(obj,"audioCompression");
+Compression_not_supported_port = deviceCapabilities.getconfig(dshalObj,"CompressionDisabledPort","getValue");
+capable =  deviceCapabilities.getconfig(dshalObj,"audioCompression");
+
+if Compression_not_supported_port in "N/A" and capable:
+    dshalObj.setAsNotApplicable();
+    print "All supported audio ports support audioCompression\nTest Case is not applicable for the DUT"
+    capable = False;
 
 if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
     dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
@@ -111,7 +117,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
     #Prmitive test case which associated to this Script
     #Only HDMI port type is supported
     tdkTestObj = dshalObj.createTestStep('DSHal_GetAudioPort');
-    tdkTestObj.addParameter("portType", audioPortType["SPDIF"]);
+    tdkTestObj.addParameter("portType", audioPortType[str(Compression_not_supported_port)]);
     #Execute the test case in STB
     tdkTestObj.executeTestCase(expectedResult);
     actualResult = tdkTestObj.getResult();
@@ -145,8 +151,8 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
 
 elif not capable and "SUCCESS" in dshalloadModuleStatus.upper():
     print "Exiting from script";
-    obj.setLoadModuleStatus("FAILURE");
-    obj.unloadModule("devicesettings");
+    dshalObj.setLoadModuleStatus("FAILURE");
+    dshalObj.unloadModule("dshal");
 
 else:
     print "Module load failed";
