@@ -20,12 +20,14 @@
 import re
 import tdklib;
 import ConfigParser
+import os
 
 #Define the search term:
 pattern = "VALIDATION"
 
 #TestApps predefined
-TESTAPP = {"essos":"Essos_TDKTestApp"}
+#Test Apps for essos: Essos_TDKTestApp and westeros : Westeros_TDKTestApp
+TESTAPP = {"essos":"Essos_TDKTestApp" ,"westeros":"sh RunWesterosTest.sh"}
 
 #Create an empty list:
 tests = []
@@ -34,17 +36,17 @@ expectedResult="SUCCESS";
 def getLogFile(obj):
     #Get EssosTestApp configuration file
     try:
-        EssosValidationConfigFile = obj.realpath+'fileStore/EssosValidation_log.config'
+        GraphicsValidationConfigFile = obj.realpath+'fileStore/GraphicsValidation_log.config'
         configParser = ConfigParser.ConfigParser()
-        configParser.read(r'%s' % EssosValidationConfigFile )
+        configParser.read(r'%s' % GraphicsValidationConfigFile )
         #EssosValidation execution log file
-        EssosValidation_log = configParser.get('EssosTestApp-config', 'logfile')
-        logFile = EssosValidation_log.split('/')
+        GraphicsValidation_log = configParser.get('GraphicsTestApp-config', 'logfile')
+        logFile = GraphicsValidation_log.split('/')
         logFile = logFile[-1]
-        print "EssosValidation Execution Log File Name : " , logFile
-        return logFile,EssosValidation_log
+        print "GraphicsValidation Execution Log File Name : " , logFile
+        return logFile,GraphicsValidation_log
     except:
-        print "\nUnable to acquire log file from EssosValidation_log.config\nConfigure the log file in EssosValidation_log.config to proceed with the testcase"
+        print "\nUnable to acquire log file from GraphicsValidation_log.config\nConfigure the log file in GraphicsValidation_log.config to proceed with the testcase"
         exit()
 
 #Prints the given string in title format
@@ -55,16 +57,22 @@ def PrintTitle(string=" ",title=0):
         print "#"*50
 
 #Lists the number of failures observed as part of the execution
-#Parses the output from the EssosValidation test app and returns the total number of failures
-def getNumberOfFailures(fileName):
+#Parses the output from the Test app and returns the total number of failures
+def getNumberOfFailures(fileName,checkPattern):
     failed = 0;
+    if os.stat(fileName).st_size == 0:
+        print "Execution failed";
+        return "error"
     for line in open(fileName):
         if line !='':
-            word = re.findall(pattern, line)
+            if checkPattern:
+                word = re.findall(pattern, line)
+            else:
+                word = True;
             if word:
-               if "ERROR" in line:
-                   failed = failed +1;
-    print "Number of FAILED testcases:",failed
+                if "ERROR" in line.upper():
+                    failed = failed +1;
+    print "Number of FAILURES:",failed
     return failed
 
 #Lists the Summary details of the testcases performed in the execution
@@ -89,23 +97,23 @@ def Summary(fileName):
 
 
 #Deletes the logFile present in DUT
-def deleteLogFile(obj,EssosValidation_log,EssosValidationExecutionStatus):
-    print "\nDelete the EssosValidation Execution log file from STB"
+def deleteLogFile(obj,GraphicsValidation_log,GraphicsValidationExecutionStatus):
+    print "\nDelete the GraphicsValidation Execution log file from STB"
     tdkTestObj = obj.createTestStep('ExecuteCommand');
-    cmd = "rm " + EssosValidation_log
+    cmd = "rm " + GraphicsValidation_log
     print cmd;
     #configre the command
     tdkTestObj.addParameter("command", cmd);
     tdkTestObj.executeTestCase(expectedResult);
     actualResult = tdkTestObj.getResult();
     if expectedResult in actualResult:
-        print "EssosValidation Execution log file deleted from STB"
+        print "GraphicsValidation Execution log file deleted from STB"
         tdkTestObj.setResultStatus("SUCCESS");
-        if "FAILURE" in EssosValidationExecutionStatus:
-            PrintTitle("EssosValidationExecution Status is FAILURE",1);
+        if "FAILURE" in GraphicsValidationExecutionStatus:
+            PrintTitle("GraphicsValidationExecution Status is FAILURE",1);
             tdkTestObj.setResultStatus("FAILURE");
     else:
-        print "Unable to delete EssosValidation Execution log file from STB"
+        print "Unable to delete GraphicsValidation Execution log file from STB"
         tdkTestObj.setResultStatus("FAILURE");
 
 
@@ -117,7 +125,7 @@ def RunTest(obj,Test,logFile,options=""):
     #Test to be executed
     cmd = TESTAPP[Test] + " " + options;
     #log the app output in a logFile
-    cmd =  cmd + ">" + logFile;
+    cmd =  cmd + " > " + logFile;
     tdkTestObj.addParameter("command", cmd);
     #Execute the test case in STB
     tdkTestObj.executeTestCase("SUCCESS");

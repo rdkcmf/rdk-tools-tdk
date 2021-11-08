@@ -1,3 +1,4 @@
+#!/bin/sh
 ##########################################################################
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
@@ -17,22 +18,18 @@
 # limitations under the License.
 ##########################################################################
 
-bin_PROGRAMS = Essos_TDKTestApp
+DISPLAY=$1
+TIMEOUT=$2
 
-Essos_TDKTestApp_SOURCES = src/EssosValidationSuite.cpp
+#Export westeros library
+export XDG_RUNTIME_DIR=/tmp
+export LD_PRELOAD=/usr/lib/libwesteros_gl.so.0.0.0
 
-Essos_TDKTestApp_CXXFLAGS = ${AM_CXXFLAGS}
-if HAVE_EGL
-Essos_TDKTestApp_CXXFLAGS += ${EGL_CFLAGS}
-endif
-Essos_TDKTestApp_LDFLAGS = $(AM_FLAGS) -lessos -lGLESv2
+#Start Westeros renderer and run it for 30 seconds
+timeout 30  westeros --renderer libwesteros_render_embedded.so.0.0.0 --display $DISPLAY --embedded --window-size 1920x1080 &
 
-bin_PROGRAMS += Westeros_TDKTestApp
-Westeros_TDKTestApp_SOURCES = src/WesterosValidationSuite.cpp
-Westeros_TDKTestApp_LDFLAGS= \
-   -lwayland-server \
-   -lwayland-client \
-   -lxkbcommon \
-   -lwesteros_simpleshell_client \
-   -lwayland-egl -lGLESv2\
-   -lEGL
+#Wait for westeros renderer
+sleep 3
+
+#Execute Westeros_TDKTestApp
+Westeros_TDKTestApp --display $DISPLAY -t=$TIMEOUT

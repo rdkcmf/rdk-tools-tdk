@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>21</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>FCS_Essos_Validation</name>
+  <name>FCS_Westeros_Validation</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test to execute the EssosValidation test app and verify the results</synopsis>
+  <synopsis>Test to validate EGL and westeros modules using Westeros_TDKTestApp and verify the results</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -60,25 +60,25 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>FCS_GRAPHICS_01</test_case_id>
-    <test_objective>Test to execute the EssosValidation test app and verify the results</test_objective>
+    <test_case_id>FCS_GRAPHICS_02</test_case_id>
+    <test_objective>Test to execute the Westeros_TDKTestApp test app  for EGL and westeros validations and verify the results</test_objective>
     <test_type>Positive</test_type>
     <test_setup>Video Accelerator, RPI</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
-2.The Essos_TDKTestApp test binary should be available in the device</pre_requisite>
-    <api_or_interface_used>Execute the EssosValidation test application in DUT</api_or_interface_used>
+2.The Westeros_TDKTestApp test binary should be available in the device</pre_requisite>
+    <api_or_interface_used>Execute the WesterosValidation test application in DUT</api_or_interface_used>
     <input_parameters>None</input_parameters>
     <automation_approch>1.Load the systemutil module.
-2.Execute the "Essos_TDKTestApp" command along with "-d" (debug option) and "-t=7" (timeout option for 7 seconds) in DUT. During the execution, the DUT will execute the avaiable in "Essos_TDKTestApp" test app.
-3.Verify the output from the execute command and check if the strings no "VALIDATION ERROR"  statements are present.
-5.Based on the ExecuteCommand() return value and the output returned from the EssosValidation application, TM return SUCCESS/FAILURE status.</automation_approch>
-    <expected_output>Checkpoint 1. Verify the API call is success
-Checkpoint 2. Verify that the output returned from EssosValidation "VALIDATION ERROR" statements.</expected_output>
+2.Execute the RunWesterosTest script which executes "Westeros_TDKTestApp" command along with "display" (display can be set to any custom name and it is set to "wayland-0" in the test) and "timeout" (timeout option for 20 seconds) in DUT.
+3.Verify the output from the execute command and check if the strings no "error"  statements are present.
+4.Based on the ExecuteCommand() return value and the output returned from the "Westeros_TDKTestApp" application, TM return SUCCESS/FAILURE status.</automation_approch>
+    <expected_output>Checkpoint 1. Application checks for the API call success with in application.
+Checkpoint 2. Verify that the output returned from Westeros_TDKTestApp "error" statements.</expected_output>
     <priority>High</priority>
     <test_stub_interface>libsystemutilstub.so.0</test_stub_interface>
-    <test_script>FCS_Essos_Validation</test_script>
+    <test_script>FCS_Westeros_Validation</test_script>
     <skipped>No</skipped>
-    <release_version>M93</release_version>
+    <release_version>M94</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -86,6 +86,7 @@ Checkpoint 2. Verify that the output returned from EssosValidation "VALIDATION E
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import time;
 import FCS_GraphicsValidation_utility
 
 #Test component to be tested
@@ -95,63 +96,69 @@ obj = tdklib.TDKScriptingLibrary("systemutil","2.0");
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'FCS_Essos_Validation');
+obj.configureTestCase(ip,port,'FCS_Westeros_Validation');
 
 #Get the result of connection with test component and STB
 sysutilLoadStatus =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %sysutilLoadStatus
 if "SUCCESS" in sysutilLoadStatus.upper():
 
-    #Get EssosValidation configuration file
-    logFile,EssosValidation_log = FCS_GraphicsValidation_utility.getLogFile(obj);
+    #Get WesterosValidation configuration file
+    logFile,WesterosValidation_log = FCS_GraphicsValidation_utility.getLogFile(obj);
+
+    #Configure Variables to start westeros instance
+    display = "wayland-0";
+    #Timeout is set to 20 seconds
+    timeout = 20;
 
     #Configure the test to be executed
-    Test = "essos"
+    Test = "westeros"
 
-    #Run the Essos_TDKTestApp with options 
-    #Add -d option for debug
-    options = " -d"
-    #Add -t option for timeout for 7 seconds
-    options = options + " -t=7"
+    #Run the Westeros_TDKTestApp with options 
+    #Add display for westeros instance
+    options = display;
+    #Add -t option for timeout
+    options = options + " " + str(timeout);
     details = FCS_GraphicsValidation_utility.RunTest(obj,Test,logFile,options);
     print "[TEST EXECUTION DETAILS] : %s" %details;
 
-    #Transfer Essos_TDKTestApp log file from STB
+    #Wait for Test to get completed
+    time.sleep(35)
+
+    #Transfer Westeros_TDKTestApp log file from STB
     try:
         tdkTestObj = obj.createTestStep('FireboltCompliance_DoNothing');
-        filepath = tdkTestObj.transferLogs( EssosValidation_log, "false" );
+        filepath = tdkTestObj.transferLogs( WesterosValidation_log, "false" );
     except:
         print "Transfer of logs unsuccessfull";
         obj.unloadModule("systemutil");
         exit() 
 
-    #Parsing the output of Essos_TDKTestApp
+    #Parsing the output of Westeros_TDKTestApp
     try:
-        FCS_GraphicsValidation_utility.PrintTitle("SUMMARY OF TEST EXECUTION")
-        FCS_GraphicsValidation_utility.Summary(filepath);
         data = open(filepath,'r');
         message = data.read()
-        print "\n**************Essos_TDKTestApp Execution Log - Begin*************\n\n"
+        print "\n**************Westeros_TDKTestApp Execution Log - Begin*************\n\n"
         print(message)
         data.close()
-        print "\n**************Essos_TDKTestApp Execution - End*************\n\n"
+        print "\n**************Westeros_TDKTestApp Execution - End*************\n\n"
 
-        #Reading the Essos_TDKTestApp Execution log file to check for number of failures 
-        Failures = FCS_GraphicsValidation_utility.getNumberOfFailures(filepath,True)
+        #Reading the Westeros_TDKTestApp Execution log file to check for number of failures 
+        Failures = FCS_GraphicsValidation_utility.getNumberOfFailures(filepath,False)
         if Failures:
-            EssosValidationExecutionStatus = "FAILURE"
+            WesterosValidationExecutionStatus = "FAILURE"
             print "Observed failures during execution"
         else:
-            EssosValidationExecutionStatus = "SUCCESS"
+            WesterosValidationExecutionStatus = "SUCCESS"
             print "Successfuly Executed the test application"
-            print "[TEST EXECUTION RESULT] : %s" %EssosValidationExecutionStatus;
+            print "[TEST EXECUTION RESULT] : %s" %WesterosValidationExecutionStatus;
     except:
         print "ERROR : Unable to open execution log file"
         obj.unloadModule("systemutil");
         exit();
 
     #Delete the log file in DUT
-    FCS_GraphicsValidation_utility.deleteLogFile(obj,EssosValidation_log,EssosValidationExecutionStatus);
+    FCS_GraphicsValidation_utility.deleteLogFile(obj,WesterosValidation_log,WesterosValidationExecutionStatus);
 
     obj.unloadModule("systemutil");
 
