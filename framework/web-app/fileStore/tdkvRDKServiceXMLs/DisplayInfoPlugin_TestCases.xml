@@ -61,14 +61,7 @@
             </testStep>
           </prerequisite>
 
-          <!-- check if TV connect. Test case need to be executed only when TV is connected. -->
-          <prerequisite requisiteId="3" requisiteName="Get_Display_Connected_Status">
-              <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings">
-                  <resultGeneration useMethodTag="display_connected_status" />
-              </testStep>
-          </prerequisite>
-
-	  <prerequisite requisiteId="4" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
+	  <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
             <event pluginName="DisplayInfo" eventName="Event_Resolution_PostChange" />
           </prerequisite>
         </pluginPreRequisite>
@@ -76,6 +69,13 @@
         <!-- Test case 01 -->
         <testCase testCaseId="DISP_01" testCaseName= "DisplayInfo_GET_audiopassthrough" desc="Read isaudioPassthrough property on HDMI.">
             <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="IsAudiopassthrough" method="DisplayInfo_Isaudiopassthrough">
                 <resultGeneration useMethodTag="displayinfo_validate_boolean_result" />
             </testStep>
@@ -142,6 +142,13 @@
         <!-- Test case 05 -->
         <testCase testCaseId="DISP_05" testCaseName= "DisplayInfo_GET_vertical_frequency" desc="Get Vertical frequency.">
             <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="Getverticalfrequency" method="DisplayInfo_Getverticalfreq">
                 <resultGeneration useMethodTag="displayinfo_validate_results" />
             </testStep>
@@ -151,6 +158,13 @@
         <!-- Test case 06 -->
         <testCase testCaseId="DISP_06" testCaseName= "DisplayInfo_GET_HDCP_protocol_version" desc="Get HDCP version.">
             <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="Gethdcpversion" method="DisplayInfo_GetHDCPversion">
                 <resultGeneration useMethodTag="displayinfo_validate_expected_results" expectedValues="HdcpUnencrypted,Hdcp1X,Hdcp2X" />
             </testStep>
@@ -160,6 +174,13 @@
         <!-- Test case 07 -->
         <testCase testCaseId="DISP_07" testCaseName= "DisplayInfo_GET_portname" desc="Get portname used for TV connection.">
             <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="Getportname" method="DisplayInfo_GetPortname">
                 <resultGeneration useMethodTag="displayinfo_check_for_nonempty_result" />
             </testStep>
@@ -253,6 +274,13 @@
        <!-- Test case 10 -->
         <testCase testCaseId="DISP_10" testCaseName= "DisplayInfo_GET_HDR_Formats_TV" desc="Gets the HDR formats supported by TV">
             <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="GetHDRFormatsTV" method="DisplayInfo_GetHDRFormatsTV">
                 <resultGeneration useMethodTag="displayinfo_validate_hdr_formats" />
             </testStep>
@@ -260,6 +288,13 @@
      <!-- Test case 11 -->
         <testCase testCaseId="DISP_11" testCaseName= "DisplayInfo_GET_HDR_Formats_STB" desc="Gets the HDR formats supported by STB">
             <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="GetHDRFormatsSTB" method="DisplayInfo_GetHDRFormatsSTB">
                 <resultGeneration useMethodTag="displayinfo_validate_hdr_formats" />
             </testStep>
@@ -267,6 +302,13 @@
      <!-- Test case 12 -->
         <testCase testCaseId="DISP_12" testCaseName= "DisplayInfo_GET_HDR_Format_In_Use" desc="Gets the HDR formats in use">
             <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="GetHDRFormatInUse" method="DisplayInfo_GetHDRFormatInUse">
                 <resultGeneration useMethodTag="displayinfo_validate_expected_results" />
             </testStep>
@@ -274,6 +316,13 @@
      <!-- Test case 13 -->    
         <testCase testCaseId="DISP_13" testCaseName= "DisplayInfo_Get_Total_GPU_RAM" desc="Gets the total GPU DRAM memory in bytes" >
             <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="Get_Total_GPU_RAM" method="Get_Total_GPU_RAM">
                 <resultGeneration useMethodTag="displayinfo_validate_results" />
             </testStep>
@@ -281,6 +330,13 @@
      <!-- Test case 14 -->
         <testCase testCaseId="DISP_14" testCaseName= "DisplayInfo_Get_Free_GPU_RAM" desc="Gets the free GPU DRAM memory in bytes" >
             <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="Get_Free_GPU_RAM" method="Get_Free_GPU_RAM">
                 <resultGeneration useMethodTag="displayinfo_validate_results" />
             </testStep>
@@ -288,6 +344,13 @@
      <!-- Test case 15 -->
         <testCase testCaseId="DISP_15" testCaseName= "DisplayInfo_Get_Widthincentimeters" desc="Gets the horizontal size in centimeters" >
             <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="Get_Width_In_Centimeters" method="Get_Width_In_Centimeters" >
                 <resultGeneration useMethodTag="displayinfo_validate_results" />
             </testStep>
@@ -295,6 +358,13 @@
      <!-- Test case 16 -->
         <testCase testCaseId="DISP_16" testCaseName= "DisplayInfo_Get_Heightincentimeters" desc="Gets the vertical size in centimeters" >
             <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="Get_Height_In_Centimeters" method="Get_Height_In_Centimeters">
                 <resultGeneration useMethodTag="displayinfo_validate_results" />
             </testStep>
