@@ -127,7 +127,7 @@
 	<function>TestMgr_BluetoothHal_GetListOfScannedDevices</function>
         <parameters>
 	  <parameter name="get_Address_and_Path" value="0"/>
-        <parameters/>
+        </parameters>
       </primitiveTest>
       <primitiveTest name="BluetoothHal_PairDevice" id=" " version="1">
         <function>TestMgr_BluetoothHal_PairDevice</function>
