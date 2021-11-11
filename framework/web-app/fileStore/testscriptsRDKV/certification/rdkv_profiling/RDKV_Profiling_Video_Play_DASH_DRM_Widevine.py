@@ -56,7 +56,7 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_PROFILING_19</test_case_id>
+    <test_case_id>RDKV_PROFILING_13</test_case_id>
     <test_objective>The objective of this test is to validate profiling data after performing video playback of dash widevine DRM protected content using lightning video player app (DASHJS)</test_objective>
     <test_type>Positive</test_type>
     <test_setup>Accelerator</test_setup>
