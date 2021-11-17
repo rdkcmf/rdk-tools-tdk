@@ -19,9 +19,14 @@
 
 import os
 import ConfigParser
-
-# Global variable to store the operations string
+import MediaValidationVariables
+# Global variable to store the operations string and use_aamp configuration
 operations = ""
+use_aamp = ""
+
+#List consisting of HLS url
+HLS_URL = [MediaValidationVariables.video_src_url_short_duration_hls,MediaValidationVariables.video_src_url_hls,MediaValidationVariables.video_src_url_4k_hls,MediaValidationVariables.video_src_url_live_hls,MediaValidationVariables.video_src_url_hls_h264,MediaValidationVariables.video_src_url_hls_h264_iframe]
+URL_TYPE = {MediaValidationVariables.video_src_url_vp9 : MediaValidationVariables.vp9_url_type, MediaValidationVariables.video_src_url_hevc:MediaValidationVariables.hevc_url_type, MediaValidationVariables.video_src_url_dolby:MediaValidationVariables.dolby_url_type , MediaValidationVariables.video_src_url_opus:MediaValidationVariables.opus_url_type, MediaValidationVariables.video_src_url_aac:MediaValidationVariables.aac_url_type}
 
 ######################################################################
 #
@@ -32,9 +37,10 @@ operations = ""
 #Function to retrieve the device configuration from device config file
 def getDeviceConfigValue (tdklibObj, configKey):
     try:
+        global use_aamp
         result = "SUCCESS"
-        configValue = ""
         #Retrieve the device details(device name) and device type from tdk library
+        configValue = ""
         deviceDetails = tdklibObj.getDeviceDetails()
         deviceType = tdklibObj.getDeviceBoxType()
         #Construct the tdkvRDKServiceConfig path in TM
@@ -51,12 +57,13 @@ def getDeviceConfigValue (tdklibObj, configKey):
         else:
             print "FAILURE : No Device config file found : " + deviceNameConfigFile + " or " + deviceTypeConfigFile
             result = "FAILURE"
-        #Continue only if the device config file exists 
+        #Continue only if the device config file exists
         if (len (deviceConfigFile) != 0):
             configParser = ConfigParser.ConfigParser()
             configParser.read(r'%s' % deviceConfigFile)
             #Retrieve the value of config key from device config file
             configValue = configParser.get('device.config', configKey)
+            use_aamp = configParser.get('device.config',"FIREBOLT_COMPLIANCE_USE_AAMP_FOR_HLS")
         else:
             print "DeviceConfig file not available"
             result = "FAILURE"
@@ -116,6 +123,22 @@ def getMediaPipelineTestCommand (testName, testUrl, **arguments):
     for name, value in arguments.items ():
         command += " " + name + "=" + value
 
+    #Feature to modify hls url to aamp url based on configuration
+    if (use_aamp == "yes"):
+        testUrl_list = testUrl.split();
+        url_list = set()
+        #Check if HLS URL is present in command
+        url_list = (set(testUrl_list) & set(HLS_URL));
+        for url in testUrl_list:
+            if URL_TYPE.get(url, "not available").lower() == "hls":
+                url_list.add(url);
+        if url_list:
+            for url in url_list:
+                #Change hls generic url to aamp url
+                url_updated = url.replace("https","aamps",1).replace("http","aamp",1);
+                command = command.replace(url,url_updated);
+            #Update GST_LOG_LEVEL to capture only critical level errors
+            command = "export GST_LOG_LEVEL=8;" + command;
     return command
 
 #Function to check mediapipeline test execution status from output string
