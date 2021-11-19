@@ -140,21 +140,21 @@ export default class App extends Lightning.Component {
     this.expectedPos = VideoPlayer.currentTime + pos
     logMsg("Expected Event: "   + this.expectedEvents)
     logMsg("Expected Pos  : [ " + (this.expectedPos).toFixed(2) + " - " + (this.expectedPos + 7).toFixed(2) + " ]")
-    VideoPlayer.skip(pos)
+    this.videoEl.currentTime += pos
   }
   seekbwd(pos){
     this.expectedEvents   = ["seeking","seeked"]
     this.expectedPos = VideoPlayer.currentTime - pos
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Expected Pos  : [ " + (this.expectedPos).toFixed(2) + " - " + (this.expectedPos+ 7).toFixed(2) + " ]")
-    VideoPlayer.skip(-pos)
+    this.videoEl.currentTime -= pos
   }
   seekpos(pos){
     this.expectedEvents   = ["seeking","seeked"]
     this.expectedPos = pos
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Expected Pos  : [ " + (this.expectedPos).toFixed(2) + " - " + (this.expectedPos+ 7).toFixed(2) + " ]")
-    VideoPlayer.seek(pos)
+    this.videoEl.currentTime = pos
   }
 
   // Methods to change video rate
@@ -351,12 +351,6 @@ export default class App extends Lightning.Component {
     this.message1 = "Video Player " + e + " " + currentTime.toFixed(2) + "/" + duration.toFixed(2)
     this.dispUIMessage(this.message1)
     this.checkAndLogEvents(e,this.message1)
-    if ( e =="seeked" && this.expectedEvents.includes("seeked")){
-      setTimeout(()=>{
-          this.videoEl.playbackRate = 1
-          this.videoEl.play()
-      },1000);
-    }
   }
   // RateChange Event Handler
   rateChangeEventHandler(){
@@ -547,14 +541,6 @@ export default class App extends Lightning.Component {
             if (action != "close"){
                 setTimeout(()=> {
                     this.updateEventFlowFlag();
-                },actionInterval+this.checkInterval);
-            }
-            if (action == "seekfwd" || action == "seekbwd" || action == "seekpos"){
-                setTimeout(()=> {
-                  if (VideoPlayer.playing == false){
-                    this.videoEl.playbackRate = 1
-                    this.videoEl.play()
-                  }
                 },actionInterval+this.checkInterval);
             }
       }

@@ -116,6 +116,20 @@ export default class App extends Lightning.Component {
       logMsg("Expected Event: " + this.expectedEvents)
       this.player.pause();
   }
+  mute() {
+      this.expectedVolume = 0
+      this.volumeChangeFlag = 1
+      logMsg("Expected Volume: " + this.expectedVolume)
+      this.setVolume(this.expectedVolume);
+      this.dispVolumeInfo()
+  }
+  unmute() {
+      this.expectedVolume = 100
+      this.volumeChangeFlag = 1
+      logMsg("Expected Volume: " + this.expectedVolume)
+      this.setVolume(this.expectedVolume);
+      this.dispVolumeInfo()
+  }
   stop() {
       this.player.stop();
   }
@@ -184,6 +198,12 @@ export default class App extends Lightning.Component {
   }
   setAudioTrack(track) {
       this.player.setAudioTrack(track);
+  }
+  getVolume(){
+      return this.player.getVolume()
+  }
+  setVolume(volume){
+      this.player.setVolume(volume)
   }
 
 
@@ -300,6 +320,13 @@ export default class App extends Lightning.Component {
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Observed Event: " + this.observedEvents)
   }
+  dispVolumeInfo(){
+    this.message1 = "Video Player Volume Change, volume: " + this.getVolume()
+    this.dispUIMessage(this.message1)
+    console.log("*****************************************************************\n" +
+	        "[ " + dispTime() + " ] " + this.message1 + "\n" +
+                "*****************************************************************")
+  }
 
 
   // Creating AAMp Object, registering events & loading URL
@@ -396,6 +423,18 @@ export default class App extends Lightning.Component {
                     this.playNow()
                 },actionInterval);
             }
+            else if (action == "mute"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.mute()
+                },actionInterval);
+            }
+            else if (action == "unmute"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.unmute()
+                },actionInterval);
+            }
 	    else if (action == "seekfwd"){
                 setTimeout(()=> {
                     this.clearEvents()
@@ -486,8 +525,21 @@ export default class App extends Lightning.Component {
   updateEventFlowFlag(){
       var Status = "SUCCESS"
       if( ! this.expectedEvents.every(e=> this.observedEvents.indexOf(e) >= 0)){
-          this.eventFlowFlag = 0
-          Status = "FAILURE"
+	  if (this.volumeChangeFlag == 1){
+              this.volumeChangeFlag = 0
+              var currVolume = parseInt(this.getVolume())
+              if( currVolume == this.expectedVolume ){
+                logMsg("volume change  operation success")
+              }else{
+                this.eventFlowFlag = 0
+                Status = "FAILURE"
+                logMsg("volume change  operation failure")
+              }
+          }
+	  else{
+              this.eventFlowFlag = 0
+              Status = "FAILURE"
+	  }
       } else{
           if (this.expectedEvents.includes("paused")){
               var currState = this.getCurrentState();
@@ -592,6 +644,8 @@ export default class App extends Lightning.Component {
     this.eventFlowFlag  = 1
     this.observedEvents = []
     this.expectedEvents = []
+    this.expectedVolume = 0
+    this.volumeChangeFlag  = 0
     this.progressEventMsg  = ""
     this.progressLogger    = null
     this.playbackSpeeds = [-64, -32, -16, -4, 1, 4, 16, 32, 64];
