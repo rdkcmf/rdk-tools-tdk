@@ -121,7 +121,7 @@ if expectedResult in result.upper():
     # Setting the pre-requites for media test. Launching the wekit instance via RDKShell and
     # moving it to the front, openning a socket connection to the webkit inspect page and
     # getting the details for proc validation from config file
-    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,webkit_instance,False)
+    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,webkit_instance)
     if pre_requisite_status == "SUCCESS":
         tdkTestObj.setResultStatus("SUCCESS");
         print "Pre conditions for the test are set successfully"
@@ -130,6 +130,8 @@ if expectedResult in result.upper():
         #Setting device config file
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
+        # Setting proc validation mode as audio-only
+        setProcCheckMode("audio-only")
         appURL    = MediaValidationVariables.lightning_video_test_app_url
         videoURL  = MediaValidationVariables.video_src_url_audio
         # Setting VideoPlayer Operations

@@ -51,6 +51,8 @@ resolution_revert = False
 # Global variables to store sound modes
 current_mode = None
 mode_revert = False
+# Global variable to store proc validation mode
+proc_check_mode = None
 
 # Function to set the operation and interval
 def setOperation(operation,intervalOrCount):
@@ -108,6 +110,10 @@ def getTestURL(appURL,URLarguments):
 def setDeviceConfigFile(conf_file):
      global deviceConfigFile
      deviceConfigFile = conf_file
+
+def setProcCheckMode(mode):
+     global proc_check_mode
+     proc_check_mode = mode
 
 def updateOptions(val):
     if all_arguments.get("options") != None:
@@ -337,6 +343,16 @@ def checkProcEntry(obj,validation_dict):
     tdkTestObj.addParameter("sshMethod",validation_dict["ssh_method"])
     tdkTestObj.addParameter("credentials",validation_dict["credentials"])
     tdkTestObj.addParameter("validation_script",validation_dict["validation_script"])
+    global proc_check_mode
+    if proc_check_mode == None:
+        result,mode = getDeviceConfigKeyValue(deviceConfigFile,"PROC_CHECK_MODE")
+        if mode.strip() != "":
+            tdkTestObj.addParameter("mode",mode)
+        else:
+            tdkTestObj.addParameter("mode","AV")
+    else:
+        tdkTestObj.addParameter("mode",proc_check_mode)
+
     tdkTestObj.executeTestCase(expectedResult);
     result = tdkTestObj.getResult();
     info = tdkTestObj.getResultDetails();
@@ -891,9 +907,9 @@ def monitorVideoTest(obj,webkit_console_socket,validation_dict,check_pattern,tim
         if "Video Player Playing" in console_log:
             play_status = "SUCCESS"
         if  check_pattern in console_log and validation_dict["proc_check"] and (all(skip_events not in console_log for skip_events in skip_proc_check_events)):
+            time.sleep(1);
             info = checkProcEntry(obj,validation_dict)
             proc_check_list.append(info)
-            #time.sleep(1);
         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
             test_result = getConsoleMessage(console_log)
             break;

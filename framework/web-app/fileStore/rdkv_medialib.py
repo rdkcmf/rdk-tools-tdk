@@ -114,15 +114,16 @@ def rdkv_media_getProcCheckInfo(realpath):
 #-------------------------------------------------------------------
 # Function to check required pattern in proc entry file
 #-------------------------------------------------------------------
-def rdkv_media_checkProcEntry(sshMethod,credentials,validation_script):
+def rdkv_media_checkProcEntry(sshMethod,credentials,validation_script,mode):
     result = "FAILURE"
     validation_script = validation_script.split('.py')[0]
     try:
         lib = importlib.import_module(validation_script)
         method = "check_video_status"
         method_to_call = getattr(lib, method)
-        result = method_to_call(sshMethod,credentials)
+        result = method_to_call(sshMethod,credentials,mode)
     except Exception as e:
+        print e;
         print "[ERROR]: Failed to import video validation script file, please check the configuration"
         result = "FAILURE"
     finally:

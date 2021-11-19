@@ -24,7 +24,7 @@
   <!-- Excecution time out of module -->
     <testGroup>Certification</testGroup>
   <!-- Logs File Names of module -->
-    <logFileNames>[]</logFileNames>
+    <logFileNames>[/opt/logs/wpeframework.log]</logFileNames>
   <!-- Crash File Names of the module -->
     <crashFileNames>[]</crashFileNames>
   <!-- Total functions corresponding module  -->
@@ -41,6 +41,7 @@
       <parameter funName='rdkv_media_checkProcEntry' parameterName='sshMethod' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_media_checkProcEntry' parameterName='credentials' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_media_checkProcEntry' parameterName='validation_script' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkv_media_checkProcEntry' parameterName='mode' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_media_getProcCheckInfo' parameterName='realpath' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_media_readUIData' parameterName='elementExpandXpath' parameterType='STRING' range='a-z' />
       <parameter funName='rdkv_media_readUIData' parameterName='dataXpath' parameterType='STRING' range='a-z' />
