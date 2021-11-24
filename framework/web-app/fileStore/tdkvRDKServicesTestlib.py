@@ -102,20 +102,22 @@ def readDeviceConfigKeys(keys):
 #-----------------------------------------------------------------------------------------------
 # executePluginTests
 #-----------------------------------------------------------------------------------------------
-# Syntax      : executePluginTests(deviceIP,port,deviceName,deviceType,basePath, pluginName, testCaseID)
+# Syntax      : executePluginTests(libobj,deviceIP,port,deviceName,deviceType,deviceMAC,basePath, pluginName, testCaseID)
 # Description : Method to check whether Plugins template xml and given plugin test case
 #               xmls exists and start the test execution
 # Parameter   : pluginName - name of the plugin
+#             : libobj   - TDk lib object
 #             : deviceIP - IP of the test device
 #             : port     - Port for testing
 #             : deviceName - name of the test device
 #             : deviceType - type of the test device
+#             : deviceMAC  - MAC  of the test device
 #             : basePath   - TDK TM webapps path
 #             : testCaseID - test case Id. By default all the test cases will be executed
 # Return Value: SUCCESS/FAILURE
 #-----------------------------------------------------------------------------------------------
 
-def executePluginTests(libobj, deviceIPAddress, devicePort, testDeviceName, testDeviceType, basePath, TMUrl, pluginName, testCaseID="all"):
+def executePluginTests(libobj, deviceIPAddress, devicePort, testDeviceName, testDeviceType, testDeviceMac, basePath, TMUrl, pluginName, testCaseID="all"):
 
     # This method is the entry-point to the RDK Services Testing
     # framework. API should be invoked from external lib/script
@@ -137,6 +139,10 @@ def executePluginTests(libobj, deviceIPAddress, devicePort, testDeviceName, test
     # Type of the test device passed from external lib/script
     global deviceType
     deviceType = str(testDeviceType)
+
+    # Type of the test device passed from external lib/script
+    global deviceMac
+    deviceMac = str(testDeviceMac)
 
     # By default, [device.config] section will be taken
     # from config file. Different sections can be added
@@ -2146,8 +2152,8 @@ def testStepResultGeneration(testStepResponse,resultGenerationInfo, action="exec
         if action in ["eventListener","eventRegister","eventUnRegister"]:
             info = CheckAndGenerateEventResult(result,tag,arg,expectedValues)
         elif action == "externalFnCall":
-            paths = [ basePathLoc, deviceConfigFile, deviceIP ]
-            info = ExecExternalFnAndGenerateResult(tag,arg,expectedValues,paths)
+            execInfo = [ basePathLoc, deviceConfigFile, deviceIP, deviceMac, execMethod]
+            info = ExecExternalFnAndGenerateResult(tag,arg,expectedValues,execInfo)
         else:
             info = CheckAndGenerateTestStepResult(result,tag,arg,expectedValues,otherInfo)
         if info["Test_Step_Status"] == "FAILURE" and action != "eventListener" and action != "externalFnCall":

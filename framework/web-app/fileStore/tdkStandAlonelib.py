@@ -70,11 +70,16 @@ def executeTest (self) :
         deviceInfo = getDeviceDetails(self);
         deviceName = deviceInfo["devicename"]
         deviceType = deviceInfo["boxtype"]
+        deviceMac = ""
+        try:
+            deviceMac = deviceInfo["mac"]
+        except Exception as e:
+            print "\nException Occurred while getting MAC \n"
         testXMLName = params["params"]["xml_name"]
         details = "SUCCESS"
         lib = importlib.import_module("tdkvRDKServicesTestlib")
         executePluginTests_method = getattr(lib,"executePluginTests")
-        result =  executePluginTests_method(self, self.ip, thunderPort, deviceName, deviceType, self.realpath, self.url, testXMLName)
+        result =  executePluginTests_method(self, self.ip, thunderPort, deviceName, deviceType, deviceMac, self.realpath, self.url, testXMLName)
     else:
         result = "FAILURE";
         #The library name will be componentName+lib. eg:rdkserviceslib

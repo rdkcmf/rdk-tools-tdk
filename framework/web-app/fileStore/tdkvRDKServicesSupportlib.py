@@ -32,6 +32,10 @@ import codecs
 from time import sleep
 import re
 import subprocess
+import requests
+
+# To use the REST API variables
+import CertificationSuiteCommonVariables
 
 #-----------------------------------------------------------------------------------------------
 #               ***  RDK SERVICES VALIDATION FRAMEWORK SUPPORTING FUNCTIONS ***
@@ -3244,26 +3248,26 @@ def generateComplexTestInputParam(methodTag,testParams):
 #-----------------------------------------------------------------------------------------------
 # ExecExternalFnAndGenerateResult
 #-----------------------------------------------------------------------------------------------
-# Syntax      : ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths)
+# Syntax      : ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,execInfo)
 # Description : Method to execute other user defined functions by the framework
 # Parameter   : methodTag - tag used to identify the function ti be called
 #             : arguments - arguments to be passed to the function
 #             : expectedValues - expected values to be checked
-#             : paths - list of paths
+#             : execInfo - list of execution details like TM path, device IP, MAC, exec method
 # Return Value: Result Info Dictionary
 #-----------------------------------------------------------------------------------------------
-def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
+def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,execInfo):
     tag  = methodTag
     arg  = arguments
-    basePath = paths[0]
-    deviceConfigFile = paths[1]
-    deviceIP = paths[2]
+    basePath = execInfo[0]
+    deviceConfigFile = execInfo[1]
+    deviceIP = execInfo[2]
 
     # Input Variables:
     # a. methodTag - string
     # b. arguments - list
     # c. expectedValues - list
-    # d. paths - list
+    # d. execInfo - list
 
     # Output Variable:
     # a.info - dictionary
@@ -3288,19 +3292,19 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             info["Test_Step_Status"] = executeBluetoothCtl(deviceConfigFile,arg)
         elif tag == "broadcastIARMEventTuneReady":
             command = "IARM_event_sender TuneReadyEvent 1"
-            info["details"] = executeCommand(deviceConfigFile, deviceIP, command)
+            info["details"] = executeCommand(execInfo, command)
             info["Test_Step_Status"] =  "SUCCESS"
         elif tag == "broadcastIARMEventChannelMap":
             command = "IARM_event_sender ChannelMapEvent 1"
-            info["deatils"] = executeCommand(deviceConfigFile, deviceIP, command)
+            info["deatils"] = executeCommand(execInfo, command)
             info["Test_Step_Status"] =  "SUCCESS"
         elif tag == "Trust_MAC":
             deviceType = arguments[0]
             command = "bluetoothctl <<< 'trust "+arguments[1]+"'"
-            executeCommand(deviceConfigFile, deviceIP, command, deviceType)
+            executeCommand(execInfo, command, deviceType)
         elif tag == "Enable_TR181_Parameter":
             command = arguments[0]
-            output = executeCommand(deviceConfigFile, deviceIP, command)
+            output = executeCommand(execInfo, command)
             if "set operation success" in output.lower():
                 info["Test_Step_Status"] = "SUCCESS"
             else:
@@ -3322,12 +3326,12 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
 
         elif tag == "Check_Version_File":
             command = '[ -f "/version.txt" ] && echo 1 || echo 0'
-            output = executeCommand(deviceConfigFile, deviceIP, command)
+            output = executeCommand(execInfo, command)
             output = str(output).split("\n")
             if int(output[1]) == 1:
                 print "Version.txt File Exists"
                 command = '[ -s "/version.txt" ] && echo 1 ||  echo 0'
-                output = executeCommand(deviceConfigFile, deviceIP, command)
+                output = executeCommand(execInfo, command)
                 output = str(output).split("\n")
                 if int(output[1]) == 1:
                     print "Version.txt File Is not Empty"
@@ -3343,7 +3347,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             xconfurl = arg[0]
             print "include.properties file exist,checking whether xconf url is updated"
             command = 'grep -q '+xconfurl+' /etc/include.properties  && echo 1 || echo 0'
-            output = executeCommand(deviceConfigFile, deviceIP, command)
+            output = executeCommand(execInfo, command)
             output = str(output).split("\n")
             if int(output[1]) == 1:
                 print "File is updated with xconf url"
@@ -3351,7 +3355,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             else:
                 print "File is not updated with xconf url,Updating file with xconf url"
                 command = 'sed -i \'s~^CLOUDURL=.*$~CLOUDURL='+xconfurl+'~g\' /etc/include.properties;grep -q '+xconfurl+' /etc/include.properties  && echo 1 || echo 0'
-                output = executeCommand(deviceConfigFile, deviceIP, command)
+                output = executeCommand(execInfo, command)
                 output = str(output).split("\n")
                 if int(output[1]) == 1:
                     print "Successfully updated file with xconf url"
@@ -3363,12 +3367,12 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
         elif tag == "check_swupdate_file":
             xconfurl = arg[0]
             command = '[ -f "/opt/swupdate.conf" ] && echo 1 || echo 0'
-            output = executeCommand(deviceConfigFile, deviceIP, command)
+            output = executeCommand(execInfo, command)
             output = str(output).split("\n")
             if int(output[1]) == 1:
                 print "swupdate.conf file exist,checking whether xconf url is updated"
                 command = 'grep -q '+xconfurl+' /opt/swupdate.conf  && echo 1 || echo 0'
-                output = executeCommand(deviceConfigFile, deviceIP, command)
+                output = executeCommand(execInfo, command)
                 output = str(output).split("\n")
                 if int(output[1]) == 1:
                     print "File is updated with xconf url"
@@ -3376,7 +3380,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
                 else:
                     print "File is not updated with xconf url,Updating file with xconf url"
                     command = 'echo '+xconfurl+' >> /opt/swupdate.conf;grep -q '+xconfurl+' /opt/swupdate.conf  && echo 1 || echo 0'
-                    output = executeCommand(deviceConfigFile, deviceIP, command)
+                    output = executeCommand(execInfo, command)
                     output = str(output).split("\n")
                     if int(output[1]) == 1:
                         print "Successfully updated file with xconf url"
@@ -3387,12 +3391,12 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             else:
                 print "swupdate.conf file does not exist. Creating the file...."
                 command = 'touch /opt/swupdate.conf;[ -f "/opt/swupdate.conf" ] && echo 1 || echo 0'
-                output = executeCommand(deviceConfigFile, deviceIP, command)
+                output = executeCommand(execInfo, command)
                 output = str(output).split("\n")
                 if int(output[1]) == 1:
                     print "File created"
                     command = 'echo '+xconfurl+' >> /opt/swupdate.conf;grep -q '+xconfurl+' /opt/swupdate.conf  && echo 1 || echo 0'
-                    output = executeCommand(deviceConfigFile, deviceIP, command)
+                    output = executeCommand(execInfo, command)
                     output = str(output).split("\n")
                     if int(output[1]) == 1:
                         print "Successfully updated file with xconf url"
@@ -3407,7 +3411,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
 
         elif tag == "Check_disk_partition":
             command = 'ls /dev/mmcblk0*'
-            output = executeCommand(deviceConfigFile, deviceIP, command)
+            output = executeCommand(execInfo, command)
             output = output.splitlines()
             partition_list = output[1].split()
             partition_count = len(partition_list)-1
@@ -3438,13 +3442,13 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
 
         elif tag == "Create_File":
             command = "mkdir "+arguments[0]+"/Controller;[ -d "+arguments[0]+"/Controller ] && echo 1 || echo 0"
-            status = executeCommand(deviceConfigFile, deviceIP, command)
+            status = executeCommand(execInfo, command)
             status = str(status).split("\n")
             result = 1
             if int(status[1]) == result:
                 info["RESULT"] = "Controller directory created"
                 command = "touch "+arguments[0]+"/Controller/TDK_TEST_FILE.txt;[ -f "+arguments[0]+"/Controller/TDK_TEST_FILE.txt ] && echo 1 || echo 0"
-                status = executeCommand(deviceConfigFile, deviceIP, command)
+                status = executeCommand(execInfo, command)
                 status = str(status).split("\n")
                 result = 1
                 if int(status[1]) == result:
@@ -3462,7 +3466,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
             processesRunning = []
             processesNotRunning = []
             command = "ps -ef | awk '{print $8}' ; ps -eo comm"
-            output = executeCommand(deviceConfigFile, deviceIP, command)
+            output = executeCommand(execInfo, command)
             for value in expectedValues:
                 if ":" in str(value):
                     value = value.split(":")[1]
@@ -3492,7 +3496,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
 
         elif tag == "Check_If_File_Exists":
             command = "[ -f "+arguments[0]+"/Controller/TDK_TEST_FILE.txt ] && echo 1 || echo 0"
-            status = executeCommand(deviceConfigFile, deviceIP, command)
+            status = executeCommand(execInfo, command)
             status = str(status).split("\n")
             result = 0
             if int(status[1]) == result:
@@ -3504,14 +3508,14 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
 
         elif tag == "Delete_Test_File":
             command = "[ -d "+arguments[0]+"/Controller ] && echo 1 || echo 0"
-            status = executeCommand(deviceConfigFile, deviceIP, command)
+            status = executeCommand(execInfo, command)
             status = str(status).split("\n")
             if int(status[1]) == 0:
                 info["RESULT"] = "File does not exist"
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 command = "rm -rf "+arguments[0]+"/Controller ; [ -d "+arguments[0]+"/Controller ] && echo 1 || echo 0"
-                status = executeCommand(deviceConfigFile, deviceIP, command)
+                status = executeCommand(execInfo, command)
                 status = str(status).split("\n")
                 if int(status[1]) == 0:
                     info["Message"] = "Test file deleted"
@@ -3537,7 +3541,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
 
         elif tag == "Check_Environment_Variable_In_Service_File":
             command = 'grep -q '+str(expectedValues[0])+' /lib/systemd/system/wpeframework.service && echo 1 || echo 0'
-            output = executeCommand(deviceConfigFile, deviceIP, command)
+            output = executeCommand(execInfo, command)
             output = str(output).split("\n")
             if int(output[1]) == 1:
                 message = "\"RDKSHELL_SPLASH_IMAGE_JPEG\" Environment variable is present in the  wpeframework.service file"
@@ -3550,11 +3554,11 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
 
         elif tag == "executeRebootCmd":
             command = "reboot"
-            info["deatils"] = executeCommand(deviceConfigFile, deviceIP, command)
+            info["deatils"] = executeCommand(execInfo, command)
             info["Test_Step_Status"] =  "SUCCESS"
         elif tag == "getImageVersion":
             command = "cat /version.txt | grep imagename | cut -d ':' -f2"
-            details = executeCommand(deviceConfigFile, deviceIP, command)
+            details = executeCommand(execInfo, command)
             info["image"] = str(details).split("\n")[1]
             if len(arg) and arg[0] == "get":
                 if str(info["image"]):
@@ -3568,7 +3572,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,paths):
                     info["Test_Step_Status"] = "FAILURE"
         elif tag == "toggleMemoryBank":
             command = "/bin/sh /usr/bin/swap_bank.sh"
-            info["deatils"] = executeCommand(deviceConfigFile, deviceIP, command)
+            info["deatils"] = executeCommand(execInfo, command)
             info["Test_Step_Status"] =  "SUCCESS"
 
         else:
@@ -3676,9 +3680,15 @@ def executeBluetoothCtl(deviceConfigFile,commands):
 
     return status
 
-def executeCommand(deviceConfigFile, deviceIP, command, device="test-device"):
+def executeCommand(execInfo, command, device="test-device"):
+    deviceConfigFile = execInfo[1]
+    deviceIP         = execInfo[2]
+    deviceMAC        = execInfo[3]
+    execMethod       = execInfo[4]
+
     configParser = ConfigParser.ConfigParser()
     configParser.read(r'%s' % deviceConfigFile)
+    sshMethod = configParser.get('device.config', 'SSH_METHOD')
     if device == "test-device":
         username = configParser.get('device.config', 'SSH_USERNAME')
         password = configParser.get('device.config', 'SSH_PASSWORD')
@@ -3691,27 +3701,58 @@ def executeCommand(deviceConfigFile, deviceIP, command, device="test-device"):
         password = ''
 
     output = ""
-    try:
-        session = pxssh.pxssh(options={
+    if sshMethod.upper() == "DIRECTSSH":
+        try:
+            session = pxssh.pxssh(options={
                                 "StrictHostKeyChecking": "no",
                                 "UserKnownHostsFile": "/dev/null"})
-        print "\nCreating ssh session"
-        session.login(deviceIP,username,password,sync_multiplier=5)
-        sleep(2)
-        print "Executing command: ",command
-        session.sendline(command)
-        if command == "reboot":
-            sleep(2);
-            output = "reboot"
-        else:
-            session.prompt()
-            output = session.before
-            print"Closing session"
-            session.logout()
-    except pxssh.ExceptionPxssh as e:
-        print "Login to device failed"
-        print e
+            print "\nCreating ssh session"
+            session.login(deviceIP,username,password,sync_multiplier=5)
+            sleep(2)
+            print "Executing command: ",command
+            session.sendline(command)
+            if command == "reboot":
+                sleep(2);
+                output = "reboot"
+            else:
+                session.prompt()
+                output = session.before
+                print"Closing session"
+                session.logout()
+        except pxssh.ExceptionPxssh as e:
+            print "Login to device failed"
+            print e
+    elif sshMethod.upper() == "REST":
+        auth_token= ""
+        rest_url = ""
+        try:
+            print "\nFetching config file values for REST api call"
+            rest_url = CertificationSuiteCommonVariables.rest_url
+            auth_method = CertificationSuiteCommonVariables.auth_method
+            if auth_method == "TOKEN":
+                auth_token = CertificationSuiteCommonVariables.auth_token
+                if auth_token =="" or rest_url == "":
+                    print "\n[ERROR]: Missing REST API configurations"
+                else:
+                    headers = {'Content-Type': 'application/json', 'authToken': auth_token,}
+                    url = str(rest_url.replace("mac",deviceMAC))
+                    command = command.replace(" grep","grep").replace("|grep",'\|grep').replace("\"","\\\"")
+                    if "awk" in command:
+                        command = command.replace("$","\$")
+                    command = "\"" + command + "\"";
+                    print "Executing command: ",command
+                    response = requests.post(url, headers=headers, data=command, timeout=20)
+                    #print response.content
+                    output = response.content
+                    #output = command + '\n' + output;
+        except Exception as e:
+            print "Login to device failed"
+            print e
+    else:
+        print "\n[ERROR]: Invalid SSH Method"
+
     return output
+
 
 def executeCommandInTM(command):
     output = ""
