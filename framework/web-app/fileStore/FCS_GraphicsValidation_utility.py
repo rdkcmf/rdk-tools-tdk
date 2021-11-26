@@ -25,10 +25,6 @@ import os
 #Define the search term:
 pattern = "VALIDATION"
 
-#TestApps predefined
-#Test Apps for essos: Essos_TDKTestApp and westeros : Westeros_TDKTestApp
-TESTAPP = {"essos":"Essos_TDKTestApp" ,"westeros":"sh RunWesterosTest.sh"}
-
 #Create an empty list:
 tests = []
 expectedResult="SUCCESS";
@@ -58,7 +54,7 @@ def PrintTitle(string=" ",title=0):
 
 #Lists the number of failures observed as part of the execution
 #Parses the output from the Test app and returns the total number of failures
-def getNumberOfFailures(fileName,checkPattern):
+def getNumberOfFailures(fileName,checkPattern=""):
     failed = 0;
     if os.stat(fileName).st_size == 0:
         print "Execution failed";
@@ -66,7 +62,7 @@ def getNumberOfFailures(fileName,checkPattern):
     for line in open(fileName):
         if line !='':
             if checkPattern:
-                word = re.findall(pattern, line)
+                word = re.findall(checkPattern, line)
             else:
                 word = True;
             if word:
@@ -88,13 +84,19 @@ def getNumberOfFailures(fileName,checkPattern):
 #VALIDATION SUCCESS : EssContextInit( ctx )
 ###############################################################################################
 ###############################################################################################
-def Summary(fileName):
+def Summary(fileName,PATTERN=""):
+    gotInfo = False;
+    if PATTERN:
+        pattern = PATTERN;
+    else:
+        pattern = "ERROR"
     for line in open(fileName):
         if line !='':
             word = re.findall(pattern, line)
             if word:
                 print line.strip('\n')
-
+                gotInfo = True;
+    return gotInfo
 
 #Deletes the logFile present in DUT
 def deleteLogFile(obj,GraphicsValidation_log,GraphicsValidationExecutionStatus):
@@ -123,7 +125,7 @@ def RunTest(obj,Test,logFile,options=""):
     print "\nStarting Test Execution\n"
     tdkTestObj = obj.createTestStep('ExecuteCommand');
     #Test to be executed
-    cmd = TESTAPP[Test] + " " + options;
+    cmd = "sh RunGraphicsTDKTest.sh " + Test + " " + options;
     #log the app output in a logFile
     cmd =  cmd + " > " + logFile;
     tdkTestObj.addParameter("command", cmd);

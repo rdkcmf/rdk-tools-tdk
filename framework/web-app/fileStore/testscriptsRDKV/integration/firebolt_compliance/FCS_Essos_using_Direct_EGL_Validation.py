@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>21</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>FCS_Essos_Validation</name>
+  <name>FCS_Essos_using_Direct_EGL_Validation</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -70,13 +70,14 @@
     <input_parameters>None</input_parameters>
     <automation_approch>1.Load the systemutil module.
 2.Execute the "Essos_TDKTestApp" command along with "-d" (debug option) and "-t=7" (timeout option for 7 seconds) in DUT. During the execution, the DUT will execute the avaiable in "Essos_TDKTestApp" test app.
+3.Essos_TDKTestApp is executed as Direct EGL application in this test scenario.
 3.Verify the output from the execute command and check if the strings no "VALIDATION ERROR"  statements are present.
 5.Based on the ExecuteCommand() return value and the output returned from the EssosValidation application, TM return SUCCESS/FAILURE status.</automation_approch>
     <expected_output>Checkpoint 1. Verify the API call is success
 Checkpoint 2. Verify that the output returned from EssosValidation "VALIDATION ERROR" statements.</expected_output>
     <priority>High</priority>
     <test_stub_interface>libsystemutilstub.so.0</test_stub_interface>
-    <test_script>FCS_Essos_Validation</test_script>
+    <test_script>FCS_Essos_using_Direct_EGL_Validation</test_script>
     <skipped>No</skipped>
     <release_version>M93</release_version>
     <remarks></remarks>
@@ -86,6 +87,7 @@ Checkpoint 2. Verify that the output returned from EssosValidation "VALIDATION E
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import time
 import FCS_GraphicsValidation_utility
 
 #Test component to be tested
@@ -95,7 +97,7 @@ obj = tdklib.TDKScriptingLibrary("systemutil","2.0");
 #This will be replaced with correspoing Box Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'FCS_Essos_Validation');
+obj.configureTestCase(ip,port,'FCS_Essos_using_Direct_EGL_Validation');
 
 #Get the result of connection with test component and STB
 sysutilLoadStatus =obj.getLoadModuleResult();
@@ -106,16 +108,15 @@ if "SUCCESS" in sysutilLoadStatus.upper():
     logFile,EssosValidation_log = FCS_GraphicsValidation_utility.getLogFile(obj);
 
     #Configure the test to be executed
-    Test = "essos"
+    Test = "Essos"
 
-    #Run the Essos_TDKTestApp with options 
-    #Add -d option for debug
-    options = " -d"
-    #Add -t option for timeout for 7 seconds
-    options = options + " -t=7"
+    #Add test app execution time as option -- 7 seconds
+    options = "7"
+
     details = FCS_GraphicsValidation_utility.RunTest(obj,Test,logFile,options);
     print "[TEST EXECUTION DETAILS] : %s" %details;
-
+    #Wait for Test to get completed
+    time.sleep(10)
     #Transfer Essos_TDKTestApp log file from STB
     try:
         tdkTestObj = obj.createTestStep('FireboltCompliance_DoNothing');
@@ -123,21 +124,21 @@ if "SUCCESS" in sysutilLoadStatus.upper():
     except:
         print "Transfer of logs unsuccessfull";
         obj.unloadModule("systemutil");
-        exit() 
+        exit()
 
     #Parsing the output of Essos_TDKTestApp
     try:
         FCS_GraphicsValidation_utility.PrintTitle("SUMMARY OF TEST EXECUTION")
-        FCS_GraphicsValidation_utility.Summary(filepath);
+        FCS_GraphicsValidation_utility.Summary(filepath,"VALIDATION");
         data = open(filepath,'r');
         message = data.read()
         print "\n**************Essos_TDKTestApp Execution Log - Begin*************\n\n"
         print(message)
         data.close()
         print "\n**************Essos_TDKTestApp Execution - End*************\n\n"
-
-        #Reading the Essos_TDKTestApp Execution log file to check for number of failures 
-        Failures = FCS_GraphicsValidation_utility.getNumberOfFailures(filepath,True)
+        #Reading the Essos_TDKTestApp Execution log file to check for number of failures
+        #Get Number of failures by filtering "VALIDATION" error statements
+        Failures = FCS_GraphicsValidation_utility.getNumberOfFailures(filepath,"VALIDATION")
         if Failures:
             EssosValidationExecutionStatus = "FAILURE"
             print "Observed failures during execution"
