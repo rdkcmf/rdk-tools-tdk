@@ -691,6 +691,10 @@ class ScriptexecutionService {
 	 */
 	def String executeScripts(String executionName, String execDeviceId, def scriptInstance,
 			Device deviceInstance, final String url, final String filePath, final String realPath, final String isMultiple, final String isBenchMark,final String  isSystemDiagnostics, final String isLogReqd, final String rerun, final String category , final String isAlertEnabled) {
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		String htmlData = ""
 		Date startTime = new Date()
 		String scriptData = convertScriptFromHTMLToPython(scriptInstance.scriptContent)
@@ -766,7 +770,7 @@ class ScriptexecutionService {
 			executionId  + COMMA_SEPERATOR + execDeviceId + COMMA_SEPERATOR + executionResultId  + REPLACE_BY_TOKEN + deviceInstance?.logTransferPort + COMMA_SEPERATOR + deviceInstance?.statusPort + COMMA_SEPERATOR +
 			sFile?.id + COMMA_SEPERATOR + deviceInstance?.id + COMMA_SEPERATOR+ SINGLE_QUOTES + isBenchMark + SINGLE_QUOTES + COMMA_SEPERATOR + SINGLE_QUOTES + isSystemDiagnostics + SINGLE_QUOTES + COMMA_SEPERATOR +
 			SINGLE_QUOTES + isMultiple + SINGLE_QUOTES + COMMA_SEPERATOR )//+ gatewayIp + COMMA_SEPERATOR)*/
-		String logFilePath = realPath?.toString()+"/logs/logs/"
+		String logFilePath = realPathFromFile?.toString()+"/logs/logs/"
 		scriptData = scriptData.replace( REPLACE_TOKEN, METHOD_TOKEN + LEFT_PARANTHESIS + SINGLE_QUOTES + url + SINGLE_QUOTES + COMMA_SEPERATOR + SINGLE_QUOTES + realPath + SINGLE_QUOTES + COMMA_SEPERATOR + SINGLE_QUOTES +logFilePath+SINGLE_QUOTES + COMMA_SEPERATOR +
 			executionId  + COMMA_SEPERATOR +  execDeviceId + COMMA_SEPERATOR + executionResultId  + REPLACE_BY_TOKEN + deviceInstance?.agentMonitorPort + COMMA_SEPERATOR + deviceInstance?.statusPort + COMMA_SEPERATOR +
 			sFile?.id + COMMA_SEPERATOR + deviceInstance?.id + COMMA_SEPERATOR + SINGLE_QUOTES + isBenchMark + SINGLE_QUOTES + COMMA_SEPERATOR + SINGLE_QUOTES + isSystemDiagnostics + SINGLE_QUOTES + COMMA_SEPERATOR +
@@ -811,8 +815,8 @@ class ScriptexecutionService {
 			//new File("${realPath}//logs//performance//${executionId}//${executionDeviceInstance?.id}//${executionResultId}").mkdirs()
 			//performanceFilePath = "${realPath}//logs//performance//${executionId}//${executionDeviceInstance?.id}//${executionResultId}//"
 			performanceFileName = "${executionId}_${executionDeviceInstance?.id}_${executionResultId}"
-			performanceFilePath = "${realPath}//logs//performance//${executionId}//${executionDeviceInstance?.id}//${executionResultId}//"
-			diagnosticsFilePath = "${realPath}//logs//stblogs//${executionId}//${executionDeviceInstance?.id}//${executionResultId}//"
+			performanceFilePath = "${realPathFromFile}//logs//performance//${executionId}//${executionDeviceInstance?.id}//${executionResultId}//"
+			diagnosticsFilePath = "${realPathFromFile}//logs//stblogs//${executionId}//${executionDeviceInstance?.id}//${executionResultId}//"
 		}
 		def tmUrl = executionService.updateTMUrl(url,deviceInstance)
 		def urlFromConfigFile = executionService.getTMUrlFromConfigFile()
@@ -836,7 +840,7 @@ class ScriptexecutionService {
 			]
 			ScriptExecutor scriptExecutor = new ScriptExecutor(executionName)
 			outData += scriptExecutor.executeScript(cmd,1)
-			executescriptService.copyPerformanceLogIntoDir(realPath, performanceFilePath,executionId,executionDeviceInstance?.id,executionResultId )
+			executescriptService.copyPerformanceLogIntoDir(realPathFromFile, performanceFilePath,executionId,executionDeviceInstance?.id,executionResultId )
 		}
 		if(isSystemDiagnostics.equals(TRUE)){
 			File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callPerformanceTest.py").file
@@ -854,23 +858,23 @@ class ScriptexecutionService {
 			]
 			ScriptExecutor scriptExecutor = new ScriptExecutor(executionName)
 			outData += scriptExecutor.executeScript(cmd,10)
-			executescriptService.copyPerformanceLogIntoDir(realPath, performanceFilePath ,executionId,executionDeviceInstance?.id,executionResultId)
+			executescriptService.copyPerformanceLogIntoDir(realPathFromFile, performanceFilePath ,executionId,executionDeviceInstance?.id,executionResultId)
 			
 			executescriptService.initiateDiagnosticsTest(deviceInstance, performanceFileName, tmUrl,executionName)
-			executescriptService.copyLogFileIntoDir(realPath, diagnosticsFilePath, executionId,executionDeviceInstance?.id, executionResultId,DEVICE_DIAGNOSTICS_LOG)
+			executescriptService.copyLogFileIntoDir(realPathFromFile, diagnosticsFilePath, executionId,executionDeviceInstance?.id, executionResultId,DEVICE_DIAGNOSTICS_LOG)
 		}
 		if(isLogReqd && isLogReqd?.toString().equalsIgnoreCase(TRUE) && deviceInstance?.isThunderEnabled != 1){
-			executescriptService.transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId,realPath,url)
+			executescriptService.transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId,realPathFromFile,url)
 		}else if (isLogReqd && isLogReqd?.toString().equalsIgnoreCase(TRUE) && deviceInstance?.isThunderEnabled == 1){
-			executescriptService.transferSTBLogRdkService(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId,realPath,url)
+			executescriptService.transferSTBLogRdkService(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId,realPathFromFile,url)
 		}
 		
 		//def logTransferFilePath = "${realPath}/logs//consolelog//${executionId}//${execDeviceId}//${executionResultId}//"
 		//new File("${realPath}/logs//consolelog//${executionId}//${execDeviceId}//${executionResultId}").mkdirs()
 		def logTransferFileName1 = "${executionId}_${execDeviceId}_${executionResultId}_AgentConsoleLog.txt"
-		def logTransferFilePath = "${realPath}/logs//consolelog//${executionId}//${execDeviceId}//${executionResultId}//"
+		def logTransferFilePath = "${realPathFromFile}/logs//consolelog//${executionId}//${execDeviceId}//${executionResultId}//"
 		if(deviceInstance?.isThunderEnabled != 1){
-		    executescriptService.logTransfer(deviceInstance,logTransferFilePath,logTransferFileName1, realPath,executionId,execDeviceId,executionResultId,url)
+		    executescriptService.logTransfer(deviceInstance,logTransferFilePath,logTransferFileName1, realPathFromFile,executionId,execDeviceId,executionResultId,url)
 		}
 		outData?.eachLine { line ->
 		    htmlData += (line + HTML_BR )
@@ -878,7 +882,7 @@ class ScriptexecutionService {
 		
 		file.delete()			
 		//TFTP  New Changes 
-		def logPath = "${realPath}/logs//${executionId}//${execDeviceId}//${executionResultId}//"
+		def logPath = "${realPathFromFile}/logs//${executionId}//${execDeviceId}//${executionResultId}//"
 		executescriptService.copyLogsIntoDir(realPath,logPath, executionId,execDeviceId,executionResultId)
 
 		List alertList = []
@@ -912,7 +916,7 @@ class ScriptexecutionService {
 				e.printStackTrace()
 			}
 		}
-		def alertTransferFilePath = "${realPath}//logs//${executionId}//${executionDeviceInstance?.id}//${executionResultId}"
+		def alertTransferFilePath = "${realPathFromFile}//logs//${executionId}//${executionDeviceInstance?.id}//${executionResultId}"
 		executescriptService.saveAlertInfoInLogFile(executionResultId,executionId,alertTransferFilePath,startTime,toDate,realPath)
 		
 		String outputData = htmlData
@@ -967,12 +971,12 @@ class ScriptexecutionService {
 				htmlData = htmlData.replaceAll("SCRIPTEND#!@~","")
 			}
 			if(deviceInstance?.isThunderEnabled != 1){
-			    executescriptService.logTransfer(deviceInstance,logTransferFilePath,logTransferFileName,realPath, executionId,execDeviceId, executionResultId,url)
+			    executescriptService.logTransfer(deviceInstance,logTransferFilePath,logTransferFileName,realPathFromFile, executionId,execDeviceId, executionResultId,url)
 			}
 			if(isLogReqd && deviceInstance?.isThunderEnabled != 1){
-				executescriptService.transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId, realPath,url)
+				executescriptService.transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId, realPathFromFile,url)
 			}else if(isLogReqd && deviceInstance?.isThunderEnabled == 1){
-				executescriptService.transferSTBLogRdkService(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId, realPath,url)
+				executescriptService.transferSTBLogRdkService(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+execDeviceId,""+executionResultId, realPathFromFile,url)
 			}
 			
 			executionService.updateExecutionResultsError(htmlData,executionResult?.id,executionInstance?.id,executionDeviceInstance?.id,timeDiff.toString(),singleScriptExecTime)
@@ -1270,7 +1274,10 @@ class ScriptexecutionService {
 	 * @return
 	 */
 	def executeVersionTransferScript(final String realPath, final String filePath, final String executionName, final String stbIp, final String logTransferPort){
-		
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		def executionInstance = Execution.findByName(executionName)
 		String fileContents = new File(filePath+DOUBLE_FWD_SLASH+VERSIONTRANSFER_FILE).text
 		
@@ -1278,7 +1285,7 @@ class ScriptexecutionService {
 		
 		fileContents = fileContents.replace(PORT, logTransferPort)
 		
-		String versionFilePath = "${realPath}//logs//version//${executionInstance?.id}_version.txt"
+		String versionFilePath = "${realPathFromFile}//logs//version//${executionInstance?.id}_version.txt"
 		fileContents = fileContents.replace(LOCALFILE, STRING_QUOTES+versionFilePath+STRING_QUOTES)
 		
 		String versionFile = TEMP_VERSIONFILE_NAME

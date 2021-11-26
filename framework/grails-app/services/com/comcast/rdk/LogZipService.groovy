@@ -105,7 +105,11 @@ class LogZipService {
 	 * Method to fetch the stb log file contents
 	 */
 	def getStbLogs(def realPath , def execId , def execDeviceId , def execResultId , def name ){
-		String filePath = "${realPath}//logs//stblogs//${execId}//${execDeviceId}//${execResultId}//${name}"
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
+		String filePath = realPathFromFile + "//logs//stblogs//${execId}//${execDeviceId}//${execResultId}//${name}"
 		String fileContents = ""
 		try {
 			File file = new File(filePath)

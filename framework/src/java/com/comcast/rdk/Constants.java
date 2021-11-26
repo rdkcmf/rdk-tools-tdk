@@ -367,6 +367,7 @@ public final class Constants
    	public static final String LOG_UPLOAD_IPV6= "log.upload.ipv6"; 
    	public static final String REST_AUTH_ENABLED = "rest.authentication.enabled";
    	public static final String TM_CONFIG_FILE= "/fileStore/tm.config";
+   	public static final String LOGS_PATH= "logs.path";
    	public static final String STORM_CONFIG_FILE= "/fileStore/storm.config";
    	public static final String STORM_DEFAULT_TIME_OUT= "2";
    	public static final String STORM_TESTS_TIME_OUT_CONFIG_FILE= "/fileStore/storm_tests_time_out.config";
@@ -375,6 +376,7 @@ public final class Constants
 	public static final String FILE_NOT_FOUND= "File not found.";
 	public static final String DEFAULT    = "Default";
 	public static final String NO_LOGS    = "No logs available.";
+	public static final String NO_LOCATION_SPECIFIED    = "No location specified";	
 	public static final String TDKB_DEVICE_CONFIG    = "tdkbDeviceConfig";
 	public static final String PY_DEVICE_CONFIG  	 = "PythonE2E";
 	public static final String TCL_DEVICE_CONFIG     = "TCLE2E";

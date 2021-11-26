@@ -132,7 +132,11 @@ class ExecutionService {
     }
 	
 	def getAgentConsoleLogData(final String realPath, final String executionId, final String executionDeviceId, final String execResId){
-		def summaryFilePath = "${realPath}//logs//consolelog//${executionId}//${executionDeviceId}//${execResId}"
+		String realPathFromFile = getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
+		def summaryFilePath = "${realPathFromFile}//logs//consolelog//${executionId}//${executionDeviceId}//${execResId}"
 		String fileContents = ""
 		try{
 			File directory = new File(summaryFilePath)
@@ -165,8 +169,12 @@ class ExecutionService {
 	
 	
 	def getLogFileNames(final String realPath, final String executionId, final String executionDeviceId, final String executionResId){
+		String realPathFromFile = getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		def mapVals = [:]
-		def summaryFilePath = "${realPath}//logs//${executionId}//${executionDeviceId}//${executionResId}"//_TestSummary"
+		def summaryFilePath = "${realPathFromFile}//logs//${executionId}//${executionDeviceId}//${executionResId}"//_TestSummary"
 		try{
 			File directory = new File(summaryFilePath);
 			List<File> foundFiles = new ArrayList<File>()
@@ -176,7 +184,7 @@ class ExecutionService {
 				if (it.isFile()) {
 					String fileName = it.getName()
 					if(fileName.startsWith( "${executionId}_TestSummary" )){
-						foundFiles << new File("${realPath}//logs//${executionId}//${executionDeviceId}//${executionResId}//${fileName}")
+						foundFiles << new File("${realPathFromFile}//logs//${executionId}//${executionDeviceId}//${executionResId}//${fileName}")
 					}
 				}
 			}
@@ -205,7 +213,7 @@ class ExecutionService {
 			   }
 			}
 			else{
-			  String filePath = "${realPath}//logs//${executionId}//${executionDeviceId}//${executionResId}"
+			  String filePath = "${realPathFromFile}//logs//${executionId}//${executionDeviceId}//${executionResId}"
 				def dir = new File(filePath)
 				dir.eachFile {
 					if (it.isFile()) {
@@ -227,13 +235,13 @@ class ExecutionService {
 		try{
 			
 			List<File> foundFiles = new ArrayList<File>()
-			def summaryFilePath1 = "${realPath}//logs//stblogs//${executionId}//${executionDeviceId}//${executionResId}"
+			def summaryFilePath1 = "${realPathFromFile}//logs//stblogs//${executionId}//${executionDeviceId}//${executionResId}"
 			File directory = new File(summaryFilePath1);
 			if(directory?.exists()){
 			directory.eachFile {
 				if (it.isFile()) {
 					String fileName = it.getName()
-						foundFiles << new File("${realPath}//logs//stblogs//${executionId}//${executionDeviceId}//${executionResId}//${fileName}")
+						foundFiles << new File("${realPathFromFile}//logs//stblogs//${executionId}//${executionDeviceId}//${executionResId}//${fileName}")
 				}
 			}
 			}
@@ -250,7 +258,7 @@ class ExecutionService {
 				}
 			}
 			else{
-			  String filePath = "${realPath}//logs//${executionId}//${executionDeviceId}//${executionResId}"
+			  String filePath = "${realPathFromFile}//logs//${executionId}//${executionDeviceId}//${executionResId}"
 				def dir = new File(filePath)
 				dir.eachFile {
 					if (it.isFile()) {
@@ -274,9 +282,13 @@ class ExecutionService {
 	
 	
 	def getCrashLogFileNames(final String realPath, final String executionId, final String executionDeviceId, final String executionResId){
+		String realPathFromFile = getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		def mapVals = [:]
 		try{
-			  String filePath = "${realPath}//logs//crashlogs//${executionId}//${executionDeviceId}//${executionResId}"
+			  String filePath = "${realPathFromFile}//logs//crashlogs//${executionId}//${executionDeviceId}//${executionResId}"
 				def dir = new File(filePath)
 				dir.eachFile {
 					if (it.isFile()) {
@@ -305,8 +317,12 @@ class ExecutionService {
      * @return
      */
     def getLogFileNames(final String realPath, final String executionId){
+		String realPathFromFile = getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
         def mapVals = [:]
-        def summaryFilePath = "${realPath}//logs//${executionId}"//_TestSummary"
+        def summaryFilePath = "${realPathFromFile}//logs//${executionId}"//_TestSummary"
         try{
             File directory = new File(summaryFilePath);
             List<File> foundFiles = new ArrayList<File>()
@@ -315,7 +331,7 @@ class ExecutionService {
                 if (it.isFile()) {
                     String fileName = it.getName()
                     if(fileName.startsWith( "${executionId}_TestSummary" )){
-                        foundFiles << new File("${realPath}//logs//${executionId}//${fileName}")
+                        foundFiles << new File("${realPathFromFile}//logs//${executionId}//${fileName}")
                     }
                 }
             }
@@ -344,7 +360,7 @@ class ExecutionService {
                }
             }
             else{
-              String filePath = "${realPath}//logs//${executionId}"
+              String filePath = "${realPathFromFile}//logs//${executionId}"
                 def dir = new File(filePath)
                 dir.eachFile {
                     if (it.isFile()) {
@@ -625,6 +641,10 @@ class ExecutionService {
 	 * @return
 	 */
     def executeVersionTransferScript(final String realPath, final String filePath, final String executionName, def exectionDeviceId, final String stbName, final String logTransferPort,def url){
+		String realPathFromFile = getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
         try{
 	        def executionInstance = Execution.findByName(executionName)
 	      /*  String fileContents = new File(filePath+DOUBLE_FWD_SLASH+VERSIONTRANSFER_FILE).text
@@ -651,7 +671,7 @@ class ExecutionService {
 	        versnFile.delete()*/
 			Device device = Device.findByStbName(stbName)
 			String versionFileName = "${executionInstance?.id}_${exectionDeviceId?.toString()}_version.txt"
-			def versionFilePath = "${realPath}//logs//version//${executionInstance?.id}//${exectionDeviceId?.toString()}"
+			def versionFilePath = "${realPathFromFile}//logs//version//${executionInstance?.id}//${exectionDeviceId?.toString()}"
 			String scriptName = getFileTransferScriptName(device)
 			File layoutFolder = grailsApplication.parentContext.getResource(scriptName).file
 			def absolutePath = layoutFolder.absolutePath
@@ -677,7 +697,7 @@ class ExecutionService {
 			String [] cmd = cmdList.toArray()
 			ScriptExecutor scriptExecutor = new ScriptExecutor()
 			def outputData = scriptExecutor.executeScript(cmd,1)
-			copyVersionLogsIntoDir(realPath, versionFilePath, executionInstance?.id , exectionDeviceId?.toString())
+			copyVersionLogsIntoDir(realPathFromFile, versionFilePath, executionInstance?.id , exectionDeviceId?.toString())
 			
 			def devName
 			ExecutionDevice.withTransaction {
@@ -688,7 +708,7 @@ class ExecutionService {
 				dev = Device.findByStbName(devName)
 			}
 			if(dev?.boxType?.type?.equalsIgnoreCase(BOXTYPE_CLIENT)){
-				getDeviceDetails(dev,device.agentMonitorPort,realPath,url)
+				getDeviceDetails(dev,device.agentMonitorPort,realPathFromFile,url)
 			}
 			
         }
@@ -705,8 +725,12 @@ class ExecutionService {
 	 * @return
 	 */
 	def copyVersionLogsIntoDir(def realPath, def logTransferFilePath,  def executionId , def executionDeviceId){
+		String realPathFromFile = getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		try {
-			String logsPath = realPath.toString()+"/logs/logs/"
+			String logsPath = realPathFromFile.toString()+"/logs/logs/"
 			File logDir  = new File(logsPath)
 			if(logDir.isDirectory()){
 				logDir.eachFile{ file->
@@ -738,8 +762,12 @@ class ExecutionService {
 	 * @return
 	 */
 	def copyDeviceLogIntoDir(def realPath, def logTransferFilePath){
+		String realPathFromFile = getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		try {
-			String logsPath = realPath.toString()+"/logs/logs/"
+			String logsPath = realPathFromFile.toString()+"/logs/logs/"
 			File logDir  = new File(logsPath)
 			if(logDir.isDirectory()){
 				logDir.eachFile{ file->
@@ -781,14 +809,17 @@ class ExecutionService {
 	
 
 	def getDeviceDetails(Device device, def logTransferPort, def realPath,def url){
-		
+		String realPathFromFile = getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		try {
 			//new File("${realPath}//logs//devicelogs//${device?.stbName}").mkdirs()
 
 		String scriptName = getFileTransferScriptName(device)
 		File layoutFolder = grailsApplication.parentContext.getResource(scriptName).file
 		def absolutePath = layoutFolder.absolutePath
-		def filePath = "${realPath}//logs//devicelogs//${device?.stbName}//"
+		def filePath = "${realPathFromFile}//logs//devicelogs//${device?.stbName}//"
 		
 		def cmdList = [
 			"python",
@@ -812,7 +843,7 @@ class ExecutionService {
 		
 	    ScriptExecutor scriptExecutor = new ScriptExecutor()
 	    def outputData = scriptExecutor.executeScript(cmd,1)
-		copyDeviceLogIntoDir(realPath,filePath)
+		copyDeviceLogIntoDir(realPathFromFile,filePath)
 		
 		parseAndSaveDeviceDetails(device, filePath)		
 		} catch (Exception e) {
@@ -1789,6 +1820,10 @@ class ExecutionService {
 	 }
 	 
 	public void setPerformance(final Execution executionInstance, final String filePath){
+		String realPathFromFile = getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = filePath
+		}
 		try{
 			Execution execution = executionInstance
 			def executionDevice = ExecutionDevice.findAllByExecution(executionInstance)
@@ -1801,9 +1836,9 @@ class ExecutionService {
 			executionDevice.each{ executiondevice ->
 				executionResult = ExecutionResult.findAllByExecutionDevice(executiondevice)
 				executionResult.each { executionresult ->
-					benchmarkPerformanceFile = new File(filePath+"//logs//performance//${executionInstance?.id}//${executiondevice?.id}//${executionresult?.id}//benchmark.log")
-					cpuPerformanceFile = new File(filePath+"//logs//performance//${executionInstance?.id}//${executiondevice?.id}//${executionresult?.id}//cpu.log")
-					memoryPerfomanceFile = new File(filePath+"//logs//performance//${executionInstance?.id}//${executiondevice?.id}//${executionresult?.id}//memused.log")
+					benchmarkPerformanceFile = new File(realPathFromFile+"//logs//performance//${executionInstance?.id}//${executiondevice?.id}//${executionresult?.id}//benchmark.log")
+					cpuPerformanceFile = new File(realPathFromFile+"//logs//performance//${executionInstance?.id}//${executiondevice?.id}//${executionresult?.id}//cpu.log")
+					memoryPerfomanceFile = new File(realPathFromFile+"//logs//performance//${executionInstance?.id}//${executiondevice?.id}//${executionresult?.id}//memused.log")
 					if(memoryPerfomanceFile.exists() || cpuPerformanceFile.exists() || benchmarkPerformanceFile.exists()){
 						execution.isPerformanceDone = true
 						execution.save(flush:true)
@@ -1870,11 +1905,11 @@ class ExecutionService {
 				
 
 			}
-			new File(filePath+"//logs//performance//${executionInstance?.id}")?.deleteDir()
+			new File(realPathFromFile+"//logs//performance//${executionInstance?.id}")?.deleteDir()
 		}catch(Exception e){
 				e.printStackTrace()
 			try{
-				new File(filePath+"//logs//performance//${executionInstance?.id}")?.deleteDir()
+				new File(realPathFromFile+"//logs//performance//${executionInstance?.id}")?.deleteDir()
 			}catch(Exception ex){
 			}
 
@@ -2430,13 +2465,17 @@ class ExecutionService {
 	 */
 	
 	def tftpServerStartUp(def realPath){
+		String realPathFromFile = getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		try{
 			def filePath = realPath?.toString()+"/fileStore/"
 			String fileName = realPath?.toString()+"/fileStore/tftp_server.py"
 			File file = new File(fileName)
 			boolean value=file.setExecutable(true)
 
-			String logFilePath = realPath+"/logs/logs/"
+			String logFilePath = realPathFromFile+"/logs/logs/"
 			File logdir = new File(logFilePath)
 
 			try {
@@ -2591,6 +2630,10 @@ class ExecutionService {
 	 * @return
 	 */
 	def fetchAlertData(Date fromDate,Date toDate,String macAddress,String realPath){
+		String realPathFromFile = getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		if(macAddress?.contains(":")){
 			macAddress = macAddress?.replace(":","")
 		}
@@ -2609,7 +2652,7 @@ class ExecutionService {
 		}
 		for (int day = 0; day < allDates.size(); day++){
 			String currentDate = format.format(allDates[day])
-			File file = new File("${realPath}/logs/grafanaAlerts/"+currentDate+"_alertData.json");
+			File file = new File(realPathFromFile + "/logs/grafanaAlerts/"+currentDate+"_alertData.json");
 			if(file?.exists()){
 				try{
 					def content = file.readLines();
@@ -2781,4 +2824,32 @@ class ExecutionService {
 		}
 		return null;
 	}	
+	
+	/**
+	* Method that returns the path to logs folder
+	* @return
+	*/
+	def String getRealPathForLogsFromTMConfig(){
+		String returnValue = Constants.NO_LOCATION_SPECIFIED
+		try{
+			String logsLocation = Constants.NO_LOCATION_SPECIFIED
+			File tmConfigFile = grailsApplication.parentContext.getResource("//fileStore//tm.config").file
+			if(tmConfigFile?.isFile()){
+				logsLocation = getConfigProperty(tmConfigFile,Constants.LOGS_PATH)
+				if(logsLocation != null){
+					File logsLocationTestDirectory = new File(logsLocation)
+					if(logsLocationTestDirectory?.isDirectory()){
+						String logsLocationLastChar = logsLocation?.charAt(logsLocation?.length()-1)
+						if(!logsLocationLastChar?.equals(Constants.URL_SEPERATOR)){
+							logsLocation = logsLocation + Constants.URL_SEPERATOR	
+						}
+						returnValue = logsLocation
+					}
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace()
+		}
+		return returnValue	
+	}
 }

@@ -251,6 +251,10 @@ class StormExecuter {
 	 * @return
 	 */
 	def static boolean writeServerConsoleLogFileData(def grailsApplication, def realPath, def executionId, def executionDeviceId, def executionResultId, String scriptname, def executionName){
+		String realPathFromFile = getRealPathForLogsFromTMConfig(realPath)
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		BufferedReader reader
 		String serverlogData = ""
 		File configFile = grailsApplication.parentContext.getResource(Constants.STORM_CONFIG_FILE).file
@@ -291,7 +295,7 @@ class StormExecuter {
 			    e.printStackTrace()
 	        }
 		}
-		String folderPath = realPath+File.separator+"logs"
+		String folderPath = realPathFromFile+File.separator+"logs"
 		String consoleLogPath = folderPath+File.separator+"consolelog"
 		File consoleLogPathDir = new File(consoleLogPath)
 		if(!consoleLogPathDir.exists()){
@@ -411,11 +415,15 @@ class StormExecuter {
 	 * @return
 	 */
 	def static boolean createThunderVersionFile(def realPath, def executionInstanceId, def executionDeviceInstanceId, def stbIP){
+		String realPathFromFile = getRealPathForLogsFromTMConfig(realPath)
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		boolean versionFileStatus = false
 		try{
 			boolean versionFilecreationSuccess = false
 			boolean versionFileTransferredStatus = false
-			String folderPath = realPath+File.separator+"logs"+File.separator+"version"
+			String folderPath = realPathFromFile+File.separator+"logs"+File.separator+"version"
 			String executionInstanceDirPath = folderPath+File.separator+executionInstanceId
 			File executionInstanceDir = new File(executionInstanceDirPath)
 			if(!executionInstanceDir.exists()){
@@ -427,7 +435,7 @@ class StormExecuter {
 							String versionFileName = executionDeviceInstanceId+"_version.txt"
 							String versionFileAbsolutePath = executionDeviceInstanceDirPath +File.separator+versionFileName
 							File versionFile = new File(versionFileAbsolutePath)
-							versionFileTransferredStatus = transferVersionTxtFile(realPath,stbIP,executionDeviceInstanceDirPath,versionFileName)
+							versionFileTransferredStatus = transferVersionTxtFile(realPathFromFile,stbIP,executionDeviceInstanceDirPath,versionFileName)
 							if(versionFileTransferredStatus == false){
 								String thunderversionDetails = retrieveThunderVersionDetails(stbIP)
 								if(versionFile.createNewFile()){
@@ -609,4 +617,36 @@ class StormExecuter {
 		}
 		return nodeRestarted
 	}
+
+	/**
+	 * Method that returns the path to logs folder
+	 * @return
+	 */
+	 def static String getRealPathForLogsFromTMConfig(String realPath){
+		 String returnValue = Constants.NO_LOCATION_SPECIFIED
+		 try{
+			 File realPathDirectory = new File(realPath)
+			 if(realPathDirectory?.isDirectory()){
+				 String logsLocation = Constants.NO_LOCATION_SPECIFIED
+				 String tmConfigFilePath = realPath+Constants.TM_CONFIG_FILE
+				 File tmConfigFile = new File(tmConfigFilePath)
+				 if(tmConfigFile?.isFile()){
+					 logsLocation = getConfigProperty(tmConfigFile,Constants.LOGS_PATH)
+					 if(logsLocation != null){
+						 File logsLocationTestDirectory = new File(logsLocation)
+						 if(logsLocationTestDirectory.isDirectory()){
+							 String logsLocationLastChar = logsLocation?.charAt(logsLocation?.length()-1)
+							 if(!logsLocationLastChar?.equals(Constants.URL_SEPERATOR)){
+								 logsLocation = logsLocation + Constants.URL_SEPERATOR
+							 }
+							 returnValue = logsLocation
+						 }
+					 }
+				 }
+			 }
+		 }catch(Exception e){
+			 e.printStackTrace()
+		 }
+		 return returnValue
+	 }
 }

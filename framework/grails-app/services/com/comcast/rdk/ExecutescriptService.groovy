@@ -29,6 +29,7 @@ import java.util.concurrent.Future
 import java.util.concurrent.Executors
 import java.util.concurrent.FutureTask;
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.apache.commons.io.FileUtils
 
 /**
  * 
@@ -97,6 +98,10 @@ class ExecutescriptService {
 	def String executeScript(final String executionName, final ExecutionDevice executionDevice, final def scriptInstance,
 			final Device deviceInstance, final String url, final String filePath, final String realPath, final String isBenchMark, final String isSystemDiagnostics,final String uniqueExecutionName,final String isMultiple, def executionResult,def isLogReqd, final def category,final String isAlertEnabled) {
 				Date startTime = new Date()
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		String htmlData = ""
 		String scriptData = executionService.convertScriptFromHTMLToPython(scriptInstance?.scriptContent)
 		String stbIp = STRING_QUOTES + deviceInstance.stbIp + STRING_QUOTES
@@ -144,7 +149,7 @@ class ExecutescriptService {
 		scriptData = scriptData?.replace( CLIENTLIST , mocaString )
 		
 		String gatewayIp = deviceInstance?.gatewayIp		
-		String logFilePath = realPath?.toString()+"/logs/logs/"
+		String logFilePath = realPathFromFile?.toString()+"/logs/logs/"
 		
 		def sFile = ScriptFile.findByScriptNameAndModuleName(scriptInstance?.name,scriptInstance?.primitiveTest?.module?.name)
 
@@ -200,7 +205,7 @@ class ExecutescriptService {
 		String singleScriptExecTime = timeDifference
 		timeDifference = timeDifference / 60;
 		
-		def logPath = "${realPath}/logs//${executionId}//${executionDevice?.id}//${executionResultId}//"
+		def logPath = "${realPathFromFile}/logs//${executionId}//${executionDevice?.id}//${executionResultId}//"
 		copyLogsIntoDir(realPath,logPath, executionId,executionDevice?.id, executionResultId)	
 		saveCpuMemoryInfo(logPath,executionId,executionResultId)
 		
@@ -244,7 +249,7 @@ class ExecutescriptService {
 				e.printStackTrace()
 			}
 		}
-		def alertTransferFilePath = "${realPath}//logs//${executionId}//${executionDevice?.id}//${executionResultId}"
+		def alertTransferFilePath = "${realPathFromFile}//logs//${executionId}//${executionDevice?.id}//${executionResultId}"
 		saveAlertInfoInLogFile(executionResultId,executionId,alertTransferFilePath,startTime,toDate,realPath)
 		try
 		{
@@ -277,14 +282,14 @@ class ExecutescriptService {
 					htmlData = htmlData.replaceAll(KEY_SCRIPTEND,"")
 				}
 				def logTransferFileName = "${executionId}_${executionDevice?.id}_${executionResultId}_AgentConsoleLog.txt"
-				def logTransferFilePath = "${realPath}/logs//consolelog//${executionId}//${executionDevice?.id}//${executionResultId}//"
+				def logTransferFilePath = "${realPathFromFile}/logs//consolelog//${executionId}//${executionDevice?.id}//${executionResultId}//"
 				if(deviceInstance?.isThunderEnabled != 1){
-					logTransfer(deviceInstance,logTransferFilePath,logTransferFileName,realPath, executionId,executionDevice?.id, executionResultId,url)
+					logTransfer(deviceInstance,logTransferFilePath,logTransferFileName,realPathFromFile, executionId,executionDevice?.id, executionResultId,url)
 				}
 				if(isLogReqd && isLogReqd?.toString().equalsIgnoreCase(TRUE) && deviceInstance?.isThunderEnabled != 1){
-					transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+executionDevice?.id,""+executionResultId , realPath,url)
+					transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+executionDevice?.id,""+executionResultId , realPathFromFile,url)
 				}else if(isLogReqd && isLogReqd?.toString().equalsIgnoreCase(TRUE) && deviceInstance?.isThunderEnabled == 1){
-					transferSTBLogRdkService(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+executionDevice?.id,""+executionResultId , realPath,url)
+					transferSTBLogRdkService(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+executionDevice?.id,""+executionResultId , realPathFromFile,url)
 				}
 				executionService.updateExecutionResultsError(htmlData,executionResultId,executionId,executionDevice?.id,timeDiff,singleScriptExecTime)
 				Thread.sleep(4000)
@@ -365,8 +370,8 @@ class ExecutescriptService {
 		if(isBenchMark.equals(TRUE) || isSystemDiagnostics.equals(TRUE)){
 			//new File("${realPath}//logs//performance//${executionId}//${executionDevice?.id}//${executionResultId}").mkdirs()
 			performanceFileName = "${executionId}_${executionDevice?.id}_${executionResultId}"
-			performanceFilePath = "${realPath}//logs//performance//${executionId}//${executionDevice?.id}//${executionResultId}//"
-			diagnosticsFilePath = "${realPath}//logs//stblogs//${executionId}//${executionDevice?.id}//${executionResultId}//"
+			performanceFilePath = "${realPathFromFile}//logs//performance//${executionId}//${executionDevice?.id}//${executionResultId}//"
+			diagnosticsFilePath = "${realPathFromFile}//logs//stblogs//${executionId}//${executionDevice?.id}//${executionResultId}//"
 		}
 		def tmUrl = executionService.updateTMUrl(url,deviceInstance)
 		def urlFromConfigFile = executionService.getTMUrlFromConfigFile()
@@ -390,7 +395,7 @@ class ExecutescriptService {
 			]
 			ScriptExecutor scriptExecutor = new ScriptExecutor(uniqueExecutionName)
 			htmlData += scriptExecutor.executeScript(cmd,1)
-			copyPerformanceLogIntoDir(realPath, performanceFilePath, executionId,executionDevice?.id, executionResultId)
+			copyPerformanceLogIntoDir(realPathFromFile, performanceFilePath, executionId,executionDevice?.id, executionResultId)
 		}
 		if(isSystemDiagnostics.equals(TRUE) && deviceInstance?.isThunderEnabled != 1){
 			File layoutFolder = grailsApplication.parentContext.getResource("//fileStore//callPerformanceTest.py").file
@@ -408,22 +413,22 @@ class ExecutescriptService {
 			]
 			ScriptExecutor scriptExecutor = new ScriptExecutor(uniqueExecutionName)
 			htmlData += scriptExecutor.executeScript(cmd,10)
-			copyPerformanceLogIntoDir(realPath, performanceFilePath, executionId,executionDevice?.id, executionResultId)
+			copyPerformanceLogIntoDir(realPathFromFile, performanceFilePath, executionId,executionDevice?.id, executionResultId)
 			
 			initiateDiagnosticsTest(deviceInstance, performanceFileName, tmUrl,uniqueExecutionName)
-			copyLogFileIntoDir(realPath, diagnosticsFilePath, executionId,executionDevice?.id, executionResultId,DEVICE_DIAGNOSTICS_LOG)
+			copyLogFileIntoDir(realPathFromFile, diagnosticsFilePath, executionId,executionDevice?.id, executionResultId,DEVICE_DIAGNOSTICS_LOG)
 		}else if(isSystemDiagnostics.equals(TRUE) && deviceInstance?.isThunderEnabled == 1){
-			initiateDiagnosticsTestRdkCertification(realPath, deviceInstance, executionId, executionDevice?.id, executionResultId, uniqueExecutionName)
+			initiateDiagnosticsTestRdkCertification(realPathFromFile, deviceInstance, executionId, executionDevice?.id, executionResultId, uniqueExecutionName)
 		}
 		//def logTransferFileName = "${executionId.toString()}${deviceInstance?.id.toString()}${scriptInstance?.id.toString()}${executionDevice?.id.toString()}"
-		def logTransferFilePath = "${realPath}/logs//consolelog//${executionId}//${executionDevice?.id}//${executionResultId}//"
+		def logTransferFilePath = "${realPathFromFile}/logs//consolelog//${executionId}//${executionDevice?.id}//${executionResultId}//"
 		def logTransferFileName = "${executionId}_${executionDevice?.id}_${executionResultId}_AgentConsoleLog.txt"
 		//new File("${realPath}/logs//consolelog//${executionId}//${executionDevice?.id}//${executionResultId}").mkdirs()
-			logTransfer(deviceInstance,logTransferFilePath,logTransferFileName ,realPath, executionId,executionDevice?.id, executionResultId,url)
+			logTransfer(deviceInstance,logTransferFilePath,logTransferFileName ,realPathFromFile, executionId,executionDevice?.id, executionResultId,url)
 		if(isLogReqd && isLogReqd?.toString().equalsIgnoreCase(TRUE) && deviceInstance?.isThunderEnabled != 1){
-			transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+executionDevice?.id,""+executionResultId, ,realPath,url)
+			transferSTBLog(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+executionDevice?.id,""+executionResultId, ,realPathFromFile,url)
 		}else if(isLogReqd && isLogReqd?.toString().equalsIgnoreCase(TRUE) && deviceInstance?.isThunderEnabled == 1){
-			transferSTBLogRdkService(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+executionDevice?.id,""+executionResultId , realPath,url)
+			transferSTBLogRdkService(scriptInstance?.primitiveTest?.module?.name, deviceInstance,""+executionId,""+executionDevice?.id,""+executionResultId , realPathFromFile,url)
 		}
 		}
 		Date endTime = new Date()
@@ -492,7 +497,11 @@ class ExecutescriptService {
 			 */
 			def copyAgentconsoleLogIntoDir(def realPath, def logTransferFilePath, def executionId, def executionDeviceId , def executionResultId){
 				try {
-					String logsPath = realPath.toString()+"/logs/logs/"
+					String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+					if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+						realPathFromFile = realPath
+					}
+					String logsPath = realPathFromFile.toString()+"/logs/logs/"
 					File logDir  = new File(logsPath)
 					if(logDir.isDirectory()){
 						logDir.eachFile{ file->
@@ -524,7 +533,11 @@ class ExecutescriptService {
 		
 			def copyPerformanceLogIntoDir(def realPath, def logTransferFilePath , def executionId, def executionDeviceId , def executionResultId){
 				try {
-					String logsPath = realPath.toString()+"/logs/logs/"
+					String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+					if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+						realPathFromFile = realPath
+					}
+					String logsPath = realPathFromFile.toString()+"/logs/logs/"
 		
 					File logDir  = new File(logsPath)
 					if(logDir.isDirectory()){
@@ -554,7 +567,11 @@ class ExecutescriptService {
 			 */
 			def copyLogFileIntoDir(def realPath, def logTransferFilePath , def executionId, def executionDeviceId , def executionResultId , def fileName){
 				try {
-					String logsPath = realPath.toString()+"/logs/logs/"
+					String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+					if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+						realPathFromFile = realPath
+					}
+					String logsPath = realPathFromFile.toString()+"/logs/logs/"
 		
 					File logDir  = new File(logsPath)
 					if(logDir.isDirectory()){
@@ -589,7 +606,11 @@ class ExecutescriptService {
 		
 			def copyStbLogsIntoDir(def realPath, def logTransferFilePath , def executionId, def executionDeviceId , def executionResultId){
 				try {
-					String logsPath = realPath.toString()+"/logs/logs/"
+					String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+					if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+						realPathFromFile = realPath
+					}
+					String logsPath = realPathFromFile.toString()+"/logs/logs/"
 					File logDir  = new File(logsPath)
 					if(logDir.isDirectory()){
 						logDir.eachFile{ file->
@@ -624,7 +645,11 @@ class ExecutescriptService {
 			 */
 			def copyLogsIntoDir(def realPath, def logTransferFilePath , def executionId, def executionDeviceId , def executionResultId){
 				try {
-					String logsPath = realPath.toString()+"/logs/logs/"
+					String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+					if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+						realPathFromFile = realPath
+					}
+					String logsPath = realPathFromFile.toString()+"/logs/logs/"
 					File logDir  = new File(logsPath)
 					if(logDir.isDirectory()){
 						logDir.eachFile{ file->
@@ -645,6 +670,15 @@ class ExecutescriptService {
 												File logTransferPath  = new File(logTransferFilePath)
 												if(file.exists()){
 													boolean fileMoved = file.renameTo(new File(logTransferPath, fileName.trim()));
+													if(fileName?.toString().contains(".svg")){
+														try{
+															if(!realPath?.equals(realPathFromFile)){
+																copySVGToRealPath(logTransferFilePath,fileName,realPath,executionId,executionDeviceId,executionResultId)
+															}
+														}catch(Exception e){
+															e.printStackTrace()
+														}
+													}
 												}
 											}
 										}
@@ -655,6 +689,32 @@ class ExecutescriptService {
 					}
 				} catch (Exception e) {
 					println  " Error"+e.getMessage()
+					e.printStackTrace()
+				}
+			}
+			
+			/**
+			 * Function to copy svg file to realpath
+			 * @param SVGFile
+			 * @param realPath
+			 * @param executionId
+			 * @param executionDeviceId
+			 * @param executionResultId
+			 * @return
+			 */
+			def copySVGToRealPath(def srcDirectory, def svgFileName, def realPath, def executionId, def executionDeviceId, def executionResultId){
+				try{
+					String fullFilePath = srcDirectory + svgFileName
+					File svgFile = new File(fullFilePath)
+					if(svgFile?.isFile()){
+						String destinationFolderPath = realPath + "//logs//${executionId}//${executionDeviceId}//${executionResultId}"
+						File destinationFolder = new File(destinationFolderPath)
+						new File(destinationFolderPath).mkdirs()
+						if(destinationFolder?.isDirectory()){
+							FileUtils.copyFileToDirectory(svgFile,destinationFolder)
+						}
+					}
+				}catch(Exception e){
 					e.printStackTrace()
 				}
 			}
@@ -715,7 +775,10 @@ class ExecutescriptService {
 	def logTransfer(def deviceInstance, def logTransferFilePath, def logTransferFileName, def realPath,  def executionId, def executionDeviceId , def executionResultId , def url){
 		Thread.sleep(4000)
 		try{			
-			
+			String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+			if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+				realPathFromFile = realPath
+			}
 			String scriptName = getConsoleFileTransferScriptName(deviceInstance)
 			
 			File layoutFolder = grailsApplication.parentContext.getResource(scriptName).file
@@ -745,7 +808,7 @@ class ExecutescriptService {
 			
 			ScriptExecutor scriptExecutor = new ScriptExecutor()
 			def resetExecutionData = scriptExecutor.executeScript(cmd,2)
-			copyAgentconsoleLogIntoDir(realPath,logTransferFilePath,executionId,executionDeviceId,executionResultId)
+			copyAgentconsoleLogIntoDir(realPathFromFile,logTransferFilePath,executionId,executionDeviceId,executionResultId)
 			Thread.sleep(4000)
 		}
 		catch(Exception e){		
@@ -2503,6 +2566,10 @@ class ExecutescriptService {
 	
 	def transferSTBLog(def moduleName , def dev,def execId, def execDeviceId,def execResultId,def realPath,def url){
 		try {
+			String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+			if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+				realPathFromFile = realPath
+			}
 			def module
 			def stbLogFiles
 			Module.withTransaction {
@@ -2518,7 +2585,7 @@ class ExecutescriptService {
 			
 			def filePath = destPath.replace("execId_logdata.txt", "${execId}//${execDeviceId}//${execResultId}")
 			def directoryPath =  "${execId}_${execDeviceId}_${execResultId}"
-			def stbFilePath = "${realPath}/logs//stblogs//${execId}//${execDeviceId}//${execResultId}//"
+			def stbFilePath = "${realPathFromFile}/logs//stblogs//${execId}//${execDeviceId}//${execResultId}//"
 			//def directoryPath = destPath.replace("execId_logdata.txt", "${execId}//${execDeviceId}//${execResultId}")
 			//new File(directoryPath).mkdirs()
 			
@@ -2559,7 +2626,7 @@ class ExecutescriptService {
 				try {
 					ScriptExecutor scriptExecutor = new ScriptExecutor()
 					def outputData = scriptExecutor.executeScript(cmd,1)
-					copyStbLogsIntoDir(realPath,stbFilePath, execId,execDeviceId,execResultId)
+					copyStbLogsIntoDir(realPathFromFile,stbFilePath, execId,execDeviceId,execResultId)
 				}catch (Exception e) {
 					println " error >> "+e.getMessage()
 					e.printStackTrace()
@@ -2585,6 +2652,10 @@ class ExecutescriptService {
 	 */
 	def transferSTBLogRdkService(def moduleName , def dev,def execId, def execDeviceId,def execResultId,def realPath,def url){
 		try {
+			String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+			if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+				realPathFromFile = realPath
+			}
 			def module
 			def stbLogFiles
 			Module.withTransaction {
@@ -2593,7 +2664,7 @@ class ExecutescriptService {
 					stbLogFiles = module?.stbLogFiles
 				}
 			}
-			def stbFilePath = "${realPath}/logs//stblogs//${execId}//${execDeviceId}//${execResultId}//"
+			def stbFilePath = "${realPathFromFile}/logs//stblogs//${execId}//${execDeviceId}//${execResultId}//"
 			try{
 				new File(stbFilePath?.toString())?.mkdirs()
 			}catch(Exception e){

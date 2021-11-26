@@ -203,7 +203,7 @@ function showMintextDeviceDetails(k){
 			def fileContents = ""
 			def firstfourLine = ""
 			try{
-			    def filePath = "${request.getRealPath('/')}//logs//version//${executionInstance.id}//${executionDeviceInstance?.id.toString()}//${executionDeviceInstance.id}_version.txt"	
+			    def filePath = realPathForLogs + "//logs//version//${executionInstance.id}//${executionDeviceInstance?.id.toString()}//${executionDeviceInstance.id}_version.txt"	
 				BufferedReader inn = new BufferedReader(new FileReader(filePath));
 				String line;
 				while((line = inn.readLine()) != null)

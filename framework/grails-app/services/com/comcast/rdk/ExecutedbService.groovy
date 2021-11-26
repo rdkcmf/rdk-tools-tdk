@@ -150,6 +150,10 @@ class ExecutedbService {
 	 * @return
 	 */
 	def deleteSelectedRowOfExecutionResult(def selectedRows, String realPath) {
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		List executionResultList = []
 		List executionMethodResultInstanceList = []
 		List performanceList = []
@@ -205,12 +209,12 @@ class ExecutedbService {
 					 * Deletes the log files, crash files 										  
 					 */
 
-					String logFilePath = "${realPath}//logs//"+execId
+					String logFilePath = "${realPathFromFile}//logs//"+execId
 					def logFiles = new File(logFilePath)
 					if(logFiles.exists()){
 						logFiles?.deleteDir()
 					}
-					String crashFilePath = "${realPath}//logs//crashlogs//"
+					String crashFilePath = "${realPathFromFile}//logs//crashlogs//"
 
 					new File(crashFilePath).eachFileRecurse { file->
 						if((file?.name).startsWith(execId.toString())){
@@ -218,13 +222,13 @@ class ExecutedbService {
 						}
 					}
 
-					String versionFilePath = "${realPath}//logs//version//"+execId
+					String versionFilePath = "${realPathFromFile}//logs//version//"+execId
 					def versionFiles = new File(versionFilePath)
 					if(versionFiles.exists()){
 						versionFiles?.deleteDir()
 					}
 
-					String agentLogFilePath = "${realPath}//logs//consolelog//"+execId
+					String agentLogFilePath = "${realPathFromFile}//logs//consolelog//"+execId
 					def agentLogFiles = new File(agentLogFilePath)
 					if(agentLogFiles.exists()){
 						agentLogFiles?.deleteDir()
@@ -267,6 +271,10 @@ class ExecutedbService {
 	 * @return
 	 */
 	def getDataForExcelExport(Execution executionInstance, String realPath) {
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		List executionDeviceList = []
 		List executionResultInstanceList = []
 		List executionMethodResultInstanceList = []
@@ -312,7 +320,7 @@ class ExecutedbService {
 			executionTime = executionDeviceInstance?.executionTime
 			executionTime = executionTimeFormat ( executionTime )
 			executionDeviceId = executionDeviceInstance?.id
-			filePath = "${realPath}//logs//version//${executionInstance?.id}//${executionDeviceId?.toString()}//${executionDeviceId?.toString()}_version.txt"
+			filePath = "${realPathFromFile}//logs//version//${executionInstance?.id}//${executionDeviceId?.toString()}//${executionDeviceId?.toString()}_version.txt"
 
 			if(filePath){
 				File file = new File(filePath)
@@ -437,7 +445,7 @@ class ExecutedbService {
 				dataList.add(logDataMap)
 				dataList.add(blankRowMap)
 
-				populateChartData(executionInstance,realPath)
+				populateChartData(executionInstance,realPathFromFile)
 
 				benchMarkDetails = ""				
 				sdDetails = ""
@@ -477,6 +485,10 @@ class ExecutedbService {
 	 * @return
 	 */
 	def getExecutionDetailsAsMap(Execution baseExecution,Execution comparisonExecution,def counter,String realPath){
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		Map executionMap = [:]
 		List baseExecutionScriptList = []
 		def successCount = 0;
@@ -505,8 +517,8 @@ class ExecutedbService {
 		ExecutionDevice comparisonExecutionDevice = ExecutionDevice.findByExecution(comparisonExecution)
 		if(comparisonExecutionDevice?.buildName && !comparisonExecutionDevice?.buildName?.isEmpty() && !comparisonExecutionDevice?.buildName?.equals("Image name not available")){
 			image = comparisonExecutionDevice?.buildName
-		}else if(realPath && comparisonExecution?.id && comparisonExecutionDevice?.id){
-			String imageNameFromVersionFile = getImageNameFromVersionFile(realPath,comparisonExecution?.id,comparisonExecutionDevice?.id)
+		}else if(realPathFromFile && comparisonExecution?.id && comparisonExecutionDevice?.id){
+			String imageNameFromVersionFile = getImageNameFromVersionFile(realPathFromFile,comparisonExecution?.id,comparisonExecutionDevice?.id)
 			if(imageNameFromVersionFile != null && !imageNameFromVersionFile.isEmpty()){
 				image = imageNameFromVersionFile
 			}
@@ -683,6 +695,10 @@ class ExecutedbService {
 	 * Method to generate the data for creating the combined report in excel format.
 	 */
 	def getDataForCombinedExcelReportGeneration(List selectedRowsDefined ,String appUrl, String realPath) {
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		Map moduleNameScriptListMap = [:]
 		Map scriptNameExecutionResultIdMap = [:]
 		Map executionResultIdScriptNameMap = [:]
@@ -812,8 +828,8 @@ class ExecutedbService {
 				def executionDevice = ExecutionDevice.findByExecution(executionObjectForImage)
 				if(executionDevice?.buildName && !executionDevice?.buildName?.isEmpty() && !executionDevice?.buildName?.equals("Image name not available")){
 					imageList.add(executionDevice?.buildName)
-				}else if(realPath && executionObjectForImage?.id && executionDevice?.id){
-					String imageNameFromVersionFile = getImageNameFromVersionFile(realPath,executionObjectForImage?.id,executionDevice?.id)
+				}else if(realPathFromFile && executionObjectForImage?.id && executionDevice?.id){
+					String imageNameFromVersionFile = getImageNameFromVersionFile(realPathFromFile,executionObjectForImage?.id,executionDevice?.id)
 					if(imageNameFromVersionFile != null && !imageNameFromVersionFile.isEmpty()){
 						imageList.add(imageNameFromVersionFile)
 					}
@@ -1035,7 +1051,11 @@ class ExecutedbService {
 	 * @return
 	 */
 	def getPmapDetails(Execution executionInstance,ExecutionDevice executionDevice,ExecutionResult executionResult, String realPath,String appUrl){
-		def logPath = "${realPath}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
+		def logPath = "${realPathFromFile}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
 		def finalLogparserFileName = ""
 		File logDir  = new File(logPath)
 		Map pmapFileMap = [:]
@@ -1113,7 +1133,11 @@ class ExecutedbService {
 	 * @return
 	 */
 	def getlmbenchDetails(Execution executionInstance,ExecutionDevice executionDevice,ExecutionResult executionResult, String realPath,String appUrl){
-		def logPath = "${realPath}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
+		def logPath = "${realPathFromFile}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
 		def finalLogparserFileName = ""
 		File logDir  = new File(logPath)
 		Map lmbenchFileMap = [:]
@@ -1151,7 +1175,11 @@ class ExecutedbService {
 	 * @return
 	 */
 	def getsystemdBootchartDetails(Execution executionInstance,ExecutionDevice executionDevice,ExecutionResult executionResult, String realPath,String appUrl){
-		def logPath = "${realPath}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
+		def logPath = "${realPathFromFile}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
 		def finalLogparserFileName = ""
 		File logDir  = new File(logPath)
 		Map systemdBootchartMap = [:]
@@ -1182,7 +1210,11 @@ class ExecutedbService {
 	 * @return
 	 */
 	def getsystemdAnalyzeDetails(Execution executionInstance,ExecutionDevice executionDevice,ExecutionResult executionResult, String realPath,String appUrl){
-		def logPath = "${realPath}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
+		def logPath = "${realPathFromFile}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
 		def finalLogparserFileName = ""
 		File logDir  = new File(logPath)
 		Map systemdAnalyzeMap = [:]
@@ -1220,7 +1252,11 @@ class ExecutedbService {
 	 * @return
 	 */
 	def getSmemDetails(Execution executionInstance,ExecutionDevice executionDevice,ExecutionResult executionResult, String realPath){
-		def logPath = "${realPath}/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
+		def logPath = realPathFromFile + "/logs//${executionInstance.id}//${executionDevice.id}//${executionResult.id}//"
 		def finalLogparserFileName = ""
 		File logDir  = new File(logPath)
 		Map smemFileMap = [:]
@@ -1700,6 +1736,10 @@ class ExecutedbService {
 	 * Method to get the data for creating the consolidated report in excel format.
 	 */
 	def getDataForConsolidatedListExcelExport(Execution executionInstance, String realPath,String appUrl) {
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		List executionDeviceList = []
 		List executionResultInstanceList = []
 		List columnWidthList = []
@@ -1731,7 +1771,7 @@ class ExecutedbService {
 			executionTime = executionDeviceInstance?.executionTime
 			executionTime = executionTimeFormat ( executionTime )
 			executionDeviceId = executionDeviceInstance?.id
-			filePath = "${realPath}//logs//version//${executionInstance?.id}//${executionDeviceId?.toString()}//${executionDeviceId?.toString()}_version.txt"
+			filePath = "${realPathFromFile}//logs//version//${executionInstance?.id}//${executionDeviceId?.toString()}//${executionDeviceId?.toString()}_version.txt"
 			if(filePath){
 				File file = new File(filePath)
 				if(file.exists()){
@@ -2293,7 +2333,10 @@ class ExecutedbService {
 	 * Method to get the data for creating the consolidated report in excel format.
 	 */
 	def getDataForConsolidatedListPerformanceExcelExport(Execution executionInstance, String realPath,String appUrl) {
-
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		List executionDeviceList = []
 		List executionResultInstanceList = []
 		List columnWidthList = []
@@ -2326,7 +2369,7 @@ class ExecutedbService {
 			executionTime = executionDeviceInstance?.executionTime
 			executionTime = executionTimeFormat ( executionTime )
 			executionDeviceId = executionDeviceInstance?.id
-			filePath = "${realPath}//logs//version//${executionInstance?.id}//${executionDeviceId?.toString()}//${executionDeviceId?.toString()}_version.txt"
+			filePath = "${realPathFromFile}//logs//version//${executionInstance?.id}//${executionDeviceId?.toString()}//${executionDeviceId?.toString()}_version.txt"
 			if(filePath){
 				File file = new File(filePath)
 				if(file.exists()){
@@ -2599,11 +2642,15 @@ class ExecutedbService {
 	 * Method to get image name from version file
 	 */
 	def getImageNameFromVersionFile(def realPath, def executionId, def executionDeviceId){
+		String realPathFromFile = executionService.getRealPathForLogsFromTMConfig()
+		if(realPathFromFile?.equals(Constants.NO_LOCATION_SPECIFIED)){
+			realPathFromFile = realPath
+		}
 		String image = ""
 		String deviceDetails
 		String filePath = ""
 		String fileContents = ""
-		filePath = "${realPath}//logs//version//${executionId}//${executionDeviceId}//${executionDeviceId}_version.txt"
+		filePath = "${realPathFromFile}//logs//version//${executionId}//${executionDeviceId}//${executionDeviceId}_version.txt"
 		if(filePath){
 			File file = new File(filePath)
 			if(file.isFile()){

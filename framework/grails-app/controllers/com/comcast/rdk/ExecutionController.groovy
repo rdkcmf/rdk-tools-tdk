@@ -1640,6 +1640,7 @@ class ExecutionController {
 	 * Function to fetch the profiling details of show link is clicked corresponding to each Profiling Metrics row
 	 */
 	def getProfilingDetails(){
+		String realPathForLogs = getRealPathForLogs()
 		def executionResultId = params?.execResId
 		def exRes = ExecutionResult.get(params?.execResId)
 		def executionId = exRes.execution.id
@@ -1653,7 +1654,7 @@ class ExecutionController {
 		def alertMap = [:]
 		Date fromDate = exRes.dateOfExecution
 		String executionTime = exRes.totalExecutionTime
-		def logPath = "${realPath}/logs//${executionId}//${executionDeviceId}//${executionResultId}//"
+		def logPath = realPathForLogs + "logs//${executionId}//${executionDeviceId}//${executionResultId}//"
 		if(executionTime != null && executionTime != ""){
 			Double totalExecutionTime =  Double.parseDouble(executionTime)
 			totalExecutionTime = totalExecutionTime * 1000
@@ -1739,8 +1740,9 @@ class ExecutionController {
 	 */
 	def downloadFileContents()  {
 		try {
+			String realPathForLogs = getRealPathForLogs()
 			String fileName = params?.id
-			String filePath = "${request.getRealPath('/')}//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.id
+			String filePath = realPathForLogs + "//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.id
 			def file = new File(filePath)
 			response.setContentType("html/text")
 			response.setHeader("Content-disposition", "attachment;filename=${file.getName()}")
@@ -1755,8 +1757,9 @@ class ExecutionController {
 	 * @return
 	 */
 	def showFileContents(){
+		String realPathForLogs = getRealPathForLogs()
 		def consoleFileData = ""
-		String filePath = "${request.getRealPath('/')}//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.fileName
+		String filePath = realPathForLogs + "//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.fileName
 		def file = new File(filePath)
 		try{
 			if(file?.exists()){
@@ -1783,8 +1786,9 @@ class ExecutionController {
 	 * @return
 	 */
 	def getPmapContents(){
+	    String realPathForLogs = getRealPathForLogs()
 		def pmapFileData = ""
-		String filePath = "${request.getRealPath('/')}//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.fileName
+		String filePath = realPathForLogs + "//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.fileName
 		def file = new File(filePath)
 		try{
 			if(file?.exists()){
@@ -1881,6 +1885,7 @@ class ExecutionController {
 	 * @return
 	 */
 	def showLog(){
+		String realPathForLogs = getRealPathForLogs()
 		Execution executionInstance = Execution.findById(params?.id)
 		String executionNameCheck = executionInstance?.name
         def repeatCount
@@ -2010,7 +2015,7 @@ class ExecutionController {
 			}
 			
 			def executionDeviceId = executionResult.executionDevice.id
-			def logPath = "${realPath}/logs//${executionInstance.id}//${executionDeviceId}//${executionResult.id}//"
+			def logPath = realPathForLogs + "/logs//${executionInstance.id}//${executionDeviceId}//${executionResult.id}//"
 			List alertListFromFile = executescriptService.fetchAlertDataForExecResult(executionInstance.id,logPath);
 			if(!alertListFromFile.isEmpty()){
 				alertList?.add(executionResult.id)
@@ -2026,7 +2031,7 @@ class ExecutionController {
 				}
 			}
 		}		
-		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus, statusListForPopUpExecution : statusListForPopUpExecution,isProfilingDataPresent:isProfilingDataPresent,profilingFileList:profilingFileList,alertList:alertList]
+		[repeatExecution: repeatExecution, repeatCount: repeatCountInt, tDataMap : tDataMap, statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap , statusList: totalStatus, statusListForPopUpExecution : statusListForPopUpExecution,isProfilingDataPresent:isProfilingDataPresent,profilingFileList:profilingFileList,alertList:alertList, realPathForLogs : realPathForLogs]
 	}
 
 	/**
@@ -2034,6 +2039,7 @@ class ExecutionController {
 	 * @return
 	 */
 	def showResult(final String execName,final String scrGrp){
+		String realPathForLogs = getRealPathForLogs()
 		Execution executionInstance = Execution.findByName(execName)
 		def executionDevice = ExecutionDevice.findAllByExecution(executionInstance)
 		def device = Device.findByStbName(executionInstance?.device)
@@ -2042,7 +2048,7 @@ class ExecutionController {
 			def script = Script.findByName(executionInstance?.script)
 			testGroup = script?.primitiveTest?.module?.testGroup
 		}
-		[executionInstance : executionInstance, executionDeviceInstanceList : executionDevice, testGroup : testGroup ]
+		[executionInstance : executionInstance, executionDeviceInstanceList : executionDevice, testGroup : testGroup , realPathForLogs : realPathForLogs]
 	}
 
 	/**
@@ -2054,12 +2060,12 @@ class ExecutionController {
 			String fileName = params?.id
 			int index = fileName.indexOf( UNDERSCORE )
 			def executionId = fileName.substring( 0, index )
-			String filePath = "${request.getRealPath('/')}//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.id
-
+			String realPathForLogs = getRealPathForLogs()
+			String filePath = realPathForLogs + "//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.id
 			def file = new File(filePath)
 			if(!file?.exists()){
 				String name =  params?.id.substring(index+1, params?.id?.length())
-				filePath = "${request.getRealPath('/')}//logs//stblogs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+name
+				filePath = realPathForLogs + "//logs//stblogs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+name
 				file = new File(filePath)
 			}
 			response.setContentType("html/text")
@@ -2080,7 +2086,8 @@ class ExecutionController {
 			String fileName = params?.id
 			int index = fileName.indexOf( UNDERSCORE )
 			def executionId = fileName.substring( 0, index )
-			String filePath = "${request.getRealPath('/')}//logs//crashlogs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.id
+			String realPathForLogs = getRealPathForLogs()
+			String filePath = realPathForLogs + "//logs//crashlogs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.id
 			def file = new File(filePath)
 			response.setContentType("html/text")
 			response.setHeader("Content-disposition", "attachment;filename=${file.getName()}")
@@ -2596,6 +2603,7 @@ class ExecutionController {
 	 * Method used to populate individual execution result
 	 */
 	def resultSummary = {
+		String realPathForLogs = getRealPathForLogs()
 		Execution executionInstance = Execution.findById(params?.executionId)
 		def executionDeviceList = ExecutionDevice.findAllByExecution(executionInstance)
 		def device = Device.findByStbName(executionInstance?.device)
@@ -2618,7 +2626,7 @@ class ExecutionController {
 			def script = Script.findByName(executionInstance?.script)
 			testGroup = script?.primitiveTest?.module?.testGroup
 		}
-		[statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap, baseUrl:params?.baseUrl]
+		[statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:executionResultMap, baseUrl:params?.baseUrl, realPathForLogs:realPathForLogs]
 	}
 
 	/**
@@ -3384,25 +3392,26 @@ class ExecutionController {
 							/**
 							 * Deletes the log files, crash files
 							 */
-							String logFilePath = "${getRealPath()}//logs//"+execId
+							String realPathForLogs = getRealPathForLogs()
+							String logFilePath = realPathForLogs + "//logs//"+execId
 							def logFiles = new File(logFilePath)
 							if(logFiles.exists()){
 								logFiles?.deleteDir()
 							}
-							String crashFilePath = "${getRealPath()}//logs//crashlogs//"
+							String crashFilePath = realPathForLogs + "//logs//crashlogs//"
 
 							new File(crashFilePath).eachFileRecurse { file->
 								if((file?.name).startsWith(execId)){
 									file?.delete()
 								}
 							}
-							String versionFilePath = "${getRealPath()}//logs//version//"+execId
+							String versionFilePath = realPathForLogs + "//logs//version//"+execId
 							def versionFiles = new File(versionFilePath)
 							if(versionFiles.exists()){
 								versionFiles?.deleteDir()
 							}
 
-							String agentLogFilePath = "${realPath}//logs//consolelog//"+execId
+							String agentLogFilePath = realPathForLogs + "//logs//consolelog//"+execId
 							def agentLogFiles = new File(agentLogFilePath)
 							if(agentLogFiles.exists()){
 								agentLogFiles?.deleteDir()
@@ -4008,7 +4017,7 @@ class ExecutionController {
 	 * Method to get the module wise execution status
 	 */
 	def executionStatus(){
-
+		String realPathForLogs = getRealPathForLogs()
 		Execution executionInstance = Execution.findById(params?.id)
 
 		def detailDataMap = executedbService.prepareDetailMap(executionInstance,request.getRealPath('/'))
@@ -4082,7 +4091,7 @@ class ExecutionController {
 			testGroup = script?.primitiveTest?.module?.testGroup
 		}
 
-		[statusResults : [:], executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:[:],detailDataMap:detailDataMap,tDataMap:tDataMap,chartModuleDataList:chartModuleDataList,barColors:barColors]
+		[statusResults : [:], executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList, testGroup : testGroup,executionresults:[:],detailDataMap:detailDataMap,tDataMap:tDataMap,chartModuleDataList:chartModuleDataList,barColors:barColors, realPathForLogs : realPathForLogs]
 
 	}
 
@@ -4488,7 +4497,8 @@ class ExecutionController {
 				executionObj?.addProperty("ExecutionName ",executionInstance?.name)
 				executionObj.addProperty("DeviceName",executionInstance?.device)
 				def device =  ExecutionDevice?.findByExecution(executionInstance)
-				def versionFilePath = "${realPath}//logs//version//${executionInstance?.id}//${device.id.toString()}"
+				String realPathForLogs = getRealPathForLogs()
+				def versionFilePath = realPathForLogs + "//logs//version//${executionInstance?.id}//${device.id.toString()}"
 				String fileName  = versionFilePath+"//"+device?.id+"_version.txt"
 				def file = new File( fileName)
 				if(file?.isFile()){
@@ -4889,7 +4899,8 @@ class ExecutionController {
 				if(uploadedFile){
 					InputStreamReader reader = new InputStreamReader(uploadedFile?.getInputStream())
 					def fileContent = reader?.readLines()
-					def logPath = "${realPath}/logs//logs"
+					String realPathForLogs = getRealPathForLogs()
+					def logPath = realPathForLogs + "/logs//logs"
 					File logFile = new File(logPath+"//${fileName}")
 					logFile.write ""
 					fileContent?.each { logg ->
@@ -4917,7 +4928,8 @@ class ExecutionController {
 					if(uploadedFile){
 						InputStreamReader reader = new InputStreamReader(uploadedFile?.getInputStream())
 						def fileContent = reader?.readLines()
-						def logPath = "${realPath}/logs//logs"
+						String realPathForLogs = getRealPathForLogs()
+						def logPath = realPathForLogs + "/logs//logs"
 						File logFile = new File(logPath+"//${fileName}")
 						fileContent?.each { logg ->
 							data = data + logg+"\n";
@@ -5717,7 +5729,8 @@ class ExecutionController {
 								if(writeDataArray?.size() != 0){
 									def execId = execResult?.execution?.id
 									def execDeviceId = execResult?.executionDevice?.id
-									def logTransferFilePath = "${realPath}/logs/"+execId+"/"+execDeviceId+"/"+execResult?.id
+									String realPathForLogs = getRealPathForLogs()
+									def logTransferFilePath = realPathForLogs + "/logs/"+execId+"/"+execDeviceId+"/"+execResult?.id
 									new File(logTransferFilePath?.toString()).mkdirs()
 									FileWriter file = new FileWriter(logTransferFilePath+"/"+execId+"_profilingData.json",true)
 									BufferedWriter buffWriter = new BufferedWriter(file)
@@ -5812,6 +5825,7 @@ class ExecutionController {
 	 */
 	def getAlertNotification(){
 		try{
+			String realPathForLogs = getRealPathForLogs()
 			BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()))
 			String dataFromSocket = reader.readLine()
 			reader.close()
@@ -5937,7 +5951,7 @@ class ExecutionController {
 				JSONObject jsonObj = new JSONObject();
 				jsonObj.put("system_time",systemTime);
 				jsonObj.put("alert_json",dataJsonObject);
-				def logTransferFilePath = "${realPath}/logs/grafanaAlerts"
+				def logTransferFilePath = realPathForLogs + "/logs/grafanaAlerts"
 				new File(logTransferFilePath?.toString()).mkdirs()
 				FileWriter file = new FileWriter(logTransferFilePath+"/"+systemTimeForLogFile+"_alertData.json",true)
 				BufferedWriter buffWriter = new BufferedWriter(file)
@@ -6189,5 +6203,27 @@ class ExecutionController {
 		def consoleFileData = ""
 		String logPath = "..//logs//${params?.execId}//${params?.execDeviceId}//${params?.execResultId}//"+params?.fileName
 		render(template: "profilingDetails", model: [svgDetails:true,logPath:logPath])
+	}
+	
+	/**
+	 * Method that returns the path to logs folder	
+	 * @return
+	 */
+	def String getRealPathForLogs(){
+		String returnValue = request.getSession().getServletContext().getRealPath(Constants.FILE_SEPARATOR)
+		File configFile = grailsApplication.parentContext.getResource(Constants.TM_CONFIG_FILE).file
+		String logsLocation= Constants.NO_LOCATION_SPECIFIED
+		logsLocation = executionService.getConfigProperty(configFile,Constants.LOGS_PATH)
+		if(logsLocation != null){
+			File logsLocationTestDirectory = new File(logsLocation)
+			if(logsLocationTestDirectory?.isDirectory()){
+				String logsLocationLastChar = logsLocation?.charAt(logsLocation?.length()-1)
+				if(!logsLocationLastChar?.equals(Constants.URL_SEPERATOR)){
+					logsLocation = logsLocation + Constants.URL_SEPERATOR
+				}
+				returnValue = logsLocation
+			}
+		}
+		return returnValue
 	}
 }

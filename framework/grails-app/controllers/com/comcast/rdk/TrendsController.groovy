@@ -1239,6 +1239,7 @@ class TrendsController {
 	 * Displays the failed execution details of the input execution
 	 */
 	def showDetails() {
+		String realPathForLogs = getRealPathForLogs()
 		Execution executionInstance = Execution.findByName(params?.id)
 		def executionDeviceList = ExecutionDevice.findAllByExecution(executionInstance)
 		def device = Device.findByStbName(executionInstance?.device)
@@ -1349,7 +1350,7 @@ class TrendsController {
 
 		def data = [statusResults : statusResultMap, executionInstance : executionInstance, executionDeviceInstanceList : executionDeviceList,
 			testGroup : testGroup, tDataMap: tDataMap, executionresults:executionResultMap, boxType: device?.boxType, defectData: defectData,
-			detailDataMap:detailDataMap, moduleDataMap: moduleData]
+			detailDataMap:detailDataMap, moduleDataMap: moduleData, realPathForLogs: realPathForLogs]
 		render(template:"showDetails", model:data)
 		return data
 	}
@@ -1859,5 +1860,25 @@ class TrendsController {
 		}
 		def mapData = [executionName :executionList, resultList:resultList, yMax:yMax ,parameterKeyList:parameterKeyList]
 		render mapData as JSON
+	}
+	
+	/**
+	 * Method that returns the path to logs folder
+	 * @return
+	 */
+	def String getRealPathForLogs(){
+		String returnValue = request.getSession().getServletContext().getRealPath(Constants.FILE_SEPARATOR)
+		File configFile = grailsApplication.parentContext.getResource(Constants.TM_CONFIG_FILE).file
+		String logsLocation= Constants.NO_LOCATION_SPECIFIED
+		logsLocation = executionService.getConfigProperty(configFile,Constants.LOGS_PATH)
+		File logsLocationTestFile = new File(logsLocation)
+		if(logsLocationTestFile.isDirectory()){
+			String logsLocationLastChar = logsLocation?.charAt(logsLocation?.length()-1)
+			if(!logsLocationLastChar?.equals(Constants.URL_SEPERATOR)){
+				logsLocation = logsLocation + Constants.URL_SEPERATOR
+			}
+			returnValue = logsLocation
+		}
+		return returnValue
 	}
 }
