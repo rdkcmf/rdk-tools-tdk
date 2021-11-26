@@ -500,6 +500,12 @@
                 </resultGeneration>
             </testStep>
         </testCase>
+        <testCase testCaseId="BT_11" testCaseName="Check_API_Version_Number" desc="Checks the API version Number">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_API_Version_Number" method="Get_API_Version_Number">
+                <resultGeneration useMethodTag="check_api_version_number" expectedValues="1" />
+            </testStep>
+        </testCase>
         <pluginPostRequisite>
           <postrequisite requisiteId="1" requisiteName="Bluetooth_Stack_Disable">
             <testStep testStepId="1" name="Disable_Bluetooth_Stack" method="Disable_Stack" saveResult="true">

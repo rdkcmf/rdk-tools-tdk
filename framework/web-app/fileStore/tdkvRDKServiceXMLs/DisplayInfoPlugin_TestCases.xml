@@ -166,7 +166,7 @@
                 </prerequisite>
             </testCasePreRequisite>
             <testStep testStepId="1" name="Gethdcpversion" method="DisplayInfo_GetHDCPversion">
-                <resultGeneration useMethodTag="displayinfo_validate_expected_results" expectedValues="HdcpUnencrypted,Hdcp1X,Hdcp2X" />
+                <resultGeneration useMethodTag="displayinfo_validate_expected_results" expectedValues="HdcpUnencrypted,Hdcp1X,Hdcp2X,HdcpAuto" />
             </testStep>
         </testCase>
 
@@ -370,7 +370,7 @@
             </testStep>
         </testCase>
      <!-- Test case 17 -->
-        <testCase testCaseId="DISP_17" testCaseName= "Check_Resolution_PostChange_Event" desc="Checks for the Resolution Post Change event">
+        <testCase testCaseId="DISP_17" testCaseName= "DisplayInfo_Check_Resolution_PostChange_Event" desc="Checks for the Resolution Post Change event">
             <testCaseInfo testCaseType="loop" revert="true"  />
             <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" pluginName="DisplaySettings">
                 <resultGeneration useMethodTag="display_connected_status"/>
@@ -417,6 +417,76 @@
             </testCasePreRequisite>
             <testStep testStepId="1" name="IsHDMIConnected" method="DisplayInfo_Isconnected">
                 <resultGeneration useMethodTag="displayinfo_validate_boolean_result" expectedValues="False" />
+            </testStep>
+        </testCase>
+     <!-- Test case 19 -->
+        <testCase testCaseId="DISP_19" testCaseName= "DisplayInfo_GET_Color_Space" desc="Gets the display color space">
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Get_Color_Space" method="Get_Color_Space">
+                <resultGeneration useMethodTag="displayinfo_validate_expected_results" expectedValues="FORMATUNKNOWN,FORMATOTHER,FORMATRGB444,FORMATYCBCR444,FORMATYCBCR422,FORMATYCBCR420"/>
+            </testStep>
+        </testCase>
+      <!-- Test case 20 -->
+        <testCase testCaseId="DISP_20" testCaseName= "DisplayInfo_Get_Colour_Depth" desc="Gets the display colour depth">
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Get_Colour_Depth" method="Get_Colour_Depth">
+                <resultGeneration useMethodTag="displayinfo_validate_expected_results" expectedValues="COLORDEPTHUNKNOWN,COLORDEPTH8BIT,COLORDEPTH10BIT,COLORDEPTH12BIT"/>
+            </testStep>
+        </testCase>
+       <!-- Test case 21 -->
+        <testCase testCaseId="DISP_21" testCaseName= "DisplayInfo_Get_Quantization_Range" desc="Gets the display quantization range">
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Get_Quantization_Range" method="Get_Quantization_Range">
+                <resultGeneration useMethodTag="displayinfo_validate_expected_results" expectedValues="QUANTIZATIONRANGEUNKNOWN,QUANTIZATIONRANGELIMITED,QUANTIZATIONRANGEFULL"/>
+            </testStep>
+        </testCase>
+       <!-- Test case 22 -->
+        <testCase testCaseId="DISP_22" testCaseName= "DisplayInfo_Get_Colorimetry" desc="Gets the display colorimetry">
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Get_Colorimetry" method="Get_Colorimetry">
+                <resultGeneration useMethodTag="displayinfo_validate_expected_results" arguments="check_colorimetry" expectedValues="COLORIMETRYUNKNOWN,COLORIMETRYOTHER,COLORIMETRYSMPTE170M,COLORIMETRYBT709,COLORIMETRYXVYCC601,COLORIMETRYXVYCC709,COLORIMETRYSYCC601, COLORIMETRYOPYCC601,COLORIMETRYOPRGB,COLORIMETRYBT2020YCCBCBRC,COLORIMETRYBT2020RGB_YCBCR"/>
+            </testStep>
+        </testCase>
+       <!-- Test case 23 -->
+        <testCase testCaseId="DISP_23" testCaseName= "DisplayInfo_Get_EOTF" desc="Gets the display Electro Optical Transfer Function" >
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Get_EOTF" method="Get_EOTF">
+                <resultGeneration useMethodTag="displayinfo_validate_expected_results" expectedValues="EOTFUNKNOWN,EOTFOTHER,EOTFBT1886,EOTFBT2100,EOTFSMPTEST2084"/>
             </testStep>
         </testCase>
 </testPlugin>

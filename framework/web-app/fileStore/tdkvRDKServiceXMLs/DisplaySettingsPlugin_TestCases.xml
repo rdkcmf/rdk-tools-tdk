@@ -2587,6 +2587,34 @@
             <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" >
                   <resultGeneration useMethodTag="display_is_connected" arguments="check_tv_not_connected" />
                 </testStep>
+        </testCase>
+       
+        <testCase testCaseId="DS_98" testCaseName= "Check_Current_And_Supported_Video_Formats"  desc="Checks the current and supported video formats">
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Check_Video_Formats" method="Get_Video_Format" saveResult="true" >
+                  <resultGeneration useMethodTag="check_audio_video_formats" arguments="get_video_format" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_99" testCaseName= "Check_Current_And_Supported_Audio_Formats"  desc="Checks the current and supported audio formats">
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+                <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Check_Audio_Formats" method="Get_Audio_Format" saveResult="true" >
+                  <resultGeneration useMethodTag="check_audio_video_formats" arguments="get_audio_format" />
+            </testStep>
         </testCase> 
 </testPlugin>  
 

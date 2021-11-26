@@ -57,6 +57,12 @@
         <method name="Configuration" api="configuration" type="property" desc="Provides access to the configuration object of a service">
             <expectedValues>null</expectedValues>
         </method>
+        <method name="Unavailable" api="unavailable" type="method" desc="Sets a plugin unavailable for interaction" >
+            <params>
+                <param tag="callsign" defaultValue="null"/>
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
         <event name="Event_Controller_State_Changed" eventName="statechange" eventId="client.events.1" type="event" desc="Signals a plugin state change" />
         <event name="Event_Controller_All" eventName="all" eventId="client.events.1" type="event" desc="Signals each and every event in the system" />
     </plugin>
@@ -854,6 +860,11 @@
         <method name="Get_Free_GPU_RAM" api="freegpuram" type="property" desc="Gets the free GPU DRAM memory in bytes"/>
         <method name="Get_Width_In_Centimeters" api="widthincentimeters" type="property" desc="Gets the horizontal size in centimeters"/>
 	<method name="Get_Height_In_Centimeters" api="heightincentimeters" type="property" desc="Gets the vertical size in centimeters"/>
+        <method name="Get_Color_Space" api="colorspace" type="property" desc="Provides access to the display color space"/>
+        <method name="Get_Colour_Depth" api="colourdepth" type="property" desc="Provides access to the display colour depth"/>
+        <method name="Get_Quantization_Range" api="quantizationrange" type="property" desc="Provides access to the display quantization range"/>
+        <method name="Get_Colorimetry" api="colorimetry" type="property" desc="Provides access to the display colorimetry"/>
+        <method name="Get_EOTF" api="eotf" type="property" desc="Provides access to the display Electro Optical Transfer Function"/>
 	<event name="Event_Resolution_PostChange" eventName="updated" eventId="client.events.1" type="event" desc="Fires on changing the resolution"/>
     </plugin>
 
@@ -1061,6 +1072,7 @@
         </method>
         <method name="Get_Connected_Devices" api="getConnectedDevices" type="method" desc="Returns a list of connected devices to this device" />
         <method name="Get_Paired_Devices" api="getPairedDevices" type="method" desc="Returns a list of devices that have paired with this device" />
+        <method name="Get_API_Version_Number" api="getApiVersionNumber" type="method" desc="Provides the current API version number" />
         <event name="Event_On_Discovered_Device" eventName="onDiscoveredDevice" eventId="client.events.1" type="event" desc="Gives discovered Bluetooth devices" />
         <event name="Event_On_Status_Changed" eventName="onStatusChanged" eventId="client.events.1" type="event" desc="Gives status change information" />
         <event name="Event_On_Request_Failed" eventName="onRequestFailed" eventId="client.events.1" type="event" desc="Indicates on request failed" />
@@ -1476,7 +1488,9 @@
                 <param tag="audioPort" defaultValue="null"/>
             </params>
             <expectedValues>0,1,2</expectedValues>
-        </method>     
+        </method>    
+        <method name="Get_Video_Format" api="getVideoFormat" type="method" desc="Returns the current and supported video formats" />
+        <method name="Get_Audio_Format" api="getAudioFormat" type="method" desc="Returns the current and supported audio formats" /> 
         <event name="Event_Zoom_Settings_Updated" eventName="zoomSettingUpdated" eventId="client.events.1" type="event" desc="Zoom settings updated event "/>
 	<event name="Event_Resolution_Changed" eventName="resolutionChanged" eventId="client.events.1" type="event" desc="Fires on changing resolution"/>
     </plugin>

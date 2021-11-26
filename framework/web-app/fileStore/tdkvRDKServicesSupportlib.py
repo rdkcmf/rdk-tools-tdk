@@ -985,8 +985,19 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             status = checkNonEmptyResultData(result)
             if status == "TRUE":
                 info["Result"] = result
-                if str(result) in expectedValues:
-                    info["Test_Step_Status"] = "SUCCESS"
+                expectedValues = [ value.lower() for value in expectedValues]
+                if len(arg) and arg[0] == "check_colorimetry":
+                    result = [ value.lower() for value in result]
+                    colorimetry_status = [ "FALSE" for value in result if value not in expectedValues ]
+                    if "FALSE" not in colorimetry_status:
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+                else:
+                    if str(result).lower() in expectedValues:
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
@@ -1617,6 +1628,20 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_audio_video_formats":
+            if len(arg) and arg[0] == "get_video_format":
+                info["supportedVideoFormat"] = supportedFormats = result.get("supportedVideoFormat")
+                info["currentVideoFormat"] = currentFormat = result.get("currentVideoFormat")
+            elif len(arg) and arg[0] == "get_audio_format":
+                info["supportedAudioFormat"] = supportedFormats = result.get("supportedAudioFormat")
+                info["currentAudioFormat"] = currentFormat = result.get("currentAudioFormat")
+            status = checkNonEmptyResultData(result)
+            if status == "TRUE" and currentFormat in supportedFormats:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_check_adapter_state":
             info = result.copy()
@@ -1799,6 +1824,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 else:
                     info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "check_api_version_number":
+            info = result
+            success = str(result.get("success")).lower() == "true"
+            if success and result.get("version") == int(expectedValues[0]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # FirmwareCotrol Plugin Response result parser steps
         elif tag == "fwc_get_status":
@@ -2240,6 +2272,15 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             info = result[0]
             status = checkNonEmptyResultData(result[0])
             if status == "TRUE" and str(result[0].get("subsystem")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag =="controller_check_error_message":
+            info = otherInfo.get("error")
+            error = otherInfo.get("error")
+            message = error.get("message")
+            code = error.get("code")
+            if message.lower() == str(expectedValues[0]).lower() and int(code) == int(expectedValues[1]):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
