@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>4</version>
+  <version>7</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RDKV_CERT_MVS_Video_UVE_AAMP_Play_HLS_HEVC</name>
+  <name>RDKV_CERT_MVS_Video_UVE_AAMP_Play_Widevine_DASH_AC3</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning UVE player application via Webkit instance and perform video play operation of HEVC codec hls stream for few minutes and close the player</synopsis>
+  <synopsis>Test Script to launch a lightning UVE AAMP player application via Webkit instance and perform video play operation of  Widevine DRM protected dash stream with AC3 audio for few minutes and close the player</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -56,29 +56,30 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_72</test_case_id>
-    <test_objective>Test Script to launch a lightning UVE player application via Webkit instance and perform video play operation of HEVC codec hls stream for few minutes and close the player</test_objective>
+    <test_case_id>RDKV_Media_Validation_80</test_case_id>
+    <test_objective>Test Script to launch a lightning UVE AAMP player application via Webkit instance and perform video play operation of  Widevine DRM protected dash stream with AC3 audio for few minutes and close the player</test_objective>
     <test_type>Positive</test_type>
     <test_setup>Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
-2.Lightning UVE Player app should be hosted</pre_requisite>
+2.Lightning UVE AAMP Player app should be hosted</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
-    <input_parameters>Lightning UVE player App URL: string
+    <input_parameters>Lightning UVE AAMP player App URL: string
 webkit_instance:string
 webinspect_port: string
-video_src_url_hls_hevc: string
+video_src_url_widevine_dash_ac3: string
+video_src_url_widevine_dash_ac3_drmconfigs:string
 close_interval: int</input_parameters>
     <automation_approch>1. As pre requisite, launch webkit instance via RDKShell, open websocket conntion to webinspect page
 2. Store the details of other launched apps. Move the webkit instance to front, if its z-order is low.
-3. Launch webkit instance with uve test app with the video src url and duration for close.
-4. App starts playing the hevc hls stream video and closes the player after the provided duration.
+3. Launch webkit instance with uve aamp test app with the video src url and duration for close.
+4. App starts playing the Widevine DRM protected dash stream with AC3 audio and closes the player after the provided duration.
 5. If expected event video playing is observed then update the result as SUCCESS or else FAILURE
 6. Update the test script result as SUCCESS/FAILURE based on event validation result and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>UVE Player should play the video for provided duration, expected event playing should occur and if proc validation is applicable, then expected data should be available in proc file </expected_output>
+    <expected_output>UVE AAMP Player should play the Widevine dash stream with AC3 audio for provided duration, expected event playing should occur and if proc validation is applicable, then expected data should be available in proc file </expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RDKV_CERT_MVS_Video_UVE_AAMP_Play_HLS_HEVC</test_script>
+    <test_script>RDKV_CERT_MVS_Video_UVE_AAMP_Play_Widevine_DASH_AC3</test_script>
     <skipped>No</skipped>
     <release_version>M88</release_version>
     <remarks></remarks>
@@ -98,7 +99,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_UVE_AAMP_Play_HLS_HEVC')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_UVE_AAMP_Play_Widevine_DASH_AC3')
 
 webkit_console_socket = None
 
@@ -111,10 +112,16 @@ if expectedResult in result.upper():
     print "\nCheck Pre conditions..."
     tdkTestObj = obj.createTestStep('rdkv_media_pre_requisites');
     tdkTestObj.executeTestCase(expectedResult);
+    # Checking whether widevine DRM is supported
     # Setting the pre-requites for media test. Launching the wekit instance via RDKShell and
-    # moving it to the front, opening a socket connection to the webkit inspect page and
+    # moving it to the front, openning a socket connection to the webkit inspect page and
     # getting the details for proc validation from config file
-    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,webkit_instance)
+    drm_pre_requisite_status = checkDRMSupported(obj,"Widevine")
+    if drm_pre_requisite_status:
+        pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,webkit_instance)
+    else:
+        pre_requisite_status = "FAILURE"
+
     if pre_requisite_status == "SUCCESS":
         tdkTestObj.setResultStatus("SUCCESS");
         print "Pre conditions for the test are set successfully"
@@ -124,7 +131,7 @@ if expectedResult in result.upper():
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_uve_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_hls_hevc
+        videoURL  = MediaValidationVariables.video_src_url_widevine_dash_ac3
         # Setting VideoPlayer Operations
         setOperation("close",MediaValidationVariables.close_interval)
         operations = getOperations()
@@ -132,13 +139,14 @@ if expectedResult in result.upper():
         setURLArgument("url",videoURL)
         setURLArgument("operations",operations)
         setURLArgument("autotest","true")
+        setURLArgument("drmconfigs",MediaValidationVariables.video_src_url_widevine_dash_ac3_drmconfigs)
         appArguments = getURLArguments()
         # Getting the complete test app URL
         video_test_url = getTestURL(appURL,appArguments)
 
         #Example video test url
-        #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkuveplayer/build/index.html?
-        #url=<video_hevc_url>.m3u8&operations=close(60)&autotest=true
+        #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkuveaampplayer/build/index.html?
+        #url=<video_ac3_url>.mpd&drmconfigs=com.widevine(<license_url>)&operations=close(60)&autotest=true
 
         # Setting the video test url in webkit instance using RDKShell
         launch_status = launchPlugin(obj,webkit_instance,video_test_url)

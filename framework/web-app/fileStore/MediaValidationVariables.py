@@ -110,8 +110,7 @@ video_src_url_dash_h264_iframe = ""
 video_src_url_hls_h264_iframe  = ""
 
 #HEVC Codec Video URL
-video_src_url_dash_hevc = ""
-video_src_url_hls_hevc  = ""
+video_src_url_hevc = ""
 
 #H.263 Codec Video URL
 video_src_url_h263 = ""
@@ -165,6 +164,7 @@ mpeg_url_type = ""
 av1_url_type  = ""
 ac3_url_type  = ""
 ec3_url_type  = ""
+hevc_url_type = ""
 ogg_url_type  = ""
 dolby_url_type = ""
 

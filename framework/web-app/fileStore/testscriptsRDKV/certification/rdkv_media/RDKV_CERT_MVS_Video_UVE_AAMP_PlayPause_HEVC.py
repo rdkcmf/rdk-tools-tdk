@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>4</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RDKV_CERT_MVS_Video_Play_PlayReady_DASH_HEVC</name>
+  <name>RDKV_CERT_MVS_Video_UVE_AAMP_PlayPause_HEVC</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit instance and perform video play operation of PlayReady DRM protected HEVC codec dash stream for few minutes and close the player</synopsis>
+  <synopsis>Test Script to launch a lightning UVE AAMP player application via Webkit instance and perform video play pause operation of HEVC codec stream and close the player</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>7</execution_time>
+  <execution_time>5</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -56,32 +56,32 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_77</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit instance and perform video play operation of PlayReady DRM protected HEVC codec dash stream for few minutes and close the player		</test_objective>
+    <test_case_id>RDKV_Media_Validation_112</test_case_id>
+    <test_objective>Test Script to launch a lightning UVE AAMP player application via Webkit instance and perform video play pause operation of HEVC codec stream and close the player	</test_objective>
     <test_type>Positive</test_type>
     <test_setup>Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
-2.Lightning Player app should be hosted</pre_requisite>
+2.Lightning UVE AAMP Player app should be hosted</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
-    <input_parameters>Lightning player App URL: string
+    <input_parameters>Lightning UVE AAMP player App URL: string
 webkit_instance:string
 webinspect_port: string
-video_src_url_playready_dash_hevc: string
-video_src_url_playready_dash_hevc_drmconfigs:string
-close_interval: int</input_parameters>
+video_src_url_hevc: string
+play_interval: int
+pause_interval:int</input_parameters>
     <automation_approch>1. As pre requisite, launch webkit instance via RDKShell, open websocket conntion to webinspect page
 2. Store the details of other launched apps. Move the webkit instance to front, if its z-order is low.
-3. Launch webkit instance with video test app with the video src url and duration for close.
-4. App starts playing the PlayReady DRM protected hevc dash stream video and closes the player after the provided duration.
-5. If expected event video playing is observed then update the result as SUCCESS or else FAILURE
-6. Update the test script result as SUCCESS/FAILURE based on event validation result and proc check status (if applicable)
+3. Launch webkit instance with uve aamp test app with the video src url and  operations to be performed, play and pause with given interval.
+4. App performs the pause and play operations of hevc content and validates using events
+5. If expected events paused and play occurs for pause and play operation, then app gives the validation result as SUCCESS or else FAILURE
+6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>Player should play the video for provided duration, expected event playing should occur and if proc validation is applicable, then expected data should be available in proc file </expected_output>
+    <expected_output>UVE AAMP Player should play and pause hevc video, expected events should occur and if proc validation is applicable, then expected data should be available in proc file</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RDKV_CERT_MVS_Video_Play_PlayReady_DASH_HEVC</test_script>
+    <test_script>RDKV_CERT_MVS_Video_UVE_AAMP_PlayPause_HEVC</test_script>
     <skipped>No</skipped>
-    <release_version>M88</release_version>
+    <release_version>M90</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -99,7 +99,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_Play_PlayReady_DASH_HEVC')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_UVE_AAMP_PlayPause_HEVC')
 
 webkit_console_socket = None
 
@@ -112,49 +112,42 @@ if expectedResult in result.upper():
     print "\nCheck Pre conditions..."
     tdkTestObj = obj.createTestStep('rdkv_media_pre_requisites');
     tdkTestObj.executeTestCase(expectedResult);
-    # Checking whether playready DRM is supported
     # Setting the pre-requites for media test. Launching the wekit instance via RDKShell and
     # moving it to the front, openning a socket connection to the webkit inspect page and
     # getting the details for proc validation from config file
-    drm_pre_requisite_status = checkDRMSupported(obj,"Playready")
-    if drm_pre_requisite_status:
-        pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,webkit_instance)
-    else:
-        pre_requisite_status = "FAILURE"
-
+    pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,webkit_instance)
     if pre_requisite_status == "SUCCESS":
         tdkTestObj.setResultStatus("SUCCESS");
         print "Pre conditions for the test are set successfully"
 
-        print "\nSet Lightning video player test app url..."
+        print "\nSet Lightning uve aamp player test app url..."
         #Setting device config file
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
-        appURL    = MediaValidationVariables.lightning_video_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_playready_dash_hevc
+        appURL    = MediaValidationVariables.lightning_uve_test_app_url
+        videoURL  = MediaValidationVariables.video_src_url_hevc
         # Setting VideoPlayer Operations
-        setOperation("close",MediaValidationVariables.close_interval)
+        setOperation("pause",MediaValidationVariables.pause_interval)
+        setOperation("play",MediaValidationVariables.play_interval)
         operations = getOperations()
         # Setting VideoPlayer test app URL arguments
         setURLArgument("url",videoURL)
         setURLArgument("operations",operations)
-        setURLArgument("drmconfigs",MediaValidationVariables.video_src_url_playready_dash_hevc_drmconfigs)
         setURLArgument("autotest","true")
-        setURLArgument("type","dash")
         appArguments = getURLArguments()
         # Getting the complete test app URL
         video_test_url = getTestURL(appURL,appArguments)
 
         #Example video test url
-        #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html?
-        #url=<video_hevc_url>.mpd&drmconfigs=com.playready(license_url)&operations=close(60)&autotest=true&type=dash
+        #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkuveplayer/build/index.html?
+        #url=<video_url>.mpd&operations=pause(30),play(10)&autotest=true
 
         # Setting the video test url in webkit instance using RDKShell
         launch_status = launchPlugin(obj,webkit_instance,video_test_url)
         if "SUCCESS" in launch_status:
             # Monitoring the app progress, checking whether app plays the video properly or any hang detected in between,
             # performing proc entry check and getting the test result from the app
-            test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Video Player Playing");
+            test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Observed Event: play");
             tdkTestObj = obj.createTestStep('rdkv_media_test');
             tdkTestObj.executeTestCase(expectedResult);
             if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
@@ -177,18 +170,19 @@ if expectedResult in result.upper():
             # moving next high z-order app to front (residentApp if its active)
             post_requisite_status = setMediaTestPostRequisites(obj,webkit_instance)
             if post_requisite_status == "SUCCESS":
-                print "Post conditions for the test are set successfully\n"
+                print "Post conditions for the test are set successfully"
                 tdkTestObj.setResultStatus("SUCCESS");
             else:
-                print "Post conditions are not met\n"
+                print "Post conditions are not met"
                 tdkTestObj.setResultStatus("FAILURE");
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Unable to load the video Test URL in Webkit\n"
+            print "Unable to load the video Test URL in Webkit"
     else:
-        print "Pre conditions are not met\n"
+        print "Pre conditions are not met"
         tdkTestObj.setResultStatus("FAILURE");
     obj.unloadModule("rdkv_media");
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"
+
