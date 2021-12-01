@@ -94,7 +94,8 @@
           <parameter name="execDeviceId" value=""/>
           <parameter name="execId" value=""/>
           <parameter name="execResultId" value=""/>
-          <parameter name="realPath" value=""/>
+	  <parameter name="realPath" value=""/>
+          <parameter name="logPath" value=""/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="rdkv_profiling_get_alerts" id=" " version="1">
@@ -113,7 +114,8 @@
           <parameter name="execId" value=""/>
           <parameter name="execResultId" value=""/>
           <parameter name="processes" value=""/>
-          <parameter name="realPath" value=""/>
+	  <parameter name="realPath" value=""/>
+	  <parameter name="logPath" value=""/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="rdkv_profiling_systemd_analyze_execute" id=" " version="1">
@@ -124,7 +126,8 @@
           <parameter name="execDeviceId" value=""/>
           <parameter name="execId" value=""/>
           <parameter name="execResultId" value=""/>
-          <parameter name="realPath" value=""/>
+	  <parameter name="realPath" value=""/>
+          <parameter name="logPath" value=""/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="rdkv_profiling_systemd_bootchart_execute" id=" " version="1">
@@ -135,7 +138,8 @@
           <parameter name="execDeviceId" value=""/>
           <parameter name="execId" value=""/>
           <parameter name="execResultId" value=""/>
-          <parameter name="realPath" value=""/>
+	  <parameter name="realPath" value=""/>
+	  <parameter name="logPath" value=""/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="rdkv_profiling_lmbench" id=" " version="1">
@@ -146,7 +150,8 @@
           <parameter name="execDeviceId" value=""/>
           <parameter name="execId" value=""/>
           <parameter name="execResultId" value=""/>
-          <parameter name="realPath" value=""/>
+	  <parameter name="realPath" value=""/>
+	  <parameter name="logPath" value=""/>
         </parameters>
       </primitiveTest>
     </primitiveTests>

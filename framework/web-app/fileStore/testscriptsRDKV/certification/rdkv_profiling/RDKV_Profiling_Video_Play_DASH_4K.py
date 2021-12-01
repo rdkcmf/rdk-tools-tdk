@@ -73,9 +73,10 @@ close_interval: int</input_parameters>
     <automation_approch>1. Launch WebKit instance using RDKShell and set the focus.
 2. Set the URL of lightning video test app with video src url.
 3. Check whether URL is loaded properly.
-4. Check video playback by proc validation if applicable.
-6. After few minutes, validate the profiling data from Grafana tool based on threshold values.
-7. Execute the smem tool and collect the log
+4. Check video playback by decoder proc validation if applicable.
+5. After few minutes, validate the profiling data from Grafana tool with the threshold values for the pre-configured process list.
+6. Execute the smem tool and collect the log
+7. Execute pmap tool for the list of given process and collect the log
 8. Revert the Webkit instance URL and plugin status.</automation_approch>
     <expected_output>Video playback should happen and profiling data should be within the expected limit</expected_output>
     <priority>High</priority>

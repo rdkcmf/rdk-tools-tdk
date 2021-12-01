@@ -52,9 +52,9 @@ html_page_url : string</input_parameters>
     <automation_approch>1. Launch HtmlApp plugin using RDKShell.
 2. Set the given URL using HtmlApp.1.url method.
 3. Verify whether URL is set.
-4. Validate the profiling data from Grafana tool based on threshold values.
+4. Validate the profiling data from Grafana tool with the threshold values for the pre-configured process list.
 5. Execute the smem tool and collect the log 
-6. Check for alerts from Grafana
+6. Execute pmap tool for the list of given process and collect the log 
 7. Revert the URL and plugin status.</automation_approch>
     <expected_output>URL should be launched successfully and profiling data should be within the expected limit</expected_output>
     <priority>High</priority>

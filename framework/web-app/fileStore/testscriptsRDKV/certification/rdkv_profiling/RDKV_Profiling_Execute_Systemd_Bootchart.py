@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>To execute systemd-bootchart command in the devices</synopsis>
+  <synopsis>The objective of this test case is to execute the systemd-bootchart command in the device to collects the CPU utilization, disk load, memory usage, as well as per-process information from a running system</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -61,7 +61,7 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_PROFILING_20</test_case_id>
-    <test_objective>he objective of this test case is to execute the systemd-bootchart command in the devices</test_objective>
+    <test_objective>The objective of this test case is to execute the systemd-bootchart command in the device to collects the CPU utilization, disk load, memory usage, as well as per-process information from a running system</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>Systemd-bootchart should be present in device</pre_requisite>
@@ -69,7 +69,7 @@
     <input_parameters>Device details</input_parameters>
     <automation_approch>1.Reboot the device.
     2.Execute the systemd-bootchart command.
-    3.Get the data of systemd-bootchart in txt and svg file.</automation_approch>
+    3.Systemd-bootchart output is captured in SVG file format, transfer svg file from DUT to TestManager and display it for user reference </automation_approch>
     <expected_output>To successfully get the output of systemd-bootchart</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_profiling</test_stub_interface>
@@ -115,6 +115,7 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter('deviceIP',ip)
         tdkTestObj.addParameter('deviceConfig',conf_file)
         tdkTestObj.addParameter('realPath',obj.realpath)
+        tdkTestObj.addParameter('logPath',obj.logpath)
         tdkTestObj.addParameter('execId',obj.execID)
         tdkTestObj.addParameter('execDeviceId',obj.execDevId)
         tdkTestObj.addParameter('execResultId',obj.resultId)

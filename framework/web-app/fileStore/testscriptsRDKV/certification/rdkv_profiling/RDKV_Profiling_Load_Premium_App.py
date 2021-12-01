@@ -49,10 +49,11 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>None</input_parameters>
     <automation_approch>1. Launch Cobalt and sleep for a minimum of 30 seconds
-2. Validate the profiling data from Grafana tool based on threshold values.
+2. Validate the profiling data from Grafana tool with the threshold values for the pre-configured process list.
 3. Execute the smem tool and collect the log
-4. Check for alerts from Grafana tool
-5. Revert the URL and plugin status.</automation_approch>
+4. Execute pmap tool for the list of given process and collect the log
+5. Check for alerts from Grafana tool
+6. Revert the URL and plugin status.</automation_approch>
     <expected_output>Cobalt should be launched successfully and  profiling data should be within the expected limit</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_profiling</test_stub_interface>

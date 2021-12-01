@@ -49,9 +49,10 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>navigation_key_sequence: string</input_parameters>
     <automation_approch>1. Navigate in ResidentApp UI using generateKey method of RDKShell
-2. Validate the profiling data from Grafana based on threshold values
+2. Validate the profiling data from Grafana tool with the threshold values for the pre-configured process list.
 3. Execute the smem tool and collect the log
-4. Check for alerts from Grafana tool</automation_approch>
+4. Execute pmap tool for the list of given process and collect the log
+5. Check for alerts from Grafana tool</automation_approch>
     <expected_output>Profiling data should be within the expected limit.</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_profiling</test_stub_interface>

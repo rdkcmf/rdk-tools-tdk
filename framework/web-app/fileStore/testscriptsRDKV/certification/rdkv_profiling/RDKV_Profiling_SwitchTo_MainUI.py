@@ -51,10 +51,11 @@
     <automation_approch>1. Launch Cobalt using RDKShell.
 2. Press home button to switch back to main UI.
 3. Check zorder to see home screen is reached.
-4. Validate the profiling data from Grafana tool based on threshold values.
+4. Validate the profiling data from Grafana tool with the threshold values for the pre-configured process list.
 5. Execute the smem tool and collect the log 
-6. Check for alerts from Grafana tool.
-7. Revert Cobalt status.</automation_approch>
+6. Execute pmap tool for the list of given process and collect the log
+7. Check for alerts from Grafana tool.
+8. Revert Cobalt status.</automation_approch>
     <expected_output>Home screen should be reached.
 Profiling data should be within the expected limit.</expected_output>
     <priority>High</priority>

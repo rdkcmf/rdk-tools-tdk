@@ -52,9 +52,10 @@
 2. Wait for 90 seconds
 3. Check the uptime
 4. Check the zorder from RDKShell to see ResidenApp is loaded.
-5. Validate the profiling data from Grafana tool based on threshold values.
+5. Validate the profiling data from Grafana tool with the threshold values for the pre-configured process list.
 6. Execute the smem tool and collect the log
-7. Check for alerts from Grafana tool.
+7. Execute pmap tool for the list of given process and collect the log
+8. Check for alerts from Grafana tool.
 </automation_approch>
     <expected_output>ResidentApp should be launched successfully and profiling data should be within the expected limit</expected_output>
     <priority>High</priority>

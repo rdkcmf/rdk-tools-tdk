@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>To execute lmbench command in devices</synopsis>
+  <synopsis>The objective of this test case is to execute the lmbench tool in the devices to measure the performance of Hardwares</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -61,15 +61,15 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_PROFILING_21</test_case_id>
-    <test_objective>The objective of this test case is to execute the lmbench command in the devices </test_objective>
+    <test_objective>The objective of this test case is to execute the lmbench tool in the devices to measure the performance of Hardwares </test_objective>
     <test_type>Positive </test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>lmbench binary should be present in device</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Device details</input_parameters>
     <automation_approch>1.Reboot the device.
-    2.Execute the lmbench command.
-    3.Get the data of lmbench in Test Manager.</automation_approch>
+     2.Execute the lmbench command with required inputs
+     3.Transfer the output of lmbench from DUT to Test Manager and display it for user reference </automation_approch>
     <expected_output>To successfully get the output of lmbench in test manager</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_profiling</test_stub_interface>
@@ -119,6 +119,7 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter('deviceIP',ip)
         tdkTestObj.addParameter('deviceConfig',conf_file)
         tdkTestObj.addParameter('realPath',obj.realpath)
+        tdkTestObj.addParameter('logPath',obj.logpath)
         tdkTestObj.addParameter('execId',obj.execID)
         tdkTestObj.addParameter('execDeviceId',obj.execDevId)
         tdkTestObj.addParameter('execResultId',obj.resultId)

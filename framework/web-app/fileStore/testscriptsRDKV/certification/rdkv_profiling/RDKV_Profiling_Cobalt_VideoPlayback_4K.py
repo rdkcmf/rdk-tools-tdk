@@ -52,11 +52,12 @@ key_navigation_for_4k : List of strings</input_parameters>
     <automation_approch>1. Launch Cobalt using RDKShell.
 2. Set a 4K video URL
 3. Navigate to set resolution option in the application and set 4K resolution for the video.
-4. Check video playback using decoder entries
-5. Validate the profiling data from Grafana tool based on threshold values.
+4. Check video playback using decoder proc entries if applicable
+5. Validate the profiling data from Grafana tool with the threshold values for the pre-configured process list.
 6. Execute the smem tool and collect the log
-7. Check for alerts from Grafana tool.
-8. Revert the plugin status.</automation_approch>
+7. Execute pmap tool for the list of given process and collect the log
+8. Check for alerts from Grafana tool.
+9. Revert the plugin status.</automation_approch>
     <expected_output>Video should be playing and profiling data should be within the expected limit</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_profiling</test_stub_interface>

@@ -50,10 +50,11 @@
     <input_parameters>app_launch_key_sequence: List of strings
 post_app_launch_key_sequence: List of strings</input_parameters>
     <automation_approch>1. Launch vimeo application from app store by keypress using generateKey method of RDKShell plugin
-2. Validate the profiling data from Grafana tool based on threshold value
+2. Validate the profiling data from Grafana tool with the threshold values for the pre-configured process list.
 3. Execute the smem tool and collect the log
-4. Check for alerts from Grafana tool
-5. Close the application by pressing home button</automation_approch>
+4. Execute pmap tool for the list of given process and collect the log
+5. Check for alerts from Grafana tool
+6. Close the application by pressing home button</automation_approch>
     <expected_output>Profiling data should be within the expected limit</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_profiling</test_stub_interface>

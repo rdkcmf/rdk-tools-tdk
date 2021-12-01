@@ -524,12 +524,13 @@ def rdkv_profiling_get_alerts(tmUrl, resultId):
 # To execute the smem tool in DUT and transfer the smem log from DUT to TM
 #
 #
-# Syntax       : rdkv_profiling_smem_execute(deviceIP,deviceConfig,realPath,execId,execDeviceId,execResultId)
+# Syntax       : rdkv_profiling_smem_execute(deviceIP,deviceConfig,realPath,logPath,execId,execDeviceId,execResultId)
 #
 # Parameters   : deviceIP - IP of the device
 #                deviceConfig - DUT config file
 #                execId - execution ID
 #                realPath - TM location
+#                logPath  - Logs folder location
 #                execResultId - execution result ID
 #                execDeviceId - execution device ID
 #
@@ -537,7 +538,7 @@ def rdkv_profiling_get_alerts(tmUrl, resultId):
 #                SUCCESS - smem tool execution & log transfer done
 #                FAILURE - smem tool execution/log transfer failed
 #----------------------------------------------------------------------------
-def rdkv_profiling_smem_execute(deviceIP,deviceConfig,realPath,execId,execDeviceId,execResultId):
+def rdkv_profiling_smem_execute(deviceIP,deviceConfig,realPath,logPath,execId,execDeviceId,execResultId):
     result_val = "SUCCESS"
     result,smem_support = getDeviceConfigKeyValue(deviceConfig,"PROFILING_SMEM_SUPPORT")
     if smem_support != "" and smem_support.upper() == "YES":
@@ -546,8 +547,8 @@ def rdkv_profiling_smem_execute(deviceIP,deviceConfig,realPath,execId,execDevice
         now = datetime.now()
         timing_info = str(now.strftime("%Y%m%d%H%M%S"))
         src_file_name = "smemData.txt"
-        dest_file_name = str(execId) + "_" + "smemData" + "_" + timing_info
-        result_val = execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,execId,execDeviceId,execResultId,src_file_name,dest_file_name)
+        dest_file_name = str(execId) + "_" + str(execDeviceId) + "_" + str(execResultId) + "_" + "smemData" + "_" + timing_info
+        result_val = execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,logPath,src_file_name,dest_file_name)
     else:
          print "\nDevice does not have smem support. Skipping smem execution"
 
@@ -589,12 +590,13 @@ def transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_pat
 # To execute the pmap tool in DUT and transfer the pmap log from DUT to TM
 #
 #
-# Syntax       : rdkv_profiling_pmap_execute(deviceIP,deviceConfig,realPath,execId,execDeviceId,execResultId)
+# Syntax       : rdkv_profiling_pmap_execute(deviceIP,deviceConfig,realPath,logPath,execId,execDeviceId,execResultId)
 #
 # Parameters   : deviceIP - IP of the device
 #                deviceConfig - DUT config file
 #                execId - execution ID
 #                realPath - TM location
+#                logPath - Logs folder location
 #                execResultId - execution result ID
 #                execDeviceId - execution device ID
 #
@@ -602,7 +604,7 @@ def transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_pat
 #                SUCCESS - pmap tool execution & log transfer done
 #                FAILURE - pmap tool execution/log transfer failed
 #----------------------------------------------------------------------------
-def rdkv_profiling_pmap_execute(deviceIP,deviceConfig,realPath,execId,execDeviceId,processes,execResultId):
+def rdkv_profiling_pmap_execute(deviceIP,deviceConfig,realPath,logPath,execId,execDeviceId,processes,execResultId):
     result_val = "SUCCESS"
     result,pmap_support = getDeviceConfigKeyValue(deviceConfig,"PROFILING_PMAP_SUPPORT")
     if pmap_support != "" and pmap_support.upper() == "YES":
@@ -612,8 +614,8 @@ def rdkv_profiling_pmap_execute(deviceIP,deviceConfig,realPath,execId,execDevice
         now = datetime.now()
         timing_info = str(now.strftime("%Y%m%d%H%M%S"))
         src_file_name = "pmapData.txt"
-        dest_file_name = str(execId) + "_" + "pmapData" + "_" + timing_info
-        result_val = execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,execId,execDeviceId,execResultId,src_file_name,dest_file_name)
+        dest_file_name = str(execId) + "_" + str(execDeviceId) + "_" + str(execResultId) + "_" + "pmapData" + "_" + timing_info
+        result_val = execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,logPath,src_file_name,dest_file_name)
     else:
          print "\nDevice does not have pmap support. Skipping pmap execution"
     return result_val
@@ -621,12 +623,13 @@ def rdkv_profiling_pmap_execute(deviceIP,deviceConfig,realPath,execId,execDevice
 # To execute the systemd-analyze tool in DUT and transfer the systemd-analyze log from DUT to TM
 #
 #
-# Syntax       : rdkv_profiling_systemd_analyze(deviceIP,deviceConfig,realPath,execId,execDeviceId,execResultId)
+# Syntax       : rdkv_profiling_systemd_analyze(deviceIP,deviceConfig,realPath,logPath,execId,execDeviceId,execResultId)
 #
 # Parameters   : deviceIP - IP of the device
 #                deviceConfig - DUT config file
 #                execId - execution ID
 #                realPath - TM location
+#                logPath - Logs folder location
 #                execResultId - execution result ID
 #                execDeviceId - execution device ID
 #
@@ -634,7 +637,7 @@ def rdkv_profiling_pmap_execute(deviceIP,deviceConfig,realPath,execId,execDevice
 #                SUCCESS - systemd-analyze tool execution & log transfer done
 #                FAILURE - systemd-analyze tool execution/log transfer failed
 #----------------------------------------------------------------------------
-def rdkv_profiling_systemd_analyze_execute(deviceIP,deviceConfig,realPath,execId,execDeviceId,execResultId):
+def rdkv_profiling_systemd_analyze_execute(deviceIP,deviceConfig,realPath,logPath,execId,execDeviceId,execResultId):
     result_val = "SUCCESS"
     result,systemd_analyze_support = getDeviceConfigKeyValue(deviceConfig,"PROFILING_SYSTEMD_ANALYZE_SUPPORT")
     if systemd_analyze_support != "" and systemd_analyze_support.upper() == "YES":
@@ -643,9 +646,9 @@ def rdkv_profiling_systemd_analyze_execute(deviceIP,deviceConfig,realPath,execId
         now = datetime.now()
         timing_info = str(now.strftime("%Y%m%d%H%M%S"))
         src_file_name = "systemdAnalyze.svg"
-        dest_file_name = str(execId) + "_" + "systemdAnalyze" + "_" + timing_info + '.svg'
+        dest_file_name = str(execId) + "_" + str(execDeviceId) + "_" + str(execResultId) + "_" + "systemdAnalyze" + "_" + timing_info + '.svg'
         #Calling ssh_method to ssh and execute the command in device
-        result_val = execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,execId,execDeviceId,execResultId,src_file_name,dest_file_name)
+        result_val = execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,logPath,src_file_name,dest_file_name)
     else:
          print "\nDevice does not have systemd analyze support. Skipping systemd analyze execution"
     return result_val
@@ -653,12 +656,13 @@ def rdkv_profiling_systemd_analyze_execute(deviceIP,deviceConfig,realPath,execId
 # To execute the systemd-bootchart tool in DUT and transfer the systemd-bootchart log from DUT to TM
 #
 #
-# Syntax       : rdkv_profiling_systemd_bootchart(deviceIP,deviceConfig,realPath,execId,execDeviceId,execResultId)
+# Syntax       : rdkv_profiling_systemd_bootchart(deviceIP,deviceConfig,realPath,logPath,execId,execDeviceId,execResultId)
 #
 # Parameters   : deviceIP - IP of the device
 #                deviceConfig - DUT config file
 #                execId - execution ID
 #                realPath - TM location
+#                logPath - Logs folder location
 #                execResultId - execution result ID
 #                execDeviceId - execution device ID
 #
@@ -666,7 +670,7 @@ def rdkv_profiling_systemd_analyze_execute(deviceIP,deviceConfig,realPath,execId
 #                SUCCESS - systemd-bootchart tool execution & log transfer done
 #                FAILURE - systemd-bootchart tool execution/log transfer failed
 #----------------------------------------------------------------------------
-def rdkv_profiling_systemd_bootchart_execute(deviceIP,deviceConfig,realPath,execId,execDeviceId,execResultId):
+def rdkv_profiling_systemd_bootchart_execute(deviceIP,deviceConfig,realPath,logPath,execId,execDeviceId,execResultId):
     result_val = "SUCCESS"
     host_name = deviceIP
     result,systemd_bootchart_support = getDeviceConfigKeyValue(deviceConfig,"PROFILING_SYSTEMD_BOOTCHART_SUPPORT")
@@ -676,9 +680,9 @@ def rdkv_profiling_systemd_bootchart_execute(deviceIP,deviceConfig,realPath,exec
         now = datetime.now()
         timing_info = str(now.strftime("%Y%m%d%H%M%S"))
         src_file_name = "systemdBootchart.svg"
-        dest_file_name = str(execId) + "_" + "systemdBootchart" + "_" + timing_info + '.svg'
+        dest_file_name = str(execId) + "_" + str(execDeviceId) + "_" + str(execResultId) + "_" + "systemdBootchart" + "_" + timing_info + '.svg'
         #Calling ssh_method to ssh and execute the command in device
-        result_val = execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,execId,execDeviceId,execResultId,src_file_name,dest_file_name)
+        result_val = execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,logPath,src_file_name,dest_file_name)
     else:
          print "\nDevice does not have systemd-bootchart support. Skipping systemd-bootchart execution"
     return result_val
@@ -686,7 +690,7 @@ def rdkv_profiling_systemd_bootchart_execute(deviceIP,deviceConfig,realPath,exec
 # To execute the lmbench tool in DUT and transfer the lmbench log from DUT to TM
 #
 #
-# Syntax       : rdkv_profiling_lmbench(deviceIP,deviceConfig,realPath,execId,execDeviceId,execResultId)
+# Syntax       : rdkv_profiling_lmbench(deviceIP,deviceConfig,realPath,logPath,execId,execDeviceId,execResultId)
 #
 # Parameters   : deviceIP - IP of the device
 #                deviceConfig - DUT config file
@@ -699,7 +703,7 @@ def rdkv_profiling_systemd_bootchart_execute(deviceIP,deviceConfig,realPath,exec
 #                SUCCESS - lmbench tool execution & log transfer done
 #                FAILURE - lmbench tool execution/log transfer failed
 #----------------------------------------------------------------------------
-def rdkv_profiling_lmbench(deviceIP,deviceConfig,realPath,execId,execDeviceId,execResultId):
+def rdkv_profiling_lmbench(deviceIP,deviceConfig,realPath,logPath,execId,execDeviceId,execResultId):
     result_val = "SUCCESS"
     result,lmbench_support = getDeviceConfigKeyValue(deviceConfig,"PROFILING_LMBENCH_SUPPORT")
     if lmbench_support != "" and lmbench_support.upper() == "YES":
@@ -708,16 +712,16 @@ def rdkv_profiling_lmbench(deviceIP,deviceConfig,realPath,execId,execDeviceId,ex
         now = datetime.now()
         timing_info = str(now.strftime("%Y%m%d%H%M%S"))
         src_file_name = "lmbench.txt"
-        dest_file_name = str(execId) + "_" + "lmbench" + "_" + timing_info
+        dest_file_name = str(execId) + "_" + str(execDeviceId) + "_" + str(execResultId) + "_" + "lmbench" + "_" + timing_info
         #Calling ssh_method to ssh and execute the command in device
-        result_val = execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,execId,execDeviceId,execResultId,src_file_name,dest_file_name)
+        result_val = execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,logPath,src_file_name,dest_file_name)
     else:
          print "\nDevice does not have lmbench support. Skipping lmbench execution"
     return result_val
 #----------------------------------------------------------------------------
 #To Handle SSH connection and execute the command in device
 #----------------------------------------------------------------------------
-def execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,execId,execDeviceId,execResultId,src_file_name,dest_file_name):
+def execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,logPath,src_file_name,dest_file_name):
     host_name = deviceIP
     result,ssh_method = getDeviceConfigKeyValue(deviceConfig,"SSH_METHOD")
     result,user_name  = getDeviceConfigKeyValue(deviceConfig,"SSH_USERNAME")
@@ -744,7 +748,7 @@ def execute_ssh(deviceIP,deviceConfig,file_name,command,realPath,execId,execDevi
                 else:
                      output = method_to_call(host_name,user_name,password,command)
 
-                dest_path = realPath + "/logs/" + str(execId) + "/" + str(execDeviceId) + "/" + str(execResultId)
+                dest_path = logPath
                 result_val = transfer_output_file(deviceIP,user_name,password,realPath,file_name,dest_path,dest_file_name,src_file_name)
             except Exception as e:
                 result_val = "EXCEPTION OCCURRED"
@@ -789,6 +793,7 @@ def get_smemdata(obj,ip,conf_file):
     tdkTestObj.addParameter('deviceIP',ip)
     tdkTestObj.addParameter('deviceConfig',conf_file)
     tdkTestObj.addParameter('realPath',obj.realpath)
+    tdkTestObj.addParameter('logPath',obj.logpath)
     tdkTestObj.addParameter('execId',obj.execID)
     tdkTestObj.addParameter('execDeviceId',obj.execDevId)
     tdkTestObj.addParameter('execResultId',obj.resultId)
@@ -806,6 +811,7 @@ def get_pmapdata(obj,ip,conf_file,process_list):
     tdkTestObj.addParameter('deviceConfig',conf_file)
     tdkTestObj.addParameter('processes',list_of_process)
     tdkTestObj.addParameter('realPath',obj.realpath)
+    tdkTestObj.addParameter('logPath',obj.logpath)
     tdkTestObj.addParameter('execId',obj.execID)
     tdkTestObj.addParameter('execDeviceId',obj.execDevId)
     tdkTestObj.addParameter('execResultId',obj.resultId)

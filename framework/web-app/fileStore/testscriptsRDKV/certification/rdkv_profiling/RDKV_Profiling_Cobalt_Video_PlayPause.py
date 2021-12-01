@@ -52,13 +52,14 @@
     <input_parameters>cobalt_test_url: string</input_parameters>
     <automation_approch>1. Launch Cobalt using RDKShell.
 2. Set a video URL
-3. Check video playback using decoder entries
+3. Check video playback using decoder proc entries if applicable
 4. Send key to pause the video
-5. Check whether video is paused decoder entries
-6. Validate the profiling data from Grafana tool based on threshold values.
+5. Check whether video is paused and verify with decoder proc entries if applicable
+6. Validate the profiling data from Grafana tool with the threshold values for the pre-configured process list.
 7. Execute the smem tool and collect the log
-8. Check for alerts from Grafana tool.
-9. Revert the plugin status.</automation_approch>
+8. Execute pmap tool for the list of given process and collect the log
+9. Check for alerts from Grafana tool.
+10. Revert the plugin status.</automation_approch>
     <expected_output>Video should be paused and profiling data should be within the expected limit</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_profiling</test_stub_interface>

@@ -53,10 +53,11 @@ lightning_app_url : string</input_parameters>
     <automation_approch>1. Launch LightningApp plugin using RDKShell.
 2. Set the URL of Lightning App.
 3. Check whether application is launched.
-4. Validate the profiling data from Grafana tool based on threshold values.
+4. Validate the profiling data from Grafana tool with the threshold values for the pre-configured process list.
 5. Execute the smem tool and collect the log
-6. Check for alerts from Grafana tool
-7. Revert the URL and plugin status.</automation_approch>
+6. Execute pmap tool for the list of given process and collect the log
+7. Check for alerts from Grafana tool
+8. Revert the URL and plugin status.</automation_approch>
     <expected_output>Lightning App should be launched and profiling data should be within the expected limit</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_profiling</test_stub_interface>

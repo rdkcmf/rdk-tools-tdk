@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>To execute systemd-analyze command in devices</synopsis>
+  <synopsis>The objective of this test case is to execute the systemd-analyze command in the device to get stats on the service initialization</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -61,7 +61,7 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_PROFILING_19</test_case_id>
-    <test_objective>The objective of this test case is to execute the systemd-analyze command in the devices </test_objective>
+    <test_objective>The objective of this test case is to execute the systemd-analyze command in the device to get stats on the service initialization</test_objective>
     <test_type>Positive </test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>Systemd-analyze should be present in device</pre_requisite>
@@ -69,7 +69,7 @@
     <input_parameters>Device details</input_parameters>
     <automation_approch>1.Reboot the device.
     2.Execute the systemd-analyze command.
-    3.Get the data of systemd-analyze in svg file.</automation_approch>
+    3.Systemd-analyze output is captured in SVG file format, transfer svg file from DUT to TestManager and display it for user reference </automation_approch>
     <expected_output>To successfully get the output of systemd-analyze</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_profiling</test_stub_interface>
@@ -118,6 +118,7 @@ if expectedResult in result.upper():
         tdkTestObj.addParameter('deviceIP',ip)
         tdkTestObj.addParameter('deviceConfig',conf_file)
         tdkTestObj.addParameter('realPath',obj.realpath)
+        tdkTestObj.addParameter('logPath',obj.logpath)
         tdkTestObj.addParameter('execId',obj.execID)
         tdkTestObj.addParameter('execDeviceId',obj.execDevId)
         tdkTestObj.addParameter('execResultId',obj.resultId)
