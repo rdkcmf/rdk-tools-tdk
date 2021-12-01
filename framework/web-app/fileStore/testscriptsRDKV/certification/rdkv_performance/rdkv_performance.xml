@@ -118,6 +118,13 @@
           <parameter name="validation_details" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkservice_getValueWithParams" id=" " version="2">
+        <function>rdkservice_getValueWithParams</function>
+        <parameters>
+          <parameter name="method" value=""/>
+          <parameter name="params" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>

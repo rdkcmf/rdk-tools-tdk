@@ -187,6 +187,19 @@ pair_unpair_max_count = 1000
 #URL used to test HtmlApp plugin
 html_page_url = "https://vimeo.com/channels/premieres"
 
-#Cobalt navigation test details
-#maximum number of key navigations
+# Cobalt navigation test details
+# maximum number of key navigations
 cobalt_max_navigations = 100
+
+# DisplaySettings tests details
+# maximum number of mute and unmute operations neeeded
+mute_unmute_max_count = 1000
+
+# maximum number of set and get volumelevel operations needed
+set_volumelevel_max_count = 1000
+
+# sleep time needed after setting a resolution ( in seconds)
+set_resolution_sleep_time = 5
+
+# maximum number of set and get resolution operations needed
+set_resolution_max_count = 1000

@@ -52,3 +52,6 @@ graphical_plugins_list = ["Cobalt","WebKitBrowser","LightningApp","ResidentApp",
 
 #URL used to test HtmlApp plugin
 html_page_url = "https://vimeo.com/channels/premieres"
+
+#List of processes that can be ignored while checking the zorder
+excluded_process_list = ['subtec_s1']

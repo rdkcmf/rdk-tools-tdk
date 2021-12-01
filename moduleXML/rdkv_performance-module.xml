@@ -46,6 +46,7 @@
       <function name='rdkservice_getBluetoothMac' />
       <function name='rdkservice_getSupportedPlugins' />
       <function name='rdkservice_validatePluginFunctionality' />
+      <function name='rdkservice_getValueWithParams' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>
@@ -70,6 +71,8 @@
       <parameter funName='rdkservice_validatePluginFunctionality' parameterName='plugin' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_validatePluginFunctionality' parameterName='operations' parameterType='STRING' range='a-z' />
       <parameter funName='rdkservice_validatePluginFunctionality' parameterName='validation_details' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_getValueWithParams' parameterName='method' parameterType='STRING' range='a-z' />
+      <parameter funName='rdkservice_getValueWithParams' parameterName='params' parameterType='STRING' range='a-z' />
     </parameters>
   </module>
 </xml>
