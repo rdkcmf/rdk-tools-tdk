@@ -136,6 +136,7 @@ if expectedResult in result.upper():
                 if expectedResult in zorder_status :
                     zorder = ast.literal_eval(zorder)["clients"]
                     print "zorder: ",zorder
+                    zorder = exclude_from_zorder(zorder)
                     if  plugin.lower() in [element.lower() for element in zorder]:
                         tdkTestObj.setResultStatus("SUCCESS")
                         if zorder[0].lower() == plugin.lower():

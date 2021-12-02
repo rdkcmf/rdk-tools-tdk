@@ -337,6 +337,7 @@ def rdkservice_executeLifeCycle(plugin,operations,validation_details):
                     if zorder_result != "EXCEPTION OCCURRED":
                         print zorder_result
                         zorder = zorder_result["clients"]
+                        zorder = rdkv_performancelib.exclude_from_zorder(zorder)
                         if zorder[check_zorder_dict[move_to_method]].lower() == plugin.lower():
                             print "\n {} operation is success ".format(move_to_method)
                         else:

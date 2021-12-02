@@ -155,6 +155,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                     tdkTestObj.setResultStatus("SUCCESS")
                     #Check zorder
                     zorder = ast.literal_eval(zorder)["clients"]
+                    zorder = exclude_from_zorder(zorder)
                     for count in range(0,moveto_back_max_count):
                         print "\n Zorder:",zorder
                         zorder = [plugin.lower() for plugin in zorder]
@@ -187,6 +188,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                             if expectedResult in zorder_status:
                                 tdkTestObj.setResultStatus("SUCCESS")
                                 zorder = ast.literal_eval(zorder)["clients"]
+                                zorder = exclude_from_zorder(zorder)
                                 print "\n zorder:",zorder
                                 if zorder[-1].lower() == plugin.lower():
                                     print "\n{} plugin moved to back \n".format(plugin)

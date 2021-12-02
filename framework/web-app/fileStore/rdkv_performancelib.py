@@ -40,6 +40,7 @@ devicePort=""
 deviceName=""
 deviceType=""
 graphical_plugins_list = PerformanceTestVariables.graphical_plugins_list
+excluded_process_list = PerformanceTestVariables.excluded_process_list
 #METHODS
 #---------------------------------------------------------------
 #INITIALIZE THE MODULE
@@ -160,6 +161,15 @@ def rdkservice_getReqValueFromResult(method,reqValue):
         return value
     else:
         return result
+
+#-------------------------------------------------------------------
+#GET THE VALUE OF METHOD WITH PARAMETERS
+#-------------------------------------------------------------------
+def rdkservice_getValueWithParams(method,params):
+    data = '"method": "'+method+'","params": '+params
+    result = execute_step(data)
+    return result
+
 #------------------------------------------------------------------
 #SET VALUE FOR A METHOD
 #------------------------------------------------------------------
@@ -188,6 +198,7 @@ def openChromeBrowser(url):
    os.environ["PATH"] += BrowserPerformanceVariables.path_of_browser_executable;
    try:
         chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         driver = webdriver.Chrome(chrome_options=chrome_options) #Opening Chrome
         driver.get(url);
@@ -657,13 +668,17 @@ def rdkservice_validatePluginFunctionality(plugin,operations,validation_details)
             zorder_result = rdkservice_getValue("org.rdk.RDKShell.1.getZOrder")
             if zorder_result != "EXCEPTION OCCURRED":
                 zorder = zorder_result["clients"]
-                if zorder[0].lower() != plugin.lower():
-                    param = '{"client": "'+plugin+'"}'
-                    movetofront_result = rdkservice_setValue("org.rdk.RDKShell.1.moveToFront",param)
-                    if movetofront_result != "EXCEPTION OCCURRED":
+                zorder = exclude_from_zorder(zorder) 
+                if plugin.lower() in zorder:
+                    if zorder[0].lower() != plugin.lower():
+                        param = '{"client": "'+plugin+'"}'
+                        movetofront_result = rdkservice_setValue("org.rdk.RDKShell.1.moveToFront",param)
+                        if movetofront_result != "EXCEPTION OCCURRED":
+                            movedToFront = True
+                    else:
                         movedToFront = True
                 else:
-                    movedToFront = True
+                    print "\n {} is not present in the zorder: {}".format(plugin,zorder)
                 if movedToFront:
                     for operation in operations:
                         method = [plugin_method for plugin_method in operation][0]
@@ -804,6 +819,7 @@ def move_plugin(obj,plugin,method):
         zorder_status = tdkTestObj.getResult()
         if expectedResult in zorder_status :
             zorder = ast.literal_eval(zorder)["clients"]
+            zorder = exclude_from_zorder(zorder)
             print "zorder: ",zorder
             if  plugin.lower() in zorder and plugin.lower() == zorder[0]:
                 result_val = "SUCCESS"
@@ -819,3 +835,10 @@ def move_plugin(obj,plugin,method):
         print "\n Error while executing {} method".format(method)
         tdkTestObj.setResultStatus("FAILURE")
     return result_val
+
+#-------------------------------------------------------------------
+#REMOVE UNWANTED PROCESSES FROM ZORDER AND RETURN UPDATED ZORDER
+#-------------------------------------------------------------------
+def exclude_from_zorder(zorder):
+   new_zorder = [ element for element in zorder if element not in excluded_process_list ] 
+   return new_zorder

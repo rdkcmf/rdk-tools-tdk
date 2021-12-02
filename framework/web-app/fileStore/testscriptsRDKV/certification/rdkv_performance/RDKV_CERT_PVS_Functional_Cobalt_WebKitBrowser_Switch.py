@@ -162,6 +162,7 @@ if expectedResult in result.upper():
                     if expectedResult in zorder_status :
                         zorder = ast.literal_eval(zorder)["clients"]
                         print "zorder: ",zorder
+                        zorder = exclude_from_zorder(zorder)
                         if zorder[0].lower() == resident_app.lower():
                             print "\n Home screen is reached"
                             tdkTestObj.setResultStatus("SUCCESS")

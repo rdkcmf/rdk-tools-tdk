@@ -155,15 +155,18 @@ if expectedResult in (result.upper() and pre_condition_status):
                     tdkTestObj.setResultStatus("SUCCESS")
                     #Check zorder
                     zorder = ast.literal_eval(zorder)["clients"]
+                    zorder = exclude_from_zorder(zorder)
                     for count in range(0,moveto_front_max_count):
                         print "\n zorder:",zorder
-                        result_dict = {}
-                        if zorder[0].lower() == "cobalt":
-                            plugin = "WebKitBrowser"
-                        elif zorder[0].lower() == "webkitbrowser" or zorder[0].lower() == "residentapp":
-                            plugin = "Cobalt"
+                        zorder = [plugin.lower() for plugin in zorder]
+                        if all(plugin in zorder for plugin in ["webkitbrowser","cobalt"]):
+                            result_dict = {}
+                            if zorder[0].lower() == "webkitbrowser":
+                                plugin = "Cobalt"
+                            else:
+                                plugin = "WebKitBrowser"
                         else:
-                            print "\n Zorder is not having Cobalt or WebkitBrowser as first plugin, zorder: ",zorder
+                            print "\n Zorder is not having Cobalt and WebKitBrowser in the list, zorder:",zorder
                             tdkTestObj.setResultStatus("FAILURE")
                             break
                         #moveToFront
@@ -185,6 +188,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                             if expectedResult in zorder_status:
                                 tdkTestObj.setResultStatus("SUCCESS")
                                 zorder = ast.literal_eval(zorder)["clients"]
+                                zorder = exclude_from_zorder(zorder)
                                 print "\n zorder:",zorder
                                 if zorder[0].lower() == plugin.lower():
                                     print "\n{} plugin moved to front \n".format(plugin)

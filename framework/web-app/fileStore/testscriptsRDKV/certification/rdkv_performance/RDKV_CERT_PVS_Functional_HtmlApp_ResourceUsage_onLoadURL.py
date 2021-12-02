@@ -41,7 +41,7 @@
     <rdk_version>RDK2.0</rdk_version>
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_PERFORMANCE_82</test_case_id>
+    <test_case_id>RDKV_PERFORMANCE_83</test_case_id>
     <test_objective>The objective of this test is to validate the resource usage after setting a Html page URL in HtmlApp plugin.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>

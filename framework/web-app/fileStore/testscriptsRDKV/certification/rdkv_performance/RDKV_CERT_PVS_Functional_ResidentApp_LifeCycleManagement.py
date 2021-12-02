@@ -91,6 +91,7 @@ expectedResult = "SUCCESS"
 if expectedResult in result.upper() :
     status = "SUCCESS"
     plugin = "ResidentApp"
+    ui_app_url = ""
     plugins_list = ["ResidentApp","WebKitBrowser"]
     print "\n Check Pre conditions"
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
@@ -139,21 +140,22 @@ if expectedResult in result.upper() :
     else:
         print "\n Preconditions are not met"
         obj.setLoadModuleStatus("FAILURE")
-    print "\n Launch ResidentApp"
-    tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
-    tdkTestObj.addParameter('plugin','ResidentApp')
-    tdkTestObj.addParameter('status','activate')
-    tdkTestObj.addParameter('uri',ui_app_url)
-    tdkTestObj.executeTestCase(expectedResult)
-    result = tdkTestObj.getResult()
-    if result == "SUCCESS":
-        print "\n Successfully launched ResidentApp"
-        tdkTestObj.setResultStatus("SUCCESS")
-        curr_plugins_status_dict.pop("ResidentApp")
-        status = set_plugins_status(obj,curr_plugins_status_dict)
-    else:
-        print "\n Error while launching ResidentApp"
-        tdkTestObj.setResultStatus("FAILURE")
+    if ui_app_url:
+        print "\n Launch ResidentApp"
+        tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
+        tdkTestObj.addParameter('plugin','ResidentApp')
+        tdkTestObj.addParameter('status','activate')
+        tdkTestObj.addParameter('uri',ui_app_url)
+        tdkTestObj.executeTestCase(expectedResult)
+        result = tdkTestObj.getResult()
+        if result == "SUCCESS":
+            print "\n Successfully launched ResidentApp"
+            tdkTestObj.setResultStatus("SUCCESS")
+            curr_plugins_status_dict.pop("ResidentApp")
+            status = set_plugins_status(obj,curr_plugins_status_dict)
+        else:
+            print "\n Error while launching ResidentApp"
+            tdkTestObj.setResultStatus("FAILURE")
     obj.unloadModule("rdkv_performance");
 else:
     obj.setLoadModuleStatus("FAILURE");
