@@ -19,4 +19,4 @@
 
 RDK Test Development Kit
 
-Version : M-94
+Version : M-95
