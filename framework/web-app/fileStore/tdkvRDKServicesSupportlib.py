@@ -35,7 +35,7 @@ import subprocess
 import requests
 
 # To use the REST API variables
-import CertificationSuiteCommonVariables
+#import CertificationSuiteCommonVariables
 
 #-----------------------------------------------------------------------------------------------
 #               ***  RDK SERVICES VALIDATION FRAMEWORK SUPPORTING FUNCTIONS ***
