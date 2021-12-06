@@ -66,7 +66,7 @@
     <input_parameters>HTML player App URL: string
 webkit_instance_html:string
 webinspect_port_html: string
-video_src_url_dash_hevc: string
+video_src_url_hevc: string
 close_interval: int</input_parameters>
     <automation_approch>1. As pre requisite, launch webkit instance via RDKShell, open websocket conntion to webinspect page
 2. Store the details of other launched apps. Move the webkit instance to front, if its z-order is low.
@@ -124,7 +124,7 @@ if expectedResult in result.upper():
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.html_video_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_dash_hevc
+        videoURL  = MediaValidationVariables.video_src_url_hevc
         # Setting VideoPlayer Operations
         setOperation("close",MediaValidationVariables.close_interval)
         operations = getOperations()
