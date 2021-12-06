@@ -134,7 +134,7 @@ if expectedResult in result.upper():
             break
     if Test_Step_Status:
         print "Retrieving Configuration values from config file......."
-        configKeyList = ["PREFERRED_NETWORK_PARAMETER","WIFI_SSID_NAME","WIFI_PASSPHRASE","WIFI_SECURITY_MODE","SSH_METHOD", "SSH_USERNAME", "SSH_PASSWORD", "ENCRYPTED_WIFI_PASSWORD_SUPPORT"]
+        configKeyList = ["PREFERRED_NETWORK_PARAMETER","WIFI_SSID_NAME","WIFI_PASSPHRASE","WIFI_SECURITY_MODE","SSH_METHOD", "SSH_USERNAME", "SSH_PASSWORD", "ENCRYPTED_WIFI_PASSWORD_SUPPORT","WPA_SUPPLICANT_FILE_PATH"]
         configValues = {}
         tdkTestObj = obj.createTestStep('rdkvsecurity_getDeviceConfig')
         #Get each configuration from device config file
@@ -201,7 +201,7 @@ if expectedResult in result.upper():
                                     print "SUCCESS: Successfully Connected to SSID \n "
                                     print "Checking WPA_Supplicant file present in DUT"
                                     tdkTestObj.setResultStatus("SUCCESS")
-                                    command = '[ -f "/opt/wifi/wpa_supplicant.conf" ] && echo 1 || echo 0'
+                                    command = '[ -f "'+configValues["WPA_SUPPLICANT_FILE_PATH"]+'/wpa_supplicant.conf" ] && echo 1 || echo 0'
                                     print "COMMAND : %s" %(command)
                                     tdkTestObj = obj.createTestStep('rdkvsecurity_executeInDUT')
                                     tdkTestObj.addParameter("sshMethod", configValues["SSH_METHOD"]);
@@ -213,7 +213,7 @@ if expectedResult in result.upper():
                                     if expectedResult in result and int(output) == 1:
                                         print "SUCCESS: WPA_Supplicant file exists checking whether it contains WiFi passphrase........"
                                         tdkTestObj.setResultStatus("SUCCESS")
-                                        command = 'grep -F '+str(configValues["WIFI_PASSPHRASE"])+' /opt/wifi/wpa_supplicant.conf'
+                                        command = 'grep -F '+str(configValues["WIFI_PASSPHRASE"])+' '+configValues["WPA_SUPPLICANT_FILE_PATH"]+'/wpa_supplicant.conf'
                                         print "COMMAND: %s" %(command)
                                         tdkTestObj = obj.createTestStep('rdkvsecurity_executeInDUT');
                                         tdkTestObj.addParameter("sshMethod", configValues["SSH_METHOD"]);
