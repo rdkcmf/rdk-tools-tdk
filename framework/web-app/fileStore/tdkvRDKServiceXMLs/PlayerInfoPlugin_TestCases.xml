@@ -133,7 +133,7 @@
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
-              <subtestStep subtestStepId="2" name="Get_Resolution"  method="Get_Resolution" revertFlag="yes" >
+              <subtestStep subtestStepId="2" name="Get_Resolution"  method="Get_Resolution" revertFlag="yes" delay="3" >
                   <resultGeneration useMethodTag="playerinfo_check_resolution" >
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>

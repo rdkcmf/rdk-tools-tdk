@@ -58,7 +58,7 @@
             </testStep>
         </testCase>
 
-       <testCase testCaseId="OCDM_02" testCaseName="OCDM_ActivateDeactivate_STRESS" desc="Activates and deactivates the plugin">
+       <!--testCase testCaseId="OCDM_02" testCaseName="OCDM_ActivateDeactivate_STRESS" desc="Activates and deactivates the plugin">
              <testCaseInfo testCaseType="stress" configurableRepeat="true" repeatKey="STRESS_TEST_REPEAT_COUNT" />
 
              <testCasePreRequisite>
@@ -106,7 +106,7 @@
                   <resultGeneration useMethodTag="deviceinfo_get_system_info" arguments="check_cpu_load" />
               </subtestStep>
             </testStep>
-    </testCase>
+    </testCase-->
 
 </testPlugin>
 

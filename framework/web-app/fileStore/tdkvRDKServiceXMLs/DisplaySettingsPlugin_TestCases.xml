@@ -290,7 +290,7 @@
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
-              <subtestStep subtestStepId="2" name="Get_Current_Resolution"  method="Get_Current_Resolution" revertFlag="yes" >
+              <subtestStep subtestStepId="2" name="Get_Current_Resolution"  method="Get_Current_Resolution" revertFlag="yes" delay="3" >
                   <resultGeneration useMethodTag="check_current_resolution" >
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
