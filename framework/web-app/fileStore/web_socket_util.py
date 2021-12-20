@@ -41,6 +41,7 @@ class createEventListener(object):
         thread.start()
         self.listen = True
         self.listenflag = False
+        self.connStatus = True
         self.eventsbuffer = []
         self.eventsregisterinfo = []
         if not events:
@@ -56,6 +57,8 @@ class createEventListener(object):
         return self.listenflag
     def setListenerFlag(self):
         self.listenflag = True
+    def getConnectionStatus(self):
+        return self.connStatus
     def getFirstElement(self):
 	self.firstElement = self.eventsbuffer[0]
 
@@ -123,6 +126,8 @@ class createEventListener(object):
         self.eventsbuffer.append(message)
     def on_error(self,error):
         print(error)
+        if "[Errno 111] Connection refused" in str(error):
+            self.connStatus = False
     def on_close(self):
         print("[INFO]: Closed websocket Connection")
 

@@ -329,11 +329,7 @@ image_upload_dir = ""
 #            CONFIGURATIONS FOR MSE/EME TESTS
 #************************************************************************
 #User shall update the URL as per the version required
-mse_conformance_test_app_url = "https://ytlr-cert.appspot.com/2021/main.html?test_type=conformance-test"
-eme_conformance_test_app_url = "https://ytlr-cert.appspot.com/2021/main.html?test_type=encryptedmedia-test"
+mse_conformance_test_app_url = "https://ytlr-cert.appspot.com/2021/main.html?command=run&test_type=conformance-test"
+eme_conformance_test_app_url = "https://ytlr-cert.appspot.com/2021/main.html?command=run&test_type=encryptedmedia-test"
 
-#Key codes to navigate and start the test. Values must follow the pattern KeyName:KeyCode seperated by comma
-#Key sequence should be updated corresponding to the test URL used by the user
-mse_key_sequence = "ArrowLeft:37,ArrowDown:40,ArrowDown:40,ArrowUp:38,ArrowLeft:37,Enter:13"
-eme_key_sequence = "ArrowDown:40,ArrowDown:40,ArrowDown:40,ArrowUp:38,ArrowLeft:37,Enter:13"
 

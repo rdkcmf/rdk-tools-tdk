@@ -123,37 +123,27 @@ if expectedResult in result.upper():
         print "\nSet EME Conformance test app url..."
         #Setting device config file
         test_app_url = MediaValidationVariables.eme_conformance_test_app_url
-        key_sequence = MediaValidationVariables.eme_key_sequence
         print "\n================================================="
         print "URL Used: ",test_app_url
-        print "Key Sequences automated to run the test: ",key_sequence
-        print "User can update the EME test parameters in the mvs config file if required."
         print "=================================================\n"
 
         # Setting the EME test url in webkit instance using RDKShell
         launch_status = launchPlugin(obj,"WebKitBrowser",test_app_url)
         if "SUCCESS" in launch_status:
-            time.sleep(60);
-            print "\n Navigate and select Run All to start the tests"
-            run_status = sendKeysToClient(obj,"WebKitBrowser",key_sequence)
-            if "SUCCESS" in run_status:
-                print "All keys sent, Test started....\n"
-                # Monitoring the app progress, checking whether app runs tests properly or any hang detected in between,
-                # and getting the test result from the app
-                # Monitoring the EME test with hang detection time-out of 5 mins (300 seconds)
-                test_result,failed_test_list = monitorConformanceTest(obj,webkit_console_socket,300)
-                tdkTestObj = obj.createTestStep('rdkv_media_test');
-                tdkTestObj.executeTestCase(expectedResult);
-                if "SUCCESS" in test_result:
-                    print "All EME Conformance Tests Success"
-                    print "[TEST EXECUTION RESULT]: SUCCESS"
-                    tdkTestObj.setResultStatus("SUCCESS");
-                else:
-                    print "EME Conformance Tests Failed"
-                    print "[TEST EXECUTION RESULT]: FAILURE"
-                    tdkTestObj.setResultStatus("FAILURE");
+            # Monitoring the app progress, checking whether app runs tests properly or any hang detected in between,
+            # and getting the test result from the app
+            # Monitoring the EME test with hang detection time-out of 5 mins (300 seconds)
+            test_result,failed_test_list = monitorConformanceTest(obj,webkit_console_socket,300)
+            tdkTestObj = obj.createTestStep('rdkv_media_test');
+            tdkTestObj.executeTestCase(expectedResult);
+            if "SUCCESS" in test_result:
+                print "All EME Conformance Tests Success"
+                print "[TEST EXECUTION RESULT]: SUCCESS"
+                tdkTestObj.setResultStatus("SUCCESS");
             else:
-                print "Not Able to navigate and select Run All to start the tests\n"
+                print "EME Conformance Tests Failed"
+                print "[TEST EXECUTION RESULT]: FAILURE"
+                tdkTestObj.setResultStatus("FAILURE");
 
             print "\nSet post conditions..."
             tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');

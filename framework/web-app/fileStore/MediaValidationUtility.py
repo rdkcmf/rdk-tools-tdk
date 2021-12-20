@@ -53,6 +53,8 @@ current_mode = None
 mode_revert = False
 # Global variable to store proc validation mode
 proc_check_mode = None
+# Global variable to store process to be excluded
+excluded_process_list = PerformanceTestVariables.excluded_process_list
 
 # Function to set the operation and interval
 def setOperation(operation,intervalOrCount):
@@ -203,7 +205,8 @@ def createWebKitSocket(obj):
     print "\nInitiate Connection to Webinspect page (port:%s)..." %(webkit_socket_port)
     socket = createEventListener(obj.IP,webkit_socket_port,[],"/devtools/page/1",False)
     time.sleep(10)
-    return socket
+    status = socket.getConnectionStatus()
+    return status,socket
 
 
 # Function to set Pre/Post requisites for executing media tests
@@ -302,6 +305,8 @@ def checkClientZOrder(obj,client):
     next_z_order_client   = None
     if "SUCCESS" in result:
         clients_list = ast.literal_eval(details)["clients"]
+        # remove unwanted process from z-order list
+        clients_list = exclude_from_zorder(clients_list)
         print "Clients Z-Order: %s" %(clients_list)
         if len(clients_list) > 0:
             tdkTestObj.setResultStatus("SUCCESS")
@@ -319,6 +324,11 @@ def checkClientZOrder(obj,client):
         tdkTestObj.setResultStatus("FAILURE")
 
     return result,client_z_order_status
+
+#remove unwanted processes from z-order list
+def exclude_from_zorder(zorder):
+   new_zorder = [ element for element in zorder if element not in excluded_process_list ]
+   return new_zorder
 
 def checkWebkitReadyState(obj,result,webkit_client,webkit_z_order_status):
     if "SUCCESS" in result and not webkit_z_order_status:
@@ -424,16 +434,16 @@ def checkDRMSupported(obj,drm):
             drm_list = [ drm_name.lower() for drm_name in drm_list ]
             if drm.lower() in drm_list:
                 print "%s DRM is supported" %(drm)
-                return True
+                return "TRUE"
             else:
                 print "%s DRM not supported" %(drm)
-                return False
+                return "NA"
         else:
             print "Unable to activate OCDM plugin to check DRM info"
-            return False
+            return "FALSE"
     else:
         print "OCDM plugin not available. DRM not supported"
-        return False
+        return "NA"
 
 
 def getConnectedVideoDisplay(obj):
@@ -864,8 +874,12 @@ def setMediaTestPreRequisites(obj,webkit_browser_instance,get_proc_info=True):
                     webkit_ready_state = checkWebkitReadyState(obj,result,webkit_client,webkit_z_order_status)
                     if webkit_ready_state:
                           if webkit_socket_conn:
-                              webkit_console_socket = createWebKitSocket(obj)
-                          pre_requisite_status = "SUCCESS"
+                              websocket_conn_status,webkit_console_socket = createWebKitSocket(obj)
+                              if not websocket_conn_status:
+                                  print "Connection to web-inspect page failed. cannot proceed test"
+                                  pre_requisite_status = "FAILURE"
+                              else:
+                                  pre_requisite_status = "SUCCESS"
                     else:
                         pre_requisite_status = "FAILURE"
                 else:

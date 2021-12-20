@@ -117,8 +117,10 @@ if expectedResult in result.upper():
     # moving it to the front, openning a socket connection to the webkit inspect page and
     # getting the details for proc validation from config file
     drm_pre_requisite_status = checkDRMSupported(obj,"Widevine")
-    if drm_pre_requisite_status:
+    if drm_pre_requisite_status == "TRUE":
         pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,webkit_instance)
+    elif drm_pre_requisite_status == "NA":
+        pre_requisite_status = "NA"
     else:
         pre_requisite_status = "FAILURE"
 
@@ -185,6 +187,9 @@ if expectedResult in result.upper():
         else:
             tdkTestObj.setResultStatus("FAILURE");
             print "Unable to load the video Test URL in Webkit\n"
+    elif pre_requisite_status == "NA":
+        print "Pre conditions are not met\n"
+        obj.setAsNotApplicable();
     else:
         print "Pre conditions are not met\n"
         tdkTestObj.setResultStatus("FAILURE");

@@ -130,7 +130,7 @@ if expectedResult in result.upper():
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_uve_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_hls_h264_iframe
+        videoURL  = MediaValidationVariables.video_src_url_hls_h264
         seekInterval  = str(MediaValidationVariables.seekfwd_interval)
         checkInterval = str(MediaValidationVariables.seekfwd_check_interval)
         # Setting VideoPlayer Operations
