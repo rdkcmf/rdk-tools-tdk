@@ -52,6 +52,8 @@ grails.project.dependency.resolution = {
 		//for example, uncomment this 
 		//to disable ehcache:
         // excludes 'ehcache'
+        excludes "grails-plugin-logging", "log4j"
+        excludes 'grails-plugin-log4j'
     }
     log "error" 
 	// log level of Ivy resolver, 
