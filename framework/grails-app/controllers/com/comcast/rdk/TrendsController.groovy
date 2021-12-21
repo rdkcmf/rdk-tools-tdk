@@ -1871,13 +1871,15 @@ class TrendsController {
 		File configFile = grailsApplication.parentContext.getResource(Constants.TM_CONFIG_FILE).file
 		String logsLocation= Constants.NO_LOCATION_SPECIFIED
 		logsLocation = executionService.getConfigProperty(configFile,Constants.LOGS_PATH)
-		File logsLocationTestFile = new File(logsLocation)
-		if(logsLocationTestFile.isDirectory()){
-			String logsLocationLastChar = logsLocation?.charAt(logsLocation?.length()-1)
-			if(!logsLocationLastChar?.equals(Constants.URL_SEPERATOR)){
-				logsLocation = logsLocation + Constants.URL_SEPERATOR
+		if(logsLocation != null){
+			File logsLocationTestDirectory = new File(logsLocation)
+			if(logsLocationTestDirectory?.isDirectory()){
+				String logsLocationLastChar = logsLocation?.charAt(logsLocation?.length()-1)
+				if(!logsLocationLastChar?.equals(Constants.URL_SEPERATOR)){
+					logsLocation = logsLocation + Constants.URL_SEPERATOR
+				}
+				returnValue = logsLocation
 			}
-			returnValue = logsLocation
 		}
 		return returnValue
 	}
