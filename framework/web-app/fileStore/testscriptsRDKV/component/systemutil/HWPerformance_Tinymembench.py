@@ -100,15 +100,16 @@ if ("SUCCESS" in sysUtilLoadStatus.upper()):
                    message = data.read()
                    print "\n**************HW Performance tools Execution Log - Begin**********\n"
                    print(message)
-                   data.close()
+                   result=hardwarePerformanceThresholdComparison(sysUtilObj,message,unit=" MB/s",reverserscheck="false")
+                   tdkTestObj.setResultStatus(result);
                    print "\n**************HW Performance tools Execution - End*************\n"
-                   print "[TEST EXECUTION RESULT] : SUCCESS"
+                   data.close()
                  except IOError:
                    print "ERROR : Unable to open execution log file"
                    tdkTestObj.setResultStatus("FAILURE");
-                   obj.unloadModule("systemutil");
+                   sysUtilObj.unloadModule("systemutil");
                    exit()
-                 print "[TEST EXECUTION RESULT] : SUCCESS"
+                 print "[TEST EXECUTION RESULT] :  %s" %result
          else:
                  tdkTestObj.setResultStatus("FAILURE");
                  print "[TEST EXECUTION RESULT] : FAILURE"

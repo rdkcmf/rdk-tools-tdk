@@ -35,6 +35,7 @@ import PerformanceTestVariables
 import sys
 import socket
 import ast
+import urllib 
 
 deviceIP=""
 devicePort=""
@@ -855,3 +856,94 @@ def move_plugin(obj,plugin,method):
 def exclude_from_zorder(zorder):
    new_zorder = [ element for element in zorder if element not in excluded_process_list ] 
    return new_zorder
+
+
+#-------------------------------------------------------------------------
+#Utility functions for Hardware Performance threshold validation - START
+#-------------------------------------------------------------------------
+def hardwarePerformanceThresholdComparison(sysUtilObj,message,unit,reverserscheck="false"):
+    status=[]
+    threshold_Check=thresholdCheck(sysUtilObj)
+    if threshold_Check=="TRUE":
+        print "***************************User Enabled Threshold check*********************************************"
+
+        transferLogDetails=json.loads(message)
+        configParam=transferLogDetails["utility"].upper()
+        thresholdValueDevice=transferLogDetails["values"]
+        conf_file,result=getConfigFileNameDetail(sysUtilObj)
+        result,thresholdLimitConfig=getDeviceConfigValue(conf_file,configParam)
+        thresholdValueConfig=json.loads(thresholdLimitConfig)
+
+        for(key1,Value1),(key2,Value2) in zip(thresholdValueDevice.items(),thresholdValueConfig.items()):
+            hw_Device_pname=key1
+            hw_Config_pname=key2
+
+            hw_Device_Value=float(Value1.split(" ")[0])
+            hw_Config_value=float(Value2.split(" ")[0])
+            if hw_Device_Value >= hw_Config_value if reverserscheck == "false" else hw_Device_Value <= hw_Config_value :
+                status.append("SUCCESS")
+                print("Success :Device performance value {0}{2} is in the expected threshold value {1}{2}".format(hw_Device_Value,hw_Config_value,unit))
+            else:
+                status.append("FAILURE")
+                print("FAILURE :Device performance value {0}{2} is not in the expected threshold value {1}{2}".format(hw_Device_Value,hw_Config_value,unit))
+        return "FAILURE" if "FAILURE" in status else "SUCCESS"
+
+    else:
+         print "*********************************User Disable  Threshold check**********************************"
+         status="SUCCESS"
+         return status
+
+#--------------------------------------------------------------------------
+#   Check ThresholdCheck User Input from Config File
+#--------------------------------------------------------------------------
+def thresholdCheck(Obj):
+    configParam="Threshold_Check"
+    conf_file=getConfigFileNameDetail(Obj)
+    Threshold_Check_UserInput=getDeviceConfigValue(conf_file,configParam)
+    status ,Threshold_Check_UserInput=getDeviceConfigValue(conf_file,configParam)
+    return Threshold_Check_UserInput
+#-------------------------------------------------------------------------
+#   Get Avg Threshold Config Value
+#-------------------------------------------------------------------------
+def getDeviceConfigValue(conf_file,configParam):
+    value=""
+    status="SUCCESS"
+    deviceConfig="device.config"
+    config=ConfigParser.ConfigParser()
+    config.read(conf_file)
+    value=str(config.get(deviceConfig,configParam))
+    return status,value
+#-----------------------------------------------------------------------
+# Get Config File Details for Threshold Comparison
+#-----------------------------------------------------------------------
+def getConfigFileNameDetail(obj):
+    url = obj.url + '/deviceGroup/getDeviceDetails?deviceIp='+obj.IP
+    try:
+        data = urllib.urlopen(url).read()
+        deviceDetails = json.loads(data)
+        device_Name = deviceDetails["devicename"]
+        device_Type = deviceDetails["boxtype"]
+        deviceConfigFile=""
+        status ="SUCCESS"
+        configPath = obj.realpath + "/"   + "fileStore/tdkvRDKServiceConfig"
+        deviceNameConfigFile = configPath + "/" + device_Name + ".config"
+        deviceTypeConfigFile = configPath + "/" + device_Type + ".config"
+        # Check whether device / platform config files required for
+        # executing the test are present
+        if os.path.exists(deviceNameConfigFile) == True:
+            deviceConfigFile = deviceNameConfigFile
+            print "[INFO]: Using Device config file: %s" %(deviceNameConfigFile)
+        elif os.path.exists(deviceTypeConfigFile) == True:
+            deviceConfigFile = deviceTypeConfigFile
+            print "[INFO]: Using Device config file: %s" %(deviceTypeConfigFile)
+        else:
+            status = "FAILURE"
+            print "[ERROR]: No Device config file found : %s or %s" %(deviceNameConfigFile,deviceTypeConfigFile)
+    except:
+        print "Unable to get Device Details from REST !!!"
+        status = "FAILURE"
+    return deviceConfigFile,status;
+
+#-------------------------------------------------------------------------
+#Utility functions for Hardware Performance threshold validation - END
+#-------------------------------------------------------------------------
