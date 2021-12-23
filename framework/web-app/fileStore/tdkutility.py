@@ -469,3 +469,38 @@ def doEnableDisableOVS(enableFlag,sysobj,tdkTestObj_Tr181_Get,tdkTestObj_Tr181_S
 
     #ovs_set = 1 - Successful operation and revert_flag = 1 - initial OVS enable value was disabled
     return ovs_set,revert_flag;
+
+def getLogFileTotalLinesCount(tdkTestObj, logFile, search_string, step):
+
+# getLogFileTotalLinesCount
+# Syntax      : getLogFileTotalLinesCount(tdkTestObj, logFile, search_string, step):
+# Description : Function to check the line count of a specific log in a given file
+# Parameters  : tdkTestObj - sysutil object
+#               logFile - name of log file
+#               search_string - string for which line count is to be found
+#               step - step number
+# Return Value: count - line count of the search string in the given log file
+
+
+    cmd = "grep -ire " + "\"" + search_string + "\"  " + logFile + " | wc -l";
+    print "Query : %s" %cmd;
+    expectedresult="SUCCESS";
+    tdkTestObj.addParameter("command",cmd);
+    tdkTestObj.executeTestCase(expectedresult);
+    actualresult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    print "TEST STEP %d : Get the number of log lines currently present" %step;
+    print "EXPECTED RESULT %d : Should get the number of log lines currently present" %step;
+    count = 0;
+
+    if expectedresult in actualresult:
+        count = int(tdkTestObj.getResultDetails().strip().replace("\\n", ""));
+        tdkTestObj.setResultStatus("SUCCESS");
+        print "ACTUAL RESULT %d: Successfully captured the number of log lines present : %d" %(step, count);
+        print "[TEST EXECUTION RESULT] : SUCCESS";
+    else:
+        tdkTestObj.setResultStatus("FAILURE");
+        print "ACTUAL RESULT %d: Failed to  capture the number of log lines present : %s" %(step, details);
+        print "[TEST EXECUTION RESULT] : FAILURE";
+    return count;
+
