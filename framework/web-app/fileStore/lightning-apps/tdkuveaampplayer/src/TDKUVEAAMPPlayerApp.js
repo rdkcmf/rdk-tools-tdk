@@ -100,7 +100,7 @@ export default class App extends Lightning.Component {
       //logMsg("Invoked initConfig with DRMconfig: " + JSON.stringify(config));
       this.player.setDRMConfig(config);
   }
-  addCustomHTTPHeader(headerName, headerValue, isLicenseRequest = false) {
+  addCustomHTTPHeader(headerName, headerValue, isLicenseRequest = true) {
       console.log("AAMP: adding header: " + headerName + "| value: " + headerValue);
       this.player.addCustomHTTPHeader(headerName, headerValue, isLicenseRequest);
   }
@@ -160,14 +160,14 @@ export default class App extends Lightning.Component {
       this.expectedEvents   = ["seeking","seeked"]
       this.expectedPos = Math.floor(this.getCurrentPosition() + pos )
       logMsg("Expected Event: "   + this.expectedEvents)
-      logMsg("Expected Pos  : [ " + this.expectedPos + " - " + (this.expectedPos + 7) + " ]")
+      logMsg("Expected Pos  : [ " + (this.expectedPos - 2) + " - " + (this.expectedPos + 7) + " ]")
       this.seek(this.expectedPos)
   }
   seekbwd(pos){
       this.expectedEvents   = ["seeking","seeked"]
       this.expectedPos = Math.floor(this.getCurrentPosition() - pos )
       logMsg("Expected Event: "   + this.expectedEvents)
-      logMsg("Expected Pos  : [ " + this.expectedPos + " - " + (this.expectedPos + 7) + " ]")
+      logMsg("Expected Pos  : [ " + (this.expectedPos - 2) + " - " + (this.expectedPos + 7) + " ]")
       this.seek(this.expectedPos)
   }
   getPlaybackRate() {
@@ -555,7 +555,7 @@ export default class App extends Lightning.Component {
               var currTime = parseInt(this.observedPos)
               //var currTime = parseInt(this.getCurrentPosition())
 	      var expTime  = parseInt(this.expectedPos)
-              if( currTime >= expTime && currTime <= (expTime+7) ){
+              if( currTime >= (expTime-2) && currTime <= (expTime+7) ){
                 logMsg("video seek operation success")
               }else{
                 this.eventFlowFlag = 0
@@ -661,7 +661,10 @@ export default class App extends Lightning.Component {
 
     this.inputs.forEach(item => {
         if(item.split("=")[0] == "drmconfigs"){
-            this.configs = GetURLParameter("drmconfigs").split(",");
+            var drm_configs = GetURLParameter("drmconfigs")
+            if (drm_configs != ""){
+                this.configs = GetURLParameter("drmconfigs").split(",");
+	    }
         }
         else if(item.split("=")[0] == "options"){
             this.options = GetURLParameter("options").split(",");
@@ -682,7 +685,7 @@ export default class App extends Lightning.Component {
       if(item.includes("headers")){
           this.license_header = String(item.split('(')[1].split(')')[0]);
       }
-      else if(item.includes("headers")){
+      else if(item.includes("preferred")){
           this.preferredDRM = String(item.split('(')[1].split(')')[0]);
           this.DRMconfig["preferredKeysystem"] = this.preferredDRM;
       }

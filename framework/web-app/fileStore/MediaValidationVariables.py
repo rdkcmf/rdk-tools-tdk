@@ -66,6 +66,7 @@ lightning_apps_loc = ""
 
 #lightning application url
 lightning_video_test_app_url     = lightning_apps_loc + "tdkvideoplayer/build/index.html"
+lightning_shaka_test_app_url     = lightning_apps_loc + "tdkshakaplayer/build/index.html"
 lightning_uve_test_app_url       = lightning_apps_loc + "tdkuveaampplayer/build/index.html"
 lightning_animation_test_app_url = lightning_apps_loc + "tdkanimations/build/index.html"
 lightning_multianimation_test_app_url    = lightning_apps_loc + "tdkmultianimations/build/index.html"

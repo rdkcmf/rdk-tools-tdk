@@ -726,13 +726,17 @@ export default class App extends Lightning.Component {
 
     // check the DRM options provided in the url and update the configs
     this.license_header = "";
+    this.preferred_drm = "";
     this.configs.forEach(item => {
       if(item.includes("headers")){
           this.license_header = String(item.split('(')[1].split(')')[0]);
       }
+      else if(item.includes("preferred")){
+          this.preferred_drm = String(item.split('(')[1].split(')')[0]);
+      }
     });
     this.configs.forEach(item => {
-      if(! item.includes("headers")){
+      if((! item.includes("headers"))&&(! item.includes("preferred"))){
           var drm = String(item.split('(')[0]);
           var license_url = String(item.split('(')[1].split(')')[0]);
           license_url = license_url.replace(/:and:/g,"&").replace(/:eq:/g, "=").replace(/:ob:/g,"(").replace(/:cb:/g,")").replace(/:comma:/g,",");
@@ -743,6 +747,10 @@ export default class App extends Lightning.Component {
                var header_info = this.license_header.split(":")[1];
                this.DRMconfig[drm]["httpRequestHeaders"] = {};
                this.DRMconfig[drm]["httpRequestHeaders"][header_tag] = header_info;
+             }
+             if(drm == this.preferred_drm){
+               //by default priority is 0. drm with highest priority value is taken as preferred
+               this.DRMconfig[drm]["priority"] = 1;
              }
           }else if(this.urlType == "hls"){
              this.DRMconfig[drm] = license_url;
