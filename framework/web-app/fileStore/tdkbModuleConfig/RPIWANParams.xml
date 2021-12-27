@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2021 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<parameters>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.Enable</name>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.Policy</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>FIXED_MODE</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterfaceNumberOfEntries</name>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>1</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Name</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>eth0</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>eth0</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.DisplayName</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>WanOE</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.MarkingNumberOfEntries</name>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>1</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Phy.Path</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Device.Ethernet.X_RDK_Interface.1</defaultValue>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Phy.Status</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>Down,UP,Up</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Wan.Enable</name>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Wan.Name</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>erouter0</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>dsl0,abc,erouter0</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Wan.SelectionTimeout</name>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>0,1</expectedValues>
+               <RFCEnabled>true</RFCEnabled>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Wan.EnableMAPT</name>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Wan.EnableDSLite</name>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Wan.EnableIPoEHealthCheck</name>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Wan.Type</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>Primary,Secondary,Unconfigured</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Wan.Priority</name>
+               <!--type of the parameter -->
+               <type>int</type>
+               <!--whether set is applicable or not -->
+               <writable>true</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>0,1</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Wan.Status</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>Up,Down</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Wan.Refresh</name>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Wan.ActiveLink</name>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Wan.LinkStatus</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>Up,Down</expectedValues>
+               <RFCEnabled>true</RFCEnabled>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.IP.IPv4Status</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>Down,Up</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.IP.IPv6Status</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>Down,Up</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.IP.Path</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.PPP.Enable</name>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>false</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.PPP.IPCPEnable</name>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>true</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.PPP.IPCPStatus</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>Down</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>Down,Up</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.PPP.IPv6CPEnable</name>
+               <!--type of the parameter -->
+               <type>bool</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>true,false</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.PPP.IPv6CPStatus</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>Up,Down</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.PPP.LCPStatus</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>Up,Down</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.PPP.LinkStatus</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>Up,Down</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.PPP.LinkType</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>PPPoE</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>PPPoE</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.PPP.Path</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.MAP.MAPTStatus</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>Up,Down</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.MAP.Path</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.DSLite.Status</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!-- the range of values acceptable -->
+               <expectedValues>Up,Down</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.DSLite.Path</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues></expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Marking.1.Alias</name>
+               <!--type of the parameter -->
+               <type>string</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>DATA</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>DATA</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Marking.1.SKBPort</name>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>1</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>1</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Marking.1.SKBMark</name>
+               <!--type of the parameter -->
+               <type>unsignedint</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>false</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>0</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>0</expectedValues>
+        </parameter>
+        <parameter>
+                <!--the tr-181 parameter name -->
+               <name>Device.X_RDK_WanManager.CPEInterface.1.Marking.1.EthernetPriorityMark</name>
+               <!--type of the parameter -->
+               <type>int</type>
+               <!--whether set is applicable or not -->
+               <writable>false</writable>
+               <!-- whether set value will be retained and set should be followed by a get or not -->
+               <persistentSet>true</persistentSet>
+               <!--default value of the param after factory reset -->
+               <defaultValue>-1</defaultValue>
+               <!-- the range of values acceptable -->
+               <expectedValues>0,1,-1</expectedValues>
+        </parameter>
+</parameters>
