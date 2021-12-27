@@ -661,6 +661,19 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
+            elif len(arg) and arg[0] == "check_reset_inactivity_interval":
+                info["Test_Step_Status"] = "FAILURE"
+                for eventResult in result:
+                    if int(float(eventResult.get("minutes"))) == int(expectedValues[0]):
+                        info["User_Inactivity_Minutes"] = eventResult.get("minutes")
+                        info["Test_Step_Status"] = "SUCCESS"
+            else:
+                result = result[0]
+                info = result
+                if result.get("minutes"):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         # TextToSpeech Events response result parser steps
         elif tag == "texttospeech_check_tts_state_changed_event":

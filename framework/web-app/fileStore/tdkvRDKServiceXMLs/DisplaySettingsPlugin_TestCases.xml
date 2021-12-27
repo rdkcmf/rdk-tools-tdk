@@ -381,6 +381,7 @@
                   <params>
                     <param tag="audioPort"  value="HDMI0"  />
                     <param tag="level" value="0,5,10" iteration="true" revertParam="yes" />
+                    <param tag="mode" value="1"  revertParam="yes" />
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
@@ -388,8 +389,8 @@
                   <params>
                     <param tag="audioPort"  value="HDMI0"  />
                   </params>
-                  <resultGeneration useMethodTag="check_volume_leveller" >
-                    <expectedValues useIterableValue="true" />
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments="check_expected_values" >
+                    <expectedValues value="1" useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -443,6 +444,7 @@
                   <params>
                     <param tag="audioPort" value="HDMI0" />
                     <param tag="boost" value="0,24,48,96" iteration="true" revertParam="yes" />
+                    <param tag="mode" value="1" revertParam="yes"/>
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
@@ -451,7 +453,7 @@
                     <param tag="audioPort" value="HDMI0" />
                   </params>
                   <resultGeneration useMethodTag="check_surround_virtualizer" >
-                    <expectedValues useIterableValue="true" />
+                    <expectedValues value="1" useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -900,6 +902,7 @@
                   <params>
                     <param tag="audioPort" value="SPDIF0"  />
                     <param tag="level" value="0,5,10" iteration="true" revertParam="yes" />
+                    <param tag="mode" value="1" revertParam="yes"/>
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
@@ -907,8 +910,8 @@
                   <params>
                     <param tag="audioPort" value="SPDIF0" />
                   </params>
-                  <resultGeneration useMethodTag="check_volume_leveller" >
-                    <expectedValues useIterableValue="true" />
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments="check_expected_values" >
+                    <expectedValues value="1" useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -931,6 +934,7 @@
                   <params>
                     <param tag="audioPort" value="IDLR0"  />
                     <param tag="level" value="0,5,10" iteration="true" revertParam="yes" />
+                    <param tag="mode" value="1" revertParam="yes"/>
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
@@ -938,8 +942,8 @@
                   <params>
                     <param tag="audioPort" value="IDLR0" />
                   </params>
-                  <resultGeneration useMethodTag="check_volume_leveller" >
-                    <expectedValues useIterableValue="true" />
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments="check_expected_values">
+                    <expectedValues value="1" useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -962,6 +966,7 @@
                   <params>
                     <param tag="audioPort" value="SPEAKER0"  />
                     <param tag="level" value="0,5,10" iteration="true" revertParam="yes" />
+                    <param tag="mode" value="1" revertParam="yes"/>
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
@@ -969,8 +974,8 @@
                   <params>
                     <param tag="audioPort" value="SPEAKER0" />
                   </params>
-                  <resultGeneration useMethodTag="check_volume_leveller" >
-                    <expectedValues useIterableValue="true" />
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments="check_expected_values" >
+                    <expectedValues value="1" useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -1068,7 +1073,7 @@
               </subtestStep>
             </testStep>
         </testCase>
-
+        
         <testCase testCaseId="DS_44" testCaseName= "Set_And_Get_Surround_Virtualizer_SPDIF0" desc="Check whether surround virtualizer values are able to set and get for SPDIF0 port" >
             <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="SurroundVirtualizer,SPDIF0" />
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
@@ -1086,6 +1091,7 @@
                   <params>
                     <param tag="audioPort"  value="SPDIF0" />
                     <param tag="boost" value="0,24,48,96" iteration="true" revertParam="yes" />
+                    <param tag="mode" value="1" revertParam="yes"/>
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
@@ -1094,7 +1100,7 @@
                     <param tag="audioPort"  value="SPDIF0" />
                   </params>
                   <resultGeneration useMethodTag="check_surround_virtualizer" >
-                    <expectedValues useIterableValue="true" />
+                    <expectedValues value="1" useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -1117,6 +1123,7 @@
                   <params>
                     <param tag="audioPort"  value="IDLR0" />
                     <param tag="boost" value="0,24,48,96" iteration="true" revertParam="yes" />
+                    <param tag="mode" value="1" revertParam="yes"/>
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
@@ -1125,7 +1132,7 @@
                     <param tag="audioPort"  value="IDLR0" />
                   </params>
                   <resultGeneration useMethodTag="check_surround_virtualizer" >
-                    <expectedValues useIterableValue="true" />
+                    <expectedValues value="1" useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -1148,6 +1155,7 @@
                   <params>
                     <param tag="audioPort"  value="SPEAKER0" />
                     <param tag="boost" value="0,24,48,96" iteration="true" revertParam="yes" />
+                    <param tag="mode" value="1" revertParam="yes"/>
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
@@ -1156,7 +1164,7 @@
                     <param tag="audioPort"  value="SPEAKER0" />
                   </params>
                   <resultGeneration useMethodTag="check_surround_virtualizer" >
-                    <expectedValues useIterableValue="true" />
+                    <expectedValues value="1" useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -2288,59 +2296,59 @@
                 </resultGeneration>
             </testStep>
         </testCase>
-        <testCase testCaseId="DS_86" testCaseName= "Set_And_Get_Volume_Leveller2_Modes_HDMI0" desc="Check whether able to enables or disables volume leveling for HDMI0 port" >
-            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="VolumeLevellerModes,HDMI0" />
+        <testCase testCaseId="DS_86" testCaseName= "Set_And_Get_Volume_Leveller_Modes_HDMI0" desc="Check whether able to enables or disables volume leveling for HDMI0 port" >
+            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="VolumeLeveller,HDMI0" />
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
                 <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="HDMI0">
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="2" name="Get_Volume_Leveller2_Modes" method="Get_Volume_Leveller2" saveResult="true" revertGet="yes" >
+            <testStep testStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Leveller" saveResult="true" revertGet="yes" >
                   <params>
                     <param tag="audioPort"  value="HDMI0"  />
                   </params>
-              <resultGeneration useMethodTag="check_volume_leveller" arguments = "check_volume_leveller_mode"/>
+              <resultGeneration useMethodTag="check_volume_leveller"/>
             </testStep>
-            <testStep testStepId="3" name="Set_Volume_Leveller2_Modes" testStepType="loop" >
-              <subtestStep subtestStepId="1" name="Set_Volume_Leveller2_Modes" method="Set_Volume_Leveller2" revertSet="yes">
+            <testStep testStepId="3" name="Set_Volume_Leveller" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Volume_Leveller" method="Set_Volume_Leveller" revertSet="yes">
                   <params>
                     <param tag="audioPort"  value="HDMI0"  />
                     <param tag="mode" value="0,1,2" iteration="true" revertParam="yes" />
-                    <param tag="level" value="10" />
+                    <param tag="level" value="10" revertParam="yes" />
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
-              <subtestStep subtestStepId="2" name="Get_Volume_Leveller2_Modes" method="Get_Volume_Leveller2" revertFlag="yes" >
+              <subtestStep subtestStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Leveller" revertFlag="yes" >
                   <params>
                     <param tag="audioPort"  value="HDMI0"  />
                   </params>
-                  <resultGeneration useMethodTag="check_volume_leveller" arguments = "check_volume_leveller_mode" >
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments ="check_volume_leveller_mode" >
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
         </testCase>
         <testCase testCaseId="DS_87" testCaseName= "Set_And_Get_Surround_Virtualizer_Modes_HDMI0" desc="Check whether able to enables or disables modes for HDMI0 port" >
-            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="SurroundVirtualizerModes,HDMI0"/>
+            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="SurroundVirtualizer,HDMI0"/>
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
                 <resultGeneration useMethodTag="check_connected_audio_ports"  expectedValues="HDMI0">
                 </resultGeneration>
             </testStep>
-            <testStep testStepId="2" name="Get_Surround_Virtualizer_Modes" method="Get_Surround_Virtualizer2" saveResult="true" revertGet="yes" >
+            <testStep testStepId="2" name="Get_Surround_Virtualizer" method="Get_Surround_Virtualizer" saveResult="true" revertGet="yes" >
                   <params>
                     <param tag="audioPort" value="HDMI0" />
                   </params>
-              <resultGeneration useMethodTag="check_surround_virtualizer" arguments="check_surround_virtualizer_mode" />
+              <resultGeneration useMethodTag="check_surround_virtualizer" arguments="check_surround_virtualizer_range" />
             </testStep>
             <testStep testStepId="3" name="Set_Surround_Virtualizer_Modes" testStepType="loop" >
-              <subtestStep subtestStepId="1" name="Set_Surround_Virtualizer_Modes" method="Set_Surround_Virtualizer2" revertSet="yes">
+              <subtestStep subtestStepId="1" name="Set_Surround_Virtualizer" method="Set_Surround_Virtualizer" revertSet="yes">
                   <params>
                     <param tag="audioPort" value="HDMI0" />
                     <param tag="mode" value="0,1,2" iteration="true" revertParam="yes" />
-                    <param tag="boost" value="2" />
+                    <param tag="boost" value="2" revertParam="yes" />
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
-              <subtestStep subtestStepId="2" name="Get_Surround_Virtualizer_Modes" method="Get_Surround_Virtualizer2" revertFlag="yes" >
+              <subtestStep subtestStepId="2" name="Get_Surround_Virtualizer" method="Get_Surround_Virtualizer" revertFlag="yes" >
                   <params>
                     <param tag="audioPort" value="HDMI0" />
                   </params>
@@ -2614,6 +2622,362 @@
             </testCasePreRequisite>
             <testStep testStepId="1" name="Check_Audio_Formats" method="Get_Audio_Format" saveResult="true" >
                   <resultGeneration useMethodTag="check_audio_video_formats" arguments="get_audio_format" />
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_100" testCaseName= "Set_And_Reset_Bass_Enhancer_SPEAKER0" desc="Check whether able to reset  bass enhancer values for SPEAKER0 port" >
+            <testCaseInfo testCaseType="setandget" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="ResetBassEnhancer,SPEAKER0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"   expectedValues="SPEAKER0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+              <resultGeneration useMethodTag="check_bass_enhancer" arguments="check_bass_range" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Bass_Enhancer" method="Set_Bass_Enhancer" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                    <param tag="bassBoost" value="50"  revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_bass_enhancer" expectedValues="50" />
+            </testStep>
+            <testStep testStepId="5" name="Reset_Bass_Enhancer" method="Reset_Bass_Enhancer" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                 <resultGeneration useMethodTag="Get_Default_Values" arguments="BassBoost" />
+            </testStep>
+            <testStep testStepId="7" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_bass_enhancer" >
+                    <expectedValues usePreviousResult="true" Id="6" useMethodTag="displaysettings_get_default_values" />
+                  </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_101" testCaseName= "Set_And_Reset_Dialog_Enhancement_SPEAKER0" desc="Check whether able to reset dialog enhancement values for SPEAKER0 port" >
+            <testCaseInfo testCaseType="setandget" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="ResetDialogEnhancement,SPEAKER0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"   expectedValues="SPEAKER0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+              <resultGeneration useMethodTag="check_dialog_enhancement" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Dialog_Enhancement" method="Set_Dialog_Enhancement" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                    <param tag="enhancerlevel" value="10"  revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_dialog_enhancement" expectedValues="10" />
+            </testStep>
+            <testStep testStepId="5" name="Reset_Dialog_Enhancement" method="Reset_Dialog_Enhancement" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                 <resultGeneration useMethodTag="Get_Default_Values" arguments="EnhancerLevel" />
+            </testStep>
+            <testStep testStepId="7" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_dialog_enhancement" >
+                    <expectedValues usePreviousResult="true" Id="6" useMethodTag="displaysettings_get_default_values" />
+                  </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_102" testCaseName="Set_And_Reset_Volume_Leveller_SPEAKER0" desc="Check whether able to reset Volume Leveller level to default volume value for SPEAKER0 port" >
+            <testCaseInfo testCaseType="setandget" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="ResetVolumeLeveller,SPEAKER0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"   expectedValues="SPEAKER0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Leveller" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+              <resultGeneration useMethodTag="check_volume_leveller" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Volume_Leveller" method="Set_Volume_Leveller" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                    <param tag="mode" value="1" revertParam="yes" />
+                    <param tag="level" value="5"  revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Volume_Leveller" method="Get_Volume_Leveller" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments="check_expected_values"  expectedValues="1,5" />
+            </testStep>
+            <testStep testStepId="5" name="Reset_Volume_Leveller" method="Reset_Volume_Leveller" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                 <resultGeneration useMethodTag="Get_Default_Values" arguments="VolumeLeveller.level,VolumeLeveller.mode,get_default_mode" />
+            </testStep>
+            <testStep testStepId="7" name="Get_Volume_Leveller" method="Get_Volume_Leveller" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments="check_expected_values" >
+                    <expectedValues usePreviousResult="true" Id="6" useMethodTag="displaysettings_get_default_values" arguments="get_default_mode" />
+                  </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_103" testCaseName="Set_And_Reset_Surround_Virtualizer_SPEAKER0" desc="Check whether able to reset the surround virtualizer to its default boost value for SPEAKER0 port" >
+            <testCaseInfo testCaseType="setandget" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="ResetSurroundVirtualizer,SPEAKER0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"   expectedValues="SPEAKER0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Surround_Virtualizer" method="Get_Surround_Virtualizer" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+              <resultGeneration useMethodTag="check_surround_virtualizer" arguments="check_surround_virtualizer_range" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Surround_Virtualizer" method="Set_Surround_Virtualizer" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                    <param tag="mode" value="1" revertParam="yes" />
+                    <param tag="boost" value="50"  revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Surround_Virtualizer" method="Get_Surround_Virtualizer" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_surround_virtualizer" expectedValues="1,50" />
+            </testStep>
+            <testStep testStepId="5" name="Reset_Surround_Virtualizer" method="Reset_Surround_Virtualizer" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                 <resultGeneration useMethodTag="Get_Default_Values" arguments="SurroundVirtualizer.boost,SurroundVirtualizer.mode,get_default_mode" />
+            </testStep>
+            <testStep testStepId="7" name="Get_Surround_Virtualizer" method="Get_Surround_Virtualizer" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_surround_virtualizer" >
+                    <expectedValues usePreviousResult="true" Id="6" useMethodTag="displaysettings_get_default_values" arguments="get_default_mode" />
+                  </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_104" testCaseName= "Set_And_Reset_Bass_Enhancer_HDMI0" desc="Check whether able to reset  bass enhancer values for HDMI0 port" >
+            <testCaseInfo testCaseType="setandget" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="ResetBassEnhancer,HDMI0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"   expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+              <resultGeneration useMethodTag="check_bass_enhancer" arguments="check_bass_range" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Bass_Enhancer" method="Set_Bass_Enhancer" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                    <param tag="bassBoost" value="50"  revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_bass_enhancer" expectedValues="50" />
+            </testStep>
+            <testStep testStepId="5" name="Reset_Bass_Enhancer" method="Reset_Bass_Enhancer" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                 <resultGeneration useMethodTag="Get_Default_Values" arguments="BassBoost" />
+            </testStep>
+            <testStep testStepId="7" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_bass_enhancer" >
+                    <expectedValues usePreviousResult="true" Id="6" useMethodTag="displaysettings_get_default_values" />
+                  </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_105" testCaseName= "Set_And_Reset_Dialog_Enhancement_HDMI0" desc="Check whether able to reset dialog enhancement values for HDMI0 port" >
+            <testCaseInfo testCaseType="setandget" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="ResetDialogEnhancement,HDMI0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"   expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+              <resultGeneration useMethodTag="check_dialog_enhancement" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Dialog_Enhancement" method="Set_Dialog_Enhancement" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                    <param tag="enhancerlevel" value="10"  revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_dialog_enhancement" expectedValues="10" />
+            </testStep>
+            <testStep testStepId="5" name="Reset_Dialog_Enhancement" method="Reset_Dialog_Enhancement" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                 <resultGeneration useMethodTag="Get_Default_Values" arguments="EnhancerLevel" />
+            </testStep>
+            <testStep testStepId="7" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_dialog_enhancement" >
+                    <expectedValues usePreviousResult="true" Id="6" useMethodTag="displaysettings_get_default_values" />
+                  </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_106" testCaseName="Set_And_Reset_Volume_Leveller_HDMI0" desc="Check whether able to reset Volume Leveller level to default volume value for HDMI0 port" >
+            <testCaseInfo testCaseType="setandget" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="ResetVolumeLeveller,HDMI0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"   expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Volume_Leveller" method="Get_Volume_Leveller" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+              <resultGeneration useMethodTag="check_volume_leveller" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Volume_Leveller" method="Set_Volume_Leveller" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                    <param tag="mode" value="1" revertParam="yes" />
+                    <param tag="level" value="5"  revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Volume_Leveller" method="Get_Volume_Leveller" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments="check_expected_values"  expectedValues="1,5" />
+            </testStep>
+            <testStep testStepId="5" name="Reset_Volume_Leveller" method="Reset_Volume_Leveller" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                 <resultGeneration useMethodTag="Get_Default_Values" arguments="VolumeLeveller.level,VolumeLeveller.mode,get_default_mode" />
+            </testStep>
+            <testStep testStepId="7" name="Get_Volume_Leveller" method="Get_Volume_Leveller" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments="check_expected_values" >
+                    <expectedValues usePreviousResult="true" Id="6" useMethodTag="displaysettings_get_default_values" arguments="get_default_mode" />
+                  </resultGeneration>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_107" testCaseName="Set_And_Reset_Surround_Virtualizer_HDMI0" desc="Check whether able to reset the surround virtualizer to its default boost value for HDMI0 port" >
+            <testCaseInfo testCaseType="setandget" revert="true"  configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="ResetSurroundVirtualizer,HDMI0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"   expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Surround_Virtualizer" method="Get_Surround_Virtualizer" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+              <resultGeneration useMethodTag="check_surround_virtualizer" arguments="check_surround_virtualizer_range" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Surround_Virtualizer" method="Set_Surround_Virtualizer" revertSet="yes">
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                    <param tag="mode" value="1" revertParam="yes" />
+                    <param tag="boost" value="50"  revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Surround_Virtualizer" method="Get_Surround_Virtualizer" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_surround_virtualizer" expectedValues="1,50" />
+            </testStep>
+            <testStep testStepId="5" name="Reset_Surround_Virtualizer" method="Reset_Surround_Virtualizer" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                 <resultGeneration useMethodTag="Get_Default_Values" arguments="SurroundVirtualizer.boost,SurroundVirtualizer.mode,get_default_mode" />
+            </testStep>
+            <testStep testStepId="7" name="Get_Surround_Virtualizer" method="Get_Surround_Virtualizer" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_surround_virtualizer" >
+                    <expectedValues usePreviousResult="true" Id="6" useMethodTag="displaysettings_get_default_values" arguments="get_default_mode" />
+                  </resultGeneration>
             </testStep>
         </testCase> 
 </testPlugin>  

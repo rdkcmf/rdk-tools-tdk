@@ -451,6 +451,9 @@
         <method name="Query_MocaStatus" api="queryMocaStatus" type="method" desc="Check whether Moca is enabled" >
             <expectedValues>true,false</expectedValues>
         </method>
+        <method name="Enable_Moca" api="enableMoca" type="method" desc="Enables or disables Moca support for the platform" >
+            <expectedValues>true,false</expectedValues>
+        </method>
         <method name="Clear_Last_DeepSleep_Reason" api="clearLastDeepSleepReason" type="method" desc="Clear the last deep sleep reason." />
         <method name="Get_Last_DeepSleep_Reason" api="getLastDeepSleepReason" type="method" desc="Retrieve the last deep sleep reason." />
         <method name="Get_PreviousReboot_Info" api="getPreviousRebootInfo" type="method" desc="Retrieve basic information about a reboot" />
@@ -812,6 +815,13 @@
             </params>
         </method>
         <method name="Hide_Splash_Logo" api="hideSplashLogo" type="method" desc="Removes the splash screen" />
+        <method name="Get_System_Memory" api="getSystemMemory" type="method" desc="Gets the information of System Memory" />
+        <method name="Reset_Inactivity_Time" api="resetInactivityTime" type="method" desc="Resets the inactivity notification interval" />
+        <method name="Hide_And_Show_All_Clients" api="hideAllClients" type="method" desc="Hides or unhides all the clients" >
+            <params>
+                <param tag="hide" type="bool" />
+            </params>
+        </method>
         <event name="Event_On_Launched" eventName="onLaunched" eventId="client.events.1" type="event" desc="Fired on launching the client" />
         <event name="Event_On_Suspended" eventName="onSuspended" eventId="client.events.1" type="event" desc="Fired on Suspending the client" />
         <event name="Event_On_Destroyed" eventName="onDestroyed" eventId="client.events.1" type="event" desc="Fired on destroying the client"/>
@@ -824,6 +834,7 @@
         <event name="Event_On_Application_Suspended" eventName="onApplicationSuspended" eventId="client.events.1" type="event" desc="Triggered when an application is suspended"/>
         <event name="Event_On_Application_Resumed" eventName="onApplicationResumed" eventId="client.events.1" type="event" desc="Triggered when an application resumes from a suspended state"/>
         <event name="Event_On_Application_Terminated" eventName="onApplicationTerminated" eventId="client.events.1" type="event" desc="Triggered when an application terminates"/>
+        <event name="Event_On_Plugin_Suspended" eventName="onPluginSuspended" eventId="client.events.1" type="event" desc="Triggered when a plugin is suspended" />
     </plugin>
 
 
@@ -1247,13 +1258,14 @@
         <method name="Get_Intelligent_Equalizer_Mode" api="getIntelligentEqualizerMode" type="method" desc="Get the intelligent equalizer modevalue" >
             <expectedValues>0,1,2,3</expectedValues>
         </method>
-        <method name="Set_Volume_Leveller" api="setVolumeLeveller" type="method" desc="Set the volume leveller values" >
+        <method name="Set_Volume_Leveller" api="setVolumeLeveller" type="method" version="2" desc="Set the volume leveller values" >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
-                <param tag="level" defaultValue="null"/>
+                <param tag="level" type="int" defaultValue="null"/>
+                <param tag="mode" type="int" defaultValue="null"/>
             </params>
         </method>
-        <method name="Get_Volume_Leveller" api="getVolumeLeveller" type="method" desc="Get the volume leveller value" >
+        <method name="Get_Volume_Leveller" api="getVolumeLeveller" type="method" version="2" desc="Get the volume leveller value" >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
             </params>
@@ -1270,13 +1282,14 @@
                 <param tag="audioPort" defaultValue="null"/>
             </params>
         </method>
-        <method name="Set_Surround_Virtualizer" api="setSurroundVirtualizer" type="method" desc="Set the surround virtualizer values" >
+        <method name="Set_Surround_Virtualizer" api="setSurroundVirtualizer" type="method" version="2" desc="Set the surround virtualizer values" >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
-                <param tag="boost"  defaultValue="null"/>
+                <param tag="boost" type="int" defaultValue="null"/>
+                <param tag="mode" type="int" defaultValue="null"/>
             </params>
         </method>
-        <method name="Get_Surround_Virtualizer" api="getSurroundVirtualizer" type="method" desc="Get the surround virtualizer value" >
+        <method name="Get_Surround_Virtualizer" api="getSurroundVirtualizer" type="method" version="2" desc="Get the surround virtualizer value" >
             <params>
                 <param tag="audioPort" defaultValue="null"/>
             </params>
@@ -1438,59 +1451,28 @@
                 <param tag="audioPort" defaultValue="null"/>
             </params>
         </method>
-	<method name="Set_Volume_Leveller2" api="setVolumeLeveller2" type="method" desc="Sets the  Volume Leveller setting" >
-            <params>
-                <param tag="audioPort" defaultValue="null"/>
-                <param tag="mode" type="int" />
-                <param tag="level" type="int" />
-            </params>
-        </method>
-        <method name="Get_Volume_Leveller2" api="getVolumeLeveller2" type="method" desc="Get the volume leveller setting" >
-            <params>
-                <param tag="audioPort" defaultValue="null"/>
-            </params>
-            <expectedValues>0,1,2</expectedValues>
-        </method>
-        <method name="Set_Surround_Virtualizer2" api="setSurroundVirtualizer2" type="method" desc="Sets the Surround Virtualizer boost setting" >
-            <params>
-                <param tag="audioPort" defaultValue="null"/>
-                <param tag="mode" type="int"/>
-                <param tag="boost"  type="int"/>
-            </params>
-        </method>
-        <method name="Get_Surround_Virtualizer2" api="getSurroundVirtualizer2" type="method" desc="Returns the current surround virtualizer boost settings." >
-            <params>
-                <param tag="audioPort" defaultValue="null"/>
-            </params>
-            <expectedValues>0,1,2</expectedValues>
-        </method><method name="Set_Volume_Leveller2" api="setVolumeLeveller2" type="method" desc="Sets the  Volume Leveller setting" >
-            <params>
-                <param tag="audioPort" defaultValue="null"/>
-                <param tag="mode" type="int" />
-                <param tag="level" type="int" />
-            </params>
-        </method>
-        <method name="Get_Volume_Leveller2" api="getVolumeLeveller2" type="method" desc="Get the volume leveller setting" >
-            <params>
-                <param tag="audioPort" defaultValue="null"/>
-            </params>
-            <expectedValues>0,1,2</expectedValues>
-        </method>
-        <method name="Set_Surround_Virtualizer2" api="setSurroundVirtualizer2" type="method" desc="Sets the Surround Virtualizer boost setting" >
-            <params>
-                <param tag="audioPort" defaultValue="null"/>
-                <param tag="mode" type="int"/>
-                <param tag="boost"  type="int"/>
-            </params>
-        </method>
-        <method name="Get_Surround_Virtualizer2" api="getSurroundVirtualizer2" type="method" desc="Returns the current surround virtualizer boost settings." >
-            <params>
-                <param tag="audioPort" defaultValue="null"/>
-            </params>
-            <expectedValues>0,1,2</expectedValues>
-        </method>    
         <method name="Get_Video_Format" api="getVideoFormat" type="method" desc="Returns the current and supported video formats" />
-        <method name="Get_Audio_Format" api="getAudioFormat" type="method" desc="Returns the current and supported audio formats" /> 
+        <method name="Get_Audio_Format" api="getAudioFormat" type="method" desc="Returns the current and supported audio formats" />
+        <method name="Reset_Bass_Enhancer" api="resetBassEnhancer" type="method" desc="Resets the dialog enhancer level to its default bassboost value" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Reset_Dialog_Enhancement" api="resetDialogEnhancement" type="method" desc="Resets the dialog enhancer level to its default enhancer level" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Reset_Volume_Leveller" api="resetVolumeLeveller" type="method" desc="Resets the Volume Leveller level to default volume value" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Reset_Surround_Virtualizer" api="resetSurroundVirtualizer" type="method" desc="Resets the surround virtualizer to its default boost value" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
+        </method> 
         <event name="Event_Zoom_Settings_Updated" eventName="zoomSettingUpdated" eventId="client.events.1" type="event" desc="Zoom settings updated event "/>
 	<event name="Event_Resolution_Changed" eventName="resolutionChanged" eventId="client.events.1" type="event" desc="Fires on changing resolution"/>
     </plugin>

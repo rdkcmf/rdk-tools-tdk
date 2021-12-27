@@ -391,5 +391,15 @@
                 </resultGeneration>
             </testStep>
        </testCase>
+       <testCase testCaseId="NW_15" testCaseName="Network_Ping_Invalid_Endpoint"  desc="Pings the invalid endpoint" >
+           <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Ping_Host" method="Ping" timeoutKey="CUSTOM_TIMEOUT_FOR_PING_AND_TRACE">
+                <params>
+                  <param tag="endpoint"  value="0.42.42.42" />
+                  <param tag="packets"   useDefault="true" />
+                </params>
+                <resultGeneration useMethodTag="network_get_ping_response" arguments="validate_error_message" expectedValues="0.42.42.42,could not ping endpoint"/>
+            </testStep>
+       </testCase>
 </testPlugin>
 

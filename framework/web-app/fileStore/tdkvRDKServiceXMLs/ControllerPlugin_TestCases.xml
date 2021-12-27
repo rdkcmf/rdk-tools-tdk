@@ -426,5 +426,29 @@
             <resultGeneration useMethodTag="controller_check_error_message" expectedValues="ERROR_PRIVILIGED_REQUEST,24"/>
          </testStep>
      </testCase>
+     <testCase testCaseId="Controller_17" testCaseName="Activate_Deactivate_Controller_Plugin" desc="Activates/Deactivates the controller plugin and validates the error code">
+       <testCaseInfo testCaseType="direct" />
+         <testStep testStepId="1" name="Activate_Plugin" method="Activate_Plugin" >
+            <params>
+               <param tag="callsign" value="Controller" />
+            </params>
+            <resultGeneration useMethodTag="controller_check_error_message" expectedValues="ERROR_PRIVILIGED_REQUEST,24"/>
+         </testStep>
+         <testStep testStepId="2" name="Deactivate_Plugin" method="Deactivate_Plugin" >
+            <params>
+               <param tag="callsign" value="Controller" />
+            </params>
+            <resultGeneration useMethodTag="controller_check_error_message" expectedValues="ERROR_PRIVILIGED_REQUEST,24"/>
+         </testStep>
+     </testCase>
+     <testCase testCaseId="Controller_18" testCaseName="Check_Invalid_Environment_Variable_Response"  desc="Passes the invalid environment variable and validates the error code">
+      <testCaseInfo testCaseType="direct"/>
+         <testStep testStepId="1" name="Get_Environment_Variable" method="Environment_Variable" >
+           <params>
+             <param tag="value" value="invalid" indexOnly="true"/>
+           </params>
+           <resultGeneration useMethodTag="controller_check_error_message" expectedValues="ERROR_UNKNOWN_KEY,22"  />
+         </testStep>
+     </testCase>
 </testPlugin>
 

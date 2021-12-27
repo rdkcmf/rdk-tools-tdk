@@ -634,4 +634,22 @@
               <resultGeneration useMethodTag="system_check_custom_reboot_reason" arguments="rebootInfo" expectedValues= "API_Validation" />
             </testStep>
        </testCase>
+    
+       <testCase testCaseId="SYS_41" testCaseName="System_Enable_Disable_Moca_Support" desc="check if able to toggle the Moca status" >
+           <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="MocaSupport" />
+            <testStep testStepId="1" name="Query_Moca_Status" method="Query_MocaStatus" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="system_get_moca_enabled_status" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Moca_Status" method="Enable_Moca" revertSet="yes">
+                <params>
+                  <param tag="value" usePreviousResult="true" Id="1" useMethodTag="system_toggle_moca_enabled_status" revertParam="yes" />
+                </params>
+                <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="3" name="Query_Moca_Status" method="Query_MocaStatus" revertFlag="yes">
+                <resultGeneration useMethodTag="system_get_moca_enabled_status">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_toggle_moca_enabled_status" />
+                </resultGeneration>
+            </testStep>
+       </testCase>
 </testPlugin>

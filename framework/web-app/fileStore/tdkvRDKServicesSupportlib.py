@@ -232,29 +232,36 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
+        
         elif tag == "network_get_ping_response":
-            info = result.copy()
-            target = result.get("target")
-            tx_packets = int(result.get("packetsTransmitted"))
-            rx_packets = int(result.get("packetsReceived"))
-            packets_loss = result.get("packetLoss")
-            if "duplicates" in packets_loss:
-                packets_loss = packets_loss.split("duplicates")[0]
-            success = str(result.get("success")).lower() == "true"
-            if len(arg) and arg[0] == "check_target":
-                packets = int(expectedValues[0])
-                host_ip = expectedValues[1]
-                if success and target == host_ip and tx_packets == packets and rx_packets == packets and int(packets_loss) == 0:
+            info = checkAndGetAllResultInfo(result)
+            if len(arg) and arg[0] == "validate_error_message":
+                if str(result.get("success")).lower() == "false" and str(result.get('error')).lower() == str(expectedValues[1]).lower() and result.get("target") == expectedValues[0]:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             else:
-                packets = int(expectedValues[0])
-                if success and target.strip() and tx_packets == packets and rx_packets == packets and int(packets_loss) == 0:
-                    info["Test_Step_Status"] = "SUCCESS"
+                info = result.copy()
+                target = result.get("target")
+                tx_packets = int(result.get("packetsTransmitted"))
+                rx_packets = int(result.get("packetsReceived"))
+                packets_loss = result.get("packetLoss")
+                if "duplicates" in packets_loss:
+                    packets_loss = packets_loss.split("duplicates")[0]
+                success = str(result.get("success")).lower() == "true"
+                if len(arg) and arg[0] == "check_target":
+                    packets = int(expectedValues[0])
+                    host_ip = expectedValues[1]
+                    if success and target == host_ip and tx_packets == packets and rx_packets == packets and int(packets_loss) == 0:
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
                 else:
-                    info["Test_Step_Status"] = "FAILURE"
+                    packets = int(expectedValues[0])
+                    if success and target.strip() and tx_packets == packets and rx_packets == packets and int(packets_loss) == 0:
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "network_get_trace_response":
             info = result.copy()
@@ -721,6 +728,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             info = checkAndGetAllResultInfo(result.get(arg[0]),result.get("success"))
             result = result.get(arg[0])
             if result.get("customReason") in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "system_get_moca_enabled_status":
+            info["mocaEnabled"] = result.get("mocaEnabled")
+            success = str(result.get("success")).lower() == "true"
+            if success and str(result.get("mocaEnabled")).lower() in expectedValues:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -1400,16 +1414,21 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_volume_leveller":
-            info["level"] = result.get('level');
-            if len(arg) and arg[0] == "check_volume_leveller_mode":
-                info["mode"] = result.get('mode');
-                print expectedValues
-                if str(result.get("success")).lower() == "true" and str(result.get('mode')) in expectedValues:
+            info["level"] = result.get('level')
+            info["mode"] = result.get('mode')
+            success = str(result.get("success")).lower() == "true"
+            if len(arg) and arg[0] == "check_expected_values":
+                if success and str(result.get('mode')) in expectedValues[0] and str(result.get('level')) in expectedValues[1]:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif len(arg) and arg[0] == "check_volume_leveller_mode":
+                if success and str(result.get('mode')) in expectedValues:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             else:
-                if str(result.get("success")).lower() == "true" and str(result.get('level')) in expectedValues:
+                if success and str(result.get('level')) in expectedValues and int(result.get('mode')) in [0,1,2]:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
@@ -1428,21 +1447,21 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "check_surround_virtualizer":
-            info["boost"] = result.get('boost');
+            info["boost"] = result.get('boost')
+            info["mode"] = result.get('mode')
+            success = str(result.get("success")).lower() == "true"
             if len(arg) and arg[0] == "check_surround_virtualizer_range":
-                if 0 <= int(result.get('boost')) <= 96 :
+                if success and 0 <= int(result.get('boost')) <= 96 and int(result.get('mode')) in [0,1,2]:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             elif len(arg) and arg[0] == "check_surround_virtualizer_mode":
-                info["mode"] = result.get('mode')
-                print  expectedValues
-                if str(result.get("success")).lower() == "true" and str(result.get('mode')) in expectedValues:
+                if success and str(result.get('mode')) in expectedValues:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             else:
-                if str(result.get("success")).lower() == "true" and str(result.get('boost')) in expectedValues:
+                if success and str(result.get('boost')) in expectedValues[1] and str(result.get('mode')) in expectedValues[0]:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
@@ -2761,6 +2780,14 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag == "system_get_current_image_name":
             testStepResults = testStepResults[0].values()[0]
             info["image_name"] = testStepResults[0].get("current_FW_version")
+        
+        elif tag == "system_toggle_moca_enabled_status":
+            testStepResults = testStepResults[0].values()[0]
+            value = testStepResults[0].get("mocaEnabled")
+            if str(value).lower() == "true":
+                info["value"] = False
+            else:
+                info["value"] = True
 
         # user Preferences result parser steps
         elif tag == "userpreferences_switch_ui_language":
@@ -2776,18 +2803,21 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag == "rdkshell_get_connected_client":
             testStepResults = testStepResults[0].values()[0]
             clients = testStepResults[0].get("clients")
-            index = int(arg[0])
-             
-            if len(clients):
-                if len(arg) > 1:
-                    if arg[1] == "target":
-                        info["target"] = clients[index]
-                
-                else:
-                    info["client"] = clients[index]
+            if len(arg) and arg[0] == "get_all_clients":
+                info["client"] = ",".join(clients)
             else:
-                info["client"] = ""
-                info["target"] = ""
+                index = int(arg[0])
+                if len(clients):
+                    if len(arg) > 1:
+                        if arg[1] == "target":
+                           info["target"] = clients[index]
+
+                    else:
+                        info["client"] = clients[index]
+                else:
+                    info["client"] = ""
+                    info["target"] = ""        
+
         elif tag == "rdkshell_get_clients_state":
             testStepResults = testStepResults[0].values()[0]
             result = testStepResults[0].get("state")
@@ -2976,6 +3006,12 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag == "get_audio_delay":
             testStepResults = testStepResults[0].values()[0]
             info["audioDelay"] = testStepResults[0].get("audioDelay")
+        
+        elif tag == "displaysettings_get_default_values":
+            testStepResults = testStepResults[0].values()[0]
+            info["defaultValue"] = testStepResults[0].get("defaultValue")
+            if len(arg) and arg[0] == "get_default_mode":
+                info["defaultMode"] = testStepResults[0].get("defaultMode")
 
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_toggle_adapter_state":
@@ -3574,7 +3610,17 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,execInfo)
                 DisplayFrameRate = width+'x'+height+'x40'
                 DisplayFrameRate_values.append(DisplayFrameRate)
             info["DisplayFrameRate"] = DisplayFrameRate_values
-        
+               
+        elif tag == "Get_Default_Values":
+            command =  'grep User.'+arg[0]+' /etc/hostDataDefault | cut -d\' \' -f2- | xargs'
+            output = executeCommand(execInfo, command)
+            info["defaultValue"] = int(output)
+
+            if len(arg) > 2 and arg[2] == "get_default_mode":
+                command =  'grep User.'+arg[1]+' /etc/hostDataDefault | cut -d\' \' -f2- | xargs'
+                output = executeCommand(execInfo, command)
+                info["defaultMode"] = int(output)
+
         elif tag == "RDKShell_Get_Width_And_Height":
             mapping_details = arg[len(arg)-1].split(":")
             info["width"] = mapping_details[1].split('|')[0].strip('[]')
