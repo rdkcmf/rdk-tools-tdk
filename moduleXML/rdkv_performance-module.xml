@@ -47,6 +47,7 @@
       <function name='rdkservice_getSupportedPlugins' />
       <function name='rdkservice_validatePluginFunctionality' />
       <function name='rdkservice_getValueWithParams' />
+      <function name='rdkservice_getBrowserScore_AnimationBenchmark' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>

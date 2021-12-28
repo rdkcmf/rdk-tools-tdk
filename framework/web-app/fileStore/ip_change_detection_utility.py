@@ -154,8 +154,9 @@ def get_curr_device_ip(tm_url):
     return device_ip
 
 # Function to enable WIFI interface and set it as default interface
-def switch_to_wifi(obj,ap_freq = "2.4",start_time_needed = False):
+def switch_to_wifi(obj,ap_freq = "2.4",start_time_needed = False, wifi_connect_needed = False):
     status = "FAILURE"
+    wifi_connect_start_time = ""
     expectedResult =  "SUCCESS"
     start_time = ""
     complete_app_url_status,complete_app_url = get_lightning_app_url(obj)
@@ -223,7 +224,10 @@ def switch_to_wifi(obj,ap_freq = "2.4",start_time_needed = False):
                                         app_status = launch_lightning_app(obj,complete_app_url)
                                         if expectedResult in app_status:
                                             time.sleep(40)
-                                            wifi_connect_status = connect_wifi(obj,ap_freq)
+                                            if wifi_connect_needed:
+                                                wifi_connect_status,wifi_connect_start_time = connect_wifi(obj,ap_freq,True)
+                                            else:
+                                                wifi_connect_status = connect_wifi(obj,ap_freq)
                                             if expectedResult in wifi_connect_status:
                                                 time.sleep(20)
                                                 if start_time_needed:
@@ -268,13 +272,17 @@ def switch_to_wifi(obj,ap_freq = "2.4",start_time_needed = False):
     else:
         print "\n Please check the preconditions before test \n"
     if start_time_needed:
-        return status,plugin_status_dict,revert,start_time
+        if wifi_connect_needed:
+            return status,plugin_status_dict,revert,start_time,wifi_connect_start_time
+        else:
+            return status,plugin_status_dict,revert,start_time
     else:
         return status,plugin_status_dict,revert
 
 # Function to connect to a SSID given in the Device configuration file               
-def connect_wifi(obj,ap_freq):
+def connect_wifi(obj,ap_freq,start_time_needed=False):
     status = "FAILURE"
+    start_time = ""
     conf_file,conf_status = getConfigFileName(obj.realpath)
     if conf_status == "SUCCESS":
         if ap_freq == "2.4":
@@ -316,6 +324,7 @@ def connect_wifi(obj,ap_freq):
                         tdkTestObj = obj.createTestStep('rdkservice_setValue')
                         tdkTestObj.addParameter("method","org.rdk.Wifi.1.connect")
                         tdkTestObj.addParameter("value",params)
+                        start_time = str(datetime.utcnow()).split()[1]
                         tdkTestObj.executeTestCase(expectedResult)
                         result = tdkTestObj.getResult()
                         if result == "SUCCESS":
@@ -359,7 +368,10 @@ def connect_wifi(obj,ap_freq):
                 tdkTestObj.setResultStatus("FAILURE")
     else:
         print "\n Device specific configuration file is missing \n"
-    return status
+    if start_time_needed:
+        return status,start_time
+    else:
+        return status
 
 # Function to set default interface
 def set_default_interface(obj,interface,start_time_needed = False):
@@ -453,8 +465,10 @@ def check_cur_ssid_freq(obj):
     return return_val
 
 # Function to connect to given interface
-def connect_to_interface(obj, required_connection):
+def connect_to_interface(obj, required_connection,start_time_needed = False, wifi_connect_needed = False):
     revert_dict = {"revert_if":False}
+    start_time = ""
+    wifi_start_time = ""
     result_status = "FAILURE"
     wifi_ssid_dict = {"WIFI":"2.4", "WIFI_5GHZ":"5"}
     revert_plugins = "NO"
@@ -463,19 +477,37 @@ def connect_to_interface(obj, required_connection):
     if revert_nw == "YES":
         revert_dict["org.rdk.Network"] = "deactivated"
     if current_connection == "EMPTY":
-        return result_status, revert_dict, revert_plugins
+        if start_time_needed:
+            if wifi_connect_needed:
+                return result_status, revert_dict, revert_plugins, start_time, wifi_start_time
+            else:
+                return result_status, revert_dict, revert_plugins, start_time
+        else:
+            return result_status, revert_dict, revert_plugins
     elif current_connection == "WIFI":
         #Check the frequency of SSID
         ssid_freq = check_cur_ssid_freq(obj)
         if ssid_freq == "FAILURE":
-            return result_status, revert_dict, revert_plugins
+            if start_time_needed:
+                if wifi_connect_needed: 
+                    return result_status, revert_dict, revert_plugins, start_time, wifi_start_time
+                else:
+                    return result_status, revert_dict, revert_plugins, start_time
+            else:
+                return result_status, revert_dict, revert_plugins
         elif ssid_freq == "5":
             current_connection = "WIFI_5GHZ"
     if current_connection == required_connection:
         result_status = "SUCCESS"
     elif current_connection == "ETHERNET" or "WIFI" in required_connection:
         revert_dict["revert_if"] = True
-        result_status, plugins_status_dict, revert_plugins = switch_to_wifi(obj, wifi_ssid_dict[required_connection], False)
+        if start_time_needed:
+            if wifi_connect_needed:
+                result_status, plugins_status_dict, revert_plugins, start_time, wifi_start_time = switch_to_wifi(obj, wifi_ssid_dict[required_connection], True, True)
+            else:
+                result_status, plugins_status_dict, revert_plugins, start_time = switch_to_wifi(obj, wifi_ssid_dict[required_connection], True)
+        else:
+            result_status, plugins_status_dict, revert_plugins = switch_to_wifi(obj, wifi_ssid_dict[required_connection], False)
     else:
         revert_dict["revert_if"] = True
         plugin_status, plugins_status_dict, revert_plugins = set_plugins(obj)
@@ -484,11 +516,20 @@ def connect_to_interface(obj, required_connection):
         time.sleep(60)
         if all(status == "SUCCESS" for status in (plugin_status, url_status, launch_app_status)):
             if required_connection == "ETHERNET":
-                result_status = set_default_interface(obj, "ETHERNET")
+                if start_time_needed:
+                    result_status,start_time = set_default_interface(obj, "ETHERNET", True)
+                else:
+                    result_status = set_default_interface(obj, "ETHERNET")
         else:
             print "\n Error while launching Lightning App"
     revert_dict["current_if"] = current_connection
     if revert_plugins == "YES":
         revert_dict.update(plugins_status_dict)
     time.sleep(30)
-    return result_status,revert_dict,revert_plugins
+    if start_time_needed:
+        if wifi_connect_needed:
+            return result_status,revert_dict,revert_plugins,start_time,wifi_start_time
+        else:
+            return result_status,revert_dict,revert_plugins,start_time
+    else:
+        return result_status,revert_dict,revert_plugins

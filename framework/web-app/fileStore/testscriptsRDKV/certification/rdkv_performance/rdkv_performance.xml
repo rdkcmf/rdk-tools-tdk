@@ -125,6 +125,10 @@
           <parameter name="params" value=""/>
         </parameters>
       </primitiveTest>
+      <primitiveTest name="rdkservice_getBrowserScore_AnimationBenchmark" id="" version="1">
+        <function>rdkservice_getBrowserScore_AnimationBenchmark</function>
+        <parameters/>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
