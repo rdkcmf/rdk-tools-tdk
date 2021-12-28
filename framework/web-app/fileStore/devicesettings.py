@@ -227,3 +227,27 @@ def dsGetCPUTemp(obj,expectedresult):
         return (retValue,details)
 
 ## End of Get CPU Temperture ##
+
+## Get supported resolutions ##
+def dsGetSupportedResolutions(obj):
+        #Primitive test case which associated to this Script
+        tdkTestObj = obj.createTestStep('DS_Resolution');
+        tdkTestObj.addParameter("port_name","HDMI0");
+        expectedresult = "SUCCESS"
+        #Execute the test case in STB
+        tdkTestObj.executeTestCase(expectedresult);
+        #Get the result of execution
+        result = tdkTestObj.getResult();
+        supportedResolutions = tdkTestObj.getResultDetails();
+        #Set the result status of execution
+        if expectedresult in result:
+            tdkTestObj.setResultStatus("SUCCESS");
+            list = supportedResolutions.split(":");
+	    resolutionList = list[1].split(",");
+            return resolutionList
+        else:
+            tdkTestObj.setResultStatus("FAILURE");
+            print "Unable to get supported Resolutions";
+            return False
+
+## End of Get supported resolutions ##

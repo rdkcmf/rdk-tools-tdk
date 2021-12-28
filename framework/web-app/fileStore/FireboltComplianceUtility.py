@@ -20,6 +20,7 @@
 import os
 import ConfigParser
 import MediaValidationVariables
+from devicesettings import *
 # Global variable to store the operations string and use_aamp configuration
 operations = ""
 use_aamp = ""
@@ -137,8 +138,8 @@ def getMediaPipelineTestCommand (testName, testUrl, **arguments):
                 #Change hls generic url to aamp url
                 url_updated = url.replace("https","aamps",1).replace("http","aamp",1);
                 command = command.replace(url,url_updated);
-            #Update GST_LOG_LEVEL to capture only critical level errors
-            command = "export GST_LOG_LEVEL=8;" + command;
+            #Update GST_LOG_LEVEL to skip error statements check while using aamp for playback
+            command = "export GST_LOG_LEVEL=0;  " + command;
     return command
 
 #Function to check mediapipeline test execution status from output string
@@ -153,4 +154,58 @@ def checkMediaPipelineTestStatus (outputString):
     else:
         result = "FAILURE"
 
+    return result
+
+def ResolutionTestStart(dsObj, resolution):
+    result = dsManagerInitialize(dsObj)
+    ResolutionSet = False
+    ResolutionBeforePlayback = False
+    gotResolution = False
+    #Check for SUCCESS/FAILURE return value of DS_ManagerInitialize
+    if "SUCCESS" in result:
+         #Calling DS_IsDisplayConnectedStatus function to check for display connection status
+         result = dsIsDisplayConnected(dsObj)
+         if "TRUE" in result:
+             #Save a copy of current resolution
+             ResolutionBeforePlayback = dsGetResolution(dsObj,"SUCCESS",kwargs={'portName':"HDMI0"});
+             resolutionList = dsGetSupportedResolutions(dsObj)
+             if not resolutionList:
+                 print "Unable to retrieve SupportedResolutionList\n"
+             else:
+                 resolutionSet = set(resolutionList)
+                 #Check resolution is supported by the device
+                 for i in range(0,len(resolutionList)):
+                     if resolution in resolutionList[i]:
+                        resolution = resolutionList[i]
+                        gotResolution = True
+                        break;
+                 if not gotResolution:
+                    print "%s is not supported by DUT\nTestcase not applicable for this platform"%resolution;
+                    return False,"Not Applicable"
+             if resolution != ResolutionBeforePlayback:
+                 result = dsSetResolution(dsObj,"SUCCESS",kwargs={'portName':"HDMI0",'resolution':resolution});
+                 if result != resolution:
+                    print "[TEST EXECUTION] : FAILURE";
+                 else:
+                    ResolutionSet = True
+             else:
+                 print "Resolution value already set to %s\n Proceeding with playback "%resolution;
+                 ResolutionSet = True
+         else:
+             print "\nTV not connected\nExiting from testcase";
+    else:
+        print "\nConnection Failed";
+    return ResolutionSet,ResolutionBeforePlayback
+
+def ResolutionTestStop(dsObj, resolution, ResolutionBeforePlayback=""):
+    if resolution and resolution != ResolutionBeforePlayback:
+        print "\nReverting resolution to %s"%ResolutionBeforePlayback
+        result = dsSetResolution(dsObj,"SUCCESS",kwargs={'portName':"HDMI0",'resolution':ResolutionBeforePlayback});
+        if result != ResolutionBeforePlayback:
+            print "[TEST EXECUTION] : FAILURE\nResolution revert failed";
+        else:
+            print "Resolution reverted";
+    result = dsManagerDeInitialize(dsObj)
+    if "FAILURE" in result:
+        print "dsManagerDeInitialize FAILED" 
     return result
