@@ -156,7 +156,7 @@ if expectedResult in result.upper():
                                         continue
                                     event_log = event_listener.getEventsBuffer().pop(0)
                                     print "\n Triggered event: ",event_log,"\n"
-                                    if ("WebKitBrowser" in event_log):
+                                    if ("WebKitBrowser" in event_log and "onLaunched" in str(event_log)):
                                         print "\n Event :onLaunched is triggered during WebKitBrowser launch \n"
                                         launched_time = event_log.split('$$$')[0]
                                         break
@@ -171,6 +171,7 @@ if expectedResult in result.upper():
                                         print "\n WebKitBrowser launched at : ",launched_time
                                         time_taken_for_launch = launched_time_in_millisec - launch_start_time_in_millisec
                                         print "\n Time taken to launch WebKitBrowser: {}(ms)".format(time_taken_for_launch)
+                                        print "\n Threshold value for time taken to launch WebKitBrowser : {} ms".format(webkit_launch_threshold)
                                         print "\n Validate the time: \n"
                                         if 0 < time_taken_for_launch < (int(webkit_launch_threshold) + int(offset)) :
                                             print "\n Time taken for launching WebKitBrowser is within the expected range \n"
@@ -189,6 +190,7 @@ if expectedResult in result.upper():
                                 tdkTestObj.setResultStatus("FAILURE")
                         else:
                             print "\n Error while launching WebKitBrowser \n"
+                            tdkTestObj.setResultStatus("FAILURE")
                         print "\n Exiting from WebKitBrowser \n"
                         tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
                         tdkTestObj.addParameter("plugin",plugin)
@@ -201,7 +203,7 @@ if expectedResult in result.upper():
                             print "Unable to deactivate Cobalt"
                             tdkTestObj.setResultStatus("FAILURE")
                         event_listener.disconnect()
-                        time.sleep(5)
+                        time.sleep(10)
                     else:
                         print "\n Preconditions are not met"
                         tdkTestObj.setResultStatus("FAILURE")

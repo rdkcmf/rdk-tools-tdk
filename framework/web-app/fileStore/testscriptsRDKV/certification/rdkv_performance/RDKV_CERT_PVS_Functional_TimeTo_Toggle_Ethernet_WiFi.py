@@ -215,6 +215,7 @@ if expectedResult in result.upper():
                         event_time_dict[new_interface] = int(getTimeInMilliSec(event_time))
                         time_taken = event_time_dict[new_interface] -  start_time_dict[new_interface]
                         print "\n Time taken for setting {} as default interface: {}(ms) ".format(new_interface,time_taken)
+                        print "\n Threshold value for time taken for setting {} as default interface: {}(ms) ".format(new_interface,validation_dict[new_interface])
                         if 0 < time_taken < ( validation_dict[new_interface] + int(offset)):
                             print "\n Time taken is within the expected range"
                             tdkTestObj.setResultStatus("SUCCESS")

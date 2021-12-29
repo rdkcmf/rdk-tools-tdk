@@ -127,6 +127,7 @@ if expectedResult in result.upper():
                 tdkTestObj.setResultStatus("FAILURE")
         else:
             print "\n Error while launching LightningApp"
+            obj.setLoadModuleStatus("FAILURE")
         #Deactivate plugin
         print "\n Exiting from LightningApp"
         tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')

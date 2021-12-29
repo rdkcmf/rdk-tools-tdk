@@ -93,7 +93,6 @@ if expectedResult in result.upper():
     start_time_dict = {}
     event_time_dict = {}
     method = ""
-    plugin = "Cobalt"
     tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
     tdkTestObj.addParameter("realpath",obj.realpath)
     tdkTestObj.addParameter("deviceIP",obj.IP)
@@ -106,26 +105,30 @@ if expectedResult in result.upper():
     ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
     revert = "NO"
     status = "SUCCESS"
-    plugins_list = ["Cobalt","WebKitBrowser"]
-    plugin_status_needed = {"Cobalt":"deactivated","WebKitBrowser":"deactivated"}
+    plugins_list = ["WebKitBrowser","LightningApp"]
+    plugin = plugins_list[0]
+    plugin_status_needed = {"LightningApp":"deactivated","WebKitBrowser":"deactivated"}
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
-    if curr_plugins_status_dict != plugin_status_needed:
+    if any(curr_plugins_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
+        print "\n Error while getting the status of plugins"
+        status = "FAILURE"
+    elif curr_plugins_status_dict != plugin_status_needed:
         revert = "YES"
         status = set_plugins_status(obj,plugin_status_needed)
         new_status_dict = get_plugins_status(obj,plugins_list)
         if new_status_dict != plugin_status_needed:
             status = "FAILURE"
+            print "\n Error while deactivating plugins:",plugins_list
     if expectedResult == (result and status) and ssh_param_dict != {} and all(value != "" for value in (moveToFront_threshold,moveToBack_threshold,offset)):
         validation_dict = {}
         tdkTestObj.setResultStatus("SUCCESS")
-        cobalt_launch_status,cobalt_launch_start_time = launch_plugin(obj,plugin)
-        time.sleep(20)
-        tdkTestObj = obj.createTestStep('rdkservice_getPluginStatus')
-        tdkTestObj.addParameter("plugin",plugin)
-        tdkTestObj.executeTestCase(expectedResult)
-        result = tdkTestObj.getResult()
-        status = tdkTestObj.getResultDetails()
-        if expectedResult == (cobalt_launch_status and result) and status in "resumed":
+        plugin_launch_status1,plugin_launch_start_time1 = launch_plugin(obj,plugin)
+        time.sleep(10)
+        plugin_launch_status2,plugin_launch_start_time2 = launch_plugin(obj,plugins_list[1])
+        time.sleep(10)
+        plugin_status_expected = {"LightningApp":"resumed","WebKitBrowser":"resumed"}
+        plugin_status_after_launch = get_plugins_status(obj,plugins_list)
+        if plugin_status_expected == plugin_status_after_launch:
             tdkTestObj.setResultStatus("SUCCESS")
             for count in range(0,2):
                 tdkTestObj = obj.createTestStep('rdkservice_getValue')
@@ -137,7 +140,7 @@ if expectedResult in result.upper():
                     zorder = ast.literal_eval(zorder)["clients"]
                     print "zorder: ",zorder
                     zorder = exclude_from_zorder(zorder)
-                    if  plugin.lower() in [element.lower() for element in zorder]:
+                    if plugin.lower() in [element.lower() for element in zorder]:
                         tdkTestObj.setResultStatus("SUCCESS")
                         if zorder[0].lower() == plugin.lower():
                             method = "moveToBack"
@@ -153,7 +156,7 @@ if expectedResult in result.upper():
                         tdkTestObj.executeTestCase(expectedResult)
                         result = tdkTestObj.getResult()
                         if expectedResult in result:
-                            time.sleep(10)
+                            time.sleep(15)
                             command = 'cat /opt/logs/wpeframework.log | grep -inr '+method+'Wrapper |  tail -1'
                             tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
                             tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
@@ -164,6 +167,7 @@ if expectedResult in result.upper():
                             output = tdkTestObj.getResultDetails()
                             if output != "EXCEPTION" and expectedResult in result and len(output.split('\n')) > 2:
                                 required_log = output.split('\n')[1]
+                                print required_log
                                 if  "response" in required_log and json.loads(required_log.split("=")[-1]).get("success"):
                                     print "\n Successfully done {} of {}, logs:{} \n".format(method,plugin,required_log)
                                     print "\n {} started at: {} UTC".format(method,start_time_dict[method])
@@ -173,6 +177,7 @@ if expectedResult in result.upper():
                                     event_time_dict[method] = int(getTimeInMilliSec(event_time))
                                     time_taken = event_time_dict[method] -  start_time_dict[method]
                                     print "\n Time taken for {}: {}(ms) ".format(method,time_taken)
+                                    print "\n Threshold value for {}: {} (ms)".format(method,validation_dict[method])
                                     if 0 < time_taken < ( validation_dict[method] + int(offset)):
                                         print "\n Time taken for {} is within the expected range".format(method)
                                         tdkTestObj.setResultStatus("SUCCESS")
@@ -180,7 +185,7 @@ if expectedResult in result.upper():
                                         print "\n  Time taken for {} is not within the expected range".format(method)
                                         tdkTestObj.setResultStatus("FAILURE")
                                 else:
-                                    print "\n The {} method is not executed successfully"
+                                    print "\n The {} method is not executed successfully".format(method)
                                     tdkTestObj.setResultStatus("FAILURE")
                                     break
                             else:
@@ -198,15 +203,11 @@ if expectedResult in result.upper():
                 else:
                     print "\n Error while getting zorder"
                     tdkTestObj.setResultStatus("FAILURE")
+                    break
         else:
             print "\n Error while set and get {} plugin status".format(plugin)
             tdkTestObj.setResultStatus("FAILURE")
-        print "\n Exiting from Cobalt \n"
-        tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
-        tdkTestObj.addParameter("plugin",plugin)
-        tdkTestObj.addParameter("status","deactivate")
-        tdkTestObj.executeTestCase(expectedResult)
-        result = tdkTestObj.getResult()
+        result = set_plugins_status(obj,curr_plugins_status_dict)
         if result == "SUCCESS":
             tdkTestObj.setResultStatus("SUCCESS")
         else:
@@ -215,10 +216,6 @@ if expectedResult in result.upper():
     else:
         print "\n Preconditions are not met"
         tdkTestObj.setResultStatus("FAILURE")
-    #Revert the values
-    if revert=="YES":
-        print "\n Revert the values before exiting"
-        status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
 else:
     obj.setLoadModuleStatus("FAILURE");

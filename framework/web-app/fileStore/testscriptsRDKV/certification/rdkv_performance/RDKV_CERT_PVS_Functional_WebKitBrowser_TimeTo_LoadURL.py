@@ -92,7 +92,6 @@ if expectedResult in result.upper():
     event_listener = None
     browser_test_url = PerformanceTestVariables.browser_test_url
     thunder_port = PerformanceTestVariables.thunder_port
-    print port
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
@@ -109,7 +108,7 @@ if expectedResult in result.upper():
                 status = "FAILURE"
     if status == "SUCCESS" and browser_test_url != "":
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "WebKitBrowser.1.register","params": {"event": "urlchange", "id": "client.events.1" }}'],"/jsonrpc",False)
-        time.sleep(5)
+        time.sleep(10)
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL in WebKitBrowser"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
@@ -172,6 +171,7 @@ if expectedResult in result.upper():
                         result1, url_loadtime_threshold_value = getDeviceConfigKeyValue(conf_file,"URL_LOADTIME_THRESHOLD_VALUE")
                         result2,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
                         if all(value != "" for value in (url_loadtime_threshold_value,offset)):
+                            print "\n Threshold value for time taken to load the URL: {} ms".format(url_loadtime_threshold_value)
                             if 0 < int(url_loaded_time) < (int(url_loadtime_threshold_value) + int(offset)):
                                 tdkTestObj.setResultStatus("SUCCESS");
                                 print "\n The time taken to load the URL is within the expected limit\n"
@@ -204,7 +204,7 @@ if expectedResult in result.upper():
             tdkTestObj.setResultStatus("FAILURE");
             print "\nFailed to get current URL from webkitbrowser"
         event_listener.disconnect()
-        time.sleep(5)
+        time.sleep(10)
     else:
         print "\nPre conditions are not met"
         obj.setLoadModuleStatus("FAILURE")

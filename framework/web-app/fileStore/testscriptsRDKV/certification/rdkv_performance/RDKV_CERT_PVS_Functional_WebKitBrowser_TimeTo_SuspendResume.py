@@ -113,7 +113,7 @@ if expectedResult in result.upper():
             status = "FAILURE"
     if status == "SUCCESS" :
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.RDKShell.1.register","params": {"event": "onSuspended", "id": "client.events.1" }}','{"jsonrpc": "2.0","id": 6,"method": "org.rdk.RDKShell.1.register","params": {"event": "onLaunched", "id": "client.events.1" }}'],"/jsonrpc",False)
-        time.sleep(5)
+        time.sleep(30)
         print "\nPre conditions for the test are set successfully"
         print "\nSuspend the WebkitBrowser plugin :\n"
         params = '{"callsign":"WebKitBrowser"}'
@@ -176,30 +176,28 @@ if expectedResult in result.upper():
                                     print "\n Suspended initiated at: " +start_suspend + "(UTC)"
                                     print "\n Suspended at : "+suspended_time+ "(UTC)"
                                     time_taken_for_suspend = suspended_time_in_millisec - start_suspend_in_millisec
-                                    print "\n Time taken to Suspend WebKitBrowser Plugin: " + str(time_taken_for_suspend) + "(ms)"
+                                    print "\n Time taken to suspend WebKitBrowser plugin: " + str(time_taken_for_suspend) + "(ms)"
+                                    print "\n Threshold value for time taken to suspend WebKitBrowser plugin: {} ms".format(suspend_threshold)
                                     print "\n Validate the time taken for suspending the plugin \n"
                                     if 0 < time_taken_for_suspend < (int(suspend_threshold) + int(offset)) :
-                                        suspend_status = True
                                         print "\n Time taken for suspending WebKitBrowser plugin is within the expected range \n"
+                                        tdkTestObj.setResultStatus("SUCCESS")
                                     else:
-                                        suspend_status = False
                                         print "\n Time taken for suspending WebKitBrowser plugin is greater than the expected range \n"
+                                        tdkTestObj.setResultStatus("FAILURE")
                                     start_resume_in_millisec = getTimeInMilliSec(start_resume)
                                     resumed_time_in_millisec =  getTimeInMilliSec(resumed_time)
                                     print "\n Resume initiated at: " + start_resume + "(UTC)"
                                     print "\n Resumed at: " + resumed_time + "(UTC)"
                                     time_taken_for_resume = resumed_time_in_millisec - start_resume_in_millisec
-                                    print "\n Time taken to Resume WebKitBrowser Plugin: " + str(time_taken_for_resume) + "(ms)"
+                                    print "\n Time taken to resume WebKitBrowser plugin: " + str(time_taken_for_resume) + "(ms)"
+                                    print "\n Threshold value for time taken to resume WebKitBrowser plugin: {} ms".format(resume_threshold)
                                     print "\n Validate the time taken for resuming the plugin \n"
                                     if 0 < time_taken_for_resume < (int(resume_threshold) + int(offset)) :
-                                        resume_status = True
                                         print "\n Time taken for resuming WebKitBrowser plugin is within the expected range \n"
-                                    else:
-                                        resume_status = False
-                                        print "\n Time taken for resuming WebKitBrowser plugin is greater than the expected range \n"
-                                    if all(status for status in (suspend_status,resume_status)):
                                         tdkTestObj.setResultStatus("SUCCESS")
                                     else:
+                                        print "\n Time taken for resuming WebKitBrowser plugin is greater than the expected range \n"
                                         tdkTestObj.setResultStatus("FAILURE")
                                 else:
                                     print "Threshold values are not configured in Device configuration file"
@@ -223,7 +221,7 @@ if expectedResult in result.upper():
             print "Unable to set WebKitBrowser plugin to suspended state"
             tdkTestObj.setResultStatus("FAILURE")
         event_listener.disconnect()
-        time.sleep(5)
+        time.sleep(30)
     else:
         print "Pre conditions are not met"
         obj.setLoadModuleStatus("FAILURE");

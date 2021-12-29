@@ -97,6 +97,7 @@ if expectedResult in result.upper():
     print "Check Pre conditions"
     event_listener = None
     continue_count = 0
+    power_state = ""
     thunder_port = PerformanceTestVariables.thunder_port
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
@@ -112,7 +113,7 @@ if expectedResult in result.upper():
             status = "FAILURE"
     if status == "SUCCESS":
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.System.1.register","params": {"event": "onSystemPowerStateChanged", "id": "client.events.1" }}'],"/jsonrpc",False)
-        time.sleep(5)
+        time.sleep(10)
         print "\nPre conditions for the test are set successfully"
         print "\n Get the current power state: \n"
         tdkTestObj = obj.createTestStep('rdkservice_getReqValueFromResult')
@@ -215,6 +216,7 @@ if expectedResult in result.upper():
                                 print "\n Power state became ON at : "+ power_on_time + "(UTC)"
                                 time_taken_for_poweron = power_on_time_in_millisec - start_power_on_in_millisec
                                 print "\n Time taken to Power ON from STANDBY: {}(ms)".format(time_taken_for_poweron)
+                                print "\n Threshold value for time taken to Power ON from STANDBY: {}(ms)".format(standby_to_on_threshold)
                                 print "\n Validate the time: \n"
                                 if 0 < time_taken_for_poweron < (int(standby_to_on_threshold) + int(offset)) :
                                     print "\n Time taken for setting power state to ON is within the expected range \n"
@@ -253,7 +255,7 @@ if expectedResult in result.upper():
             print "\n Error while executing org.rdk.System.1.getPowerState method \n"
             tdkTestObj.setResultStatus("FAILURE")
         event_listener.disconnect()
-        time.sleep(5)
+        time.sleep(10)
     else:
         print "\n Pre conditions are not met \n"
         obj.setLoadModuleStatus("FAILURE");

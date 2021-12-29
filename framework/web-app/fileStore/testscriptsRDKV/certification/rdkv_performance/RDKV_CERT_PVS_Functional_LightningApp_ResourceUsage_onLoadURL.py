@@ -202,6 +202,7 @@ if expectedResult in result.upper():
                 tdkTestObj.setResultStatus("FAILURE")
         else:
             print "\n Unable to launch LightningApp"
+            obj.setLoadModuleStatus("FAILURE")
         event_listener.disconnect()
         time.sleep(5)
     else:

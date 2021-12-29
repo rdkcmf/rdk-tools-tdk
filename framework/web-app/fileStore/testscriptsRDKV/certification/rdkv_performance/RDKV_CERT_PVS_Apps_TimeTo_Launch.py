@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>This script is to get the time taken to launch the lightning application with webkit</synopsis>
   <groups_id/>
-  <execution_time>4</execution_time>
+  <execution_time>6</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -140,7 +140,7 @@ if expectedResult in result.upper():
         if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             webkit_console_socket = createEventListener(ip,webinspect_port,[],"/devtools/page/1",False)
-            time.sleep(10)
+            time.sleep(60)
             print "\n Current URL:",current_url
             print "\n Set Lightning Application URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
@@ -174,7 +174,7 @@ if expectedResult in result.upper():
                             test_result = getConsoleMessage(console_log)
                             break;
                     webkit_console_socket.disconnect()
-                    time.sleep(5)
+                    time.sleep(30)
                     if "URL Info:" in test_result:
                         micosec_frm_start_time = int(start_time.split(".")[-1])
                         start_time = start_time.replace(start_time.split(".")[-1],"")
@@ -190,7 +190,8 @@ if expectedResult in result.upper():
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
                         result1, app_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"APP_LAUNCH_THRESHOLD_VALUE")
                         result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
-                        if all (value != "" for value in (app_launch_threshold_value,offset)): 
+                        if all (value != "" for value in (app_launch_threshold_value,offset)):
+                            print "\n Threshold value for time taken to launch the application: {} ms".format(app_launch_threshold_value)
                             if 0 < int(app_launch_time) < (int(app_launch_threshold_value) + int(offset)):
                                 tdkTestObj.setResultStatus("SUCCESS");
                                 print "\n The time taken to launch the app is within the expected limit\n"

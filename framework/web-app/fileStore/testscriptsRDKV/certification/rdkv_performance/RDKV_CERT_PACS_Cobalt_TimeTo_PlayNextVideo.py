@@ -189,6 +189,7 @@ if expectedResult in result.upper():
                         print "\n Play initiated at {}".format(play_start_time)
                         print "\n Play happend at {}".format(video_playedtime)
                         print "\n Time taken for play operation: {} milliseconds \n".format(time_for_video_play)
+                        print "\n Threshold value for Time taken for playing next video: {} milliseconds \n".format(cobalt_play_threshold)
                         if 0 < int(time_for_video_play) < (int(cobalt_play_threshold) + int(offset)):
                             print "\n Time taken for play operation is within the expected limit"
                             tdkTestObj.setResultStatus("SUCCESS")

@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>The objective of this test is to validate the time taken to destroy LightningApp plugin.</synopsis>
   <groups_id/>
-  <execution_time>2</execution_time>
+  <execution_time>3</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -110,7 +110,7 @@ if expectedResult in result.upper():
             status = "FAILURE"
     if status == "SUCCESS":
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 6,"method": "org.rdk.RDKShell.1.register","params": {"event": "onDestroyed", "id": "client.events.1" }}'],"/jsonrpc",False)
-        time.sleep(5)
+        time.sleep(10)
         launch_status,launch_start_time = launch_plugin(obj,"LightningApp")
         if launch_status == expectedResult:
             time.sleep(5)
@@ -152,7 +152,7 @@ if expectedResult in result.upper():
                                 continue
                             event_log = event_listener.getEventsBuffer().pop(0)
                             print "\n Triggered event: ",event_log,"\n"
-                            if ("LightningApp" in event_log):
+                            if ("LightningApp" in event_log and "onDestroyed" in str(event_log)):
                                 print "\n Event :onDestroyed is triggered during LightningApp destroy"
                                 destroyed_time = event_log.split('$$$')[0]
                                 break
@@ -167,6 +167,7 @@ if expectedResult in result.upper():
                                 print "\n LightningApp destroyed at : ",destroyed_time
                                 time_taken_for_destroy = destroyed_time_in_millisec - destroy_start_time_in_millisec
                                 print "\n Time taken to destroy LightningApp: {}(ms)".format(time_taken_for_destroy)
+                                print "\n Threshold value for time taken to destroy LightningApp: {}(ms)".format(htmlapp_destroy_threshold)
                                 print "\n Validate the time:"
                                 if 0 < time_taken_for_destroy < (int(htmlapp_destroy_threshold) + int(offset)) :
                                     print "\n Time taken for destroying LightningApp is within the expected range"
@@ -191,8 +192,9 @@ if expectedResult in result.upper():
                 tdkTestObj.setResultStatus("FAILURE")
         else:
             print "\n Error while launching LightningApp"
+            obj.setLoadModuleStatus("FAILURE")
         event_listener.disconnect()
-        time.sleep(5)
+        time.sleep(10)
     else:
         print "\n Preconditions are not met \n"
         obj.setLoadModuleStatus("FAILURE")

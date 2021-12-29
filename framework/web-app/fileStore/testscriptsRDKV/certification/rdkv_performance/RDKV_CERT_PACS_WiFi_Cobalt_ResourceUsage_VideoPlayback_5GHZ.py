@@ -318,6 +318,7 @@ if expectedResult in result.upper():
             status = close_lightning_app(obj)
         else:
             print "\n Error while reverting to ETHERNET"
+            obj.setLoadModuleStatus("FAILURE")
     if revert_plugins_dict != {}:
         status = set_plugins_status(obj,revert_plugins_dict)
     obj.unloadModule("rdkv_performance");

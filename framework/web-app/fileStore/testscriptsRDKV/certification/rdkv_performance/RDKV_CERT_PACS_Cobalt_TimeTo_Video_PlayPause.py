@@ -226,27 +226,25 @@ if expectedResult in result.upper():
                                                 result2,cobalt_play_threshold = getDeviceConfigKeyValue(conf_file,"COBALT_PLAY_TIME_THRESHOLD_VALUE")
                                                 offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
                                                 if all(value != "" for value in (cobalt_pause_threshold,cobalt_play_threshold,offset)):
-                                                    print "\n play initiated at {} (UTC)".format(play_start_time)
-                                                    print "\n play happend at {} (UTC)".format(video_playedtime)
+                                                    print "\n play initiated at {} ".format(play_start_time)
+                                                    print "\n play happend at {} ".format(video_playedtime)
                                                     print "\n Time taken for play operation: {} milliseconds \n".format(time_for_video_play)
+                                                    print "\n Threshold value for time taken for play operation : {} ms".format(cobalt_play_threshold)
                                                     if 0 < int(time_for_video_play) < (int(cobalt_play_threshold) + int(offset)):
-                                                        play_status = True
-                                                        print "\n Time taken for play operation is within the expected limit \n"
-                                                    else:
-                                                        play_status = False
-                                                        print "\n Time taken for play operation is not within the expected limit \n"
-                                                    print "\n pause initiated at {} (UTC)".format(pause_start_time)
-                                                    print "\n pause happend at {} (UTC)".format(video_pausedtime)
-                                                    print "\n Time taken for pause operation: {} milleseconds \n".format(time_for_video_pause)
-                                                    if 0 < int(time_for_video_pause) < (int(cobalt_pause_threshold) + int(offset)):
-                                                        pause_status = True
-                                                        print "\n Time taken for pause operation is within the expected limit \n"
-                                                    else:
-                                                        pause_status = False
-                                                        print "\n Time taken for pause operation is not within the expected limit \n"
-                                                    if all(status for status in (pause_status,play_status)):
+                                                        print "\n Time taken for play operation is within the expected limit"
                                                         tdkTestObj.setResultStatus("SUCCESS")
                                                     else:
+                                                        print "\n Time taken for play operation is not within the expected limit"
+                                                        tdkTestObj.setResultStatus("FAILURE")
+                                                    print "\n pause initiated at {} ".format(pause_start_time)
+                                                    print "\n pause happend at {} (UTC)".format(video_pausedtime)
+                                                    print "\n Time taken for pause operation: {} milleseconds \n".format(time_for_video_pause)
+                                                    print "\n Threshold value for time taken for pause operation : {} ms".format(cobalt_pause_threshold)
+                                                    if 0 < int(time_for_video_pause) < (int(cobalt_pause_threshold) + int(offset)):
+                                                        print "\n Time taken for pause operation is within the expected limit \n"
+                                                        tdkTestObj.setResultStatus("SUCCESS")
+                                                    else:
+                                                        print "\n Time taken for pause operation is not within the expected limit \n"
                                                         tdkTestObj.setResultStatus("FAILURE")
                                                 else:
                                                     print "\n Please configure the threshold values in device config file \n"

@@ -127,6 +127,7 @@ if expectedResult in result.upper():
                 tdkTestObj.setResultStatus("FAILURE")
         else:
             print "\n Error while launching HtmlApp"
+            obj.setLoadModuleStatus("FAILURE")
         #Deactivate plugin
         print "\n Exiting from HtmlApp"
         tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')

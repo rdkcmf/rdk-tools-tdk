@@ -112,7 +112,7 @@ if expectedResult in result.upper():
         status = "FAILURE"
     if status == "SUCCESS":
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 6,"method": "org.rdk.Wifi.1.register","params": {"event": "onAvailableSSIDs", "id": "client.events.1" }}'],"/jsonrpc",False)
-        time.sleep(5)
+        time.sleep(10)
         tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
         tdkTestObj.addParameter("realpath",obj.realpath)
         tdkTestObj.addParameter("deviceIP",obj.IP)
@@ -213,6 +213,7 @@ if expectedResult in result.upper():
                                                         print "\n WIFI scan completed at : ", event_time
                                                         time_taken_for_wifiscan = scan_end_time_in_millisec - scan_start_time_in_millisec
                                                         print "\n Time taken to scan WIFI details: {}(ms)".format(time_taken_for_wifiscan)
+                                                        print "\n Threshold value for time taken to scan WIFI details: {}(ms)".format(wifi_scan_threshold)
                                                         print "\n Validate the time: \n"
                                                         if 0 < time_taken_for_wifiscan < (int(wifi_scan_threshold) + int(offset)) :
                                                             print "\n Time taken for scanning the SSID details is within the expected range"
@@ -254,7 +255,7 @@ if expectedResult in result.upper():
             print "\n Please configure SSH details in Device configuration file \n"
             tdkTestObj.setResultStatus("FAILURE")
         event_listener.disconnect()
-        time.sleep(5)
+        time.sleep(10)
     else:
         print "\n Preconditions are not met \n"
         obj.setLoadModuleStatus("FAILURE");

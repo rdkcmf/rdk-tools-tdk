@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>This script is to get the performance of the Lightning application by calculating the time taken for play and pause operations.</synopsis>
   <groups_id/>
-  <execution_time>4</execution_time>
+  <execution_time>6</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -139,7 +139,7 @@ if expectedResult in result.upper():
         if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             webkit_console_socket = createEventListener(ip,webinspect_port,[],"/devtools/page/1",False)
-            time.sleep(10)
+            time.sleep(60)
             print "\n Current URL:",current_url
             print "\n Set Lightning Application URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
@@ -203,6 +203,7 @@ if expectedResult in result.upper():
                         result1, pause_time_threshold_value = getDeviceConfigKeyValue(conf_file,"PAUSE_TIME_THRESHOLD_VALUE")
                         result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
                         if all(value != "" for value in (pause_time_threshold_value,offset)):
+                            print "\n The threshold value for time taken to pause operation: {} ms".format(pause_time_threshold_value)
                             if 0 < int(pause_opn_time) < (int(pause_time_threshold_value) + int(offset)):
                                 pause_status = True 
                                 print "\n Time taken for pause operation is within the expected limit \n"
@@ -222,6 +223,7 @@ if expectedResult in result.upper():
                         print "\n Time taken for play operation: {} milliseconds \n".format(play_opn_time)
                         result, play_time_threshold_value = getDeviceConfigKeyValue(conf_file,"PLAY_TIME_THRESHOLD_VALUE")
                         if play_time_threshold_value != "":
+                            print "\n The threshold value for time taken to play operation: {} ms".format(play_time_threshold_value)
                             if 0 < int(play_opn_time) < (int(play_time_threshold_value) + int(offset)):
                                 play_status = True
                                 print "\n Time taken for play operation is within the expected limit \n"

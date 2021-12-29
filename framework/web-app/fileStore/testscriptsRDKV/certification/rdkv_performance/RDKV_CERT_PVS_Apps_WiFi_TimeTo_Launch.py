@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>The objective of this test is to  get the time taken to launch lightning app with WiFi</synopsis>
   <groups_id/>
-  <execution_time>15</execution_time>
+  <execution_time>17</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -165,7 +165,7 @@ if expectedResult in result.upper():
             if current_url != None and expectedResult in result:
                 tdkTestObj.setResultStatus("SUCCESS");
                 webkit_console_socket = createEventListener(obj.IP,webinspect_port,[],"/devtools/page/1",False)
-                time.sleep(10)
+                time.sleep(60)
                 print "\n Current URL:",current_url
                 print "\n Set Lightning Application URL"
                 tdkTestObj = obj.createTestStep('rdkservice_setValue');
@@ -215,6 +215,7 @@ if expectedResult in result.upper():
                             result1, app_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"APP_LAUNCH_THRESHOLD_VALUE")
                             result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
                             if all(value != "" for value in (app_launch_threshold_value,offset)):
+                                print "\n Threshold value for time taken to launch application: {} ms".format(app_launch_threshold_value)
                                 if 0 < int(app_launch_time) < (int(app_launch_threshold_value) + int(offset)):
                                     tdkTestObj.setResultStatus("SUCCESS");
                                     print "\n The time taken to launch the app is within the expected limit"
@@ -229,7 +230,7 @@ if expectedResult in result.upper():
                             print "\n Error occured during application launch"
                         #Set the URL back to previous
                         webkit_console_socket.disconnect()
-                        time.sleep(5)
+                        time.sleep(30)
                         tdkTestObj = obj.createTestStep('rdkservice_setValue');
                         tdkTestObj.addParameter("method",set_method);
                         tdkTestObj.addParameter("value",current_url);

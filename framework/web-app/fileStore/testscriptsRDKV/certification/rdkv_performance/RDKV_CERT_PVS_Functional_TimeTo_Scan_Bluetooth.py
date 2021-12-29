@@ -114,7 +114,7 @@ if expectedResult in result.upper():
     bluetooth_emu_status = executeBluetoothCtl(conf_file,bluetooth_commands)
     if all(status == "SUCCESS" for status in ( plugin_status,conf_status,bluetooth_emu_status)):
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 6,"method": "org.rdk.Bluetooth.1.register","params": {"event": "onDiscoveredDevice", "id": "client.events.1" }}'],"/jsonrpc",False)
-        time.sleep(5)
+        time.sleep(10)
         tdkTestObj = obj.createTestStep('rdkservice_getValue')
         tdkTestObj.addParameter("method","org.rdk.Bluetooth.1.enable")
         tdkTestObj.executeTestCase(expectedResult)
@@ -141,7 +141,6 @@ if expectedResult in result.upper():
                 result = tdkTestObj.getResult()
                 if result == "SUCCESS":
                     tdkTestObj.setResultStatus("SUCCESS")
-                    print "\n Buffer ",event_listener.getEventsBuffer()
                     if [True for event in event_listener.getEventsBuffer() if "onDiscoveredDevice" in str(event) and "DISCOVERED" in str(event)]:
                         event_log = [event for event in event_listener.getEventsBuffer() if "onDiscoveredDevice" in str(event) and "DISCOVERED" in str(event)][0]
                         print "\n Triggered event: ",event_log,"\n"
@@ -155,6 +154,7 @@ if expectedResult in result.upper():
                             print "\n BLUETOOTH scan completed at : ", event_time
                             time_taken_for_wifiscan = scan_end_time_in_millisec - scan_start_time_in_millisec
                             print "\n Time taken to scan BLUETOOTH details: {}(ms)".format(time_taken_for_wifiscan)
+                            print "\n Threshold value for time taken to scan Bluetooth details : {} ms".format(bluetooth_scan_threshold)
                             print "\n Validate the time: \n"
                             if 0 < time_taken_for_wifiscan < (int(bluetooth_scan_threshold) + int(offset)) :
                                 print "\n Time taken for scanning the Bluetooth details is within the expected range"
@@ -175,7 +175,7 @@ if expectedResult in result.upper():
                 print "\n Error while executing startscan"
                 tdkTestObj.setResultStatus("FAILURE")
             event_listener.disconnect()
-            time.sleep(5)
+            time.sleep(10)
         else:
             print "\n Error while enabling Bluetooth"
             tdkTestObj.setResultStatus("FAILURE")

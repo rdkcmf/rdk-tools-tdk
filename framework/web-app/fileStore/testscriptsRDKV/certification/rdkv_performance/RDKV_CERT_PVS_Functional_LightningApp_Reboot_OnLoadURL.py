@@ -212,6 +212,7 @@ if expectedResult in result.upper():
                     break
             else:
                 print "\n Error while resuming the plugin"
+                obj.setLoadModuleStatus("FAILURE")
                 break
         else:
             print "\n Completing the test"

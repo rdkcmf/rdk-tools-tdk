@@ -162,6 +162,7 @@ if expectedResult in result.upper():
                                     result1, ui_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"MAIN_UI_LAUNCH_TIME_THRESHOLD_VALUE")
                                     result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
                                     if all(value != "" for value in (ui_launch_threshold_value,offset)):
+                                        print "\n Threshold value for time taken for UI to load after reboot : {} ms".format(ui_launch_threshold_value)
                                         if 0 < int(ui_uptime) < (int(ui_launch_threshold_value) + int(offset)) :
                                             tdkTestObj.setResultStatus("SUCCESS");
                                             print "\n The time taken for UI to load after reboot is within the expected limit"

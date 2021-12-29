@@ -129,7 +129,7 @@ if expectedResult in result.upper():
                             status = "FAILURE"
                     if status == "SUCCESS":
                         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 6,"method": "org.rdk.RDKShell.1.register","params": {"event": "onLaunched", "id": "client.events.1" }}'],"/jsonrpc",False)
-                        time.sleep(5)
+                        time.sleep(10)
                         launch_status,launch_start_time = launch_plugin(obj,"Cobalt")
                         if launch_status == expectedResult:
                             time.sleep(5)
@@ -153,7 +153,7 @@ if expectedResult in result.upper():
                                         continue
                                     event_log = event_listener.getEventsBuffer().pop(0)
                                     print "\n Triggered event: ",event_log,"\n"
-                                    if ("Cobalt" in event_log):
+                                    if ("Cobalt" in event_log and "onLaunched" in str(event_log)):
                                         print "\n Event :onLaunched is triggered during Cobalt launch \n"
                                         launched_time = event_log.split('$$$')[0]
                                         break
@@ -168,6 +168,7 @@ if expectedResult in result.upper():
                                         print "\n Cobalt launched at : ",launched_time
                                         time_taken_for_launch = launched_time_in_millisec - launch_start_time_in_millisec
                                         print "\n Time taken to launch Cobalt: {}(ms)".format(time_taken_for_launch)
+                                        print "\n Threshold value for time taken to launch Cobalt after reboot: {}ms".format(cobalt_launch_threshold)
                                         print "\n Validate the time: \n"
                                         if 0 < time_taken_for_launch < (int(cobalt_launch_threshold) + int(offset)) :
                                             print "\n Time taken for launching Cobalt is within the expected range \n"
@@ -186,7 +187,8 @@ if expectedResult in result.upper():
                                 tdkTestObj.setResultStatus("FAILURE")
                         else:
                             print "\n Error while launching Cobalt \n"
-                         #Deactivate cobalt
+                            tdkTestObj.setResultStatus("FAILURE")
+                        #Deactivate cobalt
                         print "\n Exiting from Cobalt \n"
                         tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
                         tdkTestObj.addParameter("plugin","Cobalt")
@@ -199,7 +201,7 @@ if expectedResult in result.upper():
                             print "Unable to deactivate Cobalt"
                             tdkTestObj.setResultStatus("FAILURE")
                         event_listener.disconnect()
-                        time.sleep(5)
+                        time.sleep(10)
                     else:
                         print "\n Preconditions are not met \n"
                         tdkTestObj.setResultStatus("FAILURE")

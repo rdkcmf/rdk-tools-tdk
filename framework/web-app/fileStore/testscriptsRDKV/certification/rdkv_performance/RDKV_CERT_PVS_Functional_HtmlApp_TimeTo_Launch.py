@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>The objective of this test is to validate the time taken to launch HtmlApp plugin.</synopsis>
   <groups_id/>
-  <execution_time>2</execution_time>
+  <execution_time>3</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -109,7 +109,7 @@ if expectedResult in result.upper():
             status = "FAILURE"
     if status == "SUCCESS":
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 6,"method": "org.rdk.RDKShell.1.register","params": {"event": "onLaunched", "id": "client.events.1" }}'],"/jsonrpc",False)
-        time.sleep(5)
+        time.sleep(10)
         launch_status,launch_start_time = launch_plugin(obj,"HtmlApp")
         if launch_status == expectedResult:
             time.sleep(5)
@@ -133,7 +133,7 @@ if expectedResult in result.upper():
                         continue
                     event_log = event_listener.getEventsBuffer().pop(0)
                     print "\n Triggered event: ",event_log,"\n"
-                    if ("HtmlApp" in event_log):
+                    if ("HtmlApp" in event_log and "onLaunched" in str(event_log)):
                         print "\n Event :onLaunched is triggered during HtmlApp launch"
                         launched_time = event_log.split('$$$')[0]
                         break
@@ -148,6 +148,7 @@ if expectedResult in result.upper():
                         print "\n HtmlApp launched at : ",launched_time
                         time_taken_for_launch = launched_time_in_millisec - launch_start_time_in_millisec
                         print "\n Time taken to launch HtmlApp: {}(ms)".format(time_taken_for_launch)
+                        print "\n Threshold value for time taken to launch HtmlApp plugin : {} ms".format(htmlapp_launch_threshold)
                         print "\n Validate the time:"
                         if 0 < time_taken_for_launch < (int(htmlapp_launch_threshold) + int(offset)) :
                             print "\n Time taken for launching HtmlApp is within the expected range"
@@ -166,6 +167,7 @@ if expectedResult in result.upper():
                 tdkTestObj.setResultStatus("FAILURE")
         else:
             print "\n Error while launching HtmlApp"
+            obj.setLoadModuleStatus("FAILURE")
         #Deactivate plugin
         print "\n Exiting from HtmlApp"
         tdkTestObj = obj.createTestStep('rdkservice_setPluginStatus')
@@ -179,7 +181,7 @@ if expectedResult in result.upper():
             print "Unable to deactivate HtmlApp"
             tdkTestObj.setResultStatus("FAILURE")
         event_listener.disconnect()
-        time.sleep(5)
+        time.sleep(10)
     else:
         print "\n Preconditions are not met"
         obj.setLoadModuleStatus("FAILURE")

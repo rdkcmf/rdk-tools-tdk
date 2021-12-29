@@ -172,6 +172,7 @@ if expectedResult in result.upper():
                                 result1, if_uptime_threshold_value = getDeviceConfigKeyValue(conf_file,"WLAN0_IF_UPTIME_THRESHOLD_VALUE")
                                 result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
                                 if all(value != "" for value in (if_uptime_threshold_value,offset)):
+                                    print "\n Threshold value for time taken for wlan0 interface to up after reboot: {} ms".format(if_uptime_threshold_value)
                                     if 0 < int(interface_uptime) < (int(if_uptime_threshold_value) + int(offset)):
                                         tdkTestObj.setResultStatus("SUCCESS");
                                         print "\n The time taken for wlan0 interface to up after reboot is within the expected limit\n"

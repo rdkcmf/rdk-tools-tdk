@@ -125,7 +125,7 @@ if expectedResult in result.upper():
         if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
             webkit_console_socket = createEventListener(ip,PerformanceTestVariables.webinspect_port,[],"/devtools/page/1",False)
-            time.sleep(10)
+            time.sleep(60)
             print "Current URL:",current_url
             print "\nSet Channel change test URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
@@ -222,6 +222,7 @@ if expectedResult in result.upper():
                         result1, channelchange_time_threshold_value = getDeviceConfigKeyValue(conf_file,"CHANNEL_CHANGE_TIME_THRESHOLD_VALUE")
                         result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
                         if all(value != "" for value in (channelchange_time_threshold_value,offset)):
+                            print "\n Threshold value for time taken to channel change: {} ms".format(channelchange_time_threshold_value)
                             if 0 < int(avg_time) < (int(channelchange_time_threshold_value) + int(offset)):
                                 tdkTestObj.setResultStatus("SUCCESS");
                                 print "\n The channel change time is within the expected limit\n"
@@ -237,6 +238,7 @@ if expectedResult in result.upper():
                     else:
                         print error_msg
                     webkit_console_socket.disconnect()
+                    time.sleep(30)
                     #Set the URL back to previous
                     tdkTestObj = obj.createTestStep('rdkservice_setValue');
                     tdkTestObj.addParameter("method","WebKitBrowser.1.url");

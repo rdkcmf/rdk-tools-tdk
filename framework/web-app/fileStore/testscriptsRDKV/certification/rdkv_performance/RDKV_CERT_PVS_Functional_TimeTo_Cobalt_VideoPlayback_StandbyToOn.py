@@ -276,6 +276,7 @@ if expectedResult in result.upper():
                                                                 result1, video_lauch_threshold_value = getDeviceConfigKeyValue(conf_file,"VIDEOPLAY_FROM_STANDBY_THRESHOLD_VALUE")
                                                                 result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
                                                                 if all(value != "" for value in (video_lauch_threshold_value,offset)):
+                                                                    print "\n Threshold value for time taken to play video from standby : {} ms".format(video_lauch_threshold_value)
                                                                     if 0 < int(time_to_video_playfrom_standby) < (int(video_lauch_threshold_value) + int(offset)):
                                                                         print "\n The time taken to play video from standby is within the expected limit\n"
                                                                         tdkTestObj.setResultStatus("SUCCESS");

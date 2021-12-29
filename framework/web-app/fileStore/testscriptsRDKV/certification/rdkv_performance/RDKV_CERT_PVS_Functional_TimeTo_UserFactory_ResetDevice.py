@@ -122,7 +122,7 @@ if expectedResult in result.upper():
     if status == "SUCCESS" and ssh_param_dict != {}:
         tdkTestObj.setResultStatus("SUCCESS")
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.Warehouse.1.register","params": {"event": "resetDone", "id": "client.events.1" }}'],"/jsonrpc",False)
-        time.sleep(5)
+        time.sleep(10)
         #Save a file
         command = 'touch /opt/tdk_test.ini; [ -f /opt/tdk_test.ini ] && echo yes || echo no'
         tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
@@ -138,7 +138,7 @@ if expectedResult in result.upper():
             if len(output.split('\n')) >= 3 and "yes" in output.split('\n')[1]:
                 print "\n Successfully created tdk_test.ini file in /opt/ directory"
                 print "\n Reset device"
-                params = '{"suppressReboot": true, "resetType": "USERFACTORY"}'
+                params = '{"suppressReboot": false, "resetType": "USERFACTORY"}'
                 tdkTestObj = obj.createTestStep('rdkservice_setValue');
                 tdkTestObj.addParameter("method","org.rdk.Warehouse.1.resetDevice");
                 tdkTestObj.addParameter("value",params)
@@ -221,6 +221,7 @@ if expectedResult in result.upper():
                                                 print "\n Reset device completed at : ", reset_done_time 
                                                 time_taken_for_reset = reset_done_time_in_millisec - reset_start_time_in_millisec
                                                 print "\n Time taken to reset the device: {}(ms)".format(time_taken_for_reset)
+                                                print "\n Threshold value for time taken to reset the device: {}(ms)".format(device_reset_time_threshold)
                                                 print "\n Validate the time: \n"
                                                 if 0 < time_taken_for_reset < (int(device_reset_time_threshold) + int(offset)) :
                                                     print "\n Time taken for resetting the device is within the expected range"
@@ -259,7 +260,7 @@ if expectedResult in result.upper():
             print "\n Error while executing command in DUT"
             tdkTestObj.setResultStatus("FAILURE")
         event_listener.disconnect()
-        time.sleep(5)
+        time.sleep(10)
     else:
         print "\n Preconditions are not met"
         tdkTestObj.setResultStatus("FAILURE")

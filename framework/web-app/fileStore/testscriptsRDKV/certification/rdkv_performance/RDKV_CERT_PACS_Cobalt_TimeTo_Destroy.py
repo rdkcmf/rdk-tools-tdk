@@ -129,7 +129,7 @@ if expectedResult in result.upper():
             status = "FAILURE"
     if status == "SUCCESS":
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 6,"method": "org.rdk.RDKShell.1.register","params": {"event": "onDestroyed", "id": "client.events.1" }}'],"/jsonrpc",False)
-        time.sleep(5)
+        time.sleep(20)
         launch_status,launch_start_time = launch_plugin(obj,"Cobalt")
         if launch_status == expectedResult:
             time.sleep(5)
@@ -171,7 +171,7 @@ if expectedResult in result.upper():
                                 continue
                             event_log = event_listener.getEventsBuffer().pop(0)
                             print "\n Triggered event: ",event_log,"\n"
-                            if ("Cobalt" in event_log):
+                            if ("Cobalt" in event_log and "onDestroyed" in str(event_log)):
                                 print "\n Event :onDestroyed is triggered during Cobalt destroy"
                                 destroyed_time = event_log.split('$$$')[0]
                                 break
@@ -186,6 +186,7 @@ if expectedResult in result.upper():
                                 print "\n Cobalt destroyed at : ",destroyed_time
                                 time_taken_for_destroy = destroyed_time_in_millisec - destroy_start_time_in_millisec
                                 print "\n Time taken to destroy Cobalt: {}(ms)".format(time_taken_for_destroy)
+                                print "\n Threshold value for time taken to destroy Cobalt: {} ms".format(cobalt_destroy_threshold)
                                 print "\n Validate the time:"
                                 if 0 < time_taken_for_destroy < (int(cobalt_destroy_threshold) + int(offset)) :
                                     print "\n Time taken for destroying Cobalt is within the expected range"
@@ -210,8 +211,9 @@ if expectedResult in result.upper():
                 tdkTestObj.setResultStatus("FAILURE")
         else:
             print "\n Error while launching Cobalt"
+            obj.setLoadModuleStatus("FAILURE")
         event_listener.disconnect()
-        time.sleep(5)
+        time.sleep(10)
     else:
         print "\n Preconditions are not met \n"
         obj.setLoadModuleStatus("FAILURE")

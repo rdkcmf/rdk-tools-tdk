@@ -219,7 +219,8 @@ if expectedResult in result.upper():
                 print "Unable to deactivate WebKitBrowser"
                 tdkTestObj.setResultStatus("FAILURE")
         else:
-            print "\n Unable to launch WebKitBrowser \n" 
+            print "\n Unable to launch WebKitBrowser \n"
+            obj.setLoadModuleStatus("FAILURE")
     else:
         print "\n Preconditions are not met \n"
         obj.setLoadModuleStatus("FAILURE")

@@ -27,7 +27,7 @@
   <status>FREE</status>
   <synopsis>The objective of this test is to validate the time taken to suspend and resume HtmlApp plugin</synopsis>
   <groups_id/>
-  <execution_time>3</execution_time>
+  <execution_time>4</execution_time>
   <long_duration>false</long_duration>
   <advanced_script>false</advanced_script>
   <remarks/>
@@ -119,7 +119,7 @@ if expectedResult in result.upper():
             status = "FAILURE"
     if status == "SUCCESS" :
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.RDKShell.1.register","params": {"event": "onSuspended", "id": "client.events.1" }}','{"jsonrpc": "2.0","id": 6,"method": "org.rdk.RDKShell.1.register","params": {"event": "onLaunched", "id": "client.events.1" }}'],"/jsonrpc",False)
-        time.sleep(5)
+        time.sleep(30)
         print "\n Pre conditions for the test are set successfully"
         print "\n Suspend the HtmlApp plugin"
         suspend_status,start_suspend = suspend_plugin(obj,"HtmlApp")
@@ -167,10 +167,12 @@ if expectedResult in result.upper():
                                     print "\n Suspended initiated at: ",start_suspend
                                     print "\n Suspended at : ",suspended_time
                                     time_taken_for_suspend = suspended_time_in_millisec - start_suspend_in_millisec
-                                    print "\n Time taken to Suspend HtmlApp Plugin: " + str(time_taken_for_suspend) + "(ms)"
+                                    print "\n Time taken to suspend HtmlApp Plugin: " + str(time_taken_for_suspend) + "(ms)"
+                                    print "\n Threshold value for time taken to suspend HtmlApp plugin : {} ms".format(suspend_threshold)
                                     print "\n Validate the time taken for suspending the plugin"
                                     if 0 < time_taken_for_suspend < (int(suspend_threshold) + int(offset)) :
                                         print "\n Time taken for suspending HtmlApp plugin is within the expected range"
+                                        tdkTestObj.setResultStatus("SUCCESS")
                                     else:
                                         print "\n Time taken for suspending HtmlApp plugin is greater than the expected range"
                                         tdkTestObj.setResultStatus("FAILURE")
@@ -179,10 +181,12 @@ if expectedResult in result.upper():
                                     print "\n Resume initiated at: ",start_resume
                                     print "\n Resumed at: ",resumed_time
                                     time_taken_for_resume = resumed_time_in_millisec - start_resume_in_millisec
-                                    print "\n Time taken to Resume HtmlApp Plugin: " + str(time_taken_for_resume) + "(ms)"
+                                    print "\n Time taken to resume HtmlApp Plugin: " + str(time_taken_for_resume) + "(ms)"
+                                    print "\n Threshold value for time taken to resume HtmlApp plugin : {} ms".format(resume_threshold)
                                     print "\n Validate the time taken for resuming the plugin "
                                     if 0 < time_taken_for_resume < (int(resume_threshold) + int(offset)) :
                                         print "\n Time taken for resuming HtmlApp plugin is within the expected range"
+                                        tdkTestObj.setResultStatus("SUCCESS")
                                     else:
                                         print "\n Time taken for resuming HtmlApp plugin is greater than the expected range"
                                         tdkTestObj.setResultStatus("FAILURE")
@@ -206,9 +210,9 @@ if expectedResult in result.upper():
                 tdkTestObj.setResultStatus("FAILURE")
         else:
             print "\n Unable to set HtmlApp plugin to suspended state"
-            tdkTestObj.setResultStatus("FAILURE")
+            obj.setLoadModuleStatus("FAILURE")
         event_listener.disconnect()
-        time.sleep(5)
+        time.sleep(30)
     else:
         print "\n Pre conditions are not met"
         obj.setLoadModuleStatus("FAILURE")
