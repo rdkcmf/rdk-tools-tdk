@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>4</version>
+  <version>5</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RDKV_CERT_MVS_Video_Mute_UnMute_DASH</name>
+  <name>RDKV_CERT_MVS_Video_Mute_UnMute_HLS_H264</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit instance to play dash video content and perform mute and unmute operations</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit instance to play hls h264 video codec content and perform mute and unmute operations</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -60,8 +60,8 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_36</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit instance to play dash video content and perform mute and unmute operations</test_objective>
+    <test_case_id>RDKV_Media_Validation_35</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit instance to play hls h264 video codec content and perform mute and unmute operations</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -70,7 +70,7 @@
     <input_parameters>Lightning player App URL: string
 webkit_instance:string
 webinspect_port: string
-video_src_url_dash: string</input_parameters>
+video_src_url_hls_h264: string</input_parameters>
     <automation_approch>1. As pre requisite, launch webkit instance via RDKShell, open websocket conntion to webinspect page
 2. Store the details of other launched apps. Move the webkit instance to front, if its z-order is low.
 3. Launch webkit instance with video test app with the src url, operations to be performed, mute and unmute with given interval.
@@ -81,7 +81,7 @@ video_src_url_dash: string</input_parameters>
     <expected_output>Player mute and unmute should happen, expected event volumechange should occur and if proc validation is applicable, then expected data should be available in proc file</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RDKV_CERT_MVS_Video_Mute_UnMute_DASH</test_script>
+    <test_script>RDKV_CERT_MVS_Video_Mute_UnMute_HLS_H264</test_script>
     <skipped>No</skipped>
     <release_version>M86</release_version>
     <remarks></remarks>
@@ -101,7 +101,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_Mute_UnMute_DASH')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_Mute_UnMute_HLS_H264')
 
 webkit_console_socket = None
 
@@ -127,7 +127,7 @@ if expectedResult in result.upper():
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_video_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_dash
+        videoURL  = MediaValidationVariables.video_src_url_hls_h264
         # Setting VideoPlayer Operations
         setOperation("mute","30")
         setOperation("unmute","30")
@@ -136,14 +136,14 @@ if expectedResult in result.upper():
         setURLArgument("url",videoURL)
         setURLArgument("operations",operations)
         setURLArgument("autotest","true")
-        setURLArgument("type","dash")
+        setURLArgument("type","hls")
         appArguments = getURLArguments()
         # Getting the complete test app URL
         video_test_url = getTestURL(appURL,appArguments)
 
         #Example video test url
         #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html?
-        #url=<video_url>.mpd&operations=mute(30),unmute(30)&autotest=true&type=dash
+        #url=<video_url>.m3u8&operations=mute(30),unmute(30)&autotest=true&type=hls
 
         # Setting the video test url in webkit instance using RDKShell
         launch_status = launchPlugin(obj,webkit_instance,video_test_url)

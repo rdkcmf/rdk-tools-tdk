@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>8</version>
+  <version>5</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RDKV_CERT_MVS_Video_PlayPause_HLS</name>
+  <name>RDKV_CERT_MVS_Video_Play_HLS_H264</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit instance and perform video play pause operation of hls content</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit instance and perform video play operation of hls h264 video codec content for few minutes and close the player</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>5</execution_time>
+  <execution_time>7</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -60,8 +60,8 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_06</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit instance and perform video play pause operation of hls content</test_objective>
+    <test_case_id>RDKV_Media_Validation_24</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit instance and perform video play operation of hls h264 video codec content for few minutes and close the player</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -70,22 +70,22 @@
     <input_parameters>Lightning player App URL: string
 webkit_instance:string
 webinspect_port: string
-video_src_url_hls: string
-play_interval: int
-pause_interval:int</input_parameters>
+video_src_url_hls_h264: string
+close_interval: int
+</input_parameters>
     <automation_approch>1. As pre requisite, launch webkit instance via RDKShell, open websocket conntion to webinspect page
 2. Store the details of other launched apps. Move the webkit instance to front, if its z-order is low.
-3. Launch webkit instance with video test app url with the operations to be performed, play and pause with given interval.
-4. App performs the provided operations and validates each operation using events
-5. If expected events occurs for each operation, then app gives the validation result as SUCCESS or else FAILURE
-6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
+3. Launch webkit instance with video test app with the video src url and duration for close.
+4. App starts playing the hls h264 video codec stream and closes the player after the provided duration.
+5. If expected event video playing is observed then update the result as SUCCESS or else FAILURE
+6. Update the test script result as SUCCESS/FAILURE based on event validation result and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>Player pause and play should happen, expected events should occur and if proc validation is applicable, then expected data should be available in proc file</expected_output>
+    <expected_output>Player should play the hls h264 video codec stream for provided duration, expected event playing should occur and if proc validation is applicable, then expected data should be available in proc file </expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RDKV_CERT_MVS_Video_PlayPause_HLS</test_script>
+    <test_script>RDKV_CERT_MVS_Video_Play_HLS_H264</test_script>
     <skipped>No</skipped>
-    <release_version>M82</release_version>
+    <release_version>M86</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -103,7 +103,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_PlayPause_HLS')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_Play_HLS_H264')
 
 webkit_console_socket = None
 
@@ -129,10 +129,9 @@ if expectedResult in result.upper():
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_video_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_hls
+        videoURL  = MediaValidationVariables.video_src_url_hls_h264
         # Setting VideoPlayer Operations
-        setOperation("pause",MediaValidationVariables.pause_interval)
-        setOperation("play",MediaValidationVariables.play_interval)
+        setOperation("close",MediaValidationVariables.close_interval)
         operations = getOperations()
         # Setting VideoPlayer test app URL arguments
         setURLArgument("url",videoURL)
@@ -145,14 +144,14 @@ if expectedResult in result.upper():
 
         #Example video test url
         #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html?
-        #url=<video_url>.m3u8&operations=pause(30),play(10)&autotest=true&type=hls
+        #url=<video_url>.m3u8&operations=close(60)&autotest=true&type=hls
 
         # Setting the video test url in webkit instance using RDKShell
         launch_status = launchPlugin(obj,webkit_instance,video_test_url)
         if "SUCCESS" in launch_status:
             # Monitoring the app progress, checking whether app plays the video properly or any hang detected in between,
             # performing proc entry check and getting the test result from the app
-            test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Observed Event: play");
+            test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Video Player Playing");
             tdkTestObj = obj.createTestStep('rdkv_media_test');
             tdkTestObj.executeTestCase(expectedResult);
             if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
@@ -190,4 +189,3 @@ if expectedResult in result.upper():
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"
-

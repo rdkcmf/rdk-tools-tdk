@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>5</version>
+  <version>9</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RDKV_CERT_MVS_Video_FF4X_Play_HLS</name>
+  <name>RDKV_CERT_MVS_Video_TrickPlay_DASH_H264</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit instance and perform video fast forward operation in 4x speed for few seconds, continue video play of hls content and close the player</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit instance and perform video trickplay operations of dash h264 video codec content</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>5</execution_time>
+  <execution_time>10</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -60,8 +60,8 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_31</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit instance and perform video fast forward operation in 4x speed for few seconds, continue video play of hls content and close the player</test_objective>
+    <test_case_id>RDKV_Media_Validation_10</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit instance and perform video trickplay operations of dash h264 video codec content</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -70,21 +70,21 @@
     <input_parameters>Lightning player App URL: string
 webkit_instance:string
 webinspect_port: string
-video_src_url_hls: string
-</input_parameters>
-    <automation_approch>1. As pre requisite, launch webkit instance via RDKShell, open websocket conntion to webinspect page
+video_src_url_dash_h264: string
+operation_max_interval: int</input_parameters>
+    <automation_approch>1. As pre requisite, disable all the other plugins 1. As pre requisite, launch webkit instance via RDKShell, open websocket conntion to webinspect page
 2. Store the details of other launched apps. Move the webkit instance to front, if its z-order is low.
-3. Launch webkit instance with video test app with the src url, operations to be performed, fastforward 4x and playnow 1x with interval.
-4. App performs the provided operations and validates each operation using events
-5. If expected event ratechange occurs for fastforward and playnow operation, then app gives the validation result as SUCCESS or else FAILURE
+3. Launch webkit instance with video test app url with the operations to be performed, play, pause, seek forward/backward and fast-forward with interval.
+4. App performs the provided operations and validates each operation using events and with position and rate value for seek and fast-forward operations
+5. If expected events occurs for each operation and expected position, rate values occurs for seek and fast-forward, then app gives the validation result as SUCCESS or else FAILURE
 6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>Video should be fastfoward in 4x speed for given interval and video play should be continued in 1x speed, expected event ratechange should occur for ff4x and playnow 1x operations and if proc validation is applicable, then expected data should be available in proc file</expected_output>
+    <expected_output>All the provided player operations and expected events should occur and if proc validation is applicable, then expected data should be available in proc file</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RDKV_CERT_MVS_Video_FF4X_Play_HLS</test_script>
+    <test_script>RDKV_CERT_MVS_Video_TrickPlay_DASH_H264</test_script>
     <skipped>No</skipped>
-    <release_version>M86</release_version>
+    <release_version>M82</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -102,7 +102,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_FF4X_HLS')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_TrickPlay_DASH_H264')
 
 webkit_console_socket = None
 
@@ -128,33 +128,38 @@ if expectedResult in result.upper():
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_video_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_hls
-        checkInterval = str(MediaValidationVariables.fastfwd_check_interval)
+        videoURL  = MediaValidationVariables.video_src_url_dash_h264
         # Setting VideoPlayer Operations
-        setOperation("fastfwd4x","30")
-        setOperation("playnow","10")
-        setOperation("close","30")
+        setOperation("seekfwd",MediaValidationVariables.operation_max_interval)
+        setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
+        setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
+        setOperation("playnow",MediaValidationVariables.operation_max_interval)
+        setOperation("pause",MediaValidationVariables.operation_max_interval)
+        setOperation("play",MediaValidationVariables.operation_max_interval)
+        setOperation("seekbwd",MediaValidationVariables.operation_max_interval)
+        setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
         operations = getOperations()
         # Setting VideoPlayer test app URL arguments
         setURLArgument("url",videoURL)
         setURLArgument("operations",operations)
-        setURLArgument("options","checkInterval("+checkInterval+")")
+        setURLArgument("options","checkInterval(5),loop")
         setURLArgument("autotest","true")
-        setURLArgument("type","hls")
+        setURLArgument("type","dash")
         appArguments = getURLArguments()
         # Getting the complete test app URL
         video_test_url = getTestURL(appURL,appArguments)
 
         #Example video test url
         #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html?
-        #url=<video_url>.m3u8&operations=fastfwd2x(30),playnow(10),close(30)&options=checkInterval(5)&autotest=true&type=hls
+        #url=<video_url>.mpd&operations=seekfwd(10),fastfwd(10),fastfwd(10),playnow(10),pause(10),play(10),seekbwd(10),fastfwd(10)
+        #&options=checkInterval(5),loop&autotest=true&type=dash
 
         # Setting the video test url in webkit instance using RDKShell
         launch_status = launchPlugin(obj,webkit_instance,video_test_url)
         if "SUCCESS" in launch_status:
             # Monitoring the app progress, checking whether app plays the video properly or any hang detected in between,
             # performing proc entry check and getting the test result from the app
-            test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Observed Event: ratechange");
+            test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Observed Event: ");
             tdkTestObj = obj.createTestStep('rdkv_media_test');
             tdkTestObj.executeTestCase(expectedResult);
             if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:

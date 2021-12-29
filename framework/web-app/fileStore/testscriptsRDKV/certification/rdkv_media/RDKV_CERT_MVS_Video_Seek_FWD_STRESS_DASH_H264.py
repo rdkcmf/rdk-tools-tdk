@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>7</version>
+  <version>3</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RDKV_CERT_MVS_Video_PlayPause_DASH</name>
+  <name>RDKV_CERT_MVS_Video_Seek_FWD_STRESS_DASH_H264</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test Script to launch a lightning Video player application via Webkit instance and perform video play pause operation of mpd content</synopsis>
+  <synopsis>Test Script to launch a lightning Video player application via Webkit instance and perform video seek forward operation of dash h264 video codec content repeatedly for given number of times in provided interval</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>5</execution_time>
+  <execution_time>10</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -60,8 +60,8 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_Media_Validation_07</test_case_id>
-    <test_objective>Test Script to launch a lightning Video player application via Webkit instance and perform video play pause operation of mpd content</test_objective>
+    <test_case_id>RDKV_Media_Validation_120</test_case_id>
+    <test_objective>Test Script to launch a lightning Video player application via Webkit instance and perform video seek forward operation of dash h264 video codec content repeatedly for given number of times in provided interval	</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -70,22 +70,22 @@
     <input_parameters>Lightning player App URL: string
 webkit_instance:string
 webinspect_port: string
-video_src_url_dash: string
-play_interval: int
-pause_interval:int</input_parameters>
+video_src_url_dash_h264: string
+seekfwd_interval: int
+seekfwd_check_interval:int</input_parameters>
     <automation_approch>1. As pre requisite, launch webkit instance via RDKShell, open websocket conntion to webinspect page
 2. Store the details of other launched apps. Move the webkit instance to front, if its z-order is low.
-3. Launch webkit instance with video test app url with the operations to be performed, play and pause with given interval.
+3. Launch webkit instance with video test app with the src url, operations to be performed, seekfwd with given interval and repeat count. 
 4. App performs the provided operations and validates each operation using events
-5. If expected events occurs for each operation, then app gives the validation result as SUCCESS or else FAILURE
+5. If expected event seeking and seeked occurs for each  seekfwd operation, then app gives the validation result as SUCCESS or else FAILURE
 6. Update the test script result as SUCCESS/FAILURE based on event validation result from the app and proc check status (if applicable)
 7. Revert all values</automation_approch>
-    <expected_output>Player pause and play should happen, expected events should occur and if proc validation is applicable, then expected data should be available in proc file</expected_output>
+    <expected_output>Video should be seeked forward repeatedly and expected events seeking and seeked should occur for all the repetition and if proc validation is applicable, then expected data should be available in proc file</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_media</test_stub_interface>
-    <test_script>RDKV_CERT_MVS_Video_PlayPause_DASH</test_script>
+    <test_script>RDKV_CERT_MVS_Video_Seek_FWD_STRESS_DASH_H264</test_script>
     <skipped>No</skipped>
-    <release_version>M82</release_version>
+    <release_version>M90</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -103,7 +103,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_media","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_PlayPause_DASH')
+obj.configureTestCase(ip,port,'RDKV_CERT_MVS_Video_Seek_FWD_STRESS_DASH_H264')
 
 webkit_console_socket = None
 
@@ -129,14 +129,17 @@ if expectedResult in result.upper():
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_video_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_dash
+        videoURL  = MediaValidationVariables.video_src_url_dash_h264
+        seekInterval  = str(MediaValidationVariables.seekfwd_interval)
+        checkInterval = str(MediaValidationVariables.seekfwd_check_interval)
         # Setting VideoPlayer Operations
-        setOperation("pause",MediaValidationVariables.pause_interval)
-        setOperation("play",MediaValidationVariables.play_interval)
+        setOperation("seekfwd",MediaValidationVariables.operation_max_interval)
+        setOperation("repeat",MediaValidationVariables.repeat_count_stress)
         operations = getOperations()
         # Setting VideoPlayer test app URL arguments
         setURLArgument("url",videoURL)
         setURLArgument("operations",operations)
+        setURLArgument("options","seekInterval("+seekInterval+"),checkInterval("+checkInterval+")")
         setURLArgument("autotest","true")
         setURLArgument("type","dash")
         appArguments = getURLArguments()
@@ -145,14 +148,14 @@ if expectedResult in result.upper():
 
         #Example video test url
         #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html?
-        #url=<video_url>.mpd&operations=pause(30),play(10)&autotest=true&type=dash
+        #url=<video_url>.mpd&operations=seekfwd(10),repeat(15)&autotest=true&type=dash
 
         # Setting the video test url in webkit instance using RDKShell
         launch_status = launchPlugin(obj,webkit_instance,video_test_url)
         if "SUCCESS" in launch_status:
             # Monitoring the app progress, checking whether app plays the video properly or any hang detected in between,
             # performing proc entry check and getting the test result from the app
-            test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Observed Event: play");
+            test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Video Player seeked");
             tdkTestObj = obj.createTestStep('rdkv_media_test');
             tdkTestObj.executeTestCase(expectedResult);
             if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
@@ -175,16 +178,16 @@ if expectedResult in result.upper():
             # moving next high z-order app to front (residentApp if its active)
             post_requisite_status = setMediaTestPostRequisites(obj,webkit_instance)
             if post_requisite_status == "SUCCESS":
-                print "Post conditions for the test are set successfully"
+                print "Post conditions for the test are set successfully\n"
                 tdkTestObj.setResultStatus("SUCCESS");
             else:
-                print "Post conditions are not met"
+                print "Post conditions are not met\n"
                 tdkTestObj.setResultStatus("FAILURE");
         else:
             tdkTestObj.setResultStatus("FAILURE");
-            print "Unable to load the video Test URL in Webkit"
+            print "Unable to load the video Test URL in Webkit\n"
     else:
-        print "Pre conditions are not met"
+        print "Pre conditions are not met\n"
         tdkTestObj.setResultStatus("FAILURE");
     obj.unloadModule("rdkv_media");
 else:
