@@ -138,14 +138,20 @@ def rdkservice_getAllPluginStatus():
 #SET PLUGIN STATUS
 #------------------------------------------------------------------
 def rdkservice_setPluginStatus(plugin,status,uri=''):
+    data = ''
     if plugin in graphical_plugins_list:
-        if status in "activate":
-            data = '"method":"org.rdk.RDKShell.1.launch", "params":{"callsign": "'+plugin+'", "type":"", "uri":"'+uri+'"}'
-        else:
-            data = '"method":"org.rdk.RDKShell.1.destroy", "params":{"callsign": "'+plugin+'"}'
+        rdkshell_activated = check_status_of_rdkshell()
+        if rdkshell_activated:
+            if status in "activate":
+                data = '"method":"org.rdk.RDKShell.1.launch", "params":{"callsign": "'+plugin+'", "type":"", "uri":"'+uri+'"}'
+            else:
+                data = '"method":"org.rdk.RDKShell.1.destroy", "params":{"callsign": "'+plugin+'"}'
     else:
         data = '"method": "Controller.1.'+status+'", "params": {"callsign": "'+plugin+'"}'
-    result = execute_step(data)
+    if data != '':
+        result = execute_step(data)
+    else:
+        result = "EXCEPTION OCCURRED"
     return result
 
 #-------------------------------------------------------------------
@@ -228,7 +234,7 @@ def openChromeBrowser(url):
 def rdkservice_getBrowserScore_CSS3():
    try:
         browser_score_dict = {}
-        browser_subcategory_list = ["Basic User Interface Level 3","Basic User Interface Level 4","Cascading and Inheritance Level 3","Cascading and Inheritance Level 4","Custom Properties for Cascading Variables Level 1","Media Queries Level 3","Media Queries Level 4","Media Queries Level 5"]
+        browser_subcategory_list = BrowserPerformanceVariables.css3_test_subcategory_list
         webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
         driver = openChromeBrowser(webinspectURL);
         if driver != "EXCEPTION OCCURRED":
@@ -252,7 +258,7 @@ def rdkservice_getBrowserScore_CSS3():
             print "\nThe Browser score using CSS3 test is : ",browser_score
             print "\n Subcategory scores:\n"
             print "===================================="
-            for i in range(1,92):
+            for i in range(1,101):
                 sub_category = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li[1]/span/span').text
 
                 parent = driver.find_elements_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[2]/ol['+str(i)+']/ol[1]/li')
@@ -281,7 +287,7 @@ def rdkservice_getBrowserScore_CSS3():
 def rdkservice_getBrowserScore_Octane():
    try:
         browser_score_dict = {}
-        browser_subcategory_list = ["EarleyBoyer","Splay","SplayLatency","pdf.js","CodeLoad"]
+        browser_subcategory_list = BrowserPerformanceVariables.octane_test_subcategory_list
         webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
         driver = openChromeBrowser(webinspectURL);
         if driver != "EXCEPTION OCCURRED":
@@ -383,7 +389,7 @@ def getDeviceConfigKeyValue(deviceConfigFile,key):
 def rdkservice_getBrowserScore_HTML5():
    try:
         browser_score_dict = {}
-        browser_subcategory_list = ["Parsing rules","Communication","Streams","Performance","Security","Video","Audio","Streaming"]
+        browser_subcategory_list = BrowserPerformanceVariables.html5_test_subcategory_list
         webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
         print "url:",webinspectURL
         driver = openChromeBrowser(webinspectURL);
@@ -408,7 +414,7 @@ def rdkservice_getBrowserScore_HTML5():
             browser_score = browser_score + ' ' + max_browser_score_text
             browser_score_dict["main_score"] = browser_score
             print "\n Browser score from HTML5 test: {}".format(browser_score)
-	    print "\n Subcategory scores:\n"
+            print "\n Subcategory scores:\n"
             print "===================================="
             for i in range(1,3):
                 for j in range(1,5):
@@ -439,7 +445,7 @@ def rdkservice_getBrowserScore_SunSpider():
    try:
         browser_score = ''
         browser_score_dict = {}
-        browser_subcategory_list = ["access","bitops","3bit-bits-in-byte","bits-in-byte","bitwise-and","nsieve-bits","controlflow","recursive","math"]
+        browser_subcategory_list = BrowserPerformanceVariables.sunspider_test_subcategory_list
         webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
         driver = openChromeBrowser(webinspectURL);
         if driver != "EXCEPTION OCCURRED":
@@ -462,7 +468,7 @@ def rdkservice_getBrowserScore_SunSpider():
             children = parent.find_elements_by_tag_name("li")
             text_values = ''
             total_score_text = 'Total:'
-	    for child in children:
+            for child in children:
                 text_values += child.text
                 if total_score_text in child.text:
                     browser_score = child.text
@@ -588,20 +594,25 @@ def suspend_plugin(obj,plugin):
 #-------------------------------------------------------------------
 def launch_plugin(obj,plugin,uri=''):
     status = expectedResult = "SUCCESS"
-    print "\n Resuming {} \n".format(plugin)
-    params = '{"callsign":"'+plugin+'", "type":"", "uri":"' + uri + '"}'
-    tdkTestObj = obj.createTestStep('rdkservice_setValue')
-    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.launch")
-    tdkTestObj.addParameter("value",params)
-    start_launch = str(datetime.utcnow()).split()[1] 
-    tdkTestObj.executeTestCase(expectedResult);
-    result = tdkTestObj.getResult();
-    if result == "SUCCESS":
-        print "\n Resumed {} plugin \n".format(plugin)
-        tdkTestObj.setResultStatus("SUCCESS")
+    start_launch = ""
+    rdkshell_activated = check_status_of_rdkshell()
+    if rdkshell_activated:
+        print "\n Resuming {} \n".format(plugin)
+        params = '{"callsign":"'+plugin+'", "type":"", "uri":"' + uri + '"}'
+        tdkTestObj = obj.createTestStep('rdkservice_setValue')
+        tdkTestObj.addParameter("method","org.rdk.RDKShell.1.launch")
+        tdkTestObj.addParameter("value",params)
+        start_launch = str(datetime.utcnow()).split()[1] 
+        tdkTestObj.executeTestCase(expectedResult);
+        result = tdkTestObj.getResult();
+        if result == "SUCCESS":
+            print "\n Resumed {} plugin \n".format(plugin)
+            tdkTestObj.setResultStatus("SUCCESS")
+        else:
+            print "\n Unable to Resume {} plugin \n".format(plugin)
+            tdkTestObj.setResultStatus("FAILURE")
+            status = "FAILURE"
     else:
-        print "\n Unable to Resume {} plugin \n".format(plugin)
-        tdkTestObj.setResultStatus("FAILURE")
         status = "FAILURE"
     return status,start_launch
 
@@ -857,7 +868,6 @@ def exclude_from_zorder(zorder):
    new_zorder = [ element for element in zorder if element not in excluded_process_list ] 
    return new_zorder
 
-
 #-------------------------------------------------------------------------
 #Utility functions for Hardware Performance threshold validation - START
 #-------------------------------------------------------------------------
@@ -947,3 +957,83 @@ def getConfigFileNameDetail(obj):
 #-------------------------------------------------------------------------
 #Utility functions for Hardware Performance threshold validation - END
 #-------------------------------------------------------------------------
+
+#-------------------------------------------------------------------
+#CHECK THE STATUS OF RDKSHELL PLUGIN AND ACTIVATE IF NEEDED
+#-------------------------------------------------------------------
+def check_status_of_rdkshell():
+    activated = False
+    rdkshell_status = rdkservice_getPluginStatus("org.rdk.RDKShell")
+    if "activated" == rdkshell_status:
+        activated = True
+    elif "deactivated" == rdkshell_status:
+        set_status = rdkservice_setPluginStatus("org.rdk.RDKShell","activate")
+        time.sleep(2)
+        rdkshell_status = rdkservice_getPluginStatus("org.rdk.RDKShell")
+        if "activated" in rdkshell_status:
+            activated = True
+        else:
+            print "\n Unable to activate RDKShell plugin"
+    else:
+        print "\n RDKShell status in DUT:",rdkshell_status
+    return activated
+
+#-------------------------------------------------------------------
+#GET THE BROWSER SCORE FROM ANIMATION BENCHMARK TEST
+#-------------------------------------------------------------------
+def rdkservice_getBrowserScore_AnimationBenchmark():
+    fps_list = []
+    try:
+        browser_score_dict = {}
+        webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
+        driver = openChromeBrowser(webinspectURL);
+        if driver != "EXCEPTION OCCURRED":
+            time.sleep(10)
+            action = ActionChains(driver)
+            source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/li[2]')
+            action.move_to_element(source).context_click().perform()
+            time.sleep(10)
+            options = driver.find_elements_by_class_name('soft-context-menu')
+            try:
+                for option in options:
+                    current_option = option.find_elements_by_class_name('item')
+                    for item in current_option:
+                        if "Expand All" in item.text:
+                            item.click()
+            except exceptions.StaleElementReferenceException,e:
+                pass
+            time.sleep(10)
+            for count in range(0,5):
+                fps_info = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/li[2]/span/span[2]').text
+                if "FPS" in fps_info:
+                    fps_value = fps_info.split(' ')[0]
+                    fps_list.append(float(fps_value))
+                    time.sleep(1)
+                else:
+                    print "\n Error while getting FPS value"
+                    browser_score_dict["main_score"] = "Unable to get the browser score"
+                    break
+            else:
+                average_fps = sum(fps_list)/len(fps_list)
+                browser_score_dict["main_score"] = round(average_fps,2)
+        else:
+            browser_score_dict["main_score"] = "Unable to get the browser score"
+    except Exception as error:
+        print "Got exception while getting the browser score"
+        print error
+        browser_score_dict["main_score"] = "Unable to get the browser score"
+        driver.quit()
+    browser_score_dict = json.dumps(browser_score_dict)
+    return browser_score_dict
+
+#-------------------------------------------------------------------
+#GET THE GRAPHICAL PLUGINS SUPPORTED BY THE DUT
+#-------------------------------------------------------------------
+def get_graphical_plugins(conf_file):
+    status,graphical_plugins = getDeviceConfigKeyValue(conf_file,"AVAILABLE_GRAPHICAL_PLUGINS")
+    if graphical_plugins != "":
+        plugins_list = graphical_plugins.split(',')
+    else:
+        print "\n Please configure the available graphical plugins in device config file"
+        plugins_list = []
+    return plugins_list

@@ -91,7 +91,7 @@ obj.setLoadModuleStatus(result);
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     browser_test_url=BrowserPerformanceVariables.html5_test_url
-    browser_subcategory_list = ["Parsing rules","Communication","Streams","Performance","Security","Video","Audio","Streaming"]
+    browser_subcategory_list = BrowserPerformanceVariables.html5_test_subcategory_list
     sub_category_failure = False
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -148,6 +148,7 @@ if expectedResult in result.upper():
                         result1, html5_threshold_value = getDeviceConfigKeyValue(conf_file,"HTML5_THRESHOLD_VALUE")
                         result2, html5_subcategory_threshold_values = getDeviceConfigKeyValue(conf_file,"HTML5_SUBCATEGORY_THRESHOLD_VALUES")
                         if all(value != "" for value in (html5_threshold_value,html5_subcategory_threshold_values)):
+                            print "\n Threshold value for browser performance main score: ",html5_threshold_value
                             if int(browser_score) > int(html5_threshold_value):
                                 tdkTestObj.setResultStatus("SUCCESS");
                                 print "\n The browser performance main score is high as expected\n"

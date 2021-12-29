@@ -90,7 +90,7 @@ obj.setLoadModuleStatus(result);
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     browser_test_url=BrowserPerformanceVariables.css3_test_url;
-    browser_subcategory_list = ["Basic User Interface Level 3","Basic User Interface Level 4","Cascading and Inheritance Level 3","Cascading and Inheritance Level 4","Custom Properties for Cascading Variables Level 1","Media Queries Level 3","Media Queries Level 4","Media Queries Level 5"]
+    browser_subcategory_list = BrowserPerformanceVariables.css3_test_subcategory_list
     print "Check Pre conditions"
     sub_category_failure = False
     #No need to revert any values if the pre conditions are already set.
@@ -151,6 +151,7 @@ if expectedResult in result.upper():
                         result1, css3_threshold_value = getDeviceConfigKeyValue(conf_file,"CSS3_THRESHOLD_VALUE")
                         result2, css3_subcategory_threshold_values = getDeviceConfigKeyValue(conf_file,"CSS3_SUBCATEGORY_THRESHOLD_VALUES")
                         if all(value != "" for value in (css3_threshold_value,css3_subcategory_threshold_values)):
+                            print "\n Threshold value for browser performance main score: ",css3_threshold_value
                             if int(browser_score) > int(css3_threshold_value):
                                 print "\n The browser performance main score is high as expected\n"
                                 subcategory_threshold_value_list = css3_subcategory_threshold_values.split(',')

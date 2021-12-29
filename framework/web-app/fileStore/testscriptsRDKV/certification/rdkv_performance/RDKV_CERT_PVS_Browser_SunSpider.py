@@ -92,7 +92,7 @@ obj.setLoadModuleStatus(result);
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     browser_test_url=BrowserPerformanceVariables.sunspider_url
-    browser_subcategory_list = ["access","bitops","3bit-bits-in-byte","bits-in-byte","bitwise-and","nsieve-bits","controlflow","recursive","math"]
+    browser_subcategory_list = BrowserPerformanceVariables.sunspider_test_subcategory_list
     sub_category_failure = False
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -150,6 +150,7 @@ if expectedResult in result.upper():
                         result1, sunspider_threshold_value = getDeviceConfigKeyValue(conf_file,"SUNSPIDER_THRESHOLD_VALUE")
                         result2, sunspider_subcategory_threshold_values = getDeviceConfigKeyValue(conf_file,"SUNSPIDER_SUBCATEGORY_THRESHOLD_VALUES")
                         if all(value != "" for value in (sunspider_threshold_value,sunspider_subcategory_threshold_values)):
+                            print "\n Threshold value for browser performance main score: ",sunspider_threshold_value
                             if float(browser_score) < float(sunspider_threshold_value):
                                 tdkTestObj.setResultStatus("SUCCESS");
                                 print "\n The browser performance main score is high as expected\n"

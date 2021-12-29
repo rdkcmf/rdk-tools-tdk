@@ -91,7 +91,7 @@ obj.setLoadModuleStatus(result);
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     browser_test_url=BrowserPerformanceVariables.octane_test_url;
-    browser_subcategory_list = ["EarleyBoyer","Splay","SplayLatency","pdf.js","CodeLoad"]
+    browser_subcategory_list = BrowserPerformanceVariables.octane_test_subcategory_list
     sub_category_failure = False
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -150,6 +150,7 @@ if expectedResult in result.upper():
                         result1, octane_threshold_value = getDeviceConfigKeyValue(conf_file,"OCTANE_THRESHOLD_VALUE")
                         result2, octane_subcategory_threshold_values = getDeviceConfigKeyValue(conf_file,"OCTANE_SUBCATEGORY_THRESHOLD_VALUES")
                         if all(value != "" for value in (octane_threshold_value,octane_subcategory_threshold_values)):
+                            print "\n Threshold value for browser performance main score: ",octane_threshold_value
                             if int(browser_score) > int(octane_threshold_value):
                                 print "\n The browser performance main score is high as expected \n"
                                 subcategory_threshold_value_list = octane_subcategory_threshold_values.split(',')
