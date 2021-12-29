@@ -30,7 +30,7 @@ from resetAgent import resetAgent
 
 if((len(sys.argv))!=4):
 	print "Usage : python " + sys.argv[0] + " DeviceIP PortNumber ResetFlag"
-	print "eg    : python " + sys.argv[0] + " 192.168.160.130 8090 true"
+	print "eg    : python " + sys.argv[0] + " <Valid DUT IP Address> 8090 true"
 
 else:
 	deviceIP = sys.argv[1]

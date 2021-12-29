@@ -42,7 +42,7 @@ def getSocketInstance(ip):
 # Check the number of arguments and print the syntax if args not equal to 4
 if ( (len(sys.argv)) != 4):
         print "Usage : python " + sys.argv[0] + " Device_IP_Address Port_Number LogFile(Name of log file to be removed)"
-	print "eg    : python " + sys.argv[0] + " 192.168.160.130 8088 log.zip"
+	print "eg    : python " + sys.argv[0] + " <Valid DUT IP Address> 8088 log.zip"
 	exit()
 
 # Assigning IP address, port number and file to be reomved

@@ -73,7 +73,7 @@ def tftpDownload(ipaddrs,agentmonitorport,boxFile,tmFile):
 # Check the number of arguments and print the syntax if args not equal to 6
 if ( (len(sys.argv)) != 6):
 	print "Usage : python " + sys.argv[0] + " Device_IP_Address Agent_Port_Number Agent_Monitor_Port RPC_Method TM_File_Name"
-	print "eg    : python " + sys.argv[0] + " 192.168.160.130 8087 8090 RPC_Method_Name(PerformanceBenchMarking/PerformanceSystemDiagnostics) \"11_22_33_44version.txt\""
+	print "eg    : python " + sys.argv[0] + " <Valid DUT IP Address> 8087 8090 RPC_Method_Name(PerformanceBenchMarking/PerformanceSystemDiagnostics) \"11_22_33_44version.txt\""
 	exit()
 
 # Assigning IP address, port numbers, path of destination files and rpcmethod to be invoked

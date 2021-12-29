@@ -23,7 +23,7 @@ import sys
 
 if((len(sys.argv))!=8):
         print "Usage : python " + sys.argv[0] + " DeviceIP PortNumber ClientMACaddress ClientExecutionPort ClientStatusPort clientLogTransferPort clientAgentMonitorPort"
-        print "eg    : python " + sys.argv[0] + " 192.168.160.130 8088 b4:f2:e8:de:1b:0e 9000 9001 9002 9003"
+        print "eg    : python " + sys.argv[0] + " <Valid DUT IP Address> 8088 <Valid DUT MAC Address> 9000 9001 9002 9003"
 
 else:
 	deviceIP = sys.argv[1]

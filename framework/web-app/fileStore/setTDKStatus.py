@@ -27,7 +27,7 @@ from setTDKAvailablity import setTDKAvailablity
 if((len(sys.argv))!=4):
 	print "Invalid Arguments !!!"
 	print "Usage : python " + sys.argv[0] + " DeviceIP PortNumber option(enable/disable)"
-	print "eg    : python " + sys.argv[0] + " 192.168.161.40 8088 enable"
+	print "eg    : python " + sys.argv[0] + " <Valid DUT IP Address> 8088 enable"
 
 else:
 	deviceIP = sys.argv[1]

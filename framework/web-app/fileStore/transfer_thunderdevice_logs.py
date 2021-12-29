@@ -25,7 +25,7 @@ import sys
 #Usage example
 if((len(sys.argv))!=7):
         print "Usage : python " + sys.argv[0] + " DeviceIP username password LogFileName DestinationFolderPath DestinationFileName"
-        print "eg    : python " + sys.argv[0] + " 192.168.160.189 root None /opt/logs/wpeframework.log /home/tdk/LOGS boxLog.log"
+        print "eg    : python " + sys.argv[0] + " <Valid DUT IP Address> root None /opt/logs/wpeframework.log /home/tdk/LOGS boxLog.log"
 
 else:
     host_ip = sys.argv[1]

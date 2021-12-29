@@ -43,7 +43,7 @@ def getSocketInstance(ip):
 # Check the number of arguments and print the syntax if args not equal to 5
 if((len(sys.argv))!=5):
         print "Usage : python " + sys.argv[0] + " DeviceIP AgentMonitorPortNumber BoxFileName TMFileName"
-        print "eg    : python " + sys.argv[0] + " 192.168.160.189 8090 \"/version.txt\" \"111_222_333_version.txt\""
+        print "eg    : python " + sys.argv[0] + " <Valid DUT IP Address> 8090 \"/version.txt\" \"111_222_333_version.txt\""
 	sys.exit()
 
 # Assigning IP address, port number and path of source and destination files

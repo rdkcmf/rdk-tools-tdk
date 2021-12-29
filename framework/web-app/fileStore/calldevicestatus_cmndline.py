@@ -34,7 +34,7 @@ def timeout(signum, frame):
 # Check the number of arguments and print the syntax if args not equal to 5
 if ( (len(sys.argv)) != 5):
         print "Usage : python " + sys.argv[0] + " Device_IP_Address PortNumber Test_Manager_IP_Address Box_Name"
-        print "eg    : python " + sys.argv[0] + " 192.168.160.130 8088 192.168.160.248 \"TVM_XG1\""
+        print "eg    : python " + sys.argv[0] + " <Valid DUT IP Address> 8088 <Valid TM IP Address> \"TVM_XG1\""
         exit()
 
 # Assigning Box IP address, port number, Test manager IP address and Box Name

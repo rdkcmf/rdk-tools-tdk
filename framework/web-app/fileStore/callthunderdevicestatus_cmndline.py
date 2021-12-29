@@ -22,7 +22,7 @@ import json
 
 if ( (len(sys.argv)) != 3):
         print "Usage : python " + sys.argv[0] + " Device_IP_Address Thunder_Port"
-        print "eg    : python " + sys.argv[0] + " 192.168.160.229 9998"
+        print "eg    : python " + sys.argv[0] + " <Valid DUT IP Address> 9998"
         exit()
 else:
     data = '{"jsonrpc":"2.0","id":"3","method": "Controller.1.status@Controller"}'

@@ -70,7 +70,7 @@ def downloadFile(ipaddrs,agentmonitorport,boxFile,tmFile,logUploadURL):
 # Check the number of arguments and print the syntax if args not equal to 6
 if ( (len(sys.argv)) != 7):
 	print "Usage : python " + sys.argv[0] + " Device_IP_Address Agent_Port_Number Agent_Monitor_Port RPC_Method TM_File_Name Log_Upload_URL"
-	print "eg    : python " + sys.argv[0] + " 192.168.160.130 8087 8090 RPC_Method_Name(diagnosticsTest) \"11_22_33_44version.txt\" logUploadURL"
+	print "eg    : python " + sys.argv[0] + " <Valid DUT IP Address> 8087 8090 RPC_Method_Name(diagnosticsTest) \"11_22_33_44version.txt\" logUploadURL"
 	exit()
 
 # Assigning IP address, port numbers, path of destination files and rpcmethod to be invoked

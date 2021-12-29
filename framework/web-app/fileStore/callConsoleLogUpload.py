@@ -28,7 +28,7 @@ from consoleLogUpload import consoleLogUpload
 
 if((len(sys.argv))!=6):
 	print "Usage : python " + sys.argv[0] + " DeviceIP AgentMonitorPortNumber BoxFileName TMFileName logUploadURL"
-	print "eg    : python " + sys.argv[0] + " 192.168.160.189 8090 \"AgentConsole.log\" \"111_222_333_AgentConsole.log\" http://192.168.160.101:8080/rdk-test-tool/"
+	print "eg    : python " + sys.argv[0] + " <Valid DUT IP Address> 8090 \"AgentConsole.log\" \"111_222_333_AgentConsole.log\" http://<Valid TM IP Address>:8080/rdk-test-tool/"
 
 else:
 	deviceIP = sys.argv[1]
