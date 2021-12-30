@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><xml>
+  <module name="WesterosHal" testGroup="Component">
+    <primitiveTests>
+      <primitiveTest name="WesterosHal_CreateNativeWindow" id=" " version="2">
+        <function>TestMgr_WesterosHal_CreateNativeWindow</function>
+        <parameters>
+          <parameter name="width" value="1920"/>
+          <parameter name="height" value="1080"/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest name="WesterosHal_DestroyNativeWindow" id="" version="1">
+        <function>TestMgr_WesterosHal_DestroyNativeWindow</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="WesterosHal_GetDisplayInfo" id="" version="1">
+        <function>TestMgr_WesterosHal_GetDisplayInfo</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="WesterosHal_GetDisplaySafeArea" id="" version="1">
+        <function>TestMgr_WesterosHal_GetDisplaySafeArea</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="WesterosHal_AddDisplaySizeListener" id="" version="1">
+        <function>TestMgr_WesterosHal_AddDisplaySizeListener</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="WesterosHal_RemoveDisplaySizeListener" id="" version="1">
+        <function>TestMgr_WesterosHal_RemoveDisplaySizeListener</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="WesterosHal_GetCallBackData" id="" version="1">
+        <function>TestMgr_WesterosHal_GetCallBackData</function>
+        <parameters/>
+      </primitiveTest>
+    </primitiveTests>
+  </module>
+</xml>

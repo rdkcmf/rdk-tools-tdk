@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<xml>
+  <module>
+  <!-- Module Name  -->
+    <moduleName>WesterosHal</moduleName>
+  <!-- Category of the module  -->
+    <category>RDKV</category>
+  <!-- Excecution time out of module -->
+    <executionTimeOut>3</executionTimeOut>
+  <!-- Excecution time out of module -->
+    <testGroup>Component</testGroup>
+  <!-- Logs File Names of module -->
+    <logFileNames>[]</logFileNames>
+  <!-- Crash File Names of the module -->
+    <crashFileNames>[]</crashFileNames>
+  <!-- Total functions corresponding module  -->
+    <functions>
+      <function name='TestMgr_WesterosHal_CreateNativeWindow' />
+      <function name='TestMgr_WesterosHal_DestroyNativeWindow' />
+      <function name='TestMgr_WesterosHal_GetDisplayInfo' />
+      <function name='TestMgr_WesterosHal_GetDisplaySafeArea' />
+      <function name='TestMgr_WesterosHal_AddDisplaySizeListener' />
+      <function name='TestMgr_WesterosHal_RemoveDisplaySizeListener' />
+      <function name='TestMgr_WesterosHal_GetCallBackData' />
+    </functions>
+  <!-- Total parameters corresponding module  -->
+    <parameters>
+      <parameter funName='TestMgr_WesterosHal_CreateNativeWindow' parameterName='width' parameterType='INTEGER' range='0-3000' />
+      <parameter funName='TestMgr_WesterosHal_CreateNativeWindow' parameterName='height' parameterType='INTEGER' range='0-3000' />
+    </parameters>
+  </module>
+</xml>
