@@ -127,10 +127,12 @@ if expectedResult in result.upper():
             if current_interface != "EMPTY":
                 new_interface = inverse_dict[current_interface]
                 connect_status,revert_dict, revert_plugin_status,start_time_dict[new_interface],wifi_connect_dict[new_interface] = connect_to_interface(obj,new_interface,True,True)
-                if event_time_dict == {}:
-                    revert = "YES"
-                    curr_plugins_status_dict.update(revert_dict)
                 if connect_status == "SUCCESS":
+                    if event_time_dict == {}:
+                        revert = "YES"
+                        revert_dict.pop("current_if")
+                        revert_dict.pop("revert_if")
+                        curr_plugins_status_dict.update(revert_dict)
                     tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
                     tdkTestObj.addParameter("realpath",obj.realpath)
                     tdkTestObj.addParameter("deviceIP",obj.IP)
@@ -162,6 +164,7 @@ if expectedResult in result.upper():
                                     wifi_connect_dict[new_interface] = int(getTimeInMilliSec(wifi_connect_dict[new_interface]))
                                     time_taken = event_time_dict[new_interface] - wifi_connect_dict[new_interface]
                                 print "\n Time taken for getting {} ip address: {}(ms) ".format(new_interface,time_taken)
+                                print "\n Threshold value for getting {} ip address: {}(ms) ".format(new_interface,validation_dict[new_interface])
                                 if 0 < time_taken < ( int(validation_dict[new_interface]) + int(offset)):
                                     print "\n Time taken for getting {} ip address is within the expected range".format(new_interface)
                                     tdkTestObj.setResultStatus("SUCCESS")
