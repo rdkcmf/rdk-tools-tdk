@@ -4,7 +4,7 @@
       "w" : "1920",
       "h" : "1080",
       "clearColor": "0x00000000",
-      "useImageWorker": false
+      "useImageWorker": true
     },
     "keys": {
       "38": "Up",
@@ -20,13 +20,6 @@
   "platformSettings": {
     "path": "./static/",
     "log": true,
-    "showVersion": true,
-    "inspector" : true,
-    "showFps": true
-  },
-  "showFps": {
-    "interval": 60,
-    "log": true,
-    "threshold": 3
+    "showVersion": true
   }
 }
