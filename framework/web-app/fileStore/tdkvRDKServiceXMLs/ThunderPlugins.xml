@@ -94,7 +94,7 @@
                 <param tag="module"   defaultValue="null"/>
                 <param tag="category" defaultValue="Information"/>
             </params>
-            <expectedValues>enabled,disabled</expectedValues>
+            <expectedValues>enabled,disabled,tristated</expectedValues>
         </method>
 
         <!-- TraceControl.1.set -->

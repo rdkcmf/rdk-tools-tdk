@@ -45,9 +45,11 @@
   <!-- execution_time is the time out time for test execution -->
   <remarks>Not applicable for rpi and accelerator</remarks>
   <!-- Reason for skipping the tests if marked to skip -->
-  <skip>true</skip>
+  <skip>false</skip>
   <!--  -->
   <box_types>
+    <box_type>Video_Accelerator</box_type>
+    <!--  -->
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>

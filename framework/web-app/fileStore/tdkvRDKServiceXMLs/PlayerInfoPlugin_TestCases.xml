@@ -36,7 +36,7 @@
                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,PlayerInfo" expectedValues="activated"/>
             </testStep>
           </prerequisite>
-          <prerequisite requisiteId="2" requisiteName="Activate_Plugins">
+          <prerequisite requisiteId="2" requisiteName="Activate_DisplaySettings_Plugin">
             <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
                 <params>
                   <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />

@@ -70,7 +70,7 @@
             </testStep>
           </prerequisite>
          
-          <prerequisite requisiteId="3" requisiteName="Activate_Plugins">
+          <prerequisite requisiteId="3" requisiteName="Activate_LightningApp_Plugin">
             <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
                 <params>
                   <param tag="plugin" value="LightningApp" indexOnly="true" />

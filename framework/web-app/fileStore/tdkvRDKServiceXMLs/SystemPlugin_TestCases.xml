@@ -470,8 +470,8 @@
             <testStep testStepId="1" name="Get_Power_State" method="Get_Power_State" saveResult="true" >
                 <resultGeneration useMethodTag="system_get_power_state"/>
             </testStep>
-            <testStep testStepId="2" name="Execute_Reboot_Command" action="externalFnCall" rebootStep="yes">
-                <resultGeneration useMethodTag="executeRebootCmd"/>
+            <testStep testStepId="2" name="System_reboot" method="Reboot" rebootStep="yes" >
+              <resultGeneration useMethodTag="system_check_set_operation"  />
             </testStep>
             <testStep testStepId="3" name="Get_Power_State_Before_Reboot" method="Get_Power_State_Before_Reboot" saveResult="true" >
                 <resultGeneration useMethodTag="system_validate_powerstate_before_reboot">

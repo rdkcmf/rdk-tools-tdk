@@ -647,7 +647,7 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "rdkshell_check_on_userinactivity_event":
-            if arg[0] == "check_user_inactive":
+            if len(arg) and arg[0] == "check_user_inactive":
                 result1=result[0]
                 result2=result[1]
                 difference = int(float(result2.get("minutes"))) - int(float(result1.get("minutes")))
@@ -656,7 +656,7 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
-            elif arg[0] == "check_user_active":
+            elif len(arg) and arg[0] == "check_user_active":
                 if result == "null":
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
