@@ -151,6 +151,9 @@
                <!--whether set is applicable or not -->
                <writable>false</writable>
                 <persistentSet>false</persistentSet>
+                <expectedValues></expectedValues>
+               <!--default value of the param after factory reset -->
+               <defaultValue></defaultValue>
         </parameter>
  <parameter>
                 <!--the tr-181 parameter name -->

@@ -567,7 +567,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>3600</defaultValue>
+               <defaultValue>300</defaultValue>
                <!-- the range of values acceptable -->
                <setValue>3000</setValue>
                 <!-- the range of values acceptable for snmp-->
@@ -608,7 +608,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>40MHz</defaultValue>
+               <defaultValue>20MHz</defaultValue>
                <!--default value exepcted by snmp after factory reset -->
                <snmpDefaultValue>3</snmpDefaultValue>
         </parameter>
@@ -1972,7 +1972,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>WPA2-Personal</defaultValue>
+               <defaultValue>None</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>None,WEP-64,WEP-128,WPA-Personal,WPA2-Personal,WPA-WPA2-Personal,WPA-Enterprise,WPA2-Enterprise,WPA-WPA2-Enterprise,WPA3-Personal,WPA3-Enterprise</expectedValues>
         </parameter>

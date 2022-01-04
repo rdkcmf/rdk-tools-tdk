@@ -38,9 +38,6 @@
                <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
-               <!--default value of the param after factory reset -->
-               <defaultValue></defaultValue>
-               <expectedValues></expectedValues>
         </parameter>
 
          <parameter>
@@ -447,7 +444,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue> ARMv7 Processor rev 4 (v7l)</defaultValue>
+               <defaultValue>RPI</defaultValue>
         </parameter>
 
         <parameter>
@@ -672,7 +669,7 @@
                <!--type of the parameter -->
                <type>bool</type>
                <!--whether set is applicable or not -->
-               <writable>true</writable>
+               <writable>false</writable>
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
@@ -912,7 +909,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>false</defaultValue>
+               <defaultValue>true</defaultValue>
               <!-- the range of values acceptable -->
               <expectedValues>true,false</expectedValues>
 </parameter>
@@ -964,8 +961,8 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue></defaultValue>
-               <expectedValues>1</expectedValues>
+               <defaultValue>1</defaultValue>
+               <expectedValues>1,2</expectedValues>
                <RFCEnabled>true</RFCEnabled>
         </parameter>
 <parameter>
