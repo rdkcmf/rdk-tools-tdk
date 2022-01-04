@@ -399,6 +399,7 @@ def executeTestCases(testCaseID="all"):
             if "FAILURE" in testCasePreRequisiteStatus:
                 pluginTestsSummary.append({"testCaseName":testCaseInfo.get("testCaseName"), "testCaseId":testCaseInfo.get("testCaseId"), "status":"FAILURE"})
                 print "\nTest Case Pre-requisite Status: FAILURE\n"
+                print "\n##--------- [TEST EXECUTION STATUS] : FAILURE ----------##\n"
                 continue;
             else:
                 print "\nTest Case Pre-requisite Status: SUCCESS\n"
@@ -539,12 +540,6 @@ def executeTestCases(testCaseID="all"):
             else:
                 allTestStepStatus.append("FAILURE")
 
-        if "FAILURE" in allTestStepStatus:
-            print "\n##--------- [TEST EXECUTION STATUS] : FAILURE ----------##\n"
-        else:
-            print "\n##--------- [TEST EXECUTION STATUS] : SUCCESS ----------##\n"
-
-
         testStepResults = []
         revertTestInfo = {}
 
@@ -560,6 +555,13 @@ def executeTestCases(testCaseID="all"):
                 print "\nTest Case Post-requisite Status: FAILURE\n"
             else:
                 print "\nTest Case Post-requisite Status: SUCCESS\n"
+
+        # Give the overall test status based on test case & post-req status
+        if "FAILURE" in allTestStepStatus or "FAILURE" in testCasePostRequisiteStatus:
+            print "\n##--------- [TEST EXECUTION STATUS] : FAILURE ----------##\n"
+        else:
+            print "\n##--------- [TEST EXECUTION STATUS] : SUCCESS ----------##\n"
+
 
         # Update the test case status by checking the status of each test steps executed
         # (directly / repeatedly / looped) and test case post-requisite execution status
