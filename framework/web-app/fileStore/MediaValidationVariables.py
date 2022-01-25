@@ -291,6 +291,10 @@ seekfwd_check_interval = 5
 seekbwd_check_interval = 7
 # Default check interval for fast forward operations
 fastfwd_check_interval = 5
+# Default Seek/Jump position value and check interval.
+seekfwd_position = 120
+seekbwd_position = 80
+seekpos_check_interval = 10
 
 # Provided time (seconds) is the duration after how much second, the player should be closed
 close_interval = 180
