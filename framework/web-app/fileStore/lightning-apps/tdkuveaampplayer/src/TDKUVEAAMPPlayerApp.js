@@ -89,7 +89,7 @@ export default class App extends Lightning.Component {
   load(url,autoplay) {
       this.url = url;
       this.player.load(url,autoplay);
-      logMsg("AAMP Player loaded with video url")
+      logMsg("AAMP Player loaded with video url: " + url)
   }
 
   initConfig(config) {
@@ -132,6 +132,14 @@ export default class App extends Lightning.Component {
   }
   stop() {
       this.player.stop();
+  }
+  reload() {
+      logMsg("Loading Player with new stream...")
+      //this.player.detach();
+      this.videoURL = this.secondaryURL;
+      this.expectedEvents = ["playing"]
+      logMsg("Expected Event: " + this.expectedEvents)
+      this.load(this.videoURL,this.autoplay);
   }
   playNow(){
     this.playbackRateIndex = this.playbackSpeeds.indexOf(1)
@@ -447,6 +455,12 @@ export default class App extends Lightning.Component {
                     this.seekbwd(this.seekInterval)
                 },actionInterval);
             }
+	    else if (action == "changeurl"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.reload();
+                },actionInterval);
+            }
             else if (action == "fastfwd4x" || action == "fastfwd16x" || action == "fastfwd32x"){
                 if (action == "fastfwd32x"){
                 setTimeout(()=> {
@@ -650,6 +664,7 @@ export default class App extends Lightning.Component {
     this.progressLogger    = null
     this.playbackSpeeds = [-64, -32, -16, -4, 1, 4, 16, 32, 64];
     this.playbackRateIndex = this.playbackSpeeds.indexOf(1)
+    this.secondaryURL = "";
     logMsg("URL Info: " + this.videoURL )
 
     tag = this;
@@ -676,6 +691,9 @@ export default class App extends Lightning.Component {
         }
         else if(item.includes("checkInterval")){
          this.checkInterval = parseInt(item.split('(')[1].split(')')[0])*1000;
+       }
+        else if(item.includes("secondaryURL")){
+         this.secondaryURL = item.split('(')[1].split(')')[0];
        }
      });
     // check the DRM options provided in the url and update the configs

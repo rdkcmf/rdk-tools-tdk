@@ -102,6 +102,13 @@ export default class VideoPlayerAdvanced extends Lightning.Component {
         }
         console.log("Videoplayer (DASHJS): attaching video source url: " + url);
     }
+    reload(url){
+        if (this.player) {
+          this.player.attachSource(null);
+          this.player.attachSource(url);
+          console.log("Videoplayer (DASHJS): attaching video source url: " + url);
+        }
+    }
 
     close() {
         if (this._hls) {

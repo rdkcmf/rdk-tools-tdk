@@ -149,8 +149,10 @@ export default class App extends Lightning.Component {
     logMsg("Expected Pos  : [ " + (this.expectedPos).toFixed(2) + " - " + (this.expectedPos+ 7).toFixed(2) + " ]")
     this.videoEl.currentTime -= pos
   }
-  seekpos(pos){
+  seekpos(){
     this.expectedEvents   = ["seeking","seeked"]
+    var pos = this.seekPositions[this.seekPosIndex]
+    this.seekPosIndex += 1
     this.expectedPos = pos
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Expected Pos  : [ " + (this.expectedPos).toFixed(2) + " - " + (this.expectedPos+ 7).toFixed(2) + " ]")
@@ -195,6 +197,12 @@ export default class App extends Lightning.Component {
     logMsg("Observed Event: " + this.observedEvents)
   }
 
+  reload(url){
+    this.expectedEvents = ["playing"]
+    logMsg("Expected Event: " + this.expectedEvents)
+    this.videoURL = this.secondaryURL;
+    this.tag('VideoPlayer').reload(this.videoURL);
+  }
   close(){
     logMsg("Closing Video Player...")
     this.tag('VideoPlayer').close()
@@ -426,14 +434,15 @@ export default class App extends Lightning.Component {
 
   performOperations(operations){
       var actionInterval = 0
-      var duration = 0, position = 0
+      var duration = 0, index = 0
       logMsg("Setting up the operations...")
       for (var i = 0; i < operations.length; i++)
       {
           var action = operations[i].split('(')[0];
           if ( action == "seekpos" ){
               duration = parseInt(operations[i].split('(')[1].split(')')[0].split(":")[0]);
-              position = parseInt(operations[i].split('(')[1].split(')')[0].split(":")[1]);
+              this.seekPositions[index] = parseInt(operations[i].split('(')[1].split(')')[0].split(":")[1]);
+              index += 1;
           }else{
               duration = parseInt(operations[i].split('(')[1].split(')')[0]);
           }
@@ -482,7 +491,7 @@ export default class App extends Lightning.Component {
             else if (action == "seekpos"){
                 setTimeout(()=> {
                     this.clearEvents()
-                    this.seekpos(position)
+                    this.seekpos()
                 },actionInterval);
             }
             else if (action == "fastfwd"){
@@ -525,6 +534,12 @@ export default class App extends Lightning.Component {
                 setTimeout(()=> {
                     this.clearEvents()
                     this.unmute()
+                },actionInterval);
+            }
+            else if (action == "changeurl"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.reload(this.secondaryURL);
                 },actionInterval);
             }
             else if (action == "playtillend"){
@@ -662,10 +677,13 @@ export default class App extends Lightning.Component {
     this.eventFlowFlag  = 1
     this.observedEvents = []
     this.expectedEvents = []
+    this.seekPositions  = []
+    this.seekPosIndex   = 0
     this.playbackSpeeds = [1, 2, 4, 16]
     this.playbackRateIndex = this.playbackSpeeds.indexOf(1)
     this.progressEventMsg  = ""
     this.progressLogger    = null
+    this.secondaryURL = "";
     logMsg("URL Info: " + this.videoURL + " - " + this.urlType)
 
     this.vidElementEvents = {
@@ -711,6 +729,9 @@ export default class App extends Lightning.Component {
       }
       else if(item.includes("checkInterval")){
          this.checkInterval = parseInt(item.split('(')[1].split(')')[0])*1000;
+      }
+      else if(item.includes("secondaryURL")){
+         this.secondaryURL = item.split('(')[1].split(')')[0];
       }
       else if(item.includes("useDashlib")){
          var dashlib = item.split('(')[1].split(')')[0]
