@@ -2287,6 +2287,80 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        # DTV Plugin Response result parser steps
+        elif tag == "dtv_validate_service_search":
+            if str(result).lower() == "true":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "dtv_check_result_list":
+            if len(arg) and arg[0] == "service_list":
+                info["Service_List"] = result
+            elif len(arg) and arg[0] == "country_list":
+                info["Country_List"] = result
+            if len(result) > 0:
+                status = []
+                for data in result:
+                    status.append(checkNonEmptyResultData(data.values()))
+                if "FAILURE" not in status:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+
+        elif tag == "dtv_check_result":
+            info["result"] = result
+            if len(arg) and arg[0] == "check_play_handle":
+                if int(result) >= 0:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif len(arg) and arg[0] == "check_services":
+                if int(result) > 0:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "dtv_check_play_handle_status":
+            info = checkAndGetAllResultInfo(result)
+            if str(result.get("dvburi")).lower() == str(expectedValues[0]).lower():
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "dtv_check_country_configuration":
+            info["result"] = result
+            if str(result) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "dtv_validate_now_next_events":
+            info = checkAndGetAllResultInfo(result)
+
+        elif tag == "dtv_validate_schedule_events":
+            status = checkNonEmptyResultData(result)
+            info["SCHEDULED_EVENTS"] = result
+            if status == "TRUE":
+                nowEvent_EventID = int(expectedValues[1])
+                if len(arg) and arg[0] == "validate_now_event":
+                    if len(result) == 1 and int(result[0].get("eventid")) == nowEvent_EventID:
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+
+                elif len(arg) and arg[0] == "validate_now_next_event":
+                    nextEvent_EventID = int(expectedValues[0])
+                    if len(result) == 2 and int(result[0].get("eventid")) == nowEvent_EventID and int(result[1].get("eventid")) == nextEvent_EventID:
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_state":
             if arg[0] == "check_status":
@@ -3157,6 +3231,83 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             else:
                 info["standbybehavior"] = "active"
 
+        # DTV Plugin Response result parser steps
+        elif tag == "dtv_get_service_info":
+            testStepResults = testStepResults[0].values()[0]
+            if len(arg) and arg[0] == "get_first_service":
+                service = testStepResults[0].get("Service_List")[0]
+                info["dvburi"] = service.get("dvburi")
+                info["lcn"] = service.get("lcn")
+        
+        elif tag == "dtv_get_play_handle":
+            testStepResults = testStepResults[0].values()[0]
+            info["value"] = testStepResults[0].get("result")
+
+        elif tag == "dtv_get_country_list":
+            testStepResults = testStepResults[0].values()[0]
+            country_list  = testStepResults[0].get("Country_List")
+            if len(arg) and arg[0] == "get_country_code":
+                country_code = []
+                for country in country_list:
+                    code = country.get("code")
+                    country_code.append(code)
+                country_code = [ str(code) for code in country_code ]
+                info["country_code"] = ",".join(country_code)
+            elif len(arg) and arg[0] == "get_no_of_countries":
+                info["no_of_countries"] = len(country_list)
+            else:
+                info["Country_List"] = country_list   
+     
+        elif tag == "dtv_get_events_params":
+            testStepResults1 = testStepResults[0].values()[0]
+            testStepResults2 = testStepResults[1].values()[0]
+            service = testStepResults1[0].get("Service_List")
+            nowEvent = testStepResults2[0].get("now")
+            nextEvent = testStepResults2[0].get("next")
+            dvburi = service[0].get("dvburi")
+            nowEvent_startTime = nowEvent.get("starttime")
+            nextEvent_startTime = nextEvent.get("starttime")
+            if len(arg) and arg[0] == "get_now_event_params":
+                nowEvent_duration = nowEvent.get("duration")
+                nowEvent_endTime = (int(nowEvent_startTime) + int(nowEvent_duration)- 100)
+                value = dvburi+":"+str(nowEvent_startTime)+","+str(nowEvent_endTime)
+                info["dvburi"] = value
+            elif len(arg) and arg[0] == "get_now_next_event_params":
+                nextEvent_duration = nextEvent.get("duration")
+                nextEvent_endTime = (int(nextEvent_startTime)+int(nextEvent_duration) - 100)
+                value = dvburi+":"+str(nowEvent_startTime)+","+str(nextEvent_endTime)
+                info["dvburi"] = value
+
+        elif tag == "dtv_get_events_expected_values":
+            testStepResults = testStepResults[0].values()[0]
+            nowEvent = testStepResults[0].get("now")
+            nextEvent = testStepResults[0].get("next")
+            info["nowEvent_EventID"] = nowEvent.get("eventid")
+            info["nextEvent_EventID"] = nextEvent.get("eventid")
+
+        elif tag == "dtv_get_random_services_dvburi":
+            dvburi = []
+            service_list = []
+            testStepResults = testStepResults[0].values()[0]
+            services = testStepResults[0].get("Service_List")
+            if len(services) >= 3:
+                for value in range(3):
+                    service_list.append(services[random.randrange(0,(len(services)-1))])
+            else:
+                service_list = services
+
+            for value in service_list:
+                dvburi.append(str(value.get("dvburi")))
+            info["dvburi"] = ",".join(dvburi)
+
+        elif tag == "dtv_get_random_services_lcn":
+            testStepResults = testStepResults[0].values()[0]
+            services = testStepResults[0].get("Service_List")
+            for service in services:
+                if arg[0] == service.get("dvburi"):
+                    info["lcn"] = service.get("lcn")
+                    break
+
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_name":
             testStepResults = testStepResults[0].values()[0]
@@ -3350,6 +3501,13 @@ def generateComplexTestInputParam(methodTag,testParams):
             newtestParams = testParams.copy()
             newtestParams.pop("ishighcontrasttextenabled")
             userGeneratedParam = {"closedcaptions": newtestParams, "textdisplay": { "ishighcontrasttextenabled": testParams.get("ishighcontrasttextenabled") } }
+        elif tag == "dtv_set_service_search_params":
+            newtestParams = testParams.copy()
+            newtestParams.pop("tunertype")
+            newtestParams.pop("searchtype")
+            newtestParams.pop("retune")
+            newtestParams.pop("usetuningparams")
+            userGeneratedParam = { "tunertype":testParams.get("tunertype"),"searchtype":testParams.get("searchtype"),"retune":testParams.get("retune"),"usetuningparams":testParams.get("usetuningparams"),"dvbctuningparams":newtestParams}
         elif tag == "system_set_thresholds_params":
             userGeneratedParam = {"thresholds":testParams}
 

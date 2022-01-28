@@ -757,6 +757,15 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        # DTV Events response result parser steps
+        elif tag == "dtv_check_search_status_event":
+            info["Test_Step_Status"] = "FAILURE"
+            for eventResult in result:
+                if str(eventResult.get("eventtype")).lower() == expectedValues[0] and str(eventResult.get("finished")).lower() == expectedValues[1] and str(eventResult.get("progress")).lower() == expectedValues[2]:
+                    info = eventResult
+                    info["Test_Step_Status"] = "SUCCESS"
+                    break;
+
         # FirmwareControl Events response result parser steps
         elif tag == "fwc_check_upgrade_progress_event":
             print "Events list :",result

@@ -1756,6 +1756,52 @@
             <expectedValues>200</expectedValues>
         </event>
     </plugin>
+
+    <!-- DTV Plugin Information -->
+    <plugin pluginName="DTV" serviceName="DTV" serviceVersion="1">
+        <method name="Start_Service_Search" api="startServiceSearch" type="method" desc="Starts a service search" >
+          <params paramKey="dvbctuningparams" paramType="userGenerate" useMethodTag="dtv_set_service_search_params">
+           <param tag="tunertype" defaultValue="null"/>
+           <param tag="searchtype" defaultValue="null"/>
+           <param tag="retune" type="bool" />
+           <param tag="usetuningparams" type="bool"/>
+           <param tag="frequency" type="int" />
+           <param tag="symbolrate" type="int" />
+           <param tag="modulation" defaultValue="null"/>
+         </params>
+        </method>
+        <method name="Finish_Service_Search" api="finishServiceSearch" type="method" desc="Finishes a service search" >
+            <params>
+                <param tag="tunertype" defaultValue="null" />
+                <param tag="savechanges" type="bool" />
+            </params>
+        </method>
+        <method name="Get_Service_List" api="serviceList" type="method" desc="Provides access to the list of services for the given type of tuner or all services if no tuner is defined" />
+        <method name="Start_Playing" api="startPlaying" type="method" desc="Starts playing the specified service" >
+          <params>
+           <param tag="dvburi" defaultValue="null"/>
+           <param tag="lcn" type="int"/>
+          </params>
+        </method>
+        <method name="Get_Status" api="status" type="method" desc="Provides access to the information related to the play handle defined by the index" />
+        <method name="Stop_Playing" api="stopPlaying" type="method" desc="Stops playing the specified service" >
+            <params>
+               <param tag="params" type="int"/>
+            </params>
+        </method>
+        <method name="Get_Number_Of_Services" api="numberOfServices" type="method" desc="Provides access to the total number of services in the service database"/>
+        <method name="Get_Country_Configuration" api="country" type="method" desc="Provides access to the country configuration using the ISO 3-character country code" />
+        <method name="Set_Country_Configuration" api="country" type="method" desc="Provides access to the country configuration using the ISO 3-character country code" >
+            <params>
+               <param tag="params" type="int" />
+            </params>
+        </method>
+        <method name="Get_Country_List" api="countryList" type="method" desc="Provides access to the array containing the name and 3 character ISO country code for all the available country configurations" />
+        <method name="Get_Number_Of_Countries" api="numberOfCountries" type="method" desc="Provides access to the array containing the name and 3 character ISO country code for all the available country configurations" />
+        <method name="Get_Now_Next_Events" api="nowNextEvents" type="method" desc="Provides access to the now and next events" />
+        <method name="Schedule_Events" api="scheduleEvents" type="method" desc="Provides access to the events which are scheduled" />
+        <event name="Event_Service_Search_Status" eventName="searchstatus" eventId="client.events.1" type="event" desc="Triggered during the course of a service search" />
+    </plugin>
 </thunderPlugins>
 
 

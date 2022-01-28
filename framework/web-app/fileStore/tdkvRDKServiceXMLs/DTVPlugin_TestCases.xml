@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2022 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<testPlugin pluginName="DTV" pluginVersion="1">
+        <pluginPreRequisite>
+          <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="DTV" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DTV" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,DTV" />
+                <params>
+                  <param tag="callsign" value="DTV" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,DTV" />
+                <params>
+                  <param tag="plugin" value="DTV" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DTV" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
+          <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
+            <event pluginName="DTV" eventName="Event_Service_Search_Status" />
+          </prerequisite>
+        </pluginPreRequisite>
+
+
+        <testCase testCaseId="DTV_01" testCaseName="Play_And_Stop_Service_From_Service_List" desc="Starts and stops the service from the service list">
+            <testCaseInfo testCaseType="loop"/>
+	    <testStep testStepId="1" name="Start_Service_Search" method="Start_Service_Search" >
+	      <params paramKey="dvbctuningparams">	    
+		<param tag="tunertype" value="dvbc"/>
+                <param tag="searchtype" value="frequency"/>
+                <param tag="retune" value="false" />
+                <param tag="usetuningparams" value="true"/>
+                <param tag="frequency" useConfigFile="true" key="DVBC_FREQUENCY"/>
+                <param tag="symbolrate" useConfigFile="true" key="DVBC_SYMBOLRATE"/>
+		<param tag="modulation" useConfigFile="true" key="DVBC_MODULATION" />    
+	      </params>	
+              <resultGeneration useMethodTag="dtv_validate_service_search" />
+            </testStep>
+	    <testStep testStepId="2" name="Finish_Service_Search" method="Finish_Service_Search" delay="2" >
+		<params>
+                  <param tag="tunertype" value="dvbc" />
+                  <param tag="savechanges" value="true" />
+                </params>    
+                <resultGeneration useMethodTag="dtv_validate_service_search" />
+            </testStep>
+            <testStep testStepId="3" name="Get_Service_List" method="Get_Service_List" saveResult="true">
+                <resultGeneration useMethodTag="dtv_check_result_list" arguments="service_list"/>
+	    </testStep>            
+	    <testStep testStepId="4" name="Start_Playing_Services" testStepType="loop">
+                <subtestStep subtestStepId="1" name="Start_Playing" method="Start_Playing" saveResult="true" > 
+		  <params>    
+		     <param tag="dvburi" iteration="true" usePreviousResult="true" Id="3" useMethodTag="dtv_get_random_services_dvburi" />
+		     <param tag="lcn"  usePreviousResult="true" Id="3" useMethodTag="dtv_get_random_services_lcn" useIterableArg="true" />
+	          </params>  
+                  <resultGeneration useMethodTag="dtv_check_result" arguments="check_play_handle"/>
+	        </subtestStep>
+                <subtestStep subtestStepId="2" name="Get_Status" method="Get_Status" >
+                  <params>
+                     <param tag="value" usePreviousResult="true" subId="1" useMethodTag="dtv_get_play_handle" indexOnly="true"/>
+                  </params>
+		  <resultGeneration useMethodTag="dtv_check_play_handle_status" >
+                      <expectedValues useIterableValue="true" />
+                  </resultGeneration>			
+	        </subtestStep>
+                <subtestStep subtestStepId="3" name="Stop_Playing" method="Stop_Playing" delay="3">
+                  <params>
+                     <param tag="value" usePreviousResult="true" subId="1" useMethodTag="dtv_get_play_handle" />
+                  </params>
+	        </subtestStep>
+            </testStep> 
+        </testCase>
+        <testCase testCaseId="DTV_02" testCaseName="Check_Number_Of_Services" desc="Checks the number of services">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Number_Of_Services" method="Get_Number_Of_Services">
+                <resultGeneration useMethodTag="dtv_check_result" arguments="check_services" />
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DTV_03" testCaseName="Check_Country_List" desc="Checks whether country code is present in country list">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Country_List" method="Get_Country_List" saveResult="true">
+                <resultGeneration useMethodTag="dtv_check_result_list" arguments="country_list" />
+	    </testStep>
+            <testStep testStepId="2" name="Get_Country_Configuration" method="Get_Country_Configuration" >
+		<resultGeneration useMethodTag="dtv_check_country_configuration" >
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="dtv_get_country_list" arguments="get_country_code" />
+                </resultGeneration>
+	    </testStep>
+        </testCase>
+        <testCase testCaseId="DTV_04" testCaseName="Check_Number_Of_Countries" desc="Checks the number of countries">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Country_List" method="Get_Country_List" saveResult="true">
+                <resultGeneration useMethodTag="dtv_check_result_list" arguments="country_list" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Number_Of_Countries" method="Get_Number_Of_Countries" >
+                <resultGeneration useMethodTag="dtv_check_country_configuration" >
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="dtv_get_country_list" arguments="get_no_of_countries" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DTV_05" testCaseName="Check_Search_Status_Event" desc="Checks for the search status event">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Start_Service_Search" method="Start_Service_Search" >
+              <params paramKey="dvbctuningparams">
+                <param tag="tunertype" value="dvbc"/>
+                <param tag="searchtype" value="frequency"/>
+                <param tag="retune" value="false" />
+		<param tag="usetuningparams" value="true"/>
+		<param tag="frequency" useConfigFile="true" key="DVBC_FREQUENCY"/>
+                <param tag="symbolrate" useConfigFile="true" key="DVBC_SYMBOLRATE"/>
+                <param tag="modulation" useConfigFile="true" key="DVBC_MODULATION" />
+              </params>
+              <resultGeneration useMethodTag="dtv_validate_service_search" />
+            </testStep>
+            <testStep testStepId="2" name="Check_Search_Status_Event" event="Event_Service_Search_Status" action="eventListener" delay="5">
+              <resultGeneration useMethodTag="dtv_check_search_status_event" expectedValues="servicesearchstatus,true,100" />
+            </testStep>
+            <testStep testStepId="3" name="Finish_Service_Search" method="Finish_Service_Search" delay="2" >
+                <params>
+                  <param tag="tunertype" value="dvbc" />
+                  <param tag="savechanges" value="true" />
+                </params>
+                <resultGeneration useMethodTag="dtv_validate_service_search" />
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DTV_06" testCaseName="Check_Schedule_Events" desc="Check whether able to get the scheduled events">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Start_Service_Search" method="Start_Service_Search" >
+              <params paramKey="dvbctuningparams">
+                <param tag="tunertype" value="dvbc"/>
+                <param tag="searchtype" value="frequency"/>
+                <param tag="retune" value="false" />
+                <param tag="usetuningparams" value="true"/>
+                <param tag="frequency" useConfigFile="true" key="DVBC_FREQUENCY"/>
+                <param tag="symbolrate" useConfigFile="true" key="DVBC_SYMBOLRATE"/>
+                <param tag="modulation" useConfigFile="true" key="DVBC_MODULATION" />
+              </params>
+              <resultGeneration useMethodTag="dtv_validate_service_search" />
+            </testStep>
+            <testStep testStepId="2" name="Finish_Service_Search" method="Finish_Service_Search" delay="2" >
+                <params>
+                  <param tag="tunertype" value="dvbc" />
+                  <param tag="savechanges" value="true" />
+                </params>
+                <resultGeneration useMethodTag="dtv_validate_service_search" />
+	    </testStep>
+            <testStep testStepId="3" name="Get_Service_List" method="Get_Service_List" saveResult="true">
+                <resultGeneration useMethodTag="dtv_check_result_list" arguments="service_list"/>
+            </testStep>
+            <testStep testStepId="4" name="Get_Now_Next_Events" method="Get_Now_Next_Events" saveResult="true" >
+              <params>
+                <param tag="dvburi" usePreviousResult="true" Id="3" useMethodTag="dtv_get_service_info" arguments="get_first_service" indexOnly="true" />
+              </params>
+              <resultGeneration useMethodTag="dtv_validate_now_next_events" />
+            </testStep>
+            <testStep testStepId="5" name="Check_Scheduled_Now_Event" method="Schedule_Events" >
+              <params>
+                <param tag="dvburi" usePreviousResult="true" Id="3,4" useMethodTag="dtv_get_events_params" arguments="get_now_event_params" indexOnly="true" />
+              </params>
+              <resultGeneration useMethodTag="dtv_validate_schedule_events" arguments="validate_now_event" >
+                <expectedValues usePreviousResult="true" Id="4" useMethodTag="dtv_get_events_expected_values" />
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="6" name="Check_Scheduled_Now_And_Next_Events" method="Schedule_Events" >
+              <params>
+                <param tag="dvburi" usePreviousResult="true" Id="3,4" useMethodTag="dtv_get_events_params" arguments="get_now_next_event_params" indexOnly="true" />
+              </params>
+              <resultGeneration useMethodTag="dtv_validate_schedule_events" arguments="validate_now_next_event">
+                 <expectedValues usePreviousResult="true" Id="4" useMethodTag="dtv_get_events_expected_values" />
+              </resultGeneration>
+            </testStep>
+        </testCase> 
+</testPlugin>
+
