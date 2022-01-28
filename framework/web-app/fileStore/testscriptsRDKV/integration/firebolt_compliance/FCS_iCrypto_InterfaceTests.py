@@ -69,7 +69,7 @@
 2. The iCrypto interface test binary should be available in the device</pre_requisite>
     <api_or_interface_used>Execute the iCrypto Interface test application, "cgfacetests" in DUT</api_or_interface_used>
     <input_parameters>None</input_parameters>
-    <automation_approch>1.Load the systemuitl module.
+    <automation_approch>1.Load the systemutil module.
 2.Execute the "cgfacetests" command in DUT. During the execution, the DUT will execute all the tests available in iCrypto interface tests suite.
 3.Verify the output from the execute command and check if the strings "TOTAL:" and "0 FAILED" exists in the returned output
 4.Based on the ExecuteCommand() return value and the output returned from the cgfacetests application, TM return SUCCESS/FAILURE status.</automation_approch>

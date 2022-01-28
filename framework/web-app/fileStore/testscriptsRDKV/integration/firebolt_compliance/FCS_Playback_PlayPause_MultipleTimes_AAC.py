@@ -55,7 +55,7 @@
 test_url - AAC url from MediaValidationVariables library (MediaValidationVariables.video_src_url_aac)
 "checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
 operations=play:&lt;timeout&gt;,pause:&lt;timeout&gt;,play:&lt;timeout&gt;,pause:&lt;timeout&gt;,play:&lt;timeout&gt;,pause:&lt;timeout&gt; (number of play:&lt;timeout&gt;,pause:&lt;timeout&gt; string depends on the parameter FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT) - a comma separated string of indivudual play/pause &lt;operation:timeout&gt; string where operation could be string "play"/"pause" indicating play/pause operations and timeout is time in seconds for which the operation should be performed. The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file. The same timeout value can be used for all operations.The play/pause operations are repeted FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT times</input_parameters>
-    <automation_approch>1.Load the systemuitl module 
+    <automation_approch>1.Load the systemutil module 
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS, FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT and FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT config values from Device config file.
 3.Retrieve the video_src_url_aac variable from MediaValidationVariables library
 4. Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value, operations
@@ -114,7 +114,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
     if expectedResult in actualresult.upper() and check_av_status_flag == "yes":
-        print "Video playback status check is added"
+        print "Video Decoder proc check is added"
         checkAVStatus = check_av_status_flag
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT' that specifies the video playback timeout in seconds 
     actualresult, timeoutConfigValue = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT')

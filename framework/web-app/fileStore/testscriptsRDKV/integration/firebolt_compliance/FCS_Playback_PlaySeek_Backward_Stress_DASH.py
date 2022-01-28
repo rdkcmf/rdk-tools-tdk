@@ -75,7 +75,7 @@
 2.test_url - DASH url from MediaValidationVariables library (MediaValidationVariables.video_src_url_dash)
 3."checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
 4.operations=seek:&lt;timeout&gt;:&lt;seekposition&gt;,seek:&lt;timeout&gt;:&lt;seekposition&gt;,seek:&lt;timeout&gt;:&lt;seekposition&gt;,seek:&lt;timeout&gt;:&lt;seekposition&gt;,seek:&lt;timeout&gt;:&lt;seekposition&gt;,seek:&lt;timeout&gt;:&lt;seekposition&gt; - a ":" seperated string to specify the seek operation to be executed , the time in seconds for which the operation should be performed and seekposition in seconds to which the seek operation should be performed. seekposition will be FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT * FIREBOLT_COMPLIANCE_SEEK_STEP(since we are executing seek FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT times) in first seek, then it would be seekposition - FIREBOLT_COMPLIANCE_SEEK_STEP for the next seek operation, decrementing the seek position with FIREBOLT_COMPLIANCE_SEEK_STEP in each seek.The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file The seek step and repeat count should also be configured in device configuration(FIREBOLT_COMPLIANCE_SEEK_STEP and FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT)</input_parameters>
-    <automation_approch>1.Load the systemuitl module 
+    <automation_approch>1.Load the systemutil module 
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS, FIREBOLT_COMPLIANCE_SEEK_POSITION, FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT and FIREBOLT_COMPLIANCE_STRESS_REPEAT_COUNT config values from Device config file.
 3.Retrieve the video_src_url_dash variable from MediaValidationVariables library
 4.Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value, operation, seekposition, timeout and repeatCount
@@ -134,7 +134,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
     if expectedResult in actualresult.upper() and check_av_status_flag == "yes":
-        print "Video playback status check is added"
+        print "Video Decoder proc check is added"
         checkAVStatus = check_av_status_flag
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_SEEK_STEP' that specifies the value in seconds to which the pipeline should increment seek position each time 
     actualresult, seek_step = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_SEEK_STEP')

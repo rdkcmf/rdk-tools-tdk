@@ -25,6 +25,9 @@ from devicesettings import *
 operations = ""
 use_aamp = ""
 
+#Execution log File
+executionLogFile = " /opt/TDK/logs/AgentConsole.log "
+
 #List consisting of HLS url
 HLS_URL = [MediaValidationVariables.video_src_url_short_duration_hls,MediaValidationVariables.video_src_url_hls,MediaValidationVariables.video_src_url_4k_hls,MediaValidationVariables.video_src_url_live_hls,MediaValidationVariables.video_src_url_hls_h264,MediaValidationVariables.video_src_url_hls_h264_iframe]
 URL_TYPE = {MediaValidationVariables.video_src_url_vp9 : MediaValidationVariables.vp9_url_type, MediaValidationVariables.video_src_url_hevc:MediaValidationVariables.hevc_url_type, MediaValidationVariables.video_src_url_dolby:MediaValidationVariables.dolby_url_type , MediaValidationVariables.video_src_url_opus:MediaValidationVariables.opus_url_type, MediaValidationVariables.video_src_url_aac:MediaValidationVariables.aac_url_type}

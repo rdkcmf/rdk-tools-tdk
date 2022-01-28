@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>1</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>FCS_Playback_Rewind_4x_DASH</name>
+  <name>FCS_Playback_CheckLatency_VP9</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test to do rewind of a DASH stream with playback rate -4</synopsis>
+  <synopsis>Check if latency observed during VP9 playback is within the threshold limit</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>10</execution_time>
+  <execution_time>3</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -48,10 +48,6 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
-    <box_type>RPI-Client</box_type>
-    <!--  -->
-    <box_type>RPI-HYB</box_type>
-    <!--  -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
@@ -60,38 +56,40 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>FCS_PLAYBACK_21</test_case_id>
-    <test_objective>Test to do rewind of a DASH stream with playback rate -4</test_objective>
+    <test_case_id>FCS_Playback_99</test_case_id>
+    <test_objective>Check if latency observed during VP9 playback is within the threshold limit</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Video Accelerator, RPI</test_setup>
+    <test_setup>Video_Accelerator,RPI</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
-2. Test stream url for a DASH stream should be updated in the config variable video_src_url_dash inside MediaValidationVariables.py library inside filestore
-3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file
-4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time in seconds for which the rewind operation should be carried out</pre_requisite>
+2. Test stream url for a live VP9 stream should be updated in the config variable video_src_url_vp9 inside MediaValidationVariables.py library inside filestore.
+3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file.
+4. FIREBOLT_COMPLIANCE_PLAYBACK_LATENCY_THRESHOLD configuration should be set to some milliseconds to cross verify the latency during playback.
+5. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time to wait before checking for AV playback</pre_requisite>
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
-    <input_parameters>testcasename - "test_trickplay"
-test_url - DASH url from MediaValidationVariables library (MediaValidationVariables.video_src_url_dash)
+    <input_parameters>testcasename - "test_latency"
+test_url - vp9 stream url from MediaValidationVariables library (MediaValidationVariables.video_src_url_vp9)
 "checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
-operations=rewind4x:&lt;timeout&gt; - a ":" seperated string to specify the rewind operation to be executed and the time in seconds for which the operation should be continued. The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
-    <automation_approch>1.Load the systemutil module 
-2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
-3.Retrieve the video_src_url_dash variable from MediaValidationVariables library
-4. Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value, operation and timeout
-5.Execute the command in DUT. During the execution, the DUT will playback av for 4*FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT+30 seconds so that there is enough duration for rewind, then do a rewind operation with playback rate -4 and then continue playback  at rate -4 for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds. Then application exits by closing the pipeline
-6.Verify the output from the execute command and check if the  "Failures: 0" and "Errors: 0" string exists or "failed: 0" string exists in the returned output
+timeout - a string to specify the time in seconds for which the videoplayback should be done . This argument is the value of device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file latencyThreshold - a string to specify the time in milliseconds within which latency of playback must be observed.</input_parameters>
+    <automation_approch>1.Load the systemutil module
+2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT and FIREBOLT_COMPLIANCE_PLAYBACK_LATENCY_THRESHOLD config values from Device config file.
+3.Retrieve the video_src_url_vp9 variable from MediaValidationVariables library
+4.Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value and timeout
+5.Execute the command in DUT. During the execution, the DUT will playback av for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds and check if the latency during playback is within in the FIREBOLT_COMPLIANCE_PLAYBACK_LATENCY_THRESHOLD milliseconds then application exits by closing the pipeline
+6.Verify the output from the execute command and check if the strings "Failures: 0" and "Errors: 0", or "failed: 0" exists in the returned output
 7.Based on the ExecuteCommand() return value and the output returned from the mediapipelinetests application, TM return SUCCESS/FAILURE status.</automation_approch>
     <expected_output>Checkpoint 1. Verify the API call is success
-Checkpoint 2. Verify that the output returned from mediapipelinetests contains the strings "Failures: 0" and "Errors: 0" or it contains the string "failed: 0"</expected_output>
+Checkpoint 2. Verify that the latency during playback is within the latency threshold</expected_output>
     <priority>High</priority>
     <test_stub_interface>libsystemutilstub.so.0</test_stub_interface>
-    <test_script>FCS_Playback_Rewind_4x_DASH</test_script>
+    <test_script>FCS_Playback_CheckLatency_VP9</test_script>
     <skipped>No</skipped>
-    <release_version>M90</release_version>
+    <release_version>M97</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
 </xml>
 '''
+
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
 import MediaValidationVariables
@@ -106,16 +104,18 @@ sysUtilObj = tdklib.TDKScriptingLibrary("systemutil","1")
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-sysUtilObj.configureTestCase(ip,port,'FCS_Playback_Rewind_4x_DASH');
+sysUtilObj.configureTestCase(ip,port,'FCS_Playback_CheckLatency_VP9')
 
 #Set device configurations to default values
 checkAVStatus = "no"
 timeoutInSeconds = "10"
+latencyThresholdValue = "100"
 
 #Load the systemutil library
 sysutilloadModuleStatus =sysUtilObj.getLoadModuleResult()
 print "[System Util LIB LOAD STATUS]  :  %s" %sysutilloadModuleStatus
 sysUtilObj.setLoadModuleStatus(sysutilloadModuleStatus)
+
 if "SUCCESS" in sysutilloadModuleStatus.upper():
     expectedResult="SUCCESS"
     
@@ -123,9 +123,11 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     tdkTestObj = sysUtilObj.createTestStep('ExecuteCommand')
     
     #The test name specifies the test case to be executed from the mediapipeline test suite
-    test_name = "test_trickplay"
+    test_name = "test_latency"
+
     #Test url for the stream to be played is retrieved from MediaValidationVariables library
-    test_url = MediaValidationVariables.video_src_url_dash
+    test_url = MediaValidationVariables.video_src_url_vp9
+
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS' that specifies whether SOC level playback verification check should be done or not 
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
@@ -139,16 +141,18 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #if the device config value is empty, default timeout(10sec) is passed
     if expectedResult in actualresult.upper() and timeoutConfigValue != "":
         timeoutInSeconds = timeoutConfigValue
-    #Construct the trickplay operation string
-    #The operations specifies the operation(fastforward/rewind/seek/play/pause) to be executed from the mediapipeline trickplay test
-    # There should be enough duration available for rewind operation to perform correctly, so playing the stream for 4 * timeoutInSeconds + 30(buffer) duration. Ensure that the straem being tested is having adequate duration
-    # Sample operations strings is "operations=play:110,rewind4x:20"
-    playduration = (4 * int (timeoutInSeconds)) + 30
-    setOperations ("play", str (playduration))
-    setOperations ("rewind4x", timeoutInSeconds)
+
+    #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_PLAYBACK_LATENCY_THRESHOLD' that specifies the  latency threshold in milliseconds
+    actualresult, latencyThresholdValueConfigValue = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_PLAYBACK_LATENCY_THRESHOLD')
+
+    #If the value of FIREBOLT_COMPLIANCE_PLAYBACK_LATENCY_THRESHOLD is retrieved correctly and its value is not empty, latency threshold value should be passed to the test application
+    #if the device config value is empty, default latencyThresholdValue(100 milliseconds) is passed
+    if expectedResult in actualresult.upper() and  latencyThresholdValueConfigValue != "":
+        latencyThresholdValue = latencyThresholdValueConfigValue
+
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
-    #Sample command = "mediapipelinetests test_trickplay <DASH_STREAM_URL> checkavstatus=yes operations=play:110,rewind4x:20"
-    command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, operations = getOperations ()) 
+    #Sample command = "mediapipelinetests test_latency <VP9_STREAM_URL> checkavstatus=yes timeout=20 latencyThreshold=100"
+    command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, timeout = timeoutInSeconds, latencyThreshold = latencyThresholdValue) 
     print "Executing command in DUT: ", command
     
     tdkTestObj.addParameter("command", command)
@@ -164,15 +168,27 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
         
         if expectedResult in executionStatus:
             tdkTestObj.setResultStatus("SUCCESS")
-            print "Rewind on DASH stream with 4x speed was successfull"
+            command = "grep milliseconds"+ executionLogFile +"| grep -v grep | tr \"\n\" \"  \""
+            tdkTestObj.addParameter("command", command)
+            tdkTestObj.executeTestCase(expectedResult)
+            actualresult = tdkTestObj.getResult()
+            output = tdkTestObj.getResultDetails()
+            if expectedResult in actualresult.upper() and output:
+                print output
+            else:
+                print "Unable to retrieve latency"
+                tdkTestObj.setResultStatus("FAILURE")
+            print "Latency retrieved was optimal for VP9 playback"
             print "Mediapipeline test executed successfully"
         else:
             tdkTestObj.setResultStatus("FAILURE")
-            print "Rewind on DASH stream with 4x speed failed"
+            print "Latency retrieved was not optimal for VP9 playback"
     else:
         tdkTestObj.setResultStatus("FAILURE")
         print "Mediapipeline test execution failed"
+
     #Unload the modules
     sysUtilObj.unloadModule("systemutil")
+
 else:
     print "Module load failed"

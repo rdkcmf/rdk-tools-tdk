@@ -68,7 +68,7 @@
 2. The iCrypto interface test binary should be available in the device</pre_requisite>
     <api_or_interface_used>Execute the iCrypto Interface test application, "cgfacetests" in DUT</api_or_interface_used>
     <input_parameters>None</input_parameters>
-    <automation_approch>1.Load the systemuitl module.
+    <automation_approch>1.Load the systemutil module.
 2.Execute the Hash Interface tests in DUT. 
 3.During the execution, the DUT will test the Hash Ingest and Calculate mechanism. Raw data and the hash_sha256 for the data are present as a pre-requisite in the application. Raw Data is encrypted using hash->Ingest. The output of Calculate mechanism calculates the digest/hmac value of the digested data. The output of Calculate is verifed against the hash_sha256 present as pre-requisite in the app.
 4.During the Hash-HMAC , the above operation is done with hash object obtained using the HMAC which is obtained using a secret keyId.

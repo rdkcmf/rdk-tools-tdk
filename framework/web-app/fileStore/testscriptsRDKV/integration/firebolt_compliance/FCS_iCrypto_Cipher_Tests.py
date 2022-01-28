@@ -68,7 +68,7 @@
 2. The iCrypto interface test binary should be available in the device</pre_requisite>
     <api_or_interface_used>Execute the iCrypto Interface test application, "cgfacetests" in DUT</api_or_interface_used>
     <input_parameters>None</input_parameters>
-    <automation_approch>1.Load the systemuitl module.
+    <automation_approch>1.Load the systemutil module.
 2.Execute the Cipher Interface tests in DUT. During the execution, the DUT will execute all the tests available in iCrypto interface tests suite.
 3.The output to be obtained from Encrypt and Decrypt are known beforehand to the application and hence the verification is done based on the data.
 4.During the execution a vault object is obtained and raw data is encrypted using aes->Encrypt of Cipher module and the output is verified with the encrypted data known beforehand in the application.

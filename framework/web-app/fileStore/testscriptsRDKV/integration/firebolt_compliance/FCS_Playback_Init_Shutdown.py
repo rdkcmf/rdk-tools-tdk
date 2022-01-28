@@ -71,7 +71,7 @@
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>testcasename - "test_init_shutdown"
 test_url - dash url from MediaValidationVariables library (MediaValidationVariables.video_src_url_dash)</input_parameters>
-    <automation_approch>1.Load the systemuitl module 
+    <automation_approch>1.Load the systemutil module 
 2.Retrieve the video_src_url_dash variable from MediaValidationVariables library
 3.Construct the mediapipelinetests command based on the retrieved video url and testcasename("test_init_shutdown")
 4.Execute the command in DUT. During the execution, the DUT will initialise the pipeline with the provided url and then application exits by closing the pipeline
@@ -164,7 +164,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
             actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
             #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
             if expectedResult in actualresult.upper() and check_av_status_flag == "yes":
-                print "Video playback status check is added"
+                print "Video Decoder proc check is added"
                 checkAVStatus = check_av_status_flag
             #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT' that specifies the video playback timeout in seconds 
             actualresult, timeoutConfigValue = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT')

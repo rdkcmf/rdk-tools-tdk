@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>2</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>FCS_Playback_Rewind_4x_DASH</name>
+  <name>FCS_Playback_FastForward_16x_HEVC</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test to do rewind of a DASH stream with playback rate -4</synopsis>
+  <synopsis>Test to do fast forward of a HEVC stream with playback rate 16</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>10</execution_time>
+  <execution_time>3</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -60,33 +60,33 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>FCS_PLAYBACK_21</test_case_id>
-    <test_objective>Test to do rewind of a DASH stream with playback rate -4</test_objective>
+    <test_case_id>FCS_PLAYBACK_54</test_case_id>
+    <test_objective>Test to do fast forward of a HEVC stream with playback rate 16</test_objective>
     <test_type>Positive</test_type>
     <test_setup>Video Accelerator, RPI</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
-2. Test stream url for a DASH stream should be updated in the config variable video_src_url_dash inside MediaValidationVariables.py library inside filestore
+2. Test stream url for a HEVC stream should be updated in the config variable video_src_url_hevc inside MediaValidationVariables.py library inside filestore
 3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file
-4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time in seconds for which the rewind operation should be carried out</pre_requisite>
+4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time in seconds for which the fastforward operation should be carried out</pre_requisite>
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>testcasename - "test_trickplay"
-test_url - DASH url from MediaValidationVariables library (MediaValidationVariables.video_src_url_dash)
+test_url - HEVC url from MediaValidationVariables library (MediaValidationVariables.video_src_url_hevc)
 "checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
-operations=rewind4x:&lt;timeout&gt; - a ":" seperated string to specify the rewind operation to be executed and the time in seconds for which the operation should be continued. The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
+operations=fastforward16x:&lt;timeout&gt; - a ":" seperated string to specify the fastforwad operation to be executed and the time in seconds for which the operation should be continued. The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
     <automation_approch>1.Load the systemutil module 
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
-3.Retrieve the video_src_url_dash variable from MediaValidationVariables library
+3.Retrieve the video_src_url_hevc variable from MediaValidationVariables library
 4. Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value, operation and timeout
-5.Execute the command in DUT. During the execution, the DUT will playback av for 4*FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT+30 seconds so that there is enough duration for rewind, then do a rewind operation with playback rate -4 and then continue playback  at rate -4 for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds. Then application exits by closing the pipeline
+5.Execute the command in DUT. During the execution, the DUT will start av playback, then do a fast forward operation with playback rate 16 and then continue playback  at rate 16 for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds. Then application exits by closing the pipeline
 6.Verify the output from the execute command and check if the  "Failures: 0" and "Errors: 0" string exists or "failed: 0" string exists in the returned output
 7.Based on the ExecuteCommand() return value and the output returned from the mediapipelinetests application, TM return SUCCESS/FAILURE status.</automation_approch>
     <expected_output>Checkpoint 1. Verify the API call is success
 Checkpoint 2. Verify that the output returned from mediapipelinetests contains the strings "Failures: 0" and "Errors: 0" or it contains the string "failed: 0"</expected_output>
     <priority>High</priority>
     <test_stub_interface>libsystemutilstub.so.0</test_stub_interface>
-    <test_script>FCS_Playback_Rewind_4x_DASH</test_script>
+    <test_script>FCS_Playback_FastForward_16x_HEVC</test_script>
     <skipped>No</skipped>
-    <release_version>M90</release_version>
+    <release_version>M92</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -106,7 +106,7 @@ sysUtilObj = tdklib.TDKScriptingLibrary("systemutil","1")
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-sysUtilObj.configureTestCase(ip,port,'FCS_Playback_Rewind_4x_DASH');
+sysUtilObj.configureTestCase(ip,port,'FCS_Playback_FastForward_16x_HEVC');
 
 #Set device configurations to default values
 checkAVStatus = "no"
@@ -125,7 +125,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #The test name specifies the test case to be executed from the mediapipeline test suite
     test_name = "test_trickplay"
     #Test url for the stream to be played is retrieved from MediaValidationVariables library
-    test_url = MediaValidationVariables.video_src_url_dash
+    test_url = MediaValidationVariables.video_src_url_hevc
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS' that specifies whether SOC level playback verification check should be done or not 
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
@@ -141,13 +141,10 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
         timeoutInSeconds = timeoutConfigValue
     #Construct the trickplay operation string
     #The operations specifies the operation(fastforward/rewind/seek/play/pause) to be executed from the mediapipeline trickplay test
-    # There should be enough duration available for rewind operation to perform correctly, so playing the stream for 4 * timeoutInSeconds + 30(buffer) duration. Ensure that the straem being tested is having adequate duration
-    # Sample operations strings is "operations=play:110,rewind4x:20"
-    playduration = (4 * int (timeoutInSeconds)) + 30
-    setOperations ("play", str (playduration))
-    setOperations ("rewind4x", timeoutInSeconds)
+    # Sample operations strings is "operations=fastforward16x:20"
+    setOperations ("fastforward16x", timeoutInSeconds)
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
-    #Sample command = "mediapipelinetests test_trickplay <DASH_STREAM_URL> checkavstatus=yes operations=play:110,rewind4x:20"
+    #Sample command = "mediapipelinetests test_trickplay <HEVC_STREAM_URL> checkavstatus=yes operations=fastforward16x:20"
     command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, operations = getOperations ()) 
     print "Executing command in DUT: ", command
     
@@ -164,11 +161,11 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
         
         if expectedResult in executionStatus:
             tdkTestObj.setResultStatus("SUCCESS")
-            print "Rewind on DASH stream with 4x speed was successfull"
+            print "Fastforward on HEVC stream with 16x speed was successfull"
             print "Mediapipeline test executed successfully"
         else:
             tdkTestObj.setResultStatus("FAILURE")
-            print "Rewind on DASH stream with 4x speed failed"
+            print "Fastforward on HEVC stream with 16x speed failed"
     else:
         tdkTestObj.setResultStatus("FAILURE")
         print "Mediapipeline test execution failed"

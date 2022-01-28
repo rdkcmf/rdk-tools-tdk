@@ -68,7 +68,7 @@
 2. The iCrypto interface test binary should be available in the device</pre_requisite>
     <api_or_interface_used>Execute the iCrypto Interface test application, "cgfacetests" in DUT</api_or_interface_used>
     <input_parameters>None</input_parameters>
-    <automation_approch>1.Load the systemuitl module.
+    <automation_approch>1.Load the systemutil module.
 2.Execute the Vault Interface tests in DUT. 
 3.During the execution, the DUT will Import a test_Vector and the id returned by Import will be used to Export the data and the verification based on Import Input and Export Output.
 4.Vault Set/Get operation performs a similar operation with test_Vector  being passed to vault_Set and the id being used to retrieve the test_Vector back using vault_Get.
