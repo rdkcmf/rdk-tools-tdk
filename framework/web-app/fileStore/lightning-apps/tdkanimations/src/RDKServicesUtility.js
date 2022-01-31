@@ -39,6 +39,8 @@ export class RDKServicesInterface extends Lightning.Component {
   }
   rdkservicesInterfaceInit() {
       logMsg("RDKServicesInterface Init")
+      logMsg("Host IP:"   + this.config.host);
+      logMsg("Host PORT:" + this.config.port);
       try {
         this.thunderJS = ThunderJS(this.config);
         logMsg("RDKServicesInterface Init Success")

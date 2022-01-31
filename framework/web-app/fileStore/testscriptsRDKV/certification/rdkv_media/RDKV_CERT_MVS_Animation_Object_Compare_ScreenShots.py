@@ -171,7 +171,6 @@ if expectedResult in result.upper():
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_objects_animation_test_app_url
         # Setting Animation test app URL arguments
-        setURLArgument("ip",ip)
         setURLArgument("port",MediaValidationVariables.thunder_port)
         setURLArgument("object","Rect")
         setURLArgument("showfps","false")

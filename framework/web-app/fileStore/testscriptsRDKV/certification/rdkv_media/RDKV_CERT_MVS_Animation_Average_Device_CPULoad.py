@@ -132,7 +132,6 @@ if expectedResult in result.upper():
         setOperation("stop","60")
         operations = getOperations()
         # Setting Animation test app URL arguments
-        setURLArgument("ip",ip)
         setURLArgument("port",MediaValidationVariables.thunder_port)
         setURLArgument("operations",operations)
         setURLArgument("autotest","true")

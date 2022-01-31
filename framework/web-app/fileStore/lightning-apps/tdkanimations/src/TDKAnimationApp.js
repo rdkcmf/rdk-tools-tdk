@@ -339,7 +339,8 @@ export default class App extends Lightning.Component {
   _init()
   {
     this.autotest  = GetURLParameter("autotest");
-    this.deviceIP  = GetURLParameter("ip");
+    // Using device local host IP
+    this.deviceIP  = "127.0.0.1"
     this.devicePort  = GetURLParameter("port");
 
     this.init     = 0

@@ -141,7 +141,6 @@ if expectedResult in result.upper():
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_multianimation_test_app_url
         # Setting Animation test app URL arguments
-        setURLArgument("ip",ip)
         setURLArgument("port",MediaValidationVariables.thunder_port)
         setURLArgument("duration",MediaValidationVariables.animation_duration)
         setURLArgument("testtype","generic")

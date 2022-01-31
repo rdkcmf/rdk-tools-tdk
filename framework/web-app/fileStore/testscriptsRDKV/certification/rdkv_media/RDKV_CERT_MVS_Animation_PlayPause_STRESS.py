@@ -135,7 +135,6 @@ if expectedResult in result.upper():
         setOperation("repeat",MediaValidationVariables.repeat_count_stress)
         operations = getOperations()
         # Setting Animation test app URL arguments
-        setURLArgument("ip",ip)
         setURLArgument("port",MediaValidationVariables.thunder_port)
         setURLArgument("operations",operations)
         setURLArgument("autotest","true")

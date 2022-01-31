@@ -523,7 +523,8 @@ export default class App extends Lightning.Component {
   {
     // URL arguments
     this.autotest    = GetURLParameter("autotest");
-    this.deviceIP    = GetURLParameter("ip");
+    // Using device local host IP
+    this.deviceIP    = "127.0.0.1"
     this.devicePort  = GetURLParameter("port");
     this.expFPS      = GetURLParameter("fps");
     this.threshold   = GetURLParameter("threshold");
