@@ -1037,3 +1037,43 @@ def get_graphical_plugins(conf_file):
         print "\n Please configure the available graphical plugins in device config file"
         plugins_list = []
     return plugins_list
+
+#-------------------------------------------------------------------
+#GET THE BROWSER SCORE FROM SPEEDOMETER TEST
+#-------------------------------------------------------------------
+
+def rdkservice_getBrowserScore_Speedometer():
+    try:
+        browser_score_dict = {}
+        webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
+        driver = openChromeBrowser(webinspectURL);
+        if driver != "EXCEPTION OCCURRED":
+            time.sleep(10)
+            action = ActionChains(driver)
+            source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/li[2]/div')
+            action.move_to_element(source).context_click().perform()
+            time.sleep(10)
+            options = driver.find_elements_by_class_name('soft-context-menu')
+            try:
+                for option in options:
+                    current_option = option.find_elements_by_class_name('item')
+                    for item in current_option:
+                        if "Expand All" in item.text:
+                            item.click()
+            except exceptions.StaleElementReferenceException,e:
+                pass
+            time.sleep(10)
+            speedometer_score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol/ol[4]/li[4]/span/span[2]').text
+            browser_score_dict["main_score"] = speedometer_score
+        else:
+            browser_score_dict["main_score"] = "Unable to get the browser score"
+    except Exception as error:
+        print "Got exception while getting the browser score"
+        print error
+        browser_score_dict["main_score"] = "Unable to get the browser score"
+        driver.quit()
+    browser_score_dict = json.dumps(browser_score_dict)
+    return browser_score_dict
+
+
+
