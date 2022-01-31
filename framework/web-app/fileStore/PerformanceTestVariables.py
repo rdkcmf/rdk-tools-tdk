@@ -55,3 +55,5 @@ html_page_url = "https://vimeo.com/channels/premieres"
 
 #List of processes that can be ignored while checking the zorder
 excluded_process_list = ['subtec_s1']
+
+ping_test_destination = "google.com"
