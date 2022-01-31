@@ -230,6 +230,7 @@ if "SUCCESS" in result.upper():
 
                             #Retrieve the list of scanned devices
                             tdkTestObj = bluetoothhalObj.createTestStep('BluetoothHal_GetListOfScannedDevices');
+                            tdkTestObj.addParameter("DeviceName",bluetoothhallib.deviceName);
                             #Execute the test case in DUT
                             tdkTestObj.executeTestCase(expectedresult);
 
@@ -243,7 +244,6 @@ if "SUCCESS" in result.upper():
                                 deviceDiscovered = False
                                 if scanResult and "NO_DEVICES_FOUND" != scanResult:
                                     scannedDevices = json.loads(scanResult)
-
                                     #Traverse the scanned devices list to check if the client device is present
                                     for device in scannedDevices:
                                         if (device["deviceName"] == bluetoothhallib.deviceName):

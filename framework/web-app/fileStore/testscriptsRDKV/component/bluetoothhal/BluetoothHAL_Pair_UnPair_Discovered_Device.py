@@ -195,6 +195,7 @@ if "SUCCESS" in result.upper():
 
                             #Retrieve the list of scanned devices
                             tdkTestObj = bluetoothhalObj.createTestStep('BluetoothHal_GetListOfScannedDevices');
+                            tdkTestObj.addParameter("DeviceName",bluetoothhallib.deviceName);
                             #Execute the test case in DUT
                             tdkTestObj.executeTestCase(expectedresult);
 			
