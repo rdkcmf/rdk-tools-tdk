@@ -81,7 +81,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_WebKitBrowser_TimeTo_LoadURL');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -162,14 +163,19 @@ if expectedResult in result.upper():
                         tdkTestObj.setResultStatus("SUCCESS");
                         print "URL(",new_url,") is set successfully"
                         print "\nURL triggered at: {} (UTC)".format(url_triggered_time)
+                        Summ_list.append('URL triggered at :{}'.format(url_triggered_time))
                         print "URL changed at: {} (UTC)".format(url_changed_time)
+                        Summ_list.append('URL changed at :{}'.format(url_changed_time))
                         url_triggered_timein_millisec = getTimeInMilliSec(url_triggered_time)
                         url_changed_timin_millisec = getTimeInMilliSec(url_changed_time)
                         url_loaded_time = url_changed_timin_millisec - url_triggered_timein_millisec
                         print "Time taken to load the URL: {} ms\n".format(url_loaded_time)
+                        Summ_list.append('Time taken to load the URL :{}ms'.format(url_loaded_time))
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
                         result1, url_loadtime_threshold_value = getDeviceConfigKeyValue(conf_file,"URL_LOADTIME_THRESHOLD_VALUE")
+                        Summ_list.append('URL_LOADTIME_THRESHOLD_VALUE :{}ms'.format(url_loadtime_threshold_value))
                         result2,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                        Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                         if all(value != "" for value in (url_loadtime_threshold_value,offset)):
                             print "\n Threshold value for time taken to load the URL: {} ms".format(url_loadtime_threshold_value)
                             if 0 < int(url_loaded_time) < (int(url_loadtime_threshold_value) + int(offset)):
@@ -213,6 +219,7 @@ if expectedResult in result.upper():
         print "\nRevert the values before exiting"
         status = revert_value(curr_webkit_status,curr_cobalt_status,obj);
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

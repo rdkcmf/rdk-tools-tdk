@@ -81,7 +81,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_LaunchWebKitBrowser_AfterReboot')
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -163,14 +164,19 @@ if expectedResult in result.upper():
                                 if launched_time:
                                     conf_file,file_status = getConfigFileName(obj.realpath)
                                     config_status,webkit_launch_threshold = getDeviceConfigKeyValue(conf_file,"WEBKITBROWSER_LAUNCH_AFTER_BOOT_THRESHOLD_VALUE")
+                                    Summ_list.append('WEBKITBROWSER_LAUNCH_AFTER_BOOT_THRESHOLD_VALUE :{}ms'.format(webkit_launch_threshold))
                                     offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                    Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                                     if all(value != "" for value in (webkit_launch_threshold,offset)):
                                         launch_start_time_in_millisec = getTimeInMilliSec(launch_start_time)
                                         launched_time_in_millisec = getTimeInMilliSec(launched_time)
                                         print "\n WebKitBrowser launch initiated at: ",launch_start_time
+                                        Summ_list.append('WebKitBrowser launch initiated at :{}'.format(launch_start_time))
                                         print "\n WebKitBrowser launched at : ",launched_time
+                                        Summ_list.append('WebKitBrowser launched at :{}'.format(launched_time))
                                         time_taken_for_launch = launched_time_in_millisec - launch_start_time_in_millisec
                                         print "\n Time taken to launch WebKitBrowser: {}(ms)".format(time_taken_for_launch)
+                                        Summ_list.append('Time taken to launch WebKitBrowser :{}ms'.format(time_taken_for_launch))
                                         print "\n Threshold value for time taken to launch WebKitBrowser : {} ms".format(webkit_launch_threshold)
                                         print "\n Validate the time: \n"
                                         if 0 < time_taken_for_launch < (int(webkit_launch_threshold) + int(offset)) :
@@ -224,6 +230,7 @@ if expectedResult in result.upper():
         print "Revert the values before exiting"
         status = set_plugins_status(obj,initial_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

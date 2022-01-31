@@ -79,7 +79,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_HtmlApp_TimeTo_Launch')
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -140,14 +141,19 @@ if expectedResult in result.upper():
                 if launched_time:
                     conf_file,file_status = getConfigFileName(obj.realpath)
                     config_status,htmlapp_launch_threshold = getDeviceConfigKeyValue(conf_file,"HTMLAPP_LAUNCH_THRESHOLD_VALUE")
+                    Summ_list.append('HTMLAPP_LAUNCH_THRESHOLD_VALUE :{}ms'.format(htmlapp_launch_threshold))
                     offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                    Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                     if all(value != "" for value in (htmlapp_launch_threshold,offset)):
                         launch_start_time_in_millisec = getTimeInMilliSec(launch_start_time)
                         launched_time_in_millisec = getTimeInMilliSec(launched_time)
                         print "\n HtmlApp launch initiated at: " ,launch_start_time
+                        Summ_list.append('HtmlApp launch initiated at :{}ms'.format(launch_start_time))
                         print "\n HtmlApp launched at : ",launched_time
+                        Summ_list.append('HtmlApp launched at :{}ms'.format(launched_time))
                         time_taken_for_launch = launched_time_in_millisec - launch_start_time_in_millisec
                         print "\n Time taken to launch HtmlApp: {}(ms)".format(time_taken_for_launch)
+                        Summ_list.append('Time taken to launch HtmlApp :{}ms'.format(time_taken_for_launch))
                         print "\n Threshold value for time taken to launch HtmlApp plugin : {} ms".format(htmlapp_launch_threshold)
                         print "\n Validate the time:"
                         if 0 < time_taken_for_launch < (int(htmlapp_launch_threshold) + int(offset)) :
@@ -181,6 +187,7 @@ if expectedResult in result.upper():
             print "Unable to deactivate HtmlApp"
             tdkTestObj.setResultStatus("FAILURE")
         event_listener.disconnect()
+        getSummary(Summ_list)
         time.sleep(10)
     else:
         print "\n Preconditions are not met"

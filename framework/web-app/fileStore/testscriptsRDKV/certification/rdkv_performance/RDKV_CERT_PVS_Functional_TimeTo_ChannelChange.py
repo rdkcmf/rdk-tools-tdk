@@ -91,7 +91,8 @@ obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_ChannelChange');
 webkit_console_socket = None
 channel_change_count = 1
 max_channel_change_count = 5
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -220,7 +221,10 @@ if expectedResult in result.upper():
                         print "\nAverage time taken for channel change: {} ms\n".format(avg_time)
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
                         result1, channelchange_time_threshold_value = getDeviceConfigKeyValue(conf_file,"CHANNEL_CHANGE_TIME_THRESHOLD_VALUE")
+                        Summ_list.append('CHANNEL_CHANGE_TIME_THRESHOLD_VALUE :{}ms'.format(channelchange_time_threshold_value))
                         result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                        Summ_list.append('THRESHOLD_OFFSET :{}'.format(offset))
+                        Summ_list.append('Time taken to channel change :{}ms'.format(avg_time))
                         if all(value != "" for value in (channelchange_time_threshold_value,offset)):
                             print "\n Threshold value for time taken to channel change: {} ms".format(channelchange_time_threshold_value)
                             if 0 < int(avg_time) < (int(channelchange_time_threshold_value) + int(offset)):
@@ -268,6 +272,7 @@ if expectedResult in result.upper():
         print "Revert the values before exiting"
         status = revert_value(curr_webkit_status,curr_cobalt_status,obj);
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

@@ -82,7 +82,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_SwitchTo_MainUIFromVideoPlayback');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -179,14 +180,19 @@ if expectedResult in result.upper():
                                     required_line = output.split('\n')[1]
                                     main_ui_launched_time = getTimeStampFromString(required_line)
                                     print "\n Home button pressed at :{} (UTC)".format(start_time)
+                                    Summ_list.append('Home button pressed at  :{}'.format(start_time))
                                     print "\n Main UI launched at :{} (UTC)  ".format(main_ui_launched_time)
+                                    Summ_list.append('Main UI launched at :{}'.format(main_ui_launched_time))
                                     start_time_millisec = getTimeInMilliSec(start_time)
                                     main_ui_launched_time_millisec = getTimeInMilliSec(main_ui_launched_time)
                                     ui_launchtime = main_ui_launched_time_millisec - start_time_millisec
                                     print "\n Time taken for launching Main UI from another window  : {} ms\n".format(ui_launchtime)
+                                    Summ_list.append('Time taken for launching Main UI from another window  :{}ms'.format(ui_launchtime))
                                     conf_file,result = getConfigFileName(tdkTestObj.realpath)
                                     result1, ui_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"MAIN_UI_SWITCH_TIME_THRESHOLD_VALUE")
+                                    Summ_list.append('MAIN_UI_SWITCH_TIME_THRESHOLD_VALUE :{}ms'.format(ui_launch_threshold_value))
                                     result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                    Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                                     if all(value != "" for value in (ui_launch_threshold_value,offset)):
                                         print "\n Threshold value for time taken for launching Main UI from another window : {} ms".format(ui_launch_threshold_value)
                                         if 0 < int(ui_launchtime) < (int(ui_launch_threshold_value) + int(offset)):
@@ -234,6 +240,7 @@ if expectedResult in result.upper():
         print "\nPreconditions are not met\n"
         tdkTestObj.setResultStatus("FAILURE")
     obj.unloadModule("rdkv_performance")
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE")
     print "Failed to load module"

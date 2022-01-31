@@ -88,7 +88,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PACS_Cobalt_TimeTo_SuspendResume');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -153,15 +154,21 @@ if expectedResult in result.upper():
                             if suspended_time and resumed_time:
                                 conf_file,file_status = getConfigFileName(obj.realpath)
                                 suspend_config_status,suspend_threshold = getDeviceConfigKeyValue(conf_file,"COBALT_SUSPEND_TIME_THRESHOLD_VALUE")
+                                Summ_list.append('COBALT_SUSPEND_TIME_THRESHOLD_VALUE :{}ms'.format(suspend_threshold))
                                 resume_config_status,resume_threshold = getDeviceConfigKeyValue(conf_file,"COBALT_RESUME_TIME_THRESHOLD_VALUE")
+                                Summ_list.append('COBALT_RESUME_TIME_THRESHOLD_VALUE :{}ms'.format(resume_threshold))
                                 offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                                 if all(value != "" for value in (suspend_threshold,resume_threshold,offset)):
                                     start_suspend_in_millisec = getTimeInMilliSec(start_suspend)
                                     suspended_time_in_millisec = getTimeInMilliSec(suspended_time)
                                     print "\n Suspended initiated at: " +start_suspend + "(UTC)"
+                                    Summ_list.append('Suspended initiated at :{}'.format(start_suspend))
                                     print "\n Suspended at : "+suspended_time+ "(UTC)"
+                                    Summ_list.append('Suspended at :{}'.format(suspended_time))
                                     time_taken_for_suspend = suspended_time_in_millisec - start_suspend_in_millisec
                                     print "\n Time taken to Suspend Cobalt Plugin: " + str(time_taken_for_suspend) + "(ms)"
+                                    Summ_list.append('Time taken to Suspend Cobalt Plugin :{}ms'.format(time_taken_for_suspend))
                                     print "\n Threshold value for time taken to suspend Cobalt plugin: " + str(suspend_threshold) + "(ms)"
                                     print "\n Validate the time taken for suspending the plugin \n"
                                     if 0 < time_taken_for_suspend < (int(suspend_threshold) + int(offset)) :
@@ -173,9 +180,12 @@ if expectedResult in result.upper():
                                     start_resume_in_millisec = getTimeInMilliSec(start_resume)
                                     resumed_time_in_millisec =  getTimeInMilliSec(resumed_time)
                                     print "\n Resume initiated at: " + start_resume + "(UTC)"
+                                    Summ_list.append('Resume initiated at :{}'.format(start_resume))
                                     print "\n Resumed at: " + resumed_time + "(UTC)"
+                                    Summ_list.append('Resumed at :{}'.format(resumed_time))
                                     time_taken_for_resume = resumed_time_in_millisec - start_resume_in_millisec
                                     print "\n Time taken to Resume Cobalt Plugin: " + str(time_taken_for_resume) + "(ms)"
+                                    Summ_list.append('Time taken to Resume Cobalt Plugin :{}ms'.format(time_taken_for_resume))
                                     print "\n Threshold value for time taken to resume Cobalt plugin: " + str(resume_threshold) + "(ms)"
                                     print "\n Validate the time taken for resuming the plugin \n"
                                     if 0 < time_taken_for_resume < (int(resume_threshold) + int(offset)) :
@@ -215,6 +225,7 @@ if expectedResult in result.upper():
         print "Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

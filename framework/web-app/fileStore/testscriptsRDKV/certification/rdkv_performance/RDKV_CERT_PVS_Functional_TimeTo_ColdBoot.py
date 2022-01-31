@@ -77,7 +77,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_ColdBoot')
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -92,7 +93,9 @@ if expectedResult in result.upper():
     result2, reboot_wait_time = getDeviceConfigKeyValue(conf_file,"REBOOT_WAIT_TIME")
     result3, threshold_uptime = getDeviceConfigKeyValue(conf_file,"THRESHOLD_UPTIME")
     result4, cold_boot_time_threshold_value = getDeviceConfigKeyValue(conf_file,"COLDBOOT_TIME_THRESHOLD_VALUE")
+    Summ_list.append('COLDBOOT_TIME_THRESHOLD_VALUE :{}ms'.format(cold_boot_time_threshold_value))
     result5, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+    Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
     if all(value != "" for value in (wait_time,reboot_wait_time,threshold_uptime,cold_boot_time_threshold_value,offset)):
         #Keep device idle 
         time.sleep(int(wait_time))
@@ -131,11 +134,14 @@ if expectedResult in result.upper():
                         if required_log != "":
                             wpeframework_started_time = getTimeStampFromString(required_log)
                             print "\n Device reboot initiated at :{}".format(start_time)
+                            Summ_list.append('Device reboot initiated at :{}'.format(start_time))
                             print "\n WPEFramework started at :{}".format(wpeframework_started_time)
+                            Summ_list.append('WPEFramework started at :{}'.format(wpeframework_started_time))
                             start_time_millisec = getTimeInMilliSec(start_time)
                             wpeframwork_start_time_millisec = getTimeInMilliSec(wpeframework_started_time)
                             timeto_coldboot = wpeframwork_start_time_millisec - start_time_millisec
                             print "\n Time taken for the cold boot : {} ms".format(timeto_coldboot)
+                            Summ_list.append('Time taken for the cold boot :{}ms'.format(timeto_coldboot))
                             print "\n Threshold value for time taken for cold boot: {} ms".format(cold_boot_time_threshold_value)
                             if 0 < int(timeto_coldboot) < (int(cold_boot_time_threshold_value) + int(offset)) :
                                 tdkTestObj.setResultStatus("SUCCESS")
@@ -162,6 +168,7 @@ if expectedResult in result.upper():
         print "\n Please configure the variables in device config file"
         obj.setLoadModuleStatus("FAILURE")
     obj.unloadModule("rdkv_performance")
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE")
     print "Failed to load module"

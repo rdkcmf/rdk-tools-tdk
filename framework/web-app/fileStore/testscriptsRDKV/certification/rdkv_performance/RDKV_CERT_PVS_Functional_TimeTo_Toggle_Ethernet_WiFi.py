@@ -107,7 +107,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_Toggle_Ethernet_WiFi');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -209,13 +210,17 @@ if expectedResult in result.upper():
                         required_log = output.split('\n')[1]
                         print "\n Successfully switched to {}, logs:{} \n".format(new_interface,required_log)
                         print "\n Setting {} as default interface started at: {} UTC".format(new_interface,start_time_dict[new_interface])
+                        Summ_list.append(' Setting {} as default interface started at: {} UTC'.format(new_interface,start_time_dict[new_interface]))
                         start_time_dict[new_interface] = int(getTimeInMilliSec(start_time_dict[new_interface]))
                         event_time = getTimeStampFromString(required_log)
                         print "\n {} interface became default interface at: {} UTC".format(new_interface,event_time)
+                        Summ_list.append('{} interface became default interface at: {} UTC'.format(new_interface,event_time))
                         event_time_dict[new_interface] = int(getTimeInMilliSec(event_time))
                         time_taken = event_time_dict[new_interface] -  start_time_dict[new_interface]
                         print "\n Time taken for setting {} as default interface: {}(ms) ".format(new_interface,time_taken)
+                        Summ_list.append(' Time taken for setting {} as default interface: {}(ms)'.format(new_interface,time_taken))
                         print "\n Threshold value for time taken for setting {} as default interface: {}(ms) ".format(new_interface,validation_dict[new_interface])
+                        Summ_list.append(' Threshold value for time taken for setting {} as default interface: {}(ms)'.format(new_interface,validation_dict[new_interface]))
                         if 0 < time_taken < ( validation_dict[new_interface] + int(offset)):
                             print "\n Time taken is within the expected range"
                             tdkTestObj.setResultStatus("SUCCESS")
@@ -273,6 +278,7 @@ if expectedResult in result.upper():
     if revert_plugins_dict != {}:
         status = set_plugins_status(obj,revert_plugins_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

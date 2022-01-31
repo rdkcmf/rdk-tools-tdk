@@ -80,7 +80,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_LightningApp_TimeTo_Destroy')
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -159,14 +160,19 @@ if expectedResult in result.upper():
                         if destroyed_time:
                             conf_file,file_status = getConfigFileName(obj.realpath)
                             config_status,htmlapp_destroy_threshold = getDeviceConfigKeyValue(conf_file,"LIGHTNINGAPP_DESTROY_THRESHOLD_VALUE")
+                            Summ_list.append('LIGHTNINGAPP_DESTROY_THRESHOLD_VALUE :{}ms'.format(htmlapp_destroy_threshold))
                             offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                            Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                             if all(value != "" for value in (htmlapp_destroy_threshold,offset)):
                                 destroy_start_time_in_millisec = getTimeInMilliSec(destroy_start_time)
                                 destroyed_time_in_millisec = getTimeInMilliSec(destroyed_time)
                                 print "\n LightningApp destroy initiated at: ",destroy_start_time
+                                Summ_list.append('LightningApp destroy initiated at :{}'.format(destroy_start_time))
                                 print "\n LightningApp destroyed at : ",destroyed_time
+                                Summ_list.append('LightningApp destroyed at :{}'.format(destroyed_time))
                                 time_taken_for_destroy = destroyed_time_in_millisec - destroy_start_time_in_millisec
                                 print "\n Time taken to destroy LightningApp: {}(ms)".format(time_taken_for_destroy)
+                                Summ_list.append('Time taken to destroy LightningApp :{}ms'.format(time_taken_for_destroy))
                                 print "\n Threshold value for time taken to destroy LightningApp: {}(ms)".format(htmlapp_destroy_threshold)
                                 print "\n Validate the time:"
                                 if 0 < time_taken_for_destroy < (int(htmlapp_destroy_threshold) + int(offset)) :
@@ -194,6 +200,7 @@ if expectedResult in result.upper():
             print "\n Error while launching LightningApp"
             obj.setLoadModuleStatus("FAILURE")
         event_listener.disconnect()
+        getSummary(Summ_list)
         time.sleep(10)
     else:
         print "\n Preconditions are not met \n"

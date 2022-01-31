@@ -81,7 +81,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_Scan_WiFi');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -205,14 +206,19 @@ if expectedResult in result.upper():
                                                         print "\n Unable to scan the SSID: ",ssid
                                                 if event_time:
                                                     config_status,wifi_scan_threshold = getDeviceConfigKeyValue(conf_file,"WIFI_SCAN_TIME_THRESHOLD_VALUE")
+                                                    Summ_list.append('WIFI_SCAN_TIME_THRESHOLD_VALUE :{}ms'.format(wifi_scan_threshold))
                                                     offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                                    Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                                                     if all(value != "" for value in (wifi_scan_threshold,offset)):
                                                         scan_start_time_in_millisec = getTimeInMilliSec(scan_start_time)
                                                         scan_end_time_in_millisec = getTimeInMilliSec(event_time)
                                                         print "\n WIFI scan initiated at: ",scan_start_time
+                                                        Summ_list.append('WIFI scan initiated at :{}'.format(scan_start_time))
                                                         print "\n WIFI scan completed at : ", event_time
+                                                        Summ_list.append('WIFI scan completed at  :{}'.format(event_time))
                                                         time_taken_for_wifiscan = scan_end_time_in_millisec - scan_start_time_in_millisec
                                                         print "\n Time taken to scan WIFI details: {}(ms)".format(time_taken_for_wifiscan)
+                                                        Summ_list.append('Time taken to scan WIFI details :{}ms'.format(time_taken_for_wifiscan))
                                                         print "\n Threshold value for time taken to scan WIFI details: {}(ms)".format(wifi_scan_threshold)
                                                         print "\n Validate the time: \n"
                                                         if 0 < time_taken_for_wifiscan < (int(wifi_scan_threshold) + int(offset)) :
@@ -264,6 +270,7 @@ if expectedResult in result.upper():
         print "Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

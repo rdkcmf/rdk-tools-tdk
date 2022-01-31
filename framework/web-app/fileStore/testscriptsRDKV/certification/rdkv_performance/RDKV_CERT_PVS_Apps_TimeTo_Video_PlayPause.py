@@ -71,6 +71,7 @@ from web_socket_util import *
 import PerformanceTestVariables
 from MediaValidationUtility import *
 from StabilityTestUtility import *
+from rdkv_performancelib import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
@@ -82,7 +83,8 @@ port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Apps_TimeTo_Video_PlayPause');
 
 webkit_console_socket = None
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -201,7 +203,12 @@ if expectedResult in result.upper():
                         print "\n Time taken for pause operation: {} milleseconds \n".format(pause_opn_time)
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
                         result1, pause_time_threshold_value = getDeviceConfigKeyValue(conf_file,"PAUSE_TIME_THRESHOLD_VALUE")
+                        Summ_list.append('PAUSE_TIME_THRESHOLD_VALUE :{}ms'.format(pause_time_threshold_value))
                         result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                        Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
+                        Summ_list.append('Pause initiated at  :{}'.format(pausing_time))
+                        Summ_list.append('Pause happend at :{}'.format(paused_time))
+                        Summ_list.append('Time taken for pause operation :{}ms'.format(pause_opn_time))
                         if all(value != "" for value in (pause_time_threshold_value,offset)):
                             print "\n The threshold value for time taken to pause operation: {} ms".format(pause_time_threshold_value)
                             if 0 < int(pause_opn_time) < (int(pause_time_threshold_value) + int(offset)):
@@ -222,6 +229,10 @@ if expectedResult in result.upper():
                         play_opn_time = played_time_millisec - playing_time_millisec
                         print "\n Time taken for play operation: {} milliseconds \n".format(play_opn_time)
                         result, play_time_threshold_value = getDeviceConfigKeyValue(conf_file,"PLAY_TIME_THRESHOLD_VALUE")
+                        Summ_list.append('PLAY_TIME_THRESHOLD_VALUE :{}ms'.format(play_time_threshold_value))
+                        Summ_list.append('Play initiated at :{}'.format(playing_time))
+                        Summ_list.append('Play happend at :{}'.format(played_time))
+                        Summ_list.append('Time taken for play operation :{}ms'.format(play_opn_time))
                         if play_time_threshold_value != "":
                             print "\n The threshold value for time taken to play operation: {} ms".format(play_time_threshold_value)
                             if 0 < int(play_opn_time) < (int(play_time_threshold_value) + int(offset)):
@@ -270,6 +281,7 @@ if expectedResult in result.upper():
         print "\n Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "\n Failed to load module"

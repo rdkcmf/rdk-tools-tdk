@@ -83,7 +83,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PACS_Cobalt_TimeTo_PlayNextVideo');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -184,11 +185,16 @@ if expectedResult in result.upper():
                     #Get threshold values from device config file
                     conf_file,file_status = getConfigFileName(obj.realpath)
                     result2,cobalt_play_threshold = getDeviceConfigKeyValue(conf_file,"COBALT_PLAY_NEXT_VIDEO_TIME_THRESHOLD_VALUE")
+                    Summ_list.append('COBALT_PLAY_NEXT_VIDEO_TIME_THRESHOLD_VALUE :{}ms'.format(cobalt_play_threshold))
                     offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                    Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                     if all(value != "" for value in (cobalt_play_threshold,offset)):
                         print "\n Play initiated at {}".format(play_start_time)
+                        Summ_list.append('Play initiated at :{}'.format(play_start_time))
                         print "\n Play happend at {}".format(video_playedtime)
+                        Summ_list.append('Play happend at :{}'.format(video_playedtime))
                         print "\n Time taken for play operation: {} milliseconds \n".format(time_for_video_play)
+                        Summ_list.append('Time taken for play operation :{}ms'.format(time_for_video_play))
                         print "\n Threshold value for Time taken for playing next video: {} milliseconds \n".format(cobalt_play_threshold)
                         if 0 < int(time_for_video_play) < (int(cobalt_play_threshold) + int(offset)):
                             print "\n Time taken for play operation is within the expected limit"
@@ -223,6 +229,7 @@ if expectedResult in result.upper():
         print "\n Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

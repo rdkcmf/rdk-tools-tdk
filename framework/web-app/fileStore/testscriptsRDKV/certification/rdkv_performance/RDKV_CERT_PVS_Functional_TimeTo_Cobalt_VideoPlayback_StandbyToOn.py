@@ -90,7 +90,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_Cobalt_VideoPlayback_StandbyToOn');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -274,7 +275,10 @@ if expectedResult in result.upper():
                                                                 print "\n Time taken to play video  :{} ms\n".format(time_to_video_playfrom_standby)
                                                                 conf_file,file_status = getConfigFileName(obj.realpath)
                                                                 result1, video_lauch_threshold_value = getDeviceConfigKeyValue(conf_file,"VIDEOPLAY_FROM_STANDBY_THRESHOLD_VALUE")
+                                                                Summ_list.append('VIDEOPLAY_FROM_STANDBY_THRESHOLD_VALUE :{}ms'.format(video_lauch_threshold_value))
                                                                 result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                                                Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
+                                                                Summ_list.append('Time taken to play video :{}ms'.format(time_to_video_playfrom_standby))
                                                                 if all(value != "" for value in (video_lauch_threshold_value,offset)):
                                                                     print "\n Threshold value for time taken to play video from standby : {} ms".format(video_lauch_threshold_value)
                                                                     if 0 < int(time_to_video_playfrom_standby) < (int(video_lauch_threshold_value) + int(offset)):
@@ -357,6 +361,7 @@ if expectedResult in result.upper():
             tdkTestObj.setResultStatus("FAILURE")
         event_listener.disconnect()
         time.sleep(5)
+        getSummary(Summ_list)
     else:
         print "\n Pre conditions are not met \n"
         obj.setLoadModuleStatus("FAILURE");

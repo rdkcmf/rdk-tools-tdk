@@ -86,7 +86,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_Scan_Bluetooth')
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -146,14 +147,19 @@ if expectedResult in result.upper():
                         print "\n Triggered event: ",event_log,"\n"
                         event_time = event_log.split('$$$')[0]
                         config_status,bluetooth_scan_threshold = getDeviceConfigKeyValue(conf_file,"BLUETOOTH_SCAN_TIME_THRESHOLD_VALUE")
+                        Summ_list.append('BLUETOOTH_SCAN_TIME_THRESHOLD_VALUE :{}ms'.format(bluetooth_scan_threshold))
                         offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                        Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                         if all(value != "" for value in (bluetooth_scan_threshold,offset)):
                             scan_start_time_in_millisec = getTimeInMilliSec(scan_start_time)
                             scan_end_time_in_millisec = getTimeInMilliSec(event_time)
                             print "\n BLUETOOTH scan initiated at: ",scan_start_time
+                            Summ_list.append('BLUETOOTH scan initiated at :{}'.format(scan_start_time))
                             print "\n BLUETOOTH scan completed at : ", event_time
+                            Summ_list.append('BLUETOOTH scan completed at :{}'.format(event_time))
                             time_taken_for_wifiscan = scan_end_time_in_millisec - scan_start_time_in_millisec
                             print "\n Time taken to scan BLUETOOTH details: {}(ms)".format(time_taken_for_wifiscan)
+                            Summ_list.append('Time taken to scan BLUETOOTH details :{}ms'.format(time_taken_for_wifiscan))
                             print "\n Threshold value for time taken to scan Bluetooth details : {} ms".format(bluetooth_scan_threshold)
                             print "\n Validate the time: \n"
                             if 0 < time_taken_for_wifiscan < (int(bluetooth_scan_threshold) + int(offset)) :
@@ -186,6 +192,7 @@ if expectedResult in result.upper():
         print "\n Revert the values before exiting \n"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

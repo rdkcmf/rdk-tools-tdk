@@ -83,7 +83,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_ChangeSystemMode')
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -163,14 +164,19 @@ if expectedResult in result.upper():
                         tdkTestObj.setResultStatus("SUCCESS")
                         conf_file,file_status = getConfigFileName(obj.realpath)
                         config_status,modechange_time_threshold = getDeviceConfigKeyValue(conf_file,"SYS_MODECHANGE_THRESHOLD_VALUE")
+                        Summ_list.append('SYS_MODECHANGE_THRESHOLD_VALUE :{}ms'.format(modechange_time_threshold))
                         offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                        Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                         if all(value != "" for value in (modechange_time_threshold,offset)):
                             mode_change_start_time_in_millisec = getTimeInMilliSec(mode_change_start_time)
                             mode_changed_time_in_millisec = getTimeInMilliSec(mode_changed_time)
                             print "\n Set system mode initiated at: " + mode_change_start_time + "(UTC)"
+                            Summ_list.append('Set system mode initiated at :{}'.format(mode_change_start_time))
                             print "\n System mode changed at : "+ mode_changed_time + "(UTC)"
+                            Summ_list.append('System mode changed at :{}'.format(mode_changed_time))
                             time_taken_for_modechange = mode_changed_time_in_millisec - mode_change_start_time_in_millisec
                             print "\n Time taken for system mode change : {}(ms)".format(time_taken_for_modechange)
+                            Summ_list.append('Time taken for system mode change :{}ms'.format(time_taken_for_modechange))
                             print "\n Threshold value for system mode change: {} ms".format(modechange_time_threshold)
                             print "\n Validate the time: \n"
                             if 0 < time_taken_for_modechange < (int(modechange_time_threshold) + int(offset)) :
@@ -214,6 +220,7 @@ if expectedResult in result.upper():
         print "Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance")
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE")
     print "Failed to load module"

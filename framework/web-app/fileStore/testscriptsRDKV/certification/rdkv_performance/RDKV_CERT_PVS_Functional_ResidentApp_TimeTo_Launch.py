@@ -76,7 +76,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_ResidentApp_TimeTo_Launch')
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -90,7 +91,9 @@ if expectedResult in result.upper():
     result1, reboot_wait_time = getDeviceConfigKeyValue(conf_file,"REBOOT_WAIT_TIME")
     result2, threshold_uptime = getDeviceConfigKeyValue(conf_file,"THRESHOLD_UPTIME")
     result3, launch_time_threshold_value = getDeviceConfigKeyValue(conf_file,"RESIDENTAPP_LAUNCH_TIME_THRESHOLD_VALUE")
+    Summ_list.append('RESIDENTAPP_LAUNCH_TIME_THRESHOLD_VALUE :{}ms'.format(launch_time_threshold_value))
     result4, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+    Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
     if all(value != "" for value in (reboot_wait_time,threshold_uptime,launch_time_threshold_value,offset)):
         #Reboot device
         tdkTestObj = obj.createTestStep('rdkservice_rebootDevice')
@@ -127,6 +130,7 @@ if expectedResult in result.upper():
                             log_list = required_log.split(' ')
                             time_taken = int(float(log_list[log_list.index('took')+1]))
                             print "\n Time taken for launching ResidentApp : {} ms".format(time_taken)
+                            Summ_list.append('Time taken for launching ResidentApp :{}ms'.format(time_taken))
                             print "\n Threshold value for time taken for launching ResidentApp: {} ms".format(launch_time_threshold_value)
                             if 0 < int(time_taken) < (int(launch_time_threshold_value) + int(offset)) :
                                 tdkTestObj.setResultStatus("SUCCESS")
@@ -153,6 +157,7 @@ if expectedResult in result.upper():
         print "\n Please configure the variables in device config file"
         obj.setLoadModuleStatus("FAILURE")
     obj.unloadModule("rdkv_performance")
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE")
     print "Failed to load module"

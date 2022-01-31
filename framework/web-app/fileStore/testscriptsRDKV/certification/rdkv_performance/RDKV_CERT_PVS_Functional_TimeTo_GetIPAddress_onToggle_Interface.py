@@ -75,6 +75,7 @@ import ip_change_detection_utility
 from datetime import datetime
 from ip_change_detection_utility import *
 from StabilityTestUtility import *
+from rdkv_performancelib import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
@@ -84,7 +85,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_GetIPAddress_onToggle_Interface')
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -164,7 +166,9 @@ if expectedResult in result.upper():
                                     wifi_connect_dict[new_interface] = int(getTimeInMilliSec(wifi_connect_dict[new_interface]))
                                     time_taken = event_time_dict[new_interface] - wifi_connect_dict[new_interface]
                                 print "\n Time taken for getting {} ip address: {}(ms) ".format(new_interface,time_taken)
+                                Summ_list.append('Time taken for getting ip address :{}ms'.format(time_taken))
                                 print "\n Threshold value for getting {} ip address: {}(ms) ".format(new_interface,validation_dict[new_interface])
+                                Summ_list.append('Threshold value for getting {} ip address: {}(ms)'.format(new_interface,validation_dict[new_interface]))
                                 if 0 < time_taken < ( int(validation_dict[new_interface]) + int(offset)):
                                     print "\n Time taken for getting {} ip address is within the expected range".format(new_interface)
                                     tdkTestObj.setResultStatus("SUCCESS")
@@ -198,6 +202,7 @@ if expectedResult in result.upper():
         print "\n Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance")
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE")
     print "Failed to load module"

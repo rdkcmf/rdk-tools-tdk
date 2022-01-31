@@ -85,7 +85,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PACS_Cobalt_TimeTo_Video_PlayPause');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -223,12 +224,18 @@ if expectedResult in result.upper():
                                                 #Get threshold values from device config file
                                                 conf_file,file_status = getConfigFileName(obj.realpath)
                                                 result1,cobalt_pause_threshold = getDeviceConfigKeyValue(conf_file,"COBALT_PAUSE_TIME_THRESHOLD_VALUE")
+                                                Summ_list.append('COBALT_PAUSE_TIME_THRESHOLD_VALUE :{}ms'.format(cobalt_pause_threshold))
                                                 result2,cobalt_play_threshold = getDeviceConfigKeyValue(conf_file,"COBALT_PLAY_TIME_THRESHOLD_VALUE")
+                                                Summ_list.append('COBALT_PLAY_TIME_THRESHOLD_VALUE :{}ms'.format(cobalt_play_threshold))
                                                 offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                                Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                                                 if all(value != "" for value in (cobalt_pause_threshold,cobalt_play_threshold,offset)):
                                                     print "\n play initiated at {} ".format(play_start_time)
+                                                    Summ_list.append('play initiated at :{}'.format(play_start_time))
                                                     print "\n play happend at {} ".format(video_playedtime)
+                                                    Summ_list.append('play happend at :{}'.format(video_playedtime))
                                                     print "\n Time taken for play operation: {} milliseconds \n".format(time_for_video_play)
+                                                    Summ_list.append('Time taken for play operation :{}ms'.format(time_for_video_play))
                                                     print "\n Threshold value for time taken for play operation : {} ms".format(cobalt_play_threshold)
                                                     if 0 < int(time_for_video_play) < (int(cobalt_play_threshold) + int(offset)):
                                                         print "\n Time taken for play operation is within the expected limit"
@@ -237,8 +244,11 @@ if expectedResult in result.upper():
                                                         print "\n Time taken for play operation is not within the expected limit"
                                                         tdkTestObj.setResultStatus("FAILURE")
                                                     print "\n pause initiated at {} ".format(pause_start_time)
+                                                    Summ_list.append('pause initiated at :{}'.format(pause_start_time))
                                                     print "\n pause happend at {} (UTC)".format(video_pausedtime)
+                                                    Summ_list.append('pause happend at :{}'.format(video_pausedtime))
                                                     print "\n Time taken for pause operation: {} milleseconds \n".format(time_for_video_pause)
+                                                    Summ_list.append('Time taken for pause operation :{}ms'.format(time_for_video_pause))
                                                     print "\n Threshold value for time taken for pause operation : {} ms".format(cobalt_pause_threshold)
                                                     if 0 < int(time_for_video_pause) < (int(cobalt_pause_threshold) + int(offset)):
                                                         print "\n Time taken for pause operation is within the expected limit \n"
@@ -298,6 +308,7 @@ if expectedResult in result.upper():
         print "Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

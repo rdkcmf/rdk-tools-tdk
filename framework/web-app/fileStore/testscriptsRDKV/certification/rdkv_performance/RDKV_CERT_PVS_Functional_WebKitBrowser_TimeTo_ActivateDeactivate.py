@@ -88,7 +88,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_WebKitBrowser_TimeTo_ActivateDeactivate')
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -163,15 +164,21 @@ if expectedResult in result.upper():
                                 tdkTestObj.setResultStatus("SUCCESS")
                                 conf_file,file_status = getConfigFileName(obj.realpath)
                                 activate_config_status,activate_threshold = getDeviceConfigKeyValue(conf_file,"ACTIVATE_TIME_THRESHOLD_VALUE")
+                                Summ_list.append('ACTIVATE_TIME_THRESHOLD_VALUE :{}ms'.format(activate_threshold))
                                 deactivate_config_status,deactivate_threshold = getDeviceConfigKeyValue(conf_file,"DEACTIVATE_TIME_THRESHOLD_VALUE")
+                                Summ_list.append('DEACTIVATE_TIME_THRESHOLD_VALUE :{}ms'.format(deactivate_threshold))
                                 offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                Summ_list.append('THRESHOLD_OFFSET :{}'.format(offset))
                                 if all(value != "" for value in (activate_threshold,deactivate_threshold,offset)):
                                     start_activate_in_millisec = getTimeInMilliSec(start_activate)
                                     activated_time_in_millisec = getTimeInMilliSec(activated_time)
                                     print "\n Activate initiated at: " +start_activate + "(UTC)"
+                                    Summ_list.append('Activate initiated at :{}'.format(start_activate))
                                     print "\n Activated at : "+activated_time+ "(UTC)"
+                                    Summ_list.append('Activated at :{}'.format(activated_time))
                                     time_taken_for_activate = activated_time_in_millisec - start_activate_in_millisec
                                     print "\n Time taken to activate {} plugin: {} (ms)".format(plugin,time_taken_for_activate)
+                                    Summ_list.append('Time taken to activate {} plugin: {} (ms)'.format(plugin,time_taken_for_activate))
                                     print "\n Threshold value for time taken to activate {} plugin: {} (ms)".format(plugin,activate_threshold)
                                     print "\n Validate the time taken for activation \n"
                                     if 0 < time_taken_for_activate < (int(activate_threshold) + int(offset)) :
@@ -183,9 +190,12 @@ if expectedResult in result.upper():
                                     start_deactivate_in_millisec = getTimeInMilliSec(start_deactivate)
                                     deactivated_time_in_millisec =  getTimeInMilliSec(deactivated_time)
                                     print "\n Deactivate initiated at: " + start_deactivate + "(UTC)"
+                                    Summ_list.append('Deactivate initiated at :{}'.format(start_deactivate))
                                     print "\n Deactivated at: " + deactivated_time + "(UTC)"
+                                    Summ_list.append('Deactivated at :{}'.format(deactivated_time))
                                     time_taken_for_deactivate = deactivated_time_in_millisec - start_deactivate_in_millisec
                                     print "\n Time taken to deactivate {} plugin: {} (ms) \n".format(plugin,time_taken_for_deactivate)
+                                    Summ_list.append(' Time taken to deactivate {} plugin: {} (ms)'.format(plugin,time_taken_for_deactivate))
                                     print "\n Threshold value for time taken to deactivate {} plugin: {} (ms)".format(plugin,deactivate_threshold)
                                     print "\n Validate the time taken for deactivation: \n"
                                     if 0 < time_taken_for_deactivate < (int(deactivate_threshold)+int(offset)) :
@@ -223,6 +233,7 @@ if expectedResult in result.upper():
         print "\n Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance")
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE")
     print "Failed to load module"

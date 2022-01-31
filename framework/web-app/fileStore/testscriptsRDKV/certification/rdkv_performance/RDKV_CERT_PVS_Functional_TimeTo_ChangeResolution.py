@@ -82,7 +82,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_ChangeResolution')
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -199,13 +200,18 @@ if expectedResult in result.upper():
                                         print "\n Successfully set current resolution to: ",resolution
                                         tdkTestObj.setResultStatus("SUCCESS")
                                         config_status,resol_change_threshold = getDeviceConfigKeyValue(conf_file,"RESOLUTION_CHANGE_THRESHOLD_VALUE")
+                                        Summ_list.append('RESOLUTION_CHANGE_THRESHOLD_VALUE :{}ms'.format(resol_change_threshold))
                                         offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                        Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                                         if all(value != "" for value in (resol_change_threshold,offset)):
                                             resol_change_start_time_in_millisec = getTimeInMilliSec(resol_change_start_time)
                                             resolution_changed_time_in_millisec = getTimeInMilliSec(resolution_changed_time)
                                             print "\n Resolution change initiated at: " ,resol_change_start_time
+                                            Summ_list.append('Resolution change initiated at :{}'.format(resol_change_start_time))
                                             print "\n Resolution changed at : ",resolution_changed_time
+                                            Summ_list.append('Resolution changed at  :{}'.format(resolution_changed_time))
                                             time_taken_for_resol_change = resolution_changed_time_in_millisec - resol_change_start_time_in_millisec
+                                            Summ_list.append('Time taken to change resolution :{}ms'.format(time_taken_for_resol_change))
                                             print "\n Time taken to change resolution: {}(ms)".format(time_taken_for_resol_change)
                                             print "\n Threshold value for time taken to change resolution plugin : {} ms".format(resol_change_threshold)
                                             print "\n Validate the time:"
@@ -269,6 +275,7 @@ if expectedResult in result.upper():
         print "Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

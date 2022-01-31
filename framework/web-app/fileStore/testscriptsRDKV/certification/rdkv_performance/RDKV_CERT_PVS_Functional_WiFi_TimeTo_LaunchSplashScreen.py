@@ -94,7 +94,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_WiFi_TimeTo_LaunchSplashScreen');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -180,14 +181,19 @@ if expectedResult in result.upper():
                                 if load_finished_line != "" and '"httpstatus":200' in load_finished_line:
                                     load_finished_time = getTimeStampFromString(load_finished_line)
                                     print "\n Device reboot initiated at :{} (UTC)\n".format(start_time)
+                                    Summ_list.append('Device reboot initiated at :{}'.format(start_time))
                                     print "UI load finished at :{} (UTC) \n ".format(load_finished_time)
+                                    Summ_list.append('UI load finished at  :{}'.format(load_finished_time))
                                     start_time_millisec = getTimeInMilliSec(start_time)
                                     loadfinished_time_millisec = getTimeInMilliSec(load_finished_time)
                                     ui_uptime = loadfinished_time_millisec - start_time_millisec
                                     print "Time taken for the UI to load after reboot : {} ms\n".format(ui_uptime)
+                                    Summ_list.append('Time taken for the UI to load after reboot :{}ms'.format(ui_uptime))
                                     conf_file,result = getConfigFileName(tdkTestObj.realpath)
                                     result1, ui_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"UI_LAUNCH_TIME_THRESHOLD_VALUE")
+                                    Summ_list.append('UI_LAUNCH_TIME_THRESHOLD_VALUE :{}'.format(ui_launch_threshold_value))
                                     result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                    Summ_list.append('THRESHOLD_OFFSET :{}'.format(offset))
                                     if all(value != "" for value in (ui_launch_threshold_value,offset)):
                                         print "\n Threshold value for time taken for the splashscreen to load after reboot : {} ms".format(ui_launch_threshold_value)
                                         if 0 < int(ui_uptime) < (int(ui_launch_threshold_value) + int(offset)) :
@@ -240,6 +246,7 @@ if expectedResult in result.upper():
     if revert_plugins_dict != {}:
         status = set_plugins_status(obj,revert_plugins_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

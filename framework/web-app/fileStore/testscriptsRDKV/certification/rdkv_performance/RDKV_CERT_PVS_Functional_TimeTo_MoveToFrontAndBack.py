@@ -82,7 +82,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_MoveToFrontAndBack');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -171,13 +172,17 @@ if expectedResult in result.upper():
                                 if  "response" in required_log and json.loads(required_log.split("=")[-1]).get("success"):
                                     print "\n Successfully done {} of {}, logs:{} \n".format(method,plugin,required_log)
                                     print "\n {} started at: {} UTC".format(method,start_time_dict[method])
+                                    Summ_list.append(' {} started at: {} UTC'.format(method,start_time_dict[method]))
                                     start_time_dict[method] = int(getTimeInMilliSec(start_time_dict[method]))
                                     event_time = getTimeStampFromString(required_log)
                                     print "\n {} happened at: {} UTC".format(method,event_time)
+                                    Summ_list.append(' {} happened at: {} UTC'.format(method,event_time))
                                     event_time_dict[method] = int(getTimeInMilliSec(event_time))
                                     time_taken = event_time_dict[method] -  start_time_dict[method]
                                     print "\n Time taken for {}: {}(ms) ".format(method,time_taken)
+                                    Summ_list.append('Time taken for {}: {}(ms) '.format(method,time_taken))
                                     print "\n Threshold value for {}: {} (ms)".format(method,validation_dict[method])
+                                    Summ_list.append(' Threshold value for {}: {} (ms)'.format(method,validation_dict[method]))
                                     if 0 < time_taken < ( validation_dict[method] + int(offset)):
                                         print "\n Time taken for {} is within the expected range".format(method)
                                         tdkTestObj.setResultStatus("SUCCESS")
@@ -217,6 +222,7 @@ if expectedResult in result.upper():
         print "\n Preconditions are not met"
         tdkTestObj.setResultStatus("FAILURE")
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

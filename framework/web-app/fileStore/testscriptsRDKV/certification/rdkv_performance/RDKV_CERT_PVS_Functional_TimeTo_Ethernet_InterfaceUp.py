@@ -72,6 +72,7 @@ from StabilityTestVariables import *
 import rebootTestUtility
 from rebootTestUtility import *
 from datetime import datetime
+from rdkv_performancelib import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
@@ -81,7 +82,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_Ethernet_InterfaceUp');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -136,14 +138,19 @@ if expectedResult in result.upper():
                         if interface_up_line != "":
                             interface_up_time = getTimeStampFromString(interface_up_line)
                             print "\nDevice reboot initiated at :{} (UTC)".format(start_time)
+                            Summ_list.append('Device reboot initiated at :{}'.format(start_time))
                             print "eth0 interface became up  at :{} (UTC)  ".format(interface_up_time)
+                            Summ_list.append('eth0 interface became up  at :{}'.format(interface_up_time))
                             start_time_millisec = getTimeInMilliSec(start_time)
                             interface_up_time_millisec = getTimeInMilliSec(interface_up_time)
                             interface_uptime = interface_up_time_millisec - start_time_millisec
                             print "Time taken for the eth0 interface to up after reboot : {} ms\n".format(interface_uptime)
+                            Summ_list.append('Time taken for the eth0 interface to up after reboot :{}ms'.format(interface_uptime))
                             conf_file,result = getConfigFileName(tdkTestObj.realpath)
                             result1, if_uptime_threshold_value = getDeviceConfigKeyValue(conf_file,"IF_UPTIME_THRESHOLD_VALUE")
+                            Summ_list.append('IF_UPTIME_THRESHOLD_VALUE" :{}ms'.format(if_uptime_threshold_value))
                             result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                            Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                             if all(value != "" for value in (if_uptime_threshold_value,offset)):
                                 print "\n Threshold value for time taken for eth0 interface to up after reboot: {} ms".format(if_uptime_threshold_value)
                                 if 0 < int(interface_uptime) < (int(if_uptime_threshold_value) + int(offset)) :
@@ -174,6 +181,7 @@ if expectedResult in result.upper():
         print "Error occurred during reboot"
         tdkTestObj.setResultStatus("FAILURE")
     obj.unloadModule("rdkv_performance")
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE")
     print "Failed to load module"

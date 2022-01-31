@@ -86,7 +86,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_StandbyToOn');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -208,14 +209,19 @@ if expectedResult in result.upper():
                         if power_on_time:
                             conf_file,file_status = getConfigFileName(obj.realpath)
                             config_status,standby_to_on_threshold = getDeviceConfigKeyValue(conf_file,"STANDBY_TO_ON_THRESHOLD_VALUE")
+                            Summ_list.append('STANDBY_TO_ON_THRESHOLD_VALUE :{}ms'.format(standby_to_on_threshold))
                             offset_status,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                            Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
                             if all(value != "" for value in (standby_to_on_threshold,offset)):
                                 start_power_on_in_millisec = getTimeInMilliSec(start_power_on)
                                 power_on_time_in_millisec = getTimeInMilliSec(power_on_time)
                                 print "\n Set power state to ON initiated at: " + start_power_on + "(UTC)"
+                                Summ_list.append('Set power state to ON initiated at :{}'.format(start_power_on))
                                 print "\n Power state became ON at : "+ power_on_time + "(UTC)"
+                                Summ_list.append('Power state became ON at :{}'.format(power_on_time))
                                 time_taken_for_poweron = power_on_time_in_millisec - start_power_on_in_millisec
                                 print "\n Time taken to Power ON from STANDBY: {}(ms)".format(time_taken_for_poweron)
+                                Summ_list.append('Time taken to Power ON from STANDBY :{}ms'.format(time_taken_for_poweron))
                                 print "\n Threshold value for time taken to Power ON from STANDBY: {}(ms)".format(standby_to_on_threshold)
                                 print "\n Validate the time: \n"
                                 if 0 < time_taken_for_poweron < (int(standby_to_on_threshold) + int(offset)) :
@@ -264,6 +270,7 @@ if expectedResult in result.upper():
         print "Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

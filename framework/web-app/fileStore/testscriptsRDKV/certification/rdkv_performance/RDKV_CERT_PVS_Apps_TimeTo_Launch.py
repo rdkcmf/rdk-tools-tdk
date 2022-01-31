@@ -73,6 +73,7 @@ import PerformanceTestVariables
 from MediaValidationUtility import *
 from StabilityTestUtility import *
 from datetime import datetime
+from rdkv_performancelib import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
@@ -84,7 +85,8 @@ port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Apps_TimeTo_Launch');
 
 webkit_console_socket = None
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -189,7 +191,12 @@ if expectedResult in result.upper():
                         print "\n Time taken to launch the application: {} milliseconds \n".format(app_launch_time)
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
                         result1, app_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"APP_LAUNCH_THRESHOLD_VALUE")
+                        Summ_list.append('APP_LAUNCH_THRESHOLD_VALUE :{}ms'.format(app_launch_threshold_value))
                         result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                        Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
+                        Summ_list.append('Application Initiated  at :{}'.format(start_time))
+                        Summ_list.append('Application launched at :{}'.format(end_time))
+                        Summ_list.append('Time taken to launch the application :{}ms'.format(app_launch_time))
                         if all (value != "" for value in (app_launch_threshold_value,offset)):
                             print "\n Threshold value for time taken to launch the application: {} ms".format(app_launch_threshold_value)
                             if 0 < int(app_launch_time) < (int(app_launch_threshold_value) + int(offset)):
@@ -233,6 +240,7 @@ if expectedResult in result.upper():
         print "\n Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "\n Failed to load module"

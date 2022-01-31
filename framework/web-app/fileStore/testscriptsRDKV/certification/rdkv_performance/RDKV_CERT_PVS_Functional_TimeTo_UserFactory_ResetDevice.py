@@ -75,6 +75,7 @@ from datetime import datetime
 from web_socket_util import *
 import PerformanceTestVariables
 import ast
+from rdkv_performancelib import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
@@ -84,7 +85,8 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_UserFactory_ResetDevice');
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -218,10 +220,14 @@ if expectedResult in result.upper():
                                                 reset_start_time_in_millisec = getTimeInMilliSec(reset_start_time)
                                                 reset_done_time_in_millisec = getTimeInMilliSec(reset_done_time)
                                                 print "\n Reset device initiated at: ", reset_start_time
+                                                Summ_list.append('Reset device initiated at :{}'.format(reset_start_time))
                                                 print "\n Reset device completed at : ", reset_done_time 
+                                                Summ_list.append('Reset device completed at :{}'.format(reset_done_time))
                                                 time_taken_for_reset = reset_done_time_in_millisec - reset_start_time_in_millisec
                                                 print "\n Time taken to reset the device: {}(ms)".format(time_taken_for_reset)
+                                                Summ_list.append('Time taken to reset the device :{}ms'.format(time_taken_for_reset))
                                                 print "\n Threshold value for time taken to reset the device: {}(ms)".format(device_reset_time_threshold)
+                                                Summ_list.append('Threshold value for time taken to reset the device :{}ms'.format(device_reset_time_threshold))
                                                 print "\n Validate the time: \n"
                                                 if 0 < time_taken_for_reset < (int(device_reset_time_threshold) + int(offset)) :
                                                     print "\n Time taken for resetting the device is within the expected range"
@@ -269,6 +275,7 @@ if expectedResult in result.upper():
         print "Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

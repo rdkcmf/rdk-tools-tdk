@@ -83,6 +83,7 @@ import tdklib;
 from StabilityTestUtility import *
 from ip_change_detection_utility import *
 from web_socket_util import *
+from rdkv_performancelib import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
@@ -96,7 +97,8 @@ obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_WiFi_TimeTo_ChannelChang
 webkit_console_socket = None
 channel_change_count = 1
 max_channel_change_count = 5
-
+#Execution summary variable 
+Summ_list=[]
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -234,9 +236,12 @@ if expectedResult in result.upper():
                         tdkTestObj.setResultStatus("SUCCESS")
                         avg_time = total_time/5
                         print "\nAverage time taken for channel change: {} ms\n".format(avg_time)
+                        Summ_list.append('Average time taken for channel change :{}ms'.format(avg_time))
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
                         result1, channelchange_time_threshold_value = getDeviceConfigKeyValue(conf_file,"CHANNEL_CHANGE_TIME_THRESHOLD_VALUE")
+                        Summ_list.append('CHANNEL_CHANGE_TIME_THRESHOLD_VALUE :{}ms'.format(channelchange_time_threshold_value))
                         result2,offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                        Summ_list.append('THRESHOLD_OFFSET :{}'.format(offset))
                         if all (value != "" for value in (channelchange_time_threshold_value,offset)):
                             print "\n Threshold value for average time taken for channel change : {} ms".format(channelchange_time_threshold_value)
                             if 0 < int(avg_time) < (int(channelchange_time_threshold_value) + int(offset)):
@@ -293,6 +298,7 @@ if expectedResult in result.upper():
     if revert_plugins_dict != {}:
         status = set_plugins_status(obj,revert_plugins_dict)
     obj.unloadModule("rdkv_performance");
+    getSummary(Summ_list)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"
