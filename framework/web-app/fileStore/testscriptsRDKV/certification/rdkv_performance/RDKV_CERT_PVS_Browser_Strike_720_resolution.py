@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>3</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RDKV_CERT_PVS_Browser_Strike</name>
+  <name>RDKV_CERT_PVS_Browser_Strike_720_resolution</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id> </primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>The objective of this test is to validate the browser score using strike tool</synopsis>
+  <synopsis>The objective of this test is to validate the browser score using strike tool with 720p resolution</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>6</execution_time>
+  <execution_time>10</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -61,7 +61,7 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_PERFORMANCE_82</test_case_id>
-    <test_objective>The objective of this test is to validate the browser score using strike tool</test_objective>
+    <test_objective>The objective of this test is to validate the browser score using strike tool with 720p resolution</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI,Accelerator</test_setup>
     <pre_requisite>wpeframework should be up and running</pre_requisite>
@@ -76,9 +76,9 @@ webinspect_port:string</input_parameters>
     <expected_output>The browser score should be greater than the threshold value</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_performance</test_stub_interface>
-    <test_script>RDKV_CERT_PVS_Browser_Strike</test_script>
+    <test_script>RDKV_CERT_PVS_Browser_Strike_720_resolution</test_script>
     <skipped>No</skipped>
-    <release_version>M94</release_version>
+    <release_version>M97</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -100,7 +100,9 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Browser_Strike')
+obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Browser_Strike_720_resolution')
+# Execution Summary Variable
+Summ_list=[]
 
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
@@ -128,7 +130,46 @@ if expectedResult in result.upper():
                 status = "FAILURE"
         else:
             status = "FAILURE"
-    if status == "SUCCESS":
+    params = '{"h":720,"w":1280}'
+    set_resolution = "FAILURE"
+    print "\n Get the current screen resolution \n"
+    tdkTestObj = obj.createTestStep('rdkservice_getValue');
+    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.getScreenResolution");
+    tdkTestObj.executeTestCase(expectedResult);
+    curr_resolution = tdkTestObj.getResultDetails();
+    curr_resolution_dict = eval(curr_resolution)
+    curr_resolution_dict.pop('success')
+    if curr_resolution == params:
+        print "\n Current resolution is same as expected resolution\n"
+        set_resolution = "SUCCESS"
+    else:
+        print "\n Setting Resolution \n"
+        tdkTestObj = obj.createTestStep('rdkservice_setValue')
+        tdkTestObj.addParameter("method","org.rdk.RDKShell.1.setScreenResolution");
+        tdkTestObj.addParameter("value",params);
+        tdkTestObj.executeTestCase(expectedResult);
+        result = tdkTestObj.getResult();
+        if expectedResult in  result:
+            tdkTestObj.setResultStatus("SUCCESS")
+            time.sleep(10)
+            print "\n Validate resolution \n"
+            tdkTestObj = obj.createTestStep('rdkservice_getValue');
+            tdkTestObj.addParameter("method","org.rdk.RDKShell.1.getScreenResolution");
+            tdkTestObj.executeTestCase(expectedResult);
+            resolution_details = tdkTestObj.getResultDetails();
+            result = tdkTestObj.getResult()
+            print(resolution_details)
+            if expectedResult in result:
+                tdkTestObj.setResultStatus("SUCCESS")
+                print "\n Resolution details",resolution_details
+                resolution_dict = eval(resolution_details)
+                resolution_dict.pop('success')
+                params=json.loads(params)
+                if resolution_dict == params:
+                    print "\n Set and Get resolutions are same \n"
+                    tdkTestObj.setResultStatus("SUCCESS")
+                    set_resolution = "SUCCESS"
+    if set_resolution == "SUCCESS":
         print "\nPre conditions for the test are set successfully"
         webkit_console_socket = createEventListener(ip,webinspect_port,[],"/devtools/page/1",False)
         time.sleep(20)
@@ -193,11 +234,14 @@ if expectedResult in result.upper():
                             result, strike_threshold_value = getDeviceConfigKeyValue(conf_file,"STRIKE_THRESHOLD_VALUE")
                             if strike_threshold_value != "" :
                                 print "\n Threshold value for performance score: ",strike_threshold_value
+                                Summ_list.append('Threshold value for performance score::{}'.format(strike_threshold_value)
                                 if int(browser_score) > int(strike_threshold_value):
                                     print "\n The browser performance score is high as expected\n"
+                                    Summ_list.append('The browser performance score is high as expected')
                                     tdkTestObj.setResultStatus("SUCCESS")
                                 else:
                                     print "\n The browser performance main score is lower than expected \n"
+                                    Summ_list.append('The browser performance main score is lower than expected')
                                     tdkTestObj.setResultStatus("FAILURE")
                             else:
                                 tdkTestObj.setResultStatus("FAILURE")
@@ -229,6 +273,20 @@ if expectedResult in result.upper():
     else:
         print "\n Pre conditions are not met"
         obj.setLoadModuleStatus("FAILURE")
+    
+    print "Revert the resolution"
+    params = '{"w":'+str(curr_resolution_dict['w'])+',"h":'+str(curr_resolution_dict['h'])+'}'
+    tdkTestObj = obj.createTestStep('rdkservice_setValue')
+    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.setScreenResolution");
+    tdkTestObj.addParameter("value",params);
+    tdkTestObj.executeTestCase(expectedResult);
+    result = tdkTestObj.getResult();
+    if expectedResult in  result:
+        tdkTestObj.setResultStatus("SUCCESS")
+    else:
+        print "Unable to revert the resolution"
+        tdkTestObj.setResultStatus("FAILURE")
+    getSummary(Summ_list)
 
     #Revert the values
     if revert=="YES":
