@@ -25,6 +25,7 @@ html5_test_subcategory_list = ["Parsing rules","Elements","Forms","Web Component
 sunspider_url = "https://webkit.org/perf/sunspider-1.0.2/sunspider-1.0.2/driver.html"
 sunspider_test_subcategory_list = ["access","bitops","3bit-bits-in-byte","bits-in-byte","bitwise-and","nsieve-bits","controlflow","recursive","crypto","math"]
 strike_tool_url = "https://strike.lightningjs.io/"
+motionmark_test_url = "https://browserbench.org/MotionMark1.2/"
 animation_benchmark_test_url = "https://themaninblue.com/experiment/AnimationBenchmark/canvas/"
 speedometer_test_url = "https://browserbench.org/Speedometer2.0/"
 #https://askubuntu.com/questions/432255/what-is-the-display-environment-variable
