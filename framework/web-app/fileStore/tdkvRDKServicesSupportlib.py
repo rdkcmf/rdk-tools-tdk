@@ -929,7 +929,52 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+  
+        elif tag == "rdkshell_check_zorder":
+            success = str(result.get("success")).lower() == "true"
+            status = checkNonEmptyResultData(result)
+            if success and status == "TRUE":
+                result = result.get("clients")
+                clients = [ str(name) for name in result if str(name).strip() ]
+                info["Excluded_Process_List"] = arg
+                clients = [ element for element in clients if element not in arg ]
+                info["clients"] = clients
+                #Minimum two clients have to be running to effectivly perform RDK Shell test cases
+                if len(clients) >= 2:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "rdkshell_validate_zorder":
+            success = str(result.get("success")).lower() == "true"
+            status = checkNonEmptyResultData(result)
+            if success and status == "TRUE":
+                result = result.get("clients")
+                clients = [ str(name) for name in result if str(name).strip() ]
+                processList = list(arg)
+                processList.pop(0)
+                clients = [ element for element in clients if element not in processList ]
+                info["clients"] = clients
+                if len(arg) and arg[0] == "validate_move_to_front":
+                    if str(clients[0]).lower() == str(expectedValues[0]).lower():
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+                elif len(arg) and arg[0] == "validate_move_to_back":
+                    index = (len(clients)-1)
+                    if str(clients[index]).lower() == str(expectedValues[0]).lower():
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+                elif len(arg) and arg[0] == "validate_move_to_behind":
+                    if str(clients[1]).lower() == str(expectedValues[0]).lower():
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # DisplayInfo Plugin Response result parser steps
         elif tag == "displayinfo_get_general_info":
@@ -2466,18 +2511,6 @@ def CheckAndGenerateConditionalExecStatus(testStepResults,methodTag,arguments):
                     result = "FALSE"
 
         # RDKShell Plugin Response result parser steps
-        elif tag == "rdkshell_check_app_launch_type1":
-            Type_one = ["Cobalt"]
-            if arg[0] in Type_one:
-                result = "TRUE"
-            else:
-                result = "FALSE"
-        elif tag == "rdkshell_check_app_launch_type2":
-            Type_two = ["WebKitBrowser"]
-            if arg[0] in Type_two:
-                result = "TRUE"
-            else:
-                result = "FALSE"
         elif tag == "rdkshell_check_application_state":
             testStepResults = testStepResults[0].values()[0]
             clients = testStepResults[0].get("clients")
@@ -2862,11 +2895,17 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag == "rdkshell_get_zorder":
             testStepResults = testStepResults[0].values()[0]
             clients = testStepResults[0].get("clients")
-            index = int(arg[0])
             if len(clients):
-                info["client"] = clients[index]
+                 index = int(arg[0])
+                 if len(arg) > 1 and arg[1] == "target":
+                     info["target"] = clients[index]
+                 elif len(arg)> 1 and arg[1] == "behind":
+                     info["behind"] = clients[index]
+                 else:
+                     info["client"] = clients[index]
             else:
                 info["client"] = ""
+                info["target"] = ""
 
         elif tag == "rdkshell_toggle_enabled_status":
             testStepResults = testStepResults[0].values()[0]

@@ -707,6 +707,11 @@
                 <param tag="w" defaultValue="0" type="int" />
                 <param tag="h" defaultValue="0" type="int" />
                 <param tag="closurepolicy" defaultValue="null" />
+                <param tag="suspend" type="bool" />
+                <param tag="visible" type="bool" />
+                <param tag="focused" type="bool" />
+                <param tag="holePunch" type="bool" />
+                <param tag="behind" defaultValue="null" />
             </params>
         </method>
 
@@ -820,6 +825,14 @@
         <method name="Hide_And_Show_All_Clients" api="hideAllClients" type="method" desc="Hides or unhides all the clients" >
             <params>
                 <param tag="hide" type="bool" />
+            </params>
+        </method>
+        <method name="Set_Memory_Monitor" api="setMemoryMonitor" type="method" desc="Enables or disables RAM memory monitoring on the device" >
+            <params>
+                <param tag="enable" type="bool" />
+                <param tag="interval" type="int" />
+                <param tag="lowRam" type="int" />
+                <param tag="criticallyLowRam" type="int" />
             </params>
         </method>
         <event name="Event_On_Launched" eventName="onLaunched" eventId="client.events.1" type="event" desc="Fired on launching the client" />
