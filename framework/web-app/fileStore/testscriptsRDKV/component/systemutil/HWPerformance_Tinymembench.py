@@ -64,6 +64,7 @@
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+from rdkv_performancelib import * ;
 
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding Box Ip and port while executing script
