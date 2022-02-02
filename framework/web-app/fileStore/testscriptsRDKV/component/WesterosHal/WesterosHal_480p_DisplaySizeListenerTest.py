@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>1</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>WesterosHal_DisplaySizeListenerTest</name>
+  <name>WesterosHal_480p_DisplaySizeListenerTest</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -69,13 +69,13 @@
     <input_parameters>resolution size to create native window</input_parameters>
     <automation_approch>1.Load westeroshal and devicesettings module.
 2.Create Native window with 1280x720 resolution size.
-3.Change resolution size to to any other supported resolution using devicesettings api.
+3.Change resolution size to to 480p using devicesettings api.
 4.Check if callback data is updated with set resolution size.
 5.Destroy Native window</automation_approch>
     <expected_output>Callback data must be updated with set resolution size after resolution change is successfull</expected_output>
     <priority>High</priority>
     <test_stub_interface>libwesteroshalstub.la</test_stub_interface>
-    <test_script>WesterosHal_DisplaySizeListenerTest</test_script>
+    <test_script>WesterosHal_480p_DisplaySizeListenerTest</test_script>
     <skipped>No</skipped>
     <release_version>M96</release_version>
     <remarks></remarks>
@@ -94,8 +94,8 @@ dsObj = tdklib.TDKScriptingLibrary("devicesettings","1.2");
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-wsObj.configureTestCase(ip,port,'WesterosHal_DisplaySizeListenerTest');
-dsObj.configureTestCase(ip,port,'WesterosHal_DisplaySizeListenerTest');
+wsObj.configureTestCase(ip,port,'WesterosHal_480p_DisplaySizeListenerTest');
+dsObj.configureTestCase(ip,port,'WesterosHal_480p_DisplaySizeListenerTest');
 
 expectedresult="SUCCESS"
 
@@ -115,9 +115,10 @@ if result == "FAILURE":
     exit()
 
 dsObj.setLoadModuleStatus(result);
-resolution = "720p"
+resolution = "480p"
 width = 1280
 height = 720
+notApplicable = False
 result,details = executeTest(wsObj, 'WesterosHal_CreateNativeWindow', {"width":width,"height":height});
 if result:
     result,details = executeTest(wsObj, 'WesterosHal_AddDisplaySizeListener');
@@ -132,13 +133,13 @@ if result:
                 exit()
             result,details = executeTest(dsObj, 'DS_Resolution');
             if result:
-                resolutions = details.split(":");
-                resolutionList = resolutions[1].split(",");
-                resolutionSet = set(resolutionList)
-                resolutionSet.remove(resolution);
-                resolution = resolutionSet.pop();
-            print "Setting Resolution to %s"%resolution
-            result,details = executeTest(dsObj, 'DS_SetResolution', {"resolution":resolution,"port_name":"HDMI0"});
+                if "480p" not in details:
+                    print "480p is not supported by the DUT \nTestcase not applicable for DUT"
+                    result = False
+                    notApplicable = True
+            if result:
+                print "Setting Resolution to %s"%resolution
+                result,details = executeTest(dsObj, 'DS_SetResolution', {"resolution":resolution,"port_name":"HDMI0"});
             if result:
                 tdkTestObj = wsObj.createTestStep('WesterosHal_GetCallBackData');
                 tdkTestObj.executeTestCase(expectedresult);
@@ -159,4 +160,7 @@ if result:
         print "DS Manager Connection FAILED";
  
 wsObj.unloadModule("westeroshal");
+if notApplicable:
+    dsObj.setAsNotApplicable();
+    dsObj.setLoadModuleStatus("FAILURE");
 dsObj.unloadModule("devicesettings");
