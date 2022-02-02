@@ -129,7 +129,7 @@ if "SUCCESS" in sysutilLoadStatus.upper():
 
     #Parsing the output of iCrypto test app
     try:
-        ResultFile = FCS_iCrypto_utility.GetTestResults(filepath,Module);
+        ResultFile = FCS_iCrypto_utility.GetTestResults(obj,filepath,Module);
         FCS_iCrypto_utility.Summary(ResultFile);
         data = open(ResultFile,'r');
         message = data.read()

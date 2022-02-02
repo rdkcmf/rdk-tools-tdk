@@ -18,6 +18,7 @@
 #########################################################################
 
 import re
+import os
 import tdklib;
 import ConfigParser
 
@@ -86,23 +87,27 @@ def Summary(fileName):
 #Lists the number of failures observed as part of the execution
 #Parses the output from the iCrypto test app and returns the total number of failures
 def getNumberOfFailures(fileName,options=""):
+    failed = 0
+    Total = False
     for line in open(fileName):
         if line !='':
             word = re.findall("TOTAL", line)
-            if options in "ModuleTest":
+            if "ModuleTest" in options:
                 word = True;
             if word:
                 try:
-                    if "FAILED" in line:
-                       failed = line.split(',')[1]
-                       failed = int(filter(lambda x: x.isdigit(), failed))
+                    if "FAILED" in line and "PASSED" in line:
+                       Total = line.split(',')[1]
+                       failed = failed + int(filter(lambda x: x.isdigit(), Total))
                        print "Number of FAILED testcases:",failed
-                       return failed
                 except:
                     print "Unexpected error in parsing number of failures"
                     return "error"
-    print "Execution is not completed, due to unknown error"
-    return "error"
+    if Total:
+        return failed
+    else:
+        print "Execution is not completed, due to unknown error"
+        return "error"
 
 #Lists the testcases performed as part of this execution
 ################# Sample Output ########################
@@ -145,6 +150,10 @@ def FailureSummary(fileName):
 
 #Deletes the logFile present in DUT
 def deleteLogFile(obj,iCrypto_log,iCryptoExecutionStatus):
+    logFile_in_TM = obj.logpath + '/resultFile'
+    if (os.path.isfile(logFile_in_TM)):
+        print "Deleting logFile in TM"
+        os.remove(logFile_in_TM);
     print "\nDelete the iCrypto Execution log file from STB"
     tdkTestObj = obj.createTestStep('ExecuteCommand');
     cmd = "rm " + iCrypto_log
@@ -198,12 +207,12 @@ def RunTest(obj,Test,logFile):
 # ======== Cipher::AES - 8 PASSED, 0 FAILED
 ###############################################################################################
 
-def GetTestResults(fileName,Test):
+def GetTestResults(obj,fileName,Test):
     check_pattern=[]
     check_pattern = Tests[Test]
     check_Pattern = [pattern1 + pattern for pattern in check_pattern];
     TestScope = False
-    ReturnFile ='resultFile'
+    ReturnFile = obj.logpath + '/resultFile'
     TestResult = open(ReturnFile, 'w')
     for checkPattern in check_Pattern:
         for line in open(fileName):
