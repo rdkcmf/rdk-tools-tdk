@@ -48,6 +48,8 @@
       <function name='rdkservice_validatePluginFunctionality' />
       <function name='rdkservice_getValueWithParams' />
       <function name='rdkservice_getBrowserScore_AnimationBenchmark' />
+      <function name='rdkservice_getBrowserScore_Speedometer' />
+      <function name='rdkservice_getBrowserScore_MotionMark' />
     </functions>
   <!-- Total parameters corresponding module  -->
     <parameters>

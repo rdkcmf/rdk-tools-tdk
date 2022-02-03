@@ -129,6 +129,14 @@
         <function>rdkservice_getBrowserScore_AnimationBenchmark</function>
         <parameters/>
       </primitiveTest>
+      <primitiveTest name="rdkservice_getBrowserScore_MotionMark" id="" version="1">
+        <function>rdkservice_getBrowserScore_MotionMark</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_getBrowserScore_Speedometer" id="" version="1">
+        <function>rdkservice_getBrowserScore_Speedometer</function>
+        <parameters/>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
