@@ -43,7 +43,7 @@
     <test_case_id>CT_BLUETOOTH_HAL_08</test_case_id>
     <test_objective>To get the address of bluetooth adapter</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Accelerator</test_setup>
+    <test_setup>Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize the BTRCore module using BTRCore_Init()</pre_requisite>
     <api_or_interface_used>1. enBTRCoreRet BTRCore_GetListOfAdapters (tBTRCoreHandle hBTRCore, stBTRCoreListAdapters* pstListAdapters);
 2. enBTRCoreRet BTRCore_GetAdapterAddr (tBTRCoreHandle hBTRCore, unsigned char aui8adapterIdx, char* apui8adapterAddr);</api_or_interface_used>

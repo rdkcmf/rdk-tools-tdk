@@ -59,7 +59,7 @@
     <test_case_id>CT_BLUETOOTH_HAL_01</test_case_id>
     <test_objective>To get the list of bluetooth adapters available in the device</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Accelerator</test_setup>
+    <test_setup>Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize the BTRCore module using BTRCore_Init()</pre_requisite>
     <api_or_interface_used>enBTRCoreRet BTRCore_GetListOfAdapters (tBTRCoreHandle hBTRCore, stBTRCoreListAdapters* pstListAdapters);</api_or_interface_used>
     <input_parameters>None</input_parameters>

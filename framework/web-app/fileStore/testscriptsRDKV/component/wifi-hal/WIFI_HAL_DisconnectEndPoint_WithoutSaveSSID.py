@@ -44,7 +44,7 @@
     <test_case_id>TC_WIFI_HAL_30</test_case_id>
     <test_objective>To connect the end point with saveSSID flag as false, disconnect the endpoint and verify that the details about the end point are not saved in the lastConnected endpoint details</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>IPClient-Wifi</test_setup>
+    <test_setup>IPClient-Wifi,Video_Accelerator</test_setup>
     <pre_requisite>"1.TDK Agent should be in running state or invoke it through StartTdk.sh script"</pre_requisite>
     <api_or_interface_used>wifi_connectEndpoint
 wifi_disconnectEndpoint

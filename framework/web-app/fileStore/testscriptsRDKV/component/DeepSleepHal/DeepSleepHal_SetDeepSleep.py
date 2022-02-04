@@ -43,7 +43,7 @@
     <test_case_id>TC_DeepSleepHal_01</test_case_id>
     <test_objective>Test script to invoke deep sleep HAL API PLAT_DS_SetDeepSleep  to set deep sleep for 60 sec.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XI3</test_setup>
+    <test_setup>XI3,Video_Accelerator</test_setup>
     <pre_requisite>1.TDK agent should be up and running
 2.Initialize DeepSleep management module</pre_requisite>
     <api_or_interface_used>PLAT_DS_SetDeepSleep(uint32_t deep_sleep_timeout)</api_or_interface_used>

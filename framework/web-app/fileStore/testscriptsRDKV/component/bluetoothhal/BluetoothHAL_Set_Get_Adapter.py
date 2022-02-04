@@ -59,7 +59,7 @@
     <test_case_id>CT_BLUETOOTH_HAL_06</test_case_id>
     <test_objective>To set the current bluetooth adapter to use in DUT, and get the current adapter path</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Accelerator</test_setup>
+    <test_setup>Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize the BTRCore module using BTRCore_Init()</pre_requisite>
     <api_or_interface_used>1. enBTRCoreRet BTRCore_SetAdapter (tBTRCoreHandle hBTRCore, int adapter_number);
 2. enBTRCoreRet BTRCore_GetAdapter (tBTRCoreHandle hBTRCore, stBTRCoreAdapter* apstBTRCoreAdapter);</api_or_interface_used>

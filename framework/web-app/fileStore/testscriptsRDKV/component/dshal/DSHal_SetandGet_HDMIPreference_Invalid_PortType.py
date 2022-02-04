@@ -60,7 +60,7 @@
     <test_case_id>CT_DS_HAL_65</test_case_id>
     <test_objective>To check if HDMI preference is set for invalid PortType</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XG1V3,XI3</test_setup>
+    <test_setup>XG1V3,XI3,Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr
@@ -92,6 +92,7 @@ Checkpoint 2 Verify that the HDCP protocol version is not set</expected_output>
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
 from dshalUtility import *;
+import deviceCapabilities;
 
 #Test component to be tested
 dshalObj = tdklib.TDKScriptingLibrary("dshal","1");
@@ -106,9 +107,10 @@ dshalObj.configureTestCase(ip,port,'DSHal_SetandGet_HDMIPreference_Invalid_PortT
 dshalloadModuleStatus = dshalObj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %dshalloadModuleStatus;
 
-dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
+capable = deviceCapabilities.getconfig(dshalObj,"videoPort","RF");
 
-if "SUCCESS" in dshalloadModuleStatus.upper():
+if "SUCCESS" in dshalloadModuleStatus.upper() and capable:
+    dshalObj.setLoadModuleStatus(dshalloadModuleStatus);
     expectedResult="SUCCESS";
     #Prmitive test case which associated to this Script
     tdkTestObj = dshalObj.createTestStep('DSHal_GetVideoPort');
@@ -177,6 +179,11 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
         tdkTestObj.setResultStatus("FAILURE");
         print "VideoPort handle not retrieved";
 
+    dshalObj.unloadModule("dshal");
+
+elif not capable and "SUCCESS" in dshalloadModuleStatus.upper():
+    print "Exiting from script";
+    dshalObj.setLoadModuleStatus("FAILURE");
     dshalObj.unloadModule("dshal");
 
 else:

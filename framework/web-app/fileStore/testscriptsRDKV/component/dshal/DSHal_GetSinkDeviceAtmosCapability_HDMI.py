@@ -60,7 +60,7 @@
     <test_case_id>CT_DS_HAL_119</test_case_id>
     <test_objective>To get the SinkDeviceAtmosCapability of the audio port HDMI</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XI6</test_setup>
+    <test_setup>XI6,Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr

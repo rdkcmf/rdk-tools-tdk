@@ -63,7 +63,7 @@
     <test_case_id>WESTEROS_HAL_02</test_case_id>
     <test_objective>Add displaysize listener and change resolution size to cross verify callback</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XG, Xi, Video_Accelrator, RPI</test_setup>
+    <test_setup>XG, Xi, Video_Accelerator, RPI</test_setup>
     <pre_requisite>Display Device must be connected with DUT</pre_requisite>
     <api_or_interface_used>WstGLAddDisplaySizeListener</api_or_interface_used>
     <input_parameters>resolution size to create native window</input_parameters>

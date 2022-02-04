@@ -59,7 +59,7 @@
     <test_case_id>CT_BLUETOOTH_HAL_05</test_case_id>
     <test_objective>To get the bluetooth adapters in the DUT</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Accelerator</test_setup>
+    <test_setup>Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize the BTRCore module using BTRCore_Init()</pre_requisite>
     <api_or_interface_used>enBTRCoreRet BTRCore_GetAdapters (tBTRCoreHandle hBTRCore, stBTRCoreGetAdapters* pstGetAdapters);
 </api_or_interface_used>

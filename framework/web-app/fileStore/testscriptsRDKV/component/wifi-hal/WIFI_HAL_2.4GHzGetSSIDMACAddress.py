@@ -44,7 +44,7 @@
     <test_case_id>TC_WIFI_HAL_24</test_case_id>
     <test_objective>To get the SSID Mac Address and verify using BSSID.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>IPClient-Wifi</test_setup>
+    <test_setup>IPClient-Wifi,Video_Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script.</pre_requisite>
     <api_or_interface_used>wifi_getSSIDMACAddress()
 wifi_getBaseBSSID()

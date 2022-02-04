@@ -62,7 +62,7 @@
     <test_case_id>TC_PowerMgrHal_03</test_case_id>
     <test_objective>Test script to get the temperature of the core by invoking PowerMgr  HAL API PLAT_API_GetTemperature</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XI3,XI6</test_setup>
+    <test_setup>XI3,XI6,Video_Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be up and running
 2.Initialize CPE Power management module</pre_requisite>
     <api_or_interface_used>int PLAT_INIT(void)

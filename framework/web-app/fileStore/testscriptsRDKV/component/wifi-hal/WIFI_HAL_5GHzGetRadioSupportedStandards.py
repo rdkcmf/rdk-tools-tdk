@@ -44,7 +44,7 @@
     <test_case_id>TC_WIFI_HAL_6</test_case_id>
     <test_objective>Invoke wifi_getRadioSupportedStandards() api for 5GHz and check whether it returns the radio supported standards list as ['n','ac'].</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>IPClient-Wifi</test_setup>
+    <test_setup>IPClient-Wifi,Video_Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script</pre_requisite>
     <api_or_interface_used>wifi_getRadioSupportedStandards()
 </api_or_interface_used>

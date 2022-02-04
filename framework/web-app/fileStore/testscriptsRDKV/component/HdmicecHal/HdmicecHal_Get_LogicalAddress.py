@@ -62,7 +62,7 @@
     <test_case_id>TC_HdmicecHal_01</test_case_id>
     <test_objective>To get the Logical Address obtained by the driver.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XG,XI3,Xi6</test_setup>
+    <test_setup>XG,XI3,Xi6,Video_Accelerator</test_setup>
     <pre_requisite>1. TDK Agent should be up and running
 2.  HdmiCecOpen should open a CEC driver instance successfully and iarmbus event should be obtained from device ready call back.</pre_requisite>
     <api_or_interface_used>int HdmiCecOpen(int *handle)

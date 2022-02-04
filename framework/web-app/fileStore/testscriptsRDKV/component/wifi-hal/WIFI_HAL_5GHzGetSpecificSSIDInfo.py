@@ -60,7 +60,7 @@
     <test_case_id>TC_WIFI_HAL_37</test_case_id>
     <test_objective>To invoke wifi_getSpecificSSIDInfo()  with frequency band 2 [ 5GHz ] to get the details of the Neighboring AP  whose SSID matches with the provided SSID</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>IPClient-Wifi</test_setup>
+    <test_setup>IPClient-Wifi,Video_Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script.</pre_requisite>
     <api_or_interface_used>wifi_getNeighboringWiFiDiagnosticResult()
 wifi_getRadioSupportedFrequencyBands()

@@ -60,7 +60,7 @@
     <test_case_id>CT_DS_HAL_174</test_case_id>
     <test_objective>To set the volume leveller in invalid level and check whether levels are set properly.</test_objective>
     <test_type>Negative</test_type>
-    <test_setup>Xi</test_setup>
+    <test_setup>Xi,Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr

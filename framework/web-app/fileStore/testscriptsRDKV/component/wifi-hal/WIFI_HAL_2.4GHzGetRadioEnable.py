@@ -44,7 +44,7 @@
     <test_case_id>TC_WIFI_HAL_26</test_case_id>
     <test_objective>To invoke wifi_getRadioEnable() api and get the Radio Enable value for 2.4GHz.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>IPClient-Wifi</test_setup>
+    <test_setup>IPClient-Wifi,Video_Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script.</pre_requisite>
     <api_or_interface_used>wifi_getRadioEnable()
 wifi_getRadioStatus()</api_or_interface_used>

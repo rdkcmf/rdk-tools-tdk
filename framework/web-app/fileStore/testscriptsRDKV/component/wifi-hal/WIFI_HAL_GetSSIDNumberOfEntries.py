@@ -44,7 +44,7 @@
     <test_case_id>TC_WIFI_HAL_23</test_case_id>
     <test_objective>To get the radio number of entries and check whether the value is greater than 0.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>IPClient-Wifi</test_setup>
+    <test_setup>IPClient-Wifi,Video_Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script</pre_requisite>
     <api_or_interface_used>wifi_getRadioNumberOfEntries()</api_or_interface_used>
     <input_parameters>methodName : getRadioNumberOfEntries</input_parameters>

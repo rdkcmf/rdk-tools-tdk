@@ -67,7 +67,7 @@
     <test_case_id>WESTEROS_HAL_03</test_case_id>
     <test_objective>Get Display Safe Area of the native window created</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XG, Xi, Video_Accelrator, RPI</test_setup>
+    <test_setup>XG, Xi, Video_Accelerator, RPI</test_setup>
     <pre_requisite></pre_requisite>
     <api_or_interface_used>WstGLGetDisplaySafeArea</api_or_interface_used>
     <input_parameters>resolution size to create native window</input_parameters>

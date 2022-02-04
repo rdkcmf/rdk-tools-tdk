@@ -59,7 +59,7 @@
     <test_case_id>CT_BLUETOOTH_HAL_17</test_case_id>
     <test_objective>To check that discoverable staus ON is not persisting after reboot</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Accelerator</test_setup>
+    <test_setup>Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize the BTRCore module using BTRCore_Init()</pre_requisite>
     <api_or_interface_used>1. enBTRCoreRet BTRCore_GetAdapter (tBTRCoreHandle hBTRCore, stBTRCoreAdapter* apstBTRCoreAdapter);
 2. enBTRCoreRet BTRCore_SetAdapterDiscoverable (tBTRCoreHandle hBTRCore, const char* pAdapterPath, unsigned char discoverable);

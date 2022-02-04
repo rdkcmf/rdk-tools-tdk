@@ -59,7 +59,7 @@
     <test_case_id>CT_MFR_HAL_0333</test_case_id>
     <test_objective>To retrieve Model Name from DUT</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Accelerator</test_setup>
+    <test_setup>Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize the MFR module using mfr_init()</pre_requisite>
     <api_or_interface_used>mfrError_t mfrGetSerializedData( mfrSerializedType_t type,  mfrSerializedData_t *data );</api_or_interface_used>
     <input_parameters>mfrSerializedType_t type = 2 for mfrSERIALIZED_TYPE_MODELNAME</input_parameters>

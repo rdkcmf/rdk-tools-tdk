@@ -62,7 +62,7 @@
     <test_case_id>TC_HdmicecHal_03</test_case_id>
     <test_objective>Test Script to get the physical address obtained by the driver for a setup without HDMI connection</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XG,XI3,XI6</test_setup>
+    <test_setup>XG,XI3,XI6,Video_Accelerator</test_setup>
     <pre_requisite>1. TDK Agent should be up and running
 2. Required a setup without TV connection
 3.  HdmiCecOpen should open a CEC driver instance successfully and iarmbus event should be obtained from device ready call back.

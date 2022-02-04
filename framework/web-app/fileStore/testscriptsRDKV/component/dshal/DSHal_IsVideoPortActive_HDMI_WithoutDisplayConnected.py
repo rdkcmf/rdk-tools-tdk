@@ -62,7 +62,7 @@
     <test_case_id>CT_DS_HAL_32</test_case_id>
     <test_objective>To check the video port active status without display connected to HDMI port</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XG1V3,XI3</test_setup>
+    <test_setup>XG1V3,XI3,Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr

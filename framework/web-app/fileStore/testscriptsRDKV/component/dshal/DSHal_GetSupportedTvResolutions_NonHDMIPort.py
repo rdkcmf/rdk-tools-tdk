@@ -60,7 +60,7 @@
     <test_case_id>CT_DS_HAL_100</test_case_id>
     <test_objective>To check if supported tv resolutions is retrieved for non HDMI port</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XG1V3</test_setup>
+    <test_setup>XG1V3,Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr

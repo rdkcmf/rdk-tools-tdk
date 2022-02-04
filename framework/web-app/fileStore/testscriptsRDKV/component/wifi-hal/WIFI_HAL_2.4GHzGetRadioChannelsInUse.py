@@ -44,7 +44,7 @@
     <test_case_id>TC_WIFI_HAL_1</test_case_id>
     <test_objective>Test if the list returned by wifi_getRadioChannelsInUse() api for 2.4GHz is a subset of the list returned by wifi_getRadioPossibleChannels() for 2.4GHz.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>IPClient-Wifi</test_setup>
+    <test_setup>IPClient-Wifi,Video_Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script</pre_requisite>
     <api_or_interface_used>wifi_getRadioSupportedFrequencyBands()
 wifi_getRadioPossibleChannels()

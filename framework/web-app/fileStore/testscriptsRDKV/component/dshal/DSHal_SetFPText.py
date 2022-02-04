@@ -44,7 +44,7 @@
     <test_case_id>CT_DS_HAL_63</test_case_id>
     <test_objective>Test script sets the 7-segment display LEDs to show the given text</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XG1V3,XI3</test_setup>
+    <test_setup>XG1V3,XI3,Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr

@@ -59,7 +59,7 @@
     <test_case_id>CT_BLUETOOTH_HAL_03</test_case_id>
     <test_objective>To register/unregister a bluetooth agent with capabilities 0 ("NoInputNoOutput") which is the default agent capabilities.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Accelerator</test_setup>
+    <test_setup>Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize the BTRCore module using BTRCore_Init()</pre_requisite>
     <api_or_interface_used>1. enBTRCoreRet BTRCore_RegisterAgent (tBTRCoreHandle hBTRCore, int iBTRCapMode);
 2. enBTRCoreRet BTRCore_UnregisterAgent (tBTRCoreHandle hBTRCore);</api_or_interface_used>

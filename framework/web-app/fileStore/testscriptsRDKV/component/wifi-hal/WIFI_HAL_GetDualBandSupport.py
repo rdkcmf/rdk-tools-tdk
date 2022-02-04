@@ -44,7 +44,7 @@
     <test_case_id>TC_WIFI_HAL_34</test_case_id>
     <test_objective>To invoke wif_getDualBandSupport() api and check  whether the device supports dual band or not</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>IPClient-Wifi</test_setup>
+    <test_setup>IPClient-Wifi,Video_Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be in running state or invoke it through StartTdk.sh script.</pre_requisite>
     <api_or_interface_used>wif_getDualBandSupport()
 wifi_getRadioSupportedFrequencyBands()</api_or_interface_used>

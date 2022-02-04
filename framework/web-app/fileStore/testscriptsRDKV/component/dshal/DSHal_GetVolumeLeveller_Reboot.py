@@ -60,7 +60,7 @@
     <test_case_id>CT_DS_HAL_163</test_case_id>
     <test_objective>To get the volume leveller mode after reboot and check whether feature is disabled.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Xi</test_setup>
+    <test_setup>Xi,Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr

@@ -62,7 +62,7 @@
     <test_case_id>TC_PowerMgrHal_04</test_case_id>
     <test_objective>Test script to invoke PLAT_API_GetTempThresholds to get high and critical temperatures thresholds at which mfrTEMPERATURE_HIGH and mfrTEMPERATURE_CRITICAL are reported.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XI3,XI6</test_setup>
+    <test_setup>XI3,XI6,Video_Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be up and running
 2.Initialize CPE Power management module
 </pre_requisite>

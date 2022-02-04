@@ -43,7 +43,7 @@
     <test_case_id>CT_DS_HAL_69</test_case_id>
     <test_objective>Test script to set the invalid LEDs indicator to blink for a specified number of times at the specified blink interval.</test_objective>
     <test_type>Negative</test_type>
-    <test_setup>XG1V3,XI3</test_setup>
+    <test_setup>XG1V3,XI3,Video_Accelerator</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr
