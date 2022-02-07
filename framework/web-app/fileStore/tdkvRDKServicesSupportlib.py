@@ -2080,14 +2080,17 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             info["currentVideoMode"] = result.get("currentVideoMode")
             currentVideoMode =  result.get("currentVideoMode")
             status = checkNonEmptyResultData(currentVideoMode)
-            VideoMode = re.split('(p|i)',currentVideoMode)
             if status == "TRUE":
-                Resolution = VideoMode[0]
-                Framerate = VideoMode[2]
-                if Resolution == "unknown" and  len(Framerate) == 0 or Resolution in ["480", "576", "720", "1080", "3840x2160", "4096x2160"] and Framerate in ["24", "25", "30", "60", "23.98", "29.97", "50", "59.94"]:
+                if str(currentVideoMode).lower() == "unknown":
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
-                    info["Test_Step_Status"] = "FAILURE"
+                    VideoMode = re.split('(p|i)',currentVideoMode)
+                    Resolution = VideoMode[0]
+                    Framerate = VideoMode[2]
+                    if Resolution == "unknown" and  len(Framerate) == 0 or Resolution in ["480", "576", "720", "1080", "3840x2160", "4096x2160"] and Framerate in ["24", "25", "30", "60", "23.98", "29.97", "50", "59.94"]:
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
