@@ -173,7 +173,7 @@ if expectedResult in result.upper():
                             browser_score = browser_score_dict["main_score"]
                             conf_file,result = getConfigFileName(tdkTestObj.realpath)
                             result1, motionmark_threshold_value = getDeviceConfigKeyValue(conf_file,"MOTIONMARK_THRESHOLD_VALUE")
-                            if speedometer_threshold_value != "":
+                            if motionmark_threshold_value != "":
                                 print "\n Browser score from test: ",browser_score
                                 Summ_list.append('Browser score from test:: {} '.format(browser_score))
                                 print "\n Threshold value for browser score:",motionmark_threshold_value

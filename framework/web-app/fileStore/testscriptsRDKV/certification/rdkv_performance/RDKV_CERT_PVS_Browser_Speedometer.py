@@ -72,7 +72,7 @@
 2. Load the Speedometer Browser test URL
 3. Get the final score and validate it
 4. Revert all values</automation_approch>
-    <expected_output><The browser score from Speedometer should be in the expected range/expected_output>
+    <expected_output>The browser score from Speedometer should be in the expected range</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_performance</test_stub_interface>
     <test_script>RDKV_CERT_PVS_Browser_Speedometer</test_script>
