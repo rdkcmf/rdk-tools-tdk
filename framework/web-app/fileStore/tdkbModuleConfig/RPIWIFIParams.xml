@@ -1972,7 +1972,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>None</defaultValue>
+               <defaultValue>WPA2-Personal</defaultValue>
                <!-- the range of values acceptable -->
                <expectedValues>None,WEP-64,WEP-128,WPA-Personal,WPA2-Personal,WPA-WPA2-Personal,WPA-Enterprise,WPA2-Enterprise,WPA-WPA2-Enterprise,WPA3-Personal,WPA3-Enterprise</expectedValues>
         </parameter>
