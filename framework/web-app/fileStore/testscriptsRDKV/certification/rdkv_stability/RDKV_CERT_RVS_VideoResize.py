@@ -162,7 +162,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                         result_dict = {}
                         for key in keys_list:
                             print "\n Pressing key:{}".format(key)
-                            params = '{"keys":[ {"keyCode": '+keypress_dict[key]+',"modifiers": [],"delay":1.0}]}'
+                            params = '{"keys":[ {"keyCode": '+keypress_dict[key]+',"modifiers": [],"delay":1.0,"callsign":"WebKitBrowser","client":"WebKitBrowser"}]}'
                             tdkTestObj = obj.createTestStep('rdkservice_setValue')
                             tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
                             tdkTestObj.addParameter("value",params)
