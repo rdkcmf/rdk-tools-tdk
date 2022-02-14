@@ -75,6 +75,16 @@ lightning_objects_animation_test_app_url = lightning_apps_loc + "tdkobjectanimat
 #HTML player application url
 html_video_test_app_url = lightning_apps_loc + "tdkhtmlplayer.html"
 
+# Test Streams Base URL
+# This is the location under webapps directory in TDK Test Manager Machine where the test streams zip is extracted
+# If zip is extracted in some other server machine (not in TDK Test Manager Machine), then use the corresponding
+# server URL with the directory path of the test streams folder TDK_Clear_Test_Streams_Sunrise
+# (or)
+# If zip is copied to /opt/apache-tomcat-7.0.96/webapps/ folder in TDK Test Manager Machine and extracted,then
+# use the below test streams base URL after updating TM IP
+#test_streams_base_path = "http://<TM_IP>/TDK_Clear_Test_Streams_Sunrise/"
+test_streams_base_path = ""
+
 
 #************************************************************************
 #         DIFFERENT AV CODEC HLS/DASH URLs FOR CODEC TESTING
@@ -82,96 +92,99 @@ html_video_test_app_url = lightning_apps_loc + "tdkhtmlplayer.html"
 
 # Short duration src streams. Streams should be of maximum 15 seconds
 #HLS Video URL
-video_src_url_short_duration_hls = ""
+video_src_url_short_duration_hls  = test_streams_base_path + "HLS_H264_AAC_15Sec/master.m3u8"
 #DASH Video URL
-video_src_url_short_duration_dash = ""
+video_src_url_short_duration_dash = test_streams_base_path + "DASH_H264_AAC_15Sec/master.mpd"
 
 
 # Long duration src streams. Streams should be of minimum 5-10 minutes
 #HLS Video URL
-video_src_url_hls = ""
-video_src_url_4k_hls = ""
+video_src_url_hls    = test_streams_base_path + "HLS_H264_AAC/master.m3u8"
+video_src_url_4k_hls = test_streams_base_path + "HLS_HEVC_AAC/master.m3u8"
 video_src_url_live_hls = ""
 
 #DASH Video URL
-video_src_url_dash = ""
-video_src_url_4k_dash = ""
+video_src_url_dash    = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4.mpd"
+video_src_url_4k_dash = test_streams_base_path + "DASH_HEVC_AAC_4K_Only/atfms_291_dash_tdk_hevc_aac_fmp4_4konly.mpd"
 video_src_url_live_dash = ""
 
 #MP4 Video URL
-video_src_url_mp4 = ""
-video_src_url_dash_mp4 = ""
+video_src_url_mp4      = test_streams_base_path + "TDK_Asset_Sunrise_MP4.mp4"
+video_src_url_dash_mp4 = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4.mpd"
 
 #H.264 Codec Video URL
-video_src_url_dash_h264 = ""
-video_src_url_hls_h264  = ""
+video_src_url_dash_h264 = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4.mpd"
+video_src_url_hls_h264  = test_streams_base_path + "HLS_H264_AAC/master.m3u8"
 
 #H.264 codec video URL with iframe track. Used by UVE AAMP trickplay tests
 video_src_url_dash_h264_iframe = ""
 video_src_url_hls_h264_iframe  = ""
 
 #HEVC Codec Video URL
-video_src_url_hevc = ""
+video_src_url_hevc = test_streams_base_path + "DASH_HEVC_AAC/atfms_291_dash_tdk_hevc_aac_fmp4.mpd"
 
 #H.263 Codec Video URL
 video_src_url_h263 = ""
 
 #AAC Codec Video URL
-video_src_url_aac = ""
+video_src_url_aac = test_streams_base_path + "HLS_H264_AAC/master.m3u8"
 
 #VP9 Codec Video URL
-video_src_url_vp9 = ""
+# By default VP9_OPUS stream is used, if we need to test with VP9_OGG stream
+# then comment VP9_OPUS stream and uncomment VP9_OGG stream urls below
+video_src_url_vp9 = test_streams_base_path + "DASH_VP9_OPUS_WebM/master.mpd"
+#video_src_url_vp9 = test_streams_base_path + "DASH_VP9_OGG_WebM/master.mpd"
 
 #VP8 Codec Video URL
-video_src_url_vp8 = ""
+video_src_url_vp8 = test_streams_base_path + "TDK_Asset_Sunrise_VP8_Opus.webm"
 
 #Opus Codec Video URL
-video_src_url_opus = ""
+video_src_url_opus = test_streams_base_path + "DASH_VP9_OPUS_WebM/master.mpd"
 
 #Audio-Only URL. Stream should be of minimum 2-3 minutes
-video_src_url_audio = ""
+video_src_url_audio = test_streams_base_path  + "TDK_Asset_Sunrise_AAC.aac"
 
 #MPEG-TS Video URL
-video_src_url_mpegts = ""
+video_src_url_mpegts = test_streams_base_path + "HLS_H264_AAC/master.m3u8"
 
 #MPEG 1/2 Video URL
-video_src_url_mpeg = ""
+video_src_url_mpeg = test_streams_base_path + "TDK_Asset_Sunrise_MPEGAV.mpeg"
 
 #AV1 Codec Video URL
-video_src_url_av1 = ""
+video_src_url_av1 = test_streams_base_path + "TDK_Asset_Sunrise_AV1_Opus.webm"
 
 #AC3 Codec Video URL
-video_src_url_ac3 = ""
+video_src_url_ac3 = test_streams_base_path + "DASH_H264_AC3/atfms_291_dash_tdk_avc_ac3_fmp4.mpd"
 
 #EC3 Codec Video URL
-video_src_url_ec3 = ""
+video_src_url_ec3 = test_streams_base_path + "DASH_H264_EC3/atfms_291_dash_tdk_avc_eac3_fmp4.mpd"
 
 #OGG Video URL
-video_src_url_ogg = ""
+video_src_url_ogg = test_streams_base_path + "DASH_VP9_OGG_WebM/master.mpd"
 
 #Dolby Video URL
-video_src_url_dolby = ""
+video_src_url_dolby = test_streams_base_path + "DASH_H264_EC3/atfms_291_dash_tdk_avc_eac3_fmp4.mpd"
 
 #Type of the different codecs video stream. If the url is dash(.mpd), then type is dash. If its a
 #hls stream(.m3u8),then type is hls. If the extension is .mp4,.ogg etc mention as mp4,ogg etc.
 h263_url_type = ""
-aac_url_type  = ""
-vp9_url_type = ""
-vp8_url_type = ""
-opus_url_type = ""
-audio_url_type = ""
-mpegts_url_type = ""
-mpeg_url_type = ""
-av1_url_type  = ""
-ac3_url_type  = ""
-ec3_url_type  = ""
-hevc_url_type = ""
-ogg_url_type  = ""
-dolby_url_type = ""
+aac_url_type  = "hls"
+vp9_url_type  = "dash"
+vp8_url_type  = "webm"
+opus_url_type = "dash"
+audio_url_type  = "aac"
+mpegts_url_type = "hls"
+mpeg_url_type = "mpeg"
+av1_url_type  = "webm"
+ac3_url_type  = "dash"
+ec3_url_type  = "dash"
+hevc_url_type = "dash"
+ogg_url_type  = "dash"
+dolby_url_type = "dash"
 
 # direct ogg & webm container streams without ABR (not hls/dash)
-video_src_url_direct_ogg  = ""
-video_src_url_direct_webm = ""
+video_src_url_direct_ogg  = test_streams_base_path + "TDK_Asset_Sunrise_OGG.webm"
+video_src_url_direct_webm = test_streams_base_path + "TDK_Asset_Sunrise_VP9_Opus.webm"
 
 # Different MPD Variant streams
 video_src_url_dash_segement_base = ""
