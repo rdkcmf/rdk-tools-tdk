@@ -91,7 +91,7 @@ obj.setLoadModuleStatus(result);
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     event_listener = None
-    browser_test_url = PerformanceTestVariables.browser_test_url
+    browser_test_url = obj.url+'/fileStore/lightning-apps/KeyStressTest.html' 
     thunder_port = PerformanceTestVariables.thunder_port
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.

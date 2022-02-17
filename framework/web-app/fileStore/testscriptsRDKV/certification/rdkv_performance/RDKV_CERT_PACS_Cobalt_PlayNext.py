@@ -108,7 +108,7 @@ if expectedResult in result.upper():
         print "\nPre conditions for the test are set successfully"
         time.sleep(30)
         print "\n Navigate to next video"
-        params = '{"keys":[ {"keyCode": 39,"modifiers": [],"delay":1.0}]}'
+        params = '{"keys":[ {"keyCode": 40,"modifiers": [],"delay":1.0},{"keyCode": 39,"modifiers": [],"delay":1.0}]}'
         tdkTestObj = obj.createTestStep('rdkservice_setValue')
         tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
         tdkTestObj.addParameter("value",params)
