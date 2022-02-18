@@ -98,6 +98,52 @@ def readDeviceConfigKeys(keys):
     return status,value
 
 
+#-----------------------------------------------------------------------------------------------
+# getCITestCases
+#-----------------------------------------------------------------------------------------------
+# Syntax      : getCITestCases(plugin)
+# Description : Method to get the list of plugin test cases configured for CI execution
+# Parameter   : plugin - Name of the plugin
+# Return Value: Overall key read status (SUCCESS/FAILURE) & Key Values
+#-----------------------------------------------------------------------------------------------
+def getCITestCases(plugin):
+    pluginTestCases = "all"
+    status = "SUCCESS"
+    configPath = basePathLoc + "/"   + "fileStore/tdkvRDKServiceConfig"
+    deviceNameCIConfigFile = configPath + "/" + deviceName + "_CI_Exec.config"
+    deviceTypeCIConfigFile = configPath + "/" + deviceType + "_CI_Exec.config"
+    # Check whether device / platform CI config files required for
+    # executing the test are present
+    deviceCIConfigFile = None
+    if os.path.exists(deviceNameCIConfigFile) == True:
+        deviceCIConfigFile = deviceNameCIConfigFile
+    elif os.path.exists(deviceTypeCIConfigFile) == True:
+        deviceCIConfigFile = deviceTypeCIConfigFile
+
+    if deviceCIConfigFile != None:
+        print "[INFO]: Using Device CI config file: %s" %(deviceCIConfigFile)
+        # Parse the device CI configuration file and read the
+        # data. But if the data is empty, error is thrown
+        key = plugin + "Plugin_TestCases"
+        try:
+            config = ConfigParser.ConfigParser()
+            config.read(deviceCIConfigFile)
+            if config.has_option(deviceConfig,key):
+                pluginTestCases = str(config.get(deviceConfig,key))
+                if pluginTestCases.strip() == "":
+                    status = "FAILURE"
+                    print "\n[ERROR]: Test Cases are not configured properly in CI config file"
+            else:
+                print "[INFP]: No Plugin key in CI config file. Executing all plugin tests"
+
+        except Exception as e:
+            status = "FAILURE"
+            print "\nException Occurred: [%s] %s" %(inspect.stack()[0][3],e)
+    else:
+        print "[INFO]: No CI Exec config file. Executing all plugin tests"
+
+    return status,pluginTestCases
+
 
 #-----------------------------------------------------------------------------------------------
 # executePluginTests
@@ -212,6 +258,17 @@ def executePluginTests(libobj, deviceIPAddress, devicePort, testDeviceName, test
             status = "SUCCESS"
             print "[INFO]: Device Port No used for testing : ",portNo
             print "[INFO]: Method for Sending JSON request : ",execMethod
+            # Get the execType details and testCaseID if exec is CI
+            status1,execType = getDeviceConfigKeyValue("EXEC_TYPE")
+            if status1 == "SUCCESS" and execType in ["REGULAR","CI"]:
+                if execType == "CI":
+                    print "\n======================================"
+                    print "Execution Type: %s" %(execType)
+                    print "=======================================\n"
+                    status,testCaseID = getCITestCases(pluginName)
+            else:
+                status = "FAILURE"
+                print "[ERROR]: No proper test EXEC_TYPE input"
         else:
             status = "FAILURE"
             print "[ERROR]: No proper test EXEC_METHOD input"
@@ -225,7 +282,7 @@ def executePluginTests(libobj, deviceIPAddress, devicePort, testDeviceName, test
             status = "FAILURE"
             print "[ERROR]: No proper MAX_RESPONSE_TIME input for performance measurement"
 
-
+    sys.stdout.flush()
     # Start the test execution and get the plugin test status
     if status == "SUCCESS":
         pluginTestsStatus = executeTestCases(testCaseID)
@@ -341,7 +398,7 @@ def executeTestCases(testCaseID="all"):
     for testCase in testPlugin.findall("testCase"):
         testCaseInfo = getTestCaseInfo(testCase).copy()
 
-        if testCaseID != "all" and testCaseID != testCaseInfo.get("testCaseId"):
+        if testCaseID != "all" and testCaseInfo.get("testCaseId") not in str(testCaseID).split(","):
             continue;
 
         print "\n\n"
@@ -571,7 +628,7 @@ def executeTestCases(testCaseID="all"):
             pluginTestsSummary.append({"testCaseName":testCaseInfo.get("testCaseName"), "testCaseId":testCaseInfo.get("testCaseId"), "status":"SUCCESS"})
 
 
-        if testCaseID != "all" and testCaseID == testCaseInfo.get("testCaseId"):
+        if testCaseID != "all" and len(str(testCaseID).split(",")) == len(pluginTestsSummary):
             break;
 
 
@@ -580,7 +637,7 @@ def executeTestCases(testCaseID="all"):
     combinedTestStatus = [ test.get("status") for test in pluginTestsSummary ]
     if combinedTestStatus == [] and testCaseID != "all":
         combinedTestStatus.append("FAILURE")
-        print "\nException Occurred: Provided Test Case ID %s not found" %(testCaseID)
+        print "\nException Occurred: Provided Test Case ID(s) %s not found" %(testCaseID)
 
     testStepResults = []
     revertTestInfo  = {}
@@ -2107,6 +2164,7 @@ def dispTestStepInfo(testStepInfo,testParams,result):
     if message is not None and message.strip() != "":
         print "\n[MESSAGE]: %s" %(message)
 
+    sys.stdout.flush()
 
 
 #-----------------------------------------------------------------------------------------------
