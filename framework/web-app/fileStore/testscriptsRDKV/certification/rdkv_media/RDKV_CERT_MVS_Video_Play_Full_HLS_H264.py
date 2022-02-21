@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>9</version>
+  <version>10</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_MVS_Video_Play_Full_HLS_H264</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -37,7 +37,7 @@
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>65</execution_time>
+  <execution_time>3</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -70,10 +70,10 @@
     <input_parameters>Lightning player App URL: string
 webkit_instance:string
 webinspect_port: string
-video_src_url_hls_h264: string
+video_src_url_short_duration_hls: string
 play_interval: int
 pause_interval:int</input_parameters>
-    <automation_approch>1. As pre requisite, launch webkit instance via RDKShell, open websocket conntion to webinspect page
+    <automation_approch>1. As pre requisite, launch webkit instance via RDKShell, open websocket connection to webinspect page
 2. Store the details of other launched apps. Move the webkit instance to front, if its z-order is low.
 3. Launch webkit instance with video test app with the src url, operations to be performed i.e playtillend.
 4. App plays the entire video and validates using video events play and ended.
@@ -129,8 +129,9 @@ if expectedResult in result.upper():
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_video_test_app_url
-        videoURL  = MediaValidationVariables.video_src_url_hls_h264
+        videoURL  = MediaValidationVariables.video_src_url_short_duration_hls
         # Setting VideoPlayer Operations
+        # From the starting position (0), play the video till end EOS
         setOperation("playtillend","0")
         operations = getOperations()
         # Setting VideoPlayer test app URL arguments

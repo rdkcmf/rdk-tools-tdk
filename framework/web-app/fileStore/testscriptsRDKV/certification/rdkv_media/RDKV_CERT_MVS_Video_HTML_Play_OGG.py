@@ -128,6 +128,8 @@ if expectedResult in result.upper():
         #Setting device config file
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
+        # Setting proc validation mode as audio-only
+        setProcCheckMode("audio-only")
         appURL    = MediaValidationVariables.html_video_test_app_url
         videoURL  = MediaValidationVariables.video_src_url_direct_ogg
         # Setting VideoPlayer Operations
