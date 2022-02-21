@@ -75,6 +75,12 @@
   }
 
 
+  //Random number generator
+  export function getRandomInt(max) {
+     return Math.floor(Math.random() * max);
+  }
+
+
   // Method to get Time info
   export function dispTime() {
     var now = new Date();

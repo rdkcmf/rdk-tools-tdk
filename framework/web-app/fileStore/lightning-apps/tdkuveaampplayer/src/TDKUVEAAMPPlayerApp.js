@@ -18,7 +18,7 @@
  */
 
 import { Lightning, Utils } from '@lightningjs/sdk'
-import { dispTime, logMsg, logEventMsg, GetURLParameter, getVideoOperations } from './MediaUtility.js'
+import { dispTime, logMsg, logEventMsg, GetURLParameter, getVideoOperations, getRandomInt } from './MediaUtility.js'
 
 let tag = null;
 
@@ -178,6 +178,95 @@ export default class App extends Lightning.Component {
       logMsg("Expected Pos  : [ " + (this.expectedPos - 2) + " - " + (this.expectedPos + 7) + " ]")
       this.seek(this.expectedPos)
   }
+  getAudioLanguages(){
+      var audioTracks = []
+      logMsg("Available Audio tracks: " + this.getAvailableAudioTracks())
+      audioTracks = JSON.parse(this.getAvailableAudioTracks())
+      for (var i = 0; i < audioTracks.length; i++){
+          if(audioTracks[i].language != ""){
+              this.audioIndexes.push(i);
+              this.audioLanguages.push(audioTracks[i].language)
+              this.audioLanguagesSelected.push(audioTracks[i].language)
+          }else{
+              this.errorFlag = 1
+              logMsg("[ERROR]:Audio Track language is empty")
+          }
+      }
+      this.actualAudioIndex = this.getAudioTrack()
+      logMsg("Audio Languages: "  + this.audioLanguages)
+      logMsg("Current Audio Index: " + this.actualAudioIndex)
+      if(this.actualAudioIndex < 0){
+          this.errorFlag = 1
+          logMsg("[ERROR]: Audio language index obtained is invalid")
+      }
+      if(this.audioLanguages.length){
+          logMsg("Current Audio Language: " + this.audioLanguages[this.actualAudioIndex])
+          this.audioIndexes.splice(this.actualAudioIndex,1)
+          this.audioLanguagesSelected.splice(this.actualAudioIndex,1)
+          logMsg("Audio list excluding current language: " + this.audioLanguagesSelected)
+      }else{
+          this.audioTracksAvailability = 0
+          logMsg("[ERROR]: Cannot perform Audio Track change operation")
+      }
+  }
+  changeAudio(){
+      this.getAudioLanguages();
+      if(this.audioTracksAvailability){
+          var index = parseInt(getRandomInt(this.audioLanguagesSelected.length))
+          var language = this.audioLanguagesSelected[index]
+          this.expectedAudioIndex = this.audioIndexes[index]
+          logMsg("Changing audio language to: "+ language)
+          logMsg("Expected Audio Track language:" + language)
+          logMsg("Expected Audio Track index: " + this.expectedAudioIndex)
+          //this.setAudioLanguage(language)
+          this.audioChangeFlag = 1
+          this.setAudioTrack(this.expectedAudioIndex)
+      }
+  }
+  getTextTracks(){
+      var textTracks = []
+      logMsg("Available Text tracks: " + this.getAvailableTextTracks())
+      textTracks = JSON.parse(this.getAvailableTextTracks())
+      for (var i = 0; i < textTracks.length; i++){
+          if(textTracks[i].language != ""){
+              this.textIndexes.push(i);
+              this.textLanguages.push(textTracks[i].language)
+              this.textLanguagesSelected.push(textTracks[i].language)
+          }else{
+              this.errorFlag = 1
+              logMsg("[ERROR]:Text Track language is empty")
+          }
+      }
+      this.actualTextIndex = this.getTextTrack()
+      logMsg("Text Tracks: "  + this.textLanguages)
+      logMsg("Current Text Index: " + this.actualTextIndex)
+      if(this.actualTextIndex < 0){
+          this.errorFlag = 1
+          logMsg("[ERROR]: Text Track index obtained is invalid")
+      }
+      if(this.textLanguages.length){
+          logMsg("Current Text Language: " + this.textLanguages[this.actualTextIndex])
+          this.textIndexes.splice(this.actualTextIndex,1)
+          this.textLanguagesSelected.splice(this.actualTextIndex,1)
+          logMsg("Text list excluding current language: " + this.textLanguagesSelected)
+      }else{
+          this.textTracksAvailability = 0
+          logMsg("[ERROR]: Cannot perform Text Track change operation")
+      }
+  }
+  changeText(){
+      this.getTextTracks();
+      if(this.textTracksAvailability){
+          var index = parseInt(getRandomInt(this.textLanguagesSelected.length))
+          var language = this.textLanguagesSelected[index]
+          this.expectedTextIndex = this.textIndexes[index]
+          logMsg("Changing text language to: "+ language)
+          logMsg("Expected Text Track language:" + language)
+          logMsg("Expected Text Track index: " + this.expectedTextIndex)
+          this.textChangeFlag = 1
+          this.setTextTrack(this.expectedTextIndex)
+      }
+  }
   getPlaybackRate() {
      return this.player.getPlaybackRate();
   }
@@ -201,11 +290,28 @@ export default class App extends Lightning.Component {
   getAvailableAudioTracks() {
      return this.player.getAvailableAudioTracks();
   }
+  setAudioLanguage(language){
+      this.player.setAudioLanguage(language)
+  }
   getAudioTrack() {
       return this.player.getAudioTrack();
   }
   setAudioTrack(track) {
       this.player.setAudioTrack(track);
+  }
+  getAvailableTextTracks(){
+      return this.player.getAvailableTextTracks()
+  }
+  getTextTrack() {
+      return this.player.getTextTrack();
+  }
+  setTextTrack(track) {
+      this.player.setTextTrack(track);
+  }
+  setClosedCaptionStatus(enable){
+      logMsg("Setting the Closed Caption Status: " + enable)
+      this.player.setClosedCaptionStatus(enable)
+      //this.setTextTrack(0)
   }
   getVolume(){
       return this.player.getVolume()
@@ -236,6 +342,9 @@ export default class App extends Lightning.Component {
           logMsg("******************* VIDEO STARTED PLAYING !!! *******************")
           logMsg("VIDEO AUTOPLAY: " + tag.autoplay)
           logMsg("VIDEO DURATION: " + tag.vidDuration)
+          if (tag.enableCCStatus == "true"){
+              tag.setClosedCaptionStatus(true)
+          }
           //logMsg("Available Audio tracks: " + tag.getAvailableAudioTracks())
           //logMsg("Current Audio track: " + tag.getAudioTrack())
           tag.checkAndStartAutoTesting()
@@ -295,8 +404,10 @@ export default class App extends Lightning.Component {
     tag.observedEvents.push("ended")
     tag.handlePlayerEvents("Video PlayBack Completed")
   }
-  eventplaybackFailed(){
+  eventplaybackFailed(event){
     tag.errorFlag = 1
+    logMsg("Event Occurred: playbackFailed !!!")
+    logMsg("desc : "+ event.description + " code: "+ event.code)
     tag.handlePlayerEvents("Video PlayBack Failed")
   }
   eventplaybackSeeked(event){
@@ -330,6 +441,20 @@ export default class App extends Lightning.Component {
   }
   dispVolumeInfo(){
     this.message1 = "Video Player Volume Change, volume: " + this.getVolume()
+    this.dispUIMessage(this.message1)
+    console.log("*****************************************************************\n" +
+	        "[ " + dispTime() + " ] " + this.message1 + "\n" +
+                "*****************************************************************")
+  }
+  dispAudioInfo(){
+    this.message1 = "Observed Audio Track Index: " + this.getAudioTrack()
+    this.dispUIMessage(this.message1)
+    console.log("*****************************************************************\n" +
+	        "[ " + dispTime() + " ] " + this.message1 + "\n" +
+                "*****************************************************************")
+  }
+  dispTextInfo(){
+    this.message1 = "Observed Text Track Index: " + this.getTextTrack()
     this.dispUIMessage(this.message1)
     console.log("*****************************************************************\n" +
 	        "[ " + dispTime() + " ] " + this.message1 + "\n" +
@@ -461,6 +586,18 @@ export default class App extends Lightning.Component {
                     this.reload();
                 },actionInterval);
             }
+	    else if (action == "changeaudio"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.changeAudio();
+                },actionInterval);
+            }
+	    else if (action == "changetext"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.changeText();
+                },actionInterval);
+            }
             else if (action == "fastfwd4x" || action == "fastfwd16x" || action == "fastfwd32x"){
                 if (action == "fastfwd32x"){
                 setTimeout(()=> {
@@ -539,21 +676,8 @@ export default class App extends Lightning.Component {
   updateEventFlowFlag(){
       var Status = "SUCCESS"
       if( ! this.expectedEvents.every(e=> this.observedEvents.indexOf(e) >= 0)){
-	  if (this.volumeChangeFlag == 1){
-              this.volumeChangeFlag = 0
-              var currVolume = parseInt(this.getVolume())
-              if( currVolume == this.expectedVolume ){
-                logMsg("volume change  operation success")
-              }else{
-                this.eventFlowFlag = 0
-                Status = "FAILURE"
-                logMsg("volume change  operation failure")
-              }
-          }
-	  else{
-              this.eventFlowFlag = 0
-              Status = "FAILURE"
-	  }
+          this.eventFlowFlag = 0
+          Status = "FAILURE"
       } else{
           if (this.expectedEvents.includes("paused")){
               var currState = this.getCurrentState();
@@ -608,6 +732,44 @@ export default class App extends Lightning.Component {
                     logMsg("video rate change operation failure")
                   }
              }   
+          }
+	  else if (this.volumeChangeFlag == 1){
+              this.volumeChangeFlag = 0
+              var currVolume = parseInt(this.getVolume())
+              if( currVolume == this.expectedVolume ){
+                logMsg("volume change operation success")
+              }else{
+                this.eventFlowFlag = 0
+                Status = "FAILURE"
+                logMsg("volume change operation failure")
+              }
+          }
+	  else if (this.audioChangeFlag == 1){
+              this.audioChangeFlag = 0
+              this.dispAudioInfo()
+              var currAudioIndex = this.getAudioTrack()
+              if( currAudioIndex == this.expectedAudioIndex ){
+                logMsg("Audio language change operation success")
+              }else{
+                this.eventFlowFlag = 0
+                Status = "FAILURE"
+                logMsg("Audio language change operation failure")
+              }
+          }
+          else if (this.textChangeFlag == 1){
+              this.textChangeFlag = 0
+              this.dispTextInfo()
+              var currTextIndex = this.getTextTrack()
+              if( currTextIndex == this.expectedTextIndex ){
+                logMsg("Text Track change operation success")
+              }else{
+                this.eventFlowFlag = 0
+                Status = "FAILURE"
+                logMsg("Text Track change operation failure")
+              }
+          }
+          else if (this.audioTracksAvailability == 0 || this.textTracksAvailability == 0){
+              Status = "FAILURE"
           }
       }
       logMsg("Test step status: " + Status)
@@ -665,6 +827,21 @@ export default class App extends Lightning.Component {
     this.playbackSpeeds = [-64, -32, -16, -4, 1, 4, 16, 32, 64];
     this.playbackRateIndex = this.playbackSpeeds.indexOf(1)
     this.secondaryURL = "";
+    this.enableCCStatus = false;
+    this.audioChangeFlag  = 0
+    this.actualAudioIndex = 0;
+    this.expectedAudioIndex = 0;
+    this.audioIndexes   = []
+    this.audioLanguages = []
+    this.audioLanguagesSelected = []
+    this.audioTracksAvailability = 1
+    this.textChangeFlag  = 0
+    this.actualTextIndex = 0;
+    this.expectedTextIndex = 0;
+    this.textIndexes   = []
+    this.textLanguages = []
+    this.textLanguagesSelected = []
+    this.textTracksAvailability = 1
     logMsg("URL Info: " + this.videoURL )
 
     tag = this;
@@ -694,6 +871,9 @@ export default class App extends Lightning.Component {
        }
         else if(item.includes("secondaryURL")){
          this.secondaryURL = item.split('(')[1].split(')')[0];
+       }
+       else if(item.includes("enableCC")){
+         this.enableCCStatus = item.split('(')[1].split(')')[0];
        }
      });
     // check the DRM options provided in the url and update the configs

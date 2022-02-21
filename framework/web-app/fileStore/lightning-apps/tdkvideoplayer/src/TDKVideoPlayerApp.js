@@ -303,8 +303,10 @@ export default class App extends Lightning.Component {
 
   // Playing Event Handler
   playingEventHandler(){
+    this.observedEvents.push("playing")
     this.message1 = "Video Player Playing"
-    logMsg(this.message1 + " !!!")
+    this.dispUIMessage(this.message1)
+    this.checkAndLogEvents("playing",this.message1 + " !!!")
     if ( this.init == 0 ){
         logMsg("******************* VIDEO STARTED PLAYING !!! *******************")
         logMsg("VIDEO LOOP: " + VideoPlayer.looped)
