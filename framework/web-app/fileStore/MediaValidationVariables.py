@@ -192,6 +192,18 @@ video_src_url_dash_segement_list = ""
 video_src_url_dash_segement_timeline = ""
 video_src_url_dash_segement_template = ""
 
+# Streams with multiple audio languages & subtitle text tracks
+video_src_url_multi_audio_tracks = ""
+video_src_url_multi_text_tracks  = ""
+
+# Basic WAV PCM Audio format stream
+audio_src_url_wav_pcm = ""
+
+
+# Invalid stream URL for testing error scenarios
+video_src_url_invalid = test_streams_base_path + "test_stream_invalid.mpd"
+
+
 
 #************************************************************************
 #                  DRM PROTECTED CONTENT STREAM URLs
