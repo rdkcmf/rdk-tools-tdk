@@ -117,7 +117,7 @@ if "SUCCESS" in loadmodulestatus.upper():
         tdkTestObj.setResultStatus("FAILURE");
         print "TEST STEP 1: Get the Radio operating channel bandwidth for 5GHz";
         print "EXPECTED RESULT 1: Should get the Radio operating channel bandwidth for 5GHz";
-        print "ACTUAL RESULT 1: %s" %Bandwidth;
+        print "ACTUAL RESULT 1: %s" %details;
         #Get the result of execution
         print "[TEST EXECUTION RESULT] : FAILURE";
 
