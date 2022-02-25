@@ -111,7 +111,7 @@ if expectedResult in result.upper():
                 ip_address_num = '4'
             else:
                 ip_address_num = '6'
-            command = "ip -o -" + ip_address_num + " addr list " + interface_name.lower() + " | awk '{print $4}' | cut -d/ -f1"
+            command = "/sbin/ip -o -" + ip_address_num + " addr list " + interface_name.lower() + " | awk '{print $4}' | cut -d/ -f1"
             tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
             tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])
             tdkTestObj.addParameter("credentials",ssh_param_dict["credentials"])

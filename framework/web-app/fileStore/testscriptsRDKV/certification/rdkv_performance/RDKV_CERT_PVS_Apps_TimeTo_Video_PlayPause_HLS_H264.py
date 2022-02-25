@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2020 RDK Management
+# Copyright 2022 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@
 <?xml version="1.0" encoding="UTF-8"?><xml>
   <id/>
   <version>2</version>
-  <name>RDKV_CERT_PVS_Apps_TimeTo_Video_PlayPause</name>
+  <name>RDKV_CERT_PVS_Apps_TimeTo_Video_PlayPause_HLS_H264</name>
   <primitive_test_id/>
   <primitive_test_name>rdkservice_setValue</primitive_test_name>
   <primitive_test_version>1</primitive_test_version>
   <status>FREE</status>
-  <synopsis>This script is to get the performance of the Lightning application by calculating the time taken for play and pause operations.</synopsis>
+  <synopsis>This script is to get the performance of the Lightning application by calculating the time taken for play and pause operations of HLS H264 video.</synopsis>
   <groups_id/>
   <execution_time>6</execution_time>
   <long_duration>false</long_duration>
@@ -41,8 +41,8 @@
     <rdk_version>RDK2.0</rdk_version>
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_PERFORMANCE_03</test_case_id>
-    <test_objective>This script is to get the performance of the Lightning application by calculating the time taken for play and pause operations.</test_objective>
+    <test_case_id>RDKV_PERFORMANCE_109</test_case_id>
+    <test_objective>This script is to get the performance of the Lightning application by calculating the time taken for play and pause operations of HLS H264 video.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI,Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -56,9 +56,9 @@
     <expected_output>The video must play and pause within expected range of ms.</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_performance</test_stub_interface>
-    <test_script>RDKV_CERT_PVS_Apps_TimeTo_Video_PlayPause</test_script>
+    <test_script>RDKV_CERT_PVS_Apps_TimeTo_Video_PlayPause_HLS_H264</test_script>
     <skipped>No</skipped>
-    <release_version>M82</release_version>
+    <release_version>M98</release_version>
     <remarks/>
   </test_cases>
   <script_tags/>
@@ -69,6 +69,7 @@
 import tdklib; 
 from web_socket_util import *
 import PerformanceTestVariables
+import MediaValidationVariables
 from MediaValidationUtility import *
 from StabilityTestUtility import *
 from rdkv_performancelib import *
@@ -80,7 +81,7 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Apps_TimeTo_Video_PlayPause');
+obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Apps_TimeTo_Video_PlayPause_HLS_H264');
 
 webkit_console_socket = None
 #Execution summary variable 
@@ -93,8 +94,8 @@ obj.setLoadModuleStatus(result);
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     appURL    = PerformanceTestVariables.lightning_video_test_app_url
-    videoURL  = PerformanceTestVariables.video_src_url
-    videoURL_type = PerformanceTestVariables.video_src_url_type.lower()
+    videoURL  = MediaValidationVariables.video_src_url_hls_h264
+    videoURL_type = "hls"
     
     setOperation("pause",10)
     setOperation("play",10)

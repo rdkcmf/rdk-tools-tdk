@@ -97,7 +97,8 @@ if expectedResult in result.upper():
     print "\n Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    rebootwaitTime = 160
+    conf_file,file_status = get_configfile_name(obj)
+    result1, rebootwaitTime = getDeviceConfigKeyValue(conf_file,"REBOOT_WAIT_TIME")
     plugin = "HtmlApp"
     plugins_list = ["Cobalt","WebKitBrowser","HtmlApp"]
     plugin_status_needed = {"Cobalt":"deactivated","HtmlApp":"deactivated","WebKitBrowser":"deactivated"}
@@ -184,7 +185,7 @@ if expectedResult in result.upper():
                             time.sleep(5)
                         else:
                             tdkTestObj = obj.createTestStep('rdkservice_rebootDevice')
-                            tdkTestObj.addParameter("waitTime",rebootwaitTime)
+                            tdkTestObj.addParameter("waitTime",float(rebootwaitTime))
                             tdkTestObj.executeTestCase(expectedResult)
                             result = tdkTestObj.getResultDetails()
                             if expectedResult in result:

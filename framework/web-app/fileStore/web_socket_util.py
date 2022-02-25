@@ -119,6 +119,10 @@ class createEventListener(object):
     def on_message(self,message):
         if ("method" in message) and "client.events" in json.loads(message).get("method"):
             message = str(datetime.utcnow()).split()[1] + '$$$' + message
+        elif ("KeyCode" in message) and "KeyCode" in json.loads(message).get("params").get("message").get("text"):
+            message = str(datetime.utcnow()).split()[1] + '$$$' + message
+        elif ("RepeatCountUpdated" in message) and "count" in json.loads(message).get("params"):
+            message = str(datetime.utcnow()).split()[1] + '$$$' + message
         if self.trace:
             print "\n Received Event Response: %s" %(message)
         if "\\" in message:
