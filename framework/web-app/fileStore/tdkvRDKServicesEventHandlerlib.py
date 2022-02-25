@@ -559,62 +559,52 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
 
         # HdmiCec Events response result parser steps
         elif tag == "hdmicec_check_on_message_event":
-            result = result[0]
-            info = result
             Src_Dest_Address = {"0":"TV","1":"Recording Device 1","2":"Recording Device 2","3":"Tuner 1","4":"Playback Device 1","5":"Audio System","6":"Tuner 2","7":"Tuner 3","8":"Playback Device 2","9":"Recording Device 3","a":"Tuner 4","b":"Playback Device 3","c":"Reserved 12","d":"Reserved 13","e":"Specific Use","f":"Broadcast/Unregistered"}
-            if len(str(result.get("message"))) > 0:
-                hex_code = DecodeBase64ToHex(str(result.get("message")))
-                info["Hex_Code"] = hex_code
-                if arg[0] == "check_power_status":
-                   if "90" in str(hex_code):
-                      Power_Status = {"00":"On","01":"Standby","10":"In transition Standby to On","11":"In transition On to Standby"}
-                      Oprand  = hex_code[-2:]
-                      Address = hex_code[0:2]
-                      info["From"] = Src_Dest_Address[Address[0]]
-                      info["To"] =  Src_Dest_Address[Address[1]]
-                      info["Power_Status"] = Power_Status[Oprand]
-                      info["Test_Step_Status"] = "SUCCESS"
-                   else:
-                      info["Test_Step_Status"] = "FAILURE"  
+            info["Test_Step_Status"] = "FAILURE"
+            for eventResult in result:
+                if len(str(eventResult.get("message"))) > 0:
+                    hex_code = DecodeBase64ToHex(str(eventResult.get("message")))
+                    if arg[0] == "check_power_status":
+                       if "90" in str(hex_code):
+                           info["Hex_Code"] = hex_code
+                           Power_Status = {"00":"On","01":"Standby","10":"In transition Standby to On","11":"In transition On to Standby"}
+                           Oprand  = hex_code[-2:]
+                           Address = hex_code[0:2]
+                           info["From"] = Src_Dest_Address[Address[0]]
+                           info["To"] =  Src_Dest_Address[Address[1]]
+                           info["Power_Status"] = Power_Status[Oprand]
+                           info["Test_Step_Status"] = "SUCCESS"
 
-                elif arg[0] == "check_cec_version":
-                   if "9e" in str(hex_code):
-                      Version = {"01":"Reserved","02":"Reserved","03":"Reserved","04":"Reserved","05":"Version 1.3a","06":"Version 1.4" }
-                      Oprand  = hex_code[-2:]
-                      Address = hex_code[0:2]
-                      info["From"] = Src_Dest_Address[Address[0]]
-                      info["To"] =  Src_Dest_Address[Address[1]]
-                      info["Version"] = Version[Oprand]
-                      info["Test_Step_Status"] = "SUCCESS"
-                   else:
-                      info["Test_Step_Status"] = "FAILURE"
+                    elif arg[0] == "check_cec_version":
+                      if "9e" in str(hex_code).lower():
+                          Version = {"01":"Reserved","02":"Reserved","03":"Reserved","04":"Reserved","05":"Version 1.3a","06":"Version 1.4" }
+                          Oprand  = hex_code[-2:]
+                          Address = hex_code[0:2]
+                          info["From"] = Src_Dest_Address[Address[0]]
+                          info["To"] =  Src_Dest_Address[Address[1]]
+                          info["Version"] = Version[Oprand]
+                          info["Test_Step_Status"] = "SUCCESS"
 
-                elif arg[0] == "check_menu_language":
-                   if "32" in str(hex_code):
-                      MenuLanguage  = hex_code[2:4]
-                      Address = hex_code[0:2]
-                      info["From"] = Src_Dest_Address[Address[0]]
-                      info["To"] =  Src_Dest_Address[Address[1]]
-                      info["Menu_Language"] = MenuLanguage
-                      info["Test_Step_Status"] = "SUCCESS"
-                   else:
-                      info["Test_Step_Status"] = "FAILURE"
+                    elif arg[0] == "check_menu_language":
+                      if "32" in str(hex_code):
+                          MenuLanguage  = hex_code[2:4]
+                          Address = hex_code[0:2]
+                          info["From"] = Src_Dest_Address[Address[0]]
+                          info["To"] =  Src_Dest_Address[Address[1]]
+                          info["Menu_Language"] = MenuLanguage
+                          info["Test_Step_Status"] = "SUCCESS"
 
-                elif arg[0] == "check_device_vendor_id":
-                   if "87" in str(hex_code):
-                      VendorID  = hex_code[2:4]
-                      Address = hex_code[0:2]
-                      info["From"] = Src_Dest_Address[Address[0]]
-                      info["To"] =  Src_Dest_Address[Address[1]]
-                      info["Device_Vendor_ID"] = VendorID
-                      info["Test_Step_Status"] = "SUCCESS"
-                   else:
-                      info["Test_Step_Status"] = "FAILURE"
+                    elif arg[0] == "check_device_vendor_id":
+                      if "87" in str(hex_code):
+                          VendorID  = hex_code[2:4]
+                          Address = hex_code[0:2]
+                          info["From"] = Src_Dest_Address[Address[0]]
+                          info["To"] =  Src_Dest_Address[Address[1]]
+                          info["Device_Vendor_ID"] = VendorID
+                          info["Test_Step_Status"] = "SUCCESS"
 
-
-            else:
-                info["Test_Step_Status"] = "FAILURE"
-
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
         # Warehouse Events response result parser steps
         elif tag == "warehouse_check_device_reset_event":
             result=result[0]
