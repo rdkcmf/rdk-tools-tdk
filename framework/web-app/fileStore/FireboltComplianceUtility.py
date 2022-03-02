@@ -17,6 +17,7 @@
 # limitations under the License.
 #########################################################################
 
+import tdklib
 import os
 import ConfigParser
 import MediaValidationVariables
@@ -24,9 +25,6 @@ from devicesettings import *
 # Global variable to store the operations string and use_aamp configuration
 operations = ""
 use_aamp = ""
-
-#Execution log File
-executionLogFile = " /opt/TDK/logs/AgentConsole.log "
 
 #List consisting of HLS url
 HLS_URL = [MediaValidationVariables.video_src_url_short_duration_hls,MediaValidationVariables.video_src_url_hls,MediaValidationVariables.video_src_url_4k_hls,MediaValidationVariables.video_src_url_live_hls,MediaValidationVariables.video_src_url_hls_h264,MediaValidationVariables.video_src_url_hls_h264_iframe]
@@ -212,3 +210,24 @@ def ResolutionTestStop(dsObj, resolution, ResolutionBeforePlayback=""):
     if "FAILURE" in result:
         print "dsManagerDeInitialize FAILED" 
     return result
+
+def parseLatency(tdkTestObj,latencyThreshold):
+    command = "cat /opt/TDK/latency_log"
+    tdkTestObj.addParameter("command", command)
+    expectedResult = "SUCCESS"
+    tdkTestObj.executeTestCase(expectedResult)
+    actualresult = tdkTestObj.getResult()
+    output = tdkTestObj.getResultDetails()
+    if expectedResult in actualresult.upper():
+        if int(output.split(' ')[2]) < int(latencyThreshold):
+            print "Latency:",output.split()[2]
+            tdkTestObj.setResultStatus("SUCCESS")
+            print "Latency retrieved was optimal"
+        else:
+            print "Latency retrieved was not optimal"
+            tdkTestObj.setResultStatus("FAILURE")
+            print "Expected Latency :",latencyThreshold
+            print "Actual Latency:",output.split()[2]
+    else:
+        print "Unable to retrieve latency"
+        tdkTestObj.setResultStatus("FAILURE")

@@ -68,8 +68,8 @@
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>1.testcasename - "test_trickplay"
 2.test_url - OPUS url from MediaValidationVariables library (MediaValidationVariables.video_src_url_opus)
-3."checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
-4.operations=seek:&lt;timeout&gt;:&lt;seekposition&gt; - a ":" seperated string to specify the seek operation to be executed , the time in seconds for which the operation should be performed and seekposition in seconds to which the seek operation should be performed. The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file The seekposition should also be configured in device configuration(FIREBOLT_COMPLIANCE_SEEK_POSITION)</input_parameters>
+3."checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
+4.operations=seek:&lt;timeout&gt;:&lt;seekposition&gt; - a ":" seperated string to specify the seek operation to be executed , the time in seconds for which the operation should be performed and seekposition in seconds to which the seek operation should be performed. The timeout should be configured in the device configuration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file The seekposition should also be configured in device configuration(FIREBOLT_COMPLIANCE_SEEK_POSITION)</input_parameters>
     <automation_approch>1.Load the systemutil module 
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS, FIREBOLT_COMPLIANCE_SEEK_POSITION, FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
 3.Retrieve the video_src_url_opus variable from MediaValidationVariables library

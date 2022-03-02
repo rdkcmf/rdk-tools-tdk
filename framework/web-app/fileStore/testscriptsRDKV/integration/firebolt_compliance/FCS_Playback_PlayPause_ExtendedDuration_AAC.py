@@ -52,8 +52,8 @@
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>testcasename - "test_trickplay"
 test_url - AAC url from MediaValidationVariables library (MediaValidationVariables.video_src_url_aac)
-"checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
-operations=play:&lt;timeout&gt;,pause:&lt;timeout&gt;,play:5 - a comma separated string of indivudual play/pause &lt;operation:timeout&gt; string where operation could be string "play"/"pause" indication play/pause operations and timeout is time in seconds for which the operation should be performed. The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_EXTENDEDDURATION_TIMEOUT) from Device Config file. The same timeout value can be used for both operations</input_parameters>
+"checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
+operations=play:&lt;timeout&gt;,pause:&lt;timeout&gt;,play:5 - a comma separated string of indivudual play/pause &lt;operation:timeout&gt; string where operation could be string "play"/"pause" indication play/pause operations and timeout is time in seconds for which the operation should be performed. The timeout should be configured in the device configuration(FIREBOLT_COMPLIANCE_EXTENDEDDURATION_TIMEOUT) from Device Config file. The same timeout value can be used for both operations</input_parameters>
     <automation_approch>1.Load the systemutil module 
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_EXTENDEDDURATION_TIMEOUT config values from Device config file.
 3.Retrieve the video_src_url_aac variable from MediaValidationVariables library

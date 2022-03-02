@@ -71,8 +71,8 @@
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>testcasename - "test_trickplay"
 test_url - AAC url from MediaValidationVariables library (MediaValidationVariables.video_src_url_aac)
-"checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
-operations=rewind2x:&lt;timeout&gt; - a ":" seperated string to specify the rewind operation to be executed and the time in seconds for which the operation should be continued. The timeout should be configured in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
+"checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
+operations=rewind2x:&lt;timeout&gt; - a ":" seperated string to specify the rewind operation to be executed and the time in seconds for which the operation should be continued. The timeout should be configured in the device configuration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
     <automation_approch>1.Load the systemutil module 
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
 3.Retrieve the video_src_url_aac variable from MediaValidationVariables library

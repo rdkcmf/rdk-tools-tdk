@@ -71,8 +71,8 @@
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>testcasename - "test_generic_playback"
 test_url - hls url from MediaValidationVariables library (MediaValidationVariables.video_src_url_hls)
-"checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
-timeout - a string to specify the time in seconds for which the videoplayback should be done . This argument is the value of device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
+"checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
+timeout - a string to specify the time in seconds for which the videoplayback should be done . This argument is the value of device configuration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
     <automation_approch>1. Load the devicesetting module
 2.Set resolution to 1080p and verify resolution is set.
 3.Load the systemutil module 

@@ -71,8 +71,8 @@
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>testcasename - "test_EOS"
 test_url - HLS url from MediaValidationVariables library (MediaValidationVariables.video_src_url_short_duration_hls)
-"checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
-timeout - a string to specify the time in seconds for waiting to receive EOS . This argument is the value of device cofiguration(FIREBOLT_COMPLIANCE_EOS_TIMEOUT) from Device Config file. The default timeout of test application is 6 minutes, so for EOS test cases, if the test stream is longer than 6 minutes the total timeout in seconds ( stream duration + ~5 seconds as buffer) should be explicitly specified in configuration parameter 'FIREBOLT_COMPLIANCE_EOS_TIMEOUT' inside device config file</input_parameters>
+"checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
+timeout - a string to specify the time in seconds for waiting to receive EOS . This argument is the value of device configuration(FIREBOLT_COMPLIANCE_EOS_TIMEOUT) from Device Config file. The default timeout of test application is 6 minutes, so for EOS test cases, if the test stream is longer than 6 minutes the total timeout in seconds ( stream duration + ~5 seconds as buffer) should be explicitly specified in configuration parameter 'FIREBOLT_COMPLIANCE_EOS_TIMEOUT' inside device config file</input_parameters>
     <automation_approch>1.Load the systemutil module 
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_EOS_TIMEOUT config values from Device config file.
 3.Retrieve the video_src_url_short_duration_hls variable from MediaValidationVariables library

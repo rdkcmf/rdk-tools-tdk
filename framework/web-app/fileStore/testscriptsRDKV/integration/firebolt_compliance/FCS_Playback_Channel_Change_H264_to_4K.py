@@ -67,8 +67,8 @@
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>testcasename - "test_channel_change_playback"
 test_url(s) - DASH url from MediaValidationVariables library (MediaValidationVariables.video_src_url_dash_h264), HLS url from MediaValidationVariables library (MediaValidationVariables.video_src_url_4k_hls)
-"checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device cofiguration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
-The timeout should be configured for both the channels in the device cofiguration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT,FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_SECOND_CHANNEL_TIMEOUT) from Device Config file</input_parameters>
+"checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
+The timeout should be configured for both the channels in the device configuration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT,FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_SECOND_CHANNEL_TIMEOUT) from Device Config file</input_parameters>
     <automation_approch>1..Load the systemutil module 
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS, FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_SECOND_CHANNEL_TIMEOUT config values from Device config file.
 3.Retrieve the video_src_url_hls and video_src_url_dash  variable from MediaValidationVariables library
