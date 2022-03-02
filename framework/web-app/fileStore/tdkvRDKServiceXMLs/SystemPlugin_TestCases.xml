@@ -37,7 +37,41 @@
                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.System" expectedValues="activated"/>
             </testStep>
           </prerequisite>
-          <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
+          <prerequisite requisiteId="2" requisiteName="Activate_WebKitBrowser_Plugin">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="WebKitBrowser" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,WebKitBrowser" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,WebKitBrowser" />
+                <params>
+                  <param tag="callsign" value="WebKitBrowser" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,WebKitBrowser" />
+                <params>
+                  <param tag="plugin" value="WebKitBrowser" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,WebKitBrowser" />
+            </testStep>
+            <testStep testStepId="4" name="Is_WebKitBrowser_Resumed" method="Get_WebKitBrowser_State" pluginName="WebKitBrowser" saveResult="true" >
+                <resultGeneration useMethodTag="webkitbrowser_get_state" />
+            </testStep>
+            <testStep testStepId="5" name="Resume_WebKitBrowser" method="Set_WebKitBrowser_State" pluginName="WebKitBrowser" >
+                <conditionalExecution enable="true" Id="4" useMethodTag="webkitbrowser_check_state" arguments="isSuspended" />
+                <params>
+                  <param tag="state" useDefault="true" />
+                </params>
+            </testStep>
+            <testStep testStepId="6" name="Is_WebKitBrowser_Resumed" method="Get_WebKitBrowser_State" pluginName="WebKitBrowser" delay="5">
+                <conditionalExecution enable="true" Id="4" useMethodTag="webkitbrowser_check_state" arguments="isSuspended" />
+                <resultGeneration useMethodTag="webkitbrowser_get_state" expectedValues="resumed" />
+            </testStep>
+          </prerequisite>
+          <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
             <event pluginName="System" eventName="Event_MacAddresses_Retreived" />
             <event pluginName="System" eventName="Event_PowerState_Changed" />
             <event pluginName="System" eventName="Event_SystemMode_Changed" />
@@ -650,6 +684,73 @@
             <testStep testStepId="3" name="Query_Moca_Status" method="Query_MocaStatus" revertFlag="yes">
                 <resultGeneration useMethodTag="system_get_moca_enabled_status">
                     <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_toggle_moca_enabled_status" />
+                </resultGeneration>
+            </testStep>
+       </testCase>
+       
+       <testCase testCaseId="SYS_41" testCaseName= "System_SetAndGet_Over-Temperature_Grace_Interval" desc="Sets and gets the over-temperature grace interval">
+            <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="OverTemperatureGraceInterval" />
+            <testStep testStepId="1" name="Get_Over-Temperature_Grace_Interval_Value" method="Get_Over-Temperature_Grace_Interval" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="system_verify_interval_value"  />
+            </testStep>
+            <testStep testStepId="2" name="Set_Over-Temperature_Grace_Interval_Value" method="Set_Over-Temperature_Grace_Interval"  saveResult="true" revertSet="yes">
+                <params>
+                  <param tag="graceInterval"  usePreviousResult="true" Id="1" useMethodTag="system_generate_new_temperature_grace_interval" revertParam="yes" />
+                </params>
+                <resultGeneration useMethodTag="system_get_state_info"  />
+            </testStep>
+            <testStep testStepId="3" name="Get_Over-Temperature_Grace_Interval_Value" method="Get_Over-Temperature_Grace_Interval"  revertFlag="yes" >
+                <resultGeneration useMethodTag="system_verify_interval_value" arguments="check_expected_interval" >
+                  <expectedValues  usePreviousResult="true" Id="1" useMethodTag="system_generate_new_temperature_grace_interval"/>
+                </resultGeneration>
+            </testStep>
+       </testCase>
+
+       <testCase testCaseId="SYS_42" testCaseName= "System_Check_Model_Number" desc="Checks the model number of the DUT">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_Details" action="externalFnCall" saveResult="true">
+                    <resultGeneration useMethodTag="system_get_device_details_from_file" >
+                         <arguments value="model_number" useConfigFile="true" key="SYSTEM_DEVICE_DETAILS_FILE_PATH"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Platform_Configuration" method="Get_Platform_Configuration">
+                <params>
+                  <param tag="query" value="DeviceInfo.model" />
+                </params>
+                <resultGeneration useMethodTag="system_check_platform_configurations"   arguments="check_model_number">
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_get_device_details"/>
+                </resultGeneration>
+            </testStep>
+       </testCase>
+
+       <testCase testCaseId="SYS_43" testCaseName= "System_Check_Device_Mac_Address" desc="Checks the device MAC address">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Device_Details" action="externalFnCall" saveResult="true">
+                    <resultGeneration useMethodTag="system_get_device_details_from_file" >
+                         <arguments value="estb_mac" useConfigFile="true" key="SYSTEM_DEVICE_DETAILS_FILE_PATH"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Platform_Configuration" method="Get_Platform_Configuration">
+                <params>
+                  <param tag="query" value="AccountInfo.deviceMACAddress" />
+                </params>
+                <resultGeneration useMethodTag="system_check_platform_configurations" arguments="check_device_mac_address">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_get_device_details" />
+                </resultGeneration>
+            </testStep>
+       </testCase>
+        
+       <testCase testCaseId="SYS_44" testCaseName= "System_Check_WebBrowser_Details" desc="Checks the webbrowser details">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_UserAgent" method="Get_UserAgent" saveResult="true" pluginName="WebKitBrowser">
+                <resultGeneration useMethodTag="webkitbrowser_get_useragent" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Platform_Configuration" method="Get_Platform_Configuration">
+                <params>
+                  <param tag="query" value="DeviceInfo.webBrowser" />
+                </params>
+                <resultGeneration useMethodTag="system_check_platform_configurations" arguments="check_webbrowser_details">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="webkitbrowser_get_useragent_string"/>
                 </resultGeneration>
             </testStep>
        </testCase>

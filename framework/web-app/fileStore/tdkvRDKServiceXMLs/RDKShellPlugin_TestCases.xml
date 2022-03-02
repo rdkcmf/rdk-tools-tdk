@@ -806,7 +806,7 @@
               <resultGeneration useMethodTag="rdkshell_get_result_status"  />
             </testStep>
             <testStep testStepId="3" name="Check_On_UserInactivity_Event" event="Event_On_UserInactivity" action="eventListener" delay="120">
-              <resultGeneration useMethodTag="rdkshell_check_on_userinactivity_event"  arguments="Check_user_inactive" expectedValues="1"  />
+              <resultGeneration useMethodTag="rdkshell_check_on_userinactivity_event"  arguments="check_user_inactive" expectedValues="1"  />
             </testStep>
             <testStep testStepId="4" name="Disable_Inactivity_Reporting" method="Enable_Inactivity_Reporting" >
               <params>
@@ -815,8 +815,8 @@
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
         </testCase>
+        
         <!-- Test case 35 -->
-
         <testCase testCaseId="RDKShell_35" testCaseName= "RDKShell_Check_User_Active" desc="Checks whether user active">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Enable_Inactivity_Reporting" method="Enable_Inactivity_Reporting">
@@ -831,7 +831,7 @@
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status"  />
             </testStep>
-            <testStep testStepId="3"   name="Generate_Key" method="GenerateKey" delay="30" >
+            <testStep testStepId="3"   name="Generate_Key" method="GenerateKey" delay="90" >
               <params paramKey="keys">
                 <param tag="keyCode" value="13" />
                 <param tag="modifiers" useDefault="true" />
@@ -839,11 +839,10 @@
               </params>
               <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
-
-            <testStep testStepId="3" name="Check_On_UserInactivity_Event" event="Event_On_UserInactivity" action="eventListener" delay="30">
-              <resultGeneration useMethodTag="rdkshell_check_on_userinactivity_event" arguments="Check_user_active"  />
+            <testStep testStepId="4" name="Check_On_UserInactivity_Event" event="Event_On_UserInactivity" action="eventListener" delay="130">
+              <resultGeneration useMethodTag="rdkshell_check_on_userinactivity_event"  arguments="check_reset_inactivity_interval" expectedValues="1"/>
             </testStep>
-            <testStep testStepId="4" name="Disable_Inactivity_Reporting" method="Enable_Inactivity_Reporting" >
+            <testStep testStepId="5" name="Disable_Inactivity_Reporting" method="Enable_Inactivity_Reporting" >
               <params>
                 <param tag="enable"  value="false" />
               </params>
@@ -2169,8 +2168,84 @@
                <resultGeneration useMethodTag="rdkshell_check_hole_punch" expectedValues="True" />
             </testStep>
         </testCase>
+        
         <!-- Test case 79 -->
-        <testCase testCaseId="RDKShell_79" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
+        <testCase testCaseId="RDKShell_79" testCaseName= "RDKShell_Check_User_Inactivity_Reporting_Disabled" desc="Checks whether user inactivity reporting disabled or not">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Enable_Inactivity_Reporting" method="Enable_Inactivity_Reporting">
+              <params>
+                <param tag="enable"  value="true" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Inactivity_Interval" method="Set_Inactivity_Interval" >
+              <params>
+                <param tag="interval"  value="1" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status"  />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_UserInactivity_Event" event="Event_On_UserInactivity" action="eventListener" delay="60" >
+              <resultGeneration useMethodTag="rdkshell_check_on_userinactivity_event"  />
+            </testStep>
+            <testStep testStepId="4" name="Disable_Inactivity_Reporting" method="Enable_Inactivity_Reporting" >
+              <params>
+                <param tag="enable"  value="false" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="5" name="Check_On_UserInactivity_Event" event="Event_On_UserInactivity" action="eventListener" delay="30">
+              <resultGeneration useMethodTag="rdkshell_check_on_userinactivity_event" arguments="check_empty_event"  />
+            </testStep>
+        </testCase>
+
+        <!-- Test case 80 -->
+        <testCase testCaseId="RDKShell_80" testCaseName= "RDKShell_Check_LifeCycle_Events_WebKitBrowser" desc="Checks for the life cycle events for webkitbrowser application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_if_exists" expectedValues= "webkitbrowser" />
+            </testStep>
+            <testStep testStepId="2" name="Suspend_Application" method="SuspendApplication" >
+              <params>
+                <param tag="callsign"  value="WebKitBrowser" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_Suspended_Event" event="Event_On_Suspended" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="WebKitBrowser"/>
+            </testStep>
+            <testStep testStepId="4" name="Resume_WebKitBrowser" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="WebKitBrowser" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Check_On_Launched_Event" event="Event_On_Launched" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_on_launched_event" expectedValues="WebKitBrowser,resume"/>
+            </testStep>
+            <testStep testStepId="6" name="Destroy_Application" method="DestroyApplication" delay="2">
+              <params>
+                <param tag="callsign"  value="WebKitBrowser" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="7" name="Check_On_Destroyed_Event" event="Event_On_Destroyed" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="WebKitBrowser"/>
+            </testStep>
+            <testStep testStepId="8" name="Resume_WebKitBrowser" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="WebKitBrowser" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="9" name="Check_On_Launched_Event" event="Event_On_Launched" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_on_launched_event" expectedValues="WebKitBrowser,activate"/>
+            </testStep>
+            <testStep testStepId="10" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_if_exists" expectedValues= "webkitbrowser" />
+            </testStep>
+        </testCase>
+        <!-- Test case 81 -->
+        <testCase testCaseId="RDKShell_81" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
@@ -2194,8 +2269,8 @@
               <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
             </testStep>
         </testCase>
-        <!-- Test case 80 -->
-        <testCase testCaseId="RDKShell_80" testCaseName= "RDKShell_Application_Kill_LightningApp" desc="Kill LightningApp Application">
+        <!-- Test case 82 -->
+        <testCase testCaseId="RDKShell_82" testCaseName= "RDKShell_Application_Kill_LightningApp" desc="Kill LightningApp Application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "lightningapp" />
@@ -2220,8 +2295,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 81 -->
-        <testCase testCaseId="RDKShell_81" testCaseName= "RDKShell_Application_Kill_HtmlApp" desc="Kill HtmlApp Application">
+        <!-- Test case 83 -->
+        <testCase testCaseId="RDKShell_83" testCaseName= "RDKShell_Application_Kill_HtmlApp" desc="Kill HtmlApp Application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "htmlapp" />
@@ -2246,8 +2321,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 82 -->
-        <testCase testCaseId="RDKShell_82" testCaseName= "RDKShell_Enable_Disable_Virtual_Display_Cobalt" desc="Checks whether able to enable and disable the virtual display for the cobalt client" >
+        <!-- Test case 84 -->
+        <testCase testCaseId="RDKShell_84" testCaseName= "RDKShell_Enable_Disable_Virtual_Display_Cobalt" desc="Checks whether able to enable and disable the virtual display for the cobalt client" >
             <testCaseInfo testCaseType="setandget" revert="true"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
@@ -2275,8 +2350,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 83 -->
-        <testCase testCaseId="RDKShell_83" testCaseName= "RDKShell_Enable_Disable_Virtual_Display_WebKitBrowser" desc="Checks whether able to enable and disable the virtual display for the webkitbrowser client" >
+        <!-- Test case 85 -->
+        <testCase testCaseId="RDKShell_85" testCaseName= "RDKShell_Enable_Disable_Virtual_Display_WebKitBrowser" desc="Checks whether able to enable and disable the virtual display for the webkitbrowser client" >
             <testCaseInfo testCaseType="setandget" revert="true"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "webkitbrowser" />

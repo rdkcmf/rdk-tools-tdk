@@ -471,5 +471,65 @@
            <resultGeneration useMethodTag="controller_check_error_message" expectedValues="ERROR_UNKNOWN_KEY,22"  />
          </testStep>
      </testCase>
+     <testCase testCaseId="Controller_19" testCaseName="Deactivate_DeviceInfo_And_Check_API_Response"  desc="Queries the DeviceInfo plugin APIs after deactivated it">
+             <testCaseInfo testCaseType="direct"/>
+             <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Activate_Plugin">
+                   <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                     <params>
+                       <param tag="plugin" value="DeviceInfo" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" />
+                   </testStep>
+                   <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,DeviceInfo" />
+                     <params>
+                       <param tag="callsign" value="DeviceInfo" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,DeviceInfo" />
+                     <params>
+                       <param tag="plugin" value="DeviceInfo" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" expectedValues="activated"/>
+                   </testStep>
+                </prerequisite>
+             </testCasePreRequisite>
+             <testStep testStepId="1" name="Deactivate_DeviceInfo_Plugin" method="Deactivate_Plugin" delay="1">
+                  <params>
+                    <param tag="callsign"  value="DeviceInfo" />
+                  </params>
+             </testStep>
+             <testStep testStepId="2" name="Check_PluginActive_Status" method="Get_Plugin_Status" delay="1" >
+                <params>
+                  <param tag="plugin" value="DeviceInfo" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" expectedValues="deactivated"/>
+             </testStep>
+             <testStep testStepId="3" name="Check_DeviceInfo_API_Response" method="Get_System_Info" pluginName="DeviceInfo" >
+                <resultGeneration useMethodTag="controller_check_error_message" arguments="check_message" expectedValues="service is not active" />
+            </testStep>
+             <testStep testStepId="4" name="Activate_DeviceInfo_Plugin" method="Activate_Plugin" >
+                  <params>
+                    <param tag="callsign" value="DeviceInfo" />
+                  </params>
+             </testStep>
+             <testStep testStepId="9" name="Check_PluginActive_Status" method="Get_Plugin_Status"  delay="1" >
+                <params>
+                  <param tag="plugin" value="DeviceInfo" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" expectedValues="activated"/>
+             </testStep>
+     </testCase>
+     <testCase testCaseId="Controller_20" testCaseName="Give_Empty_Path_To_Delete_Directory_Contents"  desc="Give the empty path and validate the error message and code">
+      <testCaseInfo testCaseType="direct"/>
+      <testStep testStepId="1" name="Delete_Directory_Contents" method="Delete_Directory_Contents">
+        <params>
+          <param tag="path" value="" />
+        </params>
+        <resultGeneration useMethodTag="controller_check_error_message" expectedValues="ERROR_UNKNOWN_KEY,22" />
+      </testStep>
+     </testCase>
 </testPlugin>
 

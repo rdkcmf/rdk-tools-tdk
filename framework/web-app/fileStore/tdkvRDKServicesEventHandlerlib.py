@@ -235,8 +235,12 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
     try:
         # Check whether the response result is empty
         if result == []:
-            print "\n[INFO]: Not Received the expected event(s)"
-            info["Test_Step_Status"] = "FAILURE"
+            if len(arg) and arg[0] == "check_empty_event":
+                print "\n[INFO]: Not Received the event(s)"
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                print "\n[INFO]: Not Received the expected event(s)"
+                info["Test_Step_Status"] = "FAILURE"
 
         # WebKitBrowser Events response result parser steps
         elif tag == "webkitbrowser_check_load_finished_event":
@@ -645,7 +649,6 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
         elif tag == "rdkshell_check_on_userinactivity_event":
             if len(arg) and arg[0] == "check_user_inactive":
                 result1=result[0]
@@ -656,17 +659,15 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
-            elif len(arg) and arg[0] == "check_user_active":
-                if result == "null":
-                    info["Test_Step_Status"] = "SUCCESS"
-                else:
-                    info["Test_Step_Status"] = "FAILURE"
             elif len(arg) and arg[0] == "check_reset_inactivity_interval":
                 info["Test_Step_Status"] = "FAILURE"
                 for eventResult in result:
                     if int(float(eventResult.get("minutes"))) == int(expectedValues[0]):
                         info["User_Inactivity_Minutes"] = eventResult.get("minutes")
                         info["Test_Step_Status"] = "SUCCESS"
+            elif len(arg) and arg[0] == "check_empty_event":
+                if result:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
                 result = result[0]
                 info = result

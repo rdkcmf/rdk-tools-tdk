@@ -738,6 +738,46 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+        elif tag == "system_verify_interval_value":
+            info["graceInterval"] = result.get("graceInterval")
+            success = str(result.get("success")).lower() == "true"
+            if len(arg) and arg[0] == "check_expected_interval":
+                if success and str(result.get("graceInterval")).lower() in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                if success and str(result.get("graceInterval")):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "system_check_platform_configurations":
+            status = checkNonEmptyResultData(result)
+            success = str(result.get("success")).lower() == "true"
+            if status == "TRUE" and success:
+                if len(arg) and arg[0] == "check_model_number":
+                    deviceInfo = result.get("DeviceInfo")
+                    info["MODEL_NUMBER"] = deviceInfo.get("model")
+                    deviceDetail = deviceInfo.get("model")
+                elif len(arg) and arg[0] == "check_device_mac_address":
+                    accountInfo = result.get("AccountInfo")
+                    info["deviceMACAddress"] = accountInfo.get("deviceMACAddress")
+                    deviceDetail = accountInfo.get("deviceMACAddress")
+                elif len(arg) and arg[0] == "check_webbrowser_details":
+                    deviceInfo = result.get("DeviceInfo")
+                    webBrowser = deviceInfo.get("webBrowser")
+                    deviceDetail = webBrowser.get("userAgent")
+                    expectedValues[0] = ",".join(expectedValues)
+                    info["userAgent"] = webBrowser.get("userAgent")
+                    info["browserType"] = webBrowser.get("browserType")
+                    info["version"] = webBrowser.get("version")
+                if str(deviceDetail).lower() == str(expectedValues[0]).lower():
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # User Preferces Plugin Response result parser steps
         elif tag == "userpreferences_get_ui_language":
@@ -2033,6 +2073,16 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+        
+        elif tag =="messenger_check_error_message":
+            info = otherInfo.get("error")
+            error = otherInfo.get("error")
+            message = error.get("message")
+            code = error.get("code")
+            if message.lower() == str(expectedValues[0]).lower() and int(code) == int(expectedValues[1]):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # Monitor Plugin Response result parser steps
         elif tag == "monitor_get_result_data":
@@ -2416,15 +2466,23 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+
         elif tag =="controller_check_error_message":
             info = otherInfo.get("error")
             error = otherInfo.get("error")
             message = error.get("message")
-            code = error.get("code")
-            if message.lower() == str(expectedValues[0]).lower() and int(code) == int(expectedValues[1]):
-                info["Test_Step_Status"] = "SUCCESS"
+            if len(arg) and arg[0] == "check_message":
+                if message.lower() == str(expectedValues[0]).lower():
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
-                info["Test_Step_Status"] = "FAILURE"
+                code = error.get("code")
+                if message.lower() == str(expectedValues[0]).lower() and int(code) == int(expectedValues[1]):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
         elif tag == "controller_check_default_plugin_state":
             if arg[0] == "check_default_state":
                 state = ""
@@ -2595,6 +2653,15 @@ def CheckAndGenerateConditionalExecStatus(testStepResults,methodTag,arguments):
                 result = "TRUE"
             else:
                 result = "FALSE"
+
+        # XCast Plugin Response result parser steps
+        elif tag == "xcast_get_xdial_status":
+            testStepResults = testStepResults[0].values()[0]
+            status = testStepResults[0].get("status")
+            if str(status).lower() == "true":
+                result = "FALSE"
+            else:
+                result = "TRUE"
 
         # System Plugin Response result parser steps
         elif tag == "system_check_preferred_standby_mode":
@@ -2898,6 +2965,14 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["value"] = False
             else:
                 info["value"] = True
+
+        elif tag == "system_generate_new_temperature_grace_interval":
+            testStepResults = testStepResults[0].values()[0]
+            info["graceInterval"] = int(testStepResults[0].get("graceInterval")) + 10
+
+        elif tag == "system_get_device_details":
+            testStepResults = testStepResults[0].values()[0]
+            info["value"] = testStepResults[0].get("details")
 
         # user Preferences result parser steps
         elif tag == "userpreferences_switch_ui_language":
@@ -3587,6 +3662,20 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,execInfo)
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "Check_And_Enable_XDial":
+            if len(arg) and arg[0] == "enable_xdial":
+                command = 'tr181 -d -s -v 1 Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable'
+                output = executeCommand(execInfo, command)
+                if "set operation success" in output.lower():
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif len(arg) and arg[0] == "check_status":
+                command = 'tr181 Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.XDial.Enable'
+                output = executeCommand(execInfo, command)
+                output = str(output).split("\n")[1]
+                info["status"] = output.strip()
+ 
         elif tag == "network_check_stb_ip_family":
             info["STB_IP_Family"] = expectedValues
             if str(expectedValues[0]) == str(deviceIP):
@@ -3838,6 +3927,13 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,execInfo)
                 message = "\"RDKSHELL_SPLASH_IMAGE_JPEG\" Environment variable is not present in the wpeframework.service file but \"Splash Screen\" feature configured as supported feature in config file"
                 info["Test_Step_Message"] = message
                 info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "system_get_device_details_from_file":
+            command = 'grep '+str(arg[0])+' '+str(arg[1])+' | cut -d\'=\' -f2- | xargs'
+            output = executeCommand(execInfo, command)
+            output = str(output).split("\n")[1]
+            info["details"] = output.strip()
+            info["Test_Step_Status"] =  "SUCCESS"
 
         elif tag == "executeRebootCmd":
             command = "reboot"

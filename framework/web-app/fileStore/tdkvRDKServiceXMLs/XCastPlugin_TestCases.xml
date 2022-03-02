@@ -36,10 +36,45 @@
                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Xcast" expectedValues="activated"/>
             </testStep>
           </prerequisite>
+          <prerequisite requisiteId="2" requisiteName="Activate_System_Plugin">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="org.rdk.System" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.System" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.System" />
+                <params>
+                  <param tag="callsign" value="org.rdk.System" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.System" />
+                <params>
+                  <param tag="plugin" value="org.rdk.System" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.System" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
         </pluginPreRequisite>
-
         <testCase testCaseId="XCast_01" testCaseName="Enable_Disable_XCast" desc="Enable and disables the XCast">
-        <testCaseInfo testCaseType="setandget" revert="true" />
+         <testCaseInfo testCaseType="direct" />
+         <testCasePreRequisite>
+             <prerequisite requisiteId="1" requisiteName="Enable_XDial">
+               <testStep testStepId="1" name="Check_XDial_Status"  action="externalFnCall" saveResult="true">
+                  <resultGeneration useMethodTag="Check_And_Enable_XDial" arguments="check_status"/>
+               </testStep>
+               <testStep testStepId="2" name="Enable_XDial"  action="externalFnCall" >
+                  <conditionalExecution enable="true" Id="1" useMethodTag="xcast_get_xdial_status" />
+                  <resultGeneration useMethodTag="Check_And_Enable_XDial" arguments="enable_xdial" />
+               </testStep>
+               <testStep testStepId="3" name="System_reboot" method="Reboot" rebootStep="yes" pluginName="System">
+                   <conditionalExecution enable="true" Id="1" useMethodTag="xcast_get_xdial_status" />
+                   <resultGeneration useMethodTag="system_check_set_operation"  />
+               </testStep>
+             </prerequisite>
+         </testCasePreRequisite>
          <testStep testStepId="1" name="Get_Enabled" method="Get_Enabled" saveResult="true" revertGet="yes">
            <resultGeneration useMethodTag="xcast_get_enabled_status" />
          </testStep>
@@ -57,12 +92,42 @@
         </testCase>
         <testCase testCaseId="XCast_02" testCaseName="Check_API_Version" desc="Checks the API version">
             <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+             <prerequisite requisiteId="1" requisiteName="Enable_XDial">
+               <testStep testStepId="1" name="Check_XDial_Status"  action="externalFnCall" saveResult="true">
+                  <resultGeneration useMethodTag="Check_And_Enable_XDial" arguments="check_status"/>
+               </testStep>
+               <testStep testStepId="2" name="Enable_XDial"  action="externalFnCall" >
+                  <conditionalExecution enable="true" Id="1" useMethodTag="xcast_get_xdial_status" />
+                  <resultGeneration useMethodTag="Check_And_Enable_XDial" arguments="enable_xdial" />
+               </testStep>
+               <testStep testStepId="3" name="System_reboot" method="Reboot" rebootStep="yes" pluginName="System">
+                   <conditionalExecution enable="true" Id="1" useMethodTag="xcast_get_xdial_status" />
+                   <resultGeneration useMethodTag="system_check_set_operation"  />
+               </testStep>
+             </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="Get_API_Version" method="Get_API_Version">
                 <resultGeneration useMethodTag="xcast_check_api_version" expectedValues="1" />
             </testStep>
         </testCase>
         <testCase testCaseId="XCast_03" testCaseName="SetandGet_Friendly_Name" desc="Check whether able to set and get friendly name" >
-           <testCaseInfo testCaseType="direct"  />
+            <testCaseInfo testCaseType="direct"  />
+            <testCasePreRequisite>
+             <prerequisite requisiteId="1" requisiteName="Enable_XDial">
+               <testStep testStepId="1" name="Check_XDial_Status"  action="externalFnCall" saveResult="true">
+                  <resultGeneration useMethodTag="Check_And_Enable_XDial" arguments="check_status"/>
+               </testStep>
+               <testStep testStepId="2" name="Enable_XDial"  action="externalFnCall" >
+                  <conditionalExecution enable="true" Id="1" useMethodTag="xcast_get_xdial_status" />
+                  <resultGeneration useMethodTag="Check_And_Enable_XDial" arguments="enable_xdial" />
+               </testStep>
+               <testStep testStepId="3" name="System_reboot" method="Reboot" rebootStep="yes" pluginName="System">
+                   <conditionalExecution enable="true" Id="1" useMethodTag="xcast_get_xdial_status" />
+                   <resultGeneration useMethodTag="system_check_set_operation"  />
+               </testStep>
+             </prerequisite>
+            </testCasePreRequisite>
             <testStep testStepId="1" name="Set_Friendly_Name" method="Set_Friendly_Name" >
                 <params>
                   <param tag="friendlyname" value="Application_1" />
@@ -74,7 +139,22 @@
             </testStep>
         </testCase>
         <testCase testCaseId="XCast_04" testCaseName="SetandGet_Standby_Behavior" desc="Check whether able to set and get xcast behavior in standby mode" >
-        <testCaseInfo testCaseType="setandget" revert="true" />
+         <testCaseInfo testCaseType="setandget" revert="true" />
+         <testCasePreRequisite>
+             <prerequisite requisiteId="1" requisiteName="Enable_XDial">
+               <testStep testStepId="1" name="Check_XDial_Status"  action="externalFnCall" saveResult="true">
+                  <resultGeneration useMethodTag="Check_And_Enable_XDial" arguments="check_status"/>
+               </testStep>
+               <testStep testStepId="2" name="Enable_XDial"  action="externalFnCall" >
+                  <conditionalExecution enable="true" Id="1" useMethodTag="xcast_get_xdial_status" />
+                  <resultGeneration useMethodTag="Check_And_Enable_XDial" arguments="enable_xdial" />
+               </testStep>
+               <testStep testStepId="3" name="System_reboot" method="Reboot" rebootStep="yes" pluginName="System">
+                   <conditionalExecution enable="true" Id="1" useMethodTag="xcast_get_xdial_status" />
+                   <resultGeneration useMethodTag="system_check_set_operation"  />
+               </testStep>
+             </prerequisite>
+         </testCasePreRequisite>
          <testStep testStepId="1" name="Get_Standby_Behavior" method="Get_Standby_Behavior" saveResult="true" revertGet="yes" >
            <resultGeneration useMethodTag="xcast_check_standby_behavior" />
          </testStep>

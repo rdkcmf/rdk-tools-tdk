@@ -354,7 +354,7 @@
             <testStep testStepId="2" name="Set_Dialog_Enhancement" testStepType="loop" >
               <subtestStep subtestStepId="1" name="Set_Dialog_Enhancement" method="Set_Dialog_Enhancement" revertSet="yes">
                   <params>
-                    <param tag="enhancerlevel" value="0,8,16" iteration="true" revertParam="yes" />
+                    <param tag="enhancerlevel" value="0,8,12" iteration="true" revertParam="yes" />
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
@@ -2579,7 +2579,7 @@
         </testCase>       
 
         <testCase testCaseId="DS_96" testCaseName= "Check_Audio_Delay_Offset_Persist_HDMI0" desc="Check whether audio delay offset values are persisting after reboot for HDMI0 port" >
-            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS,AUDIO_DELAY_OFFSET_PERSISTENCE" useMethodTag="displaysetting_check_feature_applicability" arguments="AudioDelayOffset,HDMI0,yes"/>
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_PERSISTENCE_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="AudioDelayOffset,HDMI0"/>
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
                 <resultGeneration useMethodTag="check_connected_audio_ports"  expectedValues="HDMI0">
                 </resultGeneration>
@@ -3002,5 +3002,169 @@
                   </resultGeneration>
             </testStep>
         </testCase> 
+        
+        <testCase testCaseId="DS_108" testCaseName= "Check_MS12_Audio_Compression_Persist_HDMI0" desc="Check whether MS12 audio compression values are persisting after reboot for HDMI0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS,DISPLAYSETTINGS_PERSISTENCE_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="HDMI0,AudioCompression" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_MS12_Audio_Compression" method="Get_MS12_Audio_Compression" saveResult="true" revertGet="yes" >
+              <params>
+                 <param tag="audioPort"  value="HDMI0" />
+              </params>
+              <resultGeneration useMethodTag="check_MS12_audio_compression" />
+            </testStep>
+            <testStep testStepId="3" name="Set_MS12_Audio_Compression" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_MS12_Audio_Compression" method="Set_MS12_Audio_Compression" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                    <param tag="compresionLevel" value="0,5,10" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="System_reboot" method="Reboot" rebootStep="yes" pluginName="System">
+                  <resultGeneration useMethodTag="system_check_set_operation"  />
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Get_MS12_Audio_Compression" method="Get_MS12_Audio_Compression" revertFlag="yes" >
+                  <params>
+                      <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_MS12_audio_compression" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_109" testCaseName= "Check_Dialog_Enhancement_Persist_HDMI0" desc="Check whether dialog enhancement values are persisting after reboot for HDMI0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS,DISPLAYSETTINGS_PERSISTENCE_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="HDMI0,DialogEnhancement" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" saveResult="true" revertGet="yes" >
+              <params>
+                 <param tag="audioPort"  value="HDMI0" />
+              </params>
+              <resultGeneration useMethodTag="check_dialog_enhancement" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Dialog_Enhancement" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Dialog_Enhancement" method="Set_Dialog_Enhancement" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                    <param tag="enhancerlevel" value="0,8,12" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="System_reboot" method="Reboot" rebootStep="yes" pluginName="System">
+                  <resultGeneration useMethodTag="system_check_set_operation"  />
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" revertFlag="yes" >
+                  <params>
+                      <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_dialog_enhancement" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_110" testCaseName= "Check_Dolby_Volume_Mode_Persist_HDMI0"  desc="Check whether dolby volume mode are persisting after reboot for HDMI0 port">
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS,DISPLAYSETTINGS_PERSISTENCE_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="HDMI0,DolbyVolume"/>
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Dolby_Volume_Mode" method="Get_Dolby_Volume_Mode" saveResult="true" revertGet="yes" >
+              <resultGeneration useMethodTag="check_dolby_volume_mode" >
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Enable_And_Disable_Dolby_Volume_Mode" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Enable_Dolby_Volume_Mode" method="Set_Dolby_Volume_Mode" revertSet="yes">
+                  <params>
+                    <param tag="dolbyVolumeMode" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="System_reboot" method="Reboot" rebootStep="yes" pluginName="System">
+                  <resultGeneration useMethodTag="system_check_set_operation"  />
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Get_Dolby_Volume_Mode" method="Get_Dolby_Volume_Mode" revertFlag="yes" >
+                  <resultGeneration useMethodTag="check_dolby_volume_mode" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_111" testCaseName= "Check_MS12_Audio_Compression_Persist_SPEAKER0" desc="Check whether MS12 audio compression values are persisting after reboot for SPEAKER0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS,DISPLAYSETTINGS_PERSISTENCE_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="SPEAKER0,AudioCompression" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPEAKER0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_MS12_Audio_Compression" method="Get_MS12_Audio_Compression" saveResult="true" revertGet="yes" >
+              <params>
+                 <param tag="audioPort"  value="SPEAKER0" />
+              </params>
+              <resultGeneration useMethodTag="check_MS12_audio_compression" />
+            </testStep>
+            <testStep testStepId="3" name="Set_MS12_Audio_Compression" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_MS12_Audio_Compression" method="Set_MS12_Audio_Compression" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                    <param tag="compresionLevel" value="0,5,10" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="System_reboot" method="Reboot" rebootStep="yes" pluginName="System">
+                  <resultGeneration useMethodTag="system_check_set_operation"  />
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Get_MS12_Audio_Compression" method="Get_MS12_Audio_Compression" revertFlag="yes" >
+                  <params>
+                      <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_MS12_audio_compression" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="DS_112" testCaseName= "Check_Dialog_Enhancement_Persist_SPEAKER0" desc="Check whether dialog enhancement values are persisting after reboot for SPEAKER0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS,DISPLAYSETTINGS_PERSISTENCE_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="SPEAKER0,DialogEnhancement" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPEAKER0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" saveResult="true" revertGet="yes" >
+              <params>
+                 <param tag="audioPort"  value="SPEAKER0" />
+              </params>
+              <resultGeneration useMethodTag="check_dialog_enhancement" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Dialog_Enhancement" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Dialog_Enhancement" method="Set_Dialog_Enhancement" revertSet="yes">
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                    <param tag="enhancerlevel" value="0,8,12" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="System_reboot" method="Reboot" rebootStep="yes" pluginName="System">
+                  <resultGeneration useMethodTag="system_check_set_operation"  />
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" revertFlag="yes" >
+                  <params>
+                      <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_dialog_enhancement" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
 </testPlugin>  
 

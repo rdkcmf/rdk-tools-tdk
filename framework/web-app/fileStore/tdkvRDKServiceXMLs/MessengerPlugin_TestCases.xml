@@ -174,5 +174,51 @@
                 </params>
             </testStep>
         </testCase>
+
+        <testCase testCaseId="MS_06" testCaseName= "Messenger_Join_Room_With_Existing_User_Name"  desc="Joins the room with existing user name and validate the error message">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Messenger_Join" method="Messenger_Join" saveResult="true">
+                <params>
+                  <param tag="user"  value="user_6"/>
+                  <param tag="room"  value="room_6"/>
+                </params>
+              <resultGeneration useMethodTag="messenger_join_room" />
+            </testStep>
+            <testStep testStepId="2" name="Messenger_Join" method="Messenger_Join" saveResult="true">
+                <params>
+                  <param tag="user"  value="user_6"/>
+                  <param tag="room"  value="room_6"/>
+                </params>
+            <resultGeneration useMethodTag="messenger_check_error_message" expectedValues="ERROR_ILLEGAL_STATE,5"/>
+            </testStep>
+            <testStep testStepId="3" name="Messenger_Leave" method="Messenger_Leave">
+                <params>
+                  <param tag="roomid"  usePreviousResult="true" Id="1" useMethodTag="messenger_get_roomid" />
+                </params>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="MS_07" testCaseName= "Messenger_Send_Message_With_Expired_Room_ID"  desc="Sends a message with existing room ID and validate the error message">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Messenger_Join" method="Messenger_Join" saveResult="true">
+                <params>
+                  <param tag="user"  value="user_7"/>
+                  <param tag="room"  value="room_7"/>
+                </params>
+              <resultGeneration useMethodTag="messenger_join_room" />
+            </testStep>
+            <testStep testStepId="2" name="Messenger_Leave" method="Messenger_Leave">
+                <params>
+                  <param tag="roomid"  usePreviousResult="true" Id="1" useMethodTag="messenger_get_roomid" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Messenger_Send" method="Messenger_Send">
+                <params>
+                  <param tag="roomid"  usePreviousResult="true" Id="1" useMethodTag="messenger_get_roomid" />
+                  <param tag="message"  value="Hello"/>
+                </params>
+                <resultGeneration useMethodTag="messenger_check_error_message" expectedValues="ERROR_UNKNOWN_KEY,22"/>
+            </testStep>
+        </testCase>
 </testPlugin>
 

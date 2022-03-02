@@ -475,6 +475,17 @@
                 <param tag="Opt-Out" type="bool" />
             </params>
         </method>
+        <method name="Get_Over-Temperature_Grace_Interval" api="getOvertempGraceInterval" type="method" desc="Returns the over-temperature grace interval value"/>
+        <method name="Set_Over-Temperature_Grace_Interval" api="setOvertempGraceInterval" type="method" desc="Sets the over-temperature grace interval value" >
+            <params>
+                <param tag="graceInterval" defaultValue="null" />
+            </params>
+        </method>
+        <method name="Get_Platform_Configuration" api="getPlatformConfiguration" type="method" version="2" desc="Returns the supported features and device/account info" >
+            <params>
+                <param tag="query" defaultValue="null" />
+            </params>
+        </method>
         <method name="Update_Firmware" api="updateFirmware" type="method" desc="Initiates a firmware update" />
         <method name="Get_Downloaded_Firmware_Info" api="getDownloadedFirmwareInfo" type="method" desc="Returns information about firmware downloads" />
         <method name="Reboot" api="reboot" type="method" desc="system perform a reboot of the set-top box" />
@@ -1241,10 +1252,14 @@
         <method name="Get_Current_Output_Settings" api="getCurrentOutputSettings" type="method" desc="Get the current output settings details"/>
         <method name="Set_MS12_Audio_Compression" api="setMS12AudioCompression" type="method" desc="Set the MS12Audio compression values">
             <params>
+                <param tag="audioPort" defaultValue="null"/>
                 <param tag="compresionLevel" defaultValue="null"/>
             </params>
         </method>
         <method name="Get_MS12_Audio_Compression" api="getMS12AudioCompression" type="method" desc="Get the MS12Audio compression  details" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
             <expectedValues>0,1,2,3,4,5,6,7,8,9,10</expectedValues>
         </method>
         <method name="Set_Dolby_Volume_Mode" api="setDolbyVolumeMode" type="method" desc="Set the dolby volume mode as true or false" >
@@ -1257,10 +1272,14 @@
         </method>
         <method name="Set_Dialog_Enhancement" api="setDialogEnhancement" type="method" desc="Set the dialog enhancement values" >
             <params>
+                <param tag="audioPort" defaultValue="null"/>
                 <param tag="enhancerlevel" defaultValue="null"/>
             </params>
         </method>
         <method name="Get_Dialog_Enhancement" api="getDialogEnhancement" type="method" desc="Get the Dialog Enhancement value" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+            </params>
             <expectedValues>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16</expectedValues>
         </method>
         <method name="Set_Intelligent_Equalizer_Mode" api="setIntelligentEqualizerMode" type="method" desc="Set the intelligent equalizer mode values" >
