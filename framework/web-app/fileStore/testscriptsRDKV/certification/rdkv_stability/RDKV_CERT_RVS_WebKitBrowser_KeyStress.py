@@ -174,7 +174,9 @@ if expectedResult in (result.upper() and pre_condition_status):
                                 else:
                                     print "\n Checking key press events \n"
                                     for index,key in enumerate(keys_list):
-                                        key_press_log = json.loads(webkit_console_socket.getEventsBuffer()[index])
+                                        key_press_log_with_time = json.loads(webkit_console_socket.getEventsBuffer()[index])
+                                        key_press = key_press_log_with_time.split('$$$')[1]
+                                        key_press_log = json.loads(key_press)
                                         key_code = key_press_log.get("params").get("message").get("text")
                                         key_code = int(key_code.split(":")[1])
                                         if key != key_code:
