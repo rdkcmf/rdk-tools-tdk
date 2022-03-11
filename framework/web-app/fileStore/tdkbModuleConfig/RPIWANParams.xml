@@ -150,9 +150,9 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>0</defaultValue>
-               <!-- the range of values acceptable -->
-               <expectedValues>0,1</expectedValues>
+               <defaultValue>60</defaultValue>
+               <!-- the range of values acceptable for set-->
+               <setValue>30</setValue>
                <RFCEnabled>true</RFCEnabled>
         </parameter>
         <parameter>
