@@ -48,11 +48,6 @@
   <skip>true</skip>
   <!--  -->
   <box_types>
-    <box_type>IPClient-3</box_type>
-    <box_type>Video_Accelerator</box_type>
-    <!--  -->
-    <box_type>Hybrid-1</box_type>
-    <!--  -->
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>

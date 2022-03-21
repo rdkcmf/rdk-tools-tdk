@@ -93,6 +93,7 @@ Checkpoint 2 Verify that the status is set</expected_output>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
+import time
 from dshalUtility import *;
 
 #Test component to be tested
@@ -149,6 +150,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
                 print "DSHal_EnableVideoPort result: ", actualResult
                 details = tdkTestObj.getResultDetails();
                 print details;
+                time.sleep(2);
 
                 #Check if new status set
                 if expectedResult in actualResult: 
@@ -174,6 +176,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
                         print "DSHal_EnableVideoPort result: ", actualResult;
                         details = tdkTestObj.getResultDetails();
                         print details;
+                        time.sleep(2)
 
                         if expectedResult in actualResult:
                             tdkTestObj = dshalObj.createTestStep('DSHal_IsVideoPortEnabled');
