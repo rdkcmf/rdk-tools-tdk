@@ -178,7 +178,7 @@ if expectedResult in result.upper():
                                             print "\n WIFI is enabled"
                                             print "\n Start scanning for SSID"
                                             #Start scanning for SSID
-                                            params = '{"incremental":false,"ssid":"' + ssid + '","frequency":""}'
+                                            params = '{"incremental":true,"ssid":"' + ssid + '","frequency":""}'
                                             tdkTestObj = obj.createTestStep('rdkservice_setValue')
                                             tdkTestObj.addParameter("method","org.rdk.Wifi.1.startScan")
                                             tdkTestObj.addParameter("value",params)

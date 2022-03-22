@@ -92,6 +92,10 @@ def execute_step(Data):
                 result = "EXCEPTION OCCURRED"
                 return result;
         json_response = json.loads(response.content)
+        print "\n---------------------------------------------------------------------------------------------------"
+        print "Json command : ", data
+        print "\n Response : ", json_response, "\n"
+        print "----------------------------------------------------------------------------------------------------\n"
         result = json_response.get("result")
         if result != None and "'success': False" in str(result):
             result = "EXCEPTION OCCURRED"
