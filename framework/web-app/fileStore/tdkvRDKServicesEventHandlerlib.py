@@ -44,6 +44,7 @@ class createEventListener(object):
         self.eventsregistercmds   = eventsInfo.get("eventsRegisterJsonCmds")
         self.eventsunregistercmds = eventsInfo.get("eventsUnRegisterJsonCmds")
         self.trace = trace
+        self.access_token = str(eventsInfo.get("token"))
         thread = threading.Thread(target=self.connect, args=())
         thread.daemon = True
         thread.start()
@@ -83,8 +84,14 @@ class createEventListener(object):
         try:
             print "[INFO]: Opening websocket Connection"
             websocket.enableTrace(self.trace)
-            websocketConnection = "ws://" + self.ip + ":" + str(self.port) + "/jsonrpc"
-            self.ws = websocket.WebSocketApp(websocketConnection,
+            auth = "Authorization: Bearer " + str(self.access_token)
+            # # # With Thunder Security Token
+            if self.access_token != None:
+                websocketConnection = "ws://" + self.ip + ":" + str(self.port) + "/jsonrpc?token="+str(self.access_token)
+            # # # Without Thunder Security Token
+            else:
+                websocketConnection = "ws://" + self.ip + ":" + str(self.port) + "/jsonrpc"
+            self.ws = websocket.WebSocketApp(websocketConnection, header=[auth],
                                              on_message = self.on_message,
                                              on_error   = self.on_error,
                                              on_close   = self.on_close,
@@ -93,6 +100,7 @@ class createEventListener(object):
             print "[INFO]: Start Event Handler..."
             self.ws.run_forever()
         except Exception as e:
+            print e
             print "\nException Occurred while connecting to target device\n"
 
     def on_open(self):

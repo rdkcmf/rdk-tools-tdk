@@ -30,6 +30,7 @@ import requests
 import json,ast
 import ConfigParser
 import xml.etree.ElementTree as ET
+from SecurityTokenUtility import *
 from tdkvRDKServicesSupportlib import *
 from tdkvRDKServicesEventHandlerlib import *
 
@@ -223,6 +224,13 @@ def executePluginTests(libobj, deviceIPAddress, devicePort, testDeviceName, test
     pluginXML = XMLPath + "/" + "ThunderPlugins"   + ".xml"
     pluginTestCaseXML = XMLPath + "/" + pluginName + "Plugin_TestCases.xml"
 
+
+    global tokenFile
+    global deviceToken
+    global securityEnabled
+    securityEnabled = None
+    tokenFile = basePath + "/" + "fileStore/tdkvRDKServiceConfig/tokenConfig/" + deviceName + ".config"
+
     # Check whether plugin XML files required for executing
     # the test are present
     status = "SUCCESS"
@@ -272,6 +280,7 @@ def executePluginTests(libobj, deviceIPAddress, devicePort, testDeviceName, test
         else:
             status = "FAILURE"
             print "[ERROR]: No proper test EXEC_METHOD input"
+
 
     # If Performance measurement enabled, get the max response time
     if status == "SUCCESS" and IsPerformanceSelected == "true":
@@ -771,6 +780,11 @@ def executeEventHandlerRequisite(requisite):
     eventsInfo["unregisterMethods"] = unregisterMethods
     eventsInfo["eventsRegisterJsonCmds"]   = eventsRegisterJsonCmds
     eventsInfo["eventsUnRegisterJsonCmds"] = eventsUnRegisterJsonCmds
+    if securityEnabled != None:
+        eventsInfo["token"] = deviceToken
+    else:
+        eventsInfo["token"] = None
+
 
     # Create Event listener Object
     global eventListener
@@ -1349,17 +1363,56 @@ def executeCommand(testMethod,testParams):
             customTimeout = None
         else:
             responseTimeout = 30
+
         if execMethod.upper() == "CURL":
-            req_post = requests.post(requestURL,data=jsonCmd,timeout=responseTimeout)
-            jsonResponse = json.loads(req_post.content,strict=False)
-            if IsPerformanceSelected == "true":
-                responseTime = req_post.elapsed.total_seconds()
+            status,req_post,jsonResponse = postCURLRequest(requestURL,jsonCmd,responseTimeout)
+            if status == "SUCCESS":
+                # If rdkservices API invocation failed due to token issue, then update the token in DUT Token config file
+                if jsonResponse.get("error") != None and "Missing or invalid token" in jsonResponse.get("error").get("message"):
+                    #print jsonResponse
+                    print "\n[INFO]: Required Security Token for Authorization..."
+                    global deviceToken
+                    global securityEnabled
+                    if securityEnabled == None:
+                        # Create the Device Token config file and update the token
+                        status,deviceToken = read_token_config(deviceIP,tokenFile)
+                        if status == "SUCCESS":
+                            print "[INFO]: Device Security Token obtained successfully"
+                        else:
+                            print "[ERROR]: Failed to get the device security token"
+                        securityEnabled = True
+                    else:
+                        # Update the token in the device token config file
+                        status,deviceToken  = handleDeviceTokenChange(deviceIP,tokenFile)
+
+                    if status == "SUCCESS":
+                        status,req_post,jsonResponse = postCURLRequest(requestURL,jsonCmd,responseTimeout)
+                        if status == "SUCCESS":
+                            if jsonResponse.get("error") != None and "Missing or invalid token" in jsonResponse.get("error").get("message"):
+                                print "\n[INFO]: Authorization issue occurred. Update Token & Re-try..."
+                                status,deviceToken  = handleDeviceTokenChange(deviceIP,tokenFile)
+                                if status == "SUCCESS":
+                                    status,req_post,jsonResponse = postCURLRequest(requestURL,jsonCmd,responseTimeout)
+                                    if status != "SUCCESS":
+                                        executeStatus = "FAILURE"
+                                else:
+                                    executeStatus = "FAILURE"
+                        else:
+                            executeStatus = "FAILURE"
+
+                    else:
+                        executeStatus = "FAILURE"
+            else:
+                executeStatus = "FAILURE"
+
+            if IsPerformanceSelected == "true" and executeStatus == "SUCCESS":
+                    responseTime = req_post.elapsed.total_seconds()
         else:
             executeStatus = "FAILURE"
             print "\nError Occurred: Unknown method type for sending JSON Request"
 
         #Getting the response time for performance metrics
-        if IsPerformanceSelected == "true" and execMethod.upper() in ["CURL","TTS"]:
+        if IsPerformanceSelected == "true" and execMethod.upper() in ["CURL"] and executeStatus == "SUCCESS":
             print "\n\nResponse Time of %s : %s" %(testMethod,responseTime)
             responseCheckStatus = "OK"
             if (float(responseTime) <= 0 or float(responseTime) > float(maxResponseTime)):
@@ -1376,6 +1429,36 @@ def executeCommand(testMethod,testParams):
     #print "Output: " , jsonResponse
 
     return executeStatus,jsonResponse
+
+
+
+#-----------------------------------------------------------------------------------------------
+# postCURLRequest
+#-----------------------------------------------------------------------------------------------
+# Syntax      : postCURLRequest(requestURL,jsonCmd,responseTimeout)
+# Description : Method to post the curl request
+# Parameter   : requestURL - device url for posting curl request
+#             : jsonCmd    - Json Command with rdkservices API & parameters
+#             : responseTimeout - default curl response timeout
+# Return Value: Curl status (SUCCESS/FAILURE), response, response json data
+#-----------------------------------------------------------------------------------------------
+def postCURLRequest(requestURL,jsonCmd,responseTimeout):
+    status = "SUCCESS"
+    jsonResponse = {}
+    req_post = None
+    try:
+        if securityEnabled != None:
+            Bearer = 'Bearer ' + deviceToken
+            headers = {'content-type': 'text/plain;',"Authorization":Bearer}
+        else:
+            headers = {'content-type': 'text/plain;'}
+        req_post = requests.post(requestURL,headers=headers,data=jsonCmd,timeout=responseTimeout)
+        jsonResponse = json.loads(req_post.content,strict=False)
+    except Exception as e:
+        status = "FAILURE"
+        print "\nException Occurred : %s" %(e)
+        print "\nJSON Command Sent : %s" %(jsonCmd)
+    return status,req_post,jsonResponse
 
 
 
@@ -1506,12 +1589,21 @@ def handleDeviceReboot():
 
 
 def getTestDeviceStatus():
+    global deviceToken
     try:
         data = '{"jsonrpc":"2.0","id":"2","method": "Controller.1.status@Controller"}'
-        headers = {'content-type': 'text/plain;'}
+        if securityEnabled != None:
+            Bearer = 'Bearer ' + deviceToken
+            headers = {'content-type': 'text/plain;',"Authorization":Bearer}
+        else:
+            headers = {'content-type': 'text/plain;'}
         url = 'http://' + deviceIP + ':' + portNo + '/jsonrpc'
         response = requests.post(url, headers=headers, data=data, timeout=3)
         if response.status_code == 200:
+            jsonResponse = json.loads(response.content,strict=False)
+            if securityEnabled != None:
+                if jsonResponse.get("error") != None and "Missing or invalid token" in jsonResponse.get("error").get("message"):
+                    status,deviceToken = handleDeviceTokenChange(deviceIP,tokenFile)
             return "FREE"
         else:
             return "NOT_FOUND"
@@ -1561,7 +1653,6 @@ def handleDeviceIPChange():
         print "Unable to get Device Details from REST !!!"
         sys.stdout.flush()
         return "FAILURE"
-
 
 
 def setUpPreRequisitesBack():
@@ -1672,6 +1763,14 @@ def setTestStepDelay(testStepInfo):
     if testStepInfo.get("delay") is not None:
         delay = int(testStepInfo.get("delay"))
         time.sleep(delay)
+    elif testStepInfo.get("delayKey") != None:
+        try:
+            status,keyData = readDeviceConfigKeys(testStepInfo.get("delayKey"))
+            if status == "SUCCESS" and  keyData != "":
+                delay = int(keyData)
+                time.sleep(delay)
+        except Exception as e:
+            print "\nException Occurred: [%s] %s" %(inspect.stack()[0][3],e)        
 
 #-----------------------------------------------------------------------------------------------
 # getTestStepAPI
@@ -2670,3 +2769,4 @@ def dispPerformanceSummary():
     return performanceStatus
 
 #-----------------------------------------------------------------------------------------------
+
