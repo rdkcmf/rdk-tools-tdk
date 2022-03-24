@@ -36,6 +36,8 @@ import sys
 import socket
 import ast
 import urllib 
+from SecurityTokenUtility import *
+import web_socket_util
 
 deviceIP=""
 devicePort=""
@@ -43,6 +45,8 @@ deviceName=""
 deviceType=""
 deviceMac=""
 realpath=""
+securityEnabled=False
+deviceToken=""
 
 graphical_plugins_list = PerformanceTestVariables.graphical_plugins_list
 excluded_process_list = PerformanceTestVariables.excluded_process_list
@@ -72,33 +76,86 @@ def init_module(libobj,port,deviceInfo):
        print e
 
 #---------------------------------------------------------------
-#EXECUTE CURL REQUESTS
+#POST CURL REQUEST USING PYTHON REQUESTS
 #---------------------------------------------------------------
-def execute_step(Data):
-    data = '{"jsonrpc": "2.0", "id": 1234567890, '+Data+'}'
-    headers = {'content-type': 'text/plain;',}
+def postCURLRequest(data,securityEnabled):
+    status = "SUCCESS"
+    json_response={}
+    if securityEnabled:
+        Bearer = 'Bearer ' + deviceToken
+        headers = {'content-type': 'text/plain;',"Authorization":Bearer}
+    else:
+        headers = {'content-type': 'text/plain;',}
     url = 'http://'+str(deviceIP)+':'+str(devicePort)+'/jsonrpc'
     try:
         response = requests.post(url, headers=headers, data=data, timeout=20)
-	IsPerformanceSelected = libObj.parentTestCase.performanceBenchMarkingEnabled
-        if IsPerformanceSelected == "true":
-            conf_file,result = getConfigFileName(libObj.realpath)
-            result, max_response_time = getDeviceConfigKeyValue(conf_file,"MAX_RESPONSE_TIME")
-            time_taken = response.elapsed.total_seconds()
-            print "Time Taken for",Data,"is :", time_taken
-            if (float(time_taken) <= 0 or float(time_taken) > float(max_response_time)):
-                print "Device took more than usual to respond."
-                print "Exiting the script"
-                result = "EXCEPTION OCCURRED"
-                return result;
         json_response = json.loads(response.content)
-        print "\n---------------------------------------------------------------------------------------------------"
-        print "Json command : ", data
-        print "\n Response : ", json_response, "\n"
-        print "----------------------------------------------------------------------------------------------------\n"
-        result = json_response.get("result")
-        if result != None and "'success': False" in str(result):
-            result = "EXCEPTION OCCURRED"
+        if json_response.get("error") != None and "Missing or invalid token" in json_response.get("error").get("message"):
+            status = "INVALID TOKEN"
+    except requests.exceptions.RequestException as e:
+        status = "FAILURE"
+        print "ERROR!! \nEXCEPTION OCCURRED WHILE EXECUTING CURL COMMANDS!!"
+        print "Command : ",data
+        print "Error message received :\n",e;
+        response = "EXCEPTION OCCURRED"
+    return response,json_response,status
+
+#---------------------------------------------------------------
+#EXECUTE CURL REQUESTS
+#---------------------------------------------------------------
+def execute_step(Data):
+    status = "SUCCESS"
+    global securityEnabled
+    try:
+        data = '{"jsonrpc": "2.0", "id": 1234567890, '+Data+'}'
+        response,json_response,status = postCURLRequest(data,securityEnabled)
+        if status == "INVALID TOKEN":
+           print "\nAuthorization issue occurred. Update Token & Re-try..."
+           global deviceToken
+           tokenFile = libObj.realpath + "/" + "fileStore/tdkvRDKServiceConfig/tokenConfig/" + deviceName + ".config"
+           if not securityEnabled:
+               # Create the Device Token config file and update the token
+               token_status,deviceToken = read_token_config(deviceIP,tokenFile)
+               if token_status == "SUCCESS":
+                   print "\nDevice Security Token obtained successfully"
+               else:
+                   print "\nFailed to get the device security token"
+               securityEnabled = True
+           else:
+               # Update the token in the device token config file
+               token_status,deviceToken  = handleDeviceTokenChange(deviceIP,tokenFile)
+           if token_status == "SUCCESS":
+               response,json_response,status = postCURLRequest(data,securityEnabled)
+           else:
+               print "\nFailed to update the token in token config file"
+           if status == "INVALID TOKEN":
+               token_status,deviceToken  = handleDeviceTokenChange(deviceIP,tokenFile)
+               if token_status=="SUCCESS":
+                   response,json_response,status = postCURLRequest(data,securityEnabled)
+               else:
+                   status = "FAILURE"
+        web_socket_util.deviceToken = deviceToken
+        if status == "SUCCESS":
+            print "\n---------------------------------------------------------------------------------------------------"
+            print "Json command : ", data
+            print "\n Response : ", json_response, "\n"
+            print "----------------------------------------------------------------------------------------------------\n"
+            result = json_response.get("result")
+            if result != None and "'success': False" in str(result):
+                result = "EXCEPTION OCCURRED"
+
+            IsPerformanceSelected = libObj.parentTestCase.performanceBenchMarkingEnabled
+            if IsPerformanceSelected == "true":
+                conf_file,result = getConfigFileName(libObj.realpath)
+                result, max_response_time = getDeviceConfigKeyValue(conf_file,"MAX_RESPONSE_TIME")
+                time_taken = response.elapsed.total_seconds()
+                print "Time Taken for",Data,"is :", time_taken
+                if (float(time_taken) <= 0 or float(time_taken) > float(max_response_time)):
+                    print "Device took more than usual to respond."
+                    print "Exiting the script"
+                    result = "EXCEPTION OCCURRED"
+        else:
+            result = response;
         return result;
     except requests.exceptions.RequestException as e:
         print "ERROR!! \nEXCEPTION OCCURRED WHILE EXECUTING CURL COMMANDS!!"
