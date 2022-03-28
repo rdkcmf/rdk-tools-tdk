@@ -110,7 +110,6 @@ video_src_url_live_dash = ""
 
 #MP4 Video URL
 video_src_url_mp4      = test_streams_base_path + "TDK_Asset_Sunrise_MP4.mp4"
-video_src_url_dash_mp4 = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4.mpd"
 
 #H.264 Codec Video URL
 video_src_url_dash_h264 = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4.mpd"
