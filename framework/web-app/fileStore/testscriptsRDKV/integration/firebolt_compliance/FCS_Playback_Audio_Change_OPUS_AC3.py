@@ -161,6 +161,8 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
             tdkTestObj.setResultStatus("SUCCESS")
             print "OPUS AC3 codec switch was successfull"
             print "Mediapipeline test executed successfully"
+            checkifCodecPlayed(tdkTestObj,"opus")
+            checkifCodecPlayed(tdkTestObj,"ac-3")
         else:
             tdkTestObj.setResultStatus("FAILURE")
             print "OPUS AC3 codec switch failed"

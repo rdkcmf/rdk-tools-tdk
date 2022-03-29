@@ -200,6 +200,7 @@ video_src_url_ac3_aac = ""
 video_src_url_opus_ac3 = ""
 video_src_url_opus_eac3 = ""
 video_src_url_ac3_eac3 = ""
+video_src_url_aac_eac3 = ""
 
 # Basic WAV PCM Audio format stream
 audio_src_url_wav_pcm = ""

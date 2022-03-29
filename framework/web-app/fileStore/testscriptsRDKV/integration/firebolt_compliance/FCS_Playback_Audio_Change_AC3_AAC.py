@@ -155,11 +155,13 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     if expectedResult in actualresult.upper() and output:
         #Check the output string returned from 'mediapipelinetests' to verify if the test suite executed successfully 
         executionStatus = checkMediaPipelineTestStatus (output)
-        
         if expectedResult in executionStatus:
-            tdkTestObj.setResultStatus("SUCCESS")
+            #tdkTestObj.setResultStatus("SUCCESS")
+ 
             print "AC3 AAC codec switch was successfull"
             print "Mediapipeline test executed successfully"
+            checkifCodecPlayed(tdkTestObj,"ac-3")
+            checkifCodecPlayed(tdkTestObj,"aac");
         else:
             tdkTestObj.setResultStatus("FAILURE")
             print "AC3 AAC codec switch failed"

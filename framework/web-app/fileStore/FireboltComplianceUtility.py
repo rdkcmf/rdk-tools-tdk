@@ -25,6 +25,7 @@ from devicesettings import *
 # Global variable to store the operations string and use_aamp configuration
 operations = ""
 use_aamp = ""
+check_pts = ""
 
 #List consisting of HLS url
 HLS_URL = [MediaValidationVariables.video_src_url_short_duration_hls,MediaValidationVariables.video_src_url_hls,MediaValidationVariables.video_src_url_4k_hls,MediaValidationVariables.video_src_url_live_hls,MediaValidationVariables.video_src_url_hls_h264,MediaValidationVariables.video_src_url_hls_h264_iframe]
@@ -40,6 +41,7 @@ URL_TYPE = {MediaValidationVariables.video_src_url_vp9 : MediaValidationVariable
 def getDeviceConfigValue (tdklibObj, configKey):
     try:
         global use_aamp
+        global check_pts
         result = "SUCCESS"
         #Retrieve the device details(device name) and device type from tdk library
         configValue = ""
@@ -66,6 +68,7 @@ def getDeviceConfigValue (tdklibObj, configKey):
             #Retrieve the value of config key from device config file
             configValue = configParser.get('device.config', configKey)
             use_aamp = configParser.get('device.config',"FIREBOLT_COMPLIANCE_USE_AAMP_FOR_HLS")
+            check_pts = configParser.get('device.config',"FIREBOLT_COMPLIANCE_CHECK_PTS")
         else:
             print "DeviceConfig file not available"
             result = "FAILURE"
@@ -105,7 +108,7 @@ def setOperations (operation, *arguments):
             operations += operation
             #Add all the arguments
             for argument in arguments:
-                operations += ":" + argument
+                operations += ":" + str(float(argument))
         #If there are no operations to be repeated, then repeat command is invalid
         else:
             raise Exception("There are no operations to be repeated")
@@ -120,11 +123,18 @@ def getOperations ():
 def getMediaPipelineTestCommand (testName, testUrl, **arguments):
     #First construct the command with mandatory arguments
     command = "mediapipelinetests " + testName + " " + testUrl
+    #For trickplay scenrios use another app instead
+    if "trickplay" in testName:
+        command = "mediapipelinetests_trickplay" + " " + testUrl
+        if "latency" in testName.lower():
+            command += " checkLatency "
     #Based on the test, the arguments can vary, parse through the variabled arguments
     #and add the available variables
     for name, value in arguments.items ():
         command += " " + name + "=" + value
-
+    #Feature to disable  video-pts check
+    if (check_pts == "no"):
+        command = command + " checkPTS=no "
     #Feature to modify hls url to aamp url based on configuration
     if (use_aamp == "yes"):
         testUrl_list = testUrl.split();
@@ -212,7 +222,9 @@ def ResolutionTestStop(dsObj, resolution, ResolutionBeforePlayback=""):
     return result
 
 def parseLatency(tdkTestObj,latencyThreshold):
-    command = "cat /opt/TDK/latency_log"
+    logFile = " /opt/TDK/latency_log "
+    command = "cat " + logFile
+    command = command + " ;rm " + logFile
     tdkTestObj.addParameter("command", command)
     expectedResult = "SUCCESS"
     tdkTestObj.executeTestCase(expectedResult)
@@ -230,4 +242,19 @@ def parseLatency(tdkTestObj,latencyThreshold):
             print "Actual Latency:",output.split()[2]
     else:
         print "Unable to retrieve latency"
+        tdkTestObj.setResultStatus("FAILURE")
+
+def checkifCodecPlayed(tdkTestObj,codec):
+    logFile = " /opt/TDK/audio_change_log "
+    command = " grep -inr " + codec + logFile
+    tdkTestObj.addParameter("command", command)
+    expectedResult = "SUCCESS"
+    tdkTestObj.executeTestCase(expectedResult)
+    actualresult = tdkTestObj.getResult()
+    output = tdkTestObj.getResultDetails()
+    if expectedResult in actualresult.upper() and codec in output.lower():
+        print "%s played successfully"%codec
+        tdkTestObj.setResultStatus("SUCCESS")
+    else:
+        print "%s audio playback failed"%codec
         tdkTestObj.setResultStatus("FAILURE")
