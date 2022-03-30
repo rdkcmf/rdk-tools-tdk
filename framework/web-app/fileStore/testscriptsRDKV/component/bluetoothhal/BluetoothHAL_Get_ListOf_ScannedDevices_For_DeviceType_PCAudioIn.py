@@ -199,7 +199,7 @@ if "SUCCESS" in result.upper():
                                 tdkTestObj.setResultStatus("SUCCESS")
                                 result = tdkTestObj.getResultDetails()
                                 deviceDiscovered = False
-                                if result and "NO_DEVICES_FOUND" != result:
+                                if result and "NO_DEVICES_FOUND" != result and "deviceName" in result:
                                     scannedDevices = json.loads(result)
                                     #Traverse the scanned devices list to check if the client device is present
                                     for device in scannedDevices:

@@ -153,3 +153,32 @@ def closeSSHSession ():
         session.logout()
         session.close()
 
+######################################################
+#
+# Method to query the device type from the config file
+#
+######################################################
+
+def DeviceType (bluetoothObj):
+    try :
+
+        #Get Bluetooth configuration file
+        bluetoothConfigFile = bluetoothObj.realpath+'fileStore/bluetoothcredential.config'
+        configParser = ConfigParser.ConfigParser()
+        configParser.read(r'%s' % bluetoothConfigFile)
+        deviceType = configParser.get('bluetooth-config', 'deviceType')
+        if "AudioIn" in deviceType or "AudioOut" in deviceType:
+            return "I/O"
+        elif "HID" in deviceType:
+            return "HID"
+        elif "LE" in deviceType:
+            return "LE"
+        else:
+            print "Configuration parameter missing for isDeviceLE in bluetoothcredential.config"
+            print "Please configure to execute the script"
+            exit()
+
+    except Exception, e:
+        print e;
+        exit()
+

@@ -199,7 +199,7 @@ if "SUCCESS" in result.upper():
                                 tdkTestObj.setResultStatus("SUCCESS")
                                 result = tdkTestObj.getResultDetails()
                                 deviceDiscovered = False
-                                if result and "NO_DEVICES_FOUND" != result:
+                                if result and "NO_DEVICES_FOUND" != result and "deviceName" in result:
                                     scannedDevices = json.loads(result)
                                     #Traverse the scanned devices list to check if the client device is present
                                     for device in scannedDevices:
@@ -207,14 +207,23 @@ if "SUCCESS" in result.upper():
                                             print "Client device of type HID is successfully discovered in DUT"
                                             print "Client device details: \n", device
                                             deviceDiscovered = True
+                                    if DeviceType(bluetoothhalObj) not in "HID" and  True == deviceDiscovered:
+                                        print "Client device is discovered inspite of not being  HID type, which is unexpected"
+                                        tdkTestObj.setResultStatus("FAILURE")
                                     if True == deviceDiscovered:
                                         tdkTestObj.setResultStatus("SUCCESS")
                                     else:
+                                        if "HID" not in DeviceType(bluetoothhalObj):
+                                            tdkTestObj.setResultStatus("SUCCESS");
+                                        else:
+                                            tdkTestObj.setResultStatus("FAILURE")
                                         print "Client device NOT discovered in DUT"
-                                        tdkTestObj.setResultStatus("FAILURE")
                                 else:
+                                    if "HID" not in DeviceType(bluetoothhalObj):
+                                        tdkTestObj.setResultStatus("SUCCESS");
+                                    else:
+                                        tdkTestObj.setResultStatus("FAILURE")
                                     print "Client device NOT discovered in DUT"
-                                    tdkTestObj.setResultStatus("FAILURE")    
                             else:
                                 print "BluetoothHal_GetListOfScannedDevices: failed"
                                 tdkTestObj.setResultStatus("FAILURE")

@@ -199,7 +199,7 @@ if "SUCCESS" in result.upper():
                                 tdkTestObj.setResultStatus("SUCCESS")
                                 result = tdkTestObj.getResultDetails()
                                 deviceDiscovered = False
-                                if result and "NO_DEVICES_FOUND" != result:
+                                if result and "NO_DEVICES_FOUND" != result and "deviceName" in result:
                                     scannedDevices = json.loads(result)
                                     #Traverse the scanned devices list to check if the client device is present
                                     for device in scannedDevices:
@@ -210,11 +210,11 @@ if "SUCCESS" in result.upper():
                                     if True == deviceDiscovered:
                                         tdkTestObj.setResultStatus("SUCCESS")
                                     else:
-                                        print "Client device NOT discovered in DUT"
                                         tdkTestObj.setResultStatus("FAILURE")
+                                        print "Client device NOT discovered in DUT"
                                 else:
+                                    tdkTestObj.setResultStatus("FAILURE")
                                     print "Client device NOT discovered in DUT"
-                                    tdkTestObj.setResultStatus("FAILURE")    
                             else:
                                 print "BluetoothHal_GetListOfScannedDevices: failed"
                                 tdkTestObj.setResultStatus("FAILURE")

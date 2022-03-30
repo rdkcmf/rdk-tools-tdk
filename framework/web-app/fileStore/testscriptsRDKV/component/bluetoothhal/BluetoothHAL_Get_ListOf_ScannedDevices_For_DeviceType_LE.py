@@ -144,6 +144,10 @@ if "SUCCESS" in result.upper():
                 if "FAILURE" not in bluetoothctlResult:
                     tdkTestObj.setResultStatus("SUCCESS");
                     print "Client Device %s set as discoverable" %(bluetoothhallib.deviceName)
+                    if "LE" in  DeviceType(bluetoothhalObj):
+                        LowEnergy = True;
+                    else:
+                        LowEnergy = False;
                     #Start device discovery in DUT
                     print "Starting the device discovery in DUT"
                     tdkTestObj = bluetoothhalObj.createTestStep('BluetoothHal_StartDiscovery');
@@ -199,18 +203,24 @@ if "SUCCESS" in result.upper():
                                 tdkTestObj.setResultStatus("SUCCESS")
                                 result = tdkTestObj.getResultDetails()
                                 deviceDiscovered = False
-                                if result and "NO_DEVICES_FOUND" != result:
+                                if result and "NO_DEVICES_FOUND" != result and "deviceName" in result:
                                     scannedDevices = json.loads(result)
                                     #Traverse the scanned devices list to check if the client device is present
                                     for device in scannedDevices:
                                         if (device["deviceName"] == bluetoothhallib.deviceName):
                                             deviceDiscovered = True 
-                                    if True == deviceDiscovered :
-                                        print "Client device is not an LE device, but it is discovered in DUT" 
-                                        tdkTestObj.setResultStatus("FAILURE")
-                                    else:
-                                        print "Client device is not an LE device, so it is NOT discovered in DUT"
+                                    if True == deviceDiscovered and LowEnergy:
+                                        print "Client device is an LE device, and it is discovered in DUT" 
                                         tdkTestObj.setResultStatus("SUCCESS")
+                                    elif True == deviceDiscovered and not LowEnergy:
+                                        print "Client device is not an LE device, but it is discovered in DUT"
+                                        tdkTestObj.setResultStatus("FAILURE")
+                                    elif False == deviceDiscovered and not LowEnergy:
+                                        print "Client device is not an LE device and not discovered in DUT"
+                                        tdkTestObj.setResultStatus("SUCCESS")
+                                    elif False == deviceDiscovered and LowEnergy:
+                                        print "Client device is an LE device, but it is not discovered in DUT"
+                                        tdkTestObj.setResultStatus("FAILURE")
                                 else:
                                     print "Client device is not an LE device, so it is NOT discovered in DUT"
                                     tdkTestObj.setResultStatus("SUCCESS") 
