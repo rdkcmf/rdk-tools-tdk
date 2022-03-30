@@ -149,7 +149,8 @@ if expectedResult in result.upper():
         if "SUCCESS" in launch_status:
             # Monitoring the app progress, checking whether app plays the video properly or any hang detected in between,
             # performing proc entry check and getting the test result from the app
-            test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Video Player Playing");
+            # Monitoring the playback with hang detection time-out of 3 mins (180 seconds)
+            test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Video Player Playing",180);
             tdkTestObj = obj.createTestStep('rdkv_media_test');
             tdkTestObj.executeTestCase(expectedResult);
             if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:

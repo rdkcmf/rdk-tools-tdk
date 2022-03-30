@@ -460,6 +460,7 @@ def getConnectedVideoDisplay(obj):
         if "HDMI0" in disp_list:
             video_port  = "HDMI0"
             conn_status = "SUCCESS"
+        # For TV platform devices
         elif "Internal0" in disp_list:
             video_port  = "Internal0"
             conn_status = "SUCCESS"
@@ -486,6 +487,10 @@ def getConnectedAudioPorts(obj):
         print "Connected audio ports: %s" %(disp_list)
         if "HDMI0" in disp_list:
             audio_port  = "HDMI0"
+            conn_status = "SUCCESS"
+        # For TV platform devices
+        elif "SPDIF0" in disp_list:
+            audio_port  = "SPDIF0"
             conn_status = "SUCCESS"
         else:
             print "Please test with TV connected setup"
@@ -698,7 +703,8 @@ def setCurrentResolution(obj,res):
         details = tdkTestObj.getResultDetails();
         if "SUCCESS" in result:
             status,new_res = getCurrentResolution(obj)
-            if new_res == res:
+            # handling res value with framerate also (eg.1080p60)
+            if new_res == res or res in str(new_res):
                 resolution_revert = True
                 set_status = "SUCCESS"
                 tdkTestObj.setResultStatus("SUCCESS")
