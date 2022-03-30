@@ -157,7 +157,7 @@
 
 
         <testCase testCaseId="FP_06" testCaseName="Set_And_Get_FP_Clock_Brightness" desc="Adjusts FP clock brightness levels">
-            <testCaseInfo testCaseType="setandget" revert="true" />
+            <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="FRONTPANEL_SUPPORTED_FEATURES" useMethodTag="frontpanel_check_feature_applicability" arguments="ClockBrightness"/>
             <testStep testStepId="1" name="Get_FP_Clock_Brightness" method="Get_Clock_Brightness" saveResult="true" revertGet="yes">
                 <resultGeneration useMethodTag="frontpanel_get_fp_or_clock_brightness"  />
             </testStep>
@@ -291,7 +291,7 @@
         </testCase>
 
         <testCase testCaseId="FP_09" testCaseName="FP_Toggle_24_Hour_Clock_Mode" desc="Toggles clock version 12 or 24 Hr">
-            <testCaseInfo testCaseType="setandget" revert="true"  />
+            <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="FRONTPANEL_SUPPORTED_FEATURES" useMethodTag="frontpanel_check_feature_applicability" arguments="ClockVersion" />
             <testStep testStepId="1" name="Is_24_Hour_Clock" method="Is_24_Hour_Clock" saveResult="true" revertGet="yes">
                 <resultGeneration useMethodTag="frontpanel_get_clock_mode" />
             </testStep>

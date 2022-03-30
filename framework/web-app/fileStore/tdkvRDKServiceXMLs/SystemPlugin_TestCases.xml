@@ -756,4 +756,43 @@
                 </resultGeneration>
             </testStep>
        </testCase>
+
+       <testCase testCaseId="SYS_45" testCaseName= "System_Check_Power_State_Management_Status" desc="Checks the power state management status">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Power_State_Is_Managed_By_Device" method="Get_Power_State_Is_Managed_By_Device">
+                <resultGeneration useMethodTag="system_validate_bool_result" arguments="powerStateManagedByDevice">
+                  <expectedValues useConfigFile="true" key="SYSTEM_POWER_STATE_MANAGED_BY_DEVICE" />
+                </resultGeneration>
+            </testStep>
+       </testCase>
+
+       <testCase testCaseId="SYS_46" testCaseName= "System_Check_Firmware_Upgrade_Status" desc="Checks the firmware upgrade status">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_SWUpdate_File_Status" action="externalFnCall" saveResult="true">
+                <resultGeneration useMethodTag="system_check_swupdate_file_status" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Platform_Configuration" method="Get_Platform_Configuration">
+                <params>
+                  <param tag="query" value="AccountInfo.firmwareUpdateDisabled" />
+                </params>
+                <resultGeneration useMethodTag="system_check_platform_configurations" arguments="check_firmware_upgrade_status">
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_get_device_details" arguments="get_swupdate_file_status"/>
+                </resultGeneration>
+            </testStep>
+       </testCase>
+
+       <testCase testCaseId="SYS_47" testCaseName= "System_Check_Public_IP_Address" desc="Checks the public IP address">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Public_IP_Address" action="externalFnCall" saveResult="true">
+                <resultGeneration useMethodTag="system_check_public_ip_address" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Platform_Configuration" method="Get_Platform_Configuration">
+                <params>
+                  <param tag="query" value="DeviceInfo.publicIP" />
+                </params>
+                <resultGeneration useMethodTag="system_check_platform_configurations" arguments="check_public_ip_address">
+                  <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_get_device_details" arguments="get_public_ip_address"/>
+                </resultGeneration>
+            </testStep>
+       </testCase>
 </testPlugin>

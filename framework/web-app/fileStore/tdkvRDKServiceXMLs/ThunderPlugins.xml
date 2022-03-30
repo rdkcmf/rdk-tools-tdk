@@ -19,7 +19,7 @@
     <!-- Controller Plugin Information -->
     <plugin pluginName="Controller" serviceName="Controller" serviceVersion="1" >
         <method name="Get_Plugin_Status" api="status"  type="property" desc="Provides the information about plugins" >
-            <expectedValues>activated,deactivated,suspended,resumed</expectedValues>
+            <expectedValues>activated,deactivated,suspended,resumed,unavailable</expectedValues>
         </method>
         <method name="Activate_Plugin" api="activate" type="method" desc="Activates a plugin" >
             <params>
@@ -490,6 +490,7 @@
         <method name="Get_Downloaded_Firmware_Info" api="getDownloadedFirmwareInfo" type="method" desc="Returns information about firmware downloads" />
         <method name="Reboot" api="reboot" type="method" desc="system perform a reboot of the set-top box" />
         <method name="Get_Power_State_Before_Reboot" api="getPowerStateBeforeReboot" type="method" desc="Gets the power state before reboot" />
+        <method name="Get_Power_State_Is_Managed_By_Device" api="getPowerStateIsManagedByDevice" type="method" desc="Checks whether the power state is managed by the device" />
         <event name="Event_MacAddresses_Retreived" eventName="onMacAddressesRetreived" eventId="client.events.1" type="event" desc="MacAddressesRetreived" />
         <event name="Event_PowerState_Changed" eventName="onSystemPowerStateChanged" eventId="client.events.1" type="event" desc="power state changed event" />
         <event name="Event_SystemMode_Changed" eventName="onSystemModeChanged" eventId="client.events.1" type="event" desc="Fires on system mode changed event" />
@@ -1505,6 +1506,15 @@
                 <param tag="audioPort" defaultValue="null"/>
             </params>
         </method> 
+        <method name="Set_MS12_Profile_Settings_Override" api="setMS12ProfileSettingsOverride" type="method" desc="Overrides individual MS12 audio settings in order to optimize the customer experience" >
+            <params>
+                <param tag="audioPort" defaultValue="null"/>
+                <param tag="operation" defaultValue="null"/>
+                <param tag="profileName" defaultValue="null"/>
+                <param tag="ms12SettingsName" defaultValue="null"/>
+                <param tag="ms12SettingsValue" defaultValue="null"/>
+            </params>
+        </method>
         <event name="Event_Zoom_Settings_Updated" eventName="zoomSettingUpdated" eventId="client.events.1" type="event" desc="Zoom settings updated event "/>
 	<event name="Event_Resolution_Changed" eventName="resolutionChanged" eventId="client.events.1" type="event" desc="Fires on changing resolution"/>
     </plugin>

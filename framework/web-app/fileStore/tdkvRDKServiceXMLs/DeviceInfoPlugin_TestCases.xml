@@ -43,7 +43,9 @@
         <testCase testCaseId="DI_01" testCaseName= "DeviceInfo_Get_All_System_Info" desc="Gets all system information">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_System_Info" method="Get_System_Info">
-                <resultGeneration useMethodTag="deviceinfo_get_system_info" arguments="get_all_info" />
+               <resultGeneration useMethodTag="deviceinfo_get_system_info" >
+                   <arguments value="get_all_info" useConfigFile="true" key="DEVICEINFO_ESN_SUPPORT"/>
+               </resultGeneration>
             </testStep>
         </testCase>
 

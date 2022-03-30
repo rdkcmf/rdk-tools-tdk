@@ -3166,5 +3166,536 @@
               </subtestStep>
             </testStep>
         </testCase>
+        
+        <testCase testCaseId="DS_113" testCaseName= "Override_MS12_Profile_Settings_Bass_Enhancer_SPEAKER0" desc="Check whether able to override ms12 profile settings of bass enhancer for SPEAKER0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="OverrideProfileSettings,BassEnhancer,SPEAKER0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"   expectedValues="SPEAKER0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_MS12_Audio_Profiles" method="Get_Supported_MS12_Audio_Profiles" saveResult="true">
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_supported_MS12_Audio_Profiles"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles"/>
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Set_MS12_Profile_Settings_Override" testStepType="loop">
+               <subtestStep subtestStepId="1" name="Set_MS12_Audio_Profile" method="Set_MS12_Audio_Profile" revertSet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0"/>
+                    <param tag="ms12AudioProfile" usePreviousResult="true" Id="2"  iteration="true" useMethodTag="get_supported_audio_profiles" arguments="get_profiles_without_off" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="2" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" revertFlag="yes">
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues useIterableValue="true"/>
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="3" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" saveResult="true" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_bass_enhancer" arguments="check_bass_range" />
+               </subtestStep>
+               <subtestStep subtestStepId="4" name="Add_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                    <param tag="operation" value="ADD"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true"/>
+                    <param tag="ms12SettingsName" value="BassEnhancer"/>
+                    <param tag="ms12SettingsValue" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="bass_enhancer"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="5" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_bass_enhancer">
+                    <expectedValues usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="bass_enhancer" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="6" name="Remove_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                    <param tag="operation" value="REMOVE"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true"/>
+                    <param tag="ms12SettingsName" value="BassEnhancer"/>
+                    <param tag="ms12SettingsValue" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="bass_enhancer"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="7" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                  <resultGeneration useMethodTag="Get_Default_Values" >
+                    <arguments value="BassBoost" useIterableArg="true" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="8" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_bass_enhancer" >
+                    <expectedValues usePreviousResult="true" subId="7" useMethodTag="displaysettings_get_default_values" />
+                  </resultGeneration>
+               </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_114" testCaseName= "Override_MS12_Profile_Settings_Dialog_Enhancement_SPEAKER0" desc="Check whether able to override ms12 profile settings of dialog enhancer for SPEAKER0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="OverrideProfileSettings,DialogEnhancement,SPEAKER0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPEAKER0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_MS12_Audio_Profiles" method="Get_Supported_MS12_Audio_Profiles" saveResult="true">
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_supported_MS12_Audio_Profiles"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles"/>
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Set_MS12_Profile_Settings_Override" testStepType="loop">
+               <subtestStep subtestStepId="1" name="Set_MS12_Audio_Profile" method="Set_MS12_Audio_Profile" revertSet="yes" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0"/>
+                    <param tag="ms12AudioProfile" usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles" arguments="get_profiles_without_off" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="2" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" revertFlag="yes">
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues useIterableValue="true"/>
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="3" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" saveResult="true" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_dialog_enhancement"/>
+               </subtestStep>
+               <subtestStep subtestStepId="4" name="Set_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                    <param tag="operation" value="ADD"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true"/>
+                    <param tag="ms12SettingsName" value="DialogEnhance"/>
+                    <param tag="ms12SettingsValue" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="dialog_enhancement"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="5" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_dialog_enhancement">
+                    <expectedValues usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="dialog_enhancement" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="6" name="Remove_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                    <param tag="operation" value="REMOVE"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true"/>
+                    <param tag="ms12SettingsName" value="DialogEnhance"/>
+                    <param tag="ms12SettingsValue" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="dialog_enhancement"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="7" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                  <resultGeneration useMethodTag="Get_Default_Values" >
+                    <arguments value="EnhancerLevel" useIterableArg="true" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="8" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_dialog_enhancement">
+                    <expectedValues usePreviousResult="true" subId="7" useMethodTag="displaysettings_get_default_values" />
+                  </resultGeneration>
+               </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_115" testCaseName= "Override_MS12_Profile_Settings_Volume_Leveller_Level_SPEAKER0" desc="Check whether able to override ms12 profile settings of volume leveller for SPEAKER0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="OverrideProfileSettings,VolumeLeveller,SPEAKER0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"   expectedValues="SPEAKER0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_MS12_Audio_Profiles" method="Get_Supported_MS12_Audio_Profiles" saveResult="true">
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_supported_MS12_Audio_Profiles"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles"/>
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Set_MS12_Profile_Settings_Override" testStepType="loop">
+               <subtestStep subtestStepId="1" name="Set_MS12_Audio_Profile" method="Set_MS12_Audio_Profile" revertSet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0"/>
+                    <param tag="ms12AudioProfile" usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles" arguments="get_profiles_without_off" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="2" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" revertFlag="yes">
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues useIterableValue="true"/>
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="3" name="Get_Volume_Leveller" method="Get_Volume_Leveller" saveResult="true">
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_leveller" />
+               </subtestStep>
+               <subtestStep subtestStepId="4" name="Add_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                    <param tag="operation" value="ADD"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true"/>
+                    <param tag="ms12SettingsName" value="VolumeLevellerMode"/>
+                    <param tag="ms12SettingsValue" value="1"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="5" name="Add_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                    <param tag="operation" value="ADD"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true"/>
+                    <param tag="ms12SettingsName" value="VolumeLevellerLevel"/>
+                    <param tag="ms12SettingsValue" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="volume_leveller"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="6" name="Get_Volume_Leveller" method="Get_Volume_Leveller" delay="2" >
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments="check_expected_values" >
+                    <expectedValues value="1" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="volume_leveller" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="7" name="Remove_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="SPEAKER0" />
+                    <param tag="operation" value="REMOVE"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true" />
+                    <param tag="ms12SettingsName" value="VolumeLevellerLevel"/>
+                    <param tag="ms12SettingsValue" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="volume_leveller"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="8" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                  <resultGeneration useMethodTag="Get_Default_Values" >
+                    <arguments value="VolumeLeveller.level,VolumeLeveller.mode,get_audio_profiles_default_modes" useIterableArg="true" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="9" name="Get_Volume_Leveller" method="Get_Volume_Leveller" saveResult="true" delay="2">
+                  <params>
+                    <param tag="audioPort"  value="SPEAKER0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments="check_expected_values">
+                    <expectedValues usePreviousResult="true" subId="8" useMethodTag="displaysettings_get_default_values" arguments="get_default_mode"/>
+                  </resultGeneration>
+               </subtestStep>
+            </testStep>
+        </testCase>        
+        <testCase testCaseId="DS_116" testCaseName= "Override_MS12_Profile_Settings_Bass_Enhancer_HDMI0" desc="Check whether able to override ms12 profile settings of bass enhancer for HDMI0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="OverrideProfileSettings,BassEnhancer,HDMI0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"   expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_MS12_Audio_Profiles" method="Get_Supported_MS12_Audio_Profiles" saveResult="true">
+                  <params>
+                    <param tag="audioPort" value="HDMI0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_supported_MS12_Audio_Profiles"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles"/>
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Set_MS12_Profile_Settings_Override" testStepType="loop">
+               <subtestStep subtestStepId="1" name="Set_MS12_Audio_Profile" method="Set_MS12_Audio_Profile" revertSet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0"/>
+                    <param tag="ms12AudioProfile" usePreviousResult="true" Id="2"  iteration="true" useMethodTag="get_supported_audio_profiles" arguments="get_profiles_without_off" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="2" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" revertFlag="yes">
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues useIterableValue="true"/>
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="3" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" saveResult="true" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_bass_enhancer" arguments="check_bass_range" />
+               </subtestStep>
+               <subtestStep subtestStepId="4" name="Add_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                    <param tag="operation" value="ADD"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true"/>
+                    <param tag="ms12SettingsName" value="BassEnhancer"/>
+                    <param tag="ms12SettingsValue" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="bass_enhancer"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="5" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_bass_enhancer">
+                    <expectedValues usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="bass_enhancer" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="6" name="Remove_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                    <param tag="operation" value="REMOVE"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true"/>
+                    <param tag="ms12SettingsName" value="BassEnhancer"/>
+                    <param tag="ms12SettingsValue" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="bass_enhancer"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="7" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                  <resultGeneration useMethodTag="Get_Default_Values" >
+                    <arguments value="BassBoost" useIterableArg="true" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="8" name="Get_Bass_Enhancer" method="Get_Bass_Enhancer" revertFlag="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_bass_enhancer" >
+                    <expectedValues usePreviousResult="true" subId="7" useMethodTag="displaysettings_get_default_values" />
+                  </resultGeneration>
+               </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_117" testCaseName= "Override_MS12_Profile_Settings_Dialog_Enhancement_HDMI0" desc="Check whether able to override ms12 profile settings of dialog enhancer for HDMI0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="OverrideProfileSettings,DialogEnhancement,HDMI0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_MS12_Audio_Profiles" method="Get_Supported_MS12_Audio_Profiles" saveResult="true">
+                  <params>
+                    <param tag="audioPort" value="HDMI0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_supported_MS12_Audio_Profiles"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles"/>
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Set_MS12_Profile_Settings_Override" testStepType="loop">
+               <subtestStep subtestStepId="1" name="Set_MS12_Audio_Profile" method="Set_MS12_Audio_Profile" revertSet="yes" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0"/>
+                    <param tag="ms12AudioProfile" usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles" arguments="get_profiles_without_off" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="2" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" revertFlag="yes">
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues useIterableValue="true"/>
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="3" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" saveResult="true" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_dialog_enhancement"/>
+               </subtestStep>
+               <subtestStep subtestStepId="4" name="Set_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                    <param tag="operation" value="ADD"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true"/>
+                    <param tag="ms12SettingsName" value="DialogEnhance"/>
+                    <param tag="ms12SettingsValue" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="dialog_enhancement"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="5" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_dialog_enhancement">
+                    <expectedValues usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="dialog_enhancement" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="6" name="Remove_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                    <param tag="operation" value="REMOVE"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true"/>
+                    <param tag="ms12SettingsName" value="DialogEnhance"/>
+                    <param tag="ms12SettingsValue" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="dialog_enhancement"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="7" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                  <resultGeneration useMethodTag="Get_Default_Values" >
+                    <arguments value="EnhancerLevel" useIterableArg="true" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="8" name="Get_Dialog_Enhancement" method="Get_Dialog_Enhancement" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_dialog_enhancement">
+                    <expectedValues usePreviousResult="true" subId="7" useMethodTag="displaysettings_get_default_values" />
+                  </resultGeneration>
+               </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_118" testCaseName= "Override_MS12_Profile_Settings_Volume_Leveller_Level_HDMI0" desc="Check whether able to override ms12 profile settings of volume leveller for HDMI0 port" >
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES,DISPLAYSETTINGS_SUPPORTED_FEATURES,CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="OverrideProfileSettings,VolumeLeveller,HDMI0" />
+            <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
+                <resultGeneration useMethodTag="check_connected_audio_ports"   expectedValues="HDMI0">
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_MS12_Audio_Profiles" method="Get_Supported_MS12_Audio_Profiles" saveResult="true">
+                  <params>
+                    <param tag="audioPort" value="HDMI0"/>
+                  </params>
+                  <resultGeneration useMethodTag="check_supported_MS12_Audio_Profiles"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" saveResult="true" revertGet="yes" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles"/>
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Set_MS12_Profile_Settings_Override" testStepType="loop">
+               <subtestStep subtestStepId="1" name="Set_MS12_Audio_Profile" method="Set_MS12_Audio_Profile" revertSet="yes" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0"/>
+                    <param tag="ms12AudioProfile" usePreviousResult="true" Id="2" useMethodTag="get_supported_audio_profiles" arguments="get_profiles_without_off" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="2" name="Get_MS12_Audio_Profile" method="Get_MS12_Audio_Profile" revertFlag="yes">
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_audio_profile">
+                    <expectedValues useIterableValue="true"/>
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="3" name="Get_Volume_Leveller" method="Get_Volume_Leveller" saveResult="true">
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_leveller" />
+               </subtestStep>
+               <subtestStep subtestStepId="4" name="Add_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                    <param tag="operation" value="ADD"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true"/>
+                    <param tag="ms12SettingsName" value="VolumeLevellerMode"/>
+                    <param tag="ms12SettingsValue" value="1"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="5" name="Add_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                    <param tag="operation" value="ADD"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true"/>
+                    <param tag="ms12SettingsName" value="VolumeLevellerLevel"/>
+                    <param tag="ms12SettingsValue" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="volume_leveller"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="6" name="Get_Volume_Leveller" method="Get_Volume_Leveller" delay="2" >
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments="check_expected_values" >
+                    <expectedValues value="1" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="volume_leveller" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="7" name="Remove_MS12_Profile_Settings_Override" method="Set_MS12_Profile_Settings_Override" >
+                  <params>
+                    <param tag="audioPort" value="HDMI0" />
+                    <param tag="operation" value="REMOVE"/>
+                    <param tag="profileName" usePreviousResult="true" Id="2" useMethodTag="set_profile_name" useIterableArg="true" />
+                    <param tag="ms12SettingsName" value="VolumeLevellerLevel"/>
+                    <param tag="ms12SettingsValue" usePreviousResult="true" subId="3" useMethodTag="displaysettings_generate_new_value" arguments="volume_leveller"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="8" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                  <resultGeneration useMethodTag="Get_Default_Values" >
+                    <arguments value="VolumeLeveller.level,VolumeLeveller.mode,get_audio_profiles_default_modes" useIterableArg="true" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="9" name="Get_Volume_Leveller" method="Get_Volume_Leveller" saveResult="true" delay="2">
+                  <params>
+                    <param tag="audioPort"  value="HDMI0" />
+                  </params>
+                  <resultGeneration useMethodTag="check_volume_leveller" arguments="check_expected_values">
+                    <expectedValues usePreviousResult="true" subId="8" useMethodTag="displaysettings_get_default_values" arguments="get_default_mode"/>
+                  </resultGeneration>
+               </subtestStep>
+            </testStep>
+        </testCase>        
 </testPlugin>  
 

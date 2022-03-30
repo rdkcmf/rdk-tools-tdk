@@ -428,12 +428,12 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             info["devices"] = devices
 
         elif tag == "bluetooth_check_status_changed_event":
-            result=result[0]
-            info = result
-            if str(result.get("newStatus")) == str(expectedValues[0]):
-                info["Test_Step_Status"] = "SUCCESS"
-            else:
-                info["Test_Step_Status"] = "FAILURE"
+            info["Test_Step_Status"] = "FAILURE"
+            for eventResult in result:
+                if str(eventResult.get("newStatus")) == str(expectedValues[0]):
+                    info = eventResult
+                    info["Test_Step_Status"] = "SUCCESS"
+                    break;
 
         elif tag == "bluetooth_check_request_failed_event":
             result=result[0]

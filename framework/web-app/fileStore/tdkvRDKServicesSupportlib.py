@@ -97,7 +97,20 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["Test_Step_Status"] = "FAILURE"
 
             elif arg[0] == "get_all_info":
-                info = checkAndGetAllResultInfo(result)
+                if str(arg[1]).lower() == "yes":
+                    info = checkAndGetAllResultInfo(result)
+                elif str(arg[1]).lower() == "no":
+                    info = result
+                    newResult = result.copy()
+                    if "esn" in newResult:
+                         newResult.pop("esn")
+                    status = checkNonEmptyResultData(newResult)
+                    if status == "TRUE":
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"            
 
         elif tag == "deviceinfo_get_network_info":
             if arg[0] == "get_all_info":
@@ -772,6 +785,14 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["userAgent"] = webBrowser.get("userAgent")
                     info["browserType"] = webBrowser.get("browserType")
                     info["version"] = webBrowser.get("version")
+                elif len(arg) and arg[0] == "check_firmware_upgrade_status":
+                    accountInfo = result.get("AccountInfo")
+                    info["firmwareUpdateDisabled"] = accountInfo.get("firmwareUpdateDisabled")
+                    deviceDetail = accountInfo.get("firmwareUpdateDisabled")
+                elif len(arg) and arg[0] == "check_public_ip_address":
+                    deviceInfo = result.get("DeviceInfo")
+                    info["publicIP"] = deviceInfo.get("publicIP")
+                    deviceDetail = deviceInfo.get("publicIP")
                 if str(deviceDetail).lower() == str(expectedValues[0]).lower():
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
@@ -2972,7 +2993,12 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
 
         elif tag == "system_get_device_details":
             testStepResults = testStepResults[0].values()[0]
-            info["value"] = testStepResults[0].get("details")
+            if len(arg) and arg[0] == "get_swupdate_file_status":
+                info["FIRMWARE_UPGRADE_STATUS"] = testStepResults[0].get("FIRMWARE_UPGRADE_STATUS")
+            elif len(arg) and arg[0] == "get_public_ip_address":
+                info["PUBLIC_IP"] = testStepResults[0].get("PUBLIC_IP")
+            else:
+                info["value"] = testStepResults[0].get("details")
 
         # user Preferences result parser steps
         elif tag == "userpreferences_switch_ui_language":
@@ -3151,7 +3177,20 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag =="get_supported_audio_profiles":
             testStepResults = testStepResults[0].values()[0]
             audioProfiles = testStepResults[0].get("supportedMS12AudioProfiles")
-            info["ms12AudioProfile"] = ",".join(audioProfiles)
+            if len(arg) and arg[0] == "get_profiles_without_off":
+                if "Off" in audioProfiles:
+                    audioProfiles.remove("Off")
+                    info["ms12AudioProfile"] = ",".join(audioProfiles)
+                    info["profileName"] = ",".join(audioProfiles)
+                else:
+                    info["profileName"] = ",".join(audioProfiles)
+                    info["ms12AudioProfile"] = ",".join(audioProfiles)
+            else:
+                info["profileName"] = ",".join(audioProfiles)
+                info["ms12AudioProfile"] = ",".join(audioProfiles)
+
+        elif tag == "set_profile_name":
+            info["profileName"] = arg[0]
 
         elif tag == "get_connected_audio_port":
             testStepResults = testStepResults[0].values()[0]
@@ -3203,6 +3242,27 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             info["defaultValue"] = testStepResults[0].get("defaultValue")
             if len(arg) and arg[0] == "get_default_mode":
                 info["defaultMode"] = testStepResults[0].get("defaultMode")
+
+        elif tag == "displaysettings_generate_new_value":
+            testStepResults = testStepResults[0].values()[0]
+            if len(arg) and arg[0] == "bass_enhancer":
+                bassBoost = testStepResults[0].get("bassBoost")
+                if bassBoost != 75:
+                    info["ms12SettingsValue"] = "75"
+                else:
+                    info["ms12SettingsValue"] = "50"
+            elif len(arg) and arg[0] == "dialog_enhancement":
+                enhancerLevel = testStepResults[0].get('enhancerlevel')
+                if enhancerLevel != 12:
+                    info["ms12SettingsValue"] = "12"
+                else:
+                    info["ms12SettingsValue"] = "8"
+            elif len(arg) and arg[0] == "volume_leveller":
+                VolumeLeveller = testStepResults[0].get('level')
+                if VolumeLeveller != 10:
+                    info["ms12SettingsValue"] = "10"
+                else:
+                    info["ms12SettingsValue"] = "1"
 
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_toggle_adapter_state":
@@ -3441,6 +3501,12 @@ def checkTestCaseApplicability(methodTag,configKeyData,arguments):
     try:
         if tag == "is_plugin_applicable":
             if arg[0] not in keyData:
+                result = "TRUE"
+            else:
+                result = "FALSE"
+        
+        elif tag == "frontpanel_check_feature_applicability":
+            if all(item in keyData for item in arg):
                 result = "TRUE"
             else:
                 result = "FALSE"
@@ -3899,17 +3965,23 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,execInfo)
                 DisplayFrameRate = width+'x'+height+'x40'
                 DisplayFrameRate_values.append(DisplayFrameRate)
             info["DisplayFrameRate"] = DisplayFrameRate_values
-               
+        
         elif tag == "Get_Default_Values":
-            command =  'grep User.'+arg[0]+' /etc/hostDataDefault | cut -d\' \' -f2- | xargs'
+            profile = arg[len(arg)-1]
+            arg[0] = profile+'.'+arg[0]
+            command = 'grep -F '+arg[0]+' /etc/hostDataDefault'
             output = executeCommand(execInfo, command)
+            output = str(output).split()
+            output = output[1]
             info["defaultValue"] = int(output)
-
-            if len(arg) > 2 and arg[2] == "get_default_mode":
-                command =  'grep User.'+arg[1]+' /etc/hostDataDefault | cut -d\' \' -f2- | xargs'
-                output = executeCommand(execInfo, command)
-                info["defaultMode"] = int(output)
-
+            if len(arg) > 3 and arg[2] == "get_audio_profiles_default_modes":
+                    arg[1] = profile+'.'+arg[1]
+                    command =  'grep -F '+arg[1]+' /etc/hostDataDefault'
+                    output = executeCommand(execInfo, command)
+                    output = str(output).split()
+                    output = output[1]
+                    info["defaultMode"] = int(output)
+       
         elif tag == "RDKShell_Get_Width_And_Height":
             mapping_details = arg[len(arg)-1].split(":")
             info["width"] = mapping_details[1].split('|')[0].strip('[]')
@@ -3934,6 +4006,27 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,execInfo)
             output = str(output).split("\n")[1]
             info["details"] = output.strip()
             info["Test_Step_Status"] =  "SUCCESS"
+        
+        elif tag == "system_check_swupdate_file_status":
+            command = '[ -f "/opt/swupdate.conf" ] && echo 1 || echo 0'
+            output = executeCommand(execInfo, command)
+            output = str(output).split("\n")
+            if int(output[1]) == 1:
+                print "SWUpdate file exist"
+                info["FIRMWARE_UPGRADE_STATUS"] = "true"
+            else:
+                print "SWUpdate file not exist"
+                info["FIRMWARE_UPGRADE_STATUS"] = "false"
+
+        elif tag == "system_check_public_ip_address":
+            command = 'curl ifconfig.me'
+            output = executeCommand(execInfo, command)
+            output = str(output).split("\n")
+            if output[1]:
+                info["PUBLIC_IP"] = str(output[1])
+                info["Test_Step_Status"] =  "SUCCESS"
+            else:
+                info["Test_Step_Status"] =  "FAILURE"
 
         elif tag == "executeRebootCmd":
             command = "reboot"
