@@ -504,3 +504,116 @@ def getLogFileTotalLinesCount(tdkTestObj, logFile, search_string, step):
         print "[TEST EXECUTION RESULT] : FAILURE";
     return count;
 
+
+# CheckPreReqForCSI
+# Syntax      : CheckPreReqForCSI(tad_obj, tr181_obj):
+# Description : Function to check if the pre-requisites are set for CSI and set them if not set
+# Parameters  : tad_obj - tad object
+#               tr181_obj - tr181 obj
+# Return Value: pre_req_set - flag to check if the pre-requisites are set properly
+#               tdkTestObj - test object to set result status
+#               step - the current step
+#               revert_flag - flag to check if pre-requisite revert opeartion is needed
+#               initial_val - initial values of Mesh and Band Steering parameters
+
+def CheckPreReqForCSI(tad_obj, tr181_obj):
+    expectedresult="SUCCESS";
+    step = 1;
+    pre_req_set = 0;
+    revert_flag = 0;
+    initial_val = [];
+    paramList=["Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RBUS.Enable", "Device.WiFi.X_RDKCENTRAL-COM_BandSteering.Enable", "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Mesh.Enable"];
+    tdkTestObj,status,orgValue = getMultipleParameterValues(tad_obj,paramList);
+
+    print "*************Checking Pre-Requisites***************";
+    print "\nTEST STEP 1: Get the initial values of Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RBUS.Enable and Device.WiFi.X_RDKCENTRAL-COM_BandSteering.Enable and Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Mesh.Enable";
+    print "EXPECTED RESULT 1: The initial values should be fetched successfully";
+
+    if expectedresult in status and orgValue[0] != "" and orgValue[1] != "" and orgValue[2] != "":
+        #Set the result status of execution
+        tdkTestObj.setResultStatus("SUCCESS");
+        print "ACTUAL RESULT 1: The initial values are retrieved successfully";
+        print "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RBUS.Enable : %s" %orgValue[0];
+        print "Device.WiFi.X_RDKCENTRAL-COM_BandSteering.Enable : %s" %orgValue[1];
+        print "Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Mesh.Enable : %s" %orgValue[2];
+        initial_val.append(orgValue[1]);
+        initial_val.append(orgValue[2]);
+        print "TEST EXECUTION RESULT : SUCCESS";
+
+        if orgValue[0] != "true":
+            tdkTestObj.setResultStatus("FAILURE");
+            print "The RBUS is not in enabled state initially";
+        else :
+            tdkTestObj.setResultStatus("SUCCESS");
+            print "The RBUS is in enabled state initially";
+
+            if  orgValue[1] == "false" and orgValue[2] == "true":
+                pre_req_set = 1;
+                tdkTestObj.setResultStatus("SUCCESS");
+                print "Band Steering is disabled and Mesh is enabled initially";
+            else :
+                print "Enabling Mesh and Disabling Band Steering...";
+                step = 2;
+                tdkTestObj = tr181_obj.createTestStep("TDKB_TR181Stub_Set");
+                actualresult1 ,details1 = setTR181Value(tdkTestObj,"Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Mesh.Enable","true","boolean");
+                actualresult2 ,details2 = setTR181Value(tdkTestObj,"Device.WiFi.X_RDKCENTRAL-COM_BandSteering.Enable","false","boolean");
+                sleep(5);
+
+                print "\nTEST STEP 2 : Set Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Mesh.Enable to true and Device.WiFi.X_RDKCENTRAL-COM_BandSteering.Enable to false";
+                print "EXPECTED RESULT 2 : SET operations should be success";
+
+                if expectedresult in actualresult1 and expectedresult in actualresult2:
+                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "ACTUAL RESULT 2: Set operation success";
+                    print "TEST EXECUTION RESULT :SUCCESS";
+
+                    #Validate the SET with GET
+                    step = 3;
+                    paramList = ["Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Mesh.Enable", "Device.WiFi.X_RDKCENTRAL-COM_BandSteering.Enable"];
+                    tdkTestObj,status,setValue = getMultipleParameterValues(tad_obj,paramList)
+                    print "\nTEST STEP 3: Get the values of Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Mesh.Enable and Device.WiFi.X_RDKCENTRAL-COM_BandSteering.Enable";
+                    print "EXPECTED RESULT 3: The values should be retrieved successfully and should be the same as set values";
+
+                    if expectedresult in status and setValue[0] == "true" and setValue[1] == "false":
+                        pre_req_set = 1;
+                        revert_flag = 1;
+                        #Set the result status of execution
+                        tdkTestObj.setResultStatus("SUCCESS");
+                        print "ACTUAL RESULT 3: Values after the GET are same as the SET values : %s and %s respectively" %(setValue[0],setValue[1]) ;
+                        #Get the result of execution
+                        print "[TEST EXECUTION RESULT] : SUCCESS";
+                    else:
+                        #Set the result status of execution
+                        tdkTestObj.setResultStatus("FAILURE");
+                        print "ACTUAL RESULT 3: Values after the GET are NOT same as the SET values : %s and %s respectively" %(setValue[0],setValue[1]) ;
+                        #Get the result of execution
+                        print "[TEST EXECUTION RESULT] : FAILURE";
+                else:
+                    tdkTestObj.setResultStatus("FAILURE");
+                    print "ACTUAL RESULT 2: Set operation failed";
+                    print "TEST EXECUTION RESULT :FAILURE";
+    else:
+        #Set the result status of execution
+        tdkTestObj.setResultStatus("FAILURE");
+        print "ACTUAL RESULT 1: GET operation failed";
+        print "TEST EXECUTION RESULT :FAILURE";
+    return pre_req_set, tdkTestObj, step, revert_flag, initial_val;
+
+# RevertCSIPreReq
+# Syntax      : RevertCSIPreReq(tr181_obj, initial_val):
+# Description : Function to revert the pre-requisites set for CSI
+# Parameters  : tr181_obj - tr181 object
+# Return Value: status - flag to check if the revert operation is success or not
+
+def RevertCSIPreReq(tr181_obj, initial_val):
+    expectedresult="SUCCESS";
+    tdkTestObj = tr181_obj.createTestStep("TDKB_TR181Stub_Set");
+    actualresult1 ,details1 = setTR181Value(tdkTestObj,"Device.DeviceInfo.X_RDKCENTRAL-COM_xOpsDeviceMgmt.Mesh.Enable",initial_val[2],"boolean");
+    actualresult2 ,details2 = setTR181Value(tdkTestObj,"Device.WiFi.X_RDKCENTRAL-COM_BandSteering.Enable",initial_val[1],"boolean");
+
+    if expectedresult in actualresult1 and expectedresult in actualresult2:
+        status = 1;
+    else:
+        status = 0;
+    return status;
+
