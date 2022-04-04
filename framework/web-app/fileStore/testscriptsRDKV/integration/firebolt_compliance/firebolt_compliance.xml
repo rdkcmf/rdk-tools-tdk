@@ -21,6 +21,13 @@
         <function>TestMgr_FireboltCompliance_DoNothing</function>
         <parameters />
       </primitiveTest>
+      <primitiveTest name="Gstreamer_Test_Execute" id=" " version="1">
+        <function>TestMgr_Gstreamer_Test_Execute</function>
+        <parameters>
+          <parameter name="Display_option" value=""/>
+          <parameter name="GStreamer_plugins_type" value=""/>
+        </parameters>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>

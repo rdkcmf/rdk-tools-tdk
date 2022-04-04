@@ -30,8 +30,12 @@
   <!-- Total functions corresponding module  -->
     <functions>
       <function name='TestMgr_FireboltCompliance_DoNothing' />
+      <function name='TestMgr_Gstreamer_Test_Execute' />
     </functions>
   <!-- Total parameters corresponding module  -->
-    <parameters />
+    <parameters>
+      <parameter funName='TestMgr_Gstreamer_Test_Execute' parameterName='GStreamer_plugins_type' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_Gstreamer_Test_Execute' parameterName='Display_option' parameterType='STRING' range='A-Z' />
+    </parameters>
   </module>
 </xml>
