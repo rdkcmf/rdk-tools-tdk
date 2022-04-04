@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>7</version>
+  <version>8</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_MVS_Video_PlayPause_4K_HLS</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -48,10 +48,6 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
-    <box_type>RPI-Client</box_type>
-    <!--  -->
-    <box_type>RPI-HYB</box_type>
-    <!--  -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
@@ -63,7 +59,7 @@
     <test_case_id>RDKV_Media_Validation_13</test_case_id>
     <test_objective>Test Script to launch a lightning Video player application via Webkit instance and perform video play pause operation of 4k hls content</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>RPI</test_setup>
+    <test_setup>Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
 2.Lightning Player app should be hosted</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
