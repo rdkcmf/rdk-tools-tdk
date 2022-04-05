@@ -123,7 +123,7 @@ if expectedResult in result.upper():
             if configValues["SSH_PASSWORD"] == "None":
                 configValues["SSH_PASSWORD"] = ""
             credentials = obj.IP + ',' + configValues["SSH_USERNAME"] + ',' + configValues["SSH_PASSWORD"]
-            command =  'for pem in ' + configValues["CERT_PATH"] + '/*.pem; do if [[ $( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 ) -lt ' + configValues["SSL_CERTIFICATE_KEY_LENGTH"] + '&& $( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 ) -ne "0" ]]; then printf \'%s-------%d is insecure\n\' "$pem" "$( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 )"; fi done'
+            command =  'for pem in ' + configValues["CERT_PATH"] + '/*.pem; do if [[ $( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 ) -lt ' + configValues["SSL_CERTIFICATE_KEY_LENGTH"] + '&& $( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 ) -ne "0" ]]; then printf \'%s-------%d is insecure \\n\' "$pem" "$( openssl x509 -in "$pem" -text -noout | grep "Public-Key" | cut -d\( -f 2 | cut -d\'' ' \' -f 1 )"; fi done'
             print "COMMAND : %s" %(command)            
             #Primitive test case which associated to this Script
             tdkTestObj = obj.createTestStep('rdkvsecurity_executeInDUT');
@@ -138,7 +138,7 @@ if expectedResult in result.upper():
             if output and "FAILURE" not in output:
                 shortKeyCertList = []
                 for line in output.splitlines():
-                    if (".pem" in line) and (line not in command) and (configValues["CERT_PATH"]+"/*.pem" not in line):
+                    if (".pem" in line) and (line not in command) and (configValues["CERT_PATH"]+"/*.pem" not in line) and ("is insecure" in line):
                         shortKeyCertList.append (line)
                 if shortKeyCertList:
                     tdkTestObj.setResultStatus("FAILURE");
