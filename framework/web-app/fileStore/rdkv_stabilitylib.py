@@ -145,6 +145,9 @@ def execute_step(Data):
 #REBOOT THE DEVICE
 #------------------------------------------------------------------
 def rdkservice_rebootDevice(waitTime):
+    rdkv_performancelib.deviceIP=deviceIP
+    rdkv_performancelib.devicePort=devicePort
+    rdkv_performancelib.libObj=libObj
     status = rdkservice_getPluginStatus("org.rdk.System")
     if status != "activated":
         print "Activating System plugin for rebooting the device"
