@@ -123,7 +123,7 @@ video_src_url_hls_h264_iframe  = ""
 video_src_url_hevc = test_streams_base_path + "DASH_HEVC_AAC/atfms_291_dash_tdk_hevc_aac_fmp4.mpd"
 
 #H.263 Codec Video URL
-video_src_url_h263 = ""
+video_src_url_h263 = test_streams_base_path + "TDK_Asset_Sunrise_H263_AAC.mov"
 
 #AAC Codec Video URL
 video_src_url_aac = test_streams_base_path + "HLS_H264_AAC/master.m3u8"
@@ -166,7 +166,7 @@ video_src_url_dolby = test_streams_base_path + "DASH_H264_EC3/atfms_291_dash_tdk
 
 #Type of the different codecs video stream. If the url is dash(.mpd), then type is dash. If its a
 #hls stream(.m3u8),then type is hls. If the extension is .mp4,.ogg etc mention as mp4,ogg etc.
-h263_url_type = ""
+h263_url_type = "mov"
 aac_url_type  = "hls"
 vp9_url_type  = "dash"
 vp8_url_type  = "webm"
@@ -196,14 +196,18 @@ video_src_url_multi_audio_tracks = ""
 video_src_url_multi_text_tracks  = ""
 
 # Streams with multiple audio codecs
-video_src_url_ac3_aac = ""
-video_src_url_opus_ac3 = ""
-video_src_url_opus_eac3 = ""
-video_src_url_ac3_eac3 = ""
-video_src_url_aac_eac3 = ""
+#Video URL with AC3 and AAC codec audio
+video_src_url_ac3_aac   = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_AC3_AAC.mp4"
+#Video URL with OPUS and AC3 codec audio
+video_src_url_opus_ac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_AC3_OPUS.mp4"
+#Video URL with OPUS and EAC3 codec audio
+video_src_url_opus_eac3 = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_EAC3_OPUS.mp4"
+#Video URL with EAC3 and AC3 codec audio
+video_src_url_ac3_eac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_EAC3_AC3.mp4"
+video_src_url_aac_eac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_EAC3_AAC.mp4"
 
 # Basic WAV PCM Audio format stream
-audio_src_url_wav_pcm = ""
+audio_src_url_wav_pcm = test_streams_base_path + "TDK_Asset_Sunrise_WAV_Audio.wav"
 
 
 # Invalid stream URL for testing error scenarios
