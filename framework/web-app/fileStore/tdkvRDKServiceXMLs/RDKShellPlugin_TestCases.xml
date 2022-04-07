@@ -1258,7 +1258,9 @@
               <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
             </testStep>
             <testStep testStepId="2" name="getZorder" method="GetZOrder" saveResult="true" >
-              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+                <resultGeneration useMethodTag="rdkshell_check_zorder" >
+                     <arguments useConfigFile="true" key="RDKSHELL_EXCLUDED_PROCESS_LIST" />
+                </resultGeneration>
             </testStep>
             <testStep testStepId="3" name="setfocus" method="SetFocus">
               <params>
@@ -2017,7 +2019,8 @@
               <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
             </testStep>
             <testStep testStepId="6" name="getZorder" method="GetZOrder" >
-              <resultGeneration useMethodTag="rdkshell_validate_zorder" arguments="validate_move_to_behind" expectedValues="cobalt" >
+              <resultGeneration useMethodTag="rdkshell_validate_zorder"  expectedValues="cobalt" >
+                 <arguments  value="validate_move_to_behind" useConfigFile="true" key="RDKSHELL_EXCLUDED_PROCESS_LIST" />
               </resultGeneration>
             </testStep>
         </testCase>
@@ -2059,7 +2062,8 @@
               <resultGeneration useMethodTag="rdkshell_get_state" arguments="WebKitBrowser" expectedValues="resumed" />
             </testStep>
             <testStep testStepId="6" name="getZorder" method="GetZOrder" >
-              <resultGeneration useMethodTag="rdkshell_validate_zorder" arguments="validate_move_to_behind" expectedValues="webkitbrowser" >
+              <resultGeneration useMethodTag="rdkshell_validate_zorder" expectedValues="webkitbrowser" >
+                 <arguments  value="validate_move_to_behind" useConfigFile="true" key="RDKSHELL_EXCLUDED_PROCESS_LIST" />
               </resultGeneration>
             </testStep>
         </testCase>

@@ -93,7 +93,7 @@
         <testCase testCaseId="PI_05" testCaseName="PlayerInfo_Check_Dolby_Sound_mode"  desc="Checks the dolby sound mode">
             <testCaseInfo testCaseType="direct" />
             <testStep testStepId="1" name="Get_Dolby_SoundMode" method="Get_Dolby_SoundMode">
-              <resultGeneration useMethodTag="playerinfo_check_results" expectedValues="Unknown,Mono,Stereo,Surround,Passthru"/>
+              <resultGeneration useMethodTag="playerinfo_check_results" expectedValues="Unknown,Mono,Stereo,Surround,Passthru,SoundmodeAuto"/>
             </testStep>
         </testCase>
         <testCase testCaseId="PI_06" testCaseName= "Enable_Disable_Audio_Atmos_Output" desc="Check whether audio atmos output is possile to enable and disable">
