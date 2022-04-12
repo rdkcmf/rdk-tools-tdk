@@ -217,6 +217,8 @@ video_src_url_opus_vorbis = test_streams_base_path + "MultiCodecStreams/TDK_Asse
 # Basic WAV PCM Audio format stream
 audio_src_url_wav_pcm = test_streams_base_path + "TDK_Asset_Sunrise_WAV_Audio.wav"
 
+# M4A Audio format stream
+audio_src_url_m4a = test_streams_base_path + "TDK_Asset_Sunrise_M4A.m4a"
 
 # Invalid stream URL for testing error scenarios
 video_src_url_invalid = test_streams_base_path + "test_stream_invalid.mpd"
