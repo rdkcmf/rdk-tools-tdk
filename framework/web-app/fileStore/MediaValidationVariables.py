@@ -220,6 +220,12 @@ audio_src_url_wav_pcm = test_streams_base_path + "TDK_Asset_Sunrise_WAV_Audio.wa
 # M4A Audio format stream
 audio_src_url_m4a = test_streams_base_path + "TDK_Asset_Sunrise_M4A.m4a"
 
+# MP3 Audio format stream
+audio_src_url_mp3 = test_streams_base_path + "TDK_Asset_Sunrise_MP3.mp3"
+
+# DTS Audio format stream
+audio_src_url_dts = test_streams_base_path + "TDK_Asset_Sunrise_DTS.dts"
+
 # Invalid stream URL for testing error scenarios
 video_src_url_invalid = test_streams_base_path + "test_stream_invalid.mpd"
 
