@@ -416,6 +416,16 @@
         <function>TestMgr_DSHal_GetVolumeLeveller</function>
         <parameters/>
       </primitiveTest>
+      <primitiveTest id=" " name="DSHal_SetBassEnhancer" version="1">
+        <function>TestMgr_DSHal_SetBassEnhancer</function>
+        <parameters>
+          <parameter name="boost" value=""/>
+        </parameters>
+      </primitiveTest>
+      <primitiveTest id="" name="DSHal_GetBassEnhancer" version="1">
+        <function>TestMgr_DSHal_GetBassEnhancer</function>
+        <parameters/>
+      </primitiveTest>
     </primitiveTests>
   </module>
 </xml>
