@@ -134,6 +134,7 @@ if expectedResult in result.upper():
         setOperation("play",MediaValidationVariables.operation_max_interval)
         setOperation("seekbwd",MediaValidationVariables.operation_max_interval)
         setOperation("fastfwd",MediaValidationVariables.operation_max_interval)
+        setOperation("playnow",MediaValidationVariables.operation_max_interval)
         operations = getOperations()
         # Setting VideoPlayer test app URL arguments
         setURLArgument("url",videoURL)

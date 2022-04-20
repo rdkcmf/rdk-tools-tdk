@@ -135,8 +135,8 @@ if expectedResult in result.upper():
         appURL    = MediaValidationVariables.lightning_video_test_app_url
         videoURL  = MediaValidationVariables.video_src_url_audio
         # Setting VideoPlayer Operations
-        setOperation("mute","5")
-        setOperation("unmute","5")
+        setOperation("mute",MediaValidationVariables.operation_max_interval)
+        setOperation("unmute",MediaValidationVariables.operation_max_interval)
         setOperation("repeat",MediaValidationVariables.repeat_count_stress)
         operations = getOperations()
         # Setting VideoPlayer test app URL arguments
@@ -150,7 +150,7 @@ if expectedResult in result.upper():
 
         #Example video test url
         #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html?
-        #url=<audio_url>.mpd&operations=mute(5),unmute(5),repeat(15)&autotest=true&type=dash
+        #url=<audio_url>.mpd&operations=mute(10),unmute(10),repeat(10)&autotest=true&type=dash
 
         # Setting the video test url in webkit instance using RDKShell
         launch_status = launchPlugin(obj,webkit_instance,video_test_url)

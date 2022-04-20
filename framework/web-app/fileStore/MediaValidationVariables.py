@@ -65,9 +65,9 @@ thunder_port=""
 lightning_apps_loc = ""
 
 #lightning application url
-lightning_video_test_app_url     = lightning_apps_loc + "tdkvideoplayer/build/index.html"
-lightning_shaka_test_app_url     = lightning_apps_loc + "tdkshakaplayer/build/index.html"
-lightning_uve_test_app_url       = lightning_apps_loc + "tdkuveaampplayer/build/index.html"
+lightning_video_test_app_url     = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=VIDEO"
+lightning_shaka_test_app_url     = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=SHAKA"
+lightning_uve_test_app_url       = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=AAMP"
 lightning_animation_test_app_url = lightning_apps_loc + "tdkanimations/build/index.html"
 lightning_multianimation_test_app_url    = lightning_apps_loc + "tdkmultianimations/build/index.html"
 lightning_objects_animation_test_app_url = lightning_apps_loc + "tdkobjectanimations/build/index.html"
@@ -331,9 +331,9 @@ seekfwd_position = 120
 seekbwd_position = 80
 seekpos_check_interval = 10
 
-# Provided time (seconds) is the duration after how much second, the player should be closed
-close_interval = 180
-audio_close_interval = 120
+# Provided time (seconds) is the duration after how much second, the player should be closed (30 sec to 3mins)
+close_interval = 30
+audio_close_interval = 30
 
 
 

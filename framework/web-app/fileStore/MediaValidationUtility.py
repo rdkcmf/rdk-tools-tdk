@@ -105,7 +105,10 @@ def getURLArguments():
 def getTestURL(appURL,URLarguments):
     url = appURL
     if URLarguments != "" and URLarguments != None:
-        url = url + "?" + URLarguments
+        if "?" not in url:
+            url = url + "?" + URLarguments
+        else:
+            url = url + "&" + URLarguments
     url = "\"" + url + "\""
     return url
 
@@ -910,14 +913,8 @@ def monitorVideoTest(obj,webkit_console_socket,validation_dict,check_pattern,tim
     video_test_result = ""
     # Decoder value will not be increasing suring paused state and we check
     # the proc details after getting seeeked event not during the seek operation
-    skip_proc_check_events = ["Video Player Paused", "Video Player seeking"]
-    # Video progress position validation. As of now enabling for FF
-    pos_val_flag   = 0
-    pos_val_index  = 1
-    pos_list       = []
-    pos_val_result = []
-    pos_val_events   = ["ratechange"]
-    pos_val_patterns = ["Expected Event","Going to close"]
+    # While doing FF, in between rate may change to 0 and set back to original rate
+    skip_proc_check_events = ["Video Player Paused", "Video Player seeking","Video Player Rate Change to 0"]
     while True:
         if continue_count > timeout:
             hang_detected = 1
@@ -930,11 +927,6 @@ def monitorVideoTest(obj,webkit_console_socket,validation_dict,check_pattern,tim
         else:
             continue_count = 0
         console_log = webkit_console_socket.getEventsBuffer().pop(0)
-        # Video progress position validation if enabled for current opeartion
-        if pos_val_flag and any(pos_val_pattern in console_log for pos_val_pattern in pos_val_patterns):
-            pos_val_flag = 0
-            pos_val_result.append(get_pos_val_result(pos_list,pos_val_index))
-            pos_list = []
         dispConsoleLog(console_log)
         if "Video Player Playing" in console_log:
             play_status = "SUCCESS"
@@ -942,23 +934,13 @@ def monitorVideoTest(obj,webkit_console_socket,validation_dict,check_pattern,tim
             time.sleep(1);
             info = checkProcEntry(obj,validation_dict)
             proc_check_list.append(info)
-        # Check and enable video progress position validation
-        if "Observed Event:" in console_log and pos_val_flag == 0:
-            console_message = getConsoleMessage(console_log)
-            pos_val_flag,pos_val_index = get_pos_val_enable_status(pos_val_events,console_message)
-        # Capture the video progress positions if validation enabled
-        if pos_val_flag:
-            if "Video Progressing" in console_log:
-                console_message = getConsoleMessage(console_log)
-                pos = float(str(console_message).split("Video Progressing")[1].strip().split("/")[0])
-                pos_list.append(pos)
         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
             test_result = getConsoleMessage(console_log)
             break;
     webkit_console_socket.disconnect();
     time.sleep(3);
 
-    if "SUCCESS" in test_result and "SUCCESS" in play_status and hang_detected == 0 and "FAILURE" not in pos_val_result:
+    if "SUCCESS" in test_result and "SUCCESS" in play_status and hang_detected == 0:
         video_test_result = "SUCCESS"
     else:
         video_test_result = "FAILURE"
@@ -1087,61 +1069,6 @@ def dispTestCaseInfo(test_list):
         else:
             print test_info
 
-# Function to check wherher pos validation is enabled for operation
-def get_pos_val_enable_status(events,message):
-    pos_val_index = 1
-    if "\\n" in message:
-        message = message.split("\\n")
-    else:
-        message = message.split("]")
-    observed_event = str(message[1]).split(":")[1].strip()
-    if "," in observed_event:
-        observed_event = observed_event.split(",")[-1]
-    if observed_event in events:
-        pos_val_flag = 1
-        # Getting the pos diff index value based on speed set
-        if "ratechange" in observed_event:
-            rate_info = str(message[2]).split("]")[1]
-            rate = [int(i) for i in rate_info.split() if i.isdigit()]
-            if rate != []:
-                # providing some buffer
-                if rate[0] == 16:
-                    rate[0] = 10
-                pos_val_index = rate[0]
-            else:
-                # skip pos val for rewind
-                pos_val_flag = 0
-        if pos_val_flag:
-            print "Video pos index set as %s, Capturing video progress pos values ..." %(str(pos_val_index))
-    else:
-        pos_val_flag = 0
-    return pos_val_flag,pos_val_index
-
-# Function to validate the video progress position based on expected pos diff
-def get_pos_val_result(pos_list,pos_val_index):
-    pos_val_status = "SUCCESS"
-    vid_pos_list = []
-    pos_mismatch_count = 0
-    if len(pos_list) > 1:
-        # removing duplicates
-        [vid_pos_list.append(int(pos)) for pos in pos_list if int(pos) not in vid_pos_list]
-        if len(vid_pos_list) >1:
-            for i in range(0,len(vid_pos_list)-1):
-                pos_diff = vid_pos_list[i+1] - vid_pos_list[i]
-                if not (pos_diff >= pos_val_index):
-                    pos_mismatch_count += 1
-                    #print vid_pos_list[i],vid_pos_list[i+1],pos_diff
-            if pos_mismatch_count > 3:
-                pos_val_status = "FAILURE"
-
-        else:
-            pos_val_status = "FAILURE"
-    else:
-        pos_val_status = "FAILURE"
-
-    print "Video progress position validation status: %s" %(pos_val_status)
-    return pos_val_status
-
 
 # Function to set the primary post-requisites
 def setMediaTestPostRequisites(obj,webkit_browser_instance):
@@ -1158,6 +1085,7 @@ def setMediaTestPostRequisites(obj,webkit_browser_instance):
         post_requisite_status = "FAILURE"
 
     return post_requisite_status
+
 
 
 
