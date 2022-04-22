@@ -48,13 +48,13 @@
     <pre_requisite>1. Wpeframework process should be up and running in the device.</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>None</input_parameters>
-    <automation_approch>1. Enable WebkitBrowser plugin
+    <automation_approch>1. Enable WebkitInstance plugin
 2. Start listening for webinspect console logs.
 3. Load the fast channel change application in WebKit.
 4. Check whether channel change is happening in frequent intervals using console prints from webinspect page.
 5. After 1000 channel changes check whether channel is playing.
 6. Validate CPU load and memory usage after 1000 iterations
-7. Close the application and disable the WebKitBrowser</automation_approch>
+7. Close the application and disable the WebKitInstance</automation_approch>
     <expected_output>DUT should be stable and video must be playing after 1000 channel changes.</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_stability</test_stub_interface>
@@ -101,11 +101,19 @@ if expectedResult in (result.upper() and pre_condition_status):
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    plugin_list = ["WebKitBrowser","Cobalt","DeviceInfo"]
+    webkit_instance = StabilityTestVariables.webkit_instance
+    set_method = webkit_instance+'.1.url'
+    if webkit_instance in "WebKitBrowser":
+        webinspect_port = StabilityTestVariables.webinspect_port
+    elif webkit_instance in "LightningApp":
+        webinspect_port = StabilityTestVariables.lightning_app_webinspect_port
+    else:
+        webinspect_port = StabilityTestVariables.html_app_webinspect_port
+    plugin_list = [webkit_instance,"Cobalt","DeviceInfo"]
     plugins_cur_status_dict = get_plugins_status(obj,plugin_list)
     time.sleep(10)
     status = "SUCCESS"
-    plugin_status_needed = {"WebKitBrowser":"resumed","Cobalt":"deactivated","DeviceInfo":"activated"}
+    plugin_status_needed = {webkit_instance:"resumed","Cobalt":"deactivated","DeviceInfo":"activated"}
     if any(plugins_cur_status_dict[plugin] == "FAILURE" for plugin in plugin_list):
         print "\n Error while getting the status of plugins"
         status = "FAILURE"
@@ -118,26 +126,26 @@ if expectedResult in (result.upper() and pre_condition_status):
             status = "FAILURE"
     if status == "SUCCESS":
         print "\nPre conditions for the test are set successfully";
-        print "\nGet the URL in WebKitBrowser"
+        print "\nGet the URL"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
-        tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+        tdkTestObj.addParameter("method",set_method);
         tdkTestObj.executeTestCase(expectedResult);
         result = tdkTestObj.getResult()
         current_url = tdkTestObj.getResultDetails();
         if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
-            webkit_console_socket = createEventListener(ip,StabilityTestVariables.webinspect_port,[],"/devtools/page/1",False)
+            webkit_console_socket = createEventListener(ip,webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
             print "Current URL:",current_url
             print "\nSet Channel change test URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+            tdkTestObj.addParameter("method",set_method);
             tdkTestObj.addParameter("value",channel_change_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
             print "\nValidate if the URL is set successfully or not"
             tdkTestObj = obj.createTestStep('rdkservice_getValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+            tdkTestObj.addParameter("method",set_method);
             tdkTestObj.executeTestCase(expectedResult);
             result1 = tdkTestObj.getResult()
             new_url = tdkTestObj.getResultDetails();
@@ -208,7 +216,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                 time.sleep(5)
                 #Set the URL back to previous
                 tdkTestObj = obj.createTestStep('rdkservice_setValue');
-                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                tdkTestObj.addParameter("method",set_method);
                 tdkTestObj.addParameter("value",current_url);
                 tdkTestObj.executeTestCase(expectedResult);
                 result = tdkTestObj.getResult();

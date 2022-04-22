@@ -53,8 +53,8 @@
 3. Maximum allowed CPU load
 4. Maximum allowed Memory usage
 </input_parameters>
-    <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
-2. Get the current URL in webkitbrowser
+    <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitinstance only.
+2. Get the current URL
 3. Load the application to change channels for a given number of times.
 4.Validate the channel change using events
 5. Check if the CPU load and Memory usage is within the expected value.
@@ -112,11 +112,19 @@ if expectedResult in (result.upper() and pre_condition_status):
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    plugin_list = ["WebKitBrowser","Cobalt","DeviceInfo"]
+    webkit_instance = StabilityTestVariables.webkit_instance
+    set_method = webkit_instance+'.1.url'
+    if webkit_instance in "WebKitBrowser":
+        webinspect_port = StabilityTestVariables.webinspect_port
+    elif webkit_instance in "LightningApp":
+        webinspect_port = StabilityTestVariables.lightning_app_webinspect_port
+    else:
+        webinspect_port = StabilityTestVariables.html_app_webinspect_port
+    plugin_list = [webkit_instance,"Cobalt","DeviceInfo"]
     plugins_cur_status_dict = get_plugins_status(obj,plugin_list)
     time.sleep(10)
     status = "SUCCESS"
-    plugin_status_needed = {"WebKitBrowser":"resumed","Cobalt":"deactivated","DeviceInfo":"activated"}
+    plugin_status_needed = {webkit_instance:"resumed","Cobalt":"deactivated","DeviceInfo":"activated"}
     if any(plugins_cur_status_dict[plugin] == "FAILURE" for plugin in plugin_list):
         print "\n Error while getting the status of plugins"
         status = "FAILURE"
@@ -129,26 +137,26 @@ if expectedResult in (result.upper() and pre_condition_status):
             status = "FAILURE"
     if status == "SUCCESS":
         print "\nPre conditions for the test are set successfully";
-        print "\nGet the URL in WebKitBrowser"
+        print "\nGet the URL"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
-        tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+        tdkTestObj.addParameter("method",set_method);
         tdkTestObj.executeTestCase(expectedResult);
         result = tdkTestObj.getResult()
         current_url = tdkTestObj.getResultDetails();
 	if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
-	    webkit_console_socket = createEventListener(ip,StabilityTestVariables.webinspect_port,[],"/devtools/page/1",False)
+	    webkit_console_socket = createEventListener(ip,webinspect_port,[],"/devtools/page/1",False)
 	    time.sleep(10)
             print "Current URL:",current_url
             print "\nSet Channel change test URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+            tdkTestObj.addParameter("method",set_method);
             tdkTestObj.addParameter("value",channel_change_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
 	    print "\nValidate if the URL is set successfully or not"
             tdkTestObj = obj.createTestStep('rdkservice_getValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+            tdkTestObj.addParameter("method",set_method);
             tdkTestObj.executeTestCase(expectedResult);
             result1 = tdkTestObj.getResult()
             new_url = tdkTestObj.getResultDetails();
@@ -229,13 +237,13 @@ if expectedResult in (result.upper() and pre_condition_status):
 		    tdkTestObj.setResultStatus("FAILURE")
 		else:
 		    print error_msg
-		webkit_console_socket.disconnect()    
+		webkit_console_socket.disconnect()
 	        cpu_mem_info_dict["cpuMemoryDetails"] = result_dict_list
 	        json.dump(cpu_mem_info_dict,json_file)
 	        json_file.close()
                 #Set the URL back to previous
                 tdkTestObj = obj.createTestStep('rdkservice_setValue');
-                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                tdkTestObj.addParameter("method",set_method);
                 tdkTestObj.addParameter("value",current_url);
                 tdkTestObj.executeTestCase(expectedResult);
                 result = tdkTestObj.getResult();

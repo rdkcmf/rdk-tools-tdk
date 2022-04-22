@@ -51,7 +51,7 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>1. The URL of the application to be launched.
 </input_parameters>
-    <automation_approch>1. As a pre requisite disable all other plugins and enable WebKitBrowser/LightningApp plugin based on configuration.
+    <automation_approch>1. As a pre requisite disable all other plugins and enable WebKitBrowser/LightningApp/HtmlApp plugin based on configuration.
 2. Set the application URL.
 3. Get the time taken to load the application</automation_approch>
     <expected_output>The application should launch within 60 seconds.</expected_output>
@@ -113,8 +113,10 @@ if expectedResult in result.upper():
     set_method = webkit_instance+'.1.url'
     if webkit_instance in "WebKitBrowser":
         webinspect_port = PerformanceTestVariables.webinspect_port
-    else:
+    elif webkit_instance in "LightningApp":
         webinspect_port = PerformanceTestVariables.lightning_app_webinspect_port
+    else:
+        webinspect_port = PerformanceTestVariables.html_app_webinspect_port
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
     plugins_list = ["Cobalt",webkit_instance]

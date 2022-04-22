@@ -49,8 +49,8 @@
 </pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>1. The URL of the application to be launched.</input_parameters>
-    <automation_approch>1. As a pre requisite disable all other plugins and enable webkitbrowser plugin.
-2. Set the application URL in webkitbrowser
+    <automation_approch>1. As a pre requisite disable all other plugins and enable webkitinstance plugin.
+2. Set the application URL
 3. Play and pause the video from the application
 3. Get the time taken to play/pause the video</automation_approch>
     <expected_output>The video must play and pause within expected range of ms.</expected_output>
@@ -115,8 +115,10 @@ if expectedResult in result.upper():
     set_method = webkit_instance+'.1.url'
     if webkit_instance in "WebKitBrowser":
         webinspect_port = PerformanceTestVariables.webinspect_port
-    else:
+    elif webkit_instance in "LightningApp":
         webinspect_port = PerformanceTestVariables.lightning_app_webinspect_port
+    else:
+        webinspect_port = PerformanceTestVariables.html_app_webinspect_port
     plugins_list = ["Cobalt",webkit_instance]
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
     time.sleep(20)

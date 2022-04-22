@@ -67,8 +67,8 @@
     <pre_requisite>1. Wpeframework process should be up and running in the device.</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>None</input_parameters>
-    <automation_approch>1. Enable WebKitBrowser plugin.
-2. Set URL for keytest in WebKitBrowser.
+    <automation_approch>1. Enable WebKitInstance plugin.
+2. Set URL for keytest in WebKitInstance.
 3. In a loop of minimum 15 iterations send a key using generatekey method of RDKShell to the system.
 4. Validate the key press using webinspect console logs.
 5. Validate the time taken to get keys from RDK Shell.
@@ -113,11 +113,19 @@ if expectedResult in result.upper():
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    plugins_list = ["WebKitBrowser","Cobalt"]
+    webkit_instance = PerformanceTestVariables.webkit_instance
+    set_method = webkit_instance+'.1.url'
+    if webkit_instance in "WebKitBrowser":
+        webinspect_port = PerformanceTestVariables.webinspect_port
+    elif webkit_instance in "LightningApp":
+        webinspect_port = PerformanceTestVariables.lightning_app_webinspect_port
+    else:
+        webinspect_port = PerformanceTestVariables.html_app_webinspect_port
+    plugins_list = [webkit_instance,"Cobalt"]
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
     time.sleep(10)
     status = "SUCCESS"
-    plugin_status_needed = {"WebKitBrowser":"resumed","Cobalt":"deactivated"}
+    plugin_status_needed = {webkit_instance:"resumed","Cobalt":"deactivated"}
     if any(curr_plugins_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
         print "\n Error while getting the status of plugins"
         status = "FAILURE"
@@ -129,11 +137,11 @@ if expectedResult in result.upper():
         if new_plugins_status != plugin_status_needed:
             status = "FAILURE"
     if status == "SUCCESS" :
-        webkit_console_socket = createEventListener(ip,PerformanceTestVariables.webinspect_port,[],"/devtools/page/1",False)
+        webkit_console_socket = createEventListener(ip,webinspect_port,[],"/devtools/page/1",False)
         print "\nPre conditions for the test are set successfully"
-        print "\nGet the URL in WebKitBrowser"
+        print "\nGet the URL "
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
-        tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+        tdkTestObj.addParameter("method",set_method);
         tdkTestObj.executeTestCase(expectedResult);
         current_url = tdkTestObj.getResultDetails();
         result = tdkTestObj.getResult()
@@ -142,7 +150,7 @@ if expectedResult in result.upper():
             print "Current URL:",current_url
             print "\nSet Key test URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+            tdkTestObj.addParameter("method",set_method);
             tdkTestObj.addParameter("value",key_test_url);
             tdkTestObj.executeTestCase(expectedResult);
             time.sleep(10)
@@ -151,7 +159,7 @@ if expectedResult in result.upper():
                 tdkTestObj.setResultStatus("SUCCESS")
                 print "\nValidate if the URL is set successfully or not"
                 tdkTestObj = obj.createTestStep('rdkservice_getValue');
-                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                tdkTestObj.addParameter("method",set_method);
                 tdkTestObj.executeTestCase(expectedResult);
                 result = tdkTestObj.getResult()
                 if expectedResult in result:
@@ -162,7 +170,7 @@ if expectedResult in result.upper():
                         total_time = 0
                         count = 0
                         for i in range(0,15):
-                            params = '{"keys":[ {"keyCode": 50,"modifiers": [],"delay":1.0,"callsign":"WebKitBrowser","client":"WebKitBrowser"}]}'
+                            params = '{"keys":[ {"keyCode": 50,"modifiers": [],"delay":1.0,"callsign":'+webkit_instance+',"client":'+webkit_instance+'}]}'
                             tdkTestObj = obj.createTestStep('rdkservice_setValue')
                             tdkTestObj.addParameter("method","org.rdk.RDKShell.1.generateKey")
                             tdkTestObj.addParameter("value",params)
@@ -215,7 +223,7 @@ if expectedResult in result.upper():
                             tdkTestObj.setResultStatus("FAILURE")
                         #Set the URL back to previous
                         tdkTestObj = obj.createTestStep('rdkservice_setValue');
-                        tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                        tdkTestObj.addParameter("method",set_method);
                         tdkTestObj.addParameter("value",current_url);
                         tdkTestObj.executeTestCase(expectedResult);
                         result = tdkTestObj.getResult();

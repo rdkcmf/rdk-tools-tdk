@@ -136,8 +136,10 @@ if expectedResult in result.upper():
     plugins_list = ["Cobalt","DeviceInfo",webkit_instance]
     if webkit_instance in "WebKitBrowser":
         webinspect_port = PerformanceTestVariables.webinspect_port
-    else:
+    elif webkit_instance in "LightningApp":
         webinspect_port = PerformanceTestVariables.lightning_app_webinspect_port
+    else:
+        webinspect_port = PerformanceTestVariables.html_app_webinspect_port
     plugins_list = ["Cobalt",webkit_instance]
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
     time.sleep(20)

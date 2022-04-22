@@ -49,7 +49,7 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>1. The URL of the application to be launched.
 </input_parameters>
-    <automation_approch>1. As a pre requisite disable all other plugins and enable DeviceInfo and WebKitBrowser/LightningApp plugin based on configuration.
+    <automation_approch>1. As a pre requisite disable all other plugins and enable DeviceInfo and WebKitBrowser/LightningApp/HtmlApp plugin based on configuration.
 2. Set the application URL.
 3. Get the cpu load and memory usage after launching the application
 4. Revert the status of plugins</automation_approch>
@@ -113,8 +113,10 @@ if expectedResult in result.upper():
     plugins_list = ["Cobalt","DeviceInfo",webkit_instance]
     if webkit_instance in "WebKitBrowser":
         webinspect_port = PerformanceTestVariables.webinspect_port
-    else:
+    elif webkit_instance in "LightningApp":
         webinspect_port = PerformanceTestVariables.lightning_app_webinspect_port
+    else:
+        webinspect_port = PerformanceTestVariables.html_app_webinspect_port
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
     time.sleep(20)
     status = "SUCCESS"

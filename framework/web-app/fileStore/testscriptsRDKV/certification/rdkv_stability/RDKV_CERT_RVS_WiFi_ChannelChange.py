@@ -58,10 +58,10 @@ webinspect port : string</input_parameters>
     <automation_approch>1. Check the current active interface of DUT and if it is already WIFI then validate the channel changes
 2.a) If current active interface is ETHERNET, enable the WIFI interface.
 b) Connect to SSID
-c) Launch Lightning app for detecting IP change in WebKitBrowser
+c) Launch Lightning app for detecting IP change
 d) Set WIFI as default interface
 3. validate channel changes by listening to the webinspect port.
-4. Check logs for playing event 
+4. Check logs for playing event
 5. Validate CPU load and memory usage of each iteration.
 6. Revert the values and interface </automation_approch>
     <expected_output>Device should work fine even the interface is WiFi.
@@ -138,11 +138,19 @@ if expectedResult in (result.upper() and pre_condition_status):
         print "\n Current interface is WIFI \n"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
-    plugin_list = ["WebKitBrowser","Cobalt","DeviceInfo"]
+    webkit_instance = StabilityTestVariables.webkit_instance
+    set_method = webkit_instance+'.1.url'
+    if webkit_instance in "WebKitBrowser":
+        webinspect_port = StabilityTestVariables.webinspect_port
+    elif webkit_instance in "LightningApp":
+        webinspect_port = StabilityTestVariables.lightning_app_webinspect_port
+    else:
+        webinspect_port = StabilityTestVariables.html_app_webinspect_port
+    plugin_list = [webkit_instance,"Cobalt","DeviceInfo"]
     plugins_cur_status_dict = get_plugins_status(obj,plugin_list)
     time.sleep(10)
     plugin_required_status = "SUCCESS"
-    plugin_status_needed = {"WebKitBrowser":"resumed","Cobalt":"deactivated","DeviceInfo":"activated"}
+    plugin_status_needed = {webkit_instance:"resumed","Cobalt":"deactivated","DeviceInfo":"activated"}
     if any(plugins_cur_status_dict[plugin] == "FAILURE" for plugin in plugin_list):
         print "\n Error while getting the status of plugins"
         status = "FAILURE"
@@ -161,26 +169,26 @@ if expectedResult in (result.upper() and pre_condition_status):
             closed_status = close_lightning_app(obj)
             time.sleep(10)
         print "\nPre conditions for the test are set successfully";
-        print "\nGet the URL in WebKitBrowser"
+        print "\nGet the URL"
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
-        tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+        tdkTestObj.addParameter("method",set_method);
         tdkTestObj.executeTestCase(expectedResult);
         result = tdkTestObj.getResult()
         current_url = tdkTestObj.getResultDetails();
         if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
-            webkit_console_socket = createEventListener(obj.IP,StabilityTestVariables.webinspect_port,[],"/devtools/page/1",False)
+            webkit_console_socket = createEventListener(obj.IP,webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
             print "Current URL:",current_url
             print "\nSet Channel change test URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+            tdkTestObj.addParameter("method",set_method);
             tdkTestObj.addParameter("value",channel_change_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
             print "\nValidate if the URL is set successfully or not"
             tdkTestObj = obj.createTestStep('rdkservice_getValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+            tdkTestObj.addParameter("method",set_method);
             tdkTestObj.executeTestCase(expectedResult);
             result1 = tdkTestObj.getResult()
             new_url = tdkTestObj.getResultDetails();
@@ -267,7 +275,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                 json_file.close()
                 #Set the URL back to previous
                 tdkTestObj = obj.createTestStep('rdkservice_setValue');
-                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                tdkTestObj.addParameter("method",set_method);
                 tdkTestObj.addParameter("value",current_url);
                 tdkTestObj.executeTestCase(expectedResult);
                 result = tdkTestObj.getResult();

@@ -49,8 +49,8 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>channel_change_url : string,
 webinspect_port: string</input_parameters>
-    <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitbrowser only.
-2. Get the current URL in webkitbrowser
+    <automation_approch>1. As pre requisite, disable all the other plugins and enable webkitinstance only.
+2. Get the current URL
 3. Load the application to change channels for 5 times.
 4.Validate the channel change using events.
 5. Get the time taken for each channel change.
@@ -103,41 +103,51 @@ if expectedResult in result.upper():
     channel_change_url = PerformanceTestVariables.channel_change_url
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
+    webkit_instance = PerformanceTestVariables.webkit_instance
+    set_method = webkit_instance+'.1.url'
+    if webkit_instance in "WebKitBrowser":
+        webinspect_port = PerformanceTestVariables.webinspect_port
+    elif webkit_instance in "LightningApp":
+        webinspect_port = PerformanceTestVariables.lightning_app_webinspect_port
+    else:
+        webinspect_port = PerformanceTestVariables.html_app_webinspect_port
     revert="NO"
-    status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
-    print "Current values \nWebKitBrowser:%s\nCobalt:%s"%(curr_webkit_status,curr_cobalt_status);
-    if status == "FAILURE":
-        if "FAILURE" not in (curr_webkit_status,curr_cobalt_status):
-            set_status =set_pre_requisites(obj)
-            #Need to revert the values since we are changing plugin status
-            revert="YES"
-            if set_status == "SUCCESS":
-                status,webkit_status,cobalt_status = check_pre_requisites(obj)
-            else:
-                status = "FAILURE";
-    if status == "SUCCESS":
+    plugins_list = ["Cobalt",webkit_instance]
+    curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
+    time.sleep(20)
+    status = "SUCCESS"
+    plugin_status_needed = {webkit_instance:"resumed","Cobalt":"deactivated"}
+    if any(curr_plugins_status_dict[plugin] == "FAILURE" for plugin in plugins_list):
+        print "\n Error while getting plugin status"
+        status = "FAILURE"
+    elif curr_plugins_status_dict != plugin_status_needed:
+        revert = "YES"
+        status = set_plugins_status(obj,plugin_status_needed)
+        new_plugins_status = get_plugins_status(obj,plugins_list)
+        if new_plugins_status != plugin_status_needed:
+            status = "FAILURE"
         print "\nPre conditions for the test are set successfully";
-        print "\nGet the URL in WebKitBrowser"
+        print "\nGet the URL "
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
-        tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+        tdkTestObj.addParameter("method",set_method);
         tdkTestObj.executeTestCase(expectedResult);
         current_url = tdkTestObj.getResultDetails();
         result = tdkTestObj.getResult()
         if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
-            webkit_console_socket = createEventListener(ip,PerformanceTestVariables.webinspect_port,[],"/devtools/page/1",False)
+            webkit_console_socket = createEventListener(ip,webinspect_port,[],"/devtools/page/1",False)
             time.sleep(60)
             print "Current URL:",current_url
             print "\nSet Channel change test URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
-            tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+            tdkTestObj.addParameter("method",set_method);
             tdkTestObj.addParameter("value",channel_change_url);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
             if expectedResult in result:
                 print "\nValidate if the URL is set successfully or not"
                 tdkTestObj = obj.createTestStep('rdkservice_getValue');
-                tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                tdkTestObj.addParameter("method",set_method);
                 tdkTestObj.executeTestCase(expectedResult);
                 new_url = tdkTestObj.getResultDetails();
                 result = tdkTestObj.getResult()
@@ -245,7 +255,7 @@ if expectedResult in result.upper():
                     time.sleep(30)
                     #Set the URL back to previous
                     tdkTestObj = obj.createTestStep('rdkservice_setValue');
-                    tdkTestObj.addParameter("method","WebKitBrowser.1.url");
+                    tdkTestObj.addParameter("method",set_method);
                     tdkTestObj.addParameter("value",current_url);
                     tdkTestObj.executeTestCase(expectedResult);
                     result = tdkTestObj.getResult();
@@ -270,7 +280,8 @@ if expectedResult in result.upper():
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"
-        status = revert_value(curr_webkit_status,curr_cobalt_status,obj);
+        status = set_plugins_status(obj,curr_plugins_status_dict)
+        #status = revert_value(curr_webkit_status,curr_cobalt_status,obj);
     obj.unloadModule("rdkv_performance");
     getSummary(Summ_list)
 else:
