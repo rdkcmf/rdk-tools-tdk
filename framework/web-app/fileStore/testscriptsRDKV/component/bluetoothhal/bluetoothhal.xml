@@ -183,7 +183,7 @@
       <primitiveTest name="BluetoothHal_FindDevice" id=" " version="1">
         <function>TestMgr_BluetoothHal_FindDevice</function>
         <parameters>
-          <parameter name="device_id" value=""/>
+          <parameter name="device_index" value=""/>
         </parameters>
       </primitiveTest>
       <primitiveTest name="BluetoothHal_FindService" id=" " version="1">

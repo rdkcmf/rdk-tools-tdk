@@ -243,6 +243,7 @@ if "SUCCESS" in result.upper():
                                         if (device["deviceName"] == bluetoothhallib.deviceName):
                                             print "Client device of type Speakers is successfully discovered in DUT"
                                             deviceID = str(device["deviceID"])
+                                            device_index = int(device["device_index"])
                                             deviceDiscovered = True
                                     if True == deviceDiscovered:
                                         tdkTestObj.setResultStatus("SUCCESS")
@@ -270,9 +271,8 @@ if "SUCCESS" in result.upper():
 
                                                 #Find the bluetooth client device in the scanned devices list using api
                                                 tdkTestObj = bluetoothhalObj.createTestStep('BluetoothHal_FindDevice');
-                                                #Set device ID as the bluetooth client device ID
-                                                #tdkTestObj.addParameter("device_id", deviceID)
-                                                tdkTestObj.addParameter("device_id",0);
+                                                #Set device index as the bluetooth client device index
+                                                tdkTestObj.addParameter("device_index",device_index);
 
                                                 #Execute the test case in DUT
                                                 tdkTestObj.executeTestCase(expectedresult);

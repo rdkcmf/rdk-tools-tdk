@@ -96,7 +96,7 @@
       <parameter funName='TestMgr_BluetoothHal_GetDeviceConnected' parameterName='device_type' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_BluetoothHal_GetDeviceDisconnected' parameterName='device_id' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_BluetoothHal_GetDeviceDisconnected' parameterName='device_type' parameterType='INTEGER' range='0-9' />
-      <parameter funName='TestMgr_BluetoothHal_FindDevice' parameterName='device_id' parameterType='STRING' range='A-Z' />
+      <parameter funName='TestMgr_BluetoothHal_FindDevice' parameterName='device_index' parameterType='INTEGER' range='0-9' />
       <parameter funName='TestMgr_BluetoothHal_FindService' parameterName='device_id' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_BluetoothHal_FindService' parameterName='uuid' parameterType='STRING' range='A-Z' />
       <parameter funName='TestMgr_BluetoothHal_FindService' parameterName='xml_data' parameterType='STRING' range='A-Z' />
