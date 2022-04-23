@@ -1,8 +1,8 @@
 {
-  "name": "tdkvideoplayer",
-  "description": "TDKVideoPlayer",
+  "name": "tdkunifiedplayer",
+  "description": "TDKUnifiedPlayerApp",
   "dependencies": {
-    "@lightningjs/sdk": "^4.0.0"
+    "@lightningjs/sdk": "^4.8.2"
   },
   "lint-staged": {
     "*.js": [
@@ -18,13 +18,15 @@
   "devDependencies": {
     "@babel/core": "^7.7.2",
     "babel-eslint": "^10.0.3",
+    "dashjs": "^4.3.0",
     "eslint": "^6.6.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-prettier": "^3.1.1",
+    "hls.js": "^0.13.2",
     "husky": "^3.1.0",
     "lint-staged": "^9.4.3",
     "prettier": "^1.19.1",
-    "hls.js": "^0.13.2",
-    "dashjs": "^3.2.1"
+    "shaka-player": "^3.0.2",
+    "ThunderJS": "github:rdkcentral/ThunderJS"
   }
 }

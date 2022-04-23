@@ -18,7 +18,8 @@
  */
 
 import { Lightning, Utils } from '@lightningjs/sdk'
-import { dispTime, logMsg, logEventMsg, GetURLParameter, getVideoOperations, getRandomInt } from './MediaUtility.js'
+import { dispTime, logMsg, logEventMsg, logActionMsg, GetURLParameter, getVideoOperations, getRandomInt, getPosValResult } from './MediaUtility.js'
+import { RDKServicesInterface }  from './RDKServicesUtility';
 
 let tag = null;
 
@@ -68,6 +69,7 @@ export default class App extends Lightning.Component {
           textColor: 0xffff00ff,
         },
       },
+      RDKServices : { type: RDKServicesInterface }
     }
  }
 
@@ -101,7 +103,7 @@ export default class App extends Lightning.Component {
       this.player.setDRMConfig(config);
   }
   addCustomHTTPHeader(headerName, headerValue, isLicenseRequest = true) {
-      console.log("AAMP: adding header: " + headerName + "| value: " + headerValue);
+      logMsg("AAMP: adding header: " + headerName + "| value: " + headerValue);
       this.player.addCustomHTTPHeader(headerName, headerValue, isLicenseRequest);
   }
 
@@ -114,6 +116,7 @@ export default class App extends Lightning.Component {
   pause() {
       this.expectedEvents = ["paused"]
       logMsg("Expected Event: " + this.expectedEvents)
+      this.pos_zero_index_flag = 1
       this.player.pause();
   }
   mute() {
@@ -149,6 +152,7 @@ export default class App extends Lightning.Component {
   setPlaybackRate(rate, overshoot = 0) {
       this.expectedEvents = ["ratechange"]
       this.expectedRate = rate
+      this.observedRates = []
       logMsg("Expected Rate : " + this.expectedRate)
       logMsg("Expected Event: " + this.expectedEvents)
       this.player.setPlaybackRate(rate, overshoot);
@@ -156,6 +160,7 @@ export default class App extends Lightning.Component {
   setNegPlaybackRate(rate, overshoot = 0) {
       this.expectedEvents = ["ratechange"]
       this.expectedRates = [ rate, 1 ]
+      this.observedRates = []
       this.rewindFlag = 1
       logMsg("Expected Rates: " + this.expectedRates)
       logMsg("Expected Event: " + this.expectedEvents)
@@ -345,10 +350,10 @@ export default class App extends Lightning.Component {
           if (tag.enableCCStatus == "true"){
               tag.setClosedCaptionStatus(true)
           }
-          //logMsg("Available Audio tracks: " + tag.getAvailableAudioTracks())
-          //logMsg("Current Audio track: " + tag.getAudioTrack())
           tag.checkAndStartAutoTesting()
           tag.init = 1 //inited
+          // Enable video progress position validation after playing event
+          tag.pos_val_flag = 1;
           /*tag.progressLogger = setInterval(()=>{
               tag.dispProgressLog()
           },1000);*/
@@ -357,6 +362,14 @@ export default class App extends Lightning.Component {
     tag.dispUIVideoPosition(tag.message2)
     tag.progressEventMsg = "Video Progressing "  + position.toFixed(2) + "/" + duration.toFixed(2)
     logMsg(tag.progressEventMsg)
+    if(tag.pos_val_flag == 1){
+          var pos = tag.progressEventMsg.split("Video Progressing")[1].trim().split("/")[0]
+          tag.pos_list.push(pos)
+    }
+    // Get the FPS data only when collect fps option is enabled
+    if(tag.enable_fps_flag == 1){
+        tag.tag("RDKServices").getDiagnosticsInfo();
+    }
   }
   eventplaybackStateChanged(event){
     //logMsg("PlayBack state change event: " + JSON.stringify(event))
@@ -377,10 +390,17 @@ export default class App extends Lightning.Component {
         case tag.playerStates.Playing:
             tag.observedEvents.push("playing")
             tag.checkAndLogEvents("playing","Video Player Playing")
+            // Enable video progress pos validation with pos diff 1
+            tag.updatePosValidationInfo(1)
             break;
         case tag.playerStates.Paused:
             tag.observedEvents.push("paused")
             tag.checkAndLogEvents("paused","Video Player Paused")
+            // Enable video progress pos validation with pos diff 0
+            if(tag.pos_zero_index_flag){
+              tag.pos_zero_index_flag = 0
+              tag.updatePosValidationInfo(0)
+            }
             break;
         case tag.playerStates.Seeking:
             tag.observedEvents.push("seeking")
@@ -393,12 +413,21 @@ export default class App extends Lightning.Component {
   }
   eventplaybackRateChanged(event) {
     tag.observedEvents.push("ratechange")
-    if (tag.rewindFlag == 1){
-        tag.observedRates.push(event.speed);
-    }
+    //if (tag.rewindFlag == 1){
+    tag.observedRates.push(event.speed);
+    //}
     tag.observedRate = event.speed;
     var rate_info = "Video Player Rate Change to " + tag.observedRate
     tag.checkAndLogEvents("ratechange",rate_info);
+    if (event.speed > 0 ){
+        // Enable video progress pos validation with pos diff rate
+        // using same rate for 1x,2x,4x
+	var rate_index = event.speed
+        // providing some buffer for 16x
+        if (event.speed == 16)
+            rate_index = 10
+        tag.updatePosValidationInfo(rate_index)
+    }
   }
   eventplaybackCompleted(){
     tag.observedEvents.push("ended")
@@ -416,6 +445,8 @@ export default class App extends Lightning.Component {
       var dur = tag.getDurationSec()
       var seek_info = "Video Player Seeked " + tag.observedPos + "/" + dur.toFixed(2)
       tag.checkAndLogEvents("seeked",seek_info);
+      // Enable video progress pos validation with pos diff 1
+      tag.updatePosValidationInfo(1)
   }
   handlePlayerStates(id){
     if (this.playerStateIDs.includes(id)){
@@ -442,23 +473,23 @@ export default class App extends Lightning.Component {
   dispVolumeInfo(){
     this.message1 = "Video Player Volume Change, volume: " + this.getVolume()
     this.dispUIMessage(this.message1)
-    console.log("*****************************************************************\n" +
-	        "[ " + dispTime() + " ] " + this.message1 + "\n" +
-                "*****************************************************************")
+    logActionMsg(this.message1)
+    // Enable video progress pos validation with pos diff 1
+    this.updatePosValidationInfo(1)
   }
   dispAudioInfo(){
     this.message1 = "Observed Audio Track Index: " + this.getAudioTrack()
     this.dispUIMessage(this.message1)
-    console.log("*****************************************************************\n" +
-	        "[ " + dispTime() + " ] " + this.message1 + "\n" +
-                "*****************************************************************")
+    logActionMsg(this.message1)
+    // Enable video progress pos validation with pos diff 1
+    this.updatePosValidationInfo(1)
   }
   dispTextInfo(){
     this.message1 = "Observed Text Track Index: " + this.getTextTrack()
     this.dispUIMessage(this.message1)
-    console.log("*****************************************************************\n" +
-	        "[ " + dispTime() + " ] " + this.message1 + "\n" +
-                "*****************************************************************")
+    logActionMsg(this.message1)
+    // Enable video progress pos validation with pos diff 1
+    this.updatePosValidationInfo(1)
   }
 
 
@@ -636,6 +667,7 @@ export default class App extends Lightning.Component {
             }
             else if (action == "close"){
                 setTimeout(()=> {
+                    this.updatePrevPosValidationResult()
                     logMsg("**************** Going to close ****************")
                     this.stop()
                 },actionInterval);
@@ -648,6 +680,7 @@ export default class App extends Lightning.Component {
       }
       if (! operations.find(o=> o.includes("close"))){
           setTimeout(()=> {
+            this.updatePrevPosValidationResult()
             logMsg("**************** Going to close ****************")
             this.stop()
           },(actionInterval+10000));
@@ -655,7 +688,7 @@ export default class App extends Lightning.Component {
       setTimeout(()=> {
         this.dispTestResult()
       },(actionInterval+15000));
-      console.log("\n");
+      //console.log("\n");
   }
 
 
@@ -663,6 +696,7 @@ export default class App extends Lightning.Component {
   clearEvents(){
       this.observedEvents = []
       this.expectedEvents = []
+      this.updatePrevPosValidationResult()
   }
   checkAndLogEvents(checkevent,msg){
     if ( this.expectedEvents.includes(checkevent) ){
@@ -678,6 +712,7 @@ export default class App extends Lightning.Component {
       if( ! this.expectedEvents.every(e=> this.observedEvents.indexOf(e) >= 0)){
           this.eventFlowFlag = 0
           Status = "FAILURE"
+          logMsg("Failure Reason: Expected events not occurred")
       } else{
           if (this.expectedEvents.includes("paused")){
               var currState = this.getCurrentState();
@@ -687,11 +722,11 @@ export default class App extends Lightning.Component {
                 this.eventFlowFlag = 0
                 Status = "FAILURE"
                 logMsg("video pause operation failure")
+                logMsg("Failure Reason: Current player state is not paused")
               }
           }
           else if(this.expectedEvents.includes("seeked")){
               var currTime = parseInt(this.observedPos)
-              //var currTime = parseInt(this.getCurrentPosition())
 	      var expTime  = parseInt(this.expectedPos)
               if( currTime >= (expTime-2) && currTime <= (expTime+7) ){
                 logMsg("video seek operation success")
@@ -699,6 +734,7 @@ export default class App extends Lightning.Component {
                 this.eventFlowFlag = 0
                 Status = "FAILURE"
                 logMsg("video seek operation failure")
+                logMsg("Failure Reason: Seeked pos is not within expected range")
               }
           }
           else if(this.expectedEvents.includes("playing")){
@@ -709,6 +745,7 @@ export default class App extends Lightning.Component {
                 this.eventFlowFlag = 0
                 Status = "FAILURE"
                 logMsg("video play operation failure")
+                logMsg("Failure Reason: Current player state is not playing")
               }
           }
           else if(this.expectedEvents.includes("ratechange")){
@@ -718,20 +755,20 @@ export default class App extends Lightning.Component {
                     this.eventFlowFlag = 0
                     Status = "FAILURE"
                     logMsg("video rate change operation failure")
+                    logMsg("Failure Reason: Playback rate is not as expected")
                   }else{
                     logMsg("video rate change operation success")
                   }
               }else{
-                  var currRate = parseInt(this.observedRate)
-                  //logMsg("Observed Rate : " + currRate)
-                  if( currRate == this.expectedRate && currRate == parseInt(this.getPlaybackRate())){
+                  if( this.observedRates.includes(this.expectedRate)){
                     logMsg("video rate change operation success")
                   }else{
                     this.eventFlowFlag = 0
                     Status = "FAILURE"
                     logMsg("video rate change operation failure")
+                    logMsg("Failure Reason: Playback rate is not as expected")
                   }
-             }   
+             }
           }
 	  else if (this.volumeChangeFlag == 1){
               this.volumeChangeFlag = 0
@@ -742,6 +779,7 @@ export default class App extends Lightning.Component {
                 this.eventFlowFlag = 0
                 Status = "FAILURE"
                 logMsg("volume change operation failure")
+                logMsg("Failure Reason: Current volume level is not as expected")
               }
           }
 	  else if (this.audioChangeFlag == 1){
@@ -754,6 +792,7 @@ export default class App extends Lightning.Component {
                 this.eventFlowFlag = 0
                 Status = "FAILURE"
                 logMsg("Audio language change operation failure")
+                logMsg("Failure Reason: Current Audio track index is not as expected")
               }
           }
           else if (this.textChangeFlag == 1){
@@ -766,20 +805,81 @@ export default class App extends Lightning.Component {
                 this.eventFlowFlag = 0
                 Status = "FAILURE"
                 logMsg("Text Track change operation failure")
+                logMsg("Failure Reason: Current Text track index is not as expected")
               }
           }
           else if (this.audioTracksAvailability == 0 || this.textTracksAvailability == 0){
               Status = "FAILURE"
+              logMsg("Failure Reason: Audio/Text tracks list empty")
           }
       }
       logMsg("Test step status: " + Status)
   }
+
+  updatePosValidationInfo(index){
+      if (!this.pos_val_flag){
+          this.pos_val_flag  = 1
+          this.pos_val_index = index
+          logMsg("Video pos index set as "+this.pos_val_index+", Capturing video progress pos values ...");
+      }
+  }
+
+  updatePrevPosValidationResult(){
+      this.pos_val_flag = 0
+      this.pos_val_result.push(getPosValResult(this.pos_list,this.pos_val_index))
+      this.pos_list = [];
+  }
+
+  updateRDKServicesInterface(){
+    // Required device IP and Port to communicate with
+    // RDK services plugins using ThunderJS
+    this.deviceconfig = {
+        host: this.deviceIP,
+        port: this.devicePort
+    };
+    this.settings = {
+        consumer:this,
+        webkitinstance:this.webkitInstance
+    };
+    this.tag("RDKServices").updateSettings(this.deviceconfig,this.settings);
+    this.tag("RDKServices").rdkservicesInterfaceInit();
+  }
+
   dispTestResult(){
     clearInterval(this.progressLogger);
-    if (this.eventFlowFlag == 1 && this.errorFlag == 0)
+    // Check the average FPS if collect fps option is enabled
+    if(this.enable_fps_flag == 1){
+        var avgFPS = this.tag("RDKServices").getAverageDiagnosticsInfo()
+        if ( Math.round(avgFPS) >= this.expectedFPS )
+	    logMsg("Average FPS >= " + this.expectedFPS)
+	else{
+            this.errorFlag = 1
+	    logMsg("Failure Reason: Average FPS < " + this.expectedFPS)
+	}
+    }
+    // diaplay error, events & pos validation results
+    logMsg("**************** TEST STATUS ****************")
+    if (this.errorFlag == 0)
+        logMsg("OVERALL VIDEO PLAYBACK ERROR EVENT STATUS : FALSE")
+    else
+        logMsg("OVERALL VIDEO PLAYBACK ERROR EVENT STATUS : TRUE")
+
+    var overall_pos_val_status = 1
+    if (this.pos_val_result.includes("FAILURE")){
+        overall_pos_val_status = 0
+        logMsg("OVERALL VIDEO PROGRESS POSITION VALIDATION STATUS : FAILURE")
+    }else
+        logMsg("OVERALL VIDEO PROGRESS POSITION VALIDATION STATUS : SUCCESS")
+
+    if (this.eventFlowFlag == 1)
+        logMsg("OVERALL VIDEO OPERATIONS EVENTS VALIDATION STATUS : SUCCESS")
+    else
+        logMsg("OVERALL VIDEO OPERATIONS EVENTS VALIDATION STATUS : FAILURE")
+
+    //Generate TEST RESULT based on error, events & pos validation results
+    if (this.eventFlowFlag == 1 && this.errorFlag == 0 && overall_pos_val_status == 1)
         logMsg("TEST RESULT: SUCCESS")
     else{
-        logMsg("eventFlowFlag: " + this.eventFlowFlag + " errorFlag: " + this.errorFlag)
         logMsg("TEST RESULT: FAILURE")
     }
   }
@@ -842,6 +942,17 @@ export default class App extends Lightning.Component {
     this.textLanguages = []
     this.textLanguagesSelected = []
     this.textTracksAvailability = 1
+    this.pos_val_flag   = 0
+    this.pos_val_index  = 1
+    this.pos_list       = []
+    this.pos_val_result = []
+    this.pos_zero_index_flag = 0
+    // Using device local host IP
+    this.deviceIP        = "127.0.0.1"
+    this.devicePort      = 0
+    this.expectedFPS     = 0
+    this.webkitInstance  = null
+    this.enable_fps_flag = 0
     logMsg("URL Info: " + this.videoURL )
 
     tag = this;
@@ -862,19 +973,31 @@ export default class App extends Lightning.Component {
             this.options = GetURLParameter("options").split(",");
         }
     });
+
+    // check options provided in the url and update video properties
     this.options.forEach(item => {
 	if(item.includes("seekInterval")){
          this.seekInterval = parseInt(item.split('(')[1].split(')')[0]);
         }
         else if(item.includes("checkInterval")){
          this.checkInterval = parseInt(item.split('(')[1].split(')')[0])*1000;
-       }
+        }
         else if(item.includes("secondaryURL")){
          this.secondaryURL = item.split('(')[1].split(')')[0];
-       }
-       else if(item.includes("enableCC")){
+        }
+        else if(item.includes("enableCC")){
          this.enableCCStatus = item.split('(')[1].split(')')[0];
-       }
+        }
+        else if(item.includes("collectfps")){
+         this.enable_fps_flag = 1
+         this.webkitInstance = item.split('(')[1].split(')')[0];
+        }
+        else if(item.includes("deviceport")){
+         this.devicePort = parseInt(item.split('(')[1].split(')')[0]);
+        }
+        else if(item.includes("expectedfps")){
+         this.expectedFPS = parseInt(item.split('(')[1].split(')')[0]);
+        }
      });
     // check the DRM options provided in the url and update the configs
     this.license_header = "";
@@ -894,6 +1017,9 @@ export default class App extends Lightning.Component {
           this.DRMconfig[drm] = license_url;
       }
     });
+
+    if(this.enable_fps_flag)
+        this.updateRDKServicesInterface()
 
     this.loadAAMPPlayer();
   }

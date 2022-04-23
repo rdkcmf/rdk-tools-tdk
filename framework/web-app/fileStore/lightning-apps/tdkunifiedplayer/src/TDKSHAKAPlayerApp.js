@@ -17,9 +17,12 @@
  * limitations under the License.
  */
 
-import { Lightning, Utils, Log, Metrics, VideoPlayer} from '@lightningjs/sdk'
-import { dispTime, logMsg, logEventMsg, GetURLParameter, getVideoOperations } from './MediaUtility.js'
-import VideoPlayerAdvanced from './VideoPlayerAdvanced'
+import { Lightning, Utils, Log, Metrics } from '@lightningjs/sdk'
+import { dispTime, logMsg, logEventMsg, GetURLParameter, getVideoOperations, getPosValResult } from './MediaUtility.js'
+
+let tag = null;
+
+import shaka from 'shaka-player/dist/shaka-player.compiled.js'
 
 export default class App extends Lightning.Component {
   static getFonts() {
@@ -42,7 +45,7 @@ export default class App extends Lightning.Component {
         x: 1000,
         y: 60,
         text: {
-          text: "TDK Lightning Player Test App",
+          text: "TDK Lightning SHAKA Player Test App",
           fontFace: 'bold',
           fontSize: 40,
           textColor: 0xffffffff,
@@ -68,7 +71,6 @@ export default class App extends Lightning.Component {
           textColor: 0xffffffff,
         },
       },
-      VideoPlayer: { type: VideoPlayerAdvanced }
     }
   }
 
@@ -81,7 +83,13 @@ export default class App extends Lightning.Component {
       this.tag("MsgBox2").text.text = `${msg}`;
   }
 
-
+  setVideoArea(videoPos){
+       const precision = this.stage.getRenderPrecision();
+       this.videoEl.style.left = Math.round(videoPos[0] * precision) + 'px';
+       this.videoEl.style.top = Math.round(videoPos[1] * precision) + 'px';
+       this.videoEl.style.width = Math.round((videoPos[2] - videoPos[0]) * precision) + 'px';
+       this.videoEl.style.height = Math.round((videoPos[3] - videoPos[1]) * precision) + 'px';
+  }
 
   /* Methods to perform video playback/trickplay */
 
@@ -89,32 +97,24 @@ export default class App extends Lightning.Component {
   play(){
     this.expectedEvents = ["play"]
     logMsg("Expected Event: " + this.expectedEvents)
-    VideoPlayer._videoEl.playbackRate = 1
-    VideoPlayer.play(this.videoURL)
+    this.videoEl.playbackRate = 1
+    this.videoEl.play()
   }
   pause() {
     this.expectedEvents = ["paused"]
     logMsg("Expected Event: " + this.expectedEvents)
-    VideoPlayer.pause()
-  }
-  playPause(){
-    if (VideoPlayer.playing){
-        this.expectedEvents = ["paused"]
-    }else{
-        this.expectedEvents = ["play"]
-        VideoPlayer._videoEl.playbackRate = 1
-    }
-    logMsg("Expected Event: " + this.expectedEvents)
-    VideoPlayer.playPause()
+    this.pos_zero_index_flag = 1
+    this.videoEl.pause()
   }
   playNow(){
     this.playbackRateIndex = this.playbackSpeeds.indexOf(1)
     this.rate = this.playbackSpeeds[this.playbackRateIndex]
     this.expectedEvents = ["ratechange"]
     this.expectedRate   = this.rate
+    this.observedRates  = []
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Expected Rate : " + this.expectedRate)
-    VideoPlayer._videoEl.playbackRate = this.rate
+    this.videoEl.playbackRate = this.rate
   }
 
   //  Methods to change video volume (mute/unmute)
@@ -123,36 +123,34 @@ export default class App extends Lightning.Component {
     this.expectedMute   = true
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Expected Mute : " + this.expectedMute)
-    VideoPlayer.mute()
+    this.videoEl.muted = true
   }
   unmute(){
     this.expectedEvents = ["volumechange"]
     this.expectedMute   = false
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Expected Mute : " + this.expectedMute)
-    VideoPlayer.mute(false)
+    this.videoEl.muted = false
   }
 
 
   // Methods to change video position
   seekfwd(pos){
     this.expectedEvents   = ["seeking","seeked"]
-    this.expectedPos = VideoPlayer.currentTime + pos
+    this.expectedPos = this.videoEl.currentTime + pos
     logMsg("Expected Event: "   + this.expectedEvents)
     logMsg("Expected Pos  : [ " + (this.expectedPos).toFixed(2) + " - " + (this.expectedPos + 7).toFixed(2) + " ]")
     this.videoEl.currentTime += pos
   }
   seekbwd(pos){
     this.expectedEvents   = ["seeking","seeked"]
-    this.expectedPos = VideoPlayer.currentTime - pos
+    this.expectedPos = this.videoEl.currentTime - pos
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Expected Pos  : [ " + (this.expectedPos).toFixed(2) + " - " + (this.expectedPos+ 7).toFixed(2) + " ]")
     this.videoEl.currentTime -= pos
   }
-  seekpos(){
+  seekpos(pos){
     this.expectedEvents   = ["seeking","seeked"]
-    var pos = this.seekPositions[this.seekPosIndex]
-    this.seekPosIndex += 1
     this.expectedPos = pos
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Expected Pos  : [ " + (this.expectedPos).toFixed(2) + " - " + (this.expectedPos+ 7).toFixed(2) + " ]")
@@ -167,18 +165,20 @@ export default class App extends Lightning.Component {
     this.rate = this.playbackSpeeds[this.playbackRateIndex]
     this.expectedEvents = ["ratechange"]
     this.expectedRate   = this.rate
+    this.observedRates  = []
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Expected Rate : " + this.expectedRate)
-    VideoPlayer._videoEl.playbackRate = this.rate
+    this.videoEl.playbackRate = this.rate
   }
   fastfwdspeed(n){
     this.playbackRateIndex = this.playbackSpeeds.indexOf(n)
     this.rate = this.playbackSpeeds[this.playbackRateIndex]
     this.expectedEvents = ["ratechange"]
     this.expectedRate   = this.rate
+    this.observedRates  = []
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Expected Rate : " + this.expectedRate)
-    VideoPlayer._videoEl.playbackRate = this.rate
+    this.videoEl.playbackRate = this.rate
   }
   rewind() {
     if (this.playbackRateIndex > 0) {
@@ -189,68 +189,23 @@ export default class App extends Lightning.Component {
     this.expectedRate = this.rate
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Expected Rate : " + this.expectedRate)
-    VideoPlayer._videoEl.playbackRate = this.rate
+    this.videoEl.playbackRate = this.rate
   }
+
+  // Methods to set events for EOS test
   setExpPlayBackEvents(){
     this.expectedEvents = ["play","ended"]
     logMsg("Expected Event: " + this.expectedEvents)
     logMsg("Observed Event: " + this.observedEvents)
   }
-
-  reload(url){
-    this.expectedEvents = ["playing"]
-    logMsg("Expected Event: " + this.expectedEvents)
-    this.videoURL = this.secondaryURL;
-    this.tag('VideoPlayer').reload(this.videoURL);
+  getDuration(){
+      return this.videoEl && (isNaN(this.videoEl.duration) ? Infinity : this.videoEl.duration)
   }
   close(){
     logMsg("Closing Video Player...")
-    this.tag('VideoPlayer').close()
+    this.player.unload()
     this.dispUIMessage("Video Player Closed")
   }
-
-
-  // Video Player Events
-  $videoPlayerEvent(eventName){
-    if ( Object.keys(this.vidplayerEvents).includes(eventName)){
-        this.message1 = "Video Player " + this.vidplayerEvents[eventName]
-        this.dispUIMessage(this.message1)
-        logMsg(this.message1 + " !!!")
-        if (eventName == "Error")
-            this.errorFlag = 1
-    }
-  }
-  /*$videoPlayerProgress() {
-    this.progressEventHandler()
-  }*/
-  $videoPlayerTimeUpdate() {
-    this.timeUpdateEventHandler()
-  }
-  $videoPlayerPlaying(){
-    this.playingEventHandler()
-  }
-  $videoPlayerPlay(){
-    this.playEventHandler()
-  }
-  $videoPlayerPause(){
-    this.pauseEventHandler()
-  }
-  $videoPlayerVolumeChange(){
-    this.volumeChangeEventHandler()
-  }
-  $videoPlayerSeeking() {
-    this.seekEventHandler("seeking")
-  }
-  $videoPlayerSeeked() {
-    this.seekEventHandler("seeked")
-  }
-  $videoPlayerRatechange(){
-    this.rateChangeEventHandler()
-  }
-  $videoPlayerEnded(){
-    this.endedEventHandler()
-  }
-
 
 
   //Register video events
@@ -303,28 +258,28 @@ export default class App extends Lightning.Component {
 
   // Playing Event Handler
   playingEventHandler(){
-    this.observedEvents.push("playing")
     this.message1 = "Video Player Playing"
-    this.dispUIMessage(this.message1)
-    this.checkAndLogEvents("playing",this.message1 + " !!!")
+    logMsg(this.message1 + " !!!")
     if ( this.init == 0 ){
         logMsg("******************* VIDEO STARTED PLAYING !!! *******************")
-        logMsg("VIDEO LOOP: " + VideoPlayer.looped)
+        logMsg("VIDEO LOOP: " + this.videoEl.loop)
         logMsg("VIDEO AUTOPLAY: " + this.autoplay)
-        logMsg("VIDEO DURATION: " + VideoPlayer.duration.toFixed(4))
-        this.vidDuration = VideoPlayer.duration.toFixed(2)
+        logMsg("VIDEO DURATION: " + this.getDuration().toFixed(4))
+        this.vidDuration = this.getDuration().toFixed(2)
         this.checkAndStartAutoTesting()
         this.init = 1 //inited
         this.progressLogger = setInterval(()=>{
             this.dispProgressLog()
         },1000);
     }
+    // Enable video progress position validation after playing event
+    this.pos_val_flag = 1;
   }
 
   // TimeUpdate Event handler
   timeUpdateEventHandler(){
-    var currentTime = VideoPlayer.currentTime
-    var duration = VideoPlayer.duration
+    var currentTime = this.videoEl.currentTime
+    var duration = this.getDuration()
     this.message2 = "Pos: " + currentTime.toFixed(2) + "/" + duration.toFixed(2)
     this.dispUIVideoPosition(this.message2)
     this.progressEventMsg = "Video Progressing "  + currentTime.toFixed(2) + "/" + duration.toFixed(2)
@@ -336,6 +291,8 @@ export default class App extends Lightning.Component {
     this.message1 = "Video Player Play"
     this.dispUIMessage(this.message1)
     this.checkAndLogEvents("play",this.message1 + " !!!")
+    // Enable video progress pos validation with pos diff 1
+    this.updatePosValidationInfo(1)
   }
   // Pause Event Handler
   pauseEventHandler(){
@@ -343,32 +300,51 @@ export default class App extends Lightning.Component {
     this.message1 = "Video Player Paused"
     this.dispUIMessage(this.message1)
     this.checkAndLogEvents("paused",this.message1 + " !!!")
+    // Enable video progress pos validation with pos diff 0
+    if(this.pos_zero_index_flag){
+      this.pos_zero_index_flag = 0
+      this.updatePosValidationInfo(0)
+    }
   }
   // VolumeChange Event Handler
   volumeChangeEventHandler(){
     this.observedEvents.push("volumechange")
-    this.observedMute = VideoPlayer.muted
+    this.observedMute = this.videoEl.muted
     this.message1 = "Video Player Volume Change, Mute Status: " + this.observedMute
     this.dispUIMessage(this.message1)
     this.checkAndLogEvents("volumechange",this.message1)
+    // Enable video progress pos validation with pos diff 1
+    this.updatePosValidationInfo(1)
   }
   // Seek Event Handler
   seekEventHandler(e){
     this.observedEvents.push(e)
-    var currentTime = VideoPlayer.currentTime
-    var duration = VideoPlayer.duration
+    var currentTime = this.videoEl.currentTime
+    var duration = this.getDuration()
     this.observedPos = currentTime
     this.message1 = "Video Player " + e + " " + currentTime.toFixed(2) + "/" + duration.toFixed(2)
     this.dispUIMessage(this.message1)
     this.checkAndLogEvents(e,this.message1)
+    if (e == "seeked")
+      this.updatePosValidationInfo(1)
   }
   // RateChange Event Handler
   rateChangeEventHandler(){
     this.observedEvents.push("ratechange")
-    this.observedRate = VideoPlayer._videoEl.playbackRate
+    this.observedRate = this.videoEl.playbackRate
+    this.observedRates.push(parseInt(this.observedRate))
     this.message1 = "Video Player Rate Change to " + this.observedRate
     this.dispUIMessage(this.message1)
     this.checkAndLogEvents("ratechange",this.message1)
+    if (parseInt(this.observedRate) > 0){
+        // Enable video progress pos validation with pos diff rate
+        // using same rate for 1x,2x,4x
+        var rate_index = parseInt(this.observedRate)
+        // providing some buffer for 16x
+        if (parseInt(this.observedRate) == 16)
+          rate_index = 10
+      this.updatePosValidationInfo(rate_index)
+    }
   }
   endedEventHandler(){
     this.observedEvents.push("ended")
@@ -402,23 +378,33 @@ export default class App extends Lightning.Component {
      this.rewind()
    }
 
+ // SHAKA PlayBack Wrapper Methods
+  createSHAKAObject(){
+      this.player = new shaka.Player(this.videoEl);
+      window.player = this.player
+      logMsg("SHAKA Player object created !!!")
+  }
 
-  // Method to open the video player with the video URL
-  loadVideoPlayer(){
-    if (this.urlType == "hls" && this.usehlslib){
+  // Method to open the shaka player with the video URL
+  loadSHAKAPlayer(){
+        shaka.polyfill.installAll();
+        this.createSHAKAObject();
         this.registerEvents();
-        this.tag('VideoPlayer').openHls(this.videoURL,this.DRMconfig)
-    }else if (this.urlType == "hls" && ! this.usehlslib){
-        this.tag('VideoPlayer').open(this.videoURL)
-    }else if (this.urlType == "dash" && this.usedashlib){
-        this.registerEvents();
-        this.tag('VideoPlayer').openDash(this.videoURL,this.DRMconfig)
-    }else if (this.urlType == "dash" && ! this.usedashlib){
-        this.tag('VideoPlayer').open(this.videoURL)
-    }else{
-        this.tag('VideoPlayer').open(this.videoURL)
-    }
-
+	if (Object.keys(this.DRMconfig).length != 0){
+	    this.player.configure(this.DRMconfig)
+	}
+	if(this.license_header != ""){
+            var header_tag  = this.license_header.split(":")[0];
+            var header_info = this.license_header.split(":")[1];
+	    this.player.getNetworkingEngine().registerRequestFilter(function(type, request) {
+            // Only add headers to license requests:
+            if (type == shaka.net.NetworkingEngine.RequestType.LICENSE) {
+                request.headers[header_tag] = header_info;
+            }
+            });
+	}
+        this.player.load(this.videoURL)
+        logMsg("SHAKA Player loaded with video url");
   }
 
   checkAndStartAutoTesting(){
@@ -436,15 +422,14 @@ export default class App extends Lightning.Component {
 
   performOperations(operations){
       var actionInterval = 0
-      var duration = 0, index = 0
+      var duration = 0, position = 0
       logMsg("Setting up the operations...")
       for (var i = 0; i < operations.length; i++)
       {
           var action = operations[i].split('(')[0];
           if ( action == "seekpos" ){
               duration = parseInt(operations[i].split('(')[1].split(')')[0].split(":")[0]);
-              this.seekPositions[index] = parseInt(operations[i].split('(')[1].split(')')[0].split(":")[1]);
-              index += 1;
+              position = parseInt(operations[i].split('(')[1].split(')')[0].split(":")[1]);
           }else{
               duration = parseInt(operations[i].split('(')[1].split(')')[0]);
           }
@@ -493,7 +478,7 @@ export default class App extends Lightning.Component {
             else if (action == "seekpos"){
                 setTimeout(()=> {
                     this.clearEvents()
-                    this.seekpos()
+                    this.seekpos(position)
                 },actionInterval);
             }
             else if (action == "fastfwd"){
@@ -538,12 +523,6 @@ export default class App extends Lightning.Component {
                     this.unmute()
                 },actionInterval);
             }
-            else if (action == "changeurl"){
-                setTimeout(()=> {
-                    this.clearEvents()
-                    this.reload(this.secondaryURL);
-                },actionInterval);
-            }
             else if (action == "playtillend"){
                 setTimeout(()=> {
                     this.setExpPlayBackEvents()
@@ -551,6 +530,7 @@ export default class App extends Lightning.Component {
             }
             else if (action == "close"){
                 setTimeout(()=> {
+                    this.updatePrevPosValidationResult()
                     logMsg("**************** Going to close ****************")
                     this.close()
                 },actionInterval);
@@ -563,6 +543,7 @@ export default class App extends Lightning.Component {
       }
       if (! operations.find(o=> o.includes("close"))){
           setTimeout(()=> {
+            this.updatePrevPosValidationResult()
             logMsg("**************** Going to close ****************")
             this.close()
           },(actionInterval+10000));
@@ -570,7 +551,7 @@ export default class App extends Lightning.Component {
       setTimeout(()=> {
         this.dispTestResult()
       },(actionInterval+15000));
-      console.log("\n");
+      //console.log("\n");
   }
 
 
@@ -585,46 +566,47 @@ export default class App extends Lightning.Component {
   clearEvents(){
       this.observedEvents = []
       this.expectedEvents = []
+      this.updatePrevPosValidationResult()
   }
   updateEventFlowFlag(){
       var Status = "SUCCESS"
       if( ! this.expectedEvents.every(e=> this.observedEvents.indexOf(e) >= 0)){
           this.eventFlowFlag = 0
           Status = "FAILURE"
+          logMsg("Failure Reason: Expected events not occurred")
       }
       else{
           if (this.expectedEvents.includes("seeking")){
               var currTime = parseInt(this.observedPos)
               var expTime  = parseInt(this.expectedPos)
-              //logMsg("Observed Pos  : " + currTime)
               if ( currTime >= expTime && currTime <= (expTime+7) ){
                   logMsg("video seek operation success")
               }else{
                   this.eventFlowFlag = 0
                   Status = "FAILURE"
                   logMsg("video seek operation failure")
+                  logMsg("Failure Reason: Seeked pos is not within expected range")
               }
           }
           else if(this.expectedEvents.includes("ratechange")){
-              var currRate = parseInt(this.observedRate)
-              //logMsg("Observed Rate : " + currRate)
-              if( currRate == this.expectedRate ){
+              if( this.observedRates.includes(this.expectedRate) ){
                 logMsg("video rate change operation success")
               }else{
                 this.eventFlowFlag = 0
                 Status = "FAILURE"
                 logMsg("video rate change operation failure")
+                logMsg("Failure Reason: Playback rate is not as expected")
               }
            }
           else if(this.expectedEvents.includes("volumechange")){
               var currMute = this.observedMute
-              //logMsg("Observed Mute : " + currMute)
               if( currMute == this.expectedMute ){
                 logMsg("video volume change operation success")
               }else{
                 this.eventFlowFlag = 0
                 Status = "FAILURE"
                 logMsg("video volume change operation failure")
+                logMsg("Failure Reason: Volume mute status is not as expected")
               }
            }
            else{
@@ -632,20 +614,54 @@ export default class App extends Lightning.Component {
            }
       }
       logMsg("Test step status: " + Status)
-      this.clearEvents();
+  }
+
+  updatePosValidationInfo(index){
+      if (!this.pos_val_flag){
+          this.pos_val_flag  = 1
+          this.pos_val_index = index
+          logMsg("Video pos index set as "+this.pos_val_index+", Capturing video progress pos values ...");
+      }
+  }
+  updatePrevPosValidationResult(){
+      this.pos_val_flag = 0
+      this.pos_val_result.push(getPosValResult(this.pos_list,this.pos_val_index))
+      this.pos_list = [];
   }
 
   dispProgressLog(){
       if(this.progressEventMsg != "")
           logMsg(this.progressEventMsg)
+      if(this.pos_val_flag == 1){
+          var pos = this.progressEventMsg.split("Video Progressing")[1].trim().split("/")[0]
+          this.pos_list.push(pos)
+      }
   }
 
   dispTestResult(){
     clearInterval(this.progressLogger);
-    if (this.eventFlowFlag == 1 && this.errorFlag == 0)
+    logMsg("**************** TEST STATUS ****************")
+    if (this.errorFlag == 0)
+        logMsg("OVERALL VIDEO PLAYBACK ERROR EVENT STATUS : FALSE")
+    else
+        logMsg("OVERALL VIDEO PLAYBACK ERROR EVENT STATUS : TRUE")
+
+    var overall_pos_val_status = 1
+    if (this.pos_val_result.includes("FAILURE")){
+        overall_pos_val_status = 0
+        logMsg("OVERALL VIDEO PROGRESS POSITION VALIDATION STATUS : FAILURE")
+    }else
+        logMsg("OVERALL VIDEO PROGRESS POSITION VALIDATION STATUS : SUCCESS")
+
+    if (this.eventFlowFlag == 1)
+        logMsg("OVERALL VIDEO OPERATIONS EVENTS VALIDATION STATUS : SUCCESS")
+    else
+        logMsg("OVERALL VIDEO OPERATIONS EVENTS VALIDATION STATUS : FAILURE")
+
+
+    if (this.eventFlowFlag == 1 && this.errorFlag == 0 && overall_pos_val_status == 1)
         logMsg("TEST RESULT: SUCCESS")
     else{
-        logMsg("eventFlowFlag: " + this.eventFlowFlag + " errorFlag: " + this.errorFlag)
         logMsg("TEST RESULT: FAILURE")
     }
   }
@@ -656,16 +672,14 @@ export default class App extends Lightning.Component {
     this.inputs = window.location.search.substring(1).split("&");
     this.videoURL = GetURLParameter("url").replace(/:and:/g,"&").replace(/:eq:/g, "=")
     this.autotest = GetURLParameter("autotest")
-    this.urlType  = GetURLParameter("type")
     this.autoplay = true
     this.options  = []
     this.configs  = []
     this.DRMconfig= {}
     this.message1 = ""
     this.message2 = ""
+    this.player   = null;
     this.init     = 0
-    this.usedashlib = false
-    this.usehlslib  = false
     this.interval = 1000
     this.checkInterval= 3000
     this.seekInterval = 10
@@ -673,31 +687,31 @@ export default class App extends Lightning.Component {
     this.observedPos    = 0
     this.expectedRate   = 0
     this.observedRate   = 0
+    this.observedRates  = []
     this.expectedMute   = ""
     this.observedMute   = ""
     this.errorFlag      = 0
     this.eventFlowFlag  = 1
     this.observedEvents = []
     this.expectedEvents = []
-    this.seekPositions  = []
-    this.seekPosIndex   = 0
     this.playbackSpeeds = [1, 2, 4, 16]
     this.playbackRateIndex = this.playbackSpeeds.indexOf(1)
     this.progressEventMsg  = ""
     this.progressLogger    = null
-    this.secondaryURL = "";
-    logMsg("URL Info: " + this.videoURL + " - " + this.urlType)
+    this.pos_val_flag   = 0
+    this.pos_val_index  = 1
+    this.pos_list       = []
+    this.pos_val_result = []
+     this.pos_zero_index_flag = 0
+    logMsg("URL Info: " + this.videoURL )
 
+    tag = this;
     this.vidElementEvents = {
         "loadstart":"Load Start", "loadeddata":"Loaded Data", "loadedmetadata":"Loaded MetaData",
         "encrypted": "Encrypted", "progress":"Progress", "emptied":"Emptied", "durationchange":"Duration Change",
         "canplay":"CanPlay", "canplaythrough":"CanPlay Through", "waiting":"Waiting", "stalled":"Stalled", "error":"Error"
     }
-    this.vidplayerEvents = {
-        "LoadStart":"Load Start", "LoadedData":"Loaded Data", "LoadedMetadata":"Loaded MetaData",
-        "Encrypted": "Encrypted", "Progress":"Progress", "Emptied":"Emptied", "DurationChange":"Duration Change",
-        "CanPlay":"CanPlay", "CanPlayThrough":"CanPlay Through", "Waiting":"Waiting", "Stalled":"Stalled", "Error":"Error"
-    }
+
     this.inputs.forEach(item => {
         if(item.split("=")[0] == "options"){
             this.options = GetURLParameter("options").split(",");
@@ -708,22 +722,25 @@ export default class App extends Lightning.Component {
     });
 
     // Set Video Player Properties
-    this.tag('VideoPlayer').setConsumer(this);
-    VideoPlayer._videoEl.setAttribute('crossOrigin', 'anonymous');
-    this.tag('VideoPlayer').updateDimensions(0,1920,1080,0);
-    VideoPlayer.show()      // Default visible
-    VideoPlayer.mute(false) // Default unmute
-    this.videoEl = VideoPlayer._videoEl
+    this.videoEl = document.createElement('video');
+    this.videoEl.style.visibility = 'visible'    // Default visible
+    this.videoEl.muted = false                   // Default unmute
+    this.videoEl.style.position = 'absolute';
+    this.videoEl.style.zIndex = '1';
+    //this.videoEl.setAttribute('width', '100%');
+    //this.videoEl.setAttribute('height', '100%');
+    this.setVideoArea([0, 0, 1920, 1080])
+    document.body.appendChild(this.videoEl)
 
     // check options provided in the url and update video properties
     if (! this.options.includes("noautoplay"))
-        VideoPlayer._videoEl.autoplay = true
+        this.videoEl.autoplay = true
     else
         this.autoplay = false
     if (this.options.includes("loop"))
-        VideoPlayer.loop()
+        this.videoEl.loop = true
     if (this.options.includes("mute"))
-        VideoPlayer.mute()
+        this.videoEl.muted = true
 
     this.options.forEach(item => {
       if(item.includes("seekInterval")){
@@ -732,62 +749,32 @@ export default class App extends Lightning.Component {
       else if(item.includes("checkInterval")){
          this.checkInterval = parseInt(item.split('(')[1].split(')')[0])*1000;
       }
-      else if(item.includes("secondaryURL")){
-         this.secondaryURL = item.split('(')[1].split(')')[0];
-      }
-      else if(item.includes("useDashlib")){
-         var dashlib = item.split('(')[1].split(')')[0]
-         if (dashlib == "yes" || dashlib == "YES")
-           this.usedashlib = true;
-      }
-      else if(item.includes("useHlslib")){
-         var hlslib = item.split('(')[1].split(')')[0]
-         if (hlslib == "yes" || hlslib == "YES")
-           this.usehlslib = true;
-      }
     });
 
     // check the DRM options provided in the url and update the configs
     this.license_header = "";
-    this.preferred_drm = "";
     this.configs.forEach(item => {
       if(item.includes("headers")){
           this.license_header = String(item.split('(')[1].split(')')[0]);
       }
-      else if(item.includes("preferred")){
-          this.preferred_drm = String(item.split('(')[1].split(')')[0]);
-      }
     });
+    this.drm_servers = {}
     this.configs.forEach(item => {
-      if((! item.includes("headers"))&&(! item.includes("preferred"))){
+      if(! item.includes("headers")){
           var drm = String(item.split('(')[0]);
           var license_url = String(item.split('(')[1].split(')')[0]);
           license_url = license_url.replace(/:and:/g,"&").replace(/:eq:/g, "=").replace(/:ob:/g,"(").replace(/:cb:/g,")").replace(/:comma:/g,",");
-          if(this.urlType == "dash"){
-             this.DRMconfig[drm] = {"serverURL":license_url};
-             if(this.license_header != ""){
-               var header_tag  = this.license_header.split(":")[0];
-               var header_info = this.license_header.split(":")[1];
-               this.DRMconfig[drm]["httpRequestHeaders"] = {};
-               this.DRMconfig[drm]["httpRequestHeaders"][header_tag] = header_info;
-             }
-             if(drm == this.preferred_drm){
-               //by default priority is 0. drm with highest priority value is taken as preferred
-               this.DRMconfig[drm]["priority"] = 1;
-             }
-          }else if(this.urlType == "hls"){
-             this.DRMconfig[drm] = license_url;
-          }
+	  this.drm_servers[drm] = license_url
       }
     });
+    this.DRMconfig = { "drm": { "servers": {} } }
+    this.DRMconfig["drm"]["servers"] = this.drm_servers
     //logMsg("DRM info: "+ JSON.stringify(this.DRMconfig));
 
-    this.loadVideoPlayer();
-    this.vidDuration = VideoPlayer.duration;
+    this.loadSHAKAPlayer();
 
   }
 
 }
-
 
 

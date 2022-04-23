@@ -2,7 +2,7 @@
  * If not stated otherwise in this file or this component's Licenses.txt file the
  * following copyright and licenses apply:
  *
- * Copyright 2021 RDK Management
+ * Copyright 2022 RDK Management
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,20 @@
  */
 
 import { Launch } from '@lightningjs/sdk'
-import App from './TDKVideoPlayerApp.js'
+import { GetURLParameter  } from './MediaUtility.js'
+import VideoPlayerApp       from './TDKVideoPlayerApp.js'
+import UVEAAMPPlayerApp     from './TDKUVEAAMPPlayerApp.js'
+import SHAKAPlayerApp       from './TDKSHAKAPlayerApp.js'
 
 export default function() {
-  return Launch(App, ...arguments)
+          var selectedPlayer = GetURLParameter("player")
+          if (selectedPlayer == "VIDEO"){
+                  return Launch(VideoPlayerApp, ...arguments)
+          }else if (selectedPlayer == "AAMP"){
+                  return Launch(UVEAAMPPlayerApp, ...arguments)
+          }else if (selectedPlayer == "SHAKA"){
+                  return Launch(SHAKAPlayerApp, ...arguments)
+          }else{
+                  return Launch(VideoPlayerApp, ...arguments)
+	  }
 }

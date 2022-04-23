@@ -18,13 +18,14 @@
  */
 
 import { Lightning, VideoPlayer } from '@lightningjs/sdk'
+import { logMsg, logDASHEventMsg } from './MediaUtility.js'
 import Hls from 'hls.js'
 import 'dashjs/dist/dash.all.min'
 
 export default class VideoPlayerAdvanced extends Lightning.Component {
 
     _init(){
-        console.log("VideoPlayerAdvanced init");
+        logMsg("VideoPlayerAdvanced init");
     }
 
     setConsumer(consumer) {
@@ -33,12 +34,12 @@ export default class VideoPlayerAdvanced extends Lightning.Component {
 
     updateDimensions(t,r,b,l){
         VideoPlayer.area(t,r,b,l);
-        console.log("Video Player Width set to  : " + VideoPlayer.width)
-        console.log("Video Player height set to : " + VideoPlayer.height)
+        logMsg("Video Player Width set to  : " + VideoPlayer.width)
+        logMsg("Video Player height set to : " + VideoPlayer.height)
     }
 
     open(url){
-        console.log("Video Player Open: " + url)
+        logMsg("Video Player Open: " + url)
         VideoPlayer.open(url)
     }
 
@@ -71,10 +72,10 @@ export default class VideoPlayerAdvanced extends Lightning.Component {
               if (!this._hls) this._hls = new window.Hls(basic_config)
               this._hls.attachMedia(VideoPlayer._videoEl)
               this._hls.on(Hls.Events.MEDIA_ATTACHED, function () {
-                console.log("Video and HLSJS are now bound together !!!");
+                logMsg("Video and HLSJS are now bound together !!!");
               });
               setTimeout(()=>{
-                console.log("Videoplayer (HLSJS): attaching video source url: " + url);
+                logMsg("Videoplayer (HLSJS): attaching video source url: " + url);
                 this._hls.loadSource(url);
               },1000);
             }
@@ -86,27 +87,31 @@ export default class VideoPlayerAdvanced extends Lightning.Component {
 
     openDash(url,config) {
         this.player = dashjs.MediaPlayer().create()
-        this.player.updateSettings({
+        /*this.player.updateSettings({
             "streaming": {
                     "bufferPruningInterval": 5,
                     "bufferToKeep": 5,
                     "bufferTimeAtTopQuality": 5,
                     "bufferTimeAtTopQualityLongForm": 5,
             }
-        });
+        });*/
+        this.player.updateSettings({'debug':{'logLevel':dashjs.Debug.LOG_LEVEL_NONE }});
         this.player.initialize(VideoPlayer._videoEl, url, true)
-        //this.player.attachSource(url)
+        // Registering specific dash.js events
+	this.player.on(dashjs.MediaPlayer.events["PLAYBACK_STARTED"],logDASHEventMsg);
+	this.player.on(dashjs.MediaPlayer.events["PERIOD_SWITCH_STARTED"],logDASHEventMsg);
+	this.player.on(dashjs.MediaPlayer.events["PERIOD_SWITCH_COMPLETED"],logDASHEventMsg);
         if (Object.keys(config).length != 0){
             //console.log("Videoplayer (DASHJS): attaching protection data: " + JSON.stringify(config));
             this.player.setProtectionData(config);
         }
-        console.log("Videoplayer (DASHJS): attaching video source url: " + url);
+        logMsg("Attaching video source url: " + url);
     }
     reload(url){
         if (this.player) {
           this.player.attachSource(null);
           this.player.attachSource(url);
-          console.log("Videoplayer (DASHJS): attaching video source url: " + url);
+          logMsg("Attaching video source url: " + url);
         }
     }
 
@@ -124,6 +129,4 @@ export default class VideoPlayerAdvanced extends Lightning.Component {
     }
 
 }
-
-
 
