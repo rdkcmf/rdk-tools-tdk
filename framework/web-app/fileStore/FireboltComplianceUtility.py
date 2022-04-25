@@ -26,6 +26,7 @@ from devicesettings import *
 operations = ""
 use_aamp = ""
 check_pts = ""
+check_fps = ""
 
 #List consisting of HLS url
 HLS_URL = [MediaValidationVariables.video_src_url_short_duration_hls,MediaValidationVariables.video_src_url_hls,MediaValidationVariables.video_src_url_4k_hls,MediaValidationVariables.video_src_url_live_hls,MediaValidationVariables.video_src_url_hls_h264,MediaValidationVariables.video_src_url_hls_h264_iframe]
@@ -42,6 +43,7 @@ def getDeviceConfigValue (tdklibObj, configKey):
     try:
         global use_aamp
         global check_pts
+        global check_fps
         result = "SUCCESS"
         #Retrieve the device details(device name) and device type from tdk library
         configValue = ""
@@ -69,6 +71,7 @@ def getDeviceConfigValue (tdklibObj, configKey):
             configValue = configParser.get('device.config', configKey)
             use_aamp = configParser.get('device.config',"FIREBOLT_COMPLIANCE_USE_AAMP_FOR_HLS")
             check_pts = configParser.get('device.config',"FIREBOLT_COMPLIANCE_CHECK_PTS")
+            check_fps = configParser.get('device.config',"FIREBOLT_COMPLIANCE_CHECK_FPS")
         else:
             print "DeviceConfig file not available"
             result = "FAILURE"
@@ -135,6 +138,9 @@ def getMediaPipelineTestCommand (testName, testUrl, **arguments):
     #Feature to disable  video-pts check
     if (check_pts == "no"):
         command = command + " checkPTS=no "
+    #Feature to disable video-fps check
+    if (check_fps == "no"):
+        command = command + " checkFPS=no "
     #Feature to modify hls url to aamp url based on configuration
     if (use_aamp == "yes"):
         testUrl_list = testUrl.split();
@@ -257,4 +263,27 @@ def checkifCodecPlayed(tdkTestObj,codec):
         tdkTestObj.setResultStatus("SUCCESS")
     else:
         print "%s audio playback failed"%codec
+        tdkTestObj.setResultStatus("FAILURE")
+
+def checkFPS(tdkTestObj, fps):
+    fps = int(fps)
+    logFile = " /opt/TDK/video_info "
+    command = "awk '{print $8}' " + logFile
+    command = command + "; rm " + logFile
+    tdkTestObj.addParameter("command", command)
+    expectedResult = "SUCCESS"
+    tdkTestObj.executeTestCase(expectedResult)
+    actualresult = tdkTestObj.getResult()
+    output = tdkTestObj.getResultDetails().strip('\\n')
+    #FPS_THRESHOLD
+    #For fps less than 50Hz ,threshold is set to 1. For higher fps threshold is to 3
+    if (fps < 50):
+        FPS_THRESHOLD = 1
+    else:
+        FPS_THRESHOLD = 3
+    if expectedResult in actualresult.upper() and (abs(fps - float(output)) < FPS_THRESHOLD):
+        print "Playback FrameRate is rendered as expected"
+        tdkTestObj.setResultStatus("SUCCESS")
+    else:
+        print "Expected FrameRate : %s\nActual FrameRate : %s"%(fps,output)
         tdkTestObj.setResultStatus("FAILURE")
