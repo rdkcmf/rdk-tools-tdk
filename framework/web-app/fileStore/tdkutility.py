@@ -617,3 +617,137 @@ def RevertCSIPreReq(tr181_obj, initial_val):
         status = 0;
     return status;
 
+# CheckWPA3Pre_requiste
+# Syntax      : CheckWPA3Pre_requiste(obj1, step):
+# Description : Function to check if the pre-requisites are set for WPA3 and set them if not set
+# Parameters  : obj1 - wifiagent object
+#               step - test step number
+# Return Value: pre_req_set - flag to check if the pre-requisites are set properly
+#               tdkTestObj - test object to set result status
+#               step - the current step
+#               revert_flag - flag to check if pre-requisite revert opeartion is needed
+#               initial_value - initial enable value of WPA3 RFC
+
+def CheckWPA3Pre_requiste(obj1, step):
+    expectedresult="SUCCESS";
+    pre_req_set = 0;
+    revert_flag = 0;
+    parameter = "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.WPA3_Personal_Transition.Enable";
+
+    print "\nTEST STEP %d : Get the value of WPA3 Personal Transition RFC value %s" %(step, parameter);
+    print "EXPECTED RESULT %d : Should get the RFC value successfully" %step;
+
+    tdkTestObj = obj1.createTestStep("WIFIAgent_Get");
+    tdkTestObj.addParameter("paramName",parameter);
+    tdkTestObj.executeTestCase(expectedresult);
+    actualresult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+
+    if expectedresult in actualresult and details != "":
+        initial_value = details.split("VALUE:")[1].split(' ')[0].split(',')[0];
+        #Set the result status of execution
+        tdkTestObj.setResultStatus("SUCCESS");
+        print "ACTUAL RESULT %d : The RFC value retrieved successfully" %step;
+        print "%s : %s" %(parameter, initial_value);
+        print "TEST EXECUTION RESULT : SUCCESS";
+
+        if initial_value == "true":
+            pre_req_set = 1;
+            #Set the result status of execution
+            tdkTestObj.setResultStatus("SUCCESS");
+            print "WPA3 Personal Transition RFC is enabled";
+        else :
+            step = step + 1;
+            enable = "true";
+            type = "boolean";
+            print "\nTEST STEP %d : Set the value of WPA3 Personal Transition RFC value %s to true" %(step, parameter);
+            print "EXPECTED RESULT %d : Should set the RFC value successfully" %step;
+
+            tdkTestObj = obj1.createTestStep("WIFIAgent_Set");
+            tdkTestObj.addParameter("paramName",parameter);
+            tdkTestObj.addParameter("paramValue",enable);
+            tdkTestObj.addParameter("paramType",type);
+            tdkTestObj.executeTestCase(expectedresult);
+            actualresult = tdkTestObj.getResult();
+            details = tdkTestObj.getResultDetails();
+
+            if expectedresult in actualresult :
+                #Set the result status of execution
+                tdkTestObj.setResultStatus("SUCCESS");
+                print "ACTUAL RESULT %d : The RFC value set successfully; Details : %s" %(step, details);
+                print "TEST EXECUTION RESULT : SUCCESS";
+
+                #Cross check if SET reflects in GET
+                step = step + 1;
+                print "\nTEST STEP %d : Get the value of WPA3 Personal Transition RFC value %s and check if it is enabled after the SET operation" %(step, parameter);
+                print "EXPECTED RESULT %d : Should get the RFC value successfully and it should be enabled" %step;
+
+                tdkTestObj = obj1.createTestStep("WIFIAgent_Get");
+                tdkTestObj.addParameter("paramName",parameter);
+                tdkTestObj.executeTestCase(expectedresult);
+                actualresult = tdkTestObj.getResult();
+                details = tdkTestObj.getResultDetails();
+
+                if expectedresult in actualresult and details != "":
+                    final_value = details.split("VALUE:")[1].split(' ')[0].split(',')[0];
+                    #Set the result status of execution
+                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "ACTUAL RESULT %d : The RFC value retrieved successfully" %step;
+                    print "%s : %s" %(parameter, final_value);
+                    print "TEST EXECUTION RESULT : SUCCESS";
+
+                    if final_value == enable:
+                        pre_req_set = 1;
+                        revert_flag = 1;
+                        #Set the result status of execution
+                        tdkTestObj.setResultStatus("SUCCESS");
+                        print "WPA3 Personal Transition RFC is enabled";
+                    else:
+                        #Set the result status of execution
+                        tdkTestObj.setResultStatus("FAILURE");
+                        print "WPA3 Personal Transition RFC is NOT enabled";
+                else:
+                    #Set the result status of execution
+                    tdkTestObj.setResultStatus("FAILURE");
+                    print "ACTUAL RESULT %d : The RFC value NOT retrieved successfully" %step;
+                    print "%s : %s" %(parameter, final_value);
+                    print "TEST EXECUTION RESULT : FAILURE";
+            else :
+                #Set the result status of execution
+                tdkTestObj.setResultStatus("FAILURE");
+                print "ACTUAL RESULT %d : The RFC value NOT set successfully; Details : %s" %(step, details);
+                print "TEST EXECUTION RESULT : FAILURE";
+    else :
+        #Set the result status of execution
+        tdkTestObj.setResultStatus("FAILURE");
+        print "ACTUAL RESULT %d : The RFC value NOT retrieved successfully" %step;
+        print "%s : %s" %(parameter, initial_value);
+        print "TEST EXECUTION RESULT : FAILURE";
+
+    return pre_req_set, tdkTestObj, step, revert_flag, initial_value;
+
+# RevertWPA3Pre_requisite
+# Syntax      : RevertWPA3Pre_requisite(obj1, initial_value)
+# Description : Function to revert the pre-requisites set for WPA3
+# Parameters  : obj1 - wifiagent object
+# Return Value: status - flag to check if the revert operation is success or not
+
+def RevertWPA3Pre_requisite(obj1, initial_value):
+    expectedresult="SUCCESS";
+    type = "boolean";
+    parameter = "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.WPA3_Personal_Transition.Enable";
+
+    tdkTestObj = obj1.createTestStep("WIFIAgent_Set");
+    tdkTestObj.addParameter("paramName",parameter);
+    tdkTestObj.addParameter("paramValue",initial_value);
+    tdkTestObj.addParameter("paramType",type);
+    tdkTestObj.executeTestCase(expectedresult);
+    actualresult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+
+    if expectedresult in actualresult:
+        status = 1;
+    else:
+        status = 0;
+    return status;
+
