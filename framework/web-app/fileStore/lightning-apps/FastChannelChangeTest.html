@@ -48,6 +48,7 @@
         <div id="bold">.</div>
     </div>
     <div id="state"></div>
+    <script type="text/javascript" src="channels.js"></script>
     <video autoplay id="video" width="1280" height="720" style="position: absolute; z-index: -1"></video>
 <script>
 
@@ -61,7 +62,7 @@
 
     var channels = [
       {
-        "manifest" : { "src": "//cdn.metrological.com/hls/greenland720.m3u8" },
+        "manifest" : { "src": channels.ch1 },
         "id" : "Greenland",
         "rid": 1,
         "name" : "Greenland",
@@ -71,7 +72,7 @@
         "streamOffset": 0
       },
       {
-        "manifest" : { "src": "//cdn.metrological.com/hls/hongkong720.m3u8" },
+        "manifest" : { "src": channels.ch2 },
         "id" : "Hongkong",
         "rid": 5,
         "name" : "Hong Kong",
@@ -80,7 +81,7 @@
         "streamOffset": 0
       },
       {
-        "manifest" : { "src": "//cdn.metrological.com/hls/dubai720.m3u8"},
+        "manifest" : { "src": channels.ch3 },
         "id" : "Dubai",
         "rid": 3,
         "name" : "Dubai",
@@ -90,7 +91,7 @@
         "streamOffset": 0
       },
       {
-        "manifest" : { "src": "//cdn.metrological.com/hls/hawaii720.m3u8" },
+        "manifest" : { "src": channels.ch4 },
         "id" : "Hawaii",
         "rid": 4,
         "name" : "Hawaii",
@@ -99,7 +100,7 @@
         "streamOffset": 0
       },
       {
-        "manifest" : { "src": "//cdn.metrological.com/hls/liwa720.m3u8" },
+        "manifest" : { "src": channels.ch5 },
         "id" : "Liwa",
         "rid": 6,
         "name" : "Liwa",
@@ -108,7 +109,7 @@
         "streamOffset": 0
       },
       {
-        "manifest" : { "src": "//cdn.metrological.com/hls/london720.m3u8" },
+        "manifest" : { "src": channels.ch6 },
         "id" : "London",
         "rid": 7,
         "name" : "London",
@@ -117,7 +118,7 @@
         "streamOffset": 0
       },
       {
-        "manifest" : { "src": "//cdn.metrological.com/hls/losangeles720.m3u8" },
+        "manifest" : { "src": channels.ch7 },
         "id" : "Losangeles",
         "rid": 10,
         "name" : "Los Angeles",
@@ -126,7 +127,7 @@
         "streamOffset": 0
       },
       {
-        "manifest" : { "src": "//cdn.metrological.com/hls/newyork720.m3u8" },
+        "manifest" : { "src": channels.ch8 },
         "id" : "Newyork",
         "rid": 11,
         "name" : "New York",
@@ -135,7 +136,7 @@
         "streamOffset": 0
       },
       {
-        "manifest" : { "src": "//cdn.metrological.com/hls/sanfrancisco720.m3u8" },
+        "manifest" : { "src": channels.ch9 },
         "id" : "Sanfransisco",
         "rid": 12,
         "name" : "San Francisco",

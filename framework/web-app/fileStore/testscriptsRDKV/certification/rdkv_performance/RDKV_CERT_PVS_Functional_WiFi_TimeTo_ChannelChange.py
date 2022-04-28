@@ -84,6 +84,7 @@ from StabilityTestUtility import *
 from ip_change_detection_utility import *
 from web_socket_util import *
 from rdkv_performancelib import *
+import MediaValidationVariables
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
@@ -140,7 +141,26 @@ if expectedResult in result.upper():
         if revert_if == "YES":
             closed_status = close_lightning_app(obj)
             time.sleep(10)
+        #Take the channel change URL and replace TM-IP with actual TestManager IP
         channel_change_url = PerformanceTestVariables.channel_change_url
+        tm_url = obj.url.split("/")[2]
+        channel_change_url=channel_change_url.replace("TM-IP",tm_url)
+        #Write the TestManager IP and stream path to the channels.js file
+        #where the user can configure their own channels for the test.
+        filename = obj.realpath+"fileStore/lightning-apps/channels.js"
+        basepath = MediaValidationVariables.test_streams_base_path.replace("http:","")
+        with open(filename, 'r') as the_file:
+            buf = the_file.readlines()
+            line_to_add = 'var basepath = "'+basepath+'"\n'
+            if line_to_add in buf:
+                print "The stream path is already configured"
+            else:
+                print "Configuring the stream path for channel change test"
+                with open(filename, 'w') as out_file:
+                    for line in buf:
+                        if line == "*/\n":
+                            line = "*/\n"+line_to_add
+                        out_file.write(line)
         print "\nPre conditions for the test are set successfully";
         print "\nGet the URL "
         tdkTestObj = obj.createTestStep('rdkservice_getValue');
