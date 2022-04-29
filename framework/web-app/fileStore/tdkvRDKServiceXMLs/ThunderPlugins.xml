@@ -491,6 +491,7 @@
         <method name="Reboot" api="reboot" type="method" desc="system perform a reboot of the set-top box" />
         <method name="Get_Power_State_Before_Reboot" api="getPowerStateBeforeReboot" type="method" desc="Gets the power state before reboot" />
         <method name="Get_Power_State_Is_Managed_By_Device" api="getPowerStateIsManagedByDevice" type="method" desc="Checks whether the power state is managed by the device" />
+        <method name="Get_Time_Zones" api="getTimeZones" type="method" version="2" desc="Gets the available timezones from the system's time zone database" />
         <event name="Event_MacAddresses_Retreived" eventName="onMacAddressesRetreived" eventId="client.events.1" type="event" desc="MacAddressesRetreived" />
         <event name="Event_PowerState_Changed" eventName="onSystemPowerStateChanged" eventId="client.events.1" type="event" desc="power state changed event" />
         <event name="Event_SystemMode_Changed" eventName="onSystemModeChanged" eventId="client.events.1" type="event" desc="Fires on system mode changed event" />
@@ -847,6 +848,14 @@
                 <param tag="criticallyLowRam" type="int" />
             </params>
         </method>
+        <method name="Get_Logs_Flushing_Enabled" api="getLogsFlushingEnabled" type="method" desc="Returns whether log flushing is enabled or disabled" >
+                <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Enable_Logs_Flushing" api="enableLogsFlushing" type="method" desc="Enables or disables flushing all logs" >
+            <params>
+                <param tag="enable" type="bool" />
+            </params>
+        </method>
         <event name="Event_On_Launched" eventName="onLaunched" eventId="client.events.1" type="event" desc="Fired on launching the client" />
         <event name="Event_On_Suspended" eventName="onSuspended" eventId="client.events.1" type="event" desc="Fired on Suspending the client" />
         <event name="Event_On_Destroyed" eventName="onDestroyed" eventId="client.events.1" type="event" desc="Fired on destroying the client"/>
@@ -860,6 +869,7 @@
         <event name="Event_On_Application_Resumed" eventName="onApplicationResumed" eventId="client.events.1" type="event" desc="Triggered when an application resumes from a suspended state"/>
         <event name="Event_On_Application_Terminated" eventName="onApplicationTerminated" eventId="client.events.1" type="event" desc="Triggered when an application terminates"/>
         <event name="Event_On_Plugin_Suspended" eventName="onPluginSuspended" eventId="client.events.1" type="event" desc="Triggered when a plugin is suspended" />
+        <event name="Event_On_Will_Destroy" eventName="onWillDestroy" eventId="client.events.1" type="event" desc="Triggered when an application is set to be destroyed" />
     </plugin>
 
 
@@ -1719,6 +1729,7 @@
         <method name="Get_Namespaces" api="getNamespaces" type="method" desc="Gets the available namespaces" />
         <method name="Get_Storage_Size" api="getStorageSize" type="method" desc="Returns the size occupied by each namespace" />
         <method name="Flush_Cache" api="flushCache" type="method" desc="flushes the database cache" />
+        <event name="Event_On_Value_Changed" eventName="onValueChanged" eventId="client.events.1" type="event" desc="Triggered whenever any of the values stored are changed using setValue" />
     </plugin>
 
     <!-- TextToSpeech Plugin Information -->

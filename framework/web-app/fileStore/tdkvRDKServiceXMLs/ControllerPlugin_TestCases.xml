@@ -471,7 +471,7 @@
                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" expectedValues="unavailable"/>
              </testStep>
              <testStep testStepId="5" name="Check_Json_Response_of_DeviceInfo_Plugin" method="Get_System_Info" pluginName="DeviceInfo" >
-                <resultGeneration useMethodTag="controller_check_error_message" expectedValues="service is not active,2" />
+                <resultGeneration useMethodTag="controller_check_error_message" arguments="check_message" expectedValues="service is not active" />
             </testStep>
              <testStep testStepId="6" name="Deactivate_DeviceInfo_Plugin" method="Deactivate_Plugin" >
                   <params>

@@ -2382,4 +2382,111 @@
                 </resultGeneration>
             </testStep>
         </testCase>
+
+        <!-- Test case 86 -->
+        <testCase testCaseId="RDKShell_86" testCaseName="Enable_And_Disable_Logs_Flushing"  desc="Checks whether able to enable and disable flushing all logs">
+            <testCaseInfo testCaseType="loop" revert="true"/>
+            <testStep testStepId="1" name="Get_Logs_Flushing_Enabled" method="Get_Logs_Flushing_Enabled"  saveResult="true" revertGet="yes">
+              <resultGeneration useMethodTag="rdkshell_get_enabled_status" />
+            </testStep>
+            <testStep testStepId="2" name="Enable_And_Disable_Logs_Flushing" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Enable_Logs_Flushing" method="Enable_Logs_Flushing" revertSet="yes">
+                  <params>
+                    <param tag="enable" value="True,False" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="rdkshell_get_result_status" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Logs_Flushing_Enabled" method="Get_Logs_Flushing_Enabled" revertFlag="yes" >
+                  <resultGeneration useMethodTag="rdkshell_get_enabled_status" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <!-- Test case 87 -->
+        <testCase testCaseId="RDKShell_87" testCaseName="RDKShell_Check_On_Will_Destroy_Event_Cobalt" desc="Checks for the OnWillDestroy event for cobalt" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="2" name="Destroy_Application" method="DestroyApplication" >
+              <params>
+                <param tag="callsign"  value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_Will_Destroy_Event" event="Event_On_Will_Destroy" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_on_will_destroy_event" expectedValues="Cobalt"/>
+            </testStep>
+            <testStep testStepId="4" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application"  arguments= "check_not_exists" expectedValues= "cobalt" />
+            </testStep>
+            <testStep testStepId="5" name="Resume_Cobalt" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="6" name="Is_Cobalt_Resumed" method="Get_Application_State" delay="5">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
+            </testStep>
+        <testCasePostRequisite>
+         <postrequisite requisiteId="1" requisiteName="Resuming_Cobalt_Application">
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
+              <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
+            </testStep>
+            <testStep testStepId="2" name="Launch_Cobalt" method="LaunchApplication" >
+              <conditionalExecution enable="true" Id="1" useMethodTag="rdkshell_check_application_state" arguments="cobalt" />
+              <params>
+                <param tag="callsign" value="Cobalt" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+         </postrequisite>
+        </testCasePostRequisite>
+        </testCase>
+
+        <!-- Test case 88 -->
+        <testCase testCaseId="RDKShell_88" testCaseName="RDKShell_Check_On_Will_Destroy_Event_WebKitBrowser" desc="Checks for the OnWillDestroy event for webkitbrowser" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues="webkitbrowser" />
+            </testStep>
+            <testStep testStepId="2" name="Destroy_Application" method="DestroyApplication" >
+              <params>
+                <param tag="callsign"  value="WebKitBrowser" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_Will_Destroy_Event" event="Event_On_Will_Destroy" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_on_will_destroy_event" expectedValues="WebKitBrowser"/>
+            </testStep>
+            <testStep testStepId="4" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application"  arguments= "check_not_exists" expectedValues= "webkitbrowser" />
+            </testStep>
+            <testStep testStepId="5" name="Resume_WebKitBrowser" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="WebKitBrowser" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="6" name="Is_WebKitBrowser_Resumed" method="Get_Application_State" delay="3">
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="WebKitBrowser" expectedValues="resumed" />
+            </testStep>
+        <testCasePostRequisite>
+         <postrequisite requisiteId="1" requisiteName="Resuming_WebKitBrowser_Application">
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" saveResult="true">
+              <resultGeneration useMethodTag="rdkshell_get_connected_client_list"/>
+            </testStep>
+            <testStep testStepId="2" name="Launch_WebKitBrowser" method="LaunchApplication" >
+              <conditionalExecution enable="true" Id="1" useMethodTag="rdkshell_check_application_state" arguments="webkitbrowser" />
+              <params>
+                <param tag="callsign" value="WebKitBrowser" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+         </postrequisite>
+        </testCasePostRequisite>
+        </testCase>
 </testPlugin>

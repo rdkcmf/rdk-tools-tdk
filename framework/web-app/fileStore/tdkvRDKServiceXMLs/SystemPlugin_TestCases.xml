@@ -795,4 +795,61 @@
                 </resultGeneration>
             </testStep>
        </testCase>
+
+       <testCase testCaseId="SYS_48" testCaseName="System_Check_HDR_Capabilities" desc="Checks the HDR Capabilities of the device">
+            <testCaseInfo testCaseType="direct"/>
+            <testCasePreRequisite>
+              <prerequisite requisiteId="1" requisiteName="Activate_DisplaySettings_Plugin">
+                <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                  <params>
+                    <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+                  </params>
+                  <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" />
+                </testStep>
+                <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                  <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+                  <params>
+                    <param tag="callsign" value="org.rdk.DisplaySettings" />
+                  </params>
+                </testStep>
+                <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                 <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+                  <params>
+                    <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+                  </params>
+                  <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" />
+                </testStep>
+              </prerequisite>
+              <prerequisite requisiteId="2" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" pluginName="DisplaySettings" >
+                  <resultGeneration useMethodTag="display_connected_status" />
+                </testStep>
+              </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Get_Platform_Configuration" method="Get_Platform_Configuration">
+                <resultGeneration useMethodTag="system_check_hdr_capabilities" >
+                  <expectedValues useConfigFile="true" key="SYSTEM_SUPPORTED_HDR_CAPABILITIES" />
+                </resultGeneration>
+            </testStep>
+       </testCase>
+
+       <testCase testCaseId="SYS_49" testCaseName= "SetAndGet_All_Time_Zones" desc="Set and get all the time zones">
+            <testCaseInfo testCaseType="loop" />
+            <testStep testStepId="1" name="Get_Time_Zones" method="Get_Time_Zones" saveResult="true">
+                    <resultGeneration useMethodTag="system_get_api_info"/>
+            </testStep>
+            <testStep testStepId="2" name="Set_And_Get_Time_Zones" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_TimeZone_DST" method="Set_TimeZone_DST" >
+                  <params>
+                  <param tag="timeZone" usePreviousResult="true" Id="1" useMethodTag="system_get_formatted_time_zones" iteration="true"/>
+                  </params>
+                  <resultGeneration useMethodTag="system_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_TimeZone_DST"  method="Get_TimeZone_DST" delay="1" >
+                  <resultGeneration useMethodTag="system_get_timezone_dst" arguments="check_timezone" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+       </testCase>
 </testPlugin>

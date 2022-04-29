@@ -352,7 +352,7 @@
                 </prerequisite>
             </testCasePreRequisite>
             <testStep testStepId="1" name="Get_Width_In_Centimeters" method="Get_Width_In_Centimeters" >
-                <resultGeneration useMethodTag="displayinfo_validate_results" />
+                <resultGeneration useMethodTag="displayinfo_validate_results" arguments="check_width_height_in_centimeters" />
             </testStep>
         </testCase>
      <!-- Test case 16 -->
@@ -366,7 +366,7 @@
                 </prerequisite>
             </testCasePreRequisite>
             <testStep testStepId="1" name="Get_Height_In_Centimeters" method="Get_Height_In_Centimeters">
-                <resultGeneration useMethodTag="displayinfo_validate_results" />
+                <resultGeneration useMethodTag="displayinfo_validate_results" arguments="check_width_height_in_centimeters" />
             </testStep>
         </testCase>
      <!-- Test case 17 -->

@@ -674,6 +674,14 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 else:
                     info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "rdkshell_check_on_will_destroy_event":
+            result=result[0]
+            info = result
+            if str(result.get("callsign")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
         # TextToSpeech Events response result parser steps
         elif tag == "texttospeech_check_tts_state_changed_event":
             result = result[0]
@@ -764,6 +772,15 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                     info = eventResult
                     info["Test_Step_Status"] = "SUCCESS"
                     break;
+
+        # PersistentStore Events response result parser steps
+        elif tag == "persistentstore_check_on_value_changed_event":
+            result = result[0]
+            info = result
+            if str(result.get("namespace")).lower() == expectedValues[0] and str(result.get("key")).lower() == expectedValues[1] and str(result.get("value")).lower() == str(expectedValues[2]).lower():
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # FirmwareControl Events response result parser steps
         elif tag == "fwc_check_upgrade_progress_event":

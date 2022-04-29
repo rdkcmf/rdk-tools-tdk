@@ -800,6 +800,21 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "system_check_hdr_capabilities":
+            status = checkNonEmptyResultData(result)
+            success = str(result.get("success")).lower() == "true"
+            if status == "TRUE" and success:
+                deviceInfo = result.get("DeviceInfo")
+                info["HdrCapability"] = deviceInfo.get("HdrCapability")
+                deviceDetail = deviceInfo.get("HdrCapability")
+                HdrCapability = str(deviceDetail).lower().split(",")
+                result_status = [ "FALSE" for value in expectedValues if value.lower()  not in HdrCapability ]
+                if "FALSE" not in result_status:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
         # User Preferces Plugin Response result parser steps
         elif tag == "userpreferences_get_ui_language":
             info = checkAndGetAllResultInfo(result,result.get("success"))
@@ -1052,10 +1067,16 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
         
         elif tag == "displayinfo_validate_results":
             info["Result"] = result
-            if result > 0:
-                info["Test_Step_Status"] = "SUCCESS"
+            if len(arg) and arg[0] == "check_width_height_in_centimeters":
+                if result >= 0:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
             else:
-                info["Test_Step_Status"] = "FAILURE"
+                if result > 0:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "displayinfo_validate_boolean_result":
             if str(result) in expectedValues:
@@ -1877,6 +1898,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "bluetooth_get_discovered_devices":
             discoveredDevices = result.get("discoveredDevices")
+            info["discoveredDevices"] = discoveredDevices
             status = []
             devices = []
             success = str(result.get("success")).lower() == "true"
@@ -2999,6 +3021,15 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["PUBLIC_IP"] = testStepResults[0].get("PUBLIC_IP")
             else:
                 info["value"] = testStepResults[0].get("details")
+
+        elif tag == "system_get_formatted_time_zones":
+            timeZone = []
+            testStepResults = testStepResults[0].values()[0]
+            zoneInfo = testStepResults[0].get("zoneinfo")
+            for key,value in zoneInfo.items():
+               for key_item in value:
+                  timeZone.append(key+"/"+key_item)
+            info["timeZone"] = ",".join(timeZone)
 
         # user Preferences result parser steps
         elif tag == "userpreferences_switch_ui_language":

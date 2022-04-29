@@ -36,6 +36,9 @@
                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.PersistentStore" expectedValues="activated"/>
             </testStep>
           </prerequisite>
+          <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
+            <event pluginName="PersistentStore" eventName="Event_On_Value_Changed" />
+          </prerequisite>
         </pluginPreRequisite>
 
         <testCase testCaseId="PS_01" testCaseName="PersistentStore_Set_and_Get_Value"  desc="Sets and gets the particular key value">
@@ -132,5 +135,33 @@
                 <resultGeneration useMethodTag="persistentstore_check_set_operation" />
             </testStep>
         </testCase>     
+
+        <testCase testCaseId="PS_06" testCaseName="PersistentStore_Check_On_Value_Changed_Event"  desc="Sets and gets the particular key value">
+            <testCaseInfo testCaseType="loop" />
+            <testStep testStepId="1" name="check_set_value" testStepType="loop" >
+               <subtestStep subtestStepId="1" name="Set_Value" method="Set_Value">
+                  <params>
+                    <param tag="namespace" value="Namespace_3"/>
+                    <param tag="key" value="Key_1" />
+                    <param tag="value" value="Value_1,Value_2,Value_3" iteration="true" />
+                  </params>
+                  <resultGeneration useMethodTag="persistentstore_check_set_operation" />
+               </subtestStep>
+               <subtestStep subtestStepId="2" name="Get_Value" method="Get_Value">
+                  <params>
+                    <param tag="namespace" value="Namespace_3"/>
+                    <param tag="key" value="Key_1"  />
+                  </params>
+                  <resultGeneration useMethodTag="persistentstore_check_value">
+                     <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+               </subtestStep>
+               <subtestStep subtestStepId="3" name="Check_On_Value_Changed_Event" event="Event_On_Value_Changed" action="eventListener" delay="2">
+                  <resultGeneration useMethodTag="persistentstore_check_on_value_changed_event" >
+                     <expectedValues value="namespace_3,key_1" useIterableValue="true" />
+                  </resultGeneration>
+               </subtestStep>
+            </testStep>
+        </testCase>
 </testPlugin>
 
