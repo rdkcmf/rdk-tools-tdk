@@ -32,10 +32,10 @@ cobalt_test_url = ""
 #Thunder port for listening to events
 thunder_port = "9998"
 
-# webkit_instance can be "WebKitBrowser" or "LightningApp" plugin
+# webkit_instance can be "WebKitBrowser" or "LightningApp" or "HtmlApp" plugin
 webkit_instance = "LightningApp"
 
-#Video player app URL, sample URL: http://<TM-IP>:8080/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html
+#Video player app URL, sample URL: http://<TM-IP>:8080/rdk-test-tool/fileStore/lightning-apps/tdkunifiedplayer/build/index.html?player=VIDEO
 lightning_video_test_app_url = ""
 
 #Video URL, either HLS URL or DASH URL
@@ -47,6 +47,9 @@ video_src_url_type = ""
 #Webinspect port for LightningApp plugin
 lightning_app_webinspect_port = "10002"
 
+#Webinspect port for HtmlApp plugin
+html_app_webinspect_port = "10001"
+
 #List of Graphical plugins available for test
 graphical_plugins_list = ["Cobalt","WebKitBrowser","LightningApp","ResidentApp","HtmlApp"]
 
@@ -57,3 +60,4 @@ html_page_url = "https://vimeo.com/channels/premieres"
 excluded_process_list = ['subtec_s1']
 
 ping_test_destination = "google.com"
+

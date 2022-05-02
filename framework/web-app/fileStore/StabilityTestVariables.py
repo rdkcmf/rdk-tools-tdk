@@ -57,7 +57,7 @@ ValidateActivatedPlugins = "No"
 rebootwaitTime = 150
 
 ####Webkit stress test details
-# webkit_instance can be "WebKitBrowser" or "LightningApp" plugin
+# webkit_instance can be "WebKitBrowser" or "LightningApp" or "HtmlApp" plugin
 webkit_instance = "LightningApp"
 
 #test duration in minutes till webkit stress test should be performed.
@@ -161,7 +161,7 @@ webkit_test_url = "https://www.google.com/"
 lifecycle_max_count = 1000
 
 ##TDK Video player long duration test details
-#Video player app URL, sample URL: http://<TM-IP>:8080/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html
+#Video player app URL, sample URL: http://<TM-IP>:8080/rdk-test-tool/fileStore/lightning-apps/tdkunifiedplayer/build/index.html?player=VIDEO
 lightning_video_test_app_url = ""
 
 #Use video stream URL of minimum 10 hour duration or a live HLS video URL
@@ -169,6 +169,9 @@ video_src_url_hls = ""
 
 #Webinspect port for LightningApp plugin
 lightning_app_webinspect_port = "10002"
+
+#Webinspect port for HtmlApp plugin
+html_app_webinspect_port = "10001"
 
 ##ResidentApp navigation test details
 # test duration in minutes
@@ -203,3 +206,9 @@ set_resolution_sleep_time = 5
 
 # maximum number of set and get resolution operations needed
 set_resolution_max_count = 1000
+
+#URL used to test vimeo videoplayback
+vimeo_test_url="https://widgets.metrological.com/lightning/rdk/d431ce8577be56e82630650bf701c57d#app:com.metrological.app.VimeoRelease"
+
+# Test duration in minutes till test should be performed, it should be less than the duration of test video 
+vimeo_test_duration = 720
