@@ -117,7 +117,7 @@ if "success" in result.lower():
   #Primitive test case which associated to this Script
   tdkTestObj = obj.createTestStep('Gstreamer_Test_Execute');
   # Configuring the test object for gst-plugin-good test suites execution
-  tdkTestObj.addParameter("GStreamer_plugins_type","gst-plugin-base1");
+  tdkTestObj.addParameter("GStreamer_plugins_type","gst-plugin-base");
   #Execute the test case in STB
   expectedresult="Test Suite Executed"
   tdkTestObj.executeTestCase(expectedresult);
