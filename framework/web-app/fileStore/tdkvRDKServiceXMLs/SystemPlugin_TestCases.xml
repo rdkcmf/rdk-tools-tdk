@@ -636,7 +636,7 @@
             </testStep>
        </testCase>
     
-       <testCase testCaseId="SYS_40" testCaseName="System_Enable_Disable_Moca_Support" desc="check if able to toggle the Moca status" >
+       <!--testCase testCaseId="SYS_40" testCaseName="System_Enable_Disable_Moca_Support" desc="check if able to toggle the Moca status" >
            <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="MocaSupport" />
             <testStep testStepId="1" name="Query_Moca_Status" method="Query_MocaStatus" saveResult="true" revertGet="yes">
                 <resultGeneration useMethodTag="system_get_moca_enabled_status" />
@@ -652,9 +652,9 @@
                     <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_toggle_moca_enabled_status" />
                 </resultGeneration>
             </testStep>
-       </testCase>
+       </testCase-->
        
-       <testCase testCaseId="SYS_41" testCaseName= "System_SetAndGet_Over-Temperature_Grace_Interval" desc="Sets and gets the over-temperature grace interval">
+       <testCase testCaseId="SYS_40" testCaseName= "System_SetAndGet_Over-Temperature_Grace_Interval" desc="Sets and gets the over-temperature grace interval">
             <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="OverTemperatureGraceInterval" />
             <testStep testStepId="1" name="Get_Over-Temperature_Grace_Interval_Value" method="Get_Over-Temperature_Grace_Interval" saveResult="true" revertGet="yes">
                 <resultGeneration useMethodTag="system_verify_interval_value"  />
@@ -672,7 +672,7 @@
             </testStep>
        </testCase>
 
-       <testCase testCaseId="SYS_42" testCaseName= "System_Check_Model_Number" desc="Checks the model number of the DUT">
+       <testCase testCaseId="SYS_41" testCaseName= "System_Check_Model_Number" desc="Checks the model number of the DUT">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Device_Details" action="externalFnCall" saveResult="true">
                     <resultGeneration useMethodTag="system_get_device_details_from_file" >
@@ -689,7 +689,7 @@
             </testStep>
        </testCase>
 
-       <testCase testCaseId="SYS_43" testCaseName= "System_Check_Device_Mac_Address" desc="Checks the device MAC address">
+       <testCase testCaseId="SYS_42" testCaseName= "System_Check_Device_Mac_Address" desc="Checks the device MAC address">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Device_Details" action="externalFnCall" saveResult="true">
                     <resultGeneration useMethodTag="system_get_device_details_from_file" >
@@ -706,7 +706,7 @@
             </testStep>
        </testCase>
         
-       <testCase testCaseId="SYS_44" testCaseName= "System_Check_WebBrowser_Details" desc="Checks the webbrowser details">
+       <testCase testCaseId="SYS_43" testCaseName= "System_Check_WebBrowser_Details" desc="Checks the webbrowser details">
 	    <testCaseInfo testCaseType="direct"/>
 	    <testCasePreRequisite>
 		<prerequisite requisiteId="1" requisiteName="Activate_WebKitBrowser_Plugin">    
@@ -757,7 +757,7 @@
             </testStep>
        </testCase>
 
-       <testCase testCaseId="SYS_45" testCaseName= "System_Check_Power_State_Management_Status" desc="Checks the power state management status">
+       <testCase testCaseId="SYS_44" testCaseName= "System_Check_Power_State_Management_Status" desc="Checks the power state management status">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Power_State_Is_Managed_By_Device" method="Get_Power_State_Is_Managed_By_Device">
                 <resultGeneration useMethodTag="system_validate_bool_result" arguments="powerStateManagedByDevice">
@@ -766,7 +766,7 @@
             </testStep>
        </testCase>
 
-       <testCase testCaseId="SYS_46" testCaseName= "System_Check_Firmware_Upgrade_Status" desc="Checks the firmware upgrade status">
+       <testCase testCaseId="SYS_45" testCaseName= "System_Check_Firmware_Upgrade_Status" desc="Checks the firmware upgrade status">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_SWUpdate_File_Status" action="externalFnCall" saveResult="true">
                 <resultGeneration useMethodTag="system_check_swupdate_file_status" />
@@ -781,7 +781,7 @@
             </testStep>
        </testCase>
 
-       <testCase testCaseId="SYS_47" testCaseName= "System_Check_Public_IP_Address" desc="Checks the public IP address">
+       <testCase testCaseId="SYS_46" testCaseName= "System_Check_Public_IP_Address" desc="Checks the public IP address">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Public_IP_Address" action="externalFnCall" saveResult="true">
                 <resultGeneration useMethodTag="system_check_public_ip_address" />
@@ -796,7 +796,7 @@
             </testStep>
        </testCase>
 
-       <testCase testCaseId="SYS_48" testCaseName="System_Check_HDR_Capabilities" desc="Checks the HDR Capabilities of the device">
+       <testCase testCaseId="SYS_47" testCaseName="System_Check_HDR_Capabilities" desc="Checks the HDR Capabilities of the device">
             <testCaseInfo testCaseType="direct"/>
             <testCasePreRequisite>
               <prerequisite requisiteId="1" requisiteName="Activate_DisplaySettings_Plugin">
@@ -833,7 +833,7 @@
             </testStep>
        </testCase>
 
-       <testCase testCaseId="SYS_49" testCaseName= "SetAndGet_All_Time_Zones" desc="Set and get all the time zones">
+       <testCase testCaseId="SYS_48" testCaseName= "SetAndGet_All_Time_Zones" desc="Set and get all the time zones">
             <testCaseInfo testCaseType="loop" />
             <testStep testStepId="1" name="Get_Time_Zones" method="Get_Time_Zones" saveResult="true">
                     <resultGeneration useMethodTag="system_get_api_info"/>

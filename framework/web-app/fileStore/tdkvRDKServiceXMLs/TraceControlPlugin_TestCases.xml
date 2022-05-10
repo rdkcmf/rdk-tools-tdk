@@ -72,7 +72,7 @@
             </testStep>
         </testCase>
 
-        <testCase testCaseId="TC_02" testCaseName= "TraceControl_Bluetooth_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+        <!--testCase testCaseId="TC_02" testCaseName= "TraceControl_Bluetooth_Toggle_All_Tracelevels" desc="Toggles all traces levels">
             <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Bluetooth" />
             <testCasePreRequisite>
                  <prerequisite requisiteId="1" requisiteName="Activate_Bluetooth_Plugin">
@@ -125,9 +125,9 @@
                   </resultGeneration>
               </subtestStep>
             </testStep>
-        </testCase>
+        </testCase-->
 
-        <testCase testCaseId="TC_03" testCaseName= "TraceControl_Core_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+        <testCase testCaseId="TC_02" testCaseName= "TraceControl_Core_Toggle_All_Tracelevels" desc="Toggles all traces levels">
             <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Core" />
             <testStep testStepId="1" name="Get_All_Core_Tracelevels" testStepType="loop">
               <subtestStep subtestStepId="1" name="Get_Core_Tracelevel" method="Get_Trace_Status" saveResult="true" revertGet="yes">
@@ -158,7 +158,7 @@
             </testStep>
         </testCase>
 
-        <testCase testCaseId="TC_04" testCaseName= "TraceControl_SysLog_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+        <testCase testCaseId="TC_03" testCaseName= "TraceControl_SysLog_Toggle_All_Tracelevels" desc="Toggles all traces levels">
             <testCaseInfo testCaseType="loop" revert="true" />
             <testStep testStepId="1" name="Get_All_SysLog_Tracelevels" testStepType="loop">
               <subtestStep subtestStepId="1" name="Get_SysLog_Tracelevel" method="Get_Trace_Status" saveResult="true" revertGet="yes">
@@ -190,7 +190,7 @@
         </testCase>
 
 
-        <testCase testCaseId="TC_05" testCaseName= "TraceControl_Plugin_LocationSync_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+        <testCase testCaseId="TC_04" testCaseName= "TraceControl_Plugin_LocationSync_Toggle_All_Tracelevels" desc="Toggles all traces levels">
             <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Plugin_LocationSync" />
 
             <testCasePreRequisite>
@@ -242,7 +242,7 @@
             </testStep>
         </testCase>
 
-        <testCase testCaseId="TC_06" testCaseName= "TraceControl_Plugin_OCDM_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+        <testCase testCaseId="TC_05" testCaseName= "TraceControl_Plugin_OCDM_Toggle_All_Tracelevels" desc="Toggles all traces levels">
             <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="OCDM" />
 
             <testCasePreRequisite>
@@ -295,7 +295,7 @@
         </testCase>
 
 
-        <testCase testCaseId="TC_07" testCaseName= "TraceControl_Plugin_Monitor_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+        <testCase testCaseId="TC_06" testCaseName= "TraceControl_Plugin_Monitor_Toggle_All_Tracelevels" desc="Toggles all traces levels">
             <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Plugin_Monitor" />
             <testStep testStepId="1" name="Get_All_Plugin_Monitor_Tracelevels" testStepType="loop">
               <subtestStep subtestStepId="1" name="Get_Plugin_Monitor_Tracelevel" method="Get_Trace_Status" saveResult="true" revertGet="yes">
@@ -327,7 +327,7 @@
         </testCase>
 
 
-        <testCase testCaseId="TC_08" testCaseName= "TraceControl_Plugin_WebKitBrowser_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+        <testCase testCaseId="TC_07" testCaseName= "TraceControl_Plugin_WebKitBrowser_Toggle_All_Tracelevels" desc="Toggles all traces levels">
             <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Plugin_WebKitBrowser" />
 
             <testCasePreRequisite>
@@ -397,7 +397,7 @@
         </testCase>
 
 
-        <testCase testCaseId="TC_09" testCaseName= "TraceControl_Plugin_Messenger_Toggle_All_Tracelevels" desc="Toggles all traces levels">
+        <testCase testCaseId="TC_08" testCaseName= "TraceControl_Plugin_Messenger_Toggle_All_Tracelevels" desc="Toggles all traces levels">
             <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="TRACECONTROL_NOT_APPLICABLE_PLUGINS" useMethodTag="is_plugin_applicable" arguments="Plugin_Messenger" />
 
             <testCasePreRequisite>
@@ -454,7 +454,7 @@
         </testCase>
 
 
-       <testCase testCaseId="TC_10" testCaseName="TraceControl_ActivateDeactivate_STRESS" desc="Activates and deactivates the plugin">
+       <testCase testCaseId="TC_09" testCaseName="TraceControl_ActivateDeactivate_STRESS" desc="Activates and deactivates the plugin">
              <testCaseInfo testCaseType="stress" configurableRepeat="true" repeatKey="STRESS_TEST_REPEAT_COUNT" />
 
              <testCasePreRequisite>
