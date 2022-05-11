@@ -243,7 +243,7 @@ if "SUCCESS" in result.upper():
                                         if (device["deviceName"] == bluetoothhallib.deviceName):
                                             print "Client device of type Speakers is successfully discovered in DUT"
                                             deviceID = str(device["deviceID"])
-                                            device_index = int(device["device_index"])
+                                            device_index = int(device["deviceIndex"])
                                             deviceDiscovered = True
                                     if True == deviceDiscovered:
                                         tdkTestObj.setResultStatus("SUCCESS")
