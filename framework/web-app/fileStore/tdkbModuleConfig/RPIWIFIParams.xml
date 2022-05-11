@@ -608,7 +608,7 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>true</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue>20MHz</defaultValue>
+               <defaultValue>40MHz</defaultValue>
                <!--default value exepcted by snmp after factory reset -->
                <snmpDefaultValue>3</snmpDefaultValue>
         </parameter>
@@ -2384,9 +2384,9 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue></defaultValue>
+               <defaultValue>Disabled</defaultValue>
                <!-- the range of values acceptable -->
-               <expectedValues></expectedValues>
+               <expectedValues>Disabled</expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
@@ -2400,8 +2400,8 @@
                <!-- whether set value will be retained and set should be followed by a get or not -->
                <persistentSet>false</persistentSet>
                <!--default value of the param after factory reset -->
-               <defaultValue></defaultValue>
-               <expectedValues></expectedValues>
+               <defaultValue>Disabled</defaultValue>
+               <expectedValues>Disabled</expectedValues>
         </parameter>
         <parameter>
                 <!--the tr-181 parameter name -->
