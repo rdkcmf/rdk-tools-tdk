@@ -20,8 +20,8 @@
 #The port must be 9224 for rdkservice builds and 9998 for thunder builds
 webinspect_port = ""
 
-#channel change application url,replace <TM-IP> with Test manager IP in the URL:
-channel_change_url = "http://<TM-IP>:8080/rdk-test-tool/fileStore/lightning-apps/ChannelChangeTest.html?test_duration=730"
+#channel change application url
+channel_change_url = "http://TM-IP/rdk-test-tool/fileStore/lightning-apps/ChannelChangeTest.html?test_duration=730"
 
 #no of channel changes to perform
 max_channel_change_count = 1000

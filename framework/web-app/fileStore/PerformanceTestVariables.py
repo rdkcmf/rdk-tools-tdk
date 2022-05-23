@@ -23,8 +23,8 @@ browser_test_url = ""
 #Web inspect port,The port must be 9998 for thunder builds and 9224 for rdkservice builds
 webinspect_port = "9224"
 
-#Channel change application URL, Replace <TM-IP> with Test manager IP in below URL
-channel_change_url = "http://<TM-IP>:8080/rdk-test-tool/fileStore/lightning-apps/ChannelChangeTest.html?test_duration=168"
+#Channel change application URL
+channel_change_url = "http://TM-IP/rdk-test-tool/fileStore/lightning-apps/ChannelChangeTest.html?test_duration=168"
 
 #The url used for testing cobalt
 cobalt_test_url = ""
