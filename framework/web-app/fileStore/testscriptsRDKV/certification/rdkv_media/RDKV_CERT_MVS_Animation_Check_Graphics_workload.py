@@ -125,8 +125,9 @@ if expectedResult in result.upper():
     conf_file,result = getDeviceConfigFile(obj.realpath)
     result1, expected_fps  = readDeviceConfigKeyValue(conf_file,"EXPECTED_FPS")
     result2, threshold     = readDeviceConfigKeyValue(conf_file,"FPS_THRESHOLD")
-    if "SUCCESS" in result1 and "SUCCESS" in result2:
-        if expected_fps == "" and threshold == "":
+    result3, logging_method= readDeviceConfigKeyValue(conf_file,"LOGGING_METHOD")
+    if "SUCCESS" in result1 and "SUCCESS" in result2 and "SUCCESS" in result3:
+        if expected_fps == "" and threshold == "" and logging_method == "":
             config_status = "FAILURE"
             print "Please set expected_fps and threshold values in device config file"
     else:
@@ -159,25 +160,75 @@ if expectedResult in result.upper():
             minfps = float(int(expected_fps) - int(threshold))
             # Monitoring the app progress, checking whether app performs animation properly or any hang detected in between,
             # and getting the test result from the app
-            while True:
-                if continue_count > 180:
-                    print "\nApp not proceeding for 3 mins. Exiting..."
-                    break
-                if (len(webkit_console_socket.getEventsBuffer())== 0):
+            file_check_count = 0
+            logging_flag = 0
+            hang_detected = 0
+            test_result = ""
+            lastLine = None
+            lastIndex = 0
+            app_log_file = obj.logpath+"/"+str(obj.execID)+"/"+str(obj.execID)+"_"+str(obj.execDevId)+"_"+str(obj.resultId)+"_mvs_applog.txt"
+            if logging_method == "REST_API":
+                while True:
+                    if file_check_count > 60:
+                        print "\nREST API Logging is not happening properly. Exiting..."
+                        break;
+                    if os.path.exists(app_log_file):
+                        logging_flag = 1
+                        break;
+                    else:
+                        file_check_count += 1
+                        time.sleep(1);
+
+                while logging_flag:
+                    if continue_count > 180:
+                        hang_detected = 1
+                        print "\nApp not proceeding for 3 min. Exiting..."
+                        break;
+ 
+                    with open(app_log_file,'r') as f:
+                        lines = f.readlines()
+                    if lines:
+                        if len(lines) != lastIndex:
+                            continue_count = 0
+                            #print(lastIndex,len(lines))
+                            for i in range(lastIndex,len(lines)):
+                                if "[DiagnosticInfo]: CPU Load" not in lines[i]:
+                                    print(lines[i])
+                                if "[DiagnosticInfo]: No.of Animated Objects" in lines[i]:
+                                    avgerage_fps_list.append(lines[i])
+                                if "TEST COMPLETED" in lines[i] or "TEST STOPPED" in lines[i]:
+                                    test_result = lines[i]
+
+                            #lastLine  = lines[-1]
+                            lastIndex = len(lines)
+                            if test_result != "":
+                                break;
+                        else:
+                            continue_count += 1
+                    else:
+                        continue_count += 1
+ 
                     time.sleep(1)
-                    continue_count += 1
-                    continue
-                else:
-                    continue_count = 0
-                console_log = webkit_console_socket.getEventsBuffer().pop(0)
-                if "[DiagnosticInfo]: CPU Load" not in console_log:
-                    dispConsoleLog(console_log)
-                if "[DiagnosticInfo]: No.of Animated Objects" in console_log:
-                    log_message = getConsoleMessage(console_log)
-                    avgerage_fps_list.append(log_message)
-                if "TEST COMPLETED" in console_log or "TEST STOPPED" in console_log:
-                    break;
-            webkit_console_socket.disconnect()
+            elif logging_method == "WEB_INSPECT":
+                while True:
+                    if continue_count > 180:
+                        print "\nApp not proceeding for 3 mins. Exiting..."
+                        break
+                    if (len(webkit_console_socket.getEventsBuffer())== 0):
+                        time.sleep(1)
+                        continue_count += 1
+                        continue
+                    else:
+                        continue_count = 0
+                    console_log = webkit_console_socket.getEventsBuffer().pop(0)
+                    if "[DiagnosticInfo]: CPU Load" not in console_log:
+                        dispConsoleLog(console_log)
+                    if "[DiagnosticInfo]: No.of Animated Objects" in console_log:
+                        log_message = getConsoleMessage(console_log)
+                        avgerage_fps_list.append(log_message)
+                    if "TEST COMPLETED" in console_log or "TEST STOPPED" in console_log:
+                        break;
+                webkit_console_socket.disconnect()
             avg_fps_single_object = str(avgerage_fps_list[0]).split(",")[1].split(":")[1]
             if "NaN" in avg_fps_single_object:
                 print "Failed to get the average FPS Value"

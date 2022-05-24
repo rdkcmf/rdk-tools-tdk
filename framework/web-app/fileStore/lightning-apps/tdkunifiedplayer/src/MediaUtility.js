@@ -17,6 +17,8 @@
  * limitations under the License.
  */
 
+  let message = "";
+
   // Method to parse the URL parameters
   export function GetURLParameter(sParam){
     var sPageURL = window.location.search.substring(1);
@@ -155,6 +157,50 @@
   }
 
 
+  // Method to store the app logs and send them to TM
+  export function captureAppLogs(msg){
+    if (message.length < 300) {
+        //console.log("msg_append")
+        message = message + "\n" + msg
+    }else{
+        //console.log("msg_out")
+	sendLog(message)
+        message = ""+ msg
+    }
+    return;
+  }
+
+  // Method to send the app logs to TM
+  export function pushAppLogs(msg){
+      if(message.length > 0){
+          sendLog(message)
+          message = "";
+      }
+      sendLog(msg);
+  }
+
+  // Method to send the logs to TM via REST API
+  export function sendLog(msg){
+    var tmURL    = window.location.href.split("fileStore")[0];
+    let restURL  = tmURL  + 'execution/createFileAndWrite?'
+    const execID = GetURLParameter('execID')
+    const devID  = GetURLParameter('execDevId')
+    const resID  = GetURLParameter('resultId')
+    //console.log("URL: " +restURL)
+    fetch(restURL + new URLSearchParams({execId: execID,
+                                     execDevId: devID,
+                                     resultId: resID,
+                                     test: msg
+    }))
+    .then(response => {
+	    	console.log('Response from Test Manager: '+ JSON.stringify(response))
+     })
+     .catch(error => {
+              	console.log('Error while connecting to Test Manager: '+ error)
+    });
+    return;
+  }
+
   // Method to get Time info
   export function dispTime() {
     var now = new Date();
@@ -178,6 +224,7 @@
 
   // To log the general messages
   export function logMsg(msg){
+    var logging = GetURLParameter("logging")
     var inputs = window.location.search.substring(1).split("&");
     var player = GetURLParameter("player")
     var options = []
@@ -198,21 +245,40 @@
            player = "HLSJS"
       }
     });
-    console.log("[ " + dispTime() + " ] [" + player + "] " + msg)
-    //console.log("[ " + dispTime() + " ] " + msg)
+    var log_msg = "[ " + dispTime() + " ] [" + player + "] " + msg
+    console.log(log_msg)
+    if(logging == "REST_API"){
+        if(msg.includes("TEST RESULT")){
+            pushAppLogs(log_msg)
+        }else if(msg.includes("Video PlayBack Failed")){
+            pushAppLogs(log_msg)	
+        }else{
+            captureAppLogs(log_msg)
+        }
+    }
   }
   // To log the Events occured
   export function logEventMsg(observedEvents,msg){
-    console.log("*****************************************************************\n" +
-                "Observed Event: " + observedEvents    + "\n"  +
-                "Event Details : " + "[ " + dispTime() + " ] " + msg  + "\n" +
-                "*****************************************************************");
+    var logging = GetURLParameter("logging")
+    var log_msg = "*****************************************************************\n" +
+                 "Observed Event: " + observedEvents    + "\n"  +
+                 "Event Details : " + "[ " + dispTime() + " ] " + msg  + "\n" +
+                 "*****************************************************************";
+    console.log(log_msg)
+    if(logging == "REST_API"){
+        pushAppLogs(log_msg)
+    }
   }
   // To log the general API outputs
   export function logActionMsg(msg){
-    console.log("*****************************************************************\n" +
-                "[ " + dispTime() + " ] " + msg  + "\n" +
-                "*****************************************************************");
+    var logging = GetURLParameter("logging")
+    var log_msg ="*****************************************************************\n" +
+                 "[ " + dispTime() + " ] " + msg  + "\n" +
+                 "*****************************************************************";
+    console.log(log_msg)
+    if(logging == "REST_API"){
+        pushAppLogs(log_msg)
+    }
   }
   // To log the DASHJS Events occured
   export function logDASHEventMsg(e){

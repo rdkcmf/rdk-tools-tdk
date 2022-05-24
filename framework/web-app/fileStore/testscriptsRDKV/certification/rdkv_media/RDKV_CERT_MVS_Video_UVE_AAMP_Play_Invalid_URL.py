@@ -125,6 +125,7 @@ if expectedResult in result.upper():
         print "\nSet Lightning video player test app url..."
         #Setting device config file
         conf_file,result = getDeviceConfigFile(obj.realpath)
+        result, logging_method= readDeviceConfigKeyValue(conf_file,"LOGGING_METHOD")
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_uve_test_app_url
         videoURL  = MediaValidationVariables.video_src_url_invalid
@@ -150,25 +151,76 @@ if expectedResult in result.upper():
             continue_count = 0
             event_status = 0
             error_status = 0
-            while True:
-                if continue_count > 30:
-                    print "\nApp not proceeding for 30 secs. Exiting..."
-                    break
-                if (len(webkit_console_socket.getEventsBuffer())== 0):
+            file_check_count = 0
+            logging_flag = 0
+            hang_detected = 0
+            test_result = ""
+            lastLine = None
+            lastIndex = 0
+            app_log_file = obj.logpath+"/"+str(obj.execID)+"/"+str(obj.execID)+"_"+str(obj.execDevId)+"_"+str(obj.resultId)+"_mvs_applog.txt"
+            if logging_method == "REST_API":
+                while True:
+                    if file_check_count > 60:
+                        print "\nREST API Logging is not happening properly. Exiting..."
+                        break;
+                    if os.path.exists(app_log_file):
+                        logging_flag = 1
+                        break;
+                    else:
+                        file_check_count += 1
+                        time.sleep(1);
+
+                while logging_flag:
+                    if continue_count > 60:
+                        hang_detected = 1
+                        print "\nApp not proceeding for 60 secs. Exiting..."
+                        break;
+
+                    with open(app_log_file,'r') as f:
+                        lines = f.readlines()
+                    if lines:
+                        if len(lines) != lastIndex:
+                            continue_count = 0
+                            #print(lastIndex,len(lines))
+                            for i in range(lastIndex,len(lines)):
+                                print(lines[i])
+                                if "Event Occurred: playbackFailed" in lines[i]:
+                                    event_status = 1
+                                if "AAMP: Manifest Download failed" in lines[i]:
+                                    error_status = 1
+                                if "Video PlayBack Failed" in lines[i]:
+                                    test_result = lines[i]
+
+                            #lastLine  = lines[-1]
+                            lastIndex = len(lines)
+                            if test_result != "":
+                                break;
+                        else:
+                            continue_count += 1
+                    else:
+                        continue_count += 1
+
                     time.sleep(1)
-                    continue_count += 1
-                    continue
-                else:
-                    continue_count = 0
-                console_log = webkit_console_socket.getEventsBuffer().pop(0)
-                dispConsoleLog(console_log)
-                if "Event Occurred: playbackFailed" in console_log:
-                    event_status = 1
-                if "AAMP: Manifest Download failed" in console_log:
-                    error_status = 1
-                if "Video PlayBack Failed" in console_log:
-                    break;
-            webkit_console_socket.disconnect()            
+            elif logging_method == "WEB_INSPECT":
+                while True:
+                    if continue_count > 60:
+                        print "\nApp not proceeding for 60 secs. Exiting..."
+                        break
+                    if (len(webkit_console_socket.getEventsBuffer())== 0):
+                        time.sleep(1)
+                        continue_count += 1
+                        continue
+                    else:
+                        continue_count = 0
+                    console_log = webkit_console_socket.getEventsBuffer().pop(0)
+                    dispConsoleLog(console_log)
+                    if "Event Occurred: playbackFailed" in console_log:
+                        event_status = 1
+                    if "AAMP: Manifest Download failed" in console_log:
+                        error_status = 1
+                    if "Video PlayBack Failed" in console_log:
+                        break;
+                webkit_console_socket.disconnect()
             tdkTestObj = obj.createTestStep('rdkv_media_test');
             tdkTestObj.executeTestCase(expectedResult);
             if event_status == 1 and error_status == 1:

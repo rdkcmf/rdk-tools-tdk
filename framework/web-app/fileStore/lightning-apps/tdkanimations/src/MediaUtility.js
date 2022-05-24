@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+  let message = "";
 
   // Method to parse the URL parameters
   export function GetURLParameter(sParam){
@@ -87,6 +88,51 @@
       return operations
   }
 
+
+  // Method to store the app logs and send them to TM
+  export function captureAppLogs(msg){
+    if (message.length < 300) {
+        //console.log("msg_append")
+        message = message + "\n" + msg
+    }else{
+        //console.log("msg_out")
+        sendLog(message)
+        message = ""+ msg
+    }
+    return;
+  }
+
+  // Method to send the logs to TM
+  export function pushAppLogs(msg){
+     if(message.length > 0){
+          sendLog(message)
+          message = "";
+     }
+     sendLog(msg);
+  }
+
+  // Method to send the logs to TM via REST API
+  export function sendLog(msg){
+    var tmURL = window.location.href.split("fileStore")[0];
+    let restURL = tmURL  + 'execution/createFileAndWrite?'
+    const execID = GetURLParameter('execID')
+    const devID = GetURLParameter('execDevId')
+    const resID = GetURLParameter('resultId')
+    //console.log("URL: " +restURL)
+    fetch(restURL + new URLSearchParams({execId: execID,
+                                     execDevId: devID,
+                                     resultId: resID,
+                                     test: msg
+    }))
+    .then(response => {
+                console.log('Response from Test Manager: '+ JSON.stringify(response))
+     })
+     .catch(error => {
+                console.log('Error while connecting to Test Manager: '+ error)
+    });
+    return;
+  }
+
   // Method to get Time info
   export function dispTime() {
     var now = new Date();
@@ -133,11 +179,27 @@
 
   // To log the general messages
   export function logMsg(msg){
-    console.log("[ " + dispTime() + " ] " + msg)
+    var logging = GetURLParameter("logging")
+    var log_msg = "[ " + dispTime() + " ] " + msg
+    console.log(log_msg)
+    if(logging == "REST_API"){
+        if(msg.includes("TEST COMPLETED")){
+            pushAppLogs(log_msg)
+	}else if(msg.includes("TEST RESULT")){
+            pushAppLogs(log_msg)
+        }else{
+            captureAppLogs(log_msg)
+        }
+    }
   }
   // To log the Events occured
   export function logEventMsg(msg){
-    console.log("[ " + dispTime() + " ] " + "Event Occurred: " + msg )
+    var logging = GetURLParameter("logging")
+    var log_msg = "[ " + dispTime() + " ] " + "Event Occurred: " + msg
+    console.log(log_msg)
+    if(logging == "REST_API"){
+        captureAppLogs(log_msg)
+    }
   }
 
   // To set delay

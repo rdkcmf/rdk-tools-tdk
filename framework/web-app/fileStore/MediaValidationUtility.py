@@ -33,6 +33,9 @@ all_operations = ""
 # Global variable to store all the url arguments
 all_arguments  = {}
 
+# Global variable to store the monotoring mechanism
+logging_method = None
+
 # Global variable to store websocket conn feature
 webkit_socket_conn = True
 # Global variable to store default webinspect port
@@ -119,6 +122,11 @@ def setDeviceConfigFile(conf_file):
 def setProcCheckMode(mode):
      global proc_check_mode
      proc_check_mode = mode
+
+def setLoggingMethod(obj):
+    global logging_method
+    config_file,result = getDeviceConfigFile(obj.realpath)
+    result,logging_method = getDeviceConfigKeyValue(config_file,"LOGGING_METHOD")
 
 def updateOptions(val):
     if all_arguments.get("options") != None:
@@ -843,6 +851,12 @@ def setAudioAtmosOutputModePreRequisites(obj,mode):
 def setMediaTestPreRequisites(obj,webkit_browser_instance,get_proc_info=True):
     pre_requisite_status = "SUCCESS"
     webkit_console_socket = None
+    setURLArgument("execID",str(obj.execID))
+    setURLArgument("execDevId",str(obj.execDevId))
+    setURLArgument("resultId",str(obj.resultId))
+    setLoggingMethod(obj)
+    setURLArgument("logging",logging_method)
+    #print obj.logpath
     if get_proc_info:
         tdkTestObj = obj.createTestStep('rdkv_media_getProcCheckInfo')
         tdkTestObj.addParameter("realpath",obj.realpath)
@@ -882,13 +896,16 @@ def setMediaTestPreRequisites(obj,webkit_browser_instance,get_proc_info=True):
                     result,webkit_z_order_status = checkClientZOrder(obj,webkit_client)
                     webkit_ready_state = checkWebkitReadyState(obj,result,webkit_client,webkit_z_order_status)
                     if webkit_ready_state:
-                          if webkit_socket_conn:
+                          if webkit_socket_conn and logging_method == "WEB_INSPECT":
                               websocket_conn_status,webkit_console_socket = createWebKitSocket(obj)
                               if not websocket_conn_status:
                                   print "Connection to web-inspect page failed. cannot proceed test"
                                   pre_requisite_status = "FAILURE"
                               else:
                                   pre_requisite_status = "SUCCESS"
+                          elif webkit_socket_conn and logging_method == "REST_API":
+                              print "App logs are monitored and collected using REST API"
+                              pre_requisite_status = "SUCCESS"
                     else:
                         pre_requisite_status = "FAILURE"
                 else:
@@ -902,8 +919,89 @@ def setMediaTestPreRequisites(obj,webkit_browser_instance,get_proc_info=True):
 
     return pre_requisite_status,webkit_console_socket,validation_dict
 
-# Function to monitor video test app progress and get the result
+
 def monitorVideoTest(obj,webkit_console_socket,validation_dict,check_pattern,timeout=60):
+    video_test_result = ""
+    proc_check_list  = []
+    if logging_method == "WEB_INSPECT":
+        video_test_result,proc_check_list = monitorVideoTestUsingWebInspect(obj,webkit_console_socket,validation_dict,check_pattern,timeout)
+    elif logging_method == "REST_API":
+        video_test_result,proc_check_list = monitorVideoTestUsingRestAPI(obj,validation_dict,check_pattern,timeout)
+
+    return video_test_result,proc_check_list
+
+
+def monitorVideoTestUsingRestAPI(obj,validation_dict,check_pattern,timeout):
+    wait_time = timeout/60
+    continue_count = 0
+    file_check_count = 0
+    logging_flag = 0
+    hang_detected = 0
+    test_result = ""
+    proc_check_list = []
+    play_status = "FAILURE"
+    video_test_result = ""
+    last_line = None
+    last_index = 0
+    skip_proc_check_events = ["Video Player Paused", "Video Player seeking","Video Player Rate Change to 0"]
+    app_log_file = obj.logpath+"/"+str(obj.execID)+"/"+str(obj.execID)+"_"+str(obj.execDevId)+"_"+str(obj.resultId)+"_mvs_applog.txt"
+
+    while True:
+        if file_check_count > 60:
+            print "\nREST API Logging is not happening properly. Exiting..."
+            break;
+        if os.path.exists(app_log_file):
+            logging_flag = 1
+            break;
+        else:
+            file_check_count += 1
+            time.sleep(1);
+
+
+    while logging_flag:
+        if continue_count > timeout:
+            hang_detected = 1
+            print "\nApp not proceeding for %d min. Exiting..." %(wait_time)
+            break;
+
+        with open(app_log_file,'r') as f:
+            lines = f.readlines()
+        if lines:
+            if len(lines) != last_index:
+                continue_count = 0
+                #print(last_index,len(lines))
+                for i in range(last_index,len(lines)):
+                    print(lines[i])
+                    if "Video Player Playing" in lines[i]:
+                        play_status = "SUCCESS"
+                    if  check_pattern in lines[i] and validation_dict["proc_check"] and (all(skip_events not in lines[i] for skip_events in skip_proc_check_events)):
+                        time.sleep(1);
+                        info = checkProcEntry(obj,validation_dict)
+                        proc_check_list.append(info)
+                    if "TEST RESULT" in lines[i]:
+                        test_result = lines[i]
+
+                #last_line  = lines[-1]
+                last_index = len(lines)
+                if test_result != "":
+                    break;
+            else:
+                continue_count += 1
+        else:
+            continue_count += 1
+
+        time.sleep(1)
+
+    if "SUCCESS" in test_result and "SUCCESS" in play_status and hang_detected == 0:
+        video_test_result = "SUCCESS"
+    else:
+        video_test_result = "FAILURE"
+
+    return video_test_result,proc_check_list
+
+
+# Function to monitor video test app progress and get the result
+def monitorVideoTestUsingWebInspect(obj,webkit_console_socket,validation_dict,check_pattern,timeout=60):
     wait_time = timeout/60
     continue_count = 0
     hang_detected = 0
@@ -947,8 +1045,86 @@ def monitorVideoTest(obj,webkit_console_socket,validation_dict,check_pattern,tim
 
     return video_test_result,proc_check_list
 
+
+
 # Function to monitor animation test app progress and get the result
 def monitorAnimationTest(obj,webkit_console_socket,check_pattern,timeout=60):
+    animation_test_result = ""
+    diagnosis_info = ""
+    if logging_method == "WEB_INSPECT":
+        animation_test_result,diagnosis_info = monitorAnimationTestUsingWebInspect(obj,webkit_console_socket,check_pattern,timeout)
+    elif logging_method == "REST_API":
+        animation_test_result,diagnosis_info = monitorAnimationTestUsingRestAPI(obj,check_pattern,timeout)
+    return animation_test_result,diagnosis_info
+
+
+def monitorAnimationTestUsingRestAPI(obj,check_pattern,timeout):
+    wait_time = timeout/60
+    continue_count = 0
+    file_check_count = 0
+    logging_flag = 0
+    hang_detected = 0
+    test_result = ""
+    diagnosis_info = ""
+    animation_test_result = ""
+    lastLine = None
+    lastIndex = 0
+    app_log_file = obj.logpath+"/"+str(obj.execID)+"/"+str(obj.execID)+"_"+str(obj.execDevId)+"_"+str(obj.resultId)+"_mvs_applog.txt"
+
+    while True:
+        if file_check_count > 60:
+            print "\nREST API Logging is not happening properly. Exiting..."
+            break;
+        if os.path.exists(app_log_file):
+            logging_flag = 1
+            break;
+        else:
+            file_check_count += 1
+            time.sleep(1);
+
+    while logging_flag:
+        if continue_count > timeout:
+            hang_detected = 1
+            print "\nApp not proceeding for %d min. Exiting..." %(wait_time)
+            break;
+
+        with open(app_log_file,'r') as f:
+            lines = f.readlines()
+        if lines:
+            if len(lines) != lastIndex:
+                continue_count = 0
+                #print(lastIndex,len(lines))
+                for i in range(lastIndex,len(lines)):
+                    print(lines[i])
+                    if  check_pattern is not None and check_pattern in lines[i]:
+                        diagnosis_info = lines[i].split("[DiagnosticInfo]:")[1].split(":")[1]
+                    if "TEST RESULT" in lines[i]:
+                        test_result = lines[i]
+                    if "TEST COMPLETED" in lines[i]:
+                        test_result = "SUCCESS"
+
+                #lastLine  = lines[-1]
+                lastIndex = len(lines)
+                if test_result != "":
+                    break;
+            else:
+                continue_count += 1
+        else:
+            continue_count += 1
+
+        time.sleep(1)
+
+    if "SUCCESS" in test_result and hang_detected == 0:
+        animation_test_result = "SUCCESS"
+    else:
+        animation_test_result = "FAILURE"
+
+    return animation_test_result,diagnosis_info
+
+
+
+# Function to monitor animation test app progress and get the result
+def monitorAnimationTestUsingWebInspect(obj,webkit_console_socket,check_pattern,timeout=60):
     wait_time = timeout/60
     continue_count = 0
     hang_detected = 0
@@ -1085,6 +1261,7 @@ def setMediaTestPostRequisites(obj,webkit_browser_instance):
         post_requisite_status = "FAILURE"
 
     return post_requisite_status
+
 
 
 
