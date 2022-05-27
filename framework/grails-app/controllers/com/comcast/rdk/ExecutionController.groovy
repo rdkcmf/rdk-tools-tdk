@@ -6226,4 +6226,63 @@ class ExecutionController {
 		}
 		return returnValue
 	}
+	
+	/**
+	 * Function to create and write into file
+	 * @param execId
+	 * @param execDevId
+	 * @param resultId
+	 * @param test
+	 * @return
+	 */
+	def createFileAndWrite(final Integer execId ,final Integer execDevId,final Integer resultId,final String test){
+		JsonObject result = new JsonObject()
+		BufferedReader reader
+		if(execId!=null && execDevId!=null && resultId!=null){
+			try{
+
+				String realPathForLogs = getRealPathForLogs()
+				def versionFilePath = realPathForLogs + "logs/logs/${execId}"
+				String fileName  = versionFilePath+"/"+execId+"_"+execDevId+"_"+resultId+"_mvs_applog.txt"
+				def file = new File( fileName)
+				if (!file.getParentFile().exists())
+					file.getParentFile().mkdirs();
+				if (!file.exists()){
+					file.createNewFile();
+
+					file.append(System.getProperty("line.separator")+test);
+
+					result.addProperty("Status", "SUCCESS")
+					result.addProperty("Remarks", "Created file Name: "+fileName)
+
+				}else if(file.exists()){
+					reader = new BufferedReader(new FileReader(file));
+					String line = reader?.readLine();
+					while(line != null){
+						line = reader?.readLine()
+					}
+					file.append(System.getProperty("line.separator")+test);
+
+					result.addProperty("Status", "SUCCESS")
+					result.addProperty("Remarks", "Updated Existing file: "+fileName)
+
+				}
+
+				else{
+
+					result.addProperty("Status", "FAILURE")
+					result.addProperty("Remarks", "Unable to create file: "+fileName)
+
+				}
+
+			}catch (Exception e) {
+				e.printStackTrace()
+			}
+		}
+		else{
+			result.addProperty("Status", "FAILURE")
+			result.addProperty("Remarks", "Unable to create a file execId and resultId empty")
+		}
+		render result
+	}
 }
