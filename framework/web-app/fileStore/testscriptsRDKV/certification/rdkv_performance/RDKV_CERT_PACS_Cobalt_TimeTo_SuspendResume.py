@@ -88,8 +88,14 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PACS_Cobalt_TimeTo_SuspendResume');
+
+#The device will reboot before starting the performance testing if "pre_req_reboot_pvs" is
+#configured as "Yes".
+pre_requisite_reboot(obj,"yes")
+
 #Execution summary variable 
 Summ_list=[]
+
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;

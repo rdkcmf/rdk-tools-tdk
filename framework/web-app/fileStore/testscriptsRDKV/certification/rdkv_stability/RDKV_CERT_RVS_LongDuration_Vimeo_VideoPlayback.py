@@ -186,6 +186,21 @@ if expectedResult in (result.upper() and pre_condition_status):
                             print "Video playback is not happening"
                             completed =  False
                             break
+                    else:
+                        print "\nValidate if Vimeo is playing successfully or not"
+                        tdkTestObj = obj.createTestStep('rdkservice_getValue')
+                        tdkTestObj.addParameter("method",set_method)
+                        tdkTestObj.executeTestCase(expectedResult)
+                        new_url = tdkTestObj.getResultDetails()
+                        result = tdkTestObj.getResult()
+                        if new_url == vimeo_test_url and expectedResult in result:
+                            tdkTestObj.setResultStatus("SUCCESS")
+                            print "URL(",new_url,") is set successfully"
+                        else:
+                            completed = False
+                            print "\n Error while playing Vimeo"
+                            tdkTestObj.setResultStatus("FAILURE")
+                            break
                     result_dict = {}
                     iteration += 1
 		    print "\n ##### Validating CPU load and memory usage #####\n"
@@ -208,6 +223,8 @@ if expectedResult in (result.upper() and pre_condition_status):
                 	tdkTestObj.setResultStatus("FAILURE")
                 	break
                     time.sleep(test_interval)
+                if(completed):
+                    print "\nsuccessfully completed the {} times in {} minutes".format(iteration,test_time_in_mins)
                 cpu_mem_info_dict["cpuMemoryDetails"] = result_dict_list
                 json.dump(cpu_mem_info_dict,json_file)
                 json_file.close()

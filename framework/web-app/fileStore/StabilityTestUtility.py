@@ -177,10 +177,13 @@ def get_configfile_name(obj):
 #------------------------------------------------------------------------
 #REBOOT DEVICE AS A PRE-REQUESITE
 #------------------------------------------------------------------------
-def pre_requisite_reboot(obj):
+def pre_requisite_reboot(obj,is_pvs = "no"):
     result = "SUCCESS";
     conf_file, status = get_configfile_name(obj);
-    result, reboot_required = getDeviceConfigKeyValue(conf_file,"PRE_REQ_REBOOT")
+    if is_pvs == "no":
+        result, reboot_required = getDeviceConfigKeyValue(conf_file,"PRE_REQ_REBOOT")
+    else:
+        result, reboot_required = getDeviceConfigKeyValue(conf_file,"PRE_REQ_REBOOT_PVS")
 
     if reboot_required.lower() == "yes":
 

@@ -73,7 +73,7 @@ import BrowserPerformanceUtility
 from rdkv_performancelib import *
 import rdkv_performancelib
 import BrowserPerformanceVariables
-
+from StabilityTestUtility import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
@@ -83,6 +83,10 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Browser_SunSpider');
+
+#The device will reboot before starting the performance testing if "pre_req_reboot_pvs" is
+#configured as "Yes".
+pre_requisite_reboot(obj,"yes")
 
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();

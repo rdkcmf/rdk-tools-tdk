@@ -42,7 +42,7 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_PERFORMANCE_37</test_case_id>
-    <test_objective>The objective of this test is to check if the version of Cobalt is 21.</test_objective>
+    <test_objective>The objective of this test is to check if the version of Cobalt is current version.</test_objective>
     <test_type>Positive</test_type>
     <test_setup>RPI,Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
@@ -50,8 +50,8 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>None</input_parameters>
     <automation_approch>1. Do SSH to DUT and execute 'cobalt_bin --version' command.
-2. Check the output to see whether Cobalt version is 21</automation_approch>
-    <expected_output>Cobalt version should be 21</expected_output>
+2. Check the output to see whether Cobalt version is current version</automation_approch>
+    <expected_output>Cobalt version should be current version</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_performance</test_stub_interface>
     <test_script>RDKV_CERT_PACS_Cobalt_Version</test_script>
@@ -66,6 +66,7 @@
 import tdklib; 
 import json
 from rdkv_performancelib import *
+from StabilityTestUtility import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
@@ -76,12 +77,19 @@ ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PACS_Cobalt_Version');
 
+#The device will reboot before starting the performance testing if "pre_req_reboot_pvs" is
+#configured as "Yes".
+pre_requisite_reboot(obj,"yes")
+
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
 obj.setLoadModuleStatus(result)
+conf_file, status = get_configfile_name(obj);
+result, current_cobalt_version = getDeviceConfigKeyValue(conf_file,"CURRENT_COBALT_VERSION")
 
 expectedResult = "SUCCESS"
+print "current_cobalt_version ", current_cobalt_version
 if expectedResult in result.upper():
     tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
     tdkTestObj.addParameter("realpath",obj.realpath)
@@ -100,15 +108,19 @@ if expectedResult in result.upper():
         tdkTestObj.executeTestCase(expectedResult)
         result = tdkTestObj.getResult()
         output = tdkTestObj.getResultDetails()
-        if output != "EXCEPTION" and expectedResult in result and "Cobalt version" in output:
-            print "\n Checking Cobalt version\n"
-            output = output.replace(command,"")
-            cobalt_version = int(output.split('Cobalt version ')[1].split('.')[0])
-            if cobalt_version == 21 :
-                print "\n Cobalt version is 21 \n"
-                tdkTestObj.setResultStatus("SUCCESS")
+        if output != "EXCEPTION" and expectedResult in result:
+            if "Cobalt version" in output:
+                print "\n Checking Cobalt version\n"
+                output = output.replace(command,"")
+                cobalt_version = int(output.split('Cobalt version ')[1].split('.')[0])
+                if cobalt_version == int(current_cobalt_version):
+                    print "\n Cobalt version is the current version :{}  \n".format(cobalt_version)
+                    tdkTestObj.setResultStatus("SUCCESS")
+                else:
+                    print "\n Cobalt version is not  current version: {}\n".format(cobalt_version)
+                    tdkTestObj.setResultStatus("FAILURE")
             else:
-                print "\n Cobalt version is not equal to 21, current version: {}\n".format(cobalt_version)
+                print "\n Cobalt version is not available\n"
                 tdkTestObj.setResultStatus("FAILURE")
         else:
             print "\n Error occurred during SSH, please check ssh details in configuration file\n"

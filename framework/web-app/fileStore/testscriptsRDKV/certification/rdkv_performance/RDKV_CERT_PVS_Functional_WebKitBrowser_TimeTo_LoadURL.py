@@ -72,6 +72,7 @@ from datetime import datetime
 import json
 from web_socket_util import *
 from rdkv_performancelib import *
+from StabilityTestUtility import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
@@ -81,6 +82,11 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_WebKitBrowser_TimeTo_LoadURL');
+
+#The device will reboot before starting the performance testing if "pre_req_reboot_pvs" is
+#configured as "Yes".
+pre_requisite_reboot(obj,"yes")
+
 #Execution summary variable 
 Summ_list=[]
 #Get the result of connection with test component and DUT

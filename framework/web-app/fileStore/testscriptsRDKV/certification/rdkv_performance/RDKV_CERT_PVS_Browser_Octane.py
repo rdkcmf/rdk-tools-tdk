@@ -74,6 +74,7 @@ from rdkv_performancelib import *
 import rdkv_performancelib
 import BrowserPerformanceVariables
 import json
+from StabilityTestUtility import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
@@ -83,6 +84,14 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Browser_Octane');
+
+#The device will reboot before starting the performance testing if "pre_req_reboot_pvs" is
+#configured as "Yes".
+pre_requisite_reboot(obj,"yes")
+
+
+#Execution summary variable
+Summ_list=[]
 
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result.upper();
@@ -151,8 +160,10 @@ if expectedResult in result.upper():
                         result2, octane_subcategory_threshold_values = getDeviceConfigKeyValue(conf_file,"OCTANE_SUBCATEGORY_THRESHOLD_VALUES")
                         if all(value != "" for value in (octane_threshold_value,octane_subcategory_threshold_values)):
                             print "\n Threshold value for browser performance main score: ",octane_threshold_value
+                            Summ_list.append('Threshold value for browser performance main score: '.format(octane_threshold_value))
                             if int(browser_score) > int(octane_threshold_value):
                                 print "\n The browser performance main score is high as expected \n"
+                                Summ_list.append('The browser performance main score is high as expected')
                                 subcategory_threshold_value_list = octane_subcategory_threshold_values.split(',')
                                 for index,subcategory in enumerate(browser_subcategory_list):
                                     if int(browser_score_dict[subcategory]) < int(subcategory_threshold_value_list[index]):

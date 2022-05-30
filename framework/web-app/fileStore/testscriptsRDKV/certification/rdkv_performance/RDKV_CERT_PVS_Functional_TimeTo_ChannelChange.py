@@ -79,6 +79,7 @@ import PerformanceTestVariables
 from web_socket_util import *
 from rdkv_stabilitylib import *
 import MediaValidationVariables
+from StabilityTestUtility import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
@@ -88,6 +89,10 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Functional_TimeTo_ChannelChange');
+
+#The device will reboot before starting the performance testing if "pre_req_reboot_pvs" is
+#configured as "Yes".
+pre_requisite_reboot(obj,"yes")
 
 webkit_console_socket = None
 channel_change_count = 1
