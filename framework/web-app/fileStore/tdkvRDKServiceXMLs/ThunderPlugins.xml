@@ -201,6 +201,12 @@
                 <param tag="family"  defaultValue="null"/>
             </params>
         </method>
+        <method name="Get_IP_Settings2" api="getIPSettings" type="method" version="2" desc="Gets the IP settings">
+            <params>
+                <param tag="interface"   defaultValue="null" />
+                <param tag="ipversion"    defaultValue="null"/>
+            </params>
+        </method>
         <event name="Event_Interface_Status_Changed" eventName="onInterfaceStatusChanged" eventId="client.events.1" type="event" desc="Interface status changed  event" />
         <event name="Event_Connection_Status_Changed" eventName="onConnectionStatusChanged" eventId="client.events.1" type="event" desc="Connection status changed event" />
         <event name="Event_IPAddress_Status_Changed" eventName="onIPAddressStatusChanged" eventId="client.events.1" type="event" desc="IPAddress status changed event" />
@@ -856,6 +862,26 @@
                 <param tag="enable" type="bool" />
             </params>
         </method>
+        <method name="Launch_Application" api="launchApplication" type="method" desc="Launches an application" >
+            <params>
+		    <param tag="client" defaultValue="null" />
+		    <param tag="uri" defaultValue="null" />
+		    <param tag="mimeType" defaultValue="null" />
+		    <param tag="topmost" type="bool"/>
+		    <param tag="focus" type="bool"/>
+            </params>
+        </method>
+        <method name="Suspend_Application" api="suspendApplication" type="method" desc="Suspends an application" >
+            <params>
+                <param tag="client" defaultValue="null" />
+            </params>
+        </method>
+        <method name="Resume_Application" api="resumeApplication" type="method" desc="Resumes an application" >
+            <params>
+                <param tag="client" defaultValue="null" />
+            </params>
+        </method>
+        <event name="Event_On_Application_Launched" eventName="onApplicationLaunched" eventId="client.events.1" type="event" desc="Triggered when an application launches successfully"/>
         <event name="Event_On_Launched" eventName="onLaunched" eventId="client.events.1" type="event" desc="Fired on launching the client" />
         <event name="Event_On_Suspended" eventName="onSuspended" eventId="client.events.1" type="event" desc="Fired on Suspending the client" />
         <event name="Event_On_Destroyed" eventName="onDestroyed" eventId="client.events.1" type="event" desc="Fired on destroying the client"/>
@@ -945,6 +971,9 @@
                 <param tag="message" defaultValue="null" />
             </params>
         </method>
+        <method name="Get_Active_Source_Status" api="getActiveSourceStatus" type="method" desc="Gets the active source status of the device">
+            <expectedValues>True,False</expectedValues>
+        </method> 
         <event name="Event_On_Message" eventName="onMessage" eventId="client.events.1" type="event" desc="Fired when a message is sent from an HDMI device" />
     </plugin>
 
@@ -981,10 +1010,9 @@
     <plugin pluginName="FrameRate" serviceName="org.rdk.FrameRate" serviceVersion="1">
         <method name="Set_Collection_Frequency" api="setCollectionFrequency" type="method" desc="Set amount of milliseconds per collection interval">
             <params>
-                <param tag="frequencyInMs" defaultValue="null"/>
+                <param tag="frequency" defaultValue="null" type="int"/>
             </params>
         </method>
-        <method name="Set_Collection_Frequency_Default" api="setCollectionFrequency" type="method" desc="Set 10 milliseconds per collection interval"/>
         <method name="Start_FPS_Collection" api="startFpsCollection" type="method" desc="Starts the fps collection"/>
         <method name="Stop_FPS_Collection"  api="stopFpsCollection"  type="method" desc="Stops the fps collection"/>
         <method name="Get_Frm_Mode"  api="getFrmMode"  type="method" version="2" desc="Returns the current auto framerate mode" >
@@ -1523,6 +1551,20 @@
                 <param tag="profileName" defaultValue="null"/>
                 <param tag="ms12SettingsName" defaultValue="null"/>
                 <param tag="ms12SettingsValue" defaultValue="null"/>
+            </params>
+        </method>
+        <method name="Get_Color_Depth_Capabilities" api="getColorDepthCapabilities" type="method" desc="Returns supported color depth capabilities" />
+        <method name="Get_Preferred_Color_Depth" api="getPreferredColorDepth" type="method" desc="Returns the current color depth on the selected video display port" >
+            <params>
+                <param tag="videoDisplay" defaultValue="null"/>
+                <param tag="persist" type="bool" />
+            </params>
+        </method>
+        <method name="Set_Preferred_Color_Depth" api="setPreferredColorDepth" type="method" desc="Sets the current color depth for the videoDisplay" >
+            <params>
+                <param tag="videoDisplay" defaultValue="null"/>
+                <param tag="colorDepth" defaultValue="null"/>
+                <param tag="persist" type="bool" />
             </params>
         </method>
         <event name="Event_Zoom_Settings_Updated" eventName="zoomSettingUpdated" eventId="client.events.1" type="event" desc="Zoom settings updated event "/>

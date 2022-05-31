@@ -71,11 +71,12 @@
             </testStep>
           </prerequisite>          
 
-          <prerequisite requisiteId="4" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
+          <prerequisite requisiteId="4" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="true">
             <event pluginName="RDKShell" eventName="Event_On_Launched" />
             <event pluginName="RDKShell" eventName="Event_On_Suspended" />
             <event pluginName="RDKShell" eventName="Event_On_Destroyed" />
-            <event pluginName="RDKShell" eventName="Event_On_UserInactivity" />
+	    <event pluginName="RDKShell" eventName="Event_On_UserInactivity" />
+	    <event pluginName="RDKShell" eventName="Event_On_Application_Launched" />
             <event pluginName="RDKShell" eventName="Event_On_Application_Activated" />
             <event pluginName="RDKShell" eventName="Event_On_Application_Connected" />
             <event pluginName="RDKShell" eventName="Event_On_Application_Disconnected" />
@@ -84,6 +85,7 @@
             <event pluginName="RDKShell" eventName="Event_On_Application_Suspended" />
             <event pluginName="RDKShell" eventName="Event_On_Application_Terminated" />
             <event pluginName="RDKShell" eventName="Event_On_Plugin_Suspended" />
+            <event pluginName="RDKShell" eventName="Event_On_Will_Destroy" />
           </prerequisite>
 
         </pluginPreRequisite>
@@ -1401,10 +1403,10 @@
               <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_if_exists" expectedValues="cobalt" />
             </testStep>
             <testStep testStepId="4" name="Check_On_Application_Connected_Event" event="Event_On_Application_Connected" action="eventListener" clear="false" >
-                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="cobalt"/>
             </testStep>
             <testStep testStepId="5" name="Check_On_Application_First_Frame_Event" event="Event_On_Application_FirstFrame" action="eventListener" >
-                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="cobalt"/>
             </testStep>
             <testStep testStepId="6" name="Suspend_Application" method="SuspendApplication" >
               <params>
@@ -1413,7 +1415,7 @@
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
             <testStep testStepId="7" name="Check_On_Application_Suspended_Event" event="Event_On_Application_Suspended" action="eventListener"  delay="2">
-                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="cobalt"/>
             </testStep>
             <testStep testStepId="8" name="Launch_Cobalt" method="LaunchApplication" >
               <params>
@@ -1425,7 +1427,7 @@
               <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_if_exists" expectedValues="cobalt" />
             </testStep>
             <testStep testStepId="10" name="Check_On_Application_Resumed_Event" event="Event_On_Application_Resumed" action="eventListener"  delay="2">
-                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="cobalt"/>
             </testStep>
             <testStep testStepId="11" name="Destroy_Application" method="DestroyApplication" >
               <params>
@@ -1437,10 +1439,10 @@
               <resultGeneration useMethodTag="rdkshell_check_application"  arguments= "check_not_exists" expectedValues= "cobalt" />
             </testStep>
             <testStep testStepId="13" name="Check_On_Application_Disconnected_Event" event="Event_On_Application_Disconnected" action="eventListener"  clear="false">
-                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="cobalt"/>
             </testStep>
             <testStep testStepId="14" name="Check_On_Application_Terminated_Event" event="Event_On_Application_Terminated" action="eventListener" >
-                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="Cobalt"/>
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="cobalt"/>
             </testStep>
         <testCasePostRequisite>
          <postrequisite requisiteId="1" requisiteName="Resuming_Cobalt_Application">
@@ -2485,6 +2487,96 @@
                 <param tag="callsign" value="WebKitBrowser" />
               </params>
               <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+         </postrequisite>
+        </testCasePostRequisite>
+        </testCase>
+        
+	<testCase testCaseId="RDKShell_89" testCaseName="RDKShell_Launch_Westros_Application" desc="Checks if able to launch westros app" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Launch_Application" method="Launch_Application">
+              <params>
+		      <param tag="client" value="WesterosTest" />
+		      <param tag="uri" value="file:///usr/bin/westeros_test" />
+		      <param tag="mimeType" value="application/native" />
+		      <param tag="topmost" value="true" />
+		      <param tag="focus" value="true" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" delay="5">
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "westerostest" />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_Application_Launched_Event" event="Event_On_Application_Launched" action="eventListener"  >
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="westerostest"/>
+            </testStep>
+        <testCasePostRequisite>
+	 <postrequisite requisiteId="1" requisiteName="Destroy_Westros_Application">
+            <testStep testStepId="1" name="Kill_Application" method="Kill"  >
+              <params>
+                <param tag="callsign"  value="westerostest" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application"  arguments="check_not_exists" expectedValues="westerostest" />
+            </testStep>
+         </postrequisite>
+        </testCasePostRequisite>
+        </testCase>
+
+	<testCase testCaseId="RDKShell_90" testCaseName="RDKShell_Suspend_Resume_WesterosTest_Application" desc="Checks if able to suspend/resume westeros app" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Launch_Application" method="Launch_Application">
+              <params>
+                      <param tag="client" value="WesterosTest" />
+                      <param tag="uri" value="file:///usr/bin/westeros_test" />
+                      <param tag="mimeType" value="application/native" />
+                      <param tag="topmost" value="true" />
+                      <param tag="focus" value="true" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" delay="5">
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "westerostest" />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_Application_Launched_Event" event="Event_On_Application_Launched" action="eventListener"  >
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="westerostest"/>
+	    </testStep>
+            <testStep testStepId="4" name="Suspend_Application" method="Suspend_Application" >
+              <params>
+                <param tag="client"  value="westerostest" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>            
+            <testStep testStepId="5" name="Check_On_Application_Suspended_Event" event="Event_On_Application_Suspended" action="eventListener"  delay="2">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="westerostest"/>
+            </testStep>
+            <testStep testStepId="6" name="Is_Westeros_App_Suspended" method="Get_Application_State" >
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="westerostest" expectedValues="suspended" />
+            </testStep>
+            <testStep testStepId="7" name="Resume_Application" method="Resume_Application" >
+              <params>
+                <param tag="client" value="westerostest" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="8" name="Check_On_Application_Resumed_Event" event="Event_On_Application_Resumed" action="eventListener"  delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="westerostest"/>
+            </testStep>
+            <testStep testStepId="9" name="Is_Westeros_App_Resumed" method="Get_Application_State" >
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="westerostest" expectedValues="resumed" />
+            </testStep>
+        <testCasePostRequisite>
+         <postrequisite requisiteId="1" requisiteName="Destroy_Westros_Application">
+            <testStep testStepId="1" name="Kill_Application" method="Kill"  >
+              <params>
+                <param tag="callsign"  value="westerostest" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application"  arguments="check_not_exists" expectedValues="westerostest" />
             </testStep>
          </postrequisite>
         </testCasePostRequisite>

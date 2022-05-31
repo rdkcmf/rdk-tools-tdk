@@ -303,6 +303,17 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+            if len(arg) and arg[0] == "validate_ip_address":
+                status = checkNonEmptyResultData(result)
+                success = str(result.get("success")).lower() == "true"
+                if success and status == "TRUE":
+                    if str(result.get("autoconfig")).lower() == "true":
+                        if re.match("^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$",str(result.get("dhcpserver")).lower()) is None:
+                            info["Test_Step_Status"] = "FAILURE"
+                        else:
+                            info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
 
         elif tag == "network_get_interface_status":
@@ -1181,6 +1192,12 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "hdmicec_check_result":
             info = checkAndGetAllResultInfo(result,result.get("success"))
+      
+        elif tag == "hdmicec_validate_boolean_result":
+            if str(result.get("status")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "hdmicec_get_cec_addresses":
             cec_addresses = result.get("CECAddresses")
@@ -1787,6 +1804,28 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+        
+        elif tag == "check_supported_color_depth_capabilities":
+            status = checkNonEmptyResultData(result)
+            supportedColorDepth = result.get('capabilities')
+            info["supportedColorDepth"] = supportedColorDepth
+            success = str(result.get("success")).lower() == "true"
+            if success and status == "TRUE":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "check_color_depth":
+            info["colorDepth"] = result.get('colorDepth')
+            if json.dumps(result.get("success")) == "true" :
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+            if len(arg) and arg[0] == "check_expected_color_depth":
+                if result.get('colorDepth') in expectedValues and json.dumps(result.get("success")) == "true":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_check_adapter_state":
@@ -3294,6 +3333,11 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                     info["ms12SettingsValue"] = "10"
                 else:
                     info["ms12SettingsValue"] = "1"
+        
+        elif tag =="get_supported_color_depth_capabilities":
+            testStepResults = testStepResults[0].values()[0]
+            supportedColorDepth = testStepResults[0].get("supportedColorDepth")
+            info["colorDepth"] = ",".join(supportedColorDepth)
 
         # Wifi Plugin Response result parser steps
         elif tag == "wifi_toggle_adapter_state":

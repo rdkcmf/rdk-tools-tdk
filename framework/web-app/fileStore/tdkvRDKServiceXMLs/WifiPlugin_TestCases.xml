@@ -58,7 +58,8 @@
           <prerequisite requisiteId="2" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
             <event pluginName="Wifi" eventName="Event_On_WIFI_State_Changed" />
             <event pluginName="Wifi" eventName="Event_On_Available_SSIDs" />
-            <event pluginName="Wifi" eventName="Event_On_Error" /> 
+	    <event pluginName="Wifi" eventName="Event_On_Error" /> 
+	    <event pluginName="Controller" eventName="Event_Controller_State_Changed" />
           </prerequisite>
           <prerequisite requisiteId="3" requisiteName="Enable_Preferred_network_parameter" >
             <testStep testStepId="1" name="Enable_Preferred_Network_Parameter"  action="externalFnCall"  >
@@ -891,6 +892,61 @@
             </testStep>
             <testStep testStepId="3" name="Stop_Scan" method="Stop_Scan" >
                 <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase>
+       
+       <testCase testCaseId="WIFI_20" testCaseName="WIFI_ActivateDeactivate_Event_Test" desc="Validates statechange event on Activating/deactivating the plugin">
+             <testCaseInfo testCaseType="direct" />
+             <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+                   <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                     <params>
+                       <param tag="plugin" value="org.rdk.Wifi" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Wifi" />
+                   </testStep>
+                   <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Wifi" />
+                     <params>
+                       <param tag="callsign" value="org.rdk.Wifi" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Wifi" />
+                     <params>
+                       <param tag="plugin" value="org.rdk.Wifi" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Wifi" expectedValues="activated"/>
+                   </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Deactivate_WIFI_Plugin" method="Deactivate_Plugin"  pluginName="Controller">
+                  <params>
+                    <param tag="callsign"  value="org.rdk.Wifi" />
+                  </params>
+            </testStep>
+            <testStep testStepId="2" name="Check_State_Change_Event" event="Event_Controller_State_Changed" action="eventListener" delay="2" pluginName="Controller">
+              <resultGeneration useMethodTag="controller_check_state_change_event" expectedValues="org.rdk.wifi,deactivated,requested"/>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                 <params>
+                     <param tag="plugin" value="org.rdk.Wifi" indexOnly="true" />
+                 </params>
+                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Wifi" expectedValues="deactivated"/>
+	    </testStep>
+            <testStep testStepId="4" name="Activate_WIFI_Plugin" method="Activate_Plugin"  pluginName="Controller" delay="1">
+                  <params>
+                    <param tag="callsign" value="org.rdk.Wifi" />
+                  </params>
+            </testStep>
+            <testStep testStepId="5" name="Check_State_Change_Event" event="Event_Controller_State_Changed" action="eventListener" delay="2" pluginName="Controller">
+              <resultGeneration useMethodTag="controller_check_state_change_event" expectedValues="org.rdk.wifi,activated,requested"/>
+            </testStep>
+            <testStep testStepId="6" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller" PluginOnStep="yes" >
+                 <params>
+                     <param tag="plugin" value="org.rdk.Wifi" indexOnly="true" />
+                 </params>
+                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Wifi" expectedValues="activated"/>
             </testStep>
        </testCase>
 </testPlugin>

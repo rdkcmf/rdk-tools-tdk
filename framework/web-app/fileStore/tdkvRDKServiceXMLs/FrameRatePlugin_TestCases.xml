@@ -93,7 +93,10 @@
         </pluginPreRequisite>
         <testCase testCaseId="FR_01" testCaseName="FrameRate_Collect_FPS" desc="Launches graphics url using lightning app and gets fps using onFpsEvent Event">
             <testCaseInfo testCaseType="stress" configurableRepeat="true" repeatKey="WEBKIT_FPS_REPEAT_COUNT"/>
-            <testStep testStepId="1" name="Set_Collection_Frequency_Default_10Sec" method="Set_Collection_Frequency_Default" >
+	    <testStep testStepId="1" name="Set_Collection_Frequency" method="Set_Collection_Frequency" >
+	      <params>
+                <param tag="frequency" value="10000" />
+              </params>	    
               <resultGeneration useMethodTag="framerate_check_set_operation" />
             </testStep>
             <testStep testStepId="2" name="Set_Test_URL" method="Set_LightningApp_URL" pluginName="LightningApp">

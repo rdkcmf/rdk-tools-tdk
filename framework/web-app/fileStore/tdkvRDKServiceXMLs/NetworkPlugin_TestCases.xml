@@ -80,7 +80,8 @@
           <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
             <event pluginName="Network" eventName="Event_Interface_Status_Changed" />
             <event pluginName="Network" eventName="Event_Connection_Status_Changed" />
-            <event pluginName="Network" eventName="Event_IPAddress_Status_Changed" />
+	    <event pluginName="Network" eventName="Event_IPAddress_Status_Changed" />
+	    <event pluginName="Controller" eventName="Event_Controller_State_Changed" />
           </prerequisite>
 
 	  <prerequisite requisiteId="4" requisiteName="Enable_Preferred_network_parameter" >
@@ -399,6 +400,80 @@
                   <param tag="packets"   useDefault="true" />
                 </params>
                 <resultGeneration useMethodTag="network_get_ping_response" arguments="validate_error_message" expectedValues="0.42.42.42,could not ping endpoint"/>
+            </testStep>
+       </testCase>
+       <testCase testCaseId="NW_16" testCaseName="Network_ActivateDeactivate_Event_Test" desc="Validates statechange event on Activating/deactivating the plugin">
+             <testCaseInfo testCaseType="direct" />
+             <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+                   <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                     <params>
+                       <param tag="plugin" value="org.rdk.Network" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Network" />
+                   </testStep>
+                   <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Network" />
+                     <params>
+                       <param tag="callsign" value="org.rdk.Network" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.Network" />
+                     <params>
+                       <param tag="plugin" value="org.rdk.Network" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Network" expectedValues="activated"/>
+                   </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Deactivate_Network_Plugin" method="Deactivate_Plugin"  pluginName="Controller">
+                  <params>
+                    <param tag="callsign"  value="org.rdk.Network" />
+                  </params>
+            </testStep>
+            <testStep testStepId="2" name="Check_State_Change_Event" event="Event_Controller_State_Changed" action="eventListener" delay="2" pluginName="Controller">
+              <resultGeneration useMethodTag="controller_check_state_change_event" expectedValues="org.rdk.network,deactivated,requested"/>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                 <params>
+                     <param tag="plugin" value="org.rdk.Network" indexOnly="true" />
+                 </params>
+                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Network" expectedValues="deactivated"/>
+            </testStep>
+            <testStep testStepId="4" name="Activate_Network_Plugin" method="Activate_Plugin"  pluginName="Controller" delay="1">
+                  <params>
+                    <param tag="callsign" value="org.rdk.Network" />
+                  </params>
+            </testStep>
+            <testStep testStepId="5" name="Check_State_Change_Event" event="Event_Controller_State_Changed" action="eventListener" delay="2" pluginName="Controller">
+              <resultGeneration useMethodTag="controller_check_state_change_event" expectedValues="org.rdk.network,activated,requested"/>
+            </testStep>
+            <testStep testStepId="6" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller" PluginOnStep="yes" >
+                 <params>
+                     <param tag="plugin" value="org.rdk.Network" indexOnly="true" />
+                 </params>
+                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Network" expectedValues="activated"/>
+            </testStep>
+       </testCase>
+       <testCase testCaseId="NW_17" testCaseName="Network_Validate_IP_Settings" desc="Validates the IP Settings" >
+           <testCaseInfo testCaseType="direct" configurableTest="true" testKey="NETWORK_SUPPORTED_FEATURES" useMethodTag="network_check_feature_applicability" arguments="InterfaceIPSettings" />
+            <testStep testStepId="1" name="Enable_Manual_IPSettings"  action="externalFnCall"  >
+                <resultGeneration useMethodTag="Enable_TR181_Parameter" >
+                  <arguments useConfigFile="true" key="MANUAL_IPSETTINGS_PARAMETER"/>
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="2" name="Get_Default_Interface" method="Get_Default_Interface" saveResult="true">
+                <resultGeneration useMethodTag="network_get_default_interface" />
+            </testStep>
+            <testStep testStepId="3" name="Get_IP_Settings" method="Get_IP_Settings2">
+                <params>
+                     <param tag="interface"  usePreviousResult="true" Id="2" useMethodTag="network_get_default_interface_name" />
+                     <param tag="ipversion" value="IPv4" />
+                </params>
+                <resultGeneration useMethodTag="network_get_ip_settings" arguments="validate_ip_address" >
+                    <expectedValues  usePreviousResult="true" Id="2" useMethodTag="network_get_default_interface_name" />
+                </resultGeneration>
             </testStep>
        </testCase>
 </testPlugin>

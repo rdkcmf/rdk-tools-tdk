@@ -58,7 +58,8 @@
             </testStep>
           </prerequisite>
           <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
-            <event pluginName="PlayerInfo" eventName="Event_AudioMode_Changed" />
+               <event pluginName="PlayerInfo" eventName="Event_AudioMode_Changed" />
+               <event pluginName="Controller" eventName="Event_Controller_State_Changed" />
           </prerequisite>
         </pluginPreRequisite>
 
@@ -184,6 +185,59 @@
               </subtestStep>
             </testStep>
         </testCase>
-
+        <testCase testCaseId="PI_09" testCaseName="PlayerInfo_ActivateDeactivate_Event_Test" desc="Validates statechange event on Activating/deactivating the plugin">
+             <testCaseInfo testCaseType="direct" />
+             <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+                   <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                     <params>
+                       <param tag="plugin" value="PlayerInfo" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,PlayerInfo" />
+                   </testStep>
+                   <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,PlayerInfo" />
+                     <params>
+                       <param tag="callsign" value="PlayerInfo" />
+                     </params>
+                   </testStep>
+                   <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                     <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,PlayerInfo" />
+                     <params>
+                       <param tag="plugin" value="PlayerInfo" indexOnly="true" />
+                     </params>
+                     <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,PlayerInfo" expectedValues="activated"/>
+                   </testStep>
+                </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Deactivate_PlayerInfo_Plugin" method="Deactivate_Plugin"  pluginName="Controller">
+                  <params>
+                    <param tag="callsign"  value="PlayerInfo" />
+                  </params>
+            </testStep>
+            <testStep testStepId="2" name="Check_State_Change_Event" event="Event_Controller_State_Changed" action="eventListener" delay="2" pluginName="Controller">
+              <resultGeneration useMethodTag="controller_check_state_change_event" expectedValues="playerinfo,deactivated,requested"/>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                 <params>
+                     <param tag="plugin" value="PlayerInfo" indexOnly="true" />
+                 </params>
+                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,PlayerInfo" expectedValues="deactivated"/>
+            </testStep>
+            <testStep testStepId="4" name="Activate_PlayerInfo_Plugin" method="Activate_Plugin"  pluginName="Controller" delay="1">
+                  <params>
+                    <param tag="callsign" value="PlayerInfo" />
+                  </params>
+            </testStep>
+            <testStep testStepId="5" name="Check_State_Change_Event" event="Event_Controller_State_Changed" action="eventListener" delay="2" pluginName="Controller">
+              <resultGeneration useMethodTag="controller_check_state_change_event" expectedValues="playerinfo,activated,requested"/>
+            </testStep>
+            <testStep testStepId="6" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller" PluginOnStep="yes" >
+                 <params>
+                     <param tag="plugin" value="PlayerInfo" indexOnly="true" />
+                 </params>
+                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,PlayerInfo" expectedValues="activated"/>
+            </testStep>
+        </testCase>
 </testPlugin>
 

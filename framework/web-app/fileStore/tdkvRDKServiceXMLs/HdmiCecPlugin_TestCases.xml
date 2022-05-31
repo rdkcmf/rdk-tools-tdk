@@ -222,4 +222,12 @@
           <resultGeneration useMethodTag="hdmicec_check_on_message_event" arguments="check_device_vendor_id"/>
         </testStep>
     </testCase>
+
+    <!-- Test case 08 -->
+    <testCase testCaseId="HdmiCec_08" testCaseName= "Check_Active_Source_Status" desc="Checks the active source status of the device">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_Active_Source_Status" method="Get_Active_Source_Status">
+                <resultGeneration useMethodTag="hdmicec_validate_boolean_result" />
+            </testStep>
+    </testCase>
 </testPlugin>
