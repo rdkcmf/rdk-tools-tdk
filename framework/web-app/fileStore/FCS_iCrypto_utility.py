@@ -175,13 +175,27 @@ def deleteLogFile(obj,iCrypto_log,iCryptoExecutionStatus):
 
 #Executes the configured Test APP
 def RunTest(obj,Test,logFile):
+    #Test to be executed
+    test = TESTAPP[Test];
+    print "\nCheck if %s application is present or not"%(test)
+    tdkTestObj = obj.createTestStep('ExecuteCommand');
+    cmd  = "command -v " + test
+    tdkTestObj.addParameter("command", cmd);
+    #Execute the test case in STB
+    tdkTestObj.executeTestCase("SUCCESS");
+    #Get the result of execution
+    actualResult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    if not details:
+        print "%s application not found"%(test)
+        print "Not Proceeding with test case"
+        exit()
+
     #Prmitive test case which associated to this Script
     print "\nStarting iCrypto interface test Execution\n"
     tdkTestObj = obj.createTestStep('SystemUtilAgent_ExecuteBinary');
     tdkTestObj.addParameter("shell_script", "RunAppInBackground.sh");
     tdkTestObj.addParameter("log_file", logFile);
-    #Test to be executed
-    test = TESTAPP[Test];
     tdkTestObj.addParameter("tool_path", test);
     tdkTestObj.addParameter("timeout", "3");
     #Execute the test case in STB

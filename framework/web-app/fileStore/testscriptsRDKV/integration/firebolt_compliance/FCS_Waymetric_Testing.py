@@ -102,7 +102,21 @@ if "SUCCESS" in sysutilLoadStatus.upper():
     options = " --no-multi "
     #Add logFile to capture App output
     options = options + logFile
- 
+
+    print "\nCheck if waymetric application is present or not"
+    tdkTestObj = obj.createTestStep('ExecuteCommand');
+    cmd  = "command -v " + Test
+    tdkTestObj.addParameter("command", cmd);
+    #Execute the test case in STB
+    tdkTestObj.executeTestCase("SUCCESS");
+    #Get the result of execution
+    actualResult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+    if not details:
+        print "waymetric application not found"
+        print "Not Proceeding with test case"
+        exit()
+
     print "\nStarting Test Execution\n"
     tdkTestObj = obj.createTestStep('ExecuteCommand');
     #Test to be executed

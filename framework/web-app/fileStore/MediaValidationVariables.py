@@ -210,6 +210,8 @@ video_src_url_opus_eac3 = test_streams_base_path + "MultiCodecStreams/TDK_Asset_
 #Video URL with EAC3 and AC3 codec audio
 video_src_url_ac3_eac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_EAC3_AC3.mp4"
 video_src_url_aac_eac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_EAC3_AAC.mp4"
+video_src_url_opus_aac = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_AAC_OPUS.mp4"
+video_src_url_opus_vorbis = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_Vorbis_Opus.webm"
 
 # Basic WAV PCM Audio format stream
 audio_src_url_wav_pcm = test_streams_base_path + "TDK_Asset_Sunrise_WAV_Audio.wav"
