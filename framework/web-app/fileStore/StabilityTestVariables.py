@@ -212,3 +212,12 @@ vimeo_test_url="https://widgets.metrological.com/lightning/rdk/d431ce8577be56e82
 
 # Test duration in minutes till test should be performed, it should be less than the duration of test video 
 vimeo_test_duration = 720
+
+#URL used to test encrypted videoplayback
+encrypt_test_url = ""
+
+# Test duration in minutes till test should be performed, it should be less than the duration of test video
+encrypt_test_duration = 720
+
+#Video duration of the test video in minutes
+encrypt_video_duration = 
