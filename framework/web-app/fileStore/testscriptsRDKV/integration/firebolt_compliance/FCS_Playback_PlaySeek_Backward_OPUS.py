@@ -61,18 +61,18 @@
     <test_type>Positive</test_type>
     <test_setup>Video Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
-2. Test stream url for a stream with OPUS audio codec should be updated in the config variable video_src_url_opus inside MediaValidationVariables.py library inside filestore
+2. Test stream url for a stream with OPUS audio codec should be updated in the config variable video_src_url_opus_webm inside MediaValidationVariables.py library inside filestore
 3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file
 4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time in seconds for which the playback should be carried out
 5. FIREBOLT_COMPLIANCE_SEEK_POSITION configuration should be set to duration in seconds to which the seek operation should be carried out</pre_requisite>
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>1.testcasename - "test_trickplay"
-2.test_url - OPUS url from MediaValidationVariables library (MediaValidationVariables.video_src_url_opus)
+2.test_url - OPUS url from MediaValidationVariables library (MediaValidationVariables.video_src_url_opus_webm)
 3."checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
 4.operations=seek:&lt;timeout&gt;:&lt;seekposition&gt; - a ":" seperated string to specify the seek operation to be executed , the time in seconds for which the operation should be performed and seekposition in seconds to which the seek operation should be performed. The timeout should be configured in the device configuration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file The seekposition should also be configured in device configuration(FIREBOLT_COMPLIANCE_SEEK_POSITION)</input_parameters>
     <automation_approch>1.Load the systemutil module 
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS, FIREBOLT_COMPLIANCE_SEEK_POSITION, FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
-3.Retrieve the video_src_url_opus variable from MediaValidationVariables library
+3.Retrieve the video_src_url_opus_webm variable from MediaValidationVariables library
 4.Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value, operation, seekposition and timeout
 5.Execute the command in DUT. During the execution, the DUT will start av playback, then pipeline seeks to FIREBOLT_COMPLIANCE_SEEK_POSITION and then av playback is performed for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds.Then application exits by closing the pipeline
 6.Verify the output from the execute command and check if the  "Failures: 0" and "Errors: 0" string exists or "failed: 0" string exists in the returned output
@@ -123,7 +123,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #The test name specifies the test case to be executed from the mediapipeline test suite
     test_name = "test_trickplay"
     #Test url for the stream to be played is retrieved from MediaValidationVariables library
-    test_url = MediaValidationVariables.video_src_url_opus
+    test_url = MediaValidationVariables.video_src_url_opus_webm
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS' that specifies whether SOC level playback verification check should be done or not 
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application

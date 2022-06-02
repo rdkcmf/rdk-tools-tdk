@@ -144,6 +144,7 @@ video_src_url_vp8 = test_streams_base_path + "TDK_Asset_Sunrise_VP8_Opus.webm"
 
 #Opus Codec Video URL
 video_src_url_opus = test_streams_base_path + "DASH_VP9_OPUS_WebM/master.mpd"
+video_src_url_opus_webm = test_streams_base_path + "TDK_Asset_Sunrise_VP9_Opus.webm"
 
 #Audio-Only URL. Stream should be of minimum 2-3 minutes
 video_src_url_audio = test_streams_base_path  + "DASH_AAC_Audio_Only/master.mpd"
