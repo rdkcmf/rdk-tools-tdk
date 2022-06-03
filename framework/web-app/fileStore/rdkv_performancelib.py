@@ -1230,3 +1230,52 @@ def getSummary(Summ_list):
    print("############## Execution Summary #######################")
    for key in Summ_list:
       print(key)
+
+#-------------------------------------------------------------------
+#GET THE BROWSER SCORE FROM SMASHCAT TEST
+#-------------------------------------------------------------------
+def rdkservice_getBrowserScore_Smashcat():
+    try:
+        browser_score_dict = {}
+        webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
+        driver = openChromeBrowser(webinspectURL);
+        if driver != "EXCEPTION OCCURRED":
+            time.sleep(10)
+            action = ActionChains(driver)
+            source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/li[2]')
+            action.move_to_element(source).context_click().perform()
+            time.sleep(10)
+            options = driver.find_elements_by_class_name('soft-context-menu')
+            try:
+                for option in options:
+                    current_option = option.find_elements_by_class_name('item')
+                    for item in current_option:
+                        if "Expand All" in item.text:
+                            item.click()
+            except exceptions.StaleElementReferenceException,e:
+                pass
+            time.sleep(10)
+            smashcat_score_list = []
+            count = 1
+            while (count<6):
+                try:
+                    smashcat_score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[1]/li[1]/span/span[2]').text
+                except exceptions.StaleElementReferenceException,e:
+                    smashcat_score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[1]/li[1]/span/span[2]').text
+                smashcat_score = int(smashcat_score.split('f')[0])
+                print "score =",smashcat_score
+                time.sleep(2)
+                smashcat_score_list.append(smashcat_score)
+                count = count +1
+            smashcat_score =(sum(smashcat_score_list))/5
+            browser_score_dict["main_score"] = smashcat_score
+            driver.quit()
+        else:
+            browser_score_dict["main_score"] = "Unable to get the browser score"
+    except Exception as error:
+        print "Got exception while getting the browser score"
+        print error
+        browser_score_dict["main_score"] = "Unable to get the browser score"
+        driver.quit()
+    browser_score_dict = json.dumps(browser_score_dict)
+    return browser_score_dict
