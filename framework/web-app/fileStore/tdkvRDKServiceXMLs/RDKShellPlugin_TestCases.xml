@@ -71,7 +71,7 @@
             </testStep>
           </prerequisite>          
 
-          <prerequisite requisiteId="4" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="true">
+          <prerequisite requisiteId="4" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false">
             <event pluginName="RDKShell" eventName="Event_On_Launched" />
             <event pluginName="RDKShell" eventName="Event_On_Suspended" />
             <event pluginName="RDKShell" eventName="Event_On_Destroyed" />
