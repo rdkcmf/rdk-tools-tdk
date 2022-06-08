@@ -181,7 +181,7 @@ if "SUCCESS" in result.upper():
 	                #Set the adapter path to the default adapter path
 	                tdkTestObj.addParameter("adapter_path", adapterPath)
                         #Set the device type as 0 - Speakers
-                        tdkTestObj.addParameter("device_type", 5)
+                        tdkTestObj.addParameter("device_type", 0)
 
                         #Execute the test case in DUT
                         tdkTestObj.executeTestCase(expectedresult);
