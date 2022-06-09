@@ -88,18 +88,6 @@ obj = tdklib.TDKScriptingLibrary("firebolt_compliance","1");
 ip = <ipaddress>
 port = <port>
 
-def parsePATH(details):
-    LIBRARY_PATH= [];
-    details = details.partition("=")[2].strip("\\n").decode('string_escape')
-    details = details.replace('"','');
-    if details[len(details) - 1] == ":":
-       details = details[:-1];
-    details = details.split(':');
-    for PATH in details:
-        if "TDK" not in PATH:
-           LIBRARY_PATH.append(PATH);
-    return LIBRARY_PATH
-
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("systemutil","1");
 obj.configureTestCase(ip,port,'FCS_Security_Export_Libraries_Test');
@@ -110,15 +98,12 @@ obj.setLoadModuleStatus(sysUtilLoadStatus);
 
 if "SUCCESS" in sysUtilLoadStatus.upper():
     print "\nTEST STEP : Check if LD_LIBRARY_PATH is used in export"
-    result,details,tdkTestObj = executeTest(obj, 'ExecuteCommand', {"command":"export | grep LD_LIBRARY_PATH"}, True)
+    result,details,tdkTestObj = executeTest(obj, 'ExecuteCommand', {"command":"grep LD_LIBRARY_PATH /etc/profile"}, True)
     if details:
-       details = parsePATH(details)
-       if details:
-           print "FAILURE: LD_LIBRARY_PATH is used to export %s" %(details)
-           print "%s libraries must not be exported using LD_LIBRARY_PATH" %(details)
-           tdkTestObj.setResultStatus("FAILURE");
-    
-    if not details:
+        print "FAILURE: LD_LIBRARY_PATH is used to export %s" %(details)
+        print "%s libraries must not be exported using LD_LIBRARY_PATH" %(details)
+        tdkTestObj.setResultStatus("FAILURE");
+    else:
         print "SUCCESS: LD_LIBRARY_PATH is not used to export"
         tdkTestObj.setResultStatus("SUCCESS");
     obj.unloadModule("systemutil");
