@@ -74,6 +74,7 @@ import StabilityTestVariables
 from StabilityTestUtility import *
 from rdkv_performancelib import *
 from web_socket_util import *
+import MediaValidationVariables
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_stability","1",standAlone=True);
@@ -106,6 +107,22 @@ pre_condition_status = check_device_state(obj)
 expectedResult = "SUCCESS"
 if expectedResult in (result.upper() and pre_condition_status):
     channel_change_url = StabilityTestVariables.channel_change_url
+    #Write the TestManager IP and stream path to the channels.js file
+    #where the user can configure their own channels for the test.
+    filename = obj.realpath+"fileStore/lightning-apps/channels.js"
+    basepath = MediaValidationVariables.test_streams_base_path.replace("http:","")
+    with open(filename, 'r') as the_file:
+        buf = the_file.readlines()
+        line_to_add = 'var basepath = "'+basepath+'"\n'
+        if line_to_add in buf:
+            print "The stream path is already configured"
+        else:
+            print "Configuring the stream path for channel change test"
+            with open(filename, 'w') as out_file:
+                for line in buf:
+                    if line == "*/\n":
+                        line = "*/\n"+line_to_add
+                    out_file.write(line)
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
