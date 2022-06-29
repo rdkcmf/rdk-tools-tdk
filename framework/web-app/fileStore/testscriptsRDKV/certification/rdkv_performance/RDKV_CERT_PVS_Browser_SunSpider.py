@@ -88,6 +88,9 @@ obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Browser_SunSpider');
 #configured as "Yes".
 pre_requisite_reboot(obj,"yes")
 
+# Execution Summary Variable
+Summ_list=[]
+
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result;
@@ -155,6 +158,8 @@ if expectedResult in result.upper():
                         result2, sunspider_subcategory_threshold_values = getDeviceConfigKeyValue(conf_file,"SUNSPIDER_SUBCATEGORY_THRESHOLD_VALUES")
                         if all(value != "" for value in (sunspider_threshold_value,sunspider_subcategory_threshold_values)):
                             print "\n Threshold value for browser performance main score: ",sunspider_threshold_value
+                            Summ_list.append('Threshold value for browser performance main score:{} '.format(sunspider_threshold_value))
+                            Summ_list.append('Browser score from test: {} '.format(browser_score))
                             if float(browser_score) < float(sunspider_threshold_value):
                                 tdkTestObj.setResultStatus("SUCCESS");
                                 print "\n The browser performance main score is high as expected\n"
@@ -202,6 +207,7 @@ if expectedResult in result.upper():
             print "Failed to get current URL from webkitbrowser"
     else:
         print "Pre conditions are not met"
+    getSummary(Summ_list)
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"

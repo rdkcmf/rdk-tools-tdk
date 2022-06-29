@@ -1223,12 +1223,13 @@ def rdkservice_getBrowserScore_MotionMark():
     browser_score_dict = json.dumps(browser_score_dict)
     return browser_score_dict
 
+
 #---------------------------------------------------------------------------------------
 # PVS Execution Summary
 #---------------------------------------------------------------------------------------
 def getSummary(Summ_list):
-   print("############## Execution Summary #######################")
-   for key in Summ_list:
+    print("############## Execution Summary #######################")
+    for key in Summ_list:
       print(key)
 
 #-------------------------------------------------------------------
@@ -1279,3 +1280,43 @@ def rdkservice_getBrowserScore_Smashcat():
         driver.quit()
     browser_score_dict = json.dumps(browser_score_dict)
     return browser_score_dict
+
+#-------------------------------------------------------------------
+#GET THE BROWSER SCORE FROM KRAKEN TEST
+#-------------------------------------------------------------------
+
+def rdkservice_getBrowserScore_Kraken():
+    try:
+        browser_score_dict = {}
+        webinspectURL = 'http://'+deviceIP+':'+BrowserPerformanceVariables.webinspect_port+'/Main.html?page=1'
+        driver = openChromeBrowser(webinspectURL);
+        if driver != "EXCEPTION OCCURRED":
+            time.sleep(10)
+            action = ActionChains(driver)
+            source = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/li[2]')
+            action.move_to_element(source).context_click().perform()
+            time.sleep(10)
+            options = driver.find_elements_by_class_name('soft-context-menu')
+            try:
+                for option in options:
+                    current_option = option.find_elements_by_class_name('item')
+                    for item in current_option:
+                        if "Expand All" in item.text:
+                            item.click()
+            except exceptions.StaleElementReferenceException,e:
+                pass
+            time.sleep(20)
+            kraken_score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol/ol[4]/li[8]/span/span').text
+            kraken_score = kraken_score.split("Total: ")[1]
+            browser_score_dict["main_score"] = kraken_score.split('ms')[0].strip()
+            driver.quit()
+        else:
+            browser_score_dict["main_score"] = "Unable to get the browser score"
+    except Exception as error:
+        print "Got exception while getting the browser score"
+        print error
+        browser_score_dict["main_score"] = "Unable to get the browser score"
+        driver.quit()
+    browser_score_dict = json.dumps(browser_score_dict)
+    return browser_score_dict
+

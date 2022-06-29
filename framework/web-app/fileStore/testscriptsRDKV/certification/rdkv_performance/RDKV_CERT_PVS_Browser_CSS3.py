@@ -88,6 +88,9 @@ obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Browser_CSS3');
 #configured as "Yes".
 pre_requisite_reboot(obj,"yes")
 
+# Execution Summary Variable
+Summ_list=[]
+
 result =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %result.upper();
 obj.setLoadModuleStatus(result);
@@ -157,6 +160,8 @@ if expectedResult in result.upper():
                         result2, css3_subcategory_threshold_values = getDeviceConfigKeyValue(conf_file,"CSS3_SUBCATEGORY_THRESHOLD_VALUES")
                         if all(value != "" for value in (css3_threshold_value,css3_subcategory_threshold_values)):
                             print "\n Threshold value for browser performance main score: ",css3_threshold_value
+                            Summ_list.append('Threshold value for browser performance main score:{} '.format(css3_threshold_value))
+                            Summ_list.append('Browser score from test: {} '.format(browser_score))
                             if int(browser_score) > int(css3_threshold_value):
                                 print "\n The browser performance main score is high as expected\n"
                                 subcategory_threshold_value_list = css3_subcategory_threshold_values.split(',')
@@ -205,6 +210,7 @@ if expectedResult in result.upper():
         print "Pre conditions are not met"
         obj.setLoadModuleStatus("FAILURE");
 
+    getSummary(Summ_list)
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"

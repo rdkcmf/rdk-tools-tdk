@@ -88,6 +88,9 @@ obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Browser_HTML5')
 #configured as "Yes".
 pre_requisite_reboot(obj,"yes")
 
+# Execution Summary Variable
+Summ_list=[]
+
 #Get the result of connection with test component and DUT
 result =obj.getLoadModuleResult()
 print "[LIB LOAD STATUS]  :  %s" %result
@@ -154,6 +157,8 @@ if expectedResult in result.upper():
                         result2, html5_subcategory_threshold_values = getDeviceConfigKeyValue(conf_file,"HTML5_SUBCATEGORY_THRESHOLD_VALUES")
                         if all(value != "" for value in (html5_threshold_value,html5_subcategory_threshold_values)):
                             print "\n Threshold value for browser performance main score: ",html5_threshold_value
+                            Summ_list.append('Threshold value for browser performance main score:{} '.format(html5_threshold_value))
+                            Summ_list.append('Browser score from test: {} '.format(browser_score))
                             if int(browser_score) > int(html5_threshold_value):
                                 tdkTestObj.setResultStatus("SUCCESS");
                                 print "\n The browser performance main score is high as expected\n"
@@ -202,6 +207,7 @@ if expectedResult in result.upper():
     else:
         print "Pre conditions are not met"
         obj.setLoadModuleStatus("FAILURE");
+    getSummary(Summ_list)
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"

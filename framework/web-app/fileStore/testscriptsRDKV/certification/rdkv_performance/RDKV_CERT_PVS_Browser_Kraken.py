@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2021 RDK Management
+# Copyright 2022 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,23 +21,23 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>3</version>
+  <version>1</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>RDKV_CERT_PVS_Browser_Animation_FPS</name>
+  <name>RDKV_CERT_PVS_Browser_Kraken</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
-  <primitive_test_id> </primitive_test_id>
+  <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
-  <primitive_test_name>rdkservice_setValue</primitive_test_name>
+  <primitive_test_name>rdkservice_getBrowserScore_Kraken</primitive_test_name>
   <!--  -->
   <primitive_test_version>1</primitive_test_version>
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>The objective of this test is to validate the average fps value obtained from the browser performance benchmark test.</synopsis>
+  <synopsis>To get the browser score using Kraken test</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>4</execution_time>
+  <execution_time>20</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -48,9 +48,9 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
-    <box_type>RPI-HYB</box_type>
-    <!--  -->
     <box_type>RPI-Client</box_type>
+    <!--  -->
+    <box_type>RPI-HYB</box_type>
     <!--  -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
@@ -60,27 +60,26 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>RDKV_PERFORMANCE_92</test_case_id>
-    <test_objective>The objective of this test is to validate the average fps value obtained from the browser performance benchmark test.</test_objective>
+    <test_case_id>RDKV_PERFORMANCE_123</test_case_id>
+    <test_objective>To get the browser score using Kraken test</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>RPI,Accelerator</test_setup>
-    <pre_requisite>1. wpeframework should be up and running</pre_requisite>
+    <test_setup>RPI, Accelerator</test_setup>
+    <pre_requisite>1. Wpeframework process should be up and running in the device</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
-    <input_parameters>animation_benchmark_test_url:string</input_parameters>
-    <automation_approch>1. Launch WebKitBrowser using RDKShell
-2. Set browser test URL using url method
-3. Get the current URL and verify
-4. Get the 5 different fps values using webinspect page of WebKit and take the average of those 5
-5. Validate the score and revert the plugin status </automation_approch>
-    <expected_output>The browser score from animation benchmark test should be within the expected range</expected_output>
+    <input_parameters>1. Threshold value of kraken score
+2. kraken test url</input_parameters>
+    <automation_approch>1. As a pre requisite disable all other plugins and enable webkitbrowser plugin.
+2. Load the Kraken Browser test URL
+3. Get the final score and validate it
+4. Revert all values</automation_approch>
+    <expected_output>The browser score from kraken should be in the expected range</expected_output>
     <priority>High</priority>
     <test_stub_interface>rdkv_performance</test_stub_interface>
-    <test_script>RDKV_CERT_PVS_Browser_Animation_FPS</test_script>
+    <test_script>RDKV_CERT_PVS_Browser_Kraken</test_script>
     <skipped>No</skipped>
-    <release_version>M96</release_version>
+    <release_version>M102</release_version>
     <remarks></remarks>
   </test_cases>
-  <script_tags />
 </xml>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
@@ -93,31 +92,31 @@ import BrowserPerformanceVariables
 from StabilityTestUtility import *
 
 #Test component to be tested
-obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
+obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Browser_Animation_FPS')
-
-# Execution Summary Variable
-Summ_list=[]
+obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Browser_Kraken')
 
 #The device will reboot before starting the performance testing if "pre_req_reboot_pvs" is
 #configured as "Yes".
 pre_requisite_reboot(obj,"yes")
 
+
+# Execution Summary Variable
+Summ_list=[]
+
 #Get the result of connection with test component and DUT
-result =obj.getLoadModuleResult()
-print "[LIB LOAD STATUS]  :  %s" %result
+result =obj.getLoadModuleResult();
+print "[LIB LOAD STATUS]  :  %s" %result;
 obj.setLoadModuleStatus(result)
 
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
-    browser_test_url=BrowserPerformanceVariables.animation_benchmark_test_url
+    browser_test_url=BrowserPerformanceVariables.kraken_test_url
     print "\n Check Pre conditions"
-    sub_category_failure = False
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
     status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
@@ -145,15 +144,14 @@ if expectedResult in result.upper():
             tdkTestObj.setResultStatus("SUCCESS")
             print "Current URL:",current_url
             print "\nSet test URL"
-
             tdkTestObj = obj.createTestStep('rdkservice_setValue')
             tdkTestObj.addParameter("method","WebKitBrowser.1.url")
             tdkTestObj.addParameter("value",browser_test_url)
             tdkTestObj.executeTestCase(expectedResult)
             result = tdkTestObj.getResult()
-            if expectedResult in  result:
+            if expectedResult in result:
+                tdkTestObj.setResultStatus("SUCCESS")
                 time.sleep(10)
-
                 print "\nValidate if the URL is set successfully or not"
                 tdkTestObj = obj.createTestStep('rdkservice_getValue')
                 tdkTestObj.addParameter("method","WebKitBrowser.1.url")
@@ -163,9 +161,9 @@ if expectedResult in result.upper():
                 if new_url == browser_test_url and expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS")
                     print "URL(",new_url,") is set successfully"
-
-                    time.sleep(20)
-                    tdkTestObj = obj.createTestStep('rdkservice_getBrowserScore_AnimationBenchmark')
+                    tdkTestObj.setResultStatus("SUCCESS")
+                    time.sleep(900)
+                    tdkTestObj = obj.createTestStep('rdkservice_getBrowserScore_Kraken')
                     tdkTestObj.executeTestCase(expectedResult)
                     browser_score_dict = json.loads(tdkTestObj.getResultDetails())
                     result = tdkTestObj.getResult()
@@ -173,13 +171,13 @@ if expectedResult in result.upper():
                         tdkTestObj.setResultStatus("SUCCESS");
                         browser_score = browser_score_dict["main_score"]
                         conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                        result1, animation_threshold_value = getDeviceConfigKeyValue(conf_file,"ANIMATION_BENCHMARK_THRESHOLD_VALUE")
-                        if animation_threshold_value != "":
+                        result1, kraken_threshold_value = getDeviceConfigKeyValue(conf_file,"KRAKEN_THRESHOLD_VALUE")
+                        if kraken_threshold_value != "":
                             print "\n Browser score from test: ",browser_score
                             Summ_list.append('Browser score from test: {} '.format(browser_score))
-                            print "\n Threshold value for browser score:",animation_threshold_value
-                            Summ_list.append('Threshold value for browser score: {}'.format(animation_threshold_value))
-                            if float(browser_score) > float(animation_threshold_value):
+                            print "\n Threshold value for browser score:",kraken_threshold_value
+                            Summ_list.append('Threshold value for browser score: {}'.format(kraken_threshold_value))
+                            if float(browser_score) > float(kraken_threshold_value):
                                 print "\n The browser performance score is high as expected\n"
                             else:
                                 tdkTestObj.setResultStatus("FAILURE")
@@ -214,7 +212,6 @@ if expectedResult in result.upper():
     else:
         print "Pre conditions are not met"
         obj.setLoadModuleStatus("FAILURE")
-
     getSummary(Summ_list)
     #Revert the values
     if revert=="YES":
@@ -224,3 +221,4 @@ if expectedResult in result.upper():
 else:
     obj.setLoadModuleStatus("FAILURE")
     print "Failed to load module"
+

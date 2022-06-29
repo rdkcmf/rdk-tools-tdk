@@ -160,10 +160,10 @@ if expectedResult in result.upper():
                         result2, octane_subcategory_threshold_values = getDeviceConfigKeyValue(conf_file,"OCTANE_SUBCATEGORY_THRESHOLD_VALUES")
                         if all(value != "" for value in (octane_threshold_value,octane_subcategory_threshold_values)):
                             print "\n Threshold value for browser performance main score: ",octane_threshold_value
-                            Summ_list.append('Threshold value for browser performance main score: '.format(octane_threshold_value))
+                            Summ_list.append('Threshold value for browser performance main score:{} '.format(octane_threshold_value))
+                            Summ_list.append('Browser score from test: {} '.format(browser_score))
                             if int(browser_score) > int(octane_threshold_value):
                                 print "\n The browser performance main score is high as expected \n"
-                                Summ_list.append('The browser performance main score is high as expected')
                                 subcategory_threshold_value_list = octane_subcategory_threshold_values.split(',')
                                 for index,subcategory in enumerate(browser_subcategory_list):
                                     if int(browser_score_dict[subcategory]) < int(subcategory_threshold_value_list[index]):
@@ -212,7 +212,7 @@ if expectedResult in result.upper():
     else:
         print "Pre conditions are not met"
         obj.setLoadModuleStatus("FAILURE");
-
+    getSummary(Summ_list)
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"

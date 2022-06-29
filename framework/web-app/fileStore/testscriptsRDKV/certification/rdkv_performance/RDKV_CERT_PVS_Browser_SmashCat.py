@@ -89,6 +89,7 @@ import BrowserPerformanceUtility
 from rdkv_performancelib import *
 import rdkv_performancelib
 import BrowserPerformanceVariables
+from StabilityTestUtility import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
@@ -98,6 +99,10 @@ obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
 ip = <ipaddress>
 port = <port>
 obj.configureTestCase(ip,port,'RDKV_CERT_PVS_Browser_SmashCat');
+
+#The device will reboot before starting the performance testing if "pre_req_reboot_pvs" is
+#configured as "Yes".
+pre_requisite_reboot(obj,"yes")
 
 # Execution Summary Variable
 Summ_list=[]
@@ -168,7 +173,7 @@ if expectedResult in result.upper():
                         result1,smashcat_threshold_value = getDeviceConfigKeyValue(conf_file,"SMASHCAT_THRESHOLD_VALUE")
                         if smashcat_threshold_value != "":
                             print "\n Browser score from test: ",browser_score
-                            Summ_list.append('Browser score from test:: {} '.format(browser_score))
+                            Summ_list.append('Browser score from test: {} '.format(browser_score))
                             print "\n Threshold value for browser score:",smashcat_threshold_value
                             Summ_list.append('Threshold value for browser score: {}'.format(smashcat_threshold_value))
                             if float(browser_score) > float(smashcat_threshold_value):
