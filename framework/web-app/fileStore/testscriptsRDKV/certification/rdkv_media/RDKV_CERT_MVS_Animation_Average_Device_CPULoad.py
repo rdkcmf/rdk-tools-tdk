@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>5</version>
+  <version>6</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_MVS_Animation_Average_Device_CPULoad</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -69,7 +69,7 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Lightning Animation App URL: string
 webinspect_port: string
-thunder_port :string
+devicePort:int
 expected_fps_threshold:int</input_parameters>
     <automation_approch>1. As pre requisite, launch LightningApp  webkit instance via RDKShell, open websocket conntion to webinspect page
 2. Store the details of other launched apps. Move the LightningApp  webkit instance to front, if its z-order is low.
@@ -91,6 +91,7 @@ expected_fps_threshold:int</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import rdkv_medialib
 from rdkv_medialib import *
 import MediaValidationVariables
 from MediaValidationUtility import *
@@ -132,7 +133,7 @@ if expectedResult in result.upper():
         setOperation("stop","60")
         operations = getOperations()
         # Setting Animation test app URL arguments
-        setURLArgument("port",MediaValidationVariables.thunder_port)
+        setURLArgument("port",rdkv_medialib.devicePort)
         setURLArgument("operations",operations)
         setURLArgument("autotest","true")
         appArguments = getURLArguments()

@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>2</version>
+  <version>3</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_MVS_Video_Play_MP4_50FPS</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -70,6 +70,7 @@
     <input_parameters>Lightning player App URL: string
 webkit_instance:string
 webinspect_port: string
+devicePort:int
 video_src_url_mp4_50fps: string
 close_interval: int
 </input_parameters>
@@ -93,6 +94,7 @@ close_interval: int
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import rdkv_medialib
 from rdkv_medialib import *
 import MediaValidationVariables
 from MediaValidationUtility import *
@@ -148,7 +150,7 @@ if expectedResult in result.upper():
         # Setting VideoPlayer test app URL arguments
         minfps = int(int(expected_fps) - int(threshold))
         setURLArgument("url",videoURL)
-        setURLArgument("options","collectfps("+webkit_instance+"),deviceport("+MediaValidationVariables.thunder_port+"),"+"expectedfps("+str(minfps)+")")
+        setURLArgument("options","collectfps("+webkit_instance+"),deviceport("+str(rdkv_medialib.devicePort)+"),"+"expectedfps("+str(minfps)+")")
         setURLArgument("operations",operations)
         setURLArgument("autotest","true")
         setURLArgument("type","mp4")

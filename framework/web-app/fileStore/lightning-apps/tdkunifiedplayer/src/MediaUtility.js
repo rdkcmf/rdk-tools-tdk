@@ -181,7 +181,8 @@
 
   // Method to send the logs to TM via REST API
   export function sendLog(msg){
-    var tmURL    = window.location.href.split("fileStore")[0];
+    //var tmURL    = window.location.href.split("fileStore")[0];
+    const tmURL  = GetURLParameter('tmUrl')
     let restURL  = tmURL  + 'execution/createFileAndWrite?'
     const execID = GetURLParameter('execID')
     const devID  = GetURLParameter('execDevId')

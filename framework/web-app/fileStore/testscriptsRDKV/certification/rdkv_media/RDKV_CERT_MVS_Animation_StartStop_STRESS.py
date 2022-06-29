@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>6</version>
+  <version>7</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_MVS_Animation_StartStop_STRESS</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -69,7 +69,7 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Lightning Animation App URL: string
 webinspect_port: string
-thunder_port :string
+devicePort:int
 interval: int
 stress_repeat_count: int</input_parameters>
     <automation_approch>1. As pre requisite, launch LightningApp  webkit instance via RDKShell, open websocket conntion to webinspect page
@@ -92,6 +92,7 @@ stress_repeat_count: int</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import rdkv_medialib
 from rdkv_medialib import *
 import MediaValidationVariables
 from MediaValidationUtility import *
@@ -135,7 +136,7 @@ if expectedResult in result.upper():
         setOperation("repeat",MediaValidationVariables.repeat_count_stress)
         operations = getOperations()
         # Setting Animation test app URL arguments
-        setURLArgument("port",MediaValidationVariables.thunder_port)
+        setURLArgument("port",rdkv_medialib.devicePort)
         setURLArgument("operations",operations)
         setURLArgument("autotest","true")
         appArguments = getURLArguments()

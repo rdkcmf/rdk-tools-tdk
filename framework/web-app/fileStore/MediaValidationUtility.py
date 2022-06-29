@@ -904,6 +904,7 @@ def setMediaTestPreRequisites(obj,webkit_browser_instance,get_proc_info=True):
                               else:
                                   pre_requisite_status = "SUCCESS"
                           elif webkit_socket_conn and logging_method == "REST_API":
+                              setURLArgument("tmUrl",str(obj.url)+"/")
                               print "App logs are monitored and collected using REST API"
                               pre_requisite_status = "SUCCESS"
                     else:

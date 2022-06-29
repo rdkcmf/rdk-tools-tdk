@@ -52,10 +52,6 @@ webinspect_port_html = "10001"
 webinspect_port_lightning = "10002"
 
 
-#Port used by ThunderJS in lightning app,port must be 9998 for rdkservice builds
-thunder_port=""
-
-
 #************************************************************************
 #                  MVS TEST APPS URLs CONFIGURATIONS
 #************************************************************************

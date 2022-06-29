@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>5</version>
+  <version>6</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_MVS_Animation_Texts_Average_FPS</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -69,7 +69,7 @@
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Lightning Objects Animation App URL: string
 webinspect_port: string
-thunder_port :string
+devicePort:int
 expected_fps:int
 threshold:int
 object_count:int
@@ -94,6 +94,7 @@ animation_duration:int</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import rdkv_medialib
 from rdkv_medialib import *
 import MediaValidationVariables
 from MediaValidationUtility import *
@@ -142,7 +143,7 @@ if expectedResult in result.upper():
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_objects_animation_test_app_url
         # Setting Animation test app URL arguments
-        setURLArgument("port",MediaValidationVariables.thunder_port)
+        setURLArgument("port",rdkv_medialib.devicePort)
         setURLArgument("object","Text")
         setURLArgument("text","demo")
         setURLArgument("showfps","true")

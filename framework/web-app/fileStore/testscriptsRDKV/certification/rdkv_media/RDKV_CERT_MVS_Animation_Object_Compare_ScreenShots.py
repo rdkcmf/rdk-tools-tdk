@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>3</version>
+  <version>4</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_MVS_Animation_Object_Compare_ScreenShots</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -64,7 +64,7 @@
 2.Lightning Animation app should be hosted</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
     <input_parameters>Lightning Animation App URL: string
-thunder_port :string
+devicePort:int
 animation_duration:int
 image_upload_dir:string
 sc_upload_url:string</input_parameters>
@@ -89,6 +89,7 @@ sc_upload_url:string</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
 import tdklib;
+import rdkv_medialib
 from rdkv_medialib import *
 from rdkv_performancelib import *
 from rdkv_stabilitylib import *
@@ -171,7 +172,7 @@ if expectedResult in result.upper():
         setDeviceConfigFile(conf_file)
         appURL    = MediaValidationVariables.lightning_objects_animation_test_app_url
         # Setting Animation test app URL arguments
-        setURLArgument("port",MediaValidationVariables.thunder_port)
+        setURLArgument("port",rdkv_medialib.devicePort)
         setURLArgument("object","Rect")
         setURLArgument("showfps","false")
         setURLArgument("count","1")
