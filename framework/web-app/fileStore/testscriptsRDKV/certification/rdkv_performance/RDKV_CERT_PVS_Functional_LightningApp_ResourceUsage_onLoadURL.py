@@ -71,6 +71,7 @@ import PerformanceTestVariables
 import IPChangeDetectionVariables
 from StabilityTestUtility import *
 from web_socket_util import *
+import rdkv_performancelib
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
@@ -95,7 +96,6 @@ expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     event_listener = None
     lightningapp_test_url = IPChangeDetectionVariables.ip_change_app_url
-    thunder_port = PerformanceTestVariables.thunder_port
     print "\n Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
@@ -128,6 +128,7 @@ if expectedResult in result.upper():
             if lightningapp_status == 'resumed' and expectedResult in result:
                 print "\n LightningApp resumed successfully"
                 tdkTestObj.setResultStatus("SUCCESS")
+                thunder_port = rdkv_performancelib.devicePort
                 event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "LightningApp.1.register","params": {"event": "urlchange", "id": "client.events.1" }}'],"/jsonrpc",False)
                 time.sleep(10)
                 print "\n Set test URL"

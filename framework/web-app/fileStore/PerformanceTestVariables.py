@@ -29,9 +29,6 @@ channel_change_url = "http://TM-IP/rdk-test-tool/fileStore/lightning-apps/Channe
 #The url used for testing cobalt
 cobalt_test_url = ""
 
-#Thunder port for listening to events
-thunder_port = "9998"
-
 # webkit_instance can be "WebKitBrowser" or "LightningApp" or "HtmlApp" plugin
 webkit_instance = "LightningApp"
 

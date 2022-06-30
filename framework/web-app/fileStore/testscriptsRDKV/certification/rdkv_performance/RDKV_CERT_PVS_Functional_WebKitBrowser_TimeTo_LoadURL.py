@@ -71,6 +71,7 @@ import PerformanceTestVariables
 from datetime import datetime
 import json
 from web_socket_util import *
+import rdkv_performancelib
 from rdkv_performancelib import *
 from StabilityTestUtility import *
 
@@ -98,7 +99,6 @@ expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     event_listener = None
     browser_test_url = obj.url+'/fileStore/lightning-apps/KeyStressTest.html' 
-    thunder_port = PerformanceTestVariables.thunder_port
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
@@ -114,6 +114,7 @@ if expectedResult in result.upper():
             else:
                 status = "FAILURE"
     if status == "SUCCESS" and browser_test_url != "":
+        thunder_port = rdkv_performancelib.devicePort
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "WebKitBrowser.1.register","params": {"event": "urlchange", "id": "client.events.1" }}'],"/jsonrpc",False)
         time.sleep(10)
         print "\nPre conditions for the test are set successfully";

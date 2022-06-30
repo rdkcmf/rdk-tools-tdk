@@ -75,6 +75,7 @@ import tdklib
 import PerformanceTestVariables
 from StabilityTestUtility import *
 from web_socket_util import *
+import rdkv_performancelib
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
@@ -99,7 +100,6 @@ if expectedResult in result.upper():
     status = "SUCCESS"
     revert="NO"
     htmlapp_test_url = PerformanceTestVariables.html_page_url
-    thunder_port = PerformanceTestVariables.thunder_port
     plugins_list = ["WebKitBrowser","Cobalt","HtmlApp"]
     print "\n Check Pre conditions"
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
@@ -132,6 +132,7 @@ if expectedResult in result.upper():
                     tdkTestObj.setResultStatus("SUCCESS")
                     print "\n {} is resumed successfully".format(plugin)
                     if count == 1:
+                        thunder_port = rdkv_performancelib.devicePort
                         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "'+plugin+'.1.register","params": {"event": "urlchange", "id": "client.events.1" }}'],"/jsonrpc",False)
                         time.sleep(15)
                     print "\n Set test URL"

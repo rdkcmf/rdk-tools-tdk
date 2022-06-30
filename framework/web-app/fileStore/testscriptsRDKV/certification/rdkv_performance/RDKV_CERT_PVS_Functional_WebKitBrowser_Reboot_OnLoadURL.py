@@ -71,6 +71,7 @@
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib 
+import rdkv_performancelib
 from rdkv_performancelib import *
 from datetime import datetime
 from StabilityTestUtility import *
@@ -98,7 +99,6 @@ obj.setLoadModuleStatus(result)
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     event_listener = None
-    thunder_port = PerformanceTestVariables.thunder_port
     browser_test_url = PerformanceTestVariables.browser_test_url
     print "\n Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
@@ -138,6 +138,7 @@ if expectedResult in result.upper():
                     tdkTestObj.setResultStatus("SUCCESS")
                     print "\n {} is resumed successfully".format(plugin)
                     if count == 1:
+                        thunder_port = rdkv_performancelib.devicePort
                         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "'+plugin+'.1.register","params": {"event": "urlchange", "id": "client.events.1" }}'],"/jsonrpc",False)
                         time.sleep(15)
                     print "\n Set test URL"

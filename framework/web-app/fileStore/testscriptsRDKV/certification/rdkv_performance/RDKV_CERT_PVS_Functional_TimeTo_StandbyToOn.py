@@ -72,6 +72,7 @@ The time should be within the expected range.</expected_output>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
+import rdkv_performancelib
 from rdkv_performancelib import *
 from datetime import datetime
 from StabilityTestUtility import *
@@ -104,7 +105,6 @@ if expectedResult in result.upper():
     event_listener = None
     continue_count = 0
     power_state = ""
-    thunder_port = PerformanceTestVariables.thunder_port
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
     plugins_list = ["org.rdk.System"]
@@ -118,6 +118,7 @@ if expectedResult in result.upper():
         if plugins_status_dict != plugin_status_needed:
             status = "FAILURE"
     if status == "SUCCESS":
+        thunder_port = rdkv_performancelib.devicePort
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.System.1.register","params": {"event": "onSystemPowerStateChanged", "id": "client.events.1" }}'],"/jsonrpc",False)
         time.sleep(10)
         print "\nPre conditions for the test are set successfully"

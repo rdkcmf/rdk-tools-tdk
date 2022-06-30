@@ -71,6 +71,7 @@ import tdklib;
 import PerformanceTestVariables
 from StabilityTestUtility import *
 from web_socket_util import *
+import rdkv_performancelib
 from rdkv_performancelib import *
 
 #Test component to be tested
@@ -97,7 +98,6 @@ expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     print "Check Pre conditions"
     event_listener = None
-    thunder_port = PerformanceTestVariables.thunder_port
     rebootwaitTime = 160
     status = "SUCCESS"
     revert = "NO"
@@ -137,6 +137,7 @@ if expectedResult in result.upper():
                             status = "FAILURE"
                     if status == "SUCCESS":
                         plugin = "WebKitBrowser"
+                        thunder_port = rdkv_performancelib.devicePort
                         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 6,"method": "org.rdk.RDKShell.1.register","params": {"event": "onLaunched", "id": "client.events.1" }}'],"/jsonrpc",False)
                         time.sleep(10)
                         launch_status,launch_start_time = launch_plugin(obj,plugin)

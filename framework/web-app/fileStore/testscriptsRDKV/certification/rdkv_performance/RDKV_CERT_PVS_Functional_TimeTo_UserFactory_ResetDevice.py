@@ -75,6 +75,7 @@ from datetime import datetime
 from web_socket_util import *
 import PerformanceTestVariables
 import ast
+import rdkv_performancelib
 from rdkv_performancelib import *
 
 #Test component to be tested
@@ -105,7 +106,6 @@ if expectedResult in result.upper():
     revert="NO"
     event_listener = None
     reset_done_time = ""
-    thunder_port = PerformanceTestVariables.thunder_port
     plugins_list = ["org.rdk.Warehouse","org.rdk.System"]
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
     status = "SUCCESS"
@@ -128,6 +128,7 @@ if expectedResult in result.upper():
     ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
     if status == "SUCCESS" and ssh_param_dict != {}:
         tdkTestObj.setResultStatus("SUCCESS")
+        thunder_port = rdkv_performancelib.devicePort
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.Warehouse.1.register","params": {"event": "resetDone", "id": "client.events.1" }}'],"/jsonrpc",False)
         time.sleep(10)
         #Save a file

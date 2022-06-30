@@ -73,6 +73,7 @@ Threshold value of resuming time,</input_parameters>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib;
+import rdkv_performancelib
 from rdkv_performancelib import *
 from datetime import datetime
 from StabilityTestUtility import *
@@ -105,7 +106,6 @@ expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     print "Check Pre conditions"
     event_listener = None
-    thunder_port = PerformanceTestVariables.thunder_port
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
     plugins_list = ["Cobalt"]
@@ -120,6 +120,7 @@ if expectedResult in result.upper():
             status = "FAILURE"
     if status == "SUCCESS":
         time.sleep(10)
+        thunder_port = rdkv_performancelib.devicePort
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.RDKShell.1.register","params": {"event": "onSuspended", "id": "client.events.1" }}','{"jsonrpc": "2.0","id": 6,"method": "org.rdk.RDKShell.1.register","params": {"event": "onLaunched", "id": "client.events.1" }}'],"/jsonrpc",False)
         time.sleep(30)
         print "\nPre conditions for the test are set successfully"

@@ -94,6 +94,7 @@ from StabilityTestUtility import *
 import StabilityTestVariables
 from web_socket_util import *
 import PerformanceTestVariables
+import rdkv_performancelib
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_stability","1",standAlone=True);
@@ -124,7 +125,6 @@ pre_condition_status = check_device_state(obj)
 
 expectedResult = "SUCCESS"
 if expectedResult in (result.upper() and pre_condition_status):
-    thunder_port = PerformanceTestVariables.thunder_port
     cobalt_test_url = StabilityTestVariables.cobalt_test_url;
     print "Check Pre conditions"
     event_listener = None
@@ -149,6 +149,7 @@ if expectedResult in (result.upper() and pre_condition_status):
             status = "FAILURE"
     validation_dict = get_validation_params(obj)
     if status == "SUCCESS" and validation_dict != {} and cobalt_test_url != "":
+        thunder_port = rdkv_performancelib.devicePort
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.System.1.register","params": {"event": "onSystemPowerStateChanged", "id": "client.events.1" }}'],"/jsonrpc",False)
         time.sleep(5)
         print "\nPre conditions for the test are set successfully \n"

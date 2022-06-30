@@ -80,6 +80,7 @@ from StabilityTestUtility import *
 import PerformanceTestVariables
 from web_socket_util import *
 import json
+import rdkv_performancelib
 from rdkv_performancelib import *
 
 #Test component to be tested
@@ -108,7 +109,6 @@ if expectedResult in result.upper():
     continue_count = 0
     event_listener = None
     power_state = ""
-    thunder_port = PerformanceTestVariables.thunder_port
     cobalt_test_url = PerformanceTestVariables.cobalt_test_url;
     if cobalt_test_url == "":
         print "\n Please configure the cobalt_test_url value\n"
@@ -131,6 +131,7 @@ if expectedResult in result.upper():
     result = tdkTestObj.getResult()
     ssh_param_dict = json.loads(tdkTestObj.getResultDetails())
     if status == "SUCCESS" and expectedResult in result and ssh_param_dict != {} and cobalt_test_url != "":
+        thunder_port = rdkv_performancelib.devicePort
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.System.1.register","params": {"event": "onSystemPowerStateChanged", "id": "client.events.1" }}'],"/jsonrpc",False)
         time.sleep(10)
         print "\nPre conditions for the test are set successfully"

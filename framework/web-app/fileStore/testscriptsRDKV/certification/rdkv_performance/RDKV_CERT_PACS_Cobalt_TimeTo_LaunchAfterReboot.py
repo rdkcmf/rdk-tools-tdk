@@ -71,6 +71,7 @@ from StabilityTestUtility import *
 from PerformanceTestVariables import *
 from web_socket_util import *
 from rdkv_performancelib import *
+import rdkv_performancelib
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True)
@@ -135,6 +136,7 @@ if expectedResult in result.upper():
                         if new_plugins_status_dict != plugin_status_needed:
                             status = "FAILURE"
                     if status == "SUCCESS":
+                        thunder_port = rdkv_performancelib.devicePort
                         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 6,"method": "org.rdk.RDKShell.1.register","params": {"event": "onLaunched", "id": "client.events.1" }}'],"/jsonrpc",False)
                         time.sleep(10)
                         launch_status,launch_start_time = launch_plugin(obj,"Cobalt")

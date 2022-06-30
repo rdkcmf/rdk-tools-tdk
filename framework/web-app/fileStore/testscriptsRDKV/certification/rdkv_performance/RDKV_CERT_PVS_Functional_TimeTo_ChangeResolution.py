@@ -72,6 +72,7 @@ import json
 import ast
 from StabilityTestUtility import *
 from web_socket_util import *
+import rdkv_performancelib
 from rdkv_performancelib import *
 
 #Test component to be tested
@@ -102,7 +103,6 @@ if expectedResult in result.upper():
     params = {}
     event_listener = None
     plugins_list = ["org.rdk.DisplaySettings"]
-    thunder_port = PerformanceTestVariables.thunder_port
     print "\n Check Pre conditions"
     curr_plugins_status_dict = get_plugins_status(obj,plugins_list)
     time.sleep(10)
@@ -159,6 +159,7 @@ if expectedResult in result.upper():
                     print "\n Supported resolutions for {} display: {}".format(connected_displays[0],supported_resolutions)
                     if len(supported_resolutions) > 1:
                         tdkTestObj.setResultStatus("SUCCESS")
+                        thunder_port = rdkv_performancelib.devicePort
                         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 6,"method": "org.rdk.DisplaySettings.1.register","params": {"event": "resolutionChanged", "id": "client.events.1" }}'],"/jsonrpc",False)
                         time.sleep(10)
                         supported_resolutions.remove(initial_resolution)

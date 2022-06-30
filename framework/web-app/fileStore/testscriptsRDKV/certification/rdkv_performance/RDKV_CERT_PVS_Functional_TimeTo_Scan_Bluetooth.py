@@ -73,6 +73,7 @@
 import tdklib
 from tdkvRDKServicesSupportlib import executeBluetoothCtl
 from StabilityTestUtility import *
+import rdkv_performancelib
 from rdkv_performancelib import *
 from PerformanceTestVariables import *
 from web_socket_util import *
@@ -119,6 +120,7 @@ if expectedResult in result.upper():
     conf_file,conf_status = getConfigFileName(obj.realpath)
     bluetooth_emu_status = executeBluetoothCtl(conf_file,bluetooth_commands)
     if all(status == "SUCCESS" for status in ( plugin_status,conf_status,bluetooth_emu_status)):
+        thunder_port = rdkv_performancelib.devicePort
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 6,"method": "org.rdk.Bluetooth.1.register","params": {"event": "onDiscoveredDevice", "id": "client.events.1" }}'],"/jsonrpc",False)
         time.sleep(10)
         tdkTestObj = obj.createTestStep('rdkservice_getValue')

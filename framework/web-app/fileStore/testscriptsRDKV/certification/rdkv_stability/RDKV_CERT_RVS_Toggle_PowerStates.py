@@ -88,7 +88,8 @@ Outside loop
 </xml>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
-import tdklib; 
+import tdklib;
+import rdkv_performancelib
 import StabilityTestVariables
 from StabilityTestUtility import *
 from rdkv_performancelib import *
@@ -127,7 +128,6 @@ expectedResult = "SUCCESS"
 if expectedResult in (result.upper() and pre_condition_status):
     print "Check Pre conditions"
     event_listener = None
-    thunder_port = PerformanceTestVariables.thunder_port
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
     plugins_list = ["org.rdk.System","DeviceInfo"]
@@ -146,6 +146,7 @@ if expectedResult in (result.upper() and pre_condition_status):
         if plugins_status_dict != plugin_status_needed:
             status = "FAILURE"
     if status == "SUCCESS":
+        thunder_port = rdkv_performancelib.devicePort
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.System.1.register","params": {"event": "onSystemPowerStateChanged", "id": "client.events.1" }}'],"/jsonrpc",False)
         time.sleep(5)
         print "\nPre conditions for the test are set successfully"

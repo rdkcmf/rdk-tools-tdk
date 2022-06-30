@@ -74,6 +74,7 @@ Verify the status, store the current time as start_activate and activate the plu
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
+import rdkv_performancelib
 from rdkv_performancelib import *
 from datetime import datetime
 from StabilityTestUtility import *
@@ -103,7 +104,6 @@ obj.setLoadModuleStatus(result)
 expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     event_listener = None
-    thunder_port = PerformanceTestVariables.thunder_port
     print "Check Pre conditions"
     #No need to revert any values if the pre conditions are already set.
     revert="NO"
@@ -124,6 +124,7 @@ if expectedResult in result.upper():
             print "\n Error while deactivating WebKitBrowser"
             status = "FAILURE"
     if status == "SUCCESS" :
+        thunder_port = rdkv_performancelib.devicePort
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 5,"method": "org.rdk.RDKShell.1.register","params": {"event": "onLaunched", "id": "client.events.1" }}','{"jsonrpc": "2.0","id": 6,"method": "org.rdk.RDKShell.1.register","params": {"event": "onDestroyed", "id": "client.events.1" }}'],"/jsonrpc",False)
         time.sleep(30)
         print "\nPre conditions for the test are set successfully"

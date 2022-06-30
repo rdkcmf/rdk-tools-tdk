@@ -70,6 +70,7 @@ import tdklib;
 from PerformanceTestVariables import *
 from StabilityTestUtility import *
 from web_socket_util import *
+import rdkv_performancelib
 from rdkv_performancelib import *
 from datetime import datetime
 
@@ -117,6 +118,7 @@ if expectedResult in result.upper():
         print "\n Please configure the WIFI_SSID_NAME value in device config file !!"
         status = "FAILURE"
     if status == "SUCCESS":
+        thunder_port = rdkv_performancelib.devicePort
         event_listener = createEventListener(ip,thunder_port,['{"jsonrpc": "2.0","id": 6,"method": "org.rdk.Wifi.1.register","params": {"event": "onAvailableSSIDs", "id": "client.events.1" }}'],"/jsonrpc",False)
         time.sleep(10)
         tdkTestObj = obj.createTestStep('rdkservice_getSSHParams')
