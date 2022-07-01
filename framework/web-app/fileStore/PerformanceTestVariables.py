@@ -58,3 +58,5 @@ excluded_process_list = ['subtec_s1']
 
 ping_test_destination = "google.com"
 
+#URL used to test encrypted videoplayback
+encrypt_test_url = "" 

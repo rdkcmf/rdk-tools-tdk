@@ -29,6 +29,7 @@ motionmark_test_url = "https://browserbench.org/MotionMark1.2/"
 animation_benchmark_test_url = "https://themaninblue.com/experiment/AnimationBenchmark/canvas/"
 speedometer_test_url = "https://browserbench.org/Speedometer2.0/"
 smashcat_test_url = "http://www.smashcat.org/av/canvas_test/"
+kraken_test_url = "https://mozilla.github.io/krakenbenchmark.mozilla.org/kraken-1.1/driver.html"
 #https://askubuntu.com/questions/432255/what-is-the-display-environment-variable
 display_variable=":0"
 #Give the path where the chromedriver executable is available

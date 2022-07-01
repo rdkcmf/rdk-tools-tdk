@@ -220,4 +220,7 @@ encrypt_test_url = ""
 encrypt_test_duration = 720
 
 #Video duration of the test video in minutes
-encrypt_video_duration = 
+encrypt_video_duration = 150
+
+#time in minutes till the test should be performed
+encrypt_trickplay_duration = 1440

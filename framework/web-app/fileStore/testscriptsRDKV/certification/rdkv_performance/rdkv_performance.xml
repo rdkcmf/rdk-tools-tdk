@@ -137,8 +137,12 @@
         <function>rdkservice_getBrowserScore_Speedometer</function>
 	<parameters/>
       </primitiveTest>
-    <primitiveTest name="rdkservice_getBrowserScore_Smashcat" id="" version="1">
+      <primitiveTest name="rdkservice_getBrowserScore_Smashcat" id="" version="1">
         <function>rdkservice_getBrowserScore_Smashcat</function>
+        <parameters/>
+      </primitiveTest>
+      <primitiveTest name="rdkservice_getBrowserScore_Kraken" id="" version="1">
+        <function>rdkservice_getBrowserScore_Kraken</function>
         <parameters/>
       </primitiveTest>
     </primitiveTests>
