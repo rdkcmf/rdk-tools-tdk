@@ -223,6 +223,25 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     interface_names.append(interface.get("interface"))
                 interface_names = [ str(name) for name in interface_names if str(name).strip() ]
                 info["interface_names"] = interface_names
+            elif arg[0] == "check_interfaces_state":
+                interface_names = []
+                for interface in interfaces_info:
+                    interface_names.append(interface.get("interface"))
+                if "WIFI" and "ETHERNET" in interface_names:
+                    info["Test_Step_Status"] = "SUCCESS"
+                    for interface in interfaces_info:
+                      if interface.get("interface") == "ETHERNET":
+                          if str(interface.get("connected")).lower() == expectedValues[0]:
+                              info["Test_Step_Status"] = "SUCCESS"
+                          else:
+                              info["Test_Step_Status"] = "FAILURE"
+                      elif interface.get("interface") == "WIFI":
+                          if str(interface.get("connected")).lower() == expectedValues[1]:
+                              info["Test_Step_Status"] = "SUCCESS"
+                          else:
+                              info["Test_Step_Status"] = "FAILURE"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "network_get_default_interface":
             default_interface = result.get("interface")
@@ -346,6 +365,14 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "network_validate_public_ip_address":
+           success = str(result.get("success")).lower() == "true"
+           info["public_ip"] = result.get("public_ip")
+           if str(result.get("public_ip")).lower() == str(expectedValues[0]).lower():
+               info["Test_Step_Status"] = "SUCCESS"
+           else:
+               info["Test_Step_Status"] = "FAILURE"
 
         # Front Panel Response result parser steps
         elif tag == "frontpanel_get_led_info":
@@ -826,6 +853,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["Test_Step_Status"] = "FAILURE"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+        elif tag == "system_get_network_standby_mode_status":
+            info["nwStandby"] = result.get("nwStandby")
+            success = str(result.get("success")).lower() == "true"
+            if success and str(result.get("nwStandby")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
         # User Preferces Plugin Response result parser steps
         elif tag == "userpreferences_get_ui_language":
             info = checkAndGetAllResultInfo(result,result.get("success"))
@@ -878,8 +912,8 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
         elif tag == "rdkshell_check_for_resolution_set":
             w = int(result.get("w"))
             h = int(result.get("h"))
-            expectedw = int(expectedValues[0])
-            expectedh = int(expectedValues[1])
+            expectedw = int(expectedValues[1])
+            expectedh = int(expectedValues[0])
             if w == expectedw and h == expectedh:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
@@ -3060,16 +3094,24 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["PUBLIC_IP"] = testStepResults[0].get("PUBLIC_IP")
             else:
                 info["value"] = testStepResults[0].get("details")
-
+        
         elif tag == "system_get_formatted_time_zones":
             timeZone = []
             testStepResults = testStepResults[0].values()[0]
             zoneInfo = testStepResults[0].get("zoneinfo")
-            for key,value in zoneInfo.items():
-               for key_item in value:
-                  timeZone.append(key+"/"+key_item)
+            key_list=list(zoneInfo.keys())
+            timeZone.append(key_list[0])
+            timeZone.append(key_list[len(key_list)/2])
+            timeZone.append(key_list[len(key_list)-1])
             info["timeZone"] = ",".join(timeZone)
 
+        elif tag == "system_toggle_network_standby_mode_status":
+            testStepResults = testStepResults[0].values()[0]
+            nwStandby = testStepResults[0].get("nwStandby")
+            if str(nwStandby).lower() == "true":
+                info["nwStandby"] = False
+            else:
+                info["nwStandby"] = True
         # user Preferences result parser steps
         elif tag == "userpreferences_switch_ui_language":
             testStepResults = testStepResults[0].values()[0]
@@ -3162,13 +3204,22 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["enable"] = False
             else:
                 info["enable"] = True
-
+        
         elif tag == "rdkshell_set_virtual_resolution":
             testStepResults = testStepResults[0].values()[0]
             width = testStepResults[0].get("width")
             height = testStepResults[0].get("height")
-            info["width"] = width
-            info["height"] = height
+            if len(arg) and arg[0] == "set_screen_resolution":
+                info["w"] = width
+                info["h"] = height
+            else:
+                info["width"] = width
+                info["height"] = height
+
+        elif tag == "rdkshell_get_image_path":
+            testStepResults = testStepResults[0].values()[0]
+            imagePath = testStepResults[0].get("imagepath")
+            info["path"] = imagePath
 
         #Display info plugin result parser steps
         elif tag == "display_info_get_supported_resolution_list":
@@ -4056,11 +4107,21 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,execInfo)
                     output = str(output).split()
                     output = output[1]
                     info["defaultMode"] = int(output)
-       
+        
         elif tag == "RDKShell_Get_Width_And_Height":
-            mapping_details = arg[len(arg)-1].split(":")
+            mapping_details = arg[len(arg)/2].split(":")
             info["width"] = mapping_details[1].split('|')[0].strip('[]')
-            info["height"] = mapping_details[1].split('|')[1].strip('[]')
+            info["height"] = mapping_details[1].split('|')[1].strip('[]')       
+
+        elif tag == "Get_Image_Name":
+            command = 'find / -name *.png'
+            output = executeCommand(execInfo, command)
+            output = str(output).split("\n")
+            for lines in output:
+                if command not in lines and "no such file or directory" not in lines.lower():
+                    imagePath = lines
+                    break;
+            info["imagepath"] = imagePath
 
         elif tag == "Check_Environment_Variable_In_Service_File":
             command = 'grep -q '+str(expectedValues[0])+' /lib/systemd/system/wpeframework.service && echo 1 || echo 0'

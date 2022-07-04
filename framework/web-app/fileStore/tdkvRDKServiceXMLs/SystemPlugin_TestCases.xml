@@ -43,6 +43,7 @@
             <event pluginName="System" eventName="Event_SystemMode_Changed" />
 	    <event pluginName="System" eventName="Event_Temperature_Threshold_Changed" />
 	    <event pluginName="System" eventName="Event_Reboot_Request" />
+            <event pluginName="System" eventName="Event_On_Network_Standby_Mode_Changed" />
           </prerequisite>
 
         </pluginPreRequisite>
@@ -852,4 +853,28 @@
               </subtestStep>
             </testStep>
        </testCase>
+
+       <testCase testCaseId="SYS_49" testCaseName="System_Toggle_Network_Standby_Mode_Status" desc="Toggle Network Standby Mode Status" >
+           <testCaseInfo testCaseType="setandget" revert="true" />
+            <testStep testStepId="1" name="Get_Network_Standby_Mode" method="Get_Network_Standby_Mode" saveResult="true" revertGet="yes">
+                <resultGeneration useMethodTag="system_get_network_standby_mode_status" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Network_Standby_Mode" method="Set_Network_Standby_Mode" revertSet="yes">
+                <params>
+                  <param tag="nwStandby" usePreviousResult="true" Id="1" useMethodTag="system_toggle_network_standby_mode_status" revertParam="yes" />
+                </params>
+                <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="3" name="Get_Network_Standby_Mode" method="Get_Network_Standby_Mode" revertFlag="yes">
+                <resultGeneration useMethodTag="system_get_network_standby_mode_status">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_toggle_network_standby_mode_status" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Check_Network_Standby_Mode_Changed_Event" event="Event_On_Network_Standby_Mode_Changed" action="eventListener" delay="3"  >
+                <resultGeneration useMethodTag="system_check_network_standby_mode_changed_event">
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_toggle_network_standby_mode_status" />
+                </resultGeneration>
+            </testStep>
+       </testCase>
+
 </testPlugin>

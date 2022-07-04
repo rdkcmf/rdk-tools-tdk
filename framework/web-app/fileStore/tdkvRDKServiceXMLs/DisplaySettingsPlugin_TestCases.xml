@@ -62,6 +62,7 @@
           <prerequisite requisiteId="3" requisiteName="Register_And_Listen_Events" type="eventRegister" >
             <event pluginName="DisplaySettings" eventName="Event_Zoom_Settings_Updated" />
 	    <event pluginName="DisplaySettings" eventName="Event_Resolution_Changed" />
+            <event pluginName="DisplaySettings" eventName="Event_Resolution_PreChange" />
           </prerequisite>
         </pluginPreRequisite>
        
@@ -3729,6 +3730,79 @@
                   </resultGeneration>
                </subtestStep>
             </testStep>
-        </testCase-->        
+        </testCase-->       
+        <testCase testCaseId="DS_74" testCaseName= "Check_Resolution_PreChange_Event" desc="Set and get all the supported resolution by both TV and STB, also checks for the resolution prechanged event">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true">
+                <resultGeneration useMethodTag="display_connected_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_Resolutions" method="Get_Supported_Resolutions" saveResult="true">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="display_supported_resolutions"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Current_Resolution"  method="Get_Current_Resolution" saveResult="true" revertGet="yes">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="check_current_resolution"/>
+            </testStep>
+            <testStep testStepId="4" name="Set_Resolution" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Resolution" method="Set_Current_Resolution" revertSet="yes">
+                  <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                  <param tag="resolution" usePreviousResult="true" Id="2" iteration="true" useMethodTag="get_supported_resolutions" revertParam="yes"/>
+                  <param tag="persist" value="true"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Current_Resolution"  method="Get_Current_Resolution" revertFlag="yes" delay="3" >
+                  <resultGeneration useMethodTag="check_current_resolution" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Check_Resolution_PreChange_Event" event="Event_Resolution_PreChange" action="eventListener" delay="2" >
+                  <resultGeneration useMethodTag="displaysettings_check_resolution_prechange_event" >
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="DS_75" testCaseName= "Check_Resolution_Persisted_For_30Seconds_After_Reboot" desc="Checks whether resolution persisted for 30 seconds after reboot if persist set as true">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true">
+                <resultGeneration useMethodTag="display_connected_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_Resolutions" method="Get_Supported_Resolutions" saveResult="true">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="display_supported_resolutions"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Current_Resolution"  method="Get_Current_Resolution" saveResult="true" revertGet="yes">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="check_current_resolution"/>
+            </testStep>
+            <testStep testStepId="4" name="Set_Resolution" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Resolution" method="Set_Current_Resolution" revertSet="yes">
+                  <params>
+                    <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                    <param tag="resolution" usePreviousResult="true" Id="2" iteration="true" useMethodTag="get_selected_resolutions" revertParam="yes"/>
+                    <param tag="persist" value="true"/>
+                  </params>
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="System_reboot" method="Reboot" rebootStep="yes" pluginName="System">
+                  <resultGeneration useMethodTag="system_check_set_operation"  />
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Get_Current_Resolution"  method="Get_Current_Resolution" revertFlag="yes" delay="30" >
+                  <resultGeneration useMethodTag="check_current_resolution" arguments="check_expected_resolution">
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase> 
 </testPlugin>  
 

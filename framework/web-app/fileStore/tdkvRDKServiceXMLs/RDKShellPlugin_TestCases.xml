@@ -230,19 +230,24 @@
             <testStep testStepId="1" name="getscreenresolution" method="GetScreenResolution" saveResult="true" revertGet="yes">
               <resultGeneration useMethodTag="rdkshell_check_for_results"/>
             </testStep>
-            <testStep testStepId="2" name="setscreenresolution" method="SetScreenResolution" revertSet="yes">
+            <testStep testStepId="2" name="Get_Width_And_Height" action="externalFnCall" saveResult="true" >
+              <resultGeneration useMethodTag="RDKShell_Get_Width_And_Height" >
+                 <arguments useConfigFile="true" key="RESOLUTION_WIDTH_HEIGHT_MAPPING"/>
+              </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="setscreenresolution" method="SetScreenResolution" revertSet="yes">
               <params>
-                <!-- #TODO: Insted of hard coding the values, read the current resolution from displaysetting plugin and set accordingly -->
-                <param tag="w"   value="1920" revertParam="yes" />
-                <param tag="h"   value="1080" revertParam="yes" />
+                <param tag="w" usePreviousResult="true" Id="2" useMethodTag="rdkshell_set_virtual_resolution" arguments="set_screen_resolution" revertParam="yes"/>
+                <param tag="h" usePreviousResult="true" Id="2" useMethodTag="rdkshell_set_virtual_resolution" arguments="set_screen_resolution" revertParam="yes" />
               </params>
               <resultGeneration useMethodTag="rdkshell_get_result_status" />
             </testStep>
-            <testStep testStepId="3" name="getscreenresolution" method="GetScreenResolution" revertFlag="yes" delay="1">
-              <resultGeneration useMethodTag="rdkshell_check_for_resolution_set" expectedValues="1920,1080" />
+            <testStep testStepId="4" name="getscreenresolution" method="GetScreenResolution" revertFlag="yes" delay="1">
+                <resultGeneration useMethodTag="rdkshell_check_for_resolution_set" >
+                  <expectedValues  usePreviousResult="true"  Id="2" useMethodTag="rdkshell_set_virtual_resolution" arguments="set_screen_resolution" />
+                </resultGeneration>
             </testStep>
         </testCase>
-
 
         <!-- Test case 10 -->
         <testCase testCaseId="RDKShell_10" testCaseName= "RDKShell_GetClients" desc="Get connected client list">
@@ -253,7 +258,6 @@
         </testCase>
 
         <!-- Test case 11 -->
-        <!-- #TODO: Shall also include a test case to change z order using moveBehind method and check z order using getZOrder method -->
         <testCase testCaseId="RDKShell_11" testCaseName= "RDKShell_GetZOrder" desc="list applications in Z order">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
@@ -2251,7 +2255,99 @@
             </testStep>
         </testCase>
         <!-- Test case 81 -->
-        <testCase testCaseId="RDKShell_81" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
+        <testCase testCaseId="RDKShell_81" testCaseName= "RDKShell_Check_LifeCycle_Events_HtmlApp" desc="Checks for the life cycle events for htmlapp application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_if_exists" expectedValues= "htmlapp" />
+            </testStep>
+            <testStep testStepId="2" name="Suspend_Application" method="SuspendApplication" >
+              <params>
+                <param tag="callsign"  value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_Suspended_Event" event="Event_On_Suspended" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="HtmlApp"/>
+            </testStep>
+            <testStep testStepId="4" name="Resume_HtmlApp" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Check_On_Launched_Event" event="Event_On_Launched" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_on_launched_event" expectedValues="HtmlApp,resume"/>
+            </testStep>
+            <testStep testStepId="6" name="Destroy_Application" method="DestroyApplication" delay="2">
+              <params>
+                <param tag="callsign"  value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="7" name="Check_On_Destroyed_Event" event="Event_On_Destroyed" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="HtmlApp"/>
+            </testStep>
+            <testStep testStepId="8" name="Resume_HtmlApp" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="9" name="Check_On_Launched_Event" event="Event_On_Launched" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_on_launched_event" expectedValues="HtmlApp,activate"/>
+            </testStep>
+            <testStep testStepId="10" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_if_exists" expectedValues= "htmlapp" />
+            </testStep>
+        </testCase>
+        <!-- Test case 82 -->
+        <testCase testCaseId="RDKShell_82" testCaseName= "RDKShell_Check_LifeCycle_Events_LightningApp" desc="Checks for the life cycle events for lightningapp application">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_if_exists" expectedValues= "lightningapp" />
+            </testStep>
+            <testStep testStepId="2" name="Suspend_Application" method="SuspendApplication" >
+              <params>
+                <param tag="callsign"  value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_Suspended_Event" event="Event_On_Suspended" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="LightningApp"/>
+            </testStep>
+            <testStep testStepId="4" name="Resume_LightningApp" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="5" name="Check_On_Launched_Event" event="Event_On_Launched" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_on_launched_event" expectedValues="LightningApp,resume"/>
+            </testStep>
+            <testStep testStepId="6" name="Destroy_Application" method="DestroyApplication" delay="2">
+              <params>
+                <param tag="callsign"  value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="7" name="Check_On_Destroyed_Event" event="Event_On_Destroyed" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="LightningApp"/>
+            </testStep>
+            <testStep testStepId="8" name="Resume_LightningApp" method="LaunchApplication" delay="3" >
+              <params>
+                <param tag="callsign" value="LightningApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="9" name="Check_On_Launched_Event" event="Event_On_Launched" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_on_launched_event" expectedValues="LightningApp,activate"/>
+            </testStep>
+            <testStep testStepId="10" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments="check_if_exists" expectedValues= "lightningapp" />
+            </testStep>
+        </testCase>
+        <!-- Test case 83 -->
+        <testCase testCaseId="RDKShell_83" testCaseName= "RDKShell_Application_Kill_Cobalt" desc="Kill Application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
@@ -2275,8 +2371,8 @@
               <resultGeneration useMethodTag="rdkshell_get_state" arguments="Cobalt" expectedValues="resumed" />
             </testStep>
         </testCase>
-        <!-- Test case 82 -->
-        <testCase testCaseId="RDKShell_82" testCaseName= "RDKShell_Application_Kill_LightningApp" desc="Kill LightningApp Application">
+        <!-- Test case 84 -->
+        <testCase testCaseId="RDKShell_84" testCaseName= "RDKShell_Application_Kill_LightningApp" desc="Kill LightningApp Application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "lightningapp" />
@@ -2301,8 +2397,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 83 -->
-        <testCase testCaseId="RDKShell_83" testCaseName= "RDKShell_Application_Kill_HtmlApp" desc="Kill HtmlApp Application">
+        <!-- Test case 85 -->
+        <testCase testCaseId="RDKShell_85" testCaseName= "RDKShell_Application_Kill_HtmlApp" desc="Kill HtmlApp Application">
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "htmlapp" />
@@ -2327,8 +2423,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 84 -->
-        <testCase testCaseId="RDKShell_84" testCaseName= "RDKShell_Enable_Disable_Virtual_Display_Cobalt" desc="Checks whether able to enable and disable the virtual display for the cobalt client" >
+        <!-- Test case 86 -->
+        <testCase testCaseId="RDKShell_86" testCaseName= "RDKShell_Enable_Disable_Virtual_Display_Cobalt" desc="Checks whether able to enable and disable the virtual display for the cobalt client" >
             <testCaseInfo testCaseType="setandget" revert="true"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
@@ -2356,8 +2452,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 85 -->
-        <testCase testCaseId="RDKShell_85" testCaseName= "RDKShell_Enable_Disable_Virtual_Display_WebKitBrowser" desc="Checks whether able to enable and disable the virtual display for the webkitbrowser client" >
+        <!-- Test case 87 -->
+        <testCase testCaseId="RDKShell_87" testCaseName= "RDKShell_Enable_Disable_Virtual_Display_WebKitBrowser" desc="Checks whether able to enable and disable the virtual display for the webkitbrowser client" >
             <testCaseInfo testCaseType="setandget" revert="true"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "webkitbrowser" />
@@ -2385,8 +2481,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 86 -->
-        <testCase testCaseId="RDKShell_86" testCaseName="Enable_And_Disable_Logs_Flushing"  desc="Checks whether able to enable and disable flushing all logs">
+        <!-- Test case 88 -->
+        <testCase testCaseId="RDKShell_88" testCaseName="Enable_And_Disable_Logs_Flushing"  desc="Checks whether able to enable and disable flushing all logs">
             <testCaseInfo testCaseType="loop" revert="true"/>
             <testStep testStepId="1" name="Get_Logs_Flushing_Enabled" method="Get_Logs_Flushing_Enabled"  saveResult="true" revertGet="yes">
               <resultGeneration useMethodTag="rdkshell_get_enabled_status" />
@@ -2406,8 +2502,8 @@
             </testStep>
         </testCase>
 
-        <!-- Test case 87 -->
-        <testCase testCaseId="RDKShell_87" testCaseName="RDKShell_Check_On_Will_Destroy_Event_Cobalt" desc="Checks for the OnWillDestroy event for cobalt" >
+        <!-- Test case 89 -->
+        <testCase testCaseId="RDKShell_89" testCaseName="RDKShell_Check_On_Will_Destroy_Event_Cobalt" desc="Checks for the OnWillDestroy event for cobalt" >
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
@@ -2449,8 +2545,8 @@
         </testCasePostRequisite>
         </testCase>
 
-        <!-- Test case 88 -->
-        <testCase testCaseId="RDKShell_88" testCaseName="RDKShell_Check_On_Will_Destroy_Event_WebKitBrowser" desc="Checks for the OnWillDestroy event for webkitbrowser" >
+        <!-- Test case 90 -->
+        <testCase testCaseId="RDKShell_90" testCaseName="RDKShell_Check_On_Will_Destroy_Event_WebKitBrowser" desc="Checks for the OnWillDestroy event for webkitbrowser" >
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues="webkitbrowser" />
@@ -2491,8 +2587,8 @@
          </postrequisite>
         </testCasePostRequisite>
         </testCase>
-        
-	<testCase testCaseId="RDKShell_89" testCaseName="RDKShell_Launch_Westros_Application" desc="Checks if able to launch westros app" >
+        <!-- Test case 91 -->
+	<testCase testCaseId="RDKShell_91" testCaseName="RDKShell_Launch_Westros_Application" desc="Checks if able to launch westros app" >
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Launch_Application" method="Launch_Application">
               <params>
@@ -2524,8 +2620,8 @@
          </postrequisite>
         </testCasePostRequisite>
         </testCase>
-
-	<testCase testCaseId="RDKShell_90" testCaseName="RDKShell_Suspend_Resume_WesterosTest_Application" desc="Checks if able to suspend/resume westeros app" >
+        <!-- Test case 92 -->
+	<testCase testCaseId="RDKShell_92" testCaseName="RDKShell_Suspend_Resume_WesterosTest_Application" desc="Checks if able to suspend/resume westeros app" >
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Launch_Application" method="Launch_Application">
               <params>
@@ -2581,4 +2677,53 @@
          </postrequisite>
         </testCasePostRequisite>
         </testCase>
+        <!-- Test case 93 -->
+        <testCase testCaseId="RDKShell_93" testCaseName= "RDKShell_Check_User_Inactivity_Reporting_Default_Interval" desc="Checks whether user inactivity reporting is done on default interval">
+            <testCaseInfo testCaseType="direct"/>
+             <testCasePreRequisite>
+                 <prerequisite requisiteId="1" requisiteName="Disable_Inactivity_Reporting">
+                    <testStep testStepId="1" name="Disable_Inactivity_Reporting" method="Enable_Inactivity_Reporting" >
+                      <params>
+                        <param tag="enable"  value="false" />
+                      </params>
+                      <resultGeneration useMethodTag="rdkshell_get_result_status" />
+                    </testStep>
+                 </prerequisite>
+            </testCasePreRequisite>
+            <testStep testStepId="1" name="Enable_Inactivity_Reporting" method="Enable_Inactivity_Reporting">
+              <params>
+                <param tag="enable"  value="true" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="2" name="Reset_Inactivity_Interval" method="Reset_Inactivity_Time">
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_UserInactivity_Event" event="Event_On_UserInactivity" action="eventListener" delay="905">
+              <resultGeneration useMethodTag="rdkshell_check_on_userinactivity_event"  arguments="check_reset_inactivity_interval" expectedValues="15"/>
+            </testStep>
+            <testStep testStepId="4" name="Disable_Inactivity_Reporting" method="Enable_Inactivity_Reporting" >
+              <params>
+                <param tag="enable"  value="false" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+        </testCase>
+        <!-- Test case 94 -->
+        <testCase testCaseId="RDKShell_94" testCaseName= "RDKShell_Show_And_Full_Screen_Image" desc="Shows and hides full screen image">
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Execute_Command" action="externalFnCall" saveResult="true">
+              <resultGeneration useMethodTag="Get_Image_Name"/>
+            </testStep>
+            <testStep testStepId="2" name="Show_Full_Screen_Image" method="Show_Full_Screen_Image" >
+              <params>
+                <param tag="path" usePreviousResult="true" Id="1" useMethodTag="rdkshell_get_image_path"/>
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status"/>
+            </testStep>
+            <testStep testStepId="3" name="Hide_Full_Screen_Image" method="Hide_Full_Screen_Image" delay="10" >
+              <resultGeneration useMethodTag="rdkshell_get_result_status"/>
+            </testStep>
+        </testCase>
+        
 </testPlugin>
