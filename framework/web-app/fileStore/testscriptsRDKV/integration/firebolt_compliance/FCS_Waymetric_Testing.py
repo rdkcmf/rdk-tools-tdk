@@ -102,7 +102,7 @@ if "SUCCESS" in sysutilLoadStatus.upper():
     options = " --no-multi "
     #Add logFile to capture App output
     options = options + logFile
-
+ 
     print "\nCheck if waymetric application is present or not"
     tdkTestObj = obj.createTestStep('ExecuteCommand');
     cmd  = "command -v " + Test
@@ -132,30 +132,51 @@ if "SUCCESS" in sysutilLoadStatus.upper():
         print "Unable to execute %s" %(test);
         tdkTestObj.setResultStatus("FAILURE");
 
-    #Transfer waymetric report from STB
     try:
-        tdkTestObj = obj.createTestStep('FireboltCompliance_DoNothing');
-        filepath = tdkTestObj.transferLogs( Waymetric_log, "false" );
+       expectedResult = "SUCCESS"
+       actualresult, log_transfer = FCS_GraphicsValidation_utility.getDeviceConfigValue (obj, 'FIREBOLT_COMPLIANCE_TRANSFER_LOG')
+       if expectedResult in actualresult.upper() and log_transfer == "no":
+          print "Log Transfer is disabled"
+          log_transfer = False;
+       else:
+          log_transfer = True;
     except:
-        print "Transfer of logs unsuccessfull";
-        obj.unloadModule("systemutil");
-        exit() 
+       log_transfer = True;
 
-    FCS_GraphicsValidation_utility.PrintTitle("SUMMARY OF TEST EXECUTION")
-    waymetric_index = FCS_GraphicsValidation_utility.Summary(filepath,"speed index");
+    if log_transfer:
+        #Transfer waymetric report from STB
+        try:
+           tdkTestObj = obj.createTestStep('FireboltCompliance_DoNothing');
+           filepath = tdkTestObj.transferLogs( Waymetric_log, "false" );
+        except:
+           print "Transfer of logs unsuccessfull";
+           obj.unloadModule("systemutil");
+           exit() 
 
-    try:
+        FCS_GraphicsValidation_utility.PrintTitle("SUMMARY OF TEST EXECUTION")
+        waymetric_index = FCS_GraphicsValidation_utility.Summary(filepath,"speed index");
+
         data = open(filepath,'r');
         message = data.read()
         print "\n**************Waymetric Execution Log - Begin*************\n\n"
         print(message)
         data.close()
         print "\n**************Waymetric Execution - End*************\n\n"
-    except:
-        print "ERROR : Unable to open execution log file"
-        obj.unloadModule("systemutil");
-        exit();
-
+    else:
+        speed_indices = []
+        command = "grep -inr 'speed index' " + logFile + ' | wc -l';
+        tdkTestObj.addParameter("command", command);
+        tdkTestObj.executeTestCase("SUCCESS");
+        waymetric_index = int(tdkTestObj.getResultDetails().strip(r'\n'));
+        if waymetric_index:
+           for index in range (1,int(waymetric_index)+1):
+              command = "grep 'speed index' GraphicsTDKTest.txt | awk 'FNR ==" + str(index) + "'"
+              tdkTestObj.addParameter("command", command);
+              tdkTestObj.executeTestCase("SUCCESS");
+              details = tdkTestObj.getResultDetails()
+              speed_indices.append(details)
+           print " \n\n Waymetric Speed Indices";
+           print('\n'.join(map(str, speed_indices)))
 
     if waymetric_index:
         FCS_GraphicsValidation_utility.deleteLogFile(obj,Waymetric_log,"SUCCESS");

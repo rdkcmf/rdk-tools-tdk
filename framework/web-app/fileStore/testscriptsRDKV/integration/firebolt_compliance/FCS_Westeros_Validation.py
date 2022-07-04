@@ -37,7 +37,7 @@
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>2</execution_time>
+  <execution_time>10</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -125,37 +125,46 @@ if "SUCCESS" in sysutilLoadStatus.upper():
     #Wait for Test to get completed
     time.sleep(35)
 
-    #Transfer Westeros_TDKTestApp log file from STB
     try:
-        tdkTestObj = obj.createTestStep('FireboltCompliance_DoNothing');
-        filepath = tdkTestObj.transferLogs( WesterosValidation_log, "false" );
+       expectedResult = "SUCCESS"
+       actualresult, log_transfer = FCS_GraphicsValidation_utility.getDeviceConfigValue (obj, 'FIREBOLT_COMPLIANCE_TRANSFER_LOG')
+       if expectedResult in actualresult.upper() and log_transfer == "no":
+          print "Log Transfer is disabled"
+          log_transfer = False;
+       else:
+          log_transfer = True;
     except:
-        print "Transfer of logs unsuccessfull";
-        obj.unloadModule("systemutil");
-        exit() 
+       log_transfer = True;
 
-    #Parsing the output of Westeros_TDKTestApp
-    try:
+    if log_transfer:
+        #Transfer Westeros_TDKTestApp log file from STB
+        try:
+           tdkTestObj = obj.createTestStep('FireboltCompliance_DoNothing');
+           filepath = tdkTestObj.transferLogs( WesterosValidation_log, "false" );
+        except:
+           print "Transfer of logs unsuccessfull";
+           obj.unloadModule("systemutil");
+           exit()
+
+        #Parsing the output of Westeros_TDKTestApp
         data = open(filepath,'r');
         message = data.read()
         print "\n**************Westeros_TDKTestApp Execution Log - Begin*************\n\n"
         print(message)
         data.close()
         print "\n**************Westeros_TDKTestApp Execution - End*************\n\n"
+    else:
+        filepath=""
 
-        #Reading the Westeros_TDKTestApp Execution log file to check for number of failures 
-        Failures = FCS_GraphicsValidation_utility.getNumberOfFailures(filepath)
-        if Failures:
-            WesterosValidationExecutionStatus = "FAILURE"
-            print "Observed failures during execution"
-        else:
-            WesterosValidationExecutionStatus = "SUCCESS"
-            print "Successfuly Executed the test application"
-            print "[TEST EXECUTION RESULT] : %s" %WesterosValidationExecutionStatus;
-    except:
-        print "ERROR : Unable to open execution log file"
-        obj.unloadModule("systemutil");
-        exit();
+    #Reading the Westeros_TDKTestApp Execution log file to check for number of failures 
+    Failures = FCS_GraphicsValidation_utility.getNumberOfFailures(obj,filepath)
+    if Failures:
+        WesterosValidationExecutionStatus = "FAILURE"
+        print "Observed failures during execution"
+    else:
+        WesterosValidationExecutionStatus = "SUCCESS"
+        print "Successfuly Executed the test application"
+        print "[TEST EXECUTION RESULT] : %s" %WesterosValidationExecutionStatus;
 
     #Delete the log file in DUT
     FCS_GraphicsValidation_utility.deleteLogFile(obj,WesterosValidation_log,WesterosValidationExecutionStatus);

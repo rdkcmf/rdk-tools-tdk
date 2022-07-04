@@ -34,12 +34,13 @@ import tdklib;
 # Parameters  : obj - module object
 #             : testcase - primitve test to be executed
 #             : params - parameters to be added to primitve test
-# Return Value: True,details (on success), False,details(on failure)
+#             : returnObject - True/False based on whether to return the tdkTestObj
+# Return Value: True,details,tdkTestObj(on success), False,details,tdkTestObj(on failure)
 
-def executeTest(obj, testcase , params=""):
+def executeTest(obj, testcase , params="", returnObject = False):
     tdkTestObj = obj.createTestStep(testcase);
     expectedresult="SUCCESS"
-    if len(params):
+    if len(params) and "no parameters" not in params:
         for i in range(0,len(params)):
             element = params.keys()[i]
             tdkTestObj.addParameter(element,params[element]);
@@ -49,11 +50,13 @@ def executeTest(obj, testcase , params=""):
     details = tdkTestObj.getResultDetails();
     if actualResult == expectedresult:
         print "%s SUCCESS"%testcase
-        print details
-        tdkTestObj.setResultStatus("SUCCESS")
+        tdkTestObj.setResultStatus("SUCCESS");
+        if returnObject:
+            return True,details,tdkTestObj
         return True,details
     else:
         print "%s FAILURE"%testcase
-        print details
         tdkTestObj.setResultStatus("FAILURE")
+        if returnObject:
+            return False,details,tdkTestObj
         return False,details

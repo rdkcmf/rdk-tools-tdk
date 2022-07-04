@@ -117,17 +117,29 @@ if "SUCCESS" in sysutilLoadStatus.upper():
     print "[TEST EXECUTION DETAILS] : %s" %details;
     #Wait for Test to get completed
     time.sleep(10)
-    #Transfer Essos_TDKTestApp log file from STB
-    try:
-        tdkTestObj = obj.createTestStep('FireboltCompliance_DoNothing');
-        filepath = tdkTestObj.transferLogs( EssosValidation_log, "false" );
-    except:
-        print "Transfer of logs unsuccessfull";
-        obj.unloadModule("systemutil");
-        exit()
 
-    #Parsing the output of Essos_TDKTestApp
     try:
+       expectedResult = "SUCCESS"
+       actualresult, log_transfer = FCS_GraphicsValidation_utility.getDeviceConfigValue (obj, 'FIREBOLT_COMPLIANCE_TRANSFER_LOG')
+       if expectedResult in actualresult.upper() and log_transfer == "no":
+          print "Log Transfer is disabled"
+          log_transfer = False;
+       else:
+          log_transfer = True;
+    except:
+       log_transfer = True;
+
+    if log_transfer:
+        #Transfer Essos_TDKTestApp log file from STB
+        try:
+            tdkTestObj = obj.createTestStep('FireboltCompliance_DoNothing');
+            filepath = tdkTestObj.transferLogs( EssosValidation_log, "false" );
+        except:
+            print "Transfer of logs unsuccessfull";
+            obj.unloadModule("systemutil");
+            exit()
+       
+        #Parsing the output of Essos_TDKTestApp
         FCS_GraphicsValidation_utility.PrintTitle("SUMMARY OF TEST EXECUTION")
         FCS_GraphicsValidation_utility.Summary(filepath,"VALIDATION");
         data = open(filepath,'r');
@@ -136,20 +148,19 @@ if "SUCCESS" in sysutilLoadStatus.upper():
         print(message)
         data.close()
         print "\n**************Essos_TDKTestApp Execution - End*************\n\n"
-        #Reading the Essos_TDKTestApp Execution log file to check for number of failures
-        #Get Number of failures by filtering "VALIDATION" error statements
-        Failures = FCS_GraphicsValidation_utility.getNumberOfFailures(filepath,"VALIDATION")
-        if Failures:
-            EssosValidationExecutionStatus = "FAILURE"
-            print "Observed failures during execution"
-        else:
-            EssosValidationExecutionStatus = "SUCCESS"
-            print "Successfuly Executed the test application"
-            print "[TEST EXECUTION RESULT] : %s" %EssosValidationExecutionStatus;
-    except:
-        print "ERROR : Unable to open execution log file"
-        obj.unloadModule("systemutil");
-        exit();
+    else:
+        filepath=""
+
+    #Reading the Essos_TDKTestApp Execution log file to check for number of failures
+    #Get Number of failures by filtering "VALIDATION" error statements
+    Failures = FCS_GraphicsValidation_utility.getNumberOfFailures(obj,filepath,"VALIDATION")
+    if Failures:
+        EssosValidationExecutionStatus = "FAILURE"
+        print "Observed failures during execution"
+    else:
+        EssosValidationExecutionStatus = "SUCCESS"
+        print "Successfuly Executed the test application"
+        print "[TEST EXECUTION RESULT] : %s" %EssosValidationExecutionStatus;
 
     #Delete the log file in DUT
     FCS_GraphicsValidation_utility.deleteLogFile(obj,EssosValidation_log,EssosValidationExecutionStatus);

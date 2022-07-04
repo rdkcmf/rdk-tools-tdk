@@ -21,6 +21,7 @@ import re
 import tdklib;
 import ConfigParser
 import os
+from tdkvutility import *
 
 #Define the search term:
 pattern = "VALIDATION"
@@ -28,6 +29,46 @@ pattern = "VALIDATION"
 #Create an empty list:
 tests = []
 expectedResult="SUCCESS";
+log_transfer = "yes";
+
+#Function to retrieve the device configuration from device config file
+def getDeviceConfigValue (tdklibObj, configKey):
+    try:
+        global log_transfer;
+        result = "SUCCESS"
+        #Retrieve the device details(device name) and device type from tdk library
+        configValue = ""
+        deviceDetails = tdklibObj.getDeviceDetails()
+        deviceType = tdklibObj.getDeviceBoxType()
+        #Construct the tdkvRDKServiceConfig path in TM
+        configPath = tdklibObj.realpath+ "/" + "fileStore/tdkvRDKServiceConfig"
+        #Construct the device configuration file path
+        #The device configuration file can be either <device-name>.config or <box-type>.config, so we are checking for both
+        deviceNameConfigFile = configPath + "/" + deviceDetails["devicename"] + ".config"
+        deviceTypeConfigFile = configPath + "/" + deviceType + ".config"
+        # Check whether device / platform config files are present
+        if os.path.exists (deviceNameConfigFile) == True:
+            deviceConfigFile = deviceNameConfigFile
+        elif os.path.exists (deviceTypeConfigFile) == True:
+            deviceConfigFile = deviceTypeConfigFile
+        else:
+            print "FAILURE : No Device config file found : " + deviceNameConfigFile + " or " + deviceTypeConfigFile
+            result = "FAILURE"
+        #Continue only if the device config file exists
+        if (len (deviceConfigFile) != 0):
+            configParser = ConfigParser.ConfigParser()
+            configParser.read(r'%s' % deviceConfigFile)
+            #Retrieve the value of config key from device config file
+            configValue = configParser.get('device.config', configKey)
+            if configKey == "FIREBOLT_COMPLIANCE_TRANSFER_LOG":
+                log_transfer = configValue;
+        else:
+            print "DeviceConfig file not available"
+            result = "FAILURE"
+    except Exception as e:
+        print "Exception occurred while retrieving device configuration  : " + e
+        result = "FAILURE"
+    return result, configValue
 
 def getLogFile(obj):
     #Get EssosTestApp configuration file
@@ -54,20 +95,34 @@ def PrintTitle(string=" ",title=0):
 
 #Lists the number of failures observed as part of the execution
 #Parses the output from the Test app and returns the total number of failures
-def getNumberOfFailures(fileName,checkPattern=""):
+def getNumberOfFailures(obj,fileName,checkPattern=""):
     failed = 0;
-    if os.stat(fileName).st_size == 0:
-        print "Execution failed";
-        return "error"
-    for line in open(fileName):
-        if line !='':
-            if checkPattern:
-                word = re.findall(checkPattern, line)
+    if (log_transfer == "no"):
+        result,details,tdkTestObj = executeTest(obj, 'ExecuteCommand', {"command":"cat GraphicsTDKTest.txt | wc -l"}, True)
+        if int(details.strip(r'\n')):
+            if not checkPattern:
+               result,details,tdkTestObj = executeTest(obj, 'ExecuteCommand', {"command":"grep -inr error GraphicsTDKTest.txt | wc -l"}, True)
             else:
-                word = True;
-            if word:
-                if "ERROR" in line.upper():
-                    failed = failed +1;
+               command = "grep -inr " + checkPattern + " GraphicsTDKTest.txt | grep -inr error | wc -l"
+               result,details,tdkTestObj = executeTest(obj, 'ExecuteCommand', {"command":command}, True)
+            failed = int(details.strip(r'\n'));
+        else:
+            print "Execution failed";
+            return "error"
+    else:
+        if os.path.exists(fileName):
+            if os.stat(fileName).st_size == 0:
+                print "Execution failed";
+                return "error"
+        for line in open(fileName):
+            if line !='':
+                if checkPattern:
+                    word = re.findall(checkPattern, line)
+                else:
+                    word = True;
+                if word:
+                    if "ERROR" in line.upper():
+                        failed = failed +1;
     print "Number of FAILURES:",failed
     return failed
 
