@@ -106,11 +106,15 @@ video_src_url_live_dash = ""
 
 #MP4 Video URL
 video_src_url_mp4      = test_streams_base_path + "TDK_Asset_Sunrise_MP4.mp4"
+video_src_url_mp4_23fps  = test_streams_base_path + "TDK_Asset_Sunrise_23fps.mp4"
 video_src_url_mp4_24fps  = test_streams_base_path + "TDK_Asset_Sunrise_24fps.mp4"
 video_src_url_mp4_25fps  = test_streams_base_path + "TDK_Asset_Sunrise_25fps.mp4"
+video_src_url_mp4_29fps  = test_streams_base_path + "TDK_Asset_Sunrise_29fps.mp4"
 video_src_url_mp4_30fps  = test_streams_base_path + "TDK_Asset_Sunrise_30fps.mp4"
 video_src_url_mp4_50fps  = test_streams_base_path + "TDK_Asset_Sunrise_50fps.mp4"
+video_src_url_mp4_59fps  = test_streams_base_path + "TDK_Asset_Sunrise_59fps.mp4"
 video_src_url_mp4_60fps  = test_streams_base_path + "TDK_Asset_Sunrise_60fps.mp4"
+video_src_url_mp4_hevc_hdr = ""
 
 #H.264 Codec Video URL
 video_src_url_dash_h264 = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4.mpd"

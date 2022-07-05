@@ -136,14 +136,15 @@ if "SUCCESS" in result.upper() and capable:
             iteration = 0;
             fail_params = [];
             for data in settings:
-                item = data.split(':');
-                if (int(item[1]) == 0):
-                    print "Expected %s is obtained"%(parameters[iteration]);
-                else:
-                    print "Expected %s after Reboot : 0"%(parameters[iteration]);
-                    print "%s obtained : %s"%(parameters[iteration],item[1]);
-                    tdkTestObj.setResultStatus("FAILURE");
-                    fail_params = parameters[iteration];
+                if "Level" in settings:
+                    item = data.split(':');
+                    if (int(item[1]) == 0):
+                        print "Expected %s is obtained"%(parameters[iteration]);
+                    else:
+                        print "Expected %s after Reboot : 0"%(parameters[iteration]);
+                        print "%s obtained : %s"%(parameters[iteration],item[1]);
+                        tdkTestObj.setResultStatus("FAILURE");
+                        fail_params = parameters[iteration];
                 iteration += 1;
 
             if fail_params:

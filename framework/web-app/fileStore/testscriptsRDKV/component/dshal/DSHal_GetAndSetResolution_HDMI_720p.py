@@ -139,7 +139,7 @@ if "SUCCESS" in dshalloadModuleStatus.upper():
                 tdkTestObj = dshalObj.createTestStep('DSHal_SetResolution');
                 tdkTestObj.addParameter("resolution",resolution);
                 tdkTestObj.addParameter("pixelResolution",2); #1280x720 Resolution
-                tdkTestObj.addParameter("aspectRatio",1); #4:3 aspect ratio
+                tdkTestObj.addParameter("aspectRatio",1); #16:9 aspect ratio
                 tdkTestObj.addParameter("frameRate",8); #dsVIDEO_FRAMERATE_59dot94
                 tdkTestObj.addParameter("stereoScopicMode",1); #2D
                 tdkTestObj.addParameter("interlaced",0); #PROGRESSIVE
