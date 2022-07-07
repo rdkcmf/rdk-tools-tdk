@@ -68,7 +68,7 @@
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
 import json
-from StabilityTestVariables import *
+from StabilityTestUtility import *
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("rdkv_performance","1",standAlone=True);
