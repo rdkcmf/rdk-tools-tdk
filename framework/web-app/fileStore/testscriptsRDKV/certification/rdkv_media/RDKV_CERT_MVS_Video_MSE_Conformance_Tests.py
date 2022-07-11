@@ -121,6 +121,13 @@ if expectedResult in result.upper():
     # disabling proc validation
     pre_requisite_status,webkit_console_socket,validation_dict = setMediaTestPreRequisites(obj,"WebKitBrowser",False)
     config_status = "SUCCESS"
+    if webkit_console_socket == None and pre_requisite_status == "SUCCESS":
+        websocket_conn_status,webkit_console_socket = createWebKitSocket(obj)
+        if not websocket_conn_status:
+            print "Connection to web-inspect page failed. cannot proceed test"
+            pre_requisite_status = "FAILURE"
+        else:
+            pre_requisite_status = "SUCCESS"        
     if pre_requisite_status == "SUCCESS":
         tdkTestObj.setResultStatus("SUCCESS");
         print "Pre conditions for the test are set successfully"
