@@ -101,8 +101,8 @@ if "SUCCESS" in result.upper():
 
     #Prmitive test case which associated to this Script
     tdkTestObj = mfrhalObj.createTestStep('MfrHal_GetSerializedData');
-    #Set the serialized data type to 16(mfrSERIALIZED_TYPE_CHIPSETINFO)
-    tdkTestObj.addParameter("data_type", 16)
+    #Set the serialized data type to 18(mfrSERIALIZED_TYPE_CHIPSETINFO)
+    tdkTestObj.addParameter("data_type", 18)
 
     #Execute the test case in DUT
     tdkTestObj.executeTestCase(expectedresult);
