@@ -207,6 +207,21 @@
                 <param tag="ipversion"    defaultValue="null"/>
             </params>
         </method>
+        <method name="Set_Stun_End_Point" api="setStunEndPoint" type="method" desc="Set the Stun Endpoint used for getPublicIP">
+            <params>
+                <param tag="server"  defaultValue="null" />
+                <param tag="port"  defaultValue="null" type="int"/>
+                <param tag="sync"  type="bool"/>
+                <param tag="timeout"  defaultValue="null"  type="int"/>
+                <param tag="cache_timeout"  defaultValue="null"  type="int"/>
+            </params>
+        </method>
+        <method name="Get_Public_IP" api="getPublicIP" type="method" desc="It allows either zero parameter or with only interface and ipv6 parameter to determine WAN ip address">
+            <params>
+                <param tag="iface"  defaultValue="null"/>
+                <param tag="ipv6" type="bool"/>
+            </params>
+        </method>
         <event name="Event_Interface_Status_Changed" eventName="onInterfaceStatusChanged" eventId="client.events.1" type="event" desc="Interface status changed  event" />
         <event name="Event_Connection_Status_Changed" eventName="onConnectionStatusChanged" eventId="client.events.1" type="event" desc="Connection status changed event" />
         <event name="Event_IPAddress_Status_Changed" eventName="onIPAddressStatusChanged" eventId="client.events.1" type="event" desc="IPAddress status changed event" />
@@ -498,11 +513,20 @@
         <method name="Get_Power_State_Before_Reboot" api="getPowerStateBeforeReboot" type="method" desc="Gets the power state before reboot" />
         <method name="Get_Power_State_Is_Managed_By_Device" api="getPowerStateIsManagedByDevice" type="method" desc="Checks whether the power state is managed by the device" />
         <method name="Get_Time_Zones" api="getTimeZones" type="method" version="2" desc="Gets the available timezones from the system's time zone database" />
+        <method name="Get_Network_Standby_Mode" api="getNetworkStandbyMode" type="method" desc="Returns the network standby mode of the device" >
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Set_Network_Standby_Mode" api="setNetworkStandbyMode" type="method" desc="Enables or disables the network standby mode of the device" >
+            <params>
+                <param tag="nwStandby" type="bool" />
+            </params>
+        </method>
         <event name="Event_MacAddresses_Retreived" eventName="onMacAddressesRetreived" eventId="client.events.1" type="event" desc="MacAddressesRetreived" />
         <event name="Event_PowerState_Changed" eventName="onSystemPowerStateChanged" eventId="client.events.1" type="event" desc="power state changed event" />
         <event name="Event_SystemMode_Changed" eventName="onSystemModeChanged" eventId="client.events.1" type="event" desc="Fires on system mode changed event" />
 	<event name="Event_Temperature_Threshold_Changed" eventName="onTemperatureThresholdChanged" eventId="client.events.1" type="event" desc="Fires on temperature threshold change" />
 	<event name="Event_Reboot_Request" eventName="onRebootRequest" eventId="client.events.1" type="event" desc="Fires on reboot request" />
+        <event name="Event_On_Network_Standby_Mode_Changed" eventName="onNetworkStandbyModeChanged" eventId="client.events.1" type="event" desc="Triggered when the network standby mode setting changes" />
     </plugin>
 
 
@@ -624,7 +648,7 @@
 
         <method name="SetScreenResolution" api="setScreenResolution" type="method" desc="Sets the screen resolution" >
             <params>
-                <param tag="w" defaultValue="1080" type="int"/>
+                <param tag="w" defaultValue="1280" type="int"/>
                 <param tag="h" defaultValue="720" type="int" />
             </params>
         </method>
@@ -881,6 +905,12 @@
                 <param tag="client" defaultValue="null" />
             </params>
         </method>
+        <method name="Show_Full_Screen_Image" api="showFullScreenImage" type="method" desc="Shows the Full Screen Image" >
+            <params>
+                <param tag="path" defaultValue="null" />
+            </params>
+        </method>
+        <method name="Hide_Full_Screen_Image" api="hideFullScreenImage" type="method" desc="Hides the Full Screen Image" />
         <event name="Event_On_Application_Launched" eventName="onApplicationLaunched" eventId="client.events.1" type="event" desc="Triggered when an application launches successfully"/>
         <event name="Event_On_Launched" eventName="onLaunched" eventId="client.events.1" type="event" desc="Fired on launching the client" />
         <event name="Event_On_Suspended" eventName="onSuspended" eventId="client.events.1" type="event" desc="Fired on Suspending the client" />
@@ -1567,6 +1597,7 @@
                 <param tag="persist" type="bool" />
             </params>
         </method>
+        <event name="Event_Resolution_PreChange" eventName="resolutionPreChange" eventId="client.events.1" type="event" desc="Triggered on resolution pre-change"/>
         <event name="Event_Zoom_Settings_Updated" eventName="zoomSettingUpdated" eventId="client.events.1" type="event" desc="Zoom settings updated event "/>
 	<event name="Event_Resolution_Changed" eventName="resolutionChanged" eventId="client.events.1" type="event" desc="Fires on changing resolution"/>
     </plugin>

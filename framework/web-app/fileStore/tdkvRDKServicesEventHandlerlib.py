@@ -482,6 +482,15 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
              if str(result.get("rebootReason")) == str(expectedValues[0]):
                 info["Test_Step_Status"] = "SUCCESS"
 
+        elif tag == "system_check_network_standby_mode_changed_event":
+            result = result[0]
+            info = result
+            if str(result.get("nwStandby")) in  expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+
         # LoggerPreferences Events response result parser steps
         elif tag == "loggingpreferences_check_onkeystroke_mask_enabled_change_event":
             result = result[0]
@@ -503,6 +512,12 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             result = result[0]
             info = result
             if str(result.get("resolution")) in  expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "displaysettings_check_resolution_prechange_event":
+            result = result[0]
+            if result == "":
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"

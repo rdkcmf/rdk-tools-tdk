@@ -37,7 +37,7 @@
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>20</execution_time>
+  <execution_time>40</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
