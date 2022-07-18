@@ -338,11 +338,11 @@ export default class App extends Lightning.Component {
     this.checkAndLogEvents("ratechange",this.message1)
     if (parseInt(this.observedRate) > 0){
         // Enable video progress pos validation with pos diff rate
-        // using same rate for 1x,2x,4x
+        // using same rate for 1x,2x,3x,4x
         var rate_index = parseInt(this.observedRate)
         // providing some buffer for 16x
-        if (parseInt(this.observedRate) == 16)
-          rate_index = 10
+        //if (parseInt(this.observedRate) == 16)
+        // rate_index = 10
       this.updatePosValidationInfo(rate_index)
     }
   }
@@ -487,7 +487,7 @@ export default class App extends Lightning.Component {
                     this.fastfwd()
                 },actionInterval);
             }
-            else if (action == "fastfwd2x" || action == "fastfwd4x" || action == "fastfwd16x"){
+            else if (action == "fastfwd2x" || action == "fastfwd4x" || action == "fastfwd3x"){
                 if (action == "fastfwd2x"){
                 setTimeout(()=> {
                     this.clearEvents()
@@ -498,10 +498,10 @@ export default class App extends Lightning.Component {
                     this.clearEvents()
                       this.fastfwdspeed(4)
                 },actionInterval);
-                }else if (action == "fastfwd16x"){
+                }else if (action == "fastfwd3x"){
                 setTimeout(()=> {
                     this.clearEvents()
-                      this.fastfwdspeed(16)
+                      this.fastfwdspeed(3)
                 },actionInterval);
                 }
             }
@@ -694,7 +694,7 @@ export default class App extends Lightning.Component {
     this.eventFlowFlag  = 1
     this.observedEvents = []
     this.expectedEvents = []
-    this.playbackSpeeds = [1, 2, 4, 16]
+    this.playbackSpeeds = [1, 2, 3, 4]
     this.playbackRateIndex = this.playbackSpeeds.indexOf(1)
     this.progressEventMsg  = ""
     this.progressLogger    = null

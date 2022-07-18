@@ -106,7 +106,24 @@ def getURLArguments():
 
 # Function to form the complete test app url
 def getTestURL(appURL,URLarguments):
-    url = appURL
+    if "player=" in appURL:
+        urlInfo = appURL.split("?")
+        argInfo = urlInfo[1].split("&")
+        appArgs = ""
+        for arg in argInfo:
+            if "player=" in arg:
+                if "type=hls" in URLarguments:
+                    arg = "player=hlsjs"
+                elif "type=dash" in URLarguments:
+                    arg = "player=dashjs"
+
+            if appArgs != "":
+                appArgs += "&"
+            appArgs = appArgs + arg
+        url = urlInfo[0] + "?" + appArgs
+    else:
+        url = appURL
+
     if URLarguments != "" and URLarguments != None:
         if "?" not in url:
             url = url + "?" + URLarguments
@@ -981,6 +998,7 @@ def monitorVideoTestUsingRestAPI(obj,validation_dict,check_pattern,timeout):
                         proc_check_list.append(info)
                     if "TEST RESULT" in lines[i]:
                         test_result = lines[i]
+
 
                 #last_line  = lines[-1]
                 last_index = len(lines)
