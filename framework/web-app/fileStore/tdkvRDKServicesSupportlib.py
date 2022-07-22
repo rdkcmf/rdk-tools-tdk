@@ -1764,7 +1764,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
 
         elif tag == "check_device_repeater":
             info["HdcpRepeater"] = result.get('HdcpRepeater')
-            if str(result.get("success")).lower() == "true" and str(result.get('HdcpRepeater')) in expectedValues:
+            if str(result.get("success")).lower() == "true" and str(result.get('HdcpRepeater')).lower() == expectedValues[0].lower():
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"

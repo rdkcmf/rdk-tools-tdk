@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ If not stated otherwise in this file or this component's Licenses.txt file the
+ following copyright and licenses apply:
+ Copyright 2022 RDK Management
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<testPlugin pluginName="DisplaySettingsWithoutTV" pluginVersion="1">
+
+    <pluginPreRequisite>
+        <prerequisite requisiteId="1" requisiteName="Activate_Plugins">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                    <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+                <params>
+                    <param tag="callsign" value="org.rdk.DisplaySettings" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+                <params>
+                    <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" expectedValues="activated"/>
+            </testStep>
+        </prerequisite>
+    </pluginPreRequisite>
+
+    <testCase testCaseId="DSWTV_1" testCaseName= "Read_EDID_Without_TV" desc="Check the EDID status when TV is disconnected">
+        <testCaseInfo testCaseType="direct"/>
+        <testCasePreRequisite>
+            <prerequisite requisiteId="1" requisiteName="Get_Display_Connected_Status">
+                <testStep testStepId="1" name="Check_Display_Connected_Status" pluginName="DisplaySettings" method="Get_Connected_VideoDisplays" >
+                    <resultGeneration useMethodTag="display_is_connected" arguments="check_tv_connected"/>
+                </testStep>
+            </prerequisite>
+        </testCasePreRequisite>
+        <testStep testStepId="1" name="Check_EDID_Status_Of_Disconnected_Device" pluginName="DisplaySettings" method="Read_EDID">
+            <resultGeneration useMethodTag="check_connected_device_edid" arguments="check_edid_status_for_disconnected_device"/>
+        </testStep>
+    </testCase>
+
+    <testCase testCaseId="DSWTV_2" testCaseName= "Check_Connected_Video_Displays_Without_TV_Connected"  desc="Checks whether getConnectedVideoDisplays API is returning empty list when TV is not connected">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="Check_Display_Connected_Status" pluginName="DisplaySettings" method="Get_Connected_VideoDisplays" saveResult="true" >
+            <resultGeneration useMethodTag="display_is_connected" arguments="check_tv_not_connected" />
+        </testStep>
+    </testCase>
+</testPlugin>
