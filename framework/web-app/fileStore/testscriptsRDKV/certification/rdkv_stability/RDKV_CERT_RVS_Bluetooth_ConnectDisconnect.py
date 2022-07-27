@@ -186,6 +186,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                         for device in devices_list:
                             if device["name"] == device_name:
                                 device_id = device["deviceID"]
+                                device_type = device["deviceType"]
                         if device_id != "" :
                             print "\n Device found in the getDiscoveredDevices list \n"
                             tdkTestObj.setResultStatus("SUCCESS")
@@ -239,7 +240,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                                                     print "\n########## Iteration :{} ##########\n".format(count+1)
                                                     result_dict = {}
                                                     print "\n Executing connect method \n"
-                                                    params = '{"deviceID": "' + device_id + '","deviceType":"HUMAN INTERFACE DEVICE","profile": "DEFAULT"}'
+                                                    params = '{"deviceID": "' + device_id + '","deviceType":"' + device_type + '","profile": "DEFAULT"}'
                                                     tdkTestObj = obj.createTestStep('rdkservice_setValue')
                                                     tdkTestObj.addParameter("method","org.rdk.Bluetooth.1.connect")
                                                     tdkTestObj.addParameter("value",params)
@@ -263,7 +264,7 @@ if expectedResult in (result.upper() and pre_condition_status):
                                                                 tdkTestObj.setResultStatus("SUCCESS")
                                                                 #Disconnect Bluetooth device
                                                                 print "\n Disconnecting from Bluetooth device \n" 
-                                                                params = '{"deviceID": "' +device_id + '","deviceType":"HUMAN INTERFACE DEVICE"}'
+                                                                params = '{"deviceID": "' +device_id + '","deviceType":"' + device_type + '"}'
                                                                 tdkTestObj = obj.createTestStep('rdkservice_setValue')
                                                                 tdkTestObj.addParameter("method","org.rdk.Bluetooth.1.disconnect")
                                                                 tdkTestObj.addParameter("value",params)
