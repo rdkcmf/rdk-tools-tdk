@@ -54,7 +54,6 @@ def getPublicWiFiParamValues(obj):
     return (tdkTestObj,status,orgValue);
 
 ################################ End of Function #####################################
-
 # A utility function to enable the public wifi parameters.
 #
 # Syntax       : setPublicWiFiParamValues(obj,paramList)
@@ -64,15 +63,17 @@ def getPublicWiFiParamValues(obj):
 # Return Value : Execution status
 
 def setPublicWiFiParamValues(obj,paramList):
-
         tdkTestObj = obj.createTestStep("WIFIAgent_SetMultiple");
+        expectedresult="SUCCESS";
+
         paramList1 = "Device.X_COMCAST-COM_GRE.Tunnel.1.DSCPMarkPolicy|%s|int|Device.X_COMCAST-COM_GRE.Tunnel.1.PrimaryRemoteEndpoint|%s|string|Device.X_COMCAST-COM_GRE.Tunnel.1.SecondaryRemoteEndpoint|%s|string" %(paramList[0],paramList[1],paramList[2])
 
-        paramList2 = "Device.WiFi.SSID.5.SSID|xwifi-2.4|string|Device.WiFi.SSID.6.SSID|xwifi-5|string|Device.WiFi.SSID.5.Enable|%s|bool|Device.WiFi.SSID.6.Enable|%s|bool" %(paramList[3],paramList[4])
+        paramList2 = "Device.WiFi.SSID.5.SSID|xwifi-2.4|string|Device.WiFi.SSID.5.Enable|%s|bool" %(paramList[3])
 
-        paramList3 = "Device.DeviceInfo.X_COMCAST_COM_xfinitywifiEnable|%s|bool" %paramList[5]
+        paramList3 = "Device.WiFi.SSID.6.SSID|xwifi-5|string|Device.WiFi.SSID.6.Enable|%s|bool" %(paramList[4])
 
-        expectedresult="SUCCESS";
+        paramList4 = "Device.DeviceInfo.X_COMCAST_COM_xfinitywifiEnable|%s|bool" %paramList[5]
+
         tdkTestObj.addParameter("paramList",paramList1);
         tdkTestObj.executeTestCase(expectedresult);
         actualresult1 = tdkTestObj.getResult();
@@ -87,14 +88,19 @@ def setPublicWiFiParamValues(obj,paramList):
         tdkTestObj.executeTestCase(expectedresult);
         actualresult3 = tdkTestObj.getResult();
         details3 = tdkTestObj.getResultDetails();
-        if expectedresult in actualresult1 and expectedresult in actualresult2 and expectedresult in actualresult3:
+
+        tdkTestObj.addParameter("paramList",paramList4);
+        tdkTestObj.executeTestCase(expectedresult);
+        actualresult4 = tdkTestObj.getResult();
+        details4 = tdkTestObj.getResultDetails();
+
+        if expectedresult in actualresult1 and expectedresult in actualresult2 and expectedresult in actualresult3 and expectedresult in actualresult4:
             actualresult = "SUCCESS"
             details = "setPublicWiFiParamValues success"
         else:
             actualresult = "FAILURE"
             details = "setPublicWiFiParamValues failed"
         return (tdkTestObj,actualresult,details);
-
 
 # A utility function to get the public wifi parameters.
 #
