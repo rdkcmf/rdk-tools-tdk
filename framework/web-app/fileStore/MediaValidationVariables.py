@@ -61,9 +61,11 @@ webinspect_port_lightning = "10002"
 lightning_apps_loc = ""
 
 #lightning application url
-lightning_video_test_app_url     = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=VIDEO"
-lightning_shaka_test_app_url     = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=SHAKA"
-lightning_uve_test_app_url       = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=AAMP"
+lightning_video_test_app_url     = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=video"
+lightning_shaka_test_app_url     = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=shaka"
+lightning_uve_test_app_url       = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=aamp"
+
+
 lightning_animation_test_app_url = lightning_apps_loc + "tdkanimations/build/index.html"
 lightning_multianimation_test_app_url    = lightning_apps_loc + "tdkmultianimations/build/index.html"
 lightning_objects_animation_test_app_url = lightning_apps_loc + "tdkobjectanimations/build/index.html"
@@ -177,7 +179,7 @@ aac_url_type  = "hls"
 vp9_url_type  = "dash"
 vp8_url_type  = "webm"
 opus_url_type = "dash"
-audio_url_type  = "aac"
+audio_url_type  = "dash"
 mpegts_url_type = "hls"
 mpeg_url_type = "mpeg"
 av1_url_type  = "dash"
@@ -395,3 +397,32 @@ mse_conformance_test_app_url = "https://ytlr-cert.appspot.com/2021/main.html?com
 eme_conformance_test_app_url = "https://ytlr-cert.appspot.com/2021/main.html?command=run&test_type=encryptedmedia-test"
 
 
+#************************************************************************
+# ALL CODEC STREAMS PLAYBACK WITH DIFFERENT PLAYERS
+#************************************************************************
+# Below are the default players for the AV codecs.
+# User shall add different players using which test of particular codec should run.
+# Eg. codec_dash_h264 = "dashjs,shaka" . Now all the dash_h264 related test scripts
+# performs the operations using two players dashjs and shaka player
+codec_dash_h264 = "dashjs"
+codec_hls_h264  = "hlsjs"
+codec_dash_hevc = "dashjs"
+codec_hls_hevc  = "hlsjs"
+codec_dash_aac  = "dashjs"
+codec_hls_aac   = "hlsjs"
+codec_mpeg_ts   = "hlsjs"
+codec_ac3       = "dashjs"
+codec_ec3       = "dashjs"
+codec_vp9       = "dashjs"
+codec_opus      = "dashjs"
+codec_av1       = "dashjs"
+codec_h263      = "video"
+codec_vp8       = "video"
+codec_mp4       = "video"
+codec_ogg       = "video"
+codec_mpeg      = "video"
+codec_audio_aac = "dashjs"
+codec_audio_mp3 = "video"
+codec_audio_dts = "video"
+codec_audio_m4a = "video"
+codec_audio_wav_pcm = "video"

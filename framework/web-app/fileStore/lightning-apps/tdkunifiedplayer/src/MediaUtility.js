@@ -234,18 +234,6 @@
           options = GetURLParameter("options").split(",");
         }
     });
-    options.forEach(item => {
-      if(item.includes("useDashlib")){
-         var dashlib = item.split('(')[1].split(')')[0]
-         if (dashlib == "yes" || dashlib == "YES")
-           player = "DASHJS"
-      }
-      else if(item.includes("useHlslib")){
-         var hlslib = item.split('(')[1].split(')')[0]
-         if (hlslib == "yes" || hlslib == "YES")
-           player = "HLSJS"
-      }
-    });
     var log_msg = "[ " + dispTime() + " ] [" + player + "] " + msg
     console.log(log_msg)
     if(logging == "REST_API"){

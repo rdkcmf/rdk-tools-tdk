@@ -111,7 +111,7 @@ def getTestURL(appURL,URLarguments):
         argInfo = urlInfo[1].split("&")
         appArgs = ""
         for arg in argInfo:
-            if "player=" in arg:
+            if "player=video" in arg:
                 if "type=hls" in URLarguments and "useHlslib(yes)" in URLarguments:
                     arg = "player=hlsjs"
                 elif "type=dash" in URLarguments and "useDashlib(yes)" in URLarguments:
@@ -523,6 +523,9 @@ def getConnectedAudioPorts(obj):
         # For TV platform devices
         elif "SPDIF0" in disp_list:
             audio_port  = "SPDIF0"
+            conn_status = "SUCCESS"
+        elif "SPEAKER0" in disp_list:
+            audio_port  = "SPEAKER0"
             conn_status = "SUCCESS"
         else:
             print "Please test with TV connected setup"
@@ -983,7 +986,7 @@ def monitorVideoTestUsingRestAPI(obj,validation_dict,check_pattern,timeout):
     while logging_flag:
         if continue_count > timeout:
             hang_detected = 1
-            print "\nApp not proceeding for %d min. Exiting..." %(wait_time)
+            print "\nApp not proceeding for %d min. Plz check wpe log. Exiting..." %(wait_time)
             break;
 
         with open(app_log_file,'r') as f:
@@ -1039,7 +1042,7 @@ def monitorVideoTestUsingWebInspect(obj,webkit_console_socket,validation_dict,ch
     while True:
         if continue_count > timeout:
             hang_detected = 1
-            print "\nApp not proceeding for %d min. Exiting..." %(wait_time)
+            print "\nApp not proceeding for %d min. Plz check wpe log. Exiting..." %(wait_time)
             break
         if (len(webkit_console_socket.getEventsBuffer())== 0):
             time.sleep(1)
@@ -1058,8 +1061,8 @@ def monitorVideoTestUsingWebInspect(obj,webkit_console_socket,validation_dict,ch
         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
             test_result = getConsoleMessage(console_log)
             break;
-    webkit_console_socket.disconnect();
-    time.sleep(3);
+    #webkit_console_socket.disconnect();
+    #time.sleep(3);
 
     if "SUCCESS" in test_result and "SUCCESS" in play_status and hang_detected == 0:
         video_test_result = "SUCCESS"
@@ -1108,7 +1111,7 @@ def monitorAnimationTestUsingRestAPI(obj,check_pattern,timeout):
     while logging_flag:
         if continue_count > timeout:
             hang_detected = 1
-            print "\nApp not proceeding for %d min. Exiting..." %(wait_time)
+            print "\nApp not proceeding for %d min. Plz check wpe log. Exiting..." %(wait_time)
             break;
 
         with open(app_log_file,'r') as f:
@@ -1157,7 +1160,7 @@ def monitorAnimationTestUsingWebInspect(obj,webkit_console_socket,check_pattern,
     while True:
         if continue_count > timeout:
             hang_detected = 1
-            print "\nApp not proceeding for %d min. Exiting..." %(wait_time)
+            print "\nApp not proceeding for %d min. Plz check wpe log. Exiting..." %(wait_time)
             break
         if (len(webkit_console_socket.getEventsBuffer())== 0):
             time.sleep(1)
@@ -1175,8 +1178,8 @@ def monitorAnimationTestUsingWebInspect(obj,webkit_console_socket,check_pattern,
         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
             test_result = getConsoleMessage(console_log)
             break;
-    webkit_console_socket.disconnect();
-    time.sleep(3);
+    #webkit_console_socket.disconnect();
+    #time.sleep(3);
 
     if "SUCCESS" in test_result and hang_detected == 0:
         animation_test_result = "SUCCESS"
@@ -1204,7 +1207,7 @@ def monitorConformanceTest(obj,webkit_console_socket,timeout=60):
     while True:
         if continue_count > timeout:
             hang_detected = 1
-            print "\nApp not proceeding for %d min. Exiting..." %(wait_time)
+            print "\nApp not proceeding for %d min. Plz check wpe log. Exiting..." %(wait_time)
             break
         if (len(webkit_console_socket.getEventsBuffer())== 0):
             time.sleep(1)
@@ -1232,8 +1235,8 @@ def monitorConformanceTest(obj,webkit_console_socket,timeout=60):
             timeout_test_list.append(console_log)
         if "Device Status:" in console_log or "Connection refused" in console_log:
             break;
-    webkit_console_socket.disconnect();
-    time.sleep(3);
+    #webkit_console_socket.disconnect();
+    #time.sleep(3);
     if len(failed_test_list) != 0:
         print "\n\n====================== FAILED TESTS =========================="
         dispTestCaseInfo(failed_test_list)
@@ -1268,10 +1271,29 @@ def dispTestCaseInfo(test_list):
         else:
             print test_info
 
+# Function to get the test urls for different players
+def getTestURLs(players_list,appArguments):
+    test_urls = []
+    for player in players_list:
+        if "aamp" in player:
+            appURL = MediaValidationVariables.lightning_uve_test_app_url
+        elif "shaka" in player:
+            appURL = MediaValidationVariables.lightning_shaka_test_app_url
+        elif "hlsjs" in player or "dashjs" in player or "video" in player:
+            appURL = MediaValidationVariables.lightning_video_test_app_url
+
+        test_url = getTestURL(appURL,appArguments)
+        test_urls.append(test_url)
+    return test_urls
+
 
 # Function to set the primary post-requisites
-def setMediaTestPostRequisites(obj,webkit_browser_instance):
+def setMediaTestPostRequisites(obj,webkit_browser_instance,webkit_console_socket):
     post_requisite_status = "SUCCESS"
+    if logging_method == "WEB_INSPECT" or webkit_console_socket != None:
+        webkit_console_socket.disconnect();
+        time.sleep(3);
+
     launch_status = launchPlugin(obj,webkit_browser_instance,"about:blank")
     # TODO webkit browser has to be killed, but when launched again it is not
     # listed as clients after killing. This can be handled when the issues are fixed
@@ -1284,6 +1306,8 @@ def setMediaTestPostRequisites(obj,webkit_browser_instance):
         post_requisite_status = "FAILURE"
 
     return post_requisite_status
+
+
 
 
 

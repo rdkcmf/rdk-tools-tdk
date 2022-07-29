@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+
 import { Launch } from '@lightningjs/sdk'
 import { GetURLParameter  } from './MediaUtility.js'
 import VideoPlayerApp       from './TDKVideoPlayerApp.js'
@@ -25,11 +26,11 @@ import SHAKAPlayerApp       from './TDKSHAKAPlayerApp.js'
 
 export default function() {
           var selectedPlayer = GetURLParameter("player")
-          if (selectedPlayer == "VIDEO"){
+          if (selectedPlayer == "video"){
                   return Launch(VideoPlayerApp, ...arguments)
-          }else if (selectedPlayer == "AAMP"){
+          }else if (selectedPlayer == "aamp"){
                   return Launch(UVEAAMPPlayerApp, ...arguments)
-          }else if (selectedPlayer == "SHAKA"){
+          }else if (selectedPlayer == "shaka"){
                   return Launch(SHAKAPlayerApp, ...arguments)
           }else{
                   return Launch(VideoPlayerApp, ...arguments)
