@@ -307,6 +307,13 @@ video_src_url_multi_drm_dash = ""
 video_src_url_multi_drm_dash_pref_playready_drmconfigs = ""
 video_src_url_multi_drm_dash_pref_widevine_drmconfigs  = ""
 
+# DRM cbcs stream
+video_src_url_playready_cbcs_dash = ""
+video_src_url_playready_cbcs_dash_drmconfigs = ""
+
+video_src_url_playready_cbcs_hls = ""
+video_src_url_playready_cbcs_hls_drmconfigs = ""
+
 
 #************************************************************************
 #                GENERAL CONFIGURATIONS FOR VIDEO TESTS
