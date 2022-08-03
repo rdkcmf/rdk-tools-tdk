@@ -2526,6 +2526,105 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                         info["Test_Step_Status"] = "FAILURE"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+        
+        # TVControlSettings Plugin Response result parser steps
+        elif tag == "tvcontrolsettings_check_value":
+            status = checkNonEmptyResultData(result)
+            success = str(result.get("success")).lower() == "true"
+            if success and status == "TRUE":
+                valueDetails = result.get(arg[1])
+                if len(arg) and arg[0] == "version1":
+                    info[arg[1]] = valueDetails
+                    if len(arg) > 2 and arg[2] == "check_expected_value":
+                         if str(valueDetails).lower() == str(expectedValues[0]).lower():
+                             info["Test_Step_Status"] = "SUCCESS"
+                         else:
+                             info["Test_Step_Status"] = "FAILURE"
+                elif len(arg) and arg[0] == "version2":
+                    selectedValue = valueDetails.get("Selected")
+                    info[arg[2]] = valueDetails.get("Selected")
+                    info["Options"] = valueDetails.get("Options")
+                    if len(arg) > 3 and arg[3] == "check_expected_value":
+                        if str(selectedValue).lower() == str(expectedValues[0]).lower():
+                            info["Test_Step_Status"] = "SUCCESS"
+                        else:
+                            info["Test_Step_Status"] = "FAILURE"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"            
+            else:
+                info["Test_Step_Status"] = "FAILURE" 
+
+        elif tag == "tvcontrolsettings_check_set_operation":
+            info["success"] = result.get("success")
+            if str(result.get("success")).lower() == "true":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "tvcontrolsettings_check_dynamic_contrast":
+            info["DynamicContrast"] = result.get('DynamicContrast');
+            if str(result.get("success")).lower() == "true" and str(result.get('DynamicContrast')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "tvcontrolsettings_check_supported_modes":
+            info[arg[0]] = result.get(arg[0]);
+            success = str(result.get("success")).lower() == "true"
+            status = checkNonEmptyResultData(result.get(arg[0]))
+            if "FALSE" not in status and success:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "tvcontrolsettings_check_modes":
+            info[arg[0]] = result.get(arg[0])
+            if len(arg) > 1 and arg[1] == "check_expected_mode":
+                if str(result.get(arg[0])).lower() == str(expectedValues[0]).lower():
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                if str(result.get("success")).lower() == "true" and result.get(arg[0]) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "tvcontrolsettings_check_auto_backlight_control":
+            status = checkNonEmptyResultData(result)
+            info["supportedModes"] = result.get("supportedModes")
+            info["mode"] = result.get("mode")
+            success = str(result.get("success")).lower() == "true"
+            if success and status == "TRUE":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+            if len(arg) and arg[0] == "check_expected_mode":
+                if str(result.get("mode")).lower() == str(expectedValues[0]).lower():
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+
+        elif tag == "tvcontrolsettings_validate_range":
+            if arg[0] == "version1":
+                resultValue = result.get(arg[1])
+                info[arg[1]] = resultValue
+            elif arg[0] == "version2":
+                resultDetails = result.get(arg[1])
+                info[arg[2]] = resultDetails.get('Setting')
+                resultValue = resultDetails.get('Setting')
+                info["Range"] = resultDetails.get('Range')
+            if len(arg) > 2 and "check_range" in arg:
+                if 0 <= int(resultValue) <= 100 and str(result.get("success")).lower() == "true":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                if str(result.get("success")).lower() == "true" and str(resultValue) in expectedValues:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_state":
@@ -3094,7 +3193,7 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["PUBLIC_IP"] = testStepResults[0].get("PUBLIC_IP")
             else:
                 info["value"] = testStepResults[0].get("details")
-        
+
         elif tag == "system_get_formatted_time_zones":
             timeZone = []
             testStepResults = testStepResults[0].values()[0]
@@ -3568,6 +3667,18 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 if arg[0] == service.get("dvburi"):
                     info["lcn"] = service.get("lcn")
                     break
+        # TVControlSettings Plugin Response result parser steps
+        elif tag == "tvcontrolsettings_get_aspect_ratio":
+            testStepResults = testStepResults[0].values()[0]
+            info["aspectRatio"] = testStepResults[0].get("aspectRatio") 
+        
+        elif tag == "tvcontrolsettings_get_supported_modes":
+            Modes = []
+            testStepResults = testStepResults[0].values()[0]
+            supportedModes = testStepResults[0].get(arg[0])
+            for value in supportedModes:
+                Modes.append(str(value))
+            info[arg[1]] = ",".join(Modes)
 
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_name":

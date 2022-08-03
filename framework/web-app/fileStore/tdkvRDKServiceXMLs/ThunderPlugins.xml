@@ -1915,6 +1915,88 @@
         <method name="Schedule_Events" api="scheduleEvents" type="method" desc="Provides access to the events which are scheduled" />
         <event name="Event_Service_Search_Status" eventName="searchstatus" eventId="client.events.1" type="event" desc="Triggered during the course of a service search" />
     </plugin>
+    
+    <!-- TVControlSettings Plugin Information --> 
+    <plugin pluginName="TVControlSettings" serviceName="org.rdk.tv.ControlSettings" serviceVersion="2">
+	<method name="Get_Aspect_Ratio" api="getAspectRatio" type="method" desc="Get current TV aspect ratio setting" />
+        <method name="Get_Aspect_Ratio_V1" api="getAspectRatio" type="method" version="1" desc="Get current TV aspect ratio setting" />
+        <method name="Set_Aspect_Ratio" api="setAspectRatio" type="method" desc="Set current TV aspect ratio setting" >
+          <params>
+           <param tag="aspectRatio" defaultValue="null"/>
+          </params>
+        </method>
+        <method name="Set_Aspect_Ratio_V1" api="setAspectRatio" type="method" version="1" desc="Set current TV aspect ratio setting" >
+          <params>
+           <param tag="aspectRatio" defaultValue="null"/>
+          </params>
+        </method>
+        <method name="Get_Status" api="status" type="method" desc="Provides access to the information related to the play handle defined by the index" />
+	<method name="Get_Dynamic_Contrast" api="getDynamicContrast" type="method" desc="Checks if dynamic contrast is enabled or not">
+	    <expectedValues>enabled,disabled</expectedValues>
+        </method>
+        <method name="Set_Dynamic_Contrast" api="setDynamicContrast" type="method" desc="Enable/disable dynamic contrast" >
+            <params>
+               <param tag="DynamicContrast" defaultValue="null"/>
+            </params>
+        </method>
+	<method name="Get_Brightness" api="getBrightness" type="method" desc="Get current TV brightness setting" />
+	<method name="Get_Brightness_V1" api="getBrightness" type="method" version="1" desc="Get current TV brightness setting" />
+        <method name="Set_Brightness" api="setBrightness" type="method" version="1" desc="Set current TV brightness setting" >
+            <params>
+               <param tag="brightness" defaultValue="null" />
+            </params>
+        </method>
+        <method name="Get_All_Backlight_Dimming_Modes" api="getAllBacklightDimmingModes" type="method" desc="Get all supported backlight dimming modes for this product" />
+	<method name="Get_Backlight_Dimming_Mode" api="getBacklightDimmingMode" type="method" desc="Get current set TV backlight dimming mode" />
+        <method name="Set_Backlight_Dimming_Mode" api="setBacklightDimmingMode" type="method" desc="Set a current backlight dimming mode" >
+          <params>
+           <param tag="DimmingMode" defaultValue="null"/>
+          </params>
+        </method>
+        <method name="Get_Auto_Backlight_Control" api="getAutoBacklightControl" type="method" desc="API to get details on the supported modes for Auto Backlight Control" />
+	<method name="Set_Auto_Backlight_Control" api="setAutoBacklightControl" type="method" desc="Set mode for Auto Backlight Control" >
+          <params>
+           <param tag="mode" defaultValue="null"/>
+          </params>
+        </method>		
+	<method name="Get_Backlight" api="getBacklight" type="method" desc="Get current TV backlight setting" />
+	<method name="Get_Backlight_V1" api="getBacklight" type="method" version="1" desc="Get current TV backlight setting" />
+        <method name="Set_Backlight" api="setBacklight" type="method" version="1" desc="Set current TV backlight setting" >
+          <params>
+           <param tag="backlight" defaultValue="null"/>
+          </params>
+        </method>
+	<method name="Get_Color_Temperature" api="getColorTemperature" type="method" desc="Get current TV color temperature setting" />
+	<method name="Get_Color_Temperature_V1" api="getColorTemperature" type="method" version="1" desc="Get current TV color temperature setting" />
+        <method name="Set_Color_Temperature" api="setColorTemperature" type="method" version="1" desc="Set current TV color temperature setting" >
+          <params>
+           <param tag="colorTemp" defaultValue="null"/>
+          </params>
+        </method>
+        <method name="Get_Supported_Picture_Modes" api="getSupportedPictureModes" type="method" desc="Get all supported picture modes for this product" />
+        <method name="Get_Picture_Mode" api="getPictureMode" type="method" desc="Get current set TV picture mode" />
+        <method name="Set_Picture_Mode" api="setPictureMode" type="method" desc="Set TV picture mode" >
+          <params>
+           <param tag="pictureMode" defaultValue="null"/>
+          </params>
+        </method>
+	<method name="Get_Saturation" api="getSaturation" type="method" desc="Get current TV saturation setting" />
+	<method name="Get_Saturation_V1" api="getSaturation" type="method" version="1" desc="Get current TV saturation setting" />
+        <method name="Set_Saturation" api="setSaturation" type="method" version="1" desc="Set current TV saturation setting" >
+          <params>
+           <param tag="saturation" defaultValue="null"/>
+          </params>
+        </method>
+	<method name="Get_Sharpness" api="getSharpness" type="method" desc="Get current TV sharpness setting" />
+	<method name="Get_Sharpness_V1" api="getSharpness" type="method" version="1" desc="Get current TV sharpness setting" />
+        <method name="Set_Sharpness" api="setSharpness" type="method" version="1" desc="Set current TV sharpness setting" >
+          <params>
+           <param tag="sharpness" defaultValue="null"/>
+          </params>
+        </method>
+        
+    </plugin> 
+
 </thunderPlugins>
 
 
