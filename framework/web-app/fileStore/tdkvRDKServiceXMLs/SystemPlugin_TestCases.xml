@@ -855,7 +855,7 @@
        </testCase>
 
        <testCase testCaseId="SYS_49" testCaseName="System_Toggle_Network_Standby_Mode_Status" desc="Toggle Network Standby Mode Status" >
-           <testCaseInfo testCaseType="setandget" revert="true" />
+           <testCaseInfo testCaseType="setandget" revert="true" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="NetworkStandbyMode"/>
             <testStep testStepId="1" name="Get_Network_Standby_Mode" method="Get_Network_Standby_Mode" saveResult="true" revertGet="yes">
                 <resultGeneration useMethodTag="system_get_network_standby_mode_status" />
             </testStep>

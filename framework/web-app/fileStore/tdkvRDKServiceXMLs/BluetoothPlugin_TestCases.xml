@@ -631,8 +631,9 @@
                 <resultGeneration useMethodTag="bluetooth_set_operation" expectedValues="true"/>
             </testStep>
             <testStep testStepId="8" name="Get_Discovered_Devices" method="Get_Discovered_Devices" >
-                <resultGeneration useMethodTag="bluetooth_get_discovered_devices" arguments="check_device_not_discovered" >
+                <resultGeneration useMethodTag="bluetooth_get_discovered_devices">
                     <expectedValues useConfigFile="true" key="BT_EMU_DEVICE_NAME"/>
+                    <arguments value="check_device_not_discovered" usePreviousResult="true" Id="4" useMethodTag="bluetooth_get_device_id"/>
                 </resultGeneration>
             </testStep>
         </testCase>
@@ -779,8 +780,9 @@
                 <resultGeneration useMethodTag="bluetooth_set_operation" />
 	    </testStep>
             <testStep testStepId="10" name="Get_Discovered_Devices" method="Get_Discovered_Devices" >
-                <resultGeneration useMethodTag="bluetooth_get_discovered_devices" arguments="check_device_not_discovered" >
+                <resultGeneration useMethodTag="bluetooth_get_discovered_devices" >
                     <expectedValues useConfigFile="true" key="BT_EMU_DEVICE_NAME"/>
+                    <arguments value="check_device_not_discovered" usePreviousResult="true" Id="4" useMethodTag="bluetooth_get_device_id"/>
                 </resultGeneration>
             </testStep>
             <testStep testStepId="11" name="Unpair" method="Unpair" delay="3">

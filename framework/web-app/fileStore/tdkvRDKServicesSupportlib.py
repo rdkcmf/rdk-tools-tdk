@@ -150,11 +150,14 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
         elif tag == "ocdm_get_drm_info":
             if arg[0] == "get_all_info":
                 status = []
+                supportedDRMStatus = []
+                drms_name = []
                 drm_info = []
                 for drm in result:
                     drm_details = []
                     drm = eval(json.dumps(drm))
                     drm_details.append(drm.get("name"))
+                    drms_name.append(drm.get("name"))
                     if drm.get("keysystems") is not None and len(drm.get("keysystems")):
                         key_info = [ str(key) for key in drm.get("keysystems") ]
                         drm_details.extend(key_info)
@@ -163,11 +166,16 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     drm_info.append(drm)
                     status.append(checkNonEmptyResultData(drm_details))
                 info["drm_info"] = drm_info
-                if "FALSE" not in status and len(drm_info) != 0:
+                if expectedValues:
+                    drms_name = [ value.lower() for value in drms_name ]
+                    expectedValues = [ value.lower() for value in expectedValues ]
+                    for value in expectedValues:
+                        if value not in drms_name:
+                            supportedDRMStatus.append("FALSE")
+                if "FALSE" not in status and len(drm_info) != 0 and "FALSE" not in supportedDRMStatus:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
-
         elif tag == "ocdm_get_drm_key_info":
             if arg[0] == "check_drm_key":
                 key_info = []
@@ -1994,10 +2002,16 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 status.append(checkStatus)
             elif len(arg) and arg[0] == "check_device_not_discovered":
                 checkStatus = "TRUE"
-                for device_info in discoveredDevices:
-                    if str(device_info.get("name")) in expectedValues[0]:
-                        checkStatus = "FALSE"
-                        break
+                if len(arg) > 1:
+                    for device_info in discoveredDevices:
+                        if str(device_info.get("name")) in expectedValues[0] and str(device_info.get("deviceID")) in arg[1]:
+                            checkStatus = "FALSE"
+                            break
+                else:
+                    for device_info in discoveredDevices:
+                        if str(device_info.get("name")) in expectedValues[0]:
+                            checkStatus = "FALSE"
+                            break
                 status.append(checkStatus)
             if "FALSE" not in status and success:
                 info["Test_Step_Status"] = "SUCCESS"
@@ -3795,7 +3809,7 @@ def checkTestCaseApplicability(methodTag,configKeyData,arguments):
                 result = "FALSE"
 
         elif tag == "firmwarecontrol_check_feature_applicability":
-            if arg[0] in keyData:
+            if all(item in keyData for item in arg):
                 result = "TRUE"
             else:
                 result = "FALSE"
@@ -4294,7 +4308,7 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,execInfo)
                 else:
                     info["Test_Step_Status"] = "FAILURE"
         elif tag == "toggleMemoryBank":
-            command = "/bin/sh /usr/bin/swap_bank.sh"
+            command = '/bin/sh '+arg[0]
             info["deatils"] = executeCommand(execInfo, command)
             info["Test_Step_Status"] =  "SUCCESS"
 

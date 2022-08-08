@@ -44,7 +44,7 @@
         </pluginPreRequisite>
 
         <testCase testCaseId="FWC_01" testCaseName="Upgrade_Firmware_Using_Memory_RollBack_Feature" desc="Upgrade the device to the given firmware and reverts the image uisng memory rollback feature" >
-            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="SUPPORTED_PLUGINS" useMethodTag="firmwarecontrol_check_feature_applicability" arguments="FirmwareControl"/>
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="SUPPORTED_PLUGINS,FWC_MEMORY_ROLLBACK_SUPPORT" useMethodTag="firmwarecontrol_check_feature_applicability" arguments="FirmwareControl,yes"/>
             <testStep testStepId="1" name="GetCurrentImageVersion" action="externalFnCall" saveResult="true" >
                 <resultGeneration useMethodTag="getImageVersion" arguments="get"/>
             </testStep>
@@ -75,7 +75,9 @@
                 </resultGeneration>
             </testStep>
             <testStep testStepId="8" name="Toggle_Memory_Bank" action="externalFnCall" delay="10" >
-                <resultGeneration useMethodTag="toggleMemoryBank"/>
+                <resultGeneration useMethodTag="toggleMemoryBank">
+                    <arguments useConfigFile="true" key="FWC_SWAP_BANK_SCRIPT_PATH"/>
+                </resultGeneration>
             </testStep>
             <testStep testStepId="9" name="Execute_Reboot_Command" action="externalFnCall" delay="30" rebootStep="yes">
                 <resultGeneration useMethodTag="executeRebootCmd"/>

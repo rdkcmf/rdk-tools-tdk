@@ -44,7 +44,9 @@
         <testCase testCaseId="OCDM_01" testCaseName="OCDM_Get_All_DRM_Info" desc="Gets supported DRMs &amp; DRM key systems" >
             <testCaseInfo testCaseType="loop"/>
             <testStep testStepId="1" name="Get_Supported_DRM_Systems" method="Get_Supported_DRM_Systems" saveResult="true">
-                <resultGeneration useMethodTag="ocdm_get_drm_info" arguments="get_all_info" />
+                    <resultGeneration useMethodTag="ocdm_get_drm_info" arguments="get_all_info" >
+                            <expectedValues useConfigFile="true" key="OCDM_SUPPORTED_DRM_SYSTEMS"/>
+                    </resultGeneration>
             </testStep>
             <testStep testStepId="2" name="Get_And_Check_DRM_Key_Systems" testStepType="loop">
               <subtestStep subtestStepId="1" name="Get_DRM_Key_Systems" method="Get_DRM_Key_Systems" >
@@ -57,7 +59,6 @@
               </subtestStep>
             </testStep>
         </testCase>
-
        <!--testCase testCaseId="OCDM_02" testCaseName="OCDM_ActivateDeactivate_STRESS" desc="Activates and deactivates the plugin">
              <testCaseInfo testCaseType="stress" configurableRepeat="true" repeatKey="STRESS_TEST_REPEAT_COUNT" />
 

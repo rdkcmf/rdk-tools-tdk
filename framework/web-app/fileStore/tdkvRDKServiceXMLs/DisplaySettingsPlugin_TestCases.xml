@@ -732,7 +732,7 @@
         </testCase>
 
         <testCase testCaseId="DS_27" testCaseName= "Enable_Disable_Audio_Atmos_Output_Mode" desc="Check whether audio atmos output mode is possile to enable and disable">
-            <testCaseInfo testCaseType="loop" />
+            <testCaseInfo testCaseType="loop" configurableTest="true" testKey="DISPLAYSETTINGS_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="AudioAtmosOutputMode"/>
             <testStep testStepId="1" name="Enable_Disable_Audio_Atmos_Output_Mode" testStepType="loop" >
               <subtestStep subtestStepId="1" name="Enable_Disable_Audio_Atmos_Output_Mode" method="Set_Audio_Atmos_Output_Mode" >
                   <params>
