@@ -112,9 +112,9 @@ def getTestURL(appURL,URLarguments):
         appArgs = ""
         for arg in argInfo:
             if "player=" in arg:
-                if "type=hls" in URLarguments:
+                if "type=hls" in URLarguments and "useHlslib(yes)" in URLarguments:
                     arg = "player=hlsjs"
-                elif "type=dash" in URLarguments:
+                elif "type=dash" in URLarguments and "useDashlib(yes)" in URLarguments:
                     arg = "player=dashjs"
 
             if appArgs != "":
@@ -456,16 +456,20 @@ def checkDRMSupported(obj,drm):
             details = tdkTestObj.getResultDetails();
             details = ast.literal_eval(details)
             drm_list = []
-            for drm_info in details:
-                drm_list.append(drm_info.get("name"))
-            print "Supported DRMs : %s" %(drm_list)
-            drm_list = [ drm_name.lower() for drm_name in drm_list ]
-            if drm.lower() in drm_list:
-                print "%s DRM is supported" %(drm)
-                return "TRUE"
+            if details != None:
+                for drm_info in details:
+                    drm_list.append(drm_info.get("name"))
+                print "Supported DRMs : %s" %(drm_list)
+                drm_list = [ drm_name.lower() for drm_name in drm_list ]
+                if drm.lower() in drm_list:
+                    print "%s DRM is supported" %(drm)
+                    return "TRUE"
+                else:
+                    print "%s DRM not supported" %(drm)
+                    return "NA"
             else:
-                print "%s DRM not supported" %(drm)
-                return "NA"
+                print "Unable to get DRM info"
+                return "FALSE"
         else:
             print "Unable to activate OCDM plugin to check DRM info"
             return "FALSE"
