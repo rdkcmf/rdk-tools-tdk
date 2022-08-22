@@ -190,7 +190,7 @@ if expectedResult in result.upper():
             tdkTestObj.setResultStatus("FAILURE")
 
         event_listener.disconnect()
-        getSummary(Summ_list)
+        getSummary(Summ_list,obj)
         time.sleep(10)
     else:
         print "\n Preconditions are not met \n"

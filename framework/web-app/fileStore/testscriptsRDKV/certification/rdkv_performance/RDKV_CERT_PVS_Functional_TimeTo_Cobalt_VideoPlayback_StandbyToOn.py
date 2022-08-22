@@ -367,7 +367,7 @@ if expectedResult in result.upper():
             tdkTestObj.setResultStatus("FAILURE")
         event_listener.disconnect()
         time.sleep(5)
-        getSummary(Summ_list)
+        getSummary(Summ_list,obj)
     else:
         print "\n Pre conditions are not met \n"
         obj.setLoadModuleStatus("FAILURE");

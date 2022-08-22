@@ -232,7 +232,7 @@ if expectedResult in result.upper():
         print "Revert the values before exiting"
         status = set_plugins_status(obj,curr_plugins_status_dict)
     obj.unloadModule("rdkv_performance");
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

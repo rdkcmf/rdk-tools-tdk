@@ -1223,15 +1223,6 @@ def rdkservice_getBrowserScore_MotionMark():
     browser_score_dict = json.dumps(browser_score_dict)
     return browser_score_dict
 
-
-#---------------------------------------------------------------------------------------
-# PVS Execution Summary
-#---------------------------------------------------------------------------------------
-def getSummary(Summ_list):
-    print("############## Execution Summary #######################")
-    for key in Summ_list:
-      print(key)
-
 #-------------------------------------------------------------------
 #GET THE BROWSER SCORE FROM SMASHCAT TEST
 #-------------------------------------------------------------------
@@ -1319,4 +1310,61 @@ def rdkservice_getBrowserScore_Kraken():
         driver.quit()
     browser_score_dict = json.dumps(browser_score_dict)
     return browser_score_dict
+#--------------------------------------------------------
+# OPEN A LOG FILE TO REDIRECT THE LOGS
+#--------------------------------------------------------
+def open_write_logfile(obj,filename,script_name,data=""):
+    output_file = '{}{}.txt'.format(obj.logpath,filename)
+    if os.path.isfile(output_file):
+        with open(output_file, 'r') as the_file:
+            buf = the_file.readlines()
+        with open(output_file, 'w') as the_file:
+            for line in buf:
+                if script_name in line:
+                    data = line.strip() + " ::: " + data.split(" ::: ")[-1]
+                elif line.split(" ::: ")[0] != script_name:
+                    print "Writing existing line"
+                    the_file.write(line)
 
+    print "\nWriting performance data to file ", output_file
+    with open(output_file, 'a+') as out_file:
+        out_file.write(data)
+#--------------------------------------------------------------
+#GET PVS DATA AND WRITE TO LOG FILE
+#--------------------------------------------------------------
+def getDataAndWriteInFile(Value,obj):
+    #getImageName
+    ImageName = rdkservice_getValueWithParams("org.rdk.System.1.getDeviceInfo",'["imageVersion"]')
+    filename = ImageName["imageVersion"]
+    delimiter = " ::: "
+    #open_write_logfile(libObj,filename,obj.execName)
+    count1 = sum(1 for d in Value if 'THRESHOLD_VALUE' in d)
+    count2 = sum(1 for d in Value if 'Threshold value' in d)
+    count = count1 + count2
+    for i in range (count):
+        data = obj.execName + delimiter
+        for item in Value:
+            if "THRESHOLD_VALUE" in item or "Threshold value" in item:
+                threshold_value = item.split(":")[1]
+                Value.remove(item)
+                break;
+        for item in Value:
+            if "Time taken " in item or "Browser " in item:
+                data = data + item.split(":")[0] + delimiter + threshold_value + delimiter
+                data = data + item.split(":")[1]
+                Value.remove(item)
+                break;
+        data = data + "\n"
+        print data
+        open_write_logfile(libObj,filename,obj.execName,data)
+#---------------------------------------------------------------------------------------
+# PVS Execution Summary
+#---------------------------------------------------------------------------------------
+def getSummary(Summ_list,obj = False):
+    if obj != False:
+       Value = [x for x in Summ_list]
+       getDataAndWriteInFile(Value,obj)
+
+    print("############## Execution Summary #######################")
+    for key in Summ_list:
+      print(key)

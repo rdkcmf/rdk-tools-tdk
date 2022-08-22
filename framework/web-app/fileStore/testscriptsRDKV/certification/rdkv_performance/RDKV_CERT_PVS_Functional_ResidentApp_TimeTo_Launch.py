@@ -162,7 +162,7 @@ if expectedResult in result.upper():
         print "\n Please configure the variables in device config file"
         obj.setLoadModuleStatus("FAILURE")
     obj.unloadModule("rdkv_performance")
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
 else:
     obj.setLoadModuleStatus("FAILURE")
     print "Failed to load module"

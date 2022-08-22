@@ -181,7 +181,7 @@ if expectedResult in result.upper():
                             result1, motionmark_threshold_value = getDeviceConfigKeyValue(conf_file,"MOTIONMARK_THRESHOLD_VALUE")
                             if motionmark_threshold_value != "":
                                 print "\n Browser score from test: ",browser_score
-                                Summ_list.append('Browser score from test:: {} '.format(browser_score))
+                                Summ_list.append('Browser score from test: {} '.format(browser_score))
                                 print "\n Threshold value for browser score:",motionmark_threshold_value
                                 Summ_list.append('Threshold value for browser score: {}'.format(motionmark_threshold_value))
                                 if float(browser_score) > float(motionmark_threshold_value):
@@ -222,7 +222,7 @@ if expectedResult in result.upper():
     else:
         print "Pre conditions are not met"
         obj.setLoadModuleStatus("FAILURE")
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"

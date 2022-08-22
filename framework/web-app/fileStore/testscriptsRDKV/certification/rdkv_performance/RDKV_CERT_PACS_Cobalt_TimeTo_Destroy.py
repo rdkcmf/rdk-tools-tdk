@@ -225,7 +225,7 @@ if expectedResult in result.upper():
             print "\n Error while launching Cobalt"
             obj.setLoadModuleStatus("FAILURE")
         event_listener.disconnect()
-        getSummary(Summ_list)
+        getSummary(Summ_list,obj)
         time.sleep(10)
     else:
         print "\n Preconditions are not met \n"

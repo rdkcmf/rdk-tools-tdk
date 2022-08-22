@@ -226,7 +226,7 @@ if expectedResult in result.upper():
         print "\nRevert the values before exiting"
         status = revert_value(curr_webkit_status,curr_cobalt_status,obj);
     obj.unloadModule("rdkv_performance");
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

@@ -225,7 +225,7 @@ if expectedResult in result.upper():
             print "\n Unable to set LightningApp plugin to suspended state"
             obj.setLoadModuleStatus("FAILURE")
         event_listener.disconnect()
-        getSummary(Summ_list)
+        getSummary(Summ_list,obj)
         time.sleep(30)
     else:
         print "\n Pre conditions are not met \n"

@@ -227,7 +227,7 @@ if expectedResult in result.upper():
         print "\n Preconditions are not met"
         tdkTestObj.setResultStatus("FAILURE")
     obj.unloadModule("rdkv_performance");
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

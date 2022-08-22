@@ -239,7 +239,8 @@ if expectedResult in result.upper():
                             result, strike_threshold_value = getDeviceConfigKeyValue(conf_file,"STRIKE_THRESHOLD_VALUE")
                             if strike_threshold_value != "" :
                                 print "\n Threshold value for performance score: ",strike_threshold_value
-                                Summ_list.append('Threshold value for performance score::{}'.format(strike_threshold_value))
+                                Summ_list.append('Threshold value for performance score:{}'.format(strike_threshold_value))
+                                Summ_list.append('Browser score with strike:{}'.format(browser_score))
                                 if int(browser_score) > int(strike_threshold_value):
                                     print "\n The browser performance score is high as expected\n"
                                     Summ_list.append('The browser performance score is high as expected')
@@ -291,7 +292,7 @@ if expectedResult in result.upper():
     else:
         print "Unable to revert the resolution"
         tdkTestObj.setResultStatus("FAILURE")
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
     #Revert the values
     if revert=="YES":
         print "\n Revert the values before exiting"

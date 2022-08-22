@@ -309,7 +309,7 @@ if expectedResult in result.upper():
         status = set_plugins_status(obj,curr_plugins_status_dict)
         #status = revert_value(curr_webkit_status,curr_cobalt_status,obj);
     obj.unloadModule("rdkv_performance");
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

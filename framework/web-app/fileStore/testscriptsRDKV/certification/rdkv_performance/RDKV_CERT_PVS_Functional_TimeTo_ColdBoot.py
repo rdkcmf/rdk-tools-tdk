@@ -148,6 +148,7 @@ if expectedResult in result.upper():
                             print "\n Time taken for the cold boot : {} ms".format(timeto_coldboot)
                             Summ_list.append('Time taken for the cold boot :{}ms'.format(timeto_coldboot))
                             print "\n Threshold value for time taken for cold boot: {} ms".format(cold_boot_time_threshold_value)
+                            Summ_list.append("Threshold value for time taken for cold boot: {} ms".format(cold_boot_time_threshold_value))
                             if 0 < int(timeto_coldboot) < (int(cold_boot_time_threshold_value) + int(offset)) :
                                 tdkTestObj.setResultStatus("SUCCESS")
                                 print "\n The time taken for cold boot is within the expected limit"
@@ -173,7 +174,7 @@ if expectedResult in result.upper():
         print "\n Please configure the variables in device config file"
         obj.setLoadModuleStatus("FAILURE")
     obj.unloadModule("rdkv_performance")
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
 else:
     obj.setLoadModuleStatus("FAILURE")
     print "Failed to load module"

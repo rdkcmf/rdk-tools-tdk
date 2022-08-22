@@ -203,7 +203,7 @@ if expectedResult in result.upper():
         print "\nPreconditions are not met\n"
         tdkTestObj.setResultStatus("FAILURE")
     obj.unloadModule("rdkv_performance")
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
 else:
     obj.setLoadModuleStatus("FAILURE")
     print "Failed to load module"

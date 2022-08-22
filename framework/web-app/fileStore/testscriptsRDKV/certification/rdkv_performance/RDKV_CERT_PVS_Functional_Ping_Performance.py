@@ -156,9 +156,9 @@ if expectedResult in result.upper():
         result1, triptime_threshold_value = getDeviceConfigKeyValue(conf_file,"TRIPTIME_THRESHOLD_VALUE")
         if triptime_threshold_value != "":
             print "\n Average Trip Time: ",triptime
-            Summ_list.append('Average Trip Time::{}'.format(triptime))
+            Summ_list.append('Time taken for average Trip:{}'.format(triptime))
             print "\n Threshold value for trip time:",triptime_threshold_value
-            Summ_list.append('Threshold value for triptime::{}'.format(triptime_threshold_value))
+            Summ_list.append('Threshold value for triptime:{}'.format(triptime_threshold_value))
             if float(triptime) < float(triptime_threshold_value):
                  print "\n The trip time is lesser than threshold time\n"
             else:
@@ -172,7 +172,7 @@ if expectedResult in result.upper():
         tdkTestObj.setResultStatus("FAILURE")
   
   
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"

@@ -283,7 +283,7 @@ if expectedResult in result.upper():
     if revert_plugins_dict != {}:
         status = set_plugins_status(obj,revert_plugins_dict)
     obj.unloadModule("rdkv_performance");
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

@@ -207,7 +207,7 @@ if expectedResult in result.upper():
             print "Failed to get current URL from webkitbrowser"
     else:
         print "Pre conditions are not met"
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"

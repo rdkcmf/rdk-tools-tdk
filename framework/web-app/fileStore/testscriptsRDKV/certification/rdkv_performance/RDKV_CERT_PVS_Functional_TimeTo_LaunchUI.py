@@ -220,14 +220,15 @@ if expectedResult in result.upper():
             print "\nThe time taken for launching UI, calculated using 90th percentile method",ui_uptime
             if all(value != "" for value in (ui_launch_threshold_value,offset)):
                 print "\n Threshold value for time taken for UI to load after reboot: {} ms".format(ui_launch_threshold_value)
+                Summ_list.append('Threshold value for time taken for UI to load after reboot: {} ms'.format(ui_launch_threshold_value))
                 if 0 < int(ui_uptime) < (int(ui_launch_threshold_value) + int(offset)) :
                     tdkTestObj.setResultStatus("SUCCESS");
-                    Summ_list.append('The time taken for UI to load after reboot : {} ms'.format(ui_uptime))
+                    Summ_list.append('Time taken for UI to load after reboot : {} ms'.format(ui_uptime))
                     print "\n The time taken for UI to load after reboot is within the expected limit"
                     Summ_list.append('The time taken for UI to load after reboot is within the expected limit')
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
-                    Summ_list.append('The time taken for UI to load after reboot : {} ms'.format(ui_uptime))
+                    Summ_list.append('Time taken for UI to load after reboot : {} ms'.format(ui_uptime))
                     print "\n The time taken for UI to load after reboot is not within the expected limit"
                     Summ_list.append('The time taken for UI to load after reboot is not within the expected limit')
             else:
@@ -249,6 +250,6 @@ if expectedResult in result.upper():
     if revert_plugin_status == "YES":
         status = set_plugins_status(obj,revert_dict)
     obj.unloadModule("rdkv_performance");
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
 else:
     obj.setLoadModuleStatus("FAILURE");

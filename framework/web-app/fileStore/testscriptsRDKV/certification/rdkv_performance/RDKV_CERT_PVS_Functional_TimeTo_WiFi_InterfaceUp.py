@@ -214,13 +214,14 @@ if expectedResult in result.upper():
             print "\nThe time taken for wlan0 interface to up, calculated using 90th percentile method",interface_uptime
             if all(value != "" for value in (if_uptime_threshold_value,offset)):
                 print "\n Threshold value for time taken for wlan0 interface to up after reboot: {} ms".format(if_uptime_threshold_value)
+                Summ_list.append("Threshold value for time taken for wlan0 interface to up after reboot: {} ms".format(if_uptime_threshold_value))
                 if 0 < int(interface_uptime) < (int(if_uptime_threshold_value) + int(offset)):
-                    Summ_list.append('The time taken for wlan0 interface to up after reboot : {} ms'.format(interface_uptime))
+                    Summ_list.append('Time taken for wlan0 interface to up after reboot : {} ms'.format(interface_uptime))
                     tdkTestObj.setResultStatus("SUCCESS");
                     print "\n The time taken for wlan0 interface to up after reboot is within the expected limit\n"
                     Summ_list.append('The time taken for wlan0 interface to up after reboot is within the expected limit')
                 else:
-                    Summ_list.append('The time taken for wlan0 interface to up after reboot : {} ms'.format(interface_uptime))
+                    Summ_list.append('Time taken for wlan0 interface to up after reboot : {} ms'.format(interface_uptime))
                     tdkTestObj.setResultStatus("FAILURE");
                     print "\n The time taken for wlan0 interface to up after reboot is not within the expected limit \n"
                     Summ_list.append('The time taken for wlan0 interface to up after reboot is not within the expected limit')
@@ -250,7 +251,7 @@ if expectedResult in result.upper():
     if revert_plugins_dict != {}:
         status = set_plugins_status(obj,revert_plugins_dict)
     obj.unloadModule("rdkv_performance");
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
 else:
     obj.setLoadModuleStatus("FAILURE");
     print "Failed to load module"

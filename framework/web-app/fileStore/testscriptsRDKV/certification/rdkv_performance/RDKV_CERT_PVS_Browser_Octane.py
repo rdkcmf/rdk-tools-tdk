@@ -212,7 +212,7 @@ if expectedResult in result.upper():
     else:
         print "Pre conditions are not met"
         obj.setLoadModuleStatus("FAILURE");
-    getSummary(Summ_list)
+    getSummary(Summ_list,obj)
     #Revert the values
     if revert=="YES":
         print "Revert the values before exiting"
