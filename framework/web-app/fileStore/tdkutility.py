@@ -751,3 +751,184 @@ def RevertWPA3Pre_requisite(obj1, initial_value):
         status = 0;
     return status;
 
+
+# CheckWANTrafficCountsPre_requisite
+# Syntax      : CheckWANTrafficCountsPre_requisite(obj1, step):
+# Description : Function to check if the pre-requisites are set for WAN Traffic Counts and set them if not set
+# Parameters  : obj1 - LMLite object
+#               step - test step number
+# Return Value: pre_req_set - flag to check if the pre-requisites are set properly
+#               tdkTestObj - test object to set result status
+#               step - the current step
+#               revert_flag - flag to check if pre-requisite revert opeartion is needed
+#               initial_lanmode - initial enable value of Lan Mode
+
+def CheckWANTrafficCountsPre_requisite(obj1, step):
+    expectedresult="SUCCESS";
+    pre_req_set = 0;
+    revert_flag = 0;
+    parameter = "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.RBUS.Enable";
+
+    print "\nTEST STEP %d : Get the initial enable state of RBUS using %s" %(step, parameter);
+    print "EXPECTED RESULT %d : Should get the initial enable state value successfully" %step;
+
+    tdkTestObj = obj1.createTestStep("LMLiteStub_Get");
+    tdkTestObj.addParameter("paramName",parameter);
+    tdkTestObj.executeTestCase(expectedresult);
+    actualresult = tdkTestObj.getResult();
+    initial_enable = tdkTestObj.getResultDetails();
+
+    if expectedresult in actualresult and initial_enable != "":
+        #Set the result status of execution
+        tdkTestObj.setResultStatus("SUCCESS");
+        print "ACTUAL RESULT %d : The initial enable value retrieved successfully" %step;
+        print "TEST EXECUTION RESULT : SUCCESS";
+
+        if initial_enable == "true":
+            #Set the result status of execution
+            tdkTestObj.setResultStatus("SUCCESS");
+            print "RBUS is in enabled state...";
+
+            #Check if the lan mode is router, if not set to router mode
+            step = step + 1;
+            parameter = "Device.X_CISCO_COM_DeviceControl.LanManagementEntry.1.LanMode";
+            tdkTestObj = obj1.createTestStep("LMLiteStub_Get");
+            tdkTestObj.addParameter("paramName",parameter);
+            tdkTestObj.executeTestCase(expectedresult);
+            actualresult = tdkTestObj.getResult();
+            initial_lanmode = tdkTestObj.getResultDetails();
+
+            print "\nTEST STEP %d : Get the initial Lan Mode using %s" %(step, parameter);
+            print "EXPECTED RESULT %d : Should get the initial Lan Mode successfully" %step;
+
+            if expectedresult in actualresult and initial_lanmode != "":
+                #Set the result status of execution
+                tdkTestObj.setResultStatus("SUCCESS");
+                print "ACTUAL RESULT %d : The initial LanMode retrieved successfully : %s" %(step, initial_lanmode);
+                print "TEST EXECUTION RESULT : SUCCESS";
+
+                if initial_lanmode == "router":
+                    pre_req_set = 1;
+                    #Set the result status of execution
+                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "Initial Lan Mode is router, SET operation not required...";
+                else:
+                    step = step + 1;
+                    mode = "router";
+                    type = "string";
+
+                    print "\nTEST STEP %d : Set the value of %s to router" %(step, parameter);
+                    print "EXPECTED RESULT %d : Should set the LanMode value successfully" %step;
+
+                    tdkTestObj = obj1.createTestStep("LMLiteStub_Set");
+                    tdkTestObj.addParameter("ParamName",parameter);
+                    tdkTestObj.addParameter("ParamValue",mode);
+                    tdkTestObj.addParameter("Type",type);
+                    tdkTestObj.executeTestCase(expectedresult);
+                    actualresult = tdkTestObj.getResult();
+                    details = tdkTestObj.getResultDetails();
+                    sleep(120);
+
+                    if expectedresult in actualresult :
+                        #Set the result status of execution
+                        tdkTestObj.setResultStatus("SUCCESS");
+                        print "ACTUAL RESULT %d : The Lan Mode set operation success; Details : %s" %(step, details);
+                        print "TEST EXECUTION RESULT : SUCCESS";
+
+                        #Cross check with GET
+                        step = step + 1;
+                        print "\nTEST STEP %d : Get the final Lan Mode using %s" %(step, parameter);
+                        print "EXPECTED RESULT %d : Should get the final Lan Mode successfully" %step;
+
+                        tdkTestObj = obj1.createTestStep("LMLiteStub_Get");
+                        tdkTestObj.addParameter("paramName",parameter);
+                        tdkTestObj.executeTestCase(expectedresult);
+                        actualresult = tdkTestObj.getResult();
+                        final_lanmode = tdkTestObj.getResultDetails();
+
+                        if expectedresult in actualresult and final_lanmode != "":
+                            #Set the result status of execution
+                            tdkTestObj.setResultStatus("SUCCESS");
+                            print "ACTUAL RESULT %d : The final LanMode retrieved successfully : %s" %(step, final_lanmode);
+                            print "TEST EXECUTION RESULT : SUCCESS";
+
+                            if final_lanmode == mode :
+                                revert_flag = 1;
+                                pre_req_set = 1;
+                                #Set the result status of execution
+                                tdkTestObj.setResultStatus("SUCCESS");
+                                print "Lan Mode SET operation reflected in GET";
+                            else :
+                                #Set the result status of execution
+                                tdkTestObj.setResultStatus("FAILURE");
+                                print "Lan Mode SET operation did not reflect in GET";
+                        else:
+                            #Set the result status of execution
+                            tdkTestObj.setResultStatus("FAILURE");
+                            print "ACTUAL RESULT %d : The final LanMode NOT retrieved successfully : %s" %(step, final_lanmode);
+                            print "TEST EXECUTION RESULT : FAILURE";
+                    else:
+                        #Set the result status of execution
+                        tdkTestObj.setResultStatus("FAILURE");
+                        print "ACTUAL RESULT %d : The Lan Mode set operation failed; Details : %s" %(step, details);
+                        print "TEST EXECUTION RESULT : FAILURE";
+            else :
+                #Set the result status of execution
+                tdkTestObj.setResultStatus("FAILURE");
+                print "ACTUAL RESULT %d : The initial Lan Mode NOT retrieved successfully" %step;
+                print "TEST EXECUTION RESULT : FAILURE";
+        else :
+            #Set the result status of execution
+            tdkTestObj.setResultStatus("SUCCESS");
+            print "RBUS is NOT in enabled state...";
+    else :
+        #Set the result status of execution
+        tdkTestObj.setResultStatus("FAILURE");
+        print "ACTUAL RESULT %d : The initial enable value is NOT retrieved successfully" %step;
+        print "TEST EXECUTION RESULT : FAILURE";
+
+    return pre_req_set, tdkTestObj, step, revert_flag, initial_lanmode;
+
+
+# RevertWANTrafficCountsPre_requisite
+# Syntax      : RevertWANTrafficCountsPre_requisite(obj1, step, revert_flag, initial_lanmode)
+# Description : Function to revert the pre-requisites set for WAN Traffic counts
+# Parameters  : obj - lmlite object
+# Return Value: status - flag to check if the revert operation is success or not
+
+def RevertWANTrafficCountsPre_requisite(obj1, step, revert_flag, initial_lanmode):
+    expectedresult="SUCCESS";
+    status = 0;
+
+    #Revert Lan Mode if required
+    parameter = "Device.X_CISCO_COM_DeviceControl.LanManagementEntry.1.LanMode";
+
+    if revert_flag == 1 :
+        print "\nTEST STEP %d : Revert the Lan Mode to initial value" %step;
+        print "EXPECTED RESULT %d : Lan Mode should be reverted successfully" %step;
+
+        tdkTestObj = obj1.createTestStep("LMLiteStub_Set");
+        tdkTestObj.addParameter("ParamName",parameter);
+        tdkTestObj.addParameter("ParamValue",initial_lanmode);
+        tdkTestObj.addParameter("Type","string");
+        tdkTestObj.executeTestCase(expectedresult);
+        actualresult = tdkTestObj.getResult();
+        details = tdkTestObj.getResultDetails();
+        sleep(120);
+
+        if expectedresult in actualresult :
+            status = 1;
+            #Set the result status of execution
+            tdkTestObj.setResultStatus("SUCCESS");
+            print "ACTUAL RESULT %d : The Lan Mode revert operation success; Details : %s" %(step, details);
+            print "TEST EXECUTION RESULT : SUCCESS";
+        else :
+            #Set the result status of execution
+            tdkTestObj.setResultStatus("FAILURE");
+            print "ACTUAL RESULT %d : The Lan Mode revert operation failed; Details : %s" %(step, details);
+            print "TEST EXECUTION RESULT : FAILURE";
+    else :
+        status = 1;
+        print "Lan Mode revert operation not required";
+
+    return status;
