@@ -145,11 +145,9 @@ if expectedResult in result.upper():
         packet_loss = ping_details_dict["packetLoss"]
         if int(packet_loss) == 0 :
             print "No packet loss"
-            Summ_list.append('No packet loss')
             tdkTestObj.setResultStatus("SUCCESS")
         else:
             print"Packet loss is greater than zero"
-            Summ_list.append('Packet loss is greater than zero')
             tdkTestObj.setResultStatus("FAILURE")
         triptime = ping_details_dict["tripAvg"]
         conf_file,result = getConfigFileName(tdkTestObj.realpath)

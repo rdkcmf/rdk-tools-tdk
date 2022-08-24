@@ -171,7 +171,7 @@ if expectedResult in result.upper():
                         time.sleep(20)
                         if expectedResult in rdkshell_result:
                             tdkTestObj.setResultStatus("SUCCESS")
-                            command = 'cat /opt/logs/wpeframework.log | grep -inr ResidentApp.*moveToFront.*Success| tail -1'
+                            command = 'cat /opt/logs/wpeframework.log | grep -inr ResidentApp.*moveToFront.*Success.*true | tail -1'
                             #get the log line containing the main UI loaded info from wpeframework log
                             tdkTestObj = obj.createTestStep('rdkservice_getRequiredLog')
                             tdkTestObj.addParameter("ssh_method",ssh_param_dict["ssh_method"])

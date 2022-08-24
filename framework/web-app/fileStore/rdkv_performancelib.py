@@ -1249,7 +1249,7 @@ def rdkservice_getBrowserScore_Smashcat():
             time.sleep(10)
             smashcat_score_list = []
             count = 1
-            while (count<6):
+            while (count<3):
                 try:
                     smashcat_score = driver.find_element_by_xpath('//*[@id="tab-browser"]/div/div/div/div[2]/div/ol/ol/ol/ol[1]/ol[1]/li[1]/span/span[2]').text
                 except exceptions.StaleElementReferenceException,e:
@@ -1259,7 +1259,7 @@ def rdkservice_getBrowserScore_Smashcat():
                 time.sleep(2)
                 smashcat_score_list.append(smashcat_score)
                 count = count +1
-            smashcat_score =(sum(smashcat_score_list))/5
+            smashcat_score =(sum(smashcat_score_list))/2
             browser_score_dict["main_score"] = smashcat_score
             driver.quit()
         else:
@@ -1367,4 +1367,9 @@ def getSummary(Summ_list,obj = False):
 
     print("############## Execution Summary #######################")
     for key in Summ_list:
-      print(key)
+        print(key)
+        value = key.split(':')[1]
+        if 'ms' in value:
+            value = value.split('m')[0]
+        if float(value) < 0:
+            print "Check if VM and DUT time is synchronized OR Check if any previous steps got failed."

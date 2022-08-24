@@ -174,6 +174,7 @@ if expectedResult in result.upper():
                     while True:
                         if continue_count > 60:
                             print "\n Application is not playing the content"
+                            tdkTestObj.setResultStatus("FAILURE")
                             break
                         if (len(webkit_console_socket.getEventsBuffer())== 0):
                             time.sleep(1)
