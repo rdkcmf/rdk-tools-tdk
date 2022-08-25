@@ -49,6 +49,7 @@
   <!--  -->
   <box_types>
     <box_type>Video_Accelerator</box_type>
+    <box_type>RDKTV</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -59,7 +60,7 @@
     <test_case_id>FCS_GRAPHICS_04</test_case_id>
     <test_objective>To execute waymetric application for measuring the impact of Wayland (Display Server) as compared to rendering directly with EGL on graphics performance</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Video_Accelerator</test_setup>
+    <test_setup>RDK TV,Video_Accelerator</test_setup>
     <pre_requisite>1.waymetric application must be present in the device
     2.Device must not run any graphics rendering application while waymetric application is started</pre_requisite>
     <api_or_interface_used>Execute the waymetric application in the device</api_or_interface_used>

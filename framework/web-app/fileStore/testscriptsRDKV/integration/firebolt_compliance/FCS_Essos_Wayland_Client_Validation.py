@@ -54,6 +54,7 @@
     <box_type>RPI-HYB</box_type>
     <!--  -->
     <box_type>Video_Accelerator</box_type>
+    <box_type>RDKTV</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -64,7 +65,7 @@
     <test_case_id>FCS_GRAPHICS_03</test_case_id>
     <test_objective>Test to execute the Essos_TDKTestApp as wayland client and verify the results</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Video Accelerator, RPI</test_setup>
+    <test_setup>RDK TV,Video Accelerator, RPI</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
 2.The Essos_TDKTestApp test binary should be available in the device</pre_requisite>
     <api_or_interface_used>Execute the Essos_TDKTestApp application in DUT</api_or_interface_used>

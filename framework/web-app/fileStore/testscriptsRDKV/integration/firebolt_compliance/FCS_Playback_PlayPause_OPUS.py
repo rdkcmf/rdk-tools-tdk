@@ -49,6 +49,7 @@
   <!--  -->
   <box_types>
     <box_type>Video_Accelerator</box_type>
+    <box_type>RDKTV</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -59,7 +60,7 @@
     <test_case_id>FCS_PLAYBACK_81</test_case_id>
     <test_objective>To test the play-pause scenario of pipeline for a stream with OPUS codec through 'playbin' and 'westerossink' gst elements</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Video Accelerator</test_setup>
+    <test_setup>RDK TV,Video Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
 2. Test stream url for an OPUS stream should be updated in the config variable video_src_url_opus inside MediaValidationVariables.py library inside filestore
 3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file
@@ -145,8 +146,8 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     tdkTestObj.addParameter("command", command)
     tdkTestObj.executeTestCase(expectedResult)
     actualresult = tdkTestObj.getResult()
-    output = tdkTestObj.getResultDetails()
-    print "OUTPUT: ", output
+    output = tdkTestObj.getResultDetails().replace(r'\n', '\n'); output = output[output.find('\n'):]
+    print "OUTPUT: ...\n", output
 
     #Check if the command executed successfully
     if expectedResult in actualresult.upper() and output:

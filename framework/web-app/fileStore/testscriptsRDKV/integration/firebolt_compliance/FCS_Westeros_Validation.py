@@ -53,6 +53,7 @@
     <box_type>RPI-HYB</box_type>
     <!--  -->
     <box_type>Video_Accelerator</box_type>
+    <box_type>RDKTV</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -63,7 +64,7 @@
     <test_case_id>FCS_GRAPHICS_02</test_case_id>
     <test_objective>Test to execute the Westeros_TDKTestApp test app  for EGL and westeros validations and verify the results</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Video Accelerator, RPI</test_setup>
+    <test_setup>RDK TV,Video Accelerator, RPI</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
 2.The Westeros_TDKTestApp test binary should be available in the device</pre_requisite>
     <api_or_interface_used>Execute the WesterosValidation test application in DUT</api_or_interface_used>

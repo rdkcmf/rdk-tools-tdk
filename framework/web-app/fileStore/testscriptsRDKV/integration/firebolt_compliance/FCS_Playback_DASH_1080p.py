@@ -170,8 +170,8 @@ if "SUCCESS" in sysutilloadModuleStatus.upper() and ResolutionSet:
     tdkTestObj.addParameter("command", command)
     tdkTestObj.executeTestCase(expectedResult)
     actualresult = tdkTestObj.getResult()
-    output = tdkTestObj.getResultDetails()
-    print "OUTPUT: ", output
+    output = tdkTestObj.getResultDetails().replace(r'\n', '\n'); output = output[output.find('\n'):]
+    print "OUTPUT: ...\n", output
 
     #Check if the command executed successfully
     if expectedResult in actualresult.upper() and output:

@@ -49,6 +49,7 @@
   <!--  -->
   <box_types>
     <box_type>Video_Accelerator</box_type>
+    <box_type>RDKTV</box_type>
     <!--  -->
   </box_types>
   <rdk_versions />
@@ -56,7 +57,7 @@
     <test_case_id>FCS_Security_08</test_case_id>
     <test_objective>Check if kernel pointers are  hidden if printk is enabled.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Video Accelerator</test_setup>
+    <test_setup>RDK TV,Video Accelerator</test_setup>
     <pre_requisite></pre_requisite>
     <api_or_interface_used>systemutil</api_or_interface_used>
     <input_parameters></input_parameters>

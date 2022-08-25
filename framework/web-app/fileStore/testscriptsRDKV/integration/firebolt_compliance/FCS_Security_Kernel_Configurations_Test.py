@@ -49,6 +49,7 @@
   <!--  -->
   <box_types>
     <box_type>Video_Accelerator</box_type>
+    <box_type>RDKTV</box_type>
     <!--  -->
   </box_types>
   <rdk_versions />
@@ -56,7 +57,7 @@
     <test_case_id>FCS_Security_07</test_case_id>
     <test_objective>Check if expected kernel configurations are disabled</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Video Accelerator</test_setup>
+    <test_setup>RDK TV,Video Accelerator</test_setup>
     <pre_requisite>Security test shell script must be installed in the device</pre_requisite>
     <api_or_interface_used>systemutil</api_or_interface_used>
     <input_parameters></input_parameters>
