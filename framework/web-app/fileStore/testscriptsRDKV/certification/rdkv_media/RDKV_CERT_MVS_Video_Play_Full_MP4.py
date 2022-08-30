@@ -37,7 +37,7 @@
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>20</execution_time>
+  <execution_time>30</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -48,6 +48,8 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
+    <box_type>RDKTV</box_type>
+    <!-- -->
     <box_type>RPI-Client</box_type>
     <!--  -->
     <box_type>RPI-HYB</box_type>
@@ -63,7 +65,7 @@
     <test_case_id>RDKV_Media_Validation_45</test_case_id>
     <test_objective>Test Script to launch a lightning Video player application via Webkit instance and perform video play operations of mp4 content till the end</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>RPI, Accelerator</test_setup>
+    <test_setup>RDKTV,RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
 2.Lightning Player app should be hosted</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
@@ -127,7 +129,7 @@ if expectedResult in result.upper():
         #Setting device config file
         conf_file,result = getDeviceConfigFile(obj.realpath)
         setDeviceConfigFile(conf_file)
-        appURL    = MediaValidationVariables.lightning_video_test_app_url
+        #appURL    = MediaValidationVariables.lightning_video_test_app_url
         videoURL  = MediaValidationVariables.video_src_url_mp4
         # Setting VideoPlayer Operations
         setOperation("playtillend","0")
@@ -138,50 +140,63 @@ if expectedResult in result.upper():
         setURLArgument("autotest","true")
         setURLArgument("type","mp4")
         appArguments = getURLArguments()
-        # Getting the complete test app URL
-        video_test_url = getTestURL(appURL,appArguments)
+        
+	# Getting the complete test app URL for selected players
+        video_test_urls = []
+        test_counter = 0
+        players_list = str(MediaValidationVariables.codec_mp4).split(",")
+        print "SELECTED PLAYERS: ", players_list
+        video_test_urls = getTestURLs(players_list,appArguments)
+
 
         #Example video test url
         #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html?
         #url=<video_mp4_url>&operations=playtillend(0)&autotest=true&type=mp4
 
         # Setting the video test url in webkit instance using RDKShell
-        launch_status = launchPlugin(obj,webkit_instance,video_test_url)
-        if "SUCCESS" in launch_status:
-            # Monitoring the app progress, checking whether app plays the video properly or any hang detected in between,
-            # performing proc entry check and getting the test result from the app
-            # Monitoring the playback with hang detection time-out of 3 mins (180 seconds)
-            test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Video Player Playing",180);
-            tdkTestObj = obj.createTestStep('rdkv_media_test');
-            tdkTestObj.executeTestCase(expectedResult);
-            if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
-                print "Video play is fine"
-                print "[TEST EXECUTION RESULT]: SUCCESS"
-                tdkTestObj.setResultStatus("SUCCESS");
-            elif "SUCCESS" in test_result and "FAILURE" in proc_check_list:
-                print "Decoder proc entry check returns failure.Video not playing fine"
-                print "[TEST EXECUTION RESULT]: FAILURE"
-                tdkTestObj.setResultStatus("FAILURE");
-            else:
-                print "Video not playing fine"
-                print "[TEST EXECUTION RESULT]: FAILURE"
-                tdkTestObj.setResultStatus("FAILURE");
+	for video_test_url in video_test_urls:
+            launch_status = launchPlugin(obj,webkit_instance,video_test_url)
+            if "SUCCESS" in launch_status:
+            	# Monitoring the app progress, checking whether app plays the video properly or any hang detected in between,
+            	# performing proc entry check and getting the test result from the app
+            	# Monitoring the playback with hang detection time-out of 3 mins (180 seconds)
+                test_counter += 1
+                test_result,proc_check_list = monitorVideoTest(obj,webkit_console_socket,validation_dict,"Video Player Playing",180);
+            	tdkTestObj = obj.createTestStep('rdkv_media_test');
+            	tdkTestObj.executeTestCase(expectedResult);
+            	if "SUCCESS" in test_result and "FAILURE" not in proc_check_list:
+                    print "Video play is fine"
+                    print "[TEST EXECUTION RESULT]: SUCCESS"
+                    tdkTestObj.setResultStatus("SUCCESS");
+            	elif "SUCCESS" in test_result and "FAILURE" in proc_check_list:
+                    print "Decoder proc entry check returns failure.Video not playing fine"
+                    print "[TEST EXECUTION RESULT]: FAILURE"
+                    tdkTestObj.setResultStatus("FAILURE");
+            	else:
+                    print "Video not playing fine"
+                    print "[TEST EXECUTION RESULT]: FAILURE"
+                    tdkTestObj.setResultStatus("FAILURE");
 
-            print "\nSet post conditions..."
-            tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
-            tdkTestObj.executeTestCase(expectedResult);
-            # Setting the post-requites for media test.Removing app url from webkit instance and
-            # moving next high z-order app to front (residentApp if its active)
-            post_requisite_status = setMediaTestPostRequisites(obj,webkit_instance)
-            if post_requisite_status == "SUCCESS":
-                print "Post conditions for the test are set successfully\n"
-                tdkTestObj.setResultStatus("SUCCESS");
+		if test_counter < len(video_test_urls):
+                    launch_status = launchPlugin(obj,webkit_instance,"about:blank")
+                    time.sleep(3)
             else:
-                print "Post conditions are not met\n"
                 tdkTestObj.setResultStatus("FAILURE");
+                print "Unable to load the video Test URL in Webkit\n"
+
+        print "\nSet post conditions..."
+        tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
+        tdkTestObj.executeTestCase(expectedResult);
+        # Setting the post-requites for media test.Removing app url from webkit instance and
+        # moving next high z-order app to front (residentApp if its active)
+        post_requisite_status = setMediaTestPostRequisites(obj,webkit_instance,webkit_console_socket)
+        if post_requisite_status == "SUCCESS":
+            print "Post conditions for the test are set successfully\n"
+            tdkTestObj.setResultStatus("SUCCESS");
         else:
+            print "Post conditions are not met\n"
             tdkTestObj.setResultStatus("FAILURE");
-            print "Unable to load the video Test URL in Webkit\n"
+        
     else:
         print "Pre conditions are not met\n"
         tdkTestObj.setResultStatus("FAILURE");

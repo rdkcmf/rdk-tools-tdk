@@ -48,6 +48,8 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
+    <box_type>RDKTV</box_type>
+    <!-- -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
@@ -59,7 +61,7 @@
     <test_case_id>RDKV_Media_Validation_148</test_case_id>
     <test_objective>Test script to launch the EME conformance test url in Webkit browser and execute the tests.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Accelerator</test_setup>
+    <test_setup>RDKTV,Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
 2. Ensure that the eme_conformance_test_app_url and eme_key_sequence parameters in the MediaValidationVariables file has latest values.</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
@@ -151,22 +153,22 @@ if expectedResult in result.upper():
                 print "EME Conformance Tests Failed"
                 print "[TEST EXECUTION RESULT]: FAILURE"
                 tdkTestObj.setResultStatus("FAILURE");
-
-            print "\nSet post conditions..."
-            tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
-            tdkTestObj.executeTestCase(expectedResult);
-            # Setting the post-requites for media test.Removing app utl from webkit instance and
-            # moving next high z-order app to front (residentApp if its active)
-            post_requisite_status = setMediaTestPostRequisites(obj,"WebKitBrowser")
-            if post_requisite_status == "SUCCESS":
-                print "Post conditions for the test are set successfully\n"
-                tdkTestObj.setResultStatus("SUCCESS");
-            else:
-                print "Post conditions are not met\n"
-                tdkTestObj.setResultStatus("FAILURE");
         else:
             tdkTestObj.setResultStatus("FAILURE");
             print "Unable to load the EME Conformance Test URL in Webkit\n"
+
+        print "\nSet post conditions..."
+        tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
+        tdkTestObj.executeTestCase(expectedResult);
+        # Setting the post-requites for media test.Removing app utl from webkit instance and
+        # moving next high z-order app to front (residentApp if its active)
+        post_requisite_status = setMediaTestPostRequisites(obj,"WebKitBrowser",webkit_console_socket)
+        if post_requisite_status == "SUCCESS":
+            print "Post conditions for the test are set successfully\n"
+            tdkTestObj.setResultStatus("SUCCESS");
+        else:
+            print "Post conditions are not met\n"
+            tdkTestObj.setResultStatus("FAILURE");
     else:
         print "Pre conditions are not met\n"
         tdkTestObj.setResultStatus("FAILURE");

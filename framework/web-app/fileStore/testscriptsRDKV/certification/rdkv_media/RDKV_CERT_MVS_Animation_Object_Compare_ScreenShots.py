@@ -48,6 +48,8 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
+    <box_type>RDKTV</box_type>
+    <!-- -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
@@ -59,7 +61,7 @@
     <test_case_id>RDKV_Media_Validation_42</test_case_id>
     <test_objective>Test Script to launch a lightning Objects Animation application to render a rectangle and validate animation operation using screen shot comparison</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Accelerator</test_setup>
+    <test_setup>RDKTV,Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
 2.Lightning Animation app should be hosted</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
@@ -240,7 +242,7 @@ if expectedResult in result.upper():
             tdkTestObj.executeTestCase(expectedResult);
             # Setting the post-requites for media test.Removing app url from webkit instance and
             # moving next high z-order app to front (residentApp if its active)
-            post_requisite_status = setMediaTestPostRequisites(obj,"LightningApp")
+            post_requisite_status = setMediaTestPostRequisites(obj,"LightningApp",webkit_console_socket)
             if post_requisite_status == "SUCCESS":
                 print "Post conditions for the test are set successfully\n"
                 tdkTestObj.setResultStatus("SUCCESS");

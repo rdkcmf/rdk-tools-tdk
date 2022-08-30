@@ -48,6 +48,8 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
+    <box_type>RDKTV</box_type>
+    <!-- -->
     <box_type>RPI-Client</box_type>
     <!--  -->
     <box_type>RPI-HYB</box_type>
@@ -63,7 +65,7 @@
     <test_case_id>RDKV_Media_Validation_01</test_case_id>
     <test_objective>Test Script to launch a lightning Animation application and perform some operations to change the animation state</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>RPI, Accelerator</test_setup>
+    <test_setup>RDKTV,RPI, Accelerator</test_setup>
     <pre_requisite>1. Wpeframework process should be up and running in the device.
 2.Lightning Animation app should be hosted</pre_requisite>
     <api_or_interface_used>None</api_or_interface_used>
@@ -161,22 +163,22 @@ if expectedResult in result.upper():
                 print "Animation using Lightning app not working fine"
                 print "[TEST EXECUTION RESULT]: FAILURE"
                 tdkTestObj.setResultStatus("FAILURE");
-
-            print "\nSet post conditions..."
-            tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
-            tdkTestObj.executeTestCase(expectedResult);
-            # Setting the post-requites for media test.Removing app url from webkit instance and
-            # moving next high z-order app to front (residentApp if its active)
-            post_requisite_status = setMediaTestPostRequisites(obj,"LightningApp")
-            if post_requisite_status == "SUCCESS":
-                print "Post conditions for the test are set successfully\n"
-                tdkTestObj.setResultStatus("SUCCESS");
-            else:
-                print "Post conditions are not met\n"
-                tdkTestObj.setResultStatus("FAILURE");
         else:
             tdkTestObj.setResultStatus("FAILURE");
             print "Unable to load the Animataion Test URL in Webkit\n"
+
+        print "\nSet post conditions..."
+        tdkTestObj = obj.createTestStep('rdkv_media_post_requisites');
+        tdkTestObj.executeTestCase(expectedResult);
+        # Setting the post-requites for media test.Removing app url from webkit instance and
+        # moving next high z-order app to front (residentApp if its active)
+        post_requisite_status = setMediaTestPostRequisites(obj,"LightningApp",webkit_console_socket)
+        if post_requisite_status == "SUCCESS":
+            print "Post conditions for the test are set successfully\n"
+            tdkTestObj.setResultStatus("SUCCESS");
+        else:
+            print "Post conditions are not met\n"
+            tdkTestObj.setResultStatus("FAILURE");
     else:
         print "Pre conditions are not met\n"
         tdkTestObj.setResultStatus("FAILURE");
