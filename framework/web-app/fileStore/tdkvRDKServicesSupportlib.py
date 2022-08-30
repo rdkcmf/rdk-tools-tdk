@@ -35,6 +35,9 @@ import subprocess
 import requests
 import random
 
+
+timeZones = []
+
 # To use the REST API variables
 #import CertificationSuiteCommonVariables
 
@@ -867,6 +870,17 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             success = str(result.get("success")).lower() == "true"
             if success and str(result.get("nwStandby")) in expectedValues:
                 info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "system_get_time_zones_list":
+            status = checkNonEmptyResultData(result)
+            success = str(result.get("success")).lower() == "true"
+            if success and status == "TRUE":
+                info["Test_Step_Status"] = "SUCCESS"
+                getcountofelements(result.get("zoneinfo"))
+                message = "Selecting 5 timezones out of %d zone info" %(len(timeZones))
+                info["Test_Step_Message"] = message
+                info["zoneinfo"] = random.sample(timeZones,5)
             else:
                 info["Test_Step_Status"] = "FAILURE"
         # User Preferces Plugin Response result parser steps
@@ -2315,8 +2329,8 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "hdmiinput_read_edid_value":
-            info["name"]  = str(result.get("name"))
-            if str(result.get("success")).lower() == "true" and info["name"] in expectedValues[0]:
+            info["EDID"]  = str(result.get("EDID"))
+            if str(result.get("success")).lower() == "true" and info["EDID"]:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -3168,9 +3182,9 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag == "system_generate_new_temperature_thresholds":
             testStepResults_list = testStepResults[0].values()[0]
             if str(arg[0]) == "warn":
-                info["WARN"] = float(testStepResults_list[0].get("WARN")) + 10
+                info["WARN"] = float(testStepResults_list[0].get("WARN")) - 10
             if str(arg[1]) == "max":
-                info["MAX"] = float(testStepResults_list[0].get("MAX")) + 10
+                info["MAX"] = float(testStepResults_list[0].get("MAX")) - 10
 
         elif tag == "system_get_bluetooth_mac":
             testStepResults = testStepResults[0].values()[0]
@@ -3210,14 +3224,9 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["value"] = testStepResults[0].get("details")
 
         elif tag == "system_get_formatted_time_zones":
-            timeZone = []
             testStepResults = testStepResults[0].values()[0]
             zoneInfo = testStepResults[0].get("zoneinfo")
-            key_list=list(zoneInfo.keys())
-            timeZone.append(key_list[0])
-            timeZone.append(key_list[len(key_list)/2])
-            timeZone.append(key_list[len(key_list)-1])
-            info["timeZone"] = ",".join(timeZone)
+            info["timeZone"] = ",".join(zoneInfo)
 
         elif tag == "system_toggle_network_standby_mode_status":
             testStepResults = testStepResults[0].values()[0]
@@ -3457,8 +3466,11 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         
         elif tag =="get_selected_resolutions":
             resolutionsList = []
-            testStepResults = testStepResults[0].values()[0]
-            supportedResolutions = testStepResults[0].get("supportedResolutions")
+            testStepResults1 = testStepResults[0].values()[0]
+            testStepResults2 = testStepResults[1].values()[0]
+            supportedResolutions = testStepResults1[0].get("supportedResolutions")
+            currentResolution = testStepResults2[0].get("resolution")
+            supportedResolutions.remove(currentResolution)
             resolutionsList.append(supportedResolutions[0])
             resolutionsList.append(supportedResolutions[len(supportedResolutions)/2])
             resolutionsList.append(supportedResolutions[len(supportedResolutions)-1])
@@ -3570,10 +3582,10 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag == "hdmiinput_get_portids":
             testStepResults = testStepResults[0].values()[0]
             port_id_list = testStepResults[0].get("portIds")
-            portIds = []
-            for portId in port_id_list:
-                portIds.append(portId)
-            info["portId"] = ",".join(portIds)
+            if len(arg) and arg[0] == "deviceid":
+                info["deviceId"] = ",".join(port_id_list)
+            else:
+                info["portId"] = ",".join(port_id_list)
 
         #PlayerInfo Plugin Response result parser steps
         elif tag == "player_info_get_resolutions":
@@ -4406,6 +4418,15 @@ def DecodeBase64ToHex(base64):
     decoded = b64decode(base64)
     hex_code = codecs.encode(decoded, 'hex').decode("utf-8")
     return hex_code
+
+def getcountofelements(dictionary):
+    global timeZones
+    for key,value in dictionary.items():
+         if isinstance(value, dict):
+             getcountofelements(value)
+         else:
+             timeZones.append(str(key))
+    return timeZones
 
 
 # Other External Functions can be added below

@@ -314,7 +314,7 @@
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
               <subtestStep subtestStepId="2" name="Get_Current_Resolution"  method="Get_Current_Resolution" revertFlag="yes" delay="3" >
-                  <resultGeneration useMethodTag="check_current_resolution" >
+                  <resultGeneration useMethodTag="check_current_resolution" arguments="check_expected_resolution">
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
@@ -2570,7 +2570,7 @@
               <subtestStep subtestStepId="1" name="Set_Resolution" method="Set_Current_Resolution" revertSet="yes">
                   <params>
                     <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
-                    <param tag="resolution" usePreviousResult="true" Id="2" iteration="true" useMethodTag="get_selected_resolutions" revertParam="yes"/>
+                    <param tag="resolution" usePreviousResult="true" Id="2,3" iteration="true" useMethodTag="get_selected_resolutions" revertParam="yes"/>
                     <param tag="persist" value="true"/>
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
@@ -2612,7 +2612,7 @@
               <subtestStep subtestStepId="1" name="Set_Resolution" method="Set_Current_Resolution" revertSet="yes">
                   <params>
                     <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
-                    <param tag="resolution" usePreviousResult="true" Id="2" iteration="true" useMethodTag="get_selected_resolutions" revertParam="yes"/>
+                    <param tag="resolution" usePreviousResult="true" Id="2,3" iteration="true" useMethodTag="get_selected_resolutions" revertParam="yes"/>
                     <param tag="persist" value="false"/>
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
@@ -3737,7 +3737,7 @@
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
               <subtestStep subtestStepId="2" name="Get_Current_Resolution"  method="Get_Current_Resolution" revertFlag="yes" delay="3" >
-                  <resultGeneration useMethodTag="check_current_resolution" >
+                  <resultGeneration useMethodTag="check_current_resolution"  arguments="check_expected_resolution">
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
@@ -3768,7 +3768,7 @@
               <subtestStep subtestStepId="1" name="Set_Resolution" method="Set_Current_Resolution" revertSet="yes">
                   <params>
                     <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
-                    <param tag="resolution" usePreviousResult="true" Id="2" iteration="true" useMethodTag="get_selected_resolutions" revertParam="yes"/>
+                    <param tag="resolution" usePreviousResult="true" Id="2,3" iteration="true" useMethodTag="get_selected_resolutions" revertParam="yes"/>
                     <param tag="persist" value="true"/>
                   </params>
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />

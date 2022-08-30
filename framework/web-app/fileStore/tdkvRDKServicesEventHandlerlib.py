@@ -517,7 +517,7 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "FAILURE"
         elif tag == "displaysettings_check_resolution_prechange_event":
             result = result[0]
-            if result == "":
+            if not result:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -724,12 +724,12 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 
         # DisplayInfo Events response result parser steps
         elif tag == "displayinfo_check_resolution_postchange_event":
-            result = result[0]
-            info = result
-            if str(result.get("event")).lower() in expectedValues:
-                info["Test_Step_Status"] = "SUCCESS"
-            else:
-                info["Test_Step_Status"] = "FAILURE"
+            info["Test_Step_Status"] = "FAILURE"
+            for eventResult in result:
+                if str(eventResult.get("event")).lower() in expectedValues:
+                    info = eventResult
+                    info["Test_Step_Status"] = "SUCCESS"
+                    break;
 
         # Messenger Events response result parser steps
         elif tag == "messenger_check_room_updated_event":

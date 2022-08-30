@@ -42,7 +42,7 @@
             <event pluginName="FirmwareControl" eventName="Upgrade_Progress_Event" />
           </prerequisite>
         </pluginPreRequisite>
-
+        
         <testCase testCaseId="FWC_01" testCaseName="Upgrade_Firmware_Using_Memory_RollBack_Feature" desc="Upgrade the device to the given firmware and reverts the image uisng memory rollback feature" >
             <testCaseInfo testCaseType="direct" configurableTest="true" testKey="SUPPORTED_PLUGINS,FWC_MEMORY_ROLLBACK_SUPPORT" useMethodTag="firmwarecontrol_check_feature_applicability" arguments="FirmwareControl,yes"/>
             <testStep testStepId="1" name="GetCurrentImageVersion" action="externalFnCall" saveResult="true" >
@@ -60,10 +60,10 @@
                   <param tag="hmac" useConfigFile="true" key="FWC_FIRMWARE_HMAC"/>
                 </params>
             </testStep>
-            <testStep testStepId="4" name="Get_Status" method="Get_Status" delay="30">
+            <testStep testStepId="4" name="Get_Status" method="Get_Status" delayKey="FWC_REBOOT_IN_SECONDS">
                 <resultGeneration useMethodTag="fwc_get_status" />
             </testStep>
-            <testStep testStepId="5" name="Check_Upgrade_Progress_Event" event="Upgrade_Progress_Event" action="eventListener" delay="30">
+            <testStep testStepId="5" name="Check_Upgrade_Progress_Event" event="Upgrade_Progress_Event" action="eventListener" >
                 <resultGeneration useMethodTag="fwc_check_upgrade_progress_event" expectedValues="1"/>
             </testStep>
             <testStep testStepId="6" name="Execute_Reboot_Command" action="externalFnCall" rebootStep="yes">
@@ -106,10 +106,10 @@
                   <param tag="hmac" useConfigFile="true" key="FWC_FIRMWARE_HMAC"/>
                 </params>
             </testStep>
-            <testStep testStepId="4" name="Get_Status" method="Get_Status" delay="30">
+            <testStep testStepId="4" name="Get_Status" method="Get_Status" delayKey="FWC_REBOOT_IN_SECONDS">
                 <resultGeneration useMethodTag="fwc_get_status" />
             </testStep>
-            <testStep testStepId="5" name="Check_Upgrade_Progress_Event" event="Upgrade_Progress_Event" action="eventListener" delay="30">
+            <testStep testStepId="5" name="Check_Upgrade_Progress_Event" event="Upgrade_Progress_Event" action="eventListener" >
                 <resultGeneration useMethodTag="fwc_check_upgrade_progress_event" expectedValues="1"/>
             </testStep>
             <testStep testStepId="6" name="Execute_Reboot_Command" action="externalFnCall" rebootStep="yes">
@@ -129,13 +129,13 @@
                   <param tag="hmac" useConfigFile="true" key="FWC_EXISTING_FIRMWARE_HMAC"/>
                 </params>
             </testStep>
-            <testStep testStepId="9" name="Get_Status" method="Get_Status" delay="30">
+            <testStep testStepId="9" name="Get_Status" method="Get_Status" delayKey="FWC_REBOOT_IN_SECONDS">
                 <resultGeneration useMethodTag="fwc_get_status" />
             </testStep>
-            <testStep testStepId="10" name="Check_Upgrade_Progress_Event" event="Upgrade_Progress_Event" action="eventListener" delay="30">
+            <testStep testStepId="10" name="Check_Upgrade_Progress_Event" event="Upgrade_Progress_Event" action="eventListener" >
                 <resultGeneration useMethodTag="fwc_check_upgrade_progress_event" expectedValues="1"/>
             </testStep>
-            <testStep testStepId="11" name="Execute_Reboot_Command" action="externalFnCall" delay="30" rebootStep="yes">
+            <testStep testStepId="11" name="Execute_Reboot_Command" action="externalFnCall" rebootStep="yes">
                 <resultGeneration useMethodTag="executeRebootCmd"/>
             </testStep>
             <testStep testStepId="12" name="Get_Image_Version" action="externalFnCall" delay="10" >

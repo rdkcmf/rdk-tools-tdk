@@ -516,7 +516,7 @@
             <testStep testStepId="3" name="Get_Public_IP" method="Get_Public_IP">
                 <params>
                      <param tag="iface"  value="ETHERNET" />
-                     <param tag="ipv6" value="false," />
+                     <param tag="ipv6" value="false" />
                 </params>
                 <resultGeneration useMethodTag="network_validate_public_ip_address" >
                     <expectedValues usePreviousResult="true" Id="1" useMethodTag="system_get_device_details" arguments="get_public_ip_address"/>

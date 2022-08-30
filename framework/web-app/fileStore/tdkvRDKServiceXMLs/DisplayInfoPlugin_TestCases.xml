@@ -397,7 +397,7 @@
                   <resultGeneration useMethodTag="display_settings_check_set_operation" />
               </subtestStep>
               <subtestStep subtestStepId="2" name="Get_Current_Resolution"  method="Get_Current_Resolution" revertFlag="yes" pluginName="DisplaySettings" delay="3" >
-                  <resultGeneration useMethodTag="check_current_resolution" >
+                  <resultGeneration useMethodTag="check_current_resolution" arguments="check_expected_resolution">
                     <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>

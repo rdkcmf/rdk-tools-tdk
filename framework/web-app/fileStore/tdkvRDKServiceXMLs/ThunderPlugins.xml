@@ -1735,11 +1735,7 @@
                 <param tag="portId" type="int" />
             </params>
         </method>
-        <method name="Stop_HdmiInput" api="stopHdmiInput" type="method" desc="Deactivates current Hdmi In Port selected as primary video source">
-            <params>
-                <param tag="portId" type="int" />
-            </params>
-        </method>
+        <method name="Stop_HdmiInput" api="stopHdmiInput" type="method" desc="Deactivates current Hdmi In Port selected as primary video source"/>
         <method name="Write_Edid" api="writeEDID" type="method" desc="Changes a current EDID value">
             <params>
                 <param tag="deviceId" type="int" />
@@ -1747,10 +1743,13 @@
             </params>
         </method>
         <method name="Read_Edid" api="readEDID" type="method" desc="Returns a current EDID value">
-            <expectedValues>EDID</expectedValues>
+            <params>
+                <param tag="deviceId" type="int" />
+                <param tag="message" type="string" defaultValue="EDID"/>
+            </params>
         </method>
     </plugin>
-   
+ 
     <!-- PlayerInfo Plugin Information -->
     <plugin pluginName="PlayerInfo" serviceName="PlayerInfo" serviceVersion="1">
         <method name="Get_Audio_Codecs" api="audiocodecs" type="method" desc="Returns supported Audio codecs"/>

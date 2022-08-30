@@ -116,7 +116,8 @@ video_src_url_mp4_30fps  = test_streams_base_path + "TDK_Asset_Sunrise_30fps.mp4
 video_src_url_mp4_50fps  = test_streams_base_path + "TDK_Asset_Sunrise_50fps.mp4"
 video_src_url_mp4_59fps  = test_streams_base_path + "TDK_Asset_Sunrise_59fps.mp4"
 video_src_url_mp4_60fps  = test_streams_base_path + "TDK_Asset_Sunrise_60fps.mp4"
-video_src_url_mp4_hevc_hdr = ""
+video_src_url_mp4_hevc_hdr = test_streams_base_path + "TDK_Asset_Waterfall_HDR.MOV"
+video_src_url_underflow_stream = test_streams_base_path + "TDK_Asset_Sunrise_underflow_stream.mp4"
 
 #H.264 Codec Video URL
 video_src_url_dash_h264 = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4.mpd"
@@ -215,6 +216,7 @@ video_src_url_ac3_eac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_
 video_src_url_aac_eac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_EAC3_AAC.mp4"
 video_src_url_opus_aac = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_AAC_OPUS.mp4"
 video_src_url_opus_vorbis = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_Vorbis_Opus.webm"
+video_src_url_ddp51_heaac = ""
 
 # Basic WAV PCM Audio format stream
 audio_src_url_wav_pcm = test_streams_base_path + "TDK_Asset_Sunrise_WAV_Audio.wav"

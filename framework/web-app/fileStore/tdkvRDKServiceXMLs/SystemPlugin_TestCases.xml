@@ -837,7 +837,7 @@
        <testCase testCaseId="SYS_48" testCaseName= "SetAndGet_All_Time_Zones" desc="Set and get all the time zones">
             <testCaseInfo testCaseType="loop" />
             <testStep testStepId="1" name="Get_Time_Zones" method="Get_Time_Zones" saveResult="true">
-                    <resultGeneration useMethodTag="system_get_api_info"/>
+                    <resultGeneration useMethodTag="system_get_time_zones_list"/>
             </testStep>
             <testStep testStepId="2" name="Set_And_Get_Time_Zones" testStepType="loop" >
               <subtestStep subtestStepId="1" name="Set_TimeZone_DST" method="Set_TimeZone_DST" >

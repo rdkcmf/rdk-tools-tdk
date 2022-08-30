@@ -47,13 +47,13 @@
                 <resultGeneration useMethodTag="get_hdmiinput_devices" arguments="get_data" />
             </testStep>
         </testCase>
-
+        
         <testCase testCaseId="HI_02" testCaseName= "Start_And_Stop_HdmiInput "  desc="Activates and deactivates selected HdmiIn Port as primary video source">
             <testCaseInfo testCaseType="loop" revert="true" />
             <testStep testStepId="1" name="Get_HdmiInput_Devices" method="Get_HdmiInput_Devices" saveResult="true">
                 <resultGeneration useMethodTag="get_hdmiinput_devices"/>
             </testStep>
-            <testStep testStepId="2"  name="Start__Stop_HdmiInput" testStepType="loop" >
+            <testStep testStepId="2"  name="Start_Stop_HdmiInput" testStepType="loop" >
               <subtestStep subtestStepId="1" name="Start_HdmiInput" method="Start_HdmiInput">
                   <params>
                     <param tag="portId" usePreviousResult="true" Id="1" useMethodTag="hdmiinput_get_portids" iteration="true"/>
@@ -61,9 +61,6 @@
                   <resultGeneration useMethodTag="hdmiinput_check_set_operation" />
               </subtestStep>
               <subtestStep subtestStepId="2" name="Stop_HdmiInput" method="Stop_HdmiInput" >
-                  <params>
-                    <param tag="portid" usePreviousResult="true" Id="1" useMethodTag="hdmiinput_get_portids" iteration="true"/>
-                  </params>
                 <resultGeneration useMethodTag="hdmiinput_check_set_operation"/>
               </subtestStep>
             </testStep>
@@ -77,14 +74,16 @@
             <testStep testStepId="2"  name="Write_Read_EDID" testStepType="loop" >
               <subtestStep subtestStepId="1" name="Write_Edid" method="Write_Edid">
                   <params>
-                    <param tag="portId" usePreviousResult="true" Id="1" useMethodTag="hdmiinput_get_portids" iteration="true"/>
+                          <param tag="deviceId" usePreviousResult="true" Id="1" useMethodTag="hdmiinput_get_portids" arguments="deviceid" iteration="true"/>
+                          <param tag="message" value="EDID"/>
                   </params>
                   <resultGeneration useMethodTag="hdmiinput_check_set_operation" />
               </subtestStep>
               <subtestStep subtestStepId="2" name="Read_Edid" method="Read_Edid" >
-                <resultGeneration useMethodTag="hdmiinput_read_edid_value">
-                    <expectedValues useDefault="true" />
-                </resultGeneration>
+                    <params>
+                          <param tag="deviceId" usePreviousResult="true" Id="1" useMethodTag="hdmiinput_get_portids" arguments="deviceid" iteration="true"/>
+                  </params>
+                  <resultGeneration useMethodTag="hdmiinput_read_edid_value"/>
               </subtestStep>
             </testStep>
         </testCase>

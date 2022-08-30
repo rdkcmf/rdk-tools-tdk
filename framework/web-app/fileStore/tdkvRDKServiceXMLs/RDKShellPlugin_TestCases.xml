@@ -2504,7 +2504,7 @@
 
         <!-- Test case 89 -->
         <testCase testCaseId="RDKShell_89" testCaseName="RDKShell_Check_On_Will_Destroy_Event_Cobalt" desc="Checks for the OnWillDestroy event for cobalt" >
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="RDKSHELL_SUPPORTED_FEATURES" useMethodTag="rdkshell_check_feature_applicability" arguments="onwilldestroyeventfeature"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "cobalt" />
             </testStep>
@@ -2547,7 +2547,7 @@
 
         <!-- Test case 90 -->
         <testCase testCaseId="RDKShell_90" testCaseName="RDKShell_Check_On_Will_Destroy_Event_WebKitBrowser" desc="Checks for the OnWillDestroy event for webkitbrowser" >
-            <testCaseInfo testCaseType="direct"/>
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="RDKSHELL_SUPPORTED_FEATURES" useMethodTag="rdkshell_check_feature_applicability" arguments="onwilldestroyeventfeature"/>
             <testStep testStepId="1" name="Get_connected_clients" method="GetClients" >
               <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues="webkitbrowser" />
             </testStep>
