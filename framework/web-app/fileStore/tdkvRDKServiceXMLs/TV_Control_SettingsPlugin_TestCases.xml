@@ -373,6 +373,373 @@
                   </resultGeneration>
               </subtestStep>
             </testStep>
-        </testCase>        
+        </testCase>       
+        <testCase testCaseId="CS_17" testCaseName="TV_ControlSettings_Set_And_Get_Contrast_Setting"  desc="Sets and gets the current TV contrast setting">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Contrast" method="Get_Contrast" saveResult="true" revertGet="yes">
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Contrast,contrast,check_range" />
+            </testStep>
+            <testStep testStepId="2"  name="Set_And_Get_Contrast_Setting" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Contrast" method="Set_Contrast" revertSet="yes">
+                  <params>
+                    <param tag="contrast" value="0,40,80,100" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Contrast" method="Get_Contrast" revertFlag="yes">
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Contrast,contrast" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_18" testCaseName="TV_ControlSettings_Set_And_Get_Contrast_Setting_Version1"  desc="Sets and gets the current TV contrast setting with the version 1 APIs">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Contrast" method="Get_Contrast_V1" saveResult="true" revertGet="yes">
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version1,contrast,check_range" />
+            </testStep>
+            <testStep testStepId="2"  name="Set_And_Get_Contrast_Setting" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Contrast" method="Set_Contrast" revertSet="yes">
+                  <params>
+                    <param tag="contrast" value="0,40,80,100" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Contrast" method="Get_Contrast_V1" revertFlag="yes">
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version1,contrast" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_19" testCaseName="TV_ControlSettings_Set_And_Get_Hue_Setting"  desc="Sets and gets the current TV hue setting">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Hue" method="Get_Hue" saveResult="true" revertGet="yes">
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Hue,hue,check_range" />
+            </testStep>
+            <testStep testStepId="2"  name="Set_And_Get_Hue_Setting" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Hue" method="Set_Hue" revertSet="yes">
+                  <params>
+                    <param tag="hue" value="0,40,80,100" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Hue" method="Get_Hue" revertFlag="yes">
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Hue,hue" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_20" testCaseName="TV_ControlSettings_Set_And_Get_Hue_Setting_Version1"  desc="Sets and gets the current TV hue setting with the version 1 APIs">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Hue" method="Get_Hue_V1" saveResult="true" revertGet="yes">
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version1,hue,check_range" />
+            </testStep>
+            <testStep testStepId="2"  name="Set_And_Get_Hue_Setting" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Hue" method="Set_Hue" revertSet="yes">
+                  <params>
+                    <param tag="hue" value="0,40,80,100" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Hue" method="Get_Hue_V1" revertFlag="yes">
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version1,hue" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_21" testCaseName="TV_ControlSettings_Set_And_Get_All_Supported_Dolby_Vision_Modes"  desc="Sets and gets the supported dolby vision modes">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Supported_Dolby_Vision_Modes" method="Get_Supported_Dolby_Vision_Modes" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_supported_modes" arguments="SupportedDVModes"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Dolby_Vision_Mode" method="Get_Dolby_Vision_Mode" saveResult="true" revertGet="yes">
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="DolbyVisionMode">
+                          <expectedValues usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="SupportedDVModes,DolbyVisionMode"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3"  name="Set_And_Get_Dolby_Vision_Modes" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Dolby_Vision_Mode" method="Set_Dolby_Vision_Mode" revertSet="yes">
+                  <params>
+                    <param tag="DolbyVisionMode" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="SupportedDVModes,DolbyVisionMode" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Dolby_Vision_Mode" method="Get_Dolby_Vision_Mode" revertFlag="yes">
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="DolbyVisionMode,check_expected_mode">
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_22" testCaseName="TV_ControlSettings_Set_And_Get_All_Supported_HLG_Modes"  desc="Sets and gets the supported HLG modes">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Supported_HLG_Modes" method="Get_Supported_HLG_Modes" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_supported_modes" arguments="SupportedHLGModes"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_HLG_Mode" method="Get_HLG_Mode" saveResult="true" revertGet="yes">
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="HLGMode">
+                          <expectedValues usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="SupportedHLGModes,HLGMode"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3"  name="Set_And_Get_HLG_Modes" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_HLG_Mode" method="Set_HLG_Mode" revertSet="yes">
+                  <params>
+                    <param tag="HLGMode" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="SupportedHLGModes,HLGMode" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_HLG_Mode" method="Get_HLG_Mode" revertFlag="yes">
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="HLGMode,check_expected_mode">
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_23" testCaseName="TV_ControlSettings_Set_And_Get_All_Supported_HDR10_Modes"  desc="Sets and gets the supported HDR10 modes">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Supported_HDR10_Modes" method="Get_Supported_HDR10_Modes" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_supported_modes" arguments="SupportedHDR10Modes"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_HDR10_Mode" method="Get_HDR10_Mode" saveResult="true" revertGet="yes">
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="HDR10Mode">
+                          <expectedValues usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="SupportedHDR10Modes,HDR10Mode"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3"  name="Set_And_Get_HDR10_Modes" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_HDR10_Mode" method="Set_HDR10_Mode" revertSet="yes">
+                  <params>
+                    <param tag="HDR10Mode" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="SupportedHDR10Modes,HDR10Mode" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_HDR10_Mode" method="Get_HDR10_Mode" revertFlag="yes">
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="HDR10Mode,check_expected_mode">
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_24" testCaseName="TV_ControlSettings_Set_And_Get_Hue_Setting_For_Supported_Component_Colors"  desc="Sets and gets the hue settings for the supported component colors">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Component_Color_Info" method="Get_Component_Color_Info" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_supported_modes" arguments="colors"/>
+            </testStep>
+            <testStep testStepId="2"  name="Set_And_Get_Hue_Setting_For_Supported_Component_Colors" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Get_Component_Hue" method="Get_Component_Hue" saveResult="true" >
+                      <params>
+                         <param tag="color" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="colors,color" iteration="true"  />
+                      </params>
+                      <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,hue,hue,check_range" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="0,100" />
+                    </resultGeneration>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Set_Component_Hue" method="Set_Component_Hue" >
+                  <params>
+                          <param tag="color" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="colors,color" iteration="true" />
+                          <param tag="hue" usePreviousResult="true" subId="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="hue"/>
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="4" name="Get_Component_Hue" method="Get_Component_Hue" >
+                  <params>
+                     <param tag="color"  usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="colors,color" iteration="true"/>
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,hue,hue">
+                          <expectedValues usePreviousResult="true" subId="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="hue"/>
+                  </resultGeneration>
+              </subtestStep>
+              <subtestStep subtestStepId="5" name="Set_Component_Hue" method="Set_Component_Hue" >
+                 <params>
+                   <param tag="color" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="colors,color" iteration="true" />
+                   <param tag="hue" usePreviousResult="true" subId="1" useMethodTag="tvcontrolsettings_get_saved_data" arguments="hue" />
+                </params>
+                <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </subtestStep>
+            <subtestStep subtestStepId="6" name="Get_Component_Hue" method="Get_Component_Hue" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,hue,hue">
+                            <expectedValues usePreviousResult="true" subId="1" useMethodTag="tvcontrolsettings_get_saved_data" arguments="hue"/>
+                  </resultGeneration>
+            </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_25" testCaseName="TV_ControlSettings_Set_And_Get_Luma_Setting_For_Supported_Component_Colors"  desc="Sets and gets the luma settings for the supported component colors">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Component_Color_Info" method="Get_Component_Color_Info" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_supported_modes" arguments="colors"/>
+            </testStep>
+            <testStep testStepId="2"  name="Set_And_Get_Luma_Setting_For_Supported_Component_Colors" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Get_Component_Luma" method="Get_Component_Luma" saveResult="true" >
+                      <params>
+                         <param tag="color" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="colors,color" iteration="true"  />
+                      </params>
+                      <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,luma,luma,check_range_30" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="0,30" />
+                    </resultGeneration>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Set_Component_Luma" method="Set_Component_Luma" >
+                  <params>
+                          <param tag="color" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="colors,color" iteration="true" />
+                          <param tag="luma" usePreviousResult="true" subId="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="luma" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="4" name="Get_Component_Luma" method="Get_Component_Luma" >
+                  <params>
+                     <param tag="color" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="colors,color" iteration="true"  />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,luma,luma" >
+                          <expectedValues usePreviousResult="true" subId="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="luma"/>
+                  </resultGeneration>
+              </subtestStep>
+              <subtestStep subtestStepId="5" name="Set_Component_Luma" method="Set_Component_Luma" >
+                 <params>
+                   <param tag="color" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="colors,color" iteration="true"/>
+                   <param tag="luma" usePreviousResult="true" subId="1" useMethodTag="tvcontrolsettings_get_saved_data" arguments="luma" />
+                </params>
+                <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </subtestStep>
+            <subtestStep subtestStepId="4" name="Get_Component_Luma" method="Get_Component_Luma" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,luma,luma">
+                            <expectedValues usePreviousResult="true" subId="1" useMethodTag="tvcontrolsettings_get_saved_data" arguments="luma"/>
+                  </resultGeneration>
+            </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_26" testCaseName="TV_ControlSettings_Set_And_Get_Saturation_Setting_For_Supported_Component_Colors"  desc="Sets and gets the saturation settings for the supported component colors">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Component_Color_Info" method="Get_Component_Color_Info" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_supported_modes" arguments="colors"/>
+            </testStep>
+            <testStep testStepId="2"  name="Set_And_Get_Saturation_Setting_For_Supported_Component_Colors" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Get_Component_Saturation" method="Get_Component_Saturation" saveResult="true" >
+                      <params>
+                         <param tag="color" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="colors,color" iteration="true"  />
+                      </params>
+                      <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,saturation,saturation,check_range" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="0,100" />
+                    </resultGeneration>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Set_Component_Saturation" method="Set_Component_Saturation" >
+                  <params>
+                          <param tag="color" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="colors,color" iteration="true"/>
+                          <param tag="saturation" usePreviousResult="true" subId="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="saturation" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="4" name="Get_Component_Saturation" method="Get_Component_Saturation" >
+                  <params>
+                     <param tag="color" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="colors,color" iteration="true"  />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,saturation,saturation" >
+                           <expectedValues usePreviousResult="true" subId="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="saturation"/>
+                  </resultGeneration>
+              </subtestStep>
+              <subtestStep subtestStepId="3" name="Set_Component_Saturation" method="Set_Component_Saturation" >
+                 <params>
+                   <param tag="color" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="colors,color" iteration="true"/>
+                   <param tag="saturation" usePreviousResult="true" subId="1" useMethodTag="tvcontrolsettings_get_saved_data" arguments="saturation" />
+                </params>
+                <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </subtestStep>
+            <subtestStep subtestStepId="4" name="Get_Component_Saturation" method="Get_Component_Saturation" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,saturation,saturation">
+                            <expectedValues usePreviousResult="true" subId="1" useMethodTag="tvcontrolsettings_get_saved_data" arguments="saturation"/>
+                  </resultGeneration>
+            </subtestStep>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_27" testCaseName="TV_ControlSettings_Set_And_Reset_TV_Aspect_Ratio"  desc="Check whether able to reset the current TV aspect ratio settings">
+            <testCaseInfo testCaseType="direct"  />
+            <testStep testStepId="1" name="Get_Aspect_Ratio" method="Get_Aspect_Ratio" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_value" arguments="version2,AspectRatio,aspectRatio"/>
+            </testStep>
+            <testStep testStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="fixed_length_list" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="Options,aspectRatio"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_Aspect_Ratio" method="Set_Aspect_Ratio" >
+                  <params>
+                    <param tag="aspectRatio" usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="aspectRatio" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Aspect_Ratio" method="Get_Aspect_Ratio" delay="2" >
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_value" arguments="version2,AspectRatio,aspectRatio,check_expected_value" >
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="aspectRatio" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Reset_Aspect_Ratio" method="Reset_Aspect_Ratio" >
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Default_Values" >
+                            <arguments value="TvSettings.AspectRatio" useConfigFile="true" key="TV_CS_DEFAULT_VALUES_FILE_PATH"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Get_Aspect_Ratio" method="Get_Aspect_Ratio" delay="2" >
+                <resultGeneration useMethodTag="tvcontrolsettings_check_value" arguments="version2,AspectRatio,aspectRatio,check_expected_value">
+                     <expectedValues usePreviousResult="true" Id="6" useMethodTag="tvcontrolsettings_get_default_values" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="8" name="Set_Aspect_Ratio" method="Set_Aspect_Ratio" >
+                <params>
+                   <param tag="aspectRatio" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_saved_data" arguments="aspectRatio" />
+                </params>
+                <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="9" name="Get_Aspect_Ratio" method="Get_Aspect_Ratio" delay="2" >
+                <resultGeneration useMethodTag="tvcontrolsettings_check_value" arguments="version2,AspectRatio,aspectRatio,check_expected_value">
+                     <expectedValues usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_saved_data" arguments="aspectRatio"/>
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_28" testCaseName="TV_ControlSettings_Set_And_Reset_Auto_Backlight"  desc="Check whether able to reset the TV auto backlight control">
+            <testCaseInfo testCaseType="direct" revert="true"  />
+            <testStep testStepId="1" name="Get_Auto_Backlight_Control" method="Get_Auto_Backlight_Control" saveResult="true" revertGet="yes">
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_auto_backlight_control" />
+            </testStep>
+            <testStep testStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="fixed_length_list" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="supportedModes,mode"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_Auto_Backlight_Control" method="Set_Auto_Backlight_Control" revertSet="yes">
+                  <params>
+                    <param tag="mode" usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="mode" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Auto_Backlight_Control" method="Get_Auto_Backlight_Control"  >
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_auto_backlight_control" arguments="check_expected_mode" >
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="mode" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Reset_Auto_Backlight" method="Reset_Auto_Backlight" >
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Default_Values" >
+                            <arguments value="TvSettings.AutoBacklightMode" useConfigFile="true" key="TV_CS_DEFAULT_VALUES_FILE_PATH"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Get_Auto_Backlight_Control" method="Get_Auto_Backlight_Control" revertFlag="yes" >
+                <resultGeneration useMethodTag="tvcontrolsettings_check_auto_backlight_control" arguments="check_expected_mode">
+                     <expectedValues usePreviousResult="true" Id="6" useMethodTag="tvcontrolsettings_get_default_values" />
+                </resultGeneration>
+            </testStep>
+        </testCase> 
 </testPlugin>
 

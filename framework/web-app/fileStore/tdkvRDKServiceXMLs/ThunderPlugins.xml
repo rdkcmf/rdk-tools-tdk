@@ -1994,7 +1994,77 @@
            <param tag="sharpness" defaultValue="null"/>
           </params>
         </method>
-        
+        <method name="Get_Contrast" api="getContrast" type="method" desc="Get current TV contrast setting" />
+        <method name="Get_Contrast_V1" api="getContrast" type="method" version="1" desc="Get current TV contrast setting" />
+        <method name="Set_Contrast" api="setContrast" type="method" version="1" desc="Set current TV contrast setting" >
+          <params>
+           <param tag="contrast" defaultValue="null"/>
+          </params>
+        </method>
+        <method name="Get_Hue" api="getHue" type="method" desc="Get current TV hue setting" />
+        <method name="Get_Hue_V1" api="getHue" type="method" version="1" desc="Get current TV hue setting" />
+        <method name="Set_Hue" api="setHue" type="method" version="1" desc="Set current TV hue setting" >
+          <params>
+           <param tag="hue" defaultValue="null"/>
+          </params>
+        </method>
+        <method name="Get_Supported_Dolby_Vision_Modes" api="getSupportedDolbyVisionModes" type="method" desc="Get all supported dolby vision modes" />
+        <method name="Get_Dolby_Vision_Mode" api="getDolbyVisionMode" type="method" desc="Get current set dolby vision mode" />
+        <method name="Set_Dolby_Vision_Mode" api="setDolbyVisionMode" type="method" desc="Set dolby vision mode" >
+          <params>
+           <param tag="DolbyVisionMode" defaultValue="null"/>
+          </params>
+        </method>
+        <method name="Get_Supported_HLG_Modes" api="getSupportedHLGModes" type="method" desc="Get all supported HLG modes" />
+        <method name="Get_HLG_Mode" api="getHLGMode" type="method" desc="Get current set HLG mode" />
+        <method name="Set_HLG_Mode" api="setHLGMode" type="method" desc="Set current HLG mode" >
+          <params>
+           <param tag="HLGMode" defaultValue="null"/>
+          </params>
+        </method>
+        <method name="Get_Supported_HDR10_Modes" api="getSupportedHDR10Modes" type="method" desc="Get all supported HDR10 modes" />
+        <method name="Get_HDR10_Mode" api="getHDR10Mode" type="method" desc="Get current set HDR10 mode" />
+        <method name="Set_HDR10_Mode" api="setHDR10Mode" type="method" desc="Set HDR10 mode" >
+          <params>
+           <param tag="HDR10Mode" defaultValue="null"/>
+          </params>
+        </method>
+        <method name="Get_Component_Color_Info" api="getComponentColorInfo" type="method" desc="Returns the supported component colors" />
+        <method name="Get_Component_Hue" api="getComponentHue" type="method" desc="Returns the currently set component hue value for the specified color" >
+          <params>
+             <param tag="color" defaultValue="null"/>
+          </params>
+        </method>
+        <method name="Set_Component_Hue" api="setComponentHue" type="method" desc="Sets the current TV hue setting for the specified component color" >
+          <params>
+             <param tag="color" defaultValue="null"/>
+             <param tag="hue" type="int" />
+          </params>
+        </method>
+        <method name="Get_Component_Luma" api="getComponentLuma" type="method" desc="Returns the currently set component luma value for the specified color" >
+          <params>
+             <param tag="color" defaultValue="null"/>
+          </params>
+        </method>
+        <method name="Set_Component_Luma" api="setComponentLuma" type="method" desc="Sets the current TV luma setting for the specified component color" >
+          <params>
+             <param tag="color" defaultValue="null"/>
+             <param tag="luma" type="int" />
+          </params>
+        </method>
+        <method name="Get_Component_Saturation" api="getComponentSaturation" type="method" desc="Returns the current TV saturation setting for the specified color" >
+          <params>
+             <param tag="color" defaultValue="null"/>
+          </params>
+        </method>
+        <method name="Set_Component_Saturation" api="setComponentSaturation" type="method" desc="Sets the current TV saturation setting for the specified component color" >
+          <params>
+             <param tag="color" defaultValue="null"/>
+             <param tag="saturation" type="int" />
+          </params>
+        </method>       
+        <method name="Reset_Aspect_Ratio" api="resetAspectRatio" type="method" desc="Resets the TV aspect ratio to the factory default" />
+        <method name="Reset_Auto_Backlight" api="resetAutoBacklight" type="method" desc="Resets the TV automatic backlight to the factory default" /> 
     </plugin> 
 
 </thunderPlugins>

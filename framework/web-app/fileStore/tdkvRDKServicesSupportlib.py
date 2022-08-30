@@ -33,6 +33,7 @@ from time import sleep
 import re
 import subprocess
 import requests
+import random
 
 # To use the REST API variables
 #import CertificationSuiteCommonVariables
@@ -3693,6 +3694,18 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             for value in supportedModes:
                 Modes.append(str(value))
             info[arg[1]] = ",".join(Modes)
+        
+        elif tag == "tvcontrolsettings_get_saved_data":
+            testStepResults = testStepResults[0].values()[0]
+            info[arg[0]] = testStepResults[0].get(arg[0])
+
+        elif tag == "tvcontrolsettings_get_selected_mode":
+            testStepResults = testStepResults[0].values()[0]
+            info[arg[0]] = testStepResults[0].get("randomnumber")
+         
+        elif tag == "tvcontrolsettings_get_default_values":
+            testStepResults = testStepResults[0].values()[0]
+            info["defaultValue"] = testStepResults[0].get("defaultValue")
 
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_name":
@@ -4233,6 +4246,20 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,execInfo)
                     output = output[1]
                     info["defaultMode"] = int(output)
         
+        elif tag == "TV_ControlSettings_Get_Default_Values":
+            command = 'grep -F '+arg[0]+' ' +arg[1]+''
+            output = executeCommand(execInfo, command)
+            output = str(output).split("=")[1]
+            info["defaultValue"] = output.strip()
+
+        elif tag == "TV_ControlSettings_Get_Random_Number":
+            if len(arg) and arg[0] == "fixed_length_list":
+                arg.pop(0)
+                randomnumber = random.choice(arg)
+            else:
+                randomnumber = random.randint(int(arg[0]),int(arg[1]))
+            info["randomnumber"] = randomnumber
+ 
         elif tag == "RDKShell_Get_Width_And_Height":
             mapping_details = arg[len(arg)/2].split(":")
             info["width"] = mapping_details[1].split('|')[0].strip('[]')
