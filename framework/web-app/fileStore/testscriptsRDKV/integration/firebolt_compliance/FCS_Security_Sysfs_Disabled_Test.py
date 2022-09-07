@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>1</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>FCS_Security_Kernel_ldconfig_Support_Test</name>
+  <name>FCS_Security_Sysfs_Disabled_Test_Test</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test if Kernel ldconfig support is disabled </synopsis>
+  <synopsis>Test if sysfs is disabled </synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -53,25 +53,24 @@
     <box_type>RPI-Client</box_type>
     <!--  -->
     <box_type>Video_Accelerator</box_type>
-    <box_type>RDKTV</box_type>
   </box_types>
   <rdk_versions />
   <test_cases>
-    <test_case_id>FCS_Security_05</test_case_id>
-    <test_objective>Test if Kernel ldconfig support is disabled</test_objective>
+    <test_case_id>FCS_Security_11</test_case_id>
+    <test_objective>Test if sysfs is disabled</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>RDK TV,Video Accelerator, RPI</test_setup>
+    <test_setup>Video Accelerator, RPI</test_setup>
     <pre_requisite></pre_requisite>
     <api_or_interface_used>systemutil</api_or_interface_used>
     <input_parameters></input_parameters>
     <automation_approch>1.TDK Agent should be up and running in the DUT.
-2.Check if kernel ldconfig support is disabled by ensuring ldconfig is removed from rootfs.</automation_approch>
-    <expected_output>ldconfig must not be present in image</expected_output>
+2.Check if sysfs is disabled by using "mount" command.</automation_approch>
+    <expected_output>sys must not be mounted in the DUT</expected_output>
     <priority>Medium</priority>
     <test_stub_interface>libsystemutilstub.so.0</test_stub_interface>
-    <test_script>FCS_Security_Kernel_ldconfig_Support_Test</test_script>
+    <test_script>FCS_Security_Sysfs_Disabled_Test_Test</test_script>
     <skipped></skipped>
-    <release_version>M102</release_version>
+    <release_version>M104</release_version>
     <remarks></remarks>
   </test_cases>
 </xml>
@@ -91,52 +90,23 @@ port = <port>
 
 #Test component to be tested
 obj = tdklib.TDKScriptingLibrary("systemutil","1");
-obj.configureTestCase(ip,port,'FCS_Security_Kernel_ldconfig_Support_Test');
+obj.configureTestCase(ip,port,'FCS_Security_Sysfs_Disabled_Test_Test');
 sysUtilLoadStatus = obj.getLoadModuleResult();
 print "System module loading status : %s" %sysUtilLoadStatus;
 #Set the module loading status
 obj.setLoadModuleStatus(sysUtilLoadStatus);
 
 if "SUCCESS" in sysUtilLoadStatus.upper():
-    print "\nTEST STEP 1: Check if Kernel ldconfig support is enabled/disabled"
-    result,details,tdkTestObj = executeTest(obj, 'ExecuteCommand', {"command":"find /sbin -iname ldconfig*"}, True)
+    print "\nTEST STEP : Check if sysfs is enabled/disabled"
+    result,details,tdkTestObj = executeTest(obj, 'ExecuteCommand', {"command":"mount | grep sysfs"}, True)
 
-    if len(details):
-        print "FAILURE: Kernel ldconfig support is enabled"
-        print "Kernel ldconfig support must be disabled"
+    if details:
+        print "FAILURE: sysfs is enabled"
+        print "Sysfs SHOULD be disabled if possible"
         tdkTestObj.setResultStatus("FAILURE");
     else:
-        print "SUCCESS: Kernel ldconfig support is disabled as expected"
+        print "SUCCESS: sysfs is disabled as expected"
         tdkTestObj.setResultStatus("SUCCESS");
-
-    print "\nTEST STEP 2: Check if ld.so.conf file is present"
-    result,details,tdkTestObj = executeTest(obj, 'ExecuteCommand', {"command":"ls /etc/ld.so.conf "}, True)
-   
-    if len(details):
-        print "FAILURE: ld.so.conf is present"
-        print "ld.so.conf must be removed from the DUT"
-        tdkTestObj.setResultStatus("FAILURE");
-    else:
-        print "SUCCESS: ld.so.conf is not present as expected"
-        tdkTestObj.setResultStatus("SUCCESS");
-
-    print "\nTEST STEP 3: Check if ld.so.cache isused to set LIBRARY_PATH"
-    #get library paths used
-    command = 'strings /etc/ld.so.cache > tempfile ;'
-    #discard libs which are used from /usr/lib or /lib as they are default paths
-    command = command + 'grep -v "^/usr/lib/\|^/lib" tempfile > file ;'
-    #Get any other paths used for library loading
-    command = command + 'grep "^/" file ; rm file tempfile'
-    result,details,tdkTestObj = executeTest(obj, 'ExecuteCommand', {"command":command}, True)
-
-    if len(details):
-        print "FAILURE: %s paths are used for library loading"%(details)
-        print "No other paths except /usr/lib or /lib must be used to loading libraries"
-        tdkTestObj.setResultStatus("FAILURE");
-    else:
-        print "SUCCESS: Only /usr/lib or /lib are used to loading libraries"
-        tdkTestObj.setResultStatus("SUCCESS");
-
     obj.unloadModule("systemutil");
 
 else:

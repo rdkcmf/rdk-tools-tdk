@@ -163,7 +163,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
             print "AC3 EAC3 codec switch was successfull"
             print "Mediapipeline test executed successfully"
             checkifCodecPlayed(tdkTestObj,"ac-3")
-            checkifCodecPlayed(tdkTestObj,"eac-3");
+            checkifCodecPlayed(tdkTestObj,"e-ac-3");
         else:
             tdkTestObj.setResultStatus("FAILURE")
             print "AC3 EAC3 codec switch failed"

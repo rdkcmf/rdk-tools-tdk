@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>1</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the version as 1 -->
-  <name>FCS_Playback_Audio_Change_AAC_EAC3</name>
+  <name>FCS_Playback_Audio_Change_DDP51_HEAAC</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -50,7 +50,6 @@
   <box_types>
     <!--  -->
     <box_type>Video_Accelerator</box_type>
-    <box_type>RDKTV</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -58,23 +57,23 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>FCS_PLAYBACK_117</test_case_id>
+    <test_case_id>FCS_PLAYBACK_136</test_case_id>
     <test_objective>Switch to different audio codec present in the same stream without changing the video</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>RDK TV,Video Accelerator</test_setup>
+    <test_setup>Video Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
-2. Test stream url for a multi codec EAC3 AAC stream should be updated in the config variable video_src_url_aac_eac3 inside MediaValidationVariables.py library inside filestore.
+2. Test stream url for a multi codec HEAAC DDP51 stream should be updated in the config variable video_src_url_ddp51_heaac inside MediaValidationVariables.py library inside filestore.
 3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file.
 4. FIREBOLT_COMPLIANCE_PLAYBACK_LATENCY_THRESHOLD configuration should be set to some milliseconds to cross verify the latency during playback.
 5. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time to wait before checking for AV playback</pre_requisite>
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>testcasename - "test_audio_change"
-test_url - multi codec url with AAC and EAC3 audio streams from MediaValidationVariables library (MediaValidationVariables.video_src_url_aac_eac3)
+test_url - multi codec url with DDP51 and HEAAC audio streams from MediaValidationVariables library (MediaValidationVariables.video_src_url_ddp51_heaac)
 "checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
 timeout - a string to specify the time in seconds for which the videoplayback should be done . This argument is the value of device configuration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file latencyThreshold - a string to specify the time in milliseconds within which latency of playback must be observed.</input_parameters>
     <automation_approch>1.Load the systemutil module
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT and FIREBOLT_COMPLIANCE_PLAYBACK_LATENCY_THRESHOLD config values from Device config file.
-3.Retrieve the video_src_url_dash variable from MediaValidationVariables library
+3.Retrieve the video_src_url_ddp51_heaac variable from MediaValidationVariables library
 4.Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value and timeout
 5.Execute the command in DUT. During the execution, the DUT will playback av for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds for the first audio codec, then using curent-audio property of playbin , audio stream is switched to next audio stream with another codec, playabck will happen for  FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds for this audio stream as well then application exits by closing the pipeline.
 6.Verify the output from the execute command and check if the strings "Failures: 0" and "Errors: 0", or "failed: 0" exists in the returned output
@@ -83,9 +82,9 @@ timeout - a string to specify the time in seconds for which the videoplayback sh
 2.Check if Audio switch is happened properly.</expected_output>
     <priority>High</priority>
     <test_stub_interface>libsystemutilstub.so.0</test_stub_interface>
-    <test_script>FCS_Playback_Audio_Change_AAC_EAC3</test_script>
+    <test_script>FCS_Playback_Audio_Change_DDP51_HEAAC</test_script>
     <skipped></skipped>
-    <release_version>M99</release_version>
+    <release_version>M104</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags>
@@ -108,7 +107,7 @@ sysUtilObj = tdklib.TDKScriptingLibrary("systemutil","1")
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-sysUtilObj.configureTestCase(ip,port,'FCS_Playback_Audio_Change_AAC_EAC3');
+sysUtilObj.configureTestCase(ip,port,'FCS_Playback_Audio_Change_DDP51_HEAAC');
 
 #Set device configurations to default values
 checkAVStatus = "no"
@@ -127,7 +126,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #The test name specifies the test case to be executed from the mediapipeline test suite
     test_name = "test_audio_change"
     #Test url for the stream to be played is retrieved from MediaValidationVariables library
-    test_url = MediaValidationVariables.video_src_url_aac_eac3
+    test_url = MediaValidationVariables.video_src_url_ddp51_heaac
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS' that specifies whether SOC level playback verification check should be done or not 
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
@@ -143,15 +142,16 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
         timeoutInSeconds = timeoutConfigValue
 
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
-    #Sample command = "mediapipelinetests test_audio_change <AC3_EAC3_URL> checkavstatus=yes timeout=10"
+    #Sample command = "mediapipelinetests test_audio_change <AC3_HEAAC_URL> checkavstatus=yes timeout=10"
     command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, timeout = timeoutInSeconds) 
     print "Executing command in DUT: ", command
     
     tdkTestObj.addParameter("command", command)
     tdkTestObj.executeTestCase(expectedResult)
     actualresult = tdkTestObj.getResult()
-    output = tdkTestObj.getResultDetails().replace(r'\n', '\n'); output = output[output.find('\n'):]
-    print "OUTPUT: ...\n", output
+    output = tdkTestObj.getResultDetails().replace(r'\n', '\n');
+    output = output[output.find('\n'):]
+    print "OUTPUT: ...\n ", output
 
     #Check if the command executed successfully
     if expectedResult in actualresult.upper() and output:
@@ -160,13 +160,13 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
         
         if expectedResult in executionStatus:
             tdkTestObj.setResultStatus("SUCCESS")
-            print "AAC EAC3 codec switch was successfull"
+            print "DDP51 HEAAC codec switch was successfull"
             print "Mediapipeline test executed successfully"
             checkifCodecPlayed(tdkTestObj,"aac")
             checkifCodecPlayed(tdkTestObj,"e-ac-3");
         else:
             tdkTestObj.setResultStatus("FAILURE")
-            print "AAC EAC3 codec switch failed"
+            print "DDP51 HEAAC codec switch failed"
     else:
         tdkTestObj.setResultStatus("FAILURE")
         print "Mediapipeline test execution failed"

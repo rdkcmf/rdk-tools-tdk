@@ -142,7 +142,7 @@ def getMediaPipelineTestCommand (testName, testUrl, **arguments):
     if (check_pts == "no"):
         command = command + " checkPTS=no "
     #Feature to disable video-fps check
-    if (check_fps == "no"):
+    if (check_fps == "no") and "fps" not in command.lower():
         command = command + " checkFPS=no "
     #Use audioSink
     if (use_audioSink):
