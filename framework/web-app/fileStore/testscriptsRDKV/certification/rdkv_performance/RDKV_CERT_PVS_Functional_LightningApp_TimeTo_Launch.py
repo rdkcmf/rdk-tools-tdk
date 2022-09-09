@@ -160,7 +160,7 @@ if expectedResult in result.upper():
                         Summ_list.append('LightningApp launched at :{}ms'.format(launched_time))
                         time_taken_for_launch = launched_time_in_millisec - launch_start_time_in_millisec
                         print "\n Time taken to launch LightningApp: {}(ms)".format(time_taken_for_launch)
-                        Summ_list.append('Time taken to launch LightningApp: {}(ms)'.format(time_taken_for_launch))
+                        Summ_list.append('Time taken to launch LightningApp: {}ms'.format(time_taken_for_launch))
                         print "\n Threshold value for time taken to launch LightningApp: {}(ms)".format(lightningapp_launch_threshold)
                         print "\n Validate the time:"
                         if 0 < time_taken_for_launch < (int(lightningapp_launch_threshold) + int(offset)) :

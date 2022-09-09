@@ -185,9 +185,9 @@ if expectedResult in result.upper():
                                     event_time_dict[method] = int(getTimeInMilliSec(event_time))
                                     time_taken = event_time_dict[method] -  start_time_dict[method]
                                     print "\n Time taken for {}: {}(ms) ".format(method,time_taken)
-                                    Summ_list.append('Time taken for {}: {}(ms) '.format(method,time_taken))
+                                    Summ_list.append('Time taken for {}: {}ms '.format(method,time_taken))
                                     print "\n Threshold value for {}: {} (ms)".format(method,validation_dict[method])
-                                    Summ_list.append(' Threshold value for {}: {} (ms)'.format(method,validation_dict[method]))
+                                    Summ_list.append(' Threshold value for {}: {} ms'.format(method,validation_dict[method]))
                                     if 0 < time_taken < ( validation_dict[method] + int(offset)):
                                         print "\n Time taken for {} is within the expected range".format(method)
                                         tdkTestObj.setResultStatus("SUCCESS")

@@ -184,7 +184,7 @@ if expectedResult in result.upper():
                                     Summ_list.append('Activated at :{}'.format(activated_time))
                                     time_taken_for_activate = activated_time_in_millisec - start_activate_in_millisec
                                     print "\n Time taken to activate {} plugin: {} (ms)".format(plugin,time_taken_for_activate)
-                                    Summ_list.append('Time taken to activate {} plugin: {} (ms)'.format(plugin,time_taken_for_activate))
+                                    Summ_list.append('Time taken to activate {} plugin: {} ms'.format(plugin,time_taken_for_activate))
                                     print "\n Threshold value for time taken to activate {} plugin: {} (ms)".format(plugin,activate_threshold)
                                     print "\n Validate the time taken for activation \n"
                                     if 0 < time_taken_for_activate < (int(activate_threshold) + int(offset)) :
@@ -201,7 +201,7 @@ if expectedResult in result.upper():
                                     Summ_list.append('Deactivated at :{}'.format(deactivated_time))
                                     time_taken_for_deactivate = deactivated_time_in_millisec - start_deactivate_in_millisec
                                     print "\n Time taken to deactivate {} plugin: {} (ms) \n".format(plugin,time_taken_for_deactivate)
-                                    Summ_list.append(' Time taken to deactivate {} plugin: {} (ms)'.format(plugin,time_taken_for_deactivate))
+                                    Summ_list.append(' Time taken to deactivate {} plugin: {} ms'.format(plugin,time_taken_for_deactivate))
                                     print "\n Threshold value for time taken to deactivate {} plugin: {} (ms)".format(plugin,deactivate_threshold)
                                     print "\n Validate the time taken for deactivation: \n"
                                     if 0 < time_taken_for_deactivate < (int(deactivate_threshold)+int(offset)) :

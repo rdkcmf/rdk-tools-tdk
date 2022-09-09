@@ -173,7 +173,7 @@ if expectedResult in result.upper():
                                 print "\n Time taken for getting {} ip address: {}(ms) ".format(new_interface,time_taken)
                                 Summ_list.append('Time taken for getting ip address :{}ms'.format(time_taken))
                                 print "\n Threshold value for getting {} ip address: {}(ms) ".format(new_interface,validation_dict[new_interface])
-                                Summ_list.append('Threshold value for getting {} ip address: {}(ms)'.format(new_interface,validation_dict[new_interface]))
+                                Summ_list.append('Threshold value for getting {} ip address: {}ms'.format(new_interface,validation_dict[new_interface]))
                                 if 0 < time_taken < ( int(validation_dict[new_interface]) + int(offset)):
                                     print "\n Time taken for getting {} ip address is within the expected range".format(new_interface)
                                     tdkTestObj.setResultStatus("SUCCESS")

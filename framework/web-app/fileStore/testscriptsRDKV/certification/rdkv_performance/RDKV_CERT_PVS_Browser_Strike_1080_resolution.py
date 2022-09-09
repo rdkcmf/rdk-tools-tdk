@@ -243,11 +243,9 @@ if expectedResult in result.upper():
                                 Summ_list.append('Browser score with strike:{}'.format(browser_score))
                                 if int(browser_score) > int(strike_threshold_value):
                                     print "\n The browser performance score is high as expected\n"
-                                    Summ_list.append('The browser performance score is high as expected')
                                     tdkTestObj.setResultStatus("SUCCESS")
                                 else:
                                     print "\n The browser performance main score is lower than expected \n"
-                                    Summ_list.append('The browser performance main score is lower than expected')
                                     tdkTestObj.setResultStatus("FAILURE")
                             else:
                                 tdkTestObj.setResultStatus("FAILURE")

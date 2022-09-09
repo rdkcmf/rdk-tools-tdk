@@ -207,12 +207,10 @@ if expectedResult in result.upper():
                 tdkTestObj.setResultStatus("SUCCESS");
                 Summ_list.append('Time taken for UI to load after reboot : {} ms'.format(ui_uptime))
                 print "\n The time taken for UI to load after reboot is within the expected limit\n"
-                Summ_list.append('The time taken for UI to load after reboot is within the expected limit')
             else:
                 tdkTestObj.setResultStatus("FAILURE");
                 Summ_list.append('Time taken for UI to load after reboot : {} ms'.format(ui_uptime))
                 print "\n The time taken for UI to load after reboot is not within the expected limit \n"
-                Summ_list.append('The time taken for UI to load after reboot is not within the expected limit')
         else:
             tdkTestObj.setResultStatus("FAILURE");
             print "\n Failed to get the threshold value from config file"
