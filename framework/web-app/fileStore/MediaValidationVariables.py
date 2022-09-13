@@ -133,7 +133,7 @@ video_src_url_hevc = test_streams_base_path + "DASH_HEVC_AAC/atfms_291_dash_tdk_
 video_src_url_h263 = test_streams_base_path + "TDK_Asset_Sunrise_H263_AAC.mov"
 
 #AAC Codec Video URL
-video_src_url_aac = test_streams_base_path + "HLS_H264_AAC/master.m3u8"
+video_src_url_aac = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4.mpd"
 
 #VP9 Codec Video URL
 # By default VP9_OPUS stream is used, if we need to test with VP9_OGG stream
@@ -175,7 +175,7 @@ video_src_url_dolby = test_streams_base_path + "DASH_H264_EC3/atfms_291_dash_tdk
 #Type of the different codecs video stream. If the url is dash(.mpd), then type is dash. If its a
 #hls stream(.m3u8),then type is hls. If the extension is .mp4,.ogg etc mention as mp4,ogg etc.
 h263_url_type = "mov"
-aac_url_type  = "hls"
+aac_url_type  = "dash"
 vp9_url_type  = "dash"
 vp8_url_type  = "webm"
 opus_url_type = "dash"

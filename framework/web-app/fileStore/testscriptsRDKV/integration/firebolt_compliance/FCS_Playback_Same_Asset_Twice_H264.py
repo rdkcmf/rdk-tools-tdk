@@ -66,16 +66,16 @@
     <test_type>Positive</test_type>
     <test_setup>RDK TV,Video Accelerator, RPI</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
-2. Test stream url for an H264 stream should be updated in the config variable video_src_url_hls_h264 inside MediaValidationVariables.py library inside filestore(We are initialising the pipeline and setting the url, but won't do playback)
+2. Test stream url for an H264 stream should be updated in the config variable video_src_url_dash_h264 inside MediaValidationVariables.py library inside filestore(We are initialising the pipeline and setting the url, but won't do playback)
 3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file
 4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time to wait before checking for AV playback</pre_requisite>
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>testcasename - "test_generic_playback"
-test_url - hls url from MediaValidationVariables library (MediaValidationVariables.video_src_url_hls_h264)
+test_url - hls url from MediaValidationVariables library (MediaValidationVariables.video_src_url_dash_h264)
 "checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
 timeout - a string to specify the time in seconds for which the videoplayback should be done . This argument is the value of device configuration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
     <automation_approch>1.Load the systemutil module 
-2.Retrieve the video_src_url_hls_h264 variable from MediaValidationVariables library
+2.Retrieve the video_src_url_dash_h264 variable from MediaValidationVariables library
 3.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
 4.Construct the mediapipelinetests command based on the retrieved video url, testcasename("test_generic_playback"), value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS flag and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT timeout value
 5.Execute the command in DUT. During the execution, the DUT will playback the stream for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds and then the application exits by closing the pipeline
@@ -130,7 +130,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     test_name = "test_generic_playback"
 
     #Test url for the stream to be played is retrieved from MediaValidationVariables library
-    test_url = MediaValidationVariables.video_src_url_hls_h264
+    test_url = MediaValidationVariables.video_src_url_dash_h264
 
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS' that specifies whether SOC level playback verification check should be done or not 
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')

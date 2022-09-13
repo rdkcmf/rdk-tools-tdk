@@ -27,6 +27,7 @@ operations = ""
 use_aamp = ""
 check_pts = ""
 check_fps = ""
+use_audioSink = ""
 
 #List consisting of HLS url
 HLS_URL = [MediaValidationVariables.video_src_url_short_duration_hls,MediaValidationVariables.video_src_url_hls,MediaValidationVariables.video_src_url_4k_hls,MediaValidationVariables.video_src_url_live_hls,MediaValidationVariables.video_src_url_hls_h264,MediaValidationVariables.video_src_url_hls_h264_iframe]
@@ -44,6 +45,7 @@ def getDeviceConfigValue (tdklibObj, configKey):
         global use_aamp
         global check_pts
         global check_fps
+        global use_audioSink
         result = "SUCCESS"
         #Retrieve the device details(device name) and device type from tdk library
         configValue = ""
@@ -72,6 +74,7 @@ def getDeviceConfigValue (tdklibObj, configKey):
             use_aamp = configParser.get('device.config',"FIREBOLT_COMPLIANCE_USE_AAMP_FOR_HLS")
             check_pts = configParser.get('device.config',"FIREBOLT_COMPLIANCE_CHECK_PTS")
             check_fps = configParser.get('device.config',"FIREBOLT_COMPLIANCE_CHECK_FPS")
+            use_audioSink = configParser.get('device.config',"FIREBOLT_COMPLIANCE_USE_AUDIO_SINK")
         else:
             print "DeviceConfig file not available"
             result = "FAILURE"
@@ -141,6 +144,9 @@ def getMediaPipelineTestCommand (testName, testUrl, **arguments):
     #Feature to disable video-fps check
     if (check_fps == "no"):
         command = command + " checkFPS=no "
+    #Use audioSink
+    if (use_audioSink):
+        command = command + " audioSink=" + use_audioSink;
     #Feature to modify hls url to aamp url based on configuration
     if (use_aamp == "yes"):
         testUrl_list = testUrl.split();

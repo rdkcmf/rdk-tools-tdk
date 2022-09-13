@@ -66,17 +66,17 @@
     <test_type>Positive</test_type>
     <test_setup>RDK TV,Video Accelerator, RPI</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
-2. Test stream url for a H264 stream should be updated in the config variable video_src_url_hls_h264 inside MediaValidationVariables.py library inside filestore
+2. Test stream url for a H264 stream should be updated in the config variable video_src_url_dash_h264 inside MediaValidationVariables.py library inside filestore
 3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file
 4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time in seconds for which the rewind operation should be carried out</pre_requisite>
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
     <input_parameters>testcasename - "test_trickplay"
-test_url - H264 url from MediaValidationVariables library (MediaValidationVariables.video_src_url_hls_h264)
+test_url - H264 url from MediaValidationVariables library (MediaValidationVariables.video_src_url_dash_h264)
 "checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
 operations=rewind4x:&lt;timeout&gt; - a ":" seperated string to specify the rewind operation to be executed and the time in seconds for which the operation should be continued. The timeout should be configured in the device configuration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
     <automation_approch>1.Load the systemutil module 
 2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
-3.Retrieve the video_src_url_hls_h264 variable from MediaValidationVariables library
+3.Retrieve the video_src_url_dash_h264 variable from MediaValidationVariables library
 4. Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value, operation and timeout
 5.Execute the command in DUT. During the execution, the DUT will playback av for 4*FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT+30 seconds so that there is enough duration for rewind, then do a rewind operation with playback rate -4 and then continue playback  at rate -4 for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds. Then application exits by closing the pipeline
 6.Verify the output from the execute command and check if the  "Failures: 0" and "Errors: 0" string exists or "failed: 0" string exists in the returned output
@@ -126,7 +126,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #The test name specifies the test case to be executed from the mediapipeline test suite
     test_name = "test_trickplay"
     #Test url for the stream to be played is retrieved from MediaValidationVariables library
-    test_url = MediaValidationVariables.video_src_url_hls_h264
+    test_url = MediaValidationVariables.video_src_url_dash_h264
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS' that specifies whether SOC level playback verification check should be done or not 
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
@@ -142,11 +142,11 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
         timeoutInSeconds = timeoutConfigValue
     #Construct the trickplay operation string
     #The operations specifies the operation(fastforward/rewind/seek/play/pause) to be executed from the mediapipeline trickplay test
-    # There should be enough duration available for rewind operation to perform correctly, so playing the stream for 4(since we are doing rewind with 4x speed) * timeoutInSeconds + 30(buffer) duration. Ensure that the straem being tested is having adequate duration
+    # There should be enough duration available for rewind operation to perform correctly, so seeking the stream for 4(since we are doing rewind with 4x speed) * timeoutInSeconds + 30(buffer) duration. Ensure that the straem being tested is having adequate duration
     # TODO: Logic to calculate the duration available for doing rewind is to be revisited
-    # Sample operations strings is "operations=play:110,rewind4x:20"
+    # Sample operations strings is "operations=seek:10:110,rewind4x:20"
     playduration = (4 * int (timeoutInSeconds)) + 30
-    setOperations ("play", str (playduration))
+    setOperations ("seek", timeoutInSeconds, str (playduration))
     setOperations ("rewind4x", timeoutInSeconds)
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
     #Sample command = "mediapipelinetests test_trickplay <H264_STREAM_URL> checkavstatus=yes operations=play:110,rewind4x:20"

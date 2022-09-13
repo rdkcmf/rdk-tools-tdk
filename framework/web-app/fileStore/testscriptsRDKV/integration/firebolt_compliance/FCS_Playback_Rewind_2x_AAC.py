@@ -135,18 +135,18 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
         checkAVStatus = check_av_status_flag
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT' that specifies the video playback timeout in seconds 
     actualresult, timeoutConfigValue = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT')
-        
+    
     #If the value of FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT is retrieved correctly and its value is not empty, timeout value should be passed to the test application
     #if the device config value is empty, default timeout(10sec) is passed
     if expectedResult in actualresult.upper() and timeoutConfigValue != "":
         timeoutInSeconds = timeoutConfigValue
     #Construct the trickplay operation string
     #The operations specifies the operation(fastforward/rewind/seek/play/pause) to be executed from the mediapipeline trickplay test
-    # There should be enough duration available for rewind operation to perform correctly, so playing the stream for 2(since we are doing rewind with 2x speed) * timeoutInSeconds + 30(buffer) duration. Ensure that the straem being tested is having adequate duration
+    # There should be enough duration available for rewind operation to perform correctly, so seeking the stream for 2(since we are doing rewind with 2x speed) * timeoutInSeconds + 30(buffer) duration. Ensure that the straem being tested is having adequate duration
     # TODO: Logic to calculate the duration available for doing rewind is to be revisited
-    # Sample operations strings is "operations=play:70,rewind2x:20"
+    # Sample operations strings is "operations=seek:10:70,rewind2x:20"
     playduration = (2 * int (timeoutInSeconds)) + 30
-    setOperations ("play", str (playduration))
+    setOperations ("seek", timeoutInSeconds, str (playduration))
     setOperations ("rewind2x", timeoutInSeconds)
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
     #Sample command = "mediapipelinetests test_trickplay <AAC_STREAM_URL> checkavstatus=yes operations=play:70,rewind2x:20"

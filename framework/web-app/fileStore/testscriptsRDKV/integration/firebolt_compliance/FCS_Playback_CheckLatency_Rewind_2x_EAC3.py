@@ -153,9 +153,9 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
 
     #Construct the trickplay operation string
     #The operations specifies the operation(fastforward/rewind/seek/play/pause) to be executed from the mediapipeline trickplay test
-    # Sample operations strings is "operations=rewind2x:20"
+    # Sample operations strings is "operations=seek:10:50,rewind2x:20"
     playduration = (2 * int (timeoutInSeconds)) + 30
-    setOperations ("play", str (playduration))
+    setOperations ("seek", timeoutInSeconds, str (playduration))
     setOperations ("rewind2x", timeoutInSeconds)
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
     #Sample command = "mediapipelinetests test_trickplay <EAC3_STREAM_URL> checkavstatus=yes operations=rewind2x:20"

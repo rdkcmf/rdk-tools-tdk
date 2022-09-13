@@ -142,10 +142,10 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
         timeoutInSeconds = timeoutConfigValue
     #Construct the trickplay operation string
     #The operations specifies the operation(fastforward/rewind/seek/play/pause) to be executed from the mediapipeline trickplay test
-    # There should be enough duration available for rewind operation to perform correctly, so playing the stream for 2 * timeoutInSeconds + 30(buffer) duration. Ensure that the straem being tested is having adequate duration
-    # Sample operations strings is "operations=play:70,rewind2x:20"
+    # There should be enough duration available for rewind operation to perform correctly, so seeking the stream for 2 * timeoutInSeconds + 30(buffer) duration. Ensure that the straem being tested is having adequate duration
+    # Sample operations strings is "operations=seek:10:70,rewind2x:20"
     playduration = (2 * int (timeoutInSeconds)) + 30
-    setOperations ("play", str (playduration))
+    setOperations ("seek", timeoutInSeconds, str (playduration))
     setOperations ("rewind2x", timeoutInSeconds)
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
     #Sample command = "mediapipelinetests test_trickplay <HLS_STREAM_URL> checkavstatus=yes operations=play:70,rewind2x:20"
