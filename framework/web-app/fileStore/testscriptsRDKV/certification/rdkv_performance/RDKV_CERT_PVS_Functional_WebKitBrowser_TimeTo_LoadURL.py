@@ -148,7 +148,7 @@ if expectedResult in result.upper():
                     event_log = event_listener.getEventsBuffer().pop(0)
                     print "\n Triggered event: ",event_log
                     json_msg = json.loads(event_log.split('$$$')[1])
-                    if "urlchange" in event_log and browser_test_url in event_log:
+                    if "urlchange" in event_log and browser_test_url in event_log.replace("\\",""):
                         if not json_msg["params"]["loaded"]:
                             url_triggered_time = event_log.split('$$$')[0]
                             url_change_count += 1
