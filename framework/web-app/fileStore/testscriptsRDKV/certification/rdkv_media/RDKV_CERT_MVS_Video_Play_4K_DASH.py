@@ -143,8 +143,8 @@ if expectedResult in result.upper():
         test_counter = 0
         players_list = str(MediaValidationVariables.codec_dash_hevc).split(",")
         print "SELECTED PLAYERS: ", players_list
+        video_test_urls = getTestURLs(players_list,appArguments)
 	
-
         #Example video test url
         #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html?
         #url=<video_url_4k>.mpd&operations=close(60)&autotest=true&type=dash

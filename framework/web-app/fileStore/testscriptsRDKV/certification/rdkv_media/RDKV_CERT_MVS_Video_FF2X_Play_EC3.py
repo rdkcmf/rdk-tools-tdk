@@ -146,7 +146,7 @@ if expectedResult in result.upper():
         test_counter = 0
         players_list = str(MediaValidationVariables.codec_ec3).split(",")
         print "SELECTED PLAYERS: ", players_list
-        video_test_url = getTestURL(appURL,appArguments)
+        video_test_urls = getTestURLs(players_list,appArguments)
 
         #Example video test url
         #http://*testManagerIP*/rdk-test-tool/fileStore/lightning-apps/tdkvideoplayer/build/index.html?
