@@ -674,7 +674,7 @@ class ExecutionController {
 	 * @param suiteName
 	 * @return
 	 */
-	def thirdPartyTest(final String stbName, final String boxType, final String imageName, final String suiteName, final String test_request, final String callbackUrl, final String timeInfo,final String  performance, final String isLogReqd, final String reRunOnFailure , final String isAlert){
+	def thirdPartyTest(final String executionName,final String stbName, final String boxType, final String imageName, final String suiteName, final String test_request, final String callbackUrl, final String timeInfo,final String  performance, final String isLogReqd, final String reRunOnFailure , final String isAlert){
 		JsonObject jsonOutData = new JsonObject()
 		try {
 			String htmlData = ""
@@ -698,6 +698,7 @@ class ExecutionController {
 					rerun1 = reRunOnFailure
 				}
 			}
+			if(!executionName){
 			if(isLogReqd != null ){
 				isLogReqd1  = isLogReqd
 
@@ -936,12 +937,35 @@ class ExecutionController {
 					jsonOutData.addProperty("status", "RUNNING"+outData)
 					jsonOutData.addProperty("result", url)
 				}
+			
 				else{
 					url = outData
 					jsonOutData.addProperty("status", "FAILURE")
 					jsonOutData.addProperty("result", url)
 				}
 			}
+			}else {
+
+					if(rerun1?.equals(TRUE) || executionName!=null){
+					try{
+						String filePath = "${request.getRealPath('/')}//fileStore"
+						def executionInstance = Execution?.findByName(executionName)
+						String uniqueName = executionInstance?.toString()+"12"
+						if(!(executionInstance?.category?.toString()?.equals(RDKB_TCL)) && !(executionInstance?.category?.toString()?.equals(RDKV_THUNDER))){
+							executescriptService?.reRunOnFailure(getRealPath()?.toString(), filePath?.toString() ,executionName?.toString(),uniqueName?.toString(), url?.toString(), executionInstance?.category?.toString() )
+						}else if(executionInstance?.category?.toString()?.equals(RDKV_THUNDER)){
+							thunderService?.runFailedScriptsManually(params, executionName?.toString() ,  getRealPath()?.toString(),url?.toString())
+						}else{
+							tclExecutionService?.reRunOnFailure(getRealPath()?.toString(), filePath?.toString() ,executionName?.toString(),uniqueName?.toString(), url?.toString(), executionInstance?.category?.toString())
+						}
+						url = url + "/execution/thirdPartyTest?executionName=${executionName}"
+						jsonOutData.addProperty("Status", "Triggered Execution For Rerun Of Failure Scripts")
+						jsonOutData.addProperty("result", url)
+					}catch (Exception e) {
+					}
+				}
+			}
+			
 		} catch (Exception e) {
 		}
 		render jsonOutData
