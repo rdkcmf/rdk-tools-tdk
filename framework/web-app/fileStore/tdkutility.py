@@ -932,3 +932,108 @@ def RevertWANTrafficCountsPre_requisite(obj1, step, revert_flag, initial_lanmode
         print "Lan Mode revert operation not required";
 
     return status;
+
+# WiFiOffChannelScanEnable_PreReq
+# Syntax      : WiFiOffChannelScanEnable_PreReq(obj, step)
+# Description : Function to check if the pre-requisites are set for Off Channel Scan and set them if not set
+# Parameters  : obj - wifiagent object
+#               step - test step number
+# Return Value: tdkTestObj - test object to set result status
+#               status - pre-requisite set status
+#               revert_flag_rfc - flag to check if pre-requisite revert opeartion is needed
+#               step - final test step number
+
+def WiFiOffChannelScanEnable_PreReq(obj, step):
+    status = 1;
+    revert_flag_rfc = 0;
+    #Get the value of the RFC Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OffChannelScan.Enable
+    paramName = "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OffChannelScan.Enable";
+    tdkTestObj = obj.createTestStep('WIFIAgent_Get');
+    tdkTestObj.addParameter("paramName", paramName);
+    #Execute the test case in DUT
+    tdkTestObj.executeTestCase(expectedresult);
+    actualresult = tdkTestObj.getResult();
+    details = tdkTestObj.getResultDetails();
+
+    print "\nTEST STEP %d: Get the enable state of the RFC Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OffChannelScan.Enable" %step;
+    print "EXPECTED RESULT %d: Should get the enable state of Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OffChannelScan.Enable" %step;
+
+    if expectedresult in actualresult and details != "":
+        rfc_initial = details.split("VALUE:")[1].split(' ')[0].split(',')[0];
+        tdkTestObj.setResultStatus("SUCCESS");
+        print "ACTUAL RESULT %d: Off Channel Scan Enable is : %s" %(step,rfc_initial);
+        #Get the result of execution
+        print "[TEST EXECUTION RESULT] : SUCCESS";
+
+        #If RFC not enabled, enable it and validate the set operation
+        if rfc_initial != "true":
+            step = step + 1;
+            tdkTestObj = obj.createTestStep('WIFIAgent_Set_Get');
+            tdkTestObj.addParameter("paramName",paramName);
+            tdkTestObj.addParameter("paramValue","true");
+            tdkTestObj.addParameter("paramType","boolean");
+            #Execute the test case in DUT
+            tdkTestObj.executeTestCase(expectedresult);
+            actualresult = tdkTestObj.getResult();
+            details = tdkTestObj.getResultDetails();
+
+            print "\nTEST STEP %d: Set the RFC Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OffChannelScan.Enable to true" %step;
+            print "EXPECTED RESULT %d: Should set the enable state of Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OffChannelScan.Enable to true" %step;
+
+            if expectedresult in actualresult and details != "":
+                status = 0;
+                revert_flag_rfc = 1;
+                tdkTestObj.setResultStatus("SUCCESS");
+                print "ACTUAL RESULT %d: RFC value is set successfully; Details : %s" %(step,details);
+                #Get the result of execution
+                print "[TEST EXECUTION RESULT] : SUCCESS";
+            else:
+                tdkTestObj.setResultStatus("FAILURE");
+                print "ACTUAL RESULT %d: RFC value is NOT set successfully; Details : %s" %(step,details);
+                #Get the result of execution
+                print "[TEST EXECUTION RESULT] : FAILURE";
+        else:
+            status = 0;
+            print "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OffChannelScan.Enable is already enabled, SET operation not required";
+
+    return tdkTestObj, status, revert_flag_rfc, step;
+
+# WiFiOffChannelScanEnable_Revert
+# Syntax      : WiFiOffChannelScanEnable_Revert(obj, revert_flag_rfc, step)
+# Description : Function to revert the pre-requisites set for Off Channel Scan
+# Parameters  : obj - wifiagent object
+#               revert_flag_rfc - flag to indicate whether the controlling RFC revert is required or not
+#               step - the test step number
+# Return Value: none
+
+def WiFiOffChannelScanEnable_Revert(obj, revert_flag_rfc, step):
+    #Revert Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OffChannelScan.Enable
+    if revert_flag_rfc == 1:
+        paramName = "Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OffChannelScan.Enable"
+        tdkTestObj = obj.createTestStep('WIFIAgent_Set_Get');
+        tdkTestObj.addParameter("paramName",paramName);
+        tdkTestObj.addParameter("paramValue","true");
+        tdkTestObj.addParameter("paramType","boolean");
+        #Execute the test case in DUT
+        tdkTestObj.executeTestCase(expectedresult);
+        actualresult = tdkTestObj.getResult();
+        details = tdkTestObj.getResultDetails();
+
+        print "\nTEST STEP %d: Revert Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OffChannelScan.Enable to initial value" %step;
+        print "EXPECTED RESULT %d: Should revert the enable state of Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OffChannelScan.Enable to initial value" %step;
+
+        if expectedresult in actualresult and details != "":
+            tdkTestObj.setResultStatus("SUCCESS");
+            print "ACTUAL RESULT %d: RFC Enable is reverted; Details : %s" %(step,details);
+            #Get the result of execution
+            print "[TEST EXECUTION RESULT] : SUCCESS";
+        else:
+            tdkTestObj.setResultStatus("FAILURE");
+            print "ACTUAL RESULT %d: RFC Enable value is NOT reverted; Details : %s" %(step,details);
+            #Get the result of execution
+            print "[TEST EXECUTION RESULT] : FAILURE";
+    else:
+        print "Revert of Device.DeviceInfo.X_RDKCENTRAL-COM_RFC.Feature.OffChannelScan.Enable not required";
+
+    return;
+
