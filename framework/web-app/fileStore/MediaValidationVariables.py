@@ -61,7 +61,7 @@ webinspect_port_lightning = "10002"
 lightning_apps_loc = ""
 
 #lightning application url
-lightning_video_test_app_url     = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=video"
+lightning_video_test_app_url     = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=sdk"
 lightning_shaka_test_app_url     = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=shaka"
 lightning_uve_test_app_url       = lightning_apps_loc + "tdkunifiedplayer/build/index.html?player=aamp"
 
@@ -80,7 +80,7 @@ html_video_test_app_url = lightning_apps_loc + "tdkhtmlplayer.html"
 # (or)
 # If zip is copied to /opt/apache-tomcat-7.0.96/webapps/ folder in TDK Test Manager Machine and extracted,then
 # use the below test streams base URL after updating TM IP
-#test_streams_base_path = "http://<TM_IP>/TDK_Clear_Test_Streams_Sunrise/"
+#test_streams_base_path = "http://<TM_IP>:8080/TDK_Clear_Test_Streams_Sunrise/"
 test_streams_base_path = ""
 
 
@@ -418,13 +418,13 @@ codec_ec3       = "dashjs"
 codec_vp9       = "dashjs"
 codec_opus      = "dashjs"
 codec_av1       = "dashjs"
-codec_h263      = "video"
-codec_vp8       = "video"
-codec_mp4       = "video"
-codec_ogg       = "video"
-codec_mpeg      = "video"
+codec_h263      = "sdk"
+codec_vp8       = "sdk"
+codec_mp4       = "sdk"
+codec_ogg       = "sdk"
+codec_mpeg      = "sdk"
 codec_audio_aac = "dashjs"
-codec_audio_mp3 = "video"
-codec_audio_dts = "video"
-codec_audio_m4a = "video"
-codec_audio_wav_pcm = "video"
+codec_audio_mp3 = "sdk"
+codec_audio_dts = "sdk"
+codec_audio_m4a = "sdk"
+codec_audio_wav_pcm = "sdk"

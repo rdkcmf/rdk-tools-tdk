@@ -111,7 +111,7 @@ def getTestURL(appURL,URLarguments):
         argInfo = urlInfo[1].split("&")
         appArgs = ""
         for arg in argInfo:
-            if "player=video" in arg:
+            if "player=sdk" in arg:
                 if "type=hls" in URLarguments and "useHlslib(yes)" in URLarguments:
                     arg = "player=hlsjs"
                 elif "type=dash" in URLarguments and "useDashlib(yes)" in URLarguments:
@@ -968,12 +968,18 @@ def monitorVideoTestUsingRestAPI(obj,validation_dict,check_pattern,timeout):
     video_test_result = ""
     last_line = None
     last_index = 0
-    skip_proc_check_events = ["Video Player Paused", "Video Player seeking","Video Player Rate Change to 0"]
+    # Decoder value will not be increasing during paused state and we check
+    # the proc details after getting seeeked event not during the seek operation
+    # While doing FF, in between rate may change to 0 and set back to original rate
+    # Skipping the proc check during the intermediate playback events
+    skip_proc_check_events = ["Video Player Paused", "Video Player seeking","Video Player Rate Change to 0","Observed Event: Playing",
+                              "Observed Event: playbackStateChanged", "Observed Event: playbackStarted",
+                              "Observed Event: playbackProgressUpdate", " Observed Event: playbackSpeedChanged"]
     app_log_file = obj.logpath+"/"+str(obj.execID)+"/"+str(obj.execID)+"_"+str(obj.execDevId)+"_"+str(obj.resultId)+"_mvs_applog.txt"
 
     while True:
         if file_check_count > 60:
-            print "\nREST API Logging is not happening properly. Exiting..."
+            print "\nREST API didnt receive logs from app. Plz check wpe log. Exiting..."
             break;
         if os.path.exists(app_log_file):
             logging_flag = 1
@@ -999,8 +1005,9 @@ def monitorVideoTestUsingRestAPI(obj,validation_dict,check_pattern,timeout):
                     print(lines[i])
                     if "Video Player Playing" in lines[i]:
                         play_status = "SUCCESS"
-                    if  check_pattern in lines[i] and validation_dict["proc_check"] and (all(skip_events not in lines[i] for skip_events in skip_proc_check_events)):
-                        time.sleep(1);
+                    if  check_pattern.lower() in lines[i].lower() and validation_dict["proc_check"] and getEventCheckStatus(check_pattern,lines[i]) and (all(skip_events not in lines[i] for skip_events in skip_proc_check_events)):
+                        #time.sleep(1);
+                        print "<------------Proc------------->"
                         info = checkProcEntry(obj,validation_dict)
                         proc_check_list.append(info)
                     if "TEST RESULT" in lines[i]:
@@ -1023,6 +1030,9 @@ def monitorVideoTestUsingRestAPI(obj,validation_dict,check_pattern,timeout):
     else:
         video_test_result = "FAILURE"
 
+    if os.path.exists(app_log_file):
+        os.remove(app_log_file)
+
     return video_test_result,proc_check_list
 
 
@@ -1035,10 +1045,13 @@ def monitorVideoTestUsingWebInspect(obj,webkit_console_socket,validation_dict,ch
     proc_check_list = []
     play_status = "FAILURE"
     video_test_result = ""
-    # Decoder value will not be increasing suring paused state and we check
+    # Decoder value will not be increasing during paused state and we check
     # the proc details after getting seeeked event not during the seek operation
     # While doing FF, in between rate may change to 0 and set back to original rate
-    skip_proc_check_events = ["Video Player Paused", "Video Player seeking","Video Player Rate Change to 0"]
+    # Skipping the proc check during the intermediate playback events
+    skip_proc_check_events = ["Video Player Paused", "Video Player seeking","Video Player Rate Change to 0","Observed Event: Playing",
+                              "Observed Event: playbackStateChanged", "Observed Event: playbackStarted",
+                              "Observed Event: playbackProgressUpdate", " Observed Event: playbackSpeedChanged"]
     while True:
         if continue_count > timeout:
             hang_detected = 1
@@ -1054,15 +1067,14 @@ def monitorVideoTestUsingWebInspect(obj,webkit_console_socket,validation_dict,ch
         dispConsoleLog(console_log)
         if "Video Player Playing" in console_log:
             play_status = "SUCCESS"
-        if  check_pattern in console_log and validation_dict["proc_check"] and (all(skip_events not in console_log for skip_events in skip_proc_check_events)):
-            time.sleep(1);
+        if  check_pattern.lower() in console_log.lower() and validation_dict["proc_check"] and getEventCheckStatus(check_pattern,console_log) and (all(skip_events not in console_log for skip_events in skip_proc_check_events)):
+            #time.sleep(1);
+            print "<------------Proc------------->"
             info = checkProcEntry(obj,validation_dict)
             proc_check_list.append(info)
         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
             test_result = getConsoleMessage(console_log)
             break;
-    #webkit_console_socket.disconnect();
-    #time.sleep(3);
 
     if "SUCCESS" in test_result and "SUCCESS" in play_status and hang_detected == 0:
         video_test_result = "SUCCESS"
@@ -1099,7 +1111,7 @@ def monitorAnimationTestUsingRestAPI(obj,check_pattern,timeout):
 
     while True:
         if file_check_count > 60:
-            print "\nREST API Logging is not happening properly. Exiting..."
+            print "\nREST API didnt receive logs from app. Plz check wpe log. Exiting..."
             break;
         if os.path.exists(app_log_file):
             logging_flag = 1
@@ -1145,6 +1157,9 @@ def monitorAnimationTestUsingRestAPI(obj,check_pattern,timeout):
     else:
         animation_test_result = "FAILURE"
 
+    if os.path.exists(app_log_file):
+        os.remove(app_log_file)
+
     return animation_test_result,diagnosis_info
 
 
@@ -1178,8 +1193,6 @@ def monitorAnimationTestUsingWebInspect(obj,webkit_console_socket,check_pattern,
         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
             test_result = getConsoleMessage(console_log)
             break;
-    #webkit_console_socket.disconnect();
-    #time.sleep(3);
 
     if "SUCCESS" in test_result and hang_detected == 0:
         animation_test_result = "SUCCESS"
@@ -1235,8 +1248,6 @@ def monitorConformanceTest(obj,webkit_console_socket,timeout=60):
             timeout_test_list.append(console_log)
         if "Device Status:" in console_log or "Connection refused" in console_log:
             break;
-    #webkit_console_socket.disconnect();
-    #time.sleep(3);
     if len(failed_test_list) != 0:
         print "\n\n====================== FAILED TESTS =========================="
         dispTestCaseInfo(failed_test_list)
@@ -1271,6 +1282,19 @@ def dispTestCaseInfo(test_list):
         else:
             print test_info
 
+# Function to check whether proc check is applicable for observed event
+def getEventCheckStatus(check_pattern,line):
+    event_check_list = ["Observed Event: play","Observed Event: ratechange","Observed Event: seeked","Video Player Seeked"]
+    if check_pattern == "Observed Event: ":
+        status_flag = False
+        for event in event_check_list:
+            if event.lower() in line.lower():
+                status_flag = True
+                break;
+    else:
+        status_flag = True
+    return status_flag
+
 # Function to get the test urls for different players
 def getTestURLs(players_list,appArguments):
     test_urls = []
@@ -1279,7 +1303,7 @@ def getTestURLs(players_list,appArguments):
             appURL = MediaValidationVariables.lightning_uve_test_app_url
         elif "shaka" in player:
             appURL = MediaValidationVariables.lightning_shaka_test_app_url
-        elif "hlsjs" in player or "dashjs" in player or "video" in player:
+        elif "hlsjs" in player or "dashjs" in player or "sdk" in player:
             appURL = MediaValidationVariables.lightning_video_test_app_url
 
         test_url = getTestURL(appURL,appArguments)
@@ -1306,6 +1330,7 @@ def setMediaTestPostRequisites(obj,webkit_browser_instance,webkit_console_socket
         post_requisite_status = "FAILURE"
 
     return post_requisite_status
+
 
 
 

@@ -26,7 +26,7 @@ import SHAKAPlayerApp       from './TDKSHAKAPlayerApp.js'
 
 export default function() {
           var selectedPlayer = GetURLParameter("player")
-          if (selectedPlayer == "video"){
+          if (selectedPlayer == "sdk"){
                   return Launch(VideoPlayerApp, ...arguments)
           }else if (selectedPlayer == "aamp"){
                   return Launch(UVEAAMPPlayerApp, ...arguments)

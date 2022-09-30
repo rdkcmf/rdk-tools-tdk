@@ -390,19 +390,19 @@ export default class App extends Lightning.Component {
         shaka.polyfill.installAll();
         this.createSHAKAObject();
         this.registerEvents();
-	if (Object.keys(this.DRMconfig).length != 0){
-	    this.player.configure(this.DRMconfig)
-	}
-	if(this.license_header != ""){
+        if (Object.keys(this.DRMconfig).length != 0){
+            this.player.configure(this.DRMconfig)
+        }
+        if(this.license_header != ""){
             var header_tag  = this.license_header.split(":")[0];
             var header_info = this.license_header.split(":")[1];
-	    this.player.getNetworkingEngine().registerRequestFilter(function(type, request) {
+            this.player.getNetworkingEngine().registerRequestFilter(function(type, request) {
             // Only add headers to license requests:
             if (type == shaka.net.NetworkingEngine.RequestType.LICENSE) {
                 request.headers[header_tag] = header_info;
             }
             });
-	}
+        }
         this.player.load(this.videoURL)
         logMsg("SHAKA Player loaded with video url");
   }
@@ -764,17 +764,18 @@ export default class App extends Lightning.Component {
           var drm = String(item.split('(')[0]);
           var license_url = String(item.split('(')[1].split(')')[0]);
           license_url = license_url.replace(/:and:/g,"&").replace(/:eq:/g, "=").replace(/:ob:/g,"(").replace(/:cb:/g,")").replace(/:comma:/g,",");
-	  this.drm_servers[drm] = license_url
+          this.drm_servers[drm] = license_url
       }
     });
-    this.DRMconfig = { "drm": { "servers": {} } }
-    this.DRMconfig["drm"]["servers"] = this.drm_servers
-    //logMsg("DRM info: "+ JSON.stringify(this.DRMconfig));
+    this.DRMconfig = { "drm": {}}
+    this.DRMconfig.drm.servers = this.drm_servers
+    logMsg("DRM info: "+ JSON.stringify(this.DRMconfig));
 
     this.loadSHAKAPlayer();
 
   }
 
 }
+
 
 
