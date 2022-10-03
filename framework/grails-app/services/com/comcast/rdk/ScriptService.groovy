@@ -1417,6 +1417,11 @@ class ScriptService {
 					category = moduleObj?.category?.toString()
 				}
 			}
+			if(category.equals("RDKV_RDKSERVICE")){
+				if(moduleObj){
+					category = moduleObj?.category?.RDKV.toString()
+				}
+			}
 			File file = null
 			/*if("RDKV".equals(category)){
 			 //file = new File( "${realPath}//fileStore//testscriptsRDKV//"+scriptDirName+"//"+dirName+"//"+fileName+".py");
