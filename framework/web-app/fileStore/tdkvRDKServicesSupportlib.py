@@ -2051,7 +2051,17 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
-
+            elif arg[0] == "check_bt_emu_connected":
+                info = checkAndGetAllResultInfo(result,result.get("success"))
+                pairedDevices = result.get("pairedDevices")
+                success = str(result.get("success")).lower() == "true"
+                for pairedDevice in pairedDevices:
+                    if pairedDevice.get("name") and str(pairedDevice.get("name")) in expectedValues[0]:
+                        info = pairedDevice
+                if success:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "bluetooth_get_connected_devices":
             if arg[0] == "check_device_connected":
@@ -2925,6 +2935,12 @@ def CheckAndGenerateConditionalExecStatus(testStepResults,methodTag,arguments):
             else:
                 result = "FALSE"
 
+        elif tag == "bluetooth_check_device_pair_status":
+            testStepResults = testStepResults[0].values()[0]
+            if testStepResults[0].get("name"):
+                result = "TRUE"
+            else:
+                result = "FALSE"
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)
             status = "FAILURE"

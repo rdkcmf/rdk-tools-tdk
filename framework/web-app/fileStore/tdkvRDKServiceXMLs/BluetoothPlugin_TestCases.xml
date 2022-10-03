@@ -394,15 +394,26 @@
             <testStep testStepId="12" name="Get_Connected_Devices" method="Get_Connected_Devices" delay="2" >
                 <resultGeneration useMethodTag="bluetooth_get_connected_devices" arguments="check_connected_device_list_empty" />
             </testStep>
-            <testStep testStepId="13" name="Unpair" method="Unpair" delay="3">
-                <params>
-                  <param tag="deviceID" usePreviousResult="true" Id="4" useMethodTag="bluetooth_get_device_id"  />
-                </params>
-                <resultGeneration useMethodTag="bluetooth_set_operation" expectedValues="true"/>
-            </testStep>
-            <testStep testStepId="14" name="Get_Paired_Devices" method="Get_Paired_Devices" delay="3" >
-                <resultGeneration useMethodTag="bluetooth_get_paired_devices" arguments="check_paired_device_list_empty" />
-            </testStep>
+            <testCasePostRequisite>
+                <postrequisite requisiteId="1" requisiteName="Unpairing_BT_EMU_Device">
+                    <testStep testStepId="1" name="Get_Paired_Devices" method="Get_Paired_Devices" delay="5" saveResult="true">
+                        <resultGeneration useMethodTag="bluetooth_get_paired_devices" arguments="check_bt_emu_connected">
+                            <expectedValues useConfigFile="true" key="BT_EMU_DEVICE_NAME" />
+                        </resultGeneration>
+                    </testStep>
+                    <testStep testStepId="2" name="Unpair" method="Unpair" delay="3">
+                        <conditionalExecution enable="true" Id="1" useMethodTag="bluetooth_check_device_pair_status"/>
+                        <params>
+                            <param tag="deviceID" usePreviousResult="true" Id="1" useMethodTag="bluetooth_get_device_id"/>
+                        </params>
+                        <resultGeneration useMethodTag="bluetooth_set_operation" expectedValues="true"/>
+                    </testStep>
+                    <testStep testStepId="3" name="Get_Paired_Devices" method="Get_Paired_Devices" delay="3" >
+                        <conditionalExecution enable="true" Id="1" useMethodTag="bluetooth_check_device_pair_status"/>
+                        <resultGeneration useMethodTag="bluetooth_get_paired_devices" arguments="check_paired_device_list_empty" />
+                    </testStep>
+                </postrequisite>
+            </testCasePostRequisite>
         </testCase>
         <!--testCase testCaseId="BT_09" testCaseName="Bluetooth_Connect_Disconnect_Device_SMARTPHONE" desc="Connects to the given bluetooth device profile smartphone">
            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="BT_EMULATOR_SUPPORT" useMethodTag="bt_na_tests" arguments="no"/>
@@ -565,6 +576,26 @@
             <testStep testStepId="18" name="Get_Paired_Devices" method="Get_Paired_Devices" delay="3" >
                 <resultGeneration useMethodTag="bluetooth_get_paired_devices" arguments="check_paired_device_list_empty" />
             </testStep>
+            <testCasePostRequisite>
+                <postrequisite requisiteId="1" requisiteName="Unpairing_BT_EMU_Device">
+                    <testStep testStepId="1" name="Get_Paired_Devices" method="Get_Paired_Devices" delay="5" saveResult="true">
+                        <resultGeneration useMethodTag="bluetooth_get_paired_devices" arguments="check_bt_emu_connected">
+                            <expectedValues useConfigFile="true" key="BT_EMU_DEVICE_NAME" />
+                        </resultGeneration>
+                    </testStep>
+                    <testStep testStepId="2" name="Unpair" method="Unpair" delay="3">
+                        <conditionalExecution enable="true" Id="1" useMethodTag="bluetooth_check_device_pair_status"/>
+                        <params>
+                            <param tag="deviceID" usePreviousResult="true" Id="1" useMethodTag="bluetooth_get_device_id"/>
+                        </params>
+                        <resultGeneration useMethodTag="bluetooth_set_operation" expectedValues="true"/>
+                    </testStep>
+                    <testStep testStepId="3" name="Get_Paired_Devices" method="Get_Paired_Devices" delay="3" >
+                        <conditionalExecution enable="true" Id="1" useMethodTag="bluetooth_check_device_pair_status"/>
+                        <resultGeneration useMethodTag="bluetooth_get_paired_devices" arguments="check_paired_device_list_empty" />
+                    </testStep>
+                </postrequisite>
+            </testCasePostRequisite>
         </testCase>
         <testCase testCaseId="BT_09" testCaseName="Bluetooth_Get_Discovered_LE_Profile_Devices" desc="Checks whether LE profile devices are getting discovered">
            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="BT_EMULATOR_SUPPORT" useMethodTag="bt_na_tests" arguments="no"/>
@@ -725,15 +756,26 @@
             <testStep testStepId="16" name="Get_Connected_Devices" method="Get_Connected_Devices" delay="2" >
                 <resultGeneration useMethodTag="bluetooth_get_connected_devices" arguments="check_connected_device_list_empty" />
             </testStep>
-            <testStep testStepId="17" name="Unpair" method="Unpair" delay="3">
-                <params>
-                  <param tag="deviceID" usePreviousResult="true" Id="4" useMethodTag="bluetooth_get_device_id"  />
-                </params>
-                <resultGeneration useMethodTag="bluetooth_set_operation" expectedValues="true"/>
-            </testStep>
-            <testStep testStepId="18" name="Get_Paired_Devices" method="Get_Paired_Devices" delay="3" >
-                <resultGeneration useMethodTag="bluetooth_get_paired_devices" arguments="check_paired_device_list_empty" />
-            </testStep>
+            <testCasePostRequisite>
+                <postrequisite requisiteId="1" requisiteName="Unpairing_BT_EMU_Device">
+                    <testStep testStepId="1" name="Get_Paired_Devices" method="Get_Paired_Devices" delay="5" saveResult="true">
+                        <resultGeneration useMethodTag="bluetooth_get_paired_devices" arguments="check_bt_emu_connected">
+                            <expectedValues useConfigFile="true" key="BT_EMU_DEVICE_NAME" />
+                        </resultGeneration>
+                    </testStep>
+                    <testStep testStepId="2" name="Unpair" method="Unpair" delay="3">
+                        <conditionalExecution enable="true" Id="1" useMethodTag="bluetooth_check_device_pair_status"/>
+                        <params>
+                            <param tag="deviceID" usePreviousResult="true" Id="1" useMethodTag="bluetooth_get_device_id"/>
+                        </params>
+                        <resultGeneration useMethodTag="bluetooth_set_operation" expectedValues="true"/>
+                    </testStep>
+                    <testStep testStepId="3" name="Get_Paired_Devices" method="Get_Paired_Devices" delay="3" >
+                        <conditionalExecution enable="true" Id="1" useMethodTag="bluetooth_check_device_pair_status"/>
+                        <resultGeneration useMethodTag="bluetooth_get_paired_devices" arguments="check_paired_device_list_empty" />
+                    </testStep>
+                </postrequisite>
+            </testCasePostRequisite>
         </testCase>
         <testCase testCaseId="BT_13" testCaseName="Bluetooth_Pair_And_Check_the_Scanned_Devices_List" desc="Check whether bluetooth device is listed in discovered devices after pairing it">
                 <testCaseInfo testCaseType="direct" configurableTest="true" testKey="BT_EMULATOR_SUPPORT" useMethodTag="bt_na_tests" arguments="no"/>
