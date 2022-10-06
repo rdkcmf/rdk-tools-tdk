@@ -106,7 +106,7 @@ expectedResult = "SUCCESS"
 if expectedResult in result.upper():
     status,curr_webkit_status,curr_cobalt_status = check_pre_requisites(obj)
     conf_file,file_status = getConfigFileName(obj.realpath)
-    lightning_app_support_status,lightning_app_support = getDeviceConfigKeyValue(conf_file,"LIGHTNING_APP_SUPPORT")
+    lightning_app_support_status,lightning_app_support = getDeviceConfigKeyValue(conf_file,"IP_CHANGE_LIGHTNING_APP_SUPPORT")
     config_status = "SUCCESS"
     status = "SUCCESS"
     if lightning_app_support == "":

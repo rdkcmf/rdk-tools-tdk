@@ -123,7 +123,7 @@
        </testCase>
 
        <testCase testCaseId="WIFI_03" testCaseName="WIFI_Connect_Disconnect_SSIDs" desc="Connects to the given SSID and disconnects">
-            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="IP_CHANGE_LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -222,7 +222,7 @@
        </testCase>
         
        <testCase testCaseId="WIFI_05" testCaseName="WIFI_Check_Connected_SSID_After_Disconnect" desc="Checks connected SSID after disconnect">
-            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="IP_CHANGE_LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -374,7 +374,7 @@
        </testCase>
 
        <testCase testCaseId="WIFI_10" testCaseName="WIFI_Check_SSID_Paired" desc="Checks if the device is paired to an SSID">
-            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="IP_CHANGE_LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -452,7 +452,7 @@
        </testCasePostRequisite>
        </testCase>
        <testCase testCaseId="WIFI_11" testCaseName="WIFI_Get_Paired_SSID" desc="Gets the SSID to which the device is paired with">
-            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="IP_CHANGE_LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -532,7 +532,7 @@
        </testCasePostRequisite>
        </testCase>
        <testCase testCaseId="WIFI_12" testCaseName="WIFI_Get_Paired_SSID_Info" desc="Gets the SSID to which the device is paired with including the BSSID">
-            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="IP_CHANGE_LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -654,7 +654,7 @@
        </testCase>
  
        <testCase testCaseId="WIFI_16" testCaseName="WIFI_Connect_5GHZ_Acess_Point" desc="Checks if the device connects to the given 5ghz SSID">
-            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="IP_CHANGE_LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
@@ -725,7 +725,7 @@
        </testCase>
        
        <testCase testCaseId="WIFI_17" testCaseName="WIFI_Retrieve_Current_State" desc="Retrieves current state after connecting to Wifi">
-            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="IP_CHANGE_LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
             <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>
