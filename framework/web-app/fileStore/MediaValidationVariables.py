@@ -318,6 +318,12 @@ video_src_url_playready_cbcs_dash_drmconfigs = ""
 video_src_url_playready_cbcs_hls = ""
 video_src_url_playready_cbcs_hls_drmconfigs = ""
 
+video_src_url_widevine_cbcs_dash = ""
+video_src_url_widevine_cbcs_dash_drmconfigs = ""
+
+video_src_url_widevine_cbcs_hls = ""
+video_src_url_widevine_cbcs_hls_drmconfigs = ""
+
 
 #************************************************************************
 #                GENERAL CONFIGURATIONS FOR VIDEO TESTS
