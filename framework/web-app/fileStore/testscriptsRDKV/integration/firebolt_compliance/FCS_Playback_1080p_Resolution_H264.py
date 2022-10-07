@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2021 RDK Management
+# Copyright 2022 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>18</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>FCS_Playback_DASH_720p</name>
+  <name>FCS_Playback_1080p_Resolution_H264</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test to do DASH Videoplayback with resolution set to 720p through playbin gst element and westerossink</synopsis>
+  <synopsis>Test to do videoplayback with resolution set to 1080p through playbin gst element and westerossink</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -53,6 +53,7 @@
     <box_type>RPI-HYB</box_type>
     <!--  -->
     <box_type>Video_Accelerator</box_type>
+    <box_type>RDKTV</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -60,24 +61,24 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>FCS_PLAYBACK_90</test_case_id>
-    <test_objective>To test the video playback of DASH with resolution set to 720p through 'playbin' and 'westerossink' gst elements</test_objective>
+    <test_case_id>FCS_PLAYBACK_88</test_case_id>
+    <test_objective>To test the video playback with resolution set to 1080p through 'playbin' and 'westerossink' gst elements</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Video Accelerator, RPI</test_setup>
+    <test_setup>RDK TV,Video Accelerator, RPI</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
-2. Test stream url for an DASH stream should be updated in the config variable video_src_url_dash inside MediaValidationVariables.py library inside filestore
+2. Test stream url for an 1080p stream should be updated in the config variable video_src_url_mp4_1080p inside MediaValidationVariables.py library inside filestore
 3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file
 4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time to wait before checking for AV playback</pre_requisite>
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
-    <input_parameters>testcasename - "test_generic_playback"
-test_url - dash url from MediaValidationVariables library (MediaValidationVariables.video_src_url_dash)
+    <input_parameters>testcasename - "test_resolution"
+test_url - 1080p h264 mp4 url from MediaValidationVariables library (MediaValidationVariables.video_src_url_mp4_1080p)
 "checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
 timeout - a string to specify the time in seconds for which the videoplayback should be done . This argument is the value of device configuration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
     <automation_approch>1. Load the devicesetting module
-2.Set resolution to 720p and verify resolution is set.
-3.Load the systemutil module.
+2.Set resolution to 1080p and verify resolution is set.
+3.Load the systemutil module 
 4.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
-5.Retrieve the video_src_url_dash variable from MediaValidationVariables library
+5.Retrieve the video_src_url_mp4_1080p variable from MediaValidationVariables library
 6. Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value and timeout
 7.Execute the command in DUT. During the execution, the DUT will playback av for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds then application exits by closing the pipeline
 .Verify the output from the execute command and check if the strings "Failures: 0" and "Errors: 0", or "failed: 0" exists in the returned output
@@ -86,9 +87,9 @@ timeout - a string to specify the time in seconds for which the videoplayback sh
 Checkpoint 2. Verify that the output returned from mediapipelinetests contains the strings "Failures: 0" and "Errors: 0", or "failed: 0"</expected_output>
     <priority>High</priority>
     <test_stub_interface>libsystemutilstub.so.0</test_stub_interface>
-    <test_script>FCS_Playback_DASH_720p</test_script>
+    <test_script>FCS_Playback_1080p_Resolution_H264</test_script>
     <skipped>No</skipped>
-    <release_version>M96</release_version>
+    <release_version>M105</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -110,8 +111,7 @@ dsObj = tdklib.TDKScriptingLibrary("devicesettings","1.2");
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-sysUtilObj.configureTestCase(ip,port,'FCS_Playback_DASH_720p')
-dsObj.configureTestCase(ip,port,'FCS_Playback_DASH_720p')
+sysUtilObj.configureTestCase(ip,port,'FCS_Playback_1080p_Resolution_H264')
 
 #Set device configurations to default values
 checkAVStatus = "no"
@@ -121,21 +121,8 @@ timeoutInSeconds = "10"
 sysutilloadModuleStatus =sysUtilObj.getLoadModuleResult()
 print "[System Util LIB LOAD STATUS]  :  %s" %sysutilloadModuleStatus
 
-dsloadmodulestatus = dsObj.getLoadModuleResult();
-print "[Device Setting LIB LOAD STATUS]  :  %s" %dsloadmodulestatus ;
-
-resolution = "720p";
-ResolutionSet = False
-
-if "SUCCESS" in dsloadmodulestatus.upper():
-    dsObj.setLoadModuleStatus(dsloadmodulestatus);
-    #Set resolution to 720p and retrieve the current resolution as well
-    ResolutionSet,ResolutionBeforePlayback = ResolutionTestStart(dsObj, resolution);
-else:
-    print "Module load failed"
-    exit()
-
-if "SUCCESS" in sysutilloadModuleStatus.upper() and ResolutionSet:
+resolution = "1080p";
+if "SUCCESS" in sysutilloadModuleStatus.upper():
     sysUtilObj.setLoadModuleStatus(sysutilloadModuleStatus)
     expectedResult="SUCCESS"
     
@@ -143,10 +130,10 @@ if "SUCCESS" in sysutilloadModuleStatus.upper() and ResolutionSet:
     tdkTestObj = sysUtilObj.createTestStep('ExecuteCommand')
     
     #The test name specifies the test case to be executed from the mediapipeline test suite
-    test_name = "test_generic_playback"
+    test_name = "test_resolution"
 
     #Test url for the stream to be played is retrieved from MediaValidationVariables library
-    test_url = MediaValidationVariables.video_src_url_dash
+    test_url = MediaValidationVariables.video_src_url_mp4_1080p
 
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS' that specifies whether SOC level playback verification check should be done or not 
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
@@ -163,8 +150,9 @@ if "SUCCESS" in sysutilloadModuleStatus.upper() and ResolutionSet:
         timeoutInSeconds = timeoutConfigValue
 
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
-    #Sample command = "mediapipelinetests test_generic_playback <DASH_STREAM_URL> checkavstatus=yes timeout=20"
+    #Sample command = "mediapipelinetests test_resolution <MP4_STREAM_URL> checkavstatus=yes timeout=20"
     command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, timeout = timeoutInSeconds) 
+    command = command + " checkResolution=" + resolution;
     print "Executing command in DUT: ", command
     
     tdkTestObj.addParameter("command", command)
@@ -180,33 +168,17 @@ if "SUCCESS" in sysutilloadModuleStatus.upper() and ResolutionSet:
         
         if expectedResult in executionStatus:
             tdkTestObj.setResultStatus("SUCCESS")
-            print "DASH Playback using 'playbin' and 'westeros-sink' with resolution %s was successfull"%resolution
+            print "Playback using 'playbin' and 'westeros-sink' with resolution %s was successfull"%resolution
             print "Mediapipeline test executed successfully"
         else:
             tdkTestObj.setResultStatus("FAILURE")
-            print "DASH Playback using 'playbin' and 'westeros-sink' with resolution %s failed"%resolution
+            print "Playback using 'playbin' and 'westeros-sink' with resolution %s failed"%resolution
     else:
         tdkTestObj.setResultStatus("FAILURE")
         print "Mediapipeline test execution failed"
 
-    #Deinitializing DSManager and reverting the resolution
-    ResolutionTestStop(dsObj, resolution, ResolutionBeforePlayback);
-    
     #Unload the modules
     sysUtilObj.unloadModule("systemutil")
-    dsObj.unloadModule("devicesettings");
 
-elif "SUCCESS" in sysutilloadModuleStatus.upper() and "SUCCESS" in dsloadmodulestatus.upper() and not ResolutionSet:
-    #Stop Resolution test by just deinitializing DSManager
-    ResolutionTestStop(dsObj, False);
-    #if resolution is not supported, setting testcase as N/A
-    if ResolutionBeforePlayback == "Not Applicable":
-        dsObj.setAsNotApplicable();
-        dsObj.setLoadModuleStatus("FAILURE");
-
-    #Unload the modules
-    sysUtilObj.unloadModule("systemutil")
-    dsObj.unloadModule("devicesettings");
-   
 else:
     print "Module load failed"

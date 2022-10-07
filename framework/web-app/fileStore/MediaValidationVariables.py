@@ -117,7 +117,22 @@ video_src_url_mp4_50fps  = test_streams_base_path + "TDK_Asset_Sunrise_50fps.mp4
 video_src_url_mp4_59fps  = test_streams_base_path + "TDK_Asset_Sunrise_59fps.mp4"
 video_src_url_mp4_60fps  = test_streams_base_path + "TDK_Asset_Sunrise_60fps.mp4"
 video_src_url_mp4_hevc_hdr = test_streams_base_path + "TDK_Asset_Waterfall_HDR.MOV"
+
+#Stream to simulate underflow
 video_src_url_underflow_stream = test_streams_base_path + "TDK_Asset_Sunrise_underflow_stream.mp4"
+
+#Stream with known number of frames for frame Drop test
+video_src_url_mp4_frameDrop = test_streams_base_path + "TDK_Asset_Waterfall_FrameDrop_Test_30fps_30secs.mp4"
+
+#Streams with different resolutions
+video_src_url_mp4_2160p = test_streams_base_path + "TDK_Asset_Waterfall_2160p.mp4"
+video_src_url_mp4_1080p = test_streams_base_path + "TDK_Asset_Waterfall_1080p.mp4"
+video_src_url_mp4_720p = test_streams_base_path + "TDK_Asset_Waterfall_720p.mp4"
+video_src_url_mp4_480p = test_streams_base_path + "TDK_Asset_Sunrise_30fps.mp4"
+video_src_url_mp4_360p = test_streams_base_path + "TDK_Asset_Waterfall_360p.mp4"
+video_src_url_mp4_2160p_av1 = test_streams_base_path + "TDK_Asset_Waterfall_4K_AV1.mp4"
+video_src_url_mp4_1080p_av1 = test_streams_base_path + "TDK_Asset_Waterfall_1080p_Av1.mp4"
+
 
 #H.264 Codec Video URL
 video_src_url_dash_h264 = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4.mpd"
@@ -217,6 +232,10 @@ video_src_url_aac_eac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_
 video_src_url_opus_aac = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_AAC_OPUS.mp4"
 video_src_url_opus_vorbis = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_Vorbis_Opus.webm"
 video_src_url_ddp51_heaac = ""
+
+#Streams with mutiple tracks
+video_src_url_multi_audio_aac = test_streams_base_path + "TDK_Asset_Waterfall_MultiTrack_AAC.mp4"
+video_src_url_multi_audio_eac3 = test_streams_base_path + "TDK_Asset_Waterfall_MultiTrack_EAC3.mp4"
 
 # Basic WAV PCM Audio format stream
 audio_src_url_wav_pcm = test_streams_base_path + "TDK_Asset_Sunrise_WAV_Audio.wav"

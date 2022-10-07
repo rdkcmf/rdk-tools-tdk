@@ -28,6 +28,7 @@ use_aamp = ""
 check_pts = ""
 check_fps = ""
 use_audioSink = ""
+use_autoVideoSink_for_fpsdisplaysink = ""
 
 #List consisting of HLS url
 HLS_URL = [MediaValidationVariables.video_src_url_short_duration_hls,MediaValidationVariables.video_src_url_hls,MediaValidationVariables.video_src_url_4k_hls,MediaValidationVariables.video_src_url_live_hls,MediaValidationVariables.video_src_url_hls_h264,MediaValidationVariables.video_src_url_hls_h264_iframe]
@@ -46,6 +47,7 @@ def getDeviceConfigValue (tdklibObj, configKey):
         global check_pts
         global check_fps
         global use_audioSink
+        global use_autoVideoSink_for_fpsdisplaysink
         result = "SUCCESS"
         #Retrieve the device details(device name) and device type from tdk library
         configValue = ""
@@ -75,6 +77,10 @@ def getDeviceConfigValue (tdklibObj, configKey):
             check_pts = configParser.get('device.config',"FIREBOLT_COMPLIANCE_CHECK_PTS")
             check_fps = configParser.get('device.config',"FIREBOLT_COMPLIANCE_CHECK_FPS")
             use_audioSink = configParser.get('device.config',"FIREBOLT_COMPLIANCE_USE_AUDIO_SINK")
+            try:
+                use_autoVideoSink_for_fpsdisplaysink = configParser.get('device.config',"FIREBOLT_COMPLIANCE_USE_AUTOVIDEO_FOR_FPSDISPLAYSINK")
+            except:
+                use_autoVideoSink_for_fpsdisplaysink = "no"
         else:
             print "DeviceConfig file not available"
             result = "FAILURE"
@@ -147,6 +153,9 @@ def getMediaPipelineTestCommand (testName, testUrl, **arguments):
     #Use audioSink
     if (use_audioSink):
         command = command + " audioSink=" + use_audioSink;
+    #Use autovideosink for fpsdisplaysink
+    if  "checkFPS=no" not in command.lower() and use_autoVideoSink_for_fpsdisplaysink == "yes":
+        command = "export FPSDISPLAYSINK_USE_AUTOVIDEO=1 ;" + command
     #Feature to modify hls url to aamp url based on configuration
     if (use_aamp == "yes"):
         testUrl_list = testUrl.split();
@@ -258,13 +267,17 @@ def parseLatency(tdkTestObj,latencyThreshold):
 
 def checkifCodecPlayed(tdkTestObj,codec):
     logFile = " /opt/TDK/audio_change_log "
-    command = " grep -inr " + codec + logFile
+    if "e-ac-3" in  codec:
+        codec_search = '"e-ac-3\|e-ac3\|eac-3"'
+    else:
+        codec_search = codec
+    command = " grep -inr " + codec_search + logFile
     tdkTestObj.addParameter("command", command)
     expectedResult = "SUCCESS"
     tdkTestObj.executeTestCase(expectedResult)
     actualresult = tdkTestObj.getResult()
     output = tdkTestObj.getResultDetails()
-    if expectedResult in actualresult.upper() and codec in output.lower():
+    if expectedResult in actualresult.upper() and output:
         print "%s played successfully"%codec
         tdkTestObj.setResultStatus("SUCCESS")
     else:
@@ -292,4 +305,19 @@ def checkFPS(tdkTestObj, fps):
         tdkTestObj.setResultStatus("SUCCESS")
     else:
         print "Expected FrameRate : %s\nActual FrameRate : %s"%(fps,output)
+        tdkTestObj.setResultStatus("FAILURE")
+
+def checkifLanguagePlayed(tdkTestObj,language):
+    logFile = " /opt/TDK/audio_change_log "
+    command = " grep -inr " + language + logFile
+    tdkTestObj.addParameter("command", command)
+    expectedResult = "SUCCESS"
+    tdkTestObj.executeTestCase(expectedResult)
+    actualresult = tdkTestObj.getResult()
+    output = tdkTestObj.getResultDetails()
+    if expectedResult in actualresult.upper() and output:
+        print "%s played successfully"%language
+        tdkTestObj.setResultStatus("SUCCESS")
+    else:
+        print "%s audio playback failed"%language
         tdkTestObj.setResultStatus("FAILURE")
