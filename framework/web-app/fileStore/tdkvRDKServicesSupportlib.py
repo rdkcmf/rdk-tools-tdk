@@ -1260,18 +1260,17 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             cec_addresses = result.get("CECAddresses")
             if arg[0] == "get_logical_address":
                 success = str(result.get("success")).lower() == "true"
-                logical_address = cec_addresses.get("logicalAddresses")
-                info["logicalAddress"] =  logical_address.get("logicalAddress")
-                info["deviceType"] =  logical_address.get("deviceType")
-                if len(logical_address) > 0:
-                    logical_Address_value = logical_address.get("logicalAddress")
-                    Device_Type_value = logical_address.get("deviceType")
+                info["logicalAddress"] =  cec_addresses.get("logicalAddress")
+                info["deviceType"] =  cec_addresses.get("deviceType")
+                if len(cec_addresses) > 0:
+                    logical_Address_value = cec_addresses.get("logicalAddress")
+                    Device_Type_value = cec_addresses.get("deviceType")
                     if logical_Address_value  not in [15,255] and logical_Address_value == int(expectedValues[0]) and  Device_Type_value == expectedValues[1] and  success:
                         info["Test_Step_Status"] = "SUCCESS"
                     else:
                         info["Test_Step_Status"] = "FAILURE"
                 else:
-                    info["logicalAddresses"] = logical_address
+                    info["logicalAddresses"] = cec_addresses
                     info["Test_Step_Status"] = "FAILURE"
 
             elif arg[0] == "get_physical_address":
