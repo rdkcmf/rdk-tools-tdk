@@ -122,14 +122,14 @@ video_src_url_mp4_hevc_hdr = test_streams_base_path + "TDK_Asset_Waterfall_HDR.M
 video_src_url_underflow_stream = test_streams_base_path + "TDK_Asset_Sunrise_underflow_stream.mp4"
 
 #Stream with known number of frames for frame Drop test
-video_src_url_mp4_frameDrop = test_streams_base_path + "TDK_Asset_Waterfall_FrameDrop_Test_30fps_30secs.mp4"
+video_src_url_mp4_frameDrop = test_streams_base_path + "TDK_Asset_Sunrise_30fps_30secs.mp4"
 
 #Streams with different resolutions
-video_src_url_mp4_2160p = test_streams_base_path + "TDK_Asset_Waterfall_2160p.mp4"
-video_src_url_mp4_1080p = test_streams_base_path + "TDK_Asset_Waterfall_1080p.mp4"
-video_src_url_mp4_720p = test_streams_base_path + "TDK_Asset_Waterfall_720p.mp4"
-video_src_url_mp4_480p = test_streams_base_path + "TDK_Asset_Sunrise_30fps.mp4"
-video_src_url_mp4_360p = test_streams_base_path + "TDK_Asset_Waterfall_360p.mp4"
+video_src_url_mp4_2160p = test_streams_base_path + "TDK_Asset_Sunrise_2160p.mp4"
+video_src_url_mp4_1080p = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4_1080p.mp4"
+video_src_url_mp4_720p = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4_720p.mp4"
+video_src_url_mp4_480p = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4_480p.mp4"
+video_src_url_mp4_360p = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4_360p.mp4"
 video_src_url_mp4_2160p_av1 = test_streams_base_path + "TDK_Asset_Waterfall_4K_AV1.mp4"
 video_src_url_mp4_1080p_av1 = test_streams_base_path + "TDK_Asset_Waterfall_1080p_Av1.mp4"
 

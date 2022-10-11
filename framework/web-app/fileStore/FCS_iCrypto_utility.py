@@ -35,6 +35,7 @@ Tests = {"Vault":[" Vault::ImportExport", " Vault::SetGet"], "Hash" : [" Hash::H
 #Create an empty list:
 tests = []
 expectedResult="SUCCESS";
+log_transfer = False;
 
 def getLogFile(obj):
     #Get iCrypto configuration file
@@ -172,14 +173,10 @@ def deleteLogFile(obj,iCrypto_log,iCryptoExecutionStatus):
         print "Unable to delete iCrypto Execution log file from STB"
         tdkTestObj.setResultStatus("FAILURE");
 
-
-#Executes the configured Test APP
-def RunTest(obj,Test,logFile):
-    #Test to be executed
-    test = TESTAPP[Test];
-    print "\nCheck if %s application is present or not"%(test)
+def CheckAppExists(obj,appname):
+    print "\nCheck if %s application is present or not"%(appname)
     tdkTestObj = obj.createTestStep('ExecuteCommand');
-    cmd  = "command -v " + test
+    cmd  = "command -v " + appname
     tdkTestObj.addParameter("command", cmd);
     #Execute the test case in STB
     tdkTestObj.executeTestCase("SUCCESS");
@@ -190,6 +187,12 @@ def RunTest(obj,Test,logFile):
         print "%s application not found"%(test)
         print "Not Proceeding with test case"
         exit()
+
+#Executes the configured Test APP
+def RunTest(obj,Test,logFile):
+    #Test to be executed
+    test = TESTAPP[Test];
+    CheckAppExists(obj,test)
 
     #Prmitive test case which associated to this Script
     print "\nStarting iCrypto interface test Execution\n"
@@ -238,3 +241,142 @@ def GetTestResults(obj,fileName,Test):
                TestScope = False
     TestResult.close()
     return ReturnFile
+
+###############################################################################################
+# Function to run the interfacTests app (cgfacetests) module wise
+# Sample Input : RunWithoutLogTransfer(obj,Cipher)
+# Sample Output:
+# iCrypto test for  Cipher::AES was successful
+###############################################################################################
+def RunWithoutLogTransfer(obj,testModule):
+    test_Names = Tests[testModule]
+    if len(test_Names) > 1:
+        test_Name_End = str(test_Names[-1]);
+    else:
+        test_Name_End = str(test_Names[0])
+    test_Name_First = str(test_Names[0]);
+    CheckAppExists(obj,TESTAPP["interfaceTest"])
+    tdkTestObj = obj.createTestStep('ExecuteCommand')
+    command = "cgfacetests | awk '/" + test_Name_First + "/,/" + test_Name_End + " -/' | grep PASSED"
+    tdkTestObj.addParameter("command", command)
+    tdkTestObj.executeTestCase(expectedResult)
+    actualresult = tdkTestObj.getResult()
+    output = tdkTestObj.getResultDetails().replace(r'\n', '\n')
+    passed  = False;
+    if actualresult.upper() == expectedResult and output:
+        print output.splitlines()
+        for test in test_Names:
+            for line in output.splitlines():
+                if test in line:
+                    if  "0 FAILED" in line:
+                        passed = True;
+                    else:
+                        #command = "cgfacetests | awk '/" + test + "/,/" + test + " -/' | grep FAILURE"
+                        tdkTestObj.addParameter("command", command)
+                        tdkTestObj.executeTestCase(expectedResult)
+                        actualresult = tdkTestObj.getResult()
+                        output = tdkTestObj.getResultDetails().replace(r'\n', '\n')
+                        print output
+                        if actualresult.upper() == expectedResult and output:
+                            print "iCrypto " + test + " test failed at below steps"
+                            print output
+                            tdkTestObj.setResultStatus("FAILURE")
+                        else:
+                            print "iCrypto " + test + " test failed"
+                            print "Unable to get failure logs\nCheck by running cgfacetests application in DUT"
+                            tdkTestObj.setResultStatus("FAILURE")
+
+            if True == passed:
+                print "iCrypto test for " + test + " was successful\nNo Failures observed"
+                tdkTestObj.setResultStatus("SUCCESS")
+
+            if test not in output:
+                print "iCrypto " + test + " test failed"
+                print "Unable to get failure logs\nCheck by running cgfacetests application in DUT"
+                tdkTestObj.setResultStatus("FAILURE")
+    else:
+        print "Output for %s not obtained\n Try running %s in DUT"%(testModule,TESTAPP["interfaceTest"])
+        tdkTestObj.setResultStatus("FAILURE")
+    return
+
+###############################################################################################
+# Function to run the cryptography tets suite (cgfacetests/cgimptests)
+# Sample Input : RunWithoutLogTransfer(obj,interfaceTest)
+# Sample Output:
+# ======== Vault::ImportExport - 10 PASSED, 0 FAILED
+# ======== Vault::SetGet - 12 PASSED, 0 FAILED
+# ======== Hash::Hash - 9 PASSED, 0 FAILED
+# ======== Hash::HMAC - 8 PASSED, 0 FAILED
+# ======== Cipher::AES - 8 PASSED, 0 FAILED
+# ======== DH::Generate - 13 PASSED, 0 FAILED
+# TOTAL: 60 tests; 60 PASSED, 0 FAILED
+###############################################################################################
+def RunSuiteWithoutLogTransfer(obj,Test):
+    test = TESTAPP[Test];
+    CheckAppExists(obj,test)
+    tdkTestObj = obj.createTestStep('ExecuteCommand')
+    command = test + " | grep PASSED"
+    tdkTestObj.addParameter("command", command)
+    tdkTestObj.executeTestCase(expectedResult)
+    actualresult = tdkTestObj.getResult()
+    output = tdkTestObj.getResultDetails().replace(r'\n', '\n')
+    failed  = False;
+    completed = False;
+    if actualresult.upper() == expectedResult and output:
+        print output
+        for line in output.splitlines():
+            if "TOTAL" in line.upper():
+                completed = True;
+            if "0 FAILED" not in line:
+                print "FAILURE at : ",line
+                failed = True
+                tdkTestObj.setResultStatus("FAILURE")
+        if False == failed and completed:
+            print "%s SUCCESS"%(test)
+            tdkTestObj.setResultStatus("SUCCESS")
+        else:
+            print "%s FAILURE"%(test)
+            tdkTestObj.setResultStatus("FAILURE")
+    else:
+         print "Unable to get application logs\nCheck by running cgfacetests application in DUT"
+         tdkTestObj.setResultStatus("FAILURE")
+    return
+
+#Function to retrieve the device configuration from device config file
+def getDeviceConfigValue (tdklibObj, configKey):
+    try:
+        global log_transfer;
+        result = "SUCCESS"
+        #Retrieve the device details(device name) and device type from tdk library
+        configValue = ""
+        deviceDetails = tdklibObj.getDeviceDetails()
+        deviceType = tdklibObj.getDeviceBoxType()
+        #Construct the tdkvRDKServiceConfig path in TM
+        configPath = tdklibObj.realpath+ "/" + "fileStore/tdkvRDKServiceConfig"
+        #Construct the device configuration file path
+        #The device configuration file can be either <device-name>.config or <box-type>.config, so we are checking for both
+        deviceNameConfigFile = configPath + "/" + deviceDetails["devicename"] + ".config"
+        deviceTypeConfigFile = configPath + "/" + deviceType + ".config"
+        # Check whether device / platform config files are present
+        if os.path.exists (deviceNameConfigFile) == True:
+            deviceConfigFile = deviceNameConfigFile
+        elif os.path.exists (deviceTypeConfigFile) == True:
+            deviceConfigFile = deviceTypeConfigFile
+        else:
+            print "FAILURE : No Device config file found : " + deviceNameConfigFile + " or " + deviceTypeConfigFile
+            result = "FAILURE"
+        #Continue only if the device config file exists
+        if (len (deviceConfigFile) != 0):
+            configParser = ConfigParser.ConfigParser()
+            configParser.read(r'%s' % deviceConfigFile)
+            #Retrieve the value of config key from device config file
+            configValue = configParser.get('device.config', configKey)
+            if configKey == "FIREBOLT_COMPLIANCE_TRANSFER_LOG":
+                log_transfer = configValue;
+        else:
+            print "DeviceConfig file not available"
+            result = "FAILURE"
+    except Exception as e:
+        print "Exception occurred while retrieving device configuration  : " + e
+        result = "FAILURE"
+    return result, configValue

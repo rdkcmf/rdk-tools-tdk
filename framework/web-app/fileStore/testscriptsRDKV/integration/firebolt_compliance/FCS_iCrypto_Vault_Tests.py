@@ -106,57 +106,71 @@ sysutilLoadStatus =obj.getLoadModuleResult();
 print "[LIB LOAD STATUS]  :  %s" %sysutilLoadStatus
 if "SUCCESS" in sysutilLoadStatus.upper():
 
-    #Get iCrypto configuration file
-    logFile,iCrypto_log = FCS_iCrypto_utility.getLogFile(obj);
-
     #Configure the test to be executed
     Test = "interfaceTest"
     Module = "Vault"
 
-    #Run the interface test for OpenSSL
-    details = FCS_iCrypto_utility.RunTest(obj,Test,logFile);
-    print "[TEST EXECUTION DETAILS] : %s" %details;
-    time.sleep(3)
-
-    #Transfer iCrypto log file from STB
     try:
-        tdkTestObj = obj.createTestStep('FireboltCompliance_DoNothing');
-        filepath = tdkTestObj.transferLogs( iCrypto_log, "false" );
-    except:
-        print "Transfer of logs unsuccessfull";
-        obj.unloadModule("systemutil");
-        exit() 
-
-
-    #Parsing the output of iCrypto test app
-    try:
-        ResultFile = FCS_iCrypto_utility.GetTestResults(obj,filepath,Module);
-        FCS_iCrypto_utility.Summary(ResultFile);
-        data = open(ResultFile,'r');
-        message = data.read()
-        print "\n**************iCrypto TestApp Execution Log - Begin*************\n\n"
-        print(message)
-        data.close()
-        print "\n**************iCrypto TestApp Execution - End*************\n\n"
-
-        #Reading the iCrypto Execution log file to check for number of failures 
-        Failures = FCS_iCrypto_utility.getNumberOfFailures(ResultFile,"ModuleTest")
-        if Failures:
-            FCS_iCrypto_utility.PrintTitle("SUMMARY OF FAILED TESTCASES")
-            FCS_iCrypto_utility.FailureSummary(ResultFile);
-            iCryptoExecutionStatus = "FAILURE"
-            print "Observed failures during execution"
+        expectedResult = "SUCCESS"
+        actualresult, log_transfer = FCS_iCrypto_utility.getDeviceConfigValue (obj, 'FIREBOLT_COMPLIANCE_TRANSFER_LOG')
+        if expectedResult in actualresult.upper() and log_transfer == "no":
+            print "Log Transfer is disabled"
+            log_transfer = False;
         else:
-            iCryptoExecutionStatus = "SUCCESS"
-            print "Successfuly Executed the test application"
-        print "[TEST EXECUTION RESULT] : %s" %iCryptoExecutionStatus;
+            log_transfer = True;
     except:
-        print "ERROR : Unable to open execution log file"
-        obj.unloadModule("systemutil");
-        exit();
+        log_transfer = False;
 
-    #Delete the log file in DUT
-    FCS_iCrypto_utility.deleteLogFile(obj,iCrypto_log,iCryptoExecutionStatus);
+    if log_transfer:
+        #Get iCrypto configuration file
+        logFile,iCrypto_log = FCS_iCrypto_utility.getLogFile(obj);
+
+        #Run the interface test for OpenSSL
+        details = FCS_iCrypto_utility.RunTest(obj,Test,logFile);
+        print "[TEST EXECUTION DETAILS] : %s" %details;
+        time.sleep(3)
+
+        #Transfer iCrypto log file from STB
+        try:
+            tdkTestObj = obj.createTestStep('FireboltCompliance_DoNothing');
+            filepath = tdkTestObj.transferLogs( iCrypto_log, "false" );
+        except:
+            print "Transfer of logs unsuccessfull";
+            obj.unloadModule("systemutil");
+            exit() 
+
+
+        #Parsing the output of iCrypto test app
+        try:
+            ResultFile = FCS_iCrypto_utility.GetTestResults(obj,filepath,Module);
+            FCS_iCrypto_utility.Summary(ResultFile);
+            data = open(ResultFile,'r');
+            message = data.read()
+            print "\n**************iCrypto TestApp Execution Log - Begin*************\n\n"
+            print(message)
+            data.close()
+            print "\n**************iCrypto TestApp Execution - End*************\n\n"
+
+            #Reading the iCrypto Execution log file to check for number of failures 
+            Failures = FCS_iCrypto_utility.getNumberOfFailures(ResultFile,"ModuleTest")
+            if Failures:
+                FCS_iCrypto_utility.PrintTitle("SUMMARY OF FAILED TESTCASES")
+                FCS_iCrypto_utility.FailureSummary(ResultFile);
+                iCryptoExecutionStatus = "FAILURE"
+                print "Observed failures during execution"
+            else:
+                iCryptoExecutionStatus = "SUCCESS"
+                print "Successfuly Executed the test application"
+            print "[TEST EXECUTION RESULT] : %s" %iCryptoExecutionStatus;
+        except:
+            print "ERROR : Unable to open execution log file"
+            obj.unloadModule("systemutil");
+            exit();
+
+        #Delete the log file in DUT
+        FCS_iCrypto_utility.deleteLogFile(obj,iCrypto_log,iCryptoExecutionStatus);
+    else:
+        FCS_iCrypto_utility.RunWithoutLogTransfer(obj,Module);
 
     obj.unloadModule("systemutil");
 
