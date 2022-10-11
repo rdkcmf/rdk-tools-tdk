@@ -111,7 +111,6 @@ if "SUCCESS" in loadModuleStatus.upper():
                 tdkTestObj.setResultStatus("SUCCESS");
                 print "ACTUAL RESULT  : CPU freeze duration & GPIO Wakeup status are as expected"
                 print "[TEST EXECUTION RESULT] : SUCCESS\n"
-                obj.initiateReboot();
             else:
                 tdkTestObj.setResultStatus("FAILURE");
                 print "ACTUAL RESULT  : CPU freeze duration & GPIO Wakeup status are not as expected"
@@ -128,7 +127,6 @@ if "SUCCESS" in loadModuleStatus.upper():
                 tdkTestObj.setResultStatus("SUCCESS");
                 print "ACTUAL RESULT  : CPU freeze duration is as expected"
                 print "[TEST EXECUTION RESULT] : SUCCESS\n"
-                obj.initiateReboot();
             else:
                 tdkTestObj.setResultStatus("FAILURE");
                 print "ACTUAL RESULT  : CPU freeze duration is not as expected"

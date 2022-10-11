@@ -49,7 +49,7 @@
   <!--  -->
   <box_types>
     <box_type>IPClient-Wifi</box_type>
-    <box_type>Video_Accelerator</box_type>
+    <box_type>RDKTV</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -60,7 +60,7 @@
     <test_case_id>CT_DS_HAL_165</test_case_id>
     <test_objective>To set Bass Enhancer to maximum value</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XI6,Video_Accelerator</test_setup>
+    <test_setup>XI6,RDK TV</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr

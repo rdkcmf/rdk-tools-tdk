@@ -150,14 +150,14 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStat
                     print details;
                     logName = "/opt/TDK/logs/AgentConsole.log";
                     tdkTestObj = sysObj.createTestStep('ExecuteCommand');
-                    cmd = "grep -n \"dsSetBackgroundColor\" " + logName + " | grep -v grep | cut -f3 -d':' | tr -d '\n'";
+                    cmd = "grep -n \"dsSetBackgroundColor\" " + logName;
                     print cmd;
                     tdkTestObj.addParameter("command", cmd);
                     tdkTestObj.executeTestCase("SUCCESS");
                     actualresult = tdkTestObj.getResult();
                     color = tdkTestObj.getResultDetails();
                     print "OUTPUT:", color;
-                    if color == colorMap["Black"]:
+                    if color in colorMap["Black"] or color in colorId["Black"]:
                         tdkTestObj.setResultStatus("SUCCESS");
                         print "BGColor set to Black";
                     else:

@@ -48,6 +48,7 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
+    <box_type>RDKTV</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -58,7 +59,7 @@
     <test_case_id>CT_DS_HAL_158</test_case_id>
     <test_objective>To disable the surround virtualizer mode after reboot and check whether feature is disabled.</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Xi</test_setup>
+    <test_setup>RDK TV</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr

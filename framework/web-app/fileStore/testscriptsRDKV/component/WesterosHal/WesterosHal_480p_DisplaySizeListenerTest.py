@@ -48,7 +48,6 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
-    <box_type>Video_Accelerator</box_type>
     <box_type>RPI-HYB</box_type>
     <box_type>RPI-Client</box_type>
     <box_type>Hybrid-1</box_type>
@@ -63,7 +62,7 @@
     <test_case_id>WESTEROS_HAL_02</test_case_id>
     <test_objective>Add displaysize listener and change resolution size to cross verify callback</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XG, Xi, Video_Accelerator, RPI</test_setup>
+    <test_setup>XG, Xi, RPI</test_setup>
     <pre_requisite>Display Device must be connected with DUT</pre_requisite>
     <api_or_interface_used>WstGLAddDisplaySizeListener</api_or_interface_used>
     <input_parameters>resolution size to create native window</input_parameters>

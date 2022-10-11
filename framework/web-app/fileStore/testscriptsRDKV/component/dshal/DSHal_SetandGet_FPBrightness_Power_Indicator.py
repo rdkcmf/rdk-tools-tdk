@@ -34,7 +34,6 @@
   <skip>false</skip>
   <box_types>
     <box_type>IPClient-3</box_type>
-    <box_type>Video_Accelerator</box_type>
     <box_type>Hybrid-1</box_type>
   </box_types>
   <rdk_versions>
@@ -44,7 +43,7 @@
     <test_case_id>CT_DS_HAL_53</test_case_id>
     <test_objective>To set the brightness of Power indicator and check using get method</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>XG1V3,XI3,Video_Accelerator</test_setup>
+    <test_setup>XG1V3,XI3</test_setup>
     <pre_requisite>1. Initialize IARMBus
 2. Connect IARMBus
 3. Initialize dsMgr
