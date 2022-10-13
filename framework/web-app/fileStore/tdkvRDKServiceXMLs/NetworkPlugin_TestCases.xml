@@ -314,7 +314,7 @@
             </testStep>
        </testCase>
        <testCase testCaseId="NW_12" testCaseName="Check_IPAddress_Status_Changed"  desc="Checks for the ipaddress status change event" >
-            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
+            <testCaseInfo testCaseType="direct" configurableTest="true" testKey="IP_CHANGE_LIGHTNING_APP_SUPPORT" useMethodTag="wifi_check_feature_applicability" arguments="yes" />
             <testStep testStepId="1" pluginName="Wifi" name="Start_Scan" method="Start_Scan" >
                 <params>
                   <param tag="ssid" value=""/>

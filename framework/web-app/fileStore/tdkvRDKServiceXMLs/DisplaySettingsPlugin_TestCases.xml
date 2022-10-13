@@ -601,7 +601,7 @@
         </testCase>    
      
         <testCase testCaseId="DS_22" testCaseName= "Set_And_Get_Gain_HDMI0" desc="Check whether audio port gain values are able to set and get for HDMI0 port" >
-            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="HDMI0" />
+            <testCaseInfo testCaseType="loop" revert="true" configurableTest="true" testKey="CONNECTED_AUDIO_PORTS,DISPLAYSETTINGS_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="HDMI0,Gain" />
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
                 <resultGeneration useMethodTag="check_connected_audio_ports"  expectedValues="HDMI0">
                 </resultGeneration>
@@ -1545,7 +1545,7 @@
             </testStep>
         </testCase>
         <testCase testCaseId="DS_43" testCaseName= "Set_And_Get_Gain_SPDIF0" desc="Check whether audio port gain values are able to set and get for SPDIF0 port" >
-            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="SPDIF0"/>
+            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="CONNECTED_AUDIO_PORTS,DISPLAYSETTINGS_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="SPDIF0,Gain"/>
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
                 <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPDIF0">
                 </resultGeneration>
@@ -1575,7 +1575,7 @@
             </testStep>
         </testCase>
         <testCase testCaseId="DS_44" testCaseName= "Set_And_Get_Gain_IDLR0" desc="Check whether audio port gain values are able to set and get for IDLR0 port" >
-            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="IDLR0"/>
+            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="CONNECTED_AUDIO_PORTS,DISPLAYSETTINGS_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="IDLR0,Gain"/>
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
                 <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="IDLR0">
                 </resultGeneration>
@@ -1605,7 +1605,7 @@
             </testStep>
         </testCase>
         <testCase testCaseId="DS_45" testCaseName= "Set_And_Get_Gain_SPEAKER0" desc="Check whether audio port gain values are able to set and get for SPEAKER0 port" >
-            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="CONNECTED_AUDIO_PORTS" useMethodTag="displaysetting_check_feature_applicability" arguments="SPEAKER0"/>
+            <testCaseInfo testCaseType="loop" revert="true"  configurableTest="true" testKey="CONNECTED_AUDIO_PORTS,DISPLAYSETTINGS_SUPPORTED_FEATURES" useMethodTag="displaysetting_check_feature_applicability" arguments="SPEAKER0,Gain"/>
             <testStep testStepId="1" name="Check_Connected_AudioPorts" method="Get_Connected_AudioPorts" saveResult="true">
                 <resultGeneration useMethodTag="check_connected_audio_ports" expectedValues="SPEAKER0">
                 </resultGeneration>
