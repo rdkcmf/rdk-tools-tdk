@@ -218,7 +218,7 @@ if expectedResult in result.upper():
                                 print(lines[i])
                                 if "Event Occurred: playbackFailed" in lines[i]:
                                     event_status = 1
-                                if "AAMP: DRM License Request Failed" in lines[i]:
+                                if "AAMP: DRM License Request Failed" in lines[i] or "AAMP: DRM License Challenge Generation Failed" in lines[i]:
                                     error_status = 1
                                 if "Video PlayBack Failed" in lines[i]:
                                     test_result = lines[i]
@@ -248,7 +248,7 @@ if expectedResult in result.upper():
                     dispConsoleLog(console_log)
                     if "Event Occurred: playbackFailed" in console_log:
                         event_status = 1
-                    if "AAMP: DRM License Request Failed" in console_log:
+                    if "AAMP: DRM License Request Failed" in console_log or "AAMP: DRM License Challenge Generation Failed" in console_log:
                         error_status = 1
                     if "Video PlayBack Failed" in console_log:
                         break;
