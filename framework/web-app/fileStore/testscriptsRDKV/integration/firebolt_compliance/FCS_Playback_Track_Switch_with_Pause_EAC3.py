@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2021 RDK Management
+# Copyright 2022 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>18</version>
-  <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>FCS_Playback_HLS_4K</name>
+  <version>1</version>
+  <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the version as 1 -->
+  <name>FCS_Playback_Track_Switch_with_Pause_EAC3</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,11 +33,11 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>Test to do HLS Videoplayback with resolution set to 4K through playbin gst element and westerossink</synopsis>
+  <synopsis>Switch to different audio codec present in the same stream without changing the video</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
-  <execution_time>3</execution_time>
+  <execution_time>5</execution_time>
   <!--  -->
   <long_duration>false</long_duration>
   <!--  -->
@@ -50,6 +50,7 @@
   <box_types>
     <!--  -->
     <box_type>Video_Accelerator</box_type>
+    <box_type>RDKTV</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -57,58 +58,57 @@
     <!--  -->
   </rdk_versions>
   <test_cases>
-    <test_case_id>FCS_PLAYBACK_89</test_case_id>
-    <test_objective>To test the video playback of HLS with resolution set to 4K through 'playbin' and 'westerossink' gst elements</test_objective>
+    <test_case_id>FCS_PLAYBACK_140</test_case_id>
+    <test_objective>Switch to different audio codec present in the same stream without changing the video</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Video Accelerator</test_setup>
+    <test_setup>RDK TV,Video Accelerator</test_setup>
     <pre_requisite>1.TDK Agent should be up and running in the DUT
-2. Test stream url for an HLS stream should be updated in the config variable video_src_url_hls inside MediaValidationVariables.py library inside filestore
-3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file
-4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time to wait before checking for AV playback</pre_requisite>
+2. Test stream url for a multi track EAC3 stream should be updated in the config variable video_src_url_multi_audio_eac3 inside MediaValidationVariables.py library inside filestore.
+3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file.
+4. FIREBOLT_COMPLIANCE_PLAYBACK_LATENCY_THRESHOLD configuration should be set to some milliseconds to cross verify the latency during playback.
+5. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time to wait before checking for AV playback</pre_requisite>
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
-    <input_parameters>testcasename - "test_generic_playback"
-test_url - hls url from MediaValidationVariables library (MediaValidationVariables.video_src_url_hls)
+    <input_parameters>testcasename - "test_audio_change_with_pause"
+test_url - multi track url with EAC3 audio streams from MediaValidationVariables library (MediaValidationVariables.video_src_url_multi_audio_eac3)
 "checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
-timeout - a string to specify the time in seconds for which the videoplayback should be done . This argument is the value of device configuration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
-    <automation_approch>1. Load the devicesetting module
-2.Set resolution to 4K and verify resolution is set.
-3.Load the systemutil module 
-4.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
-5.Retrieve the video_src_url_hls variable from MediaValidationVariables library
-6. Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value and timeout
-7.Execute the command in DUT. During the execution, the DUT will playback av for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds then application exits by closing the pipeline
-.Verify the output from the execute command and check if the strings "Failures: 0" and "Errors: 0", or "failed: 0" exists in the returned output
+timeout - a string to specify the time in seconds for which the videoplayback should be done . This argument is the value of device configuration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) </input_parameters>
+    <automation_approch>1.Load the systemutil module
+2.Retrieve the FIREBOLT_COMPLIANCE_CHECK_AV_STATUS and FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT config values from Device config file.
+3.Retrieve the video_src_url_multi_audio_eac3 variable from MediaValidationVariables library
+4.Construct the mediapipelinetests command based on the retrieved video url, testcasename, FIREBOLT_COMPLIANCE_CHECK_AV_STATUS deviceconfig value and timeout
+5.Execute the command in DUT. During the execution, the DUT will playback av for FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds for the first audio track, then using curent-audio property of playbin , audio stream is switched to next audio stream with same codec, playabck will happen for  FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT seconds for this audio stream as well then application exits by closing the pipeline.
+6.Verify the output from the execute command and check if the strings "Failures: 0" and "Errors: 0", or "failed: 0" exists in the returned output
 7.Based on the ExecuteCommand() return value and the output returned from the mediapipelinetests application, TM return SUCCESS/FAILURE status.</automation_approch>
     <expected_output>Checkpoint 1. Verify the API call is success
-Checkpoint 2. Verify that the output returned from mediapipelinetests contains the strings "Failures: 0" and "Errors: 0", or "failed: 0"</expected_output>
+2.Check if Audio switch is happened properly.</expected_output>
     <priority>High</priority>
     <test_stub_interface>libsystemutilstub.so.0</test_stub_interface>
-    <test_script>FCS_Playback_HLS_4K</test_script>
-    <skipped>No</skipped>
-    <release_version>M96</release_version>
+    <test_script>FCS_Playback_Track_Switch_with_Pause_EAC3</test_script>
+    <skipped></skipped>
+    <release_version>M105</release_version>
     <remarks></remarks>
   </test_cases>
-  <script_tags />
+  <script_tags>
+    <script_tag>BASIC</script_tag>
+    <!--  -->
+  </script_tags>
 </xml>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
-import tdklib; 
+import tdklib;
 import MediaValidationVariables
 from FireboltComplianceUtility import *
-from devicesettings import *
 
 #Test component to be tested
 fcObj = tdklib.TDKScriptingLibrary("firebolt_compliance","1")
 #Using systemutil library for command execution
 sysUtilObj = tdklib.TDKScriptingLibrary("systemutil","1")
-dsObj = tdklib.TDKScriptingLibrary("devicesettings","1.2");
 
 #IP and Port of box, No need to change,
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-sysUtilObj.configureTestCase(ip,port,'FCS_Playback_HLS_4K')
-dsObj.configureTestCase(ip,port,'FCS_Playback_HLS_4K')
+sysUtilObj.configureTestCase(ip,port,'FCS_Playback_Track_Switch_with_Pause_EAC3');
 
 #Set device configurations to default values
 checkAVStatus = "no"
@@ -117,38 +117,22 @@ timeoutInSeconds = "10"
 #Load the systemutil library
 sysutilloadModuleStatus =sysUtilObj.getLoadModuleResult()
 print "[System Util LIB LOAD STATUS]  :  %s" %sysutilloadModuleStatus
-
-dsloadmodulestatus = dsObj.getLoadModuleResult();
-print "[Device Setting LIB LOAD STATUS]  :  %s" %dsloadmodulestatus ;
-
-resolution = "2160p";
-ResolutionSet = False
-
-if "SUCCESS" in dsloadmodulestatus.upper():
-    dsObj.setLoadModuleStatus(dsloadmodulestatus);
-    #Set resolution to 4K and retrieve the current resolution as well
-    ResolutionSet,ResolutionBeforePlayback = ResolutionTestStart(dsObj, resolution);
-else:
-    print "Module load failed"
-
-if "SUCCESS" in sysutilloadModuleStatus.upper() and ResolutionSet:
-    sysUtilObj.setLoadModuleStatus(sysutilloadModuleStatus)
+sysUtilObj.setLoadModuleStatus(sysutilloadModuleStatus)
+if "SUCCESS" in sysutilloadModuleStatus.upper():
     expectedResult="SUCCESS"
     
     #Construct the command with the url and execute the command in DUT
     tdkTestObj = sysUtilObj.createTestStep('ExecuteCommand')
     
     #The test name specifies the test case to be executed from the mediapipeline test suite
-    test_name = "test_generic_playback"
-
+    test_name = "test_audio_change_with_pause"
     #Test url for the stream to be played is retrieved from MediaValidationVariables library
-    test_url = MediaValidationVariables.video_src_url_hls
-
+    test_url = MediaValidationVariables.video_src_url_multi_audio_eac3
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS' that specifies whether SOC level playback verification check should be done or not 
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
     if expectedResult in actualresult.upper() and check_av_status_flag == "yes":
-        print "Video Decoder proc check is added"
+        print "Video playback status check is added"
         checkAVStatus = check_av_status_flag
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT' that specifies the video playback timeout in seconds 
     actualresult, timeoutConfigValue = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT')
@@ -159,7 +143,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper() and ResolutionSet:
         timeoutInSeconds = timeoutConfigValue
 
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
-    #Sample command = "mediapipelinetests test_generic_playback <HLS_STREAM_URL> checkavstatus=yes timeout=20"
+    #Sample command = "mediapipelinetests test_audio_change_with_pause <AC3_EAC3_URL> checkavstatus=yes timeout=10"
     command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, timeout = timeoutInSeconds) 
     print "Executing command in DUT: ", command
     
@@ -176,33 +160,17 @@ if "SUCCESS" in sysutilloadModuleStatus.upper() and ResolutionSet:
         
         if expectedResult in executionStatus:
             tdkTestObj.setResultStatus("SUCCESS")
-            print "HLS Playback using 'playbin' and 'westeros-sink' with resolution %s was successfull"%resolution
+            print "EAC3 track switch with pause was successfull"
             print "Mediapipeline test executed successfully"
+            checkifLanguagePlayed(tdkTestObj,"en")
+            checkifLanguagePlayed(tdkTestObj,"de");
         else:
             tdkTestObj.setResultStatus("FAILURE")
-            print "HLS Playback using 'playbin' and 'westeros-sink' with resolution %s failed"%resolution
+            print "EAC3 track switch with pause failed"
     else:
         tdkTestObj.setResultStatus("FAILURE")
         print "Mediapipeline test execution failed"
-
-    #Deinitializing DSManager and reverting the resolution
-    ResolutionTestStop(dsObj, resolution, ResolutionBeforePlayback);
-    
     #Unload the modules
     sysUtilObj.unloadModule("systemutil")
-    dsObj.unloadModule("devicesettings");
-
-elif "SUCCESS" in sysutilloadModuleStatus.upper() and "SUCCESS" in dsloadmodulestatus.upper() and not ResolutionSet:
-    #Stop Resolution test by just deinitializing DSManager
-    ResolutionTestStop(dsObj, False);
-    #if resolution is not supported, setting testcase as N/A
-    if ResolutionBeforePlayback == "Not Applicable":
-        dsObj.setAsNotApplicable();
-        dsObj.setLoadModuleStatus("FAILURE");
-
-    #Unload the modules
-    sysUtilObj.unloadModule("systemutil")
-    dsObj.unloadModule("devicesettings");
-   
 else:
     print "Module load failed"

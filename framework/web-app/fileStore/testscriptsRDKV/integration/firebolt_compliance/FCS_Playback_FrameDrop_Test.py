@@ -109,7 +109,8 @@ sysUtilObj.configureTestCase(ip,port,'FCS_Playback_FrameDrop_Test')
 
 #Set device configurations to default values
 checkAVStatus = "no"
-timeoutInSeconds = "60"
+timeoutInSeconds = "32"
+totalFrames = "900"
 
 #Load the systemutil library
 sysutilloadModuleStatus =sysUtilObj.getLoadModuleResult()
@@ -124,8 +125,8 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     
     #The test name specifies the test case to be executed from the mediapipeline test suite
     test_name = "test_frameDrop"
-
-    test_url = ""
+    
+    test_url = MediaValidationVariables.video_src_url_mp4_frameDrop
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS' that specifies whether SOC level playback verification check should be done or not 
     actualresult, check_av_status_flag = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_CHECK_AV_STATUS')
     #If the value of FIREBOLT_COMPLIANCE_CHECK_AV_STATUS is retrieved correctly and its value is "yes", argument to check the SOC level AV status should be passed to test application
@@ -135,45 +136,33 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     #Retrieve the value of configuration parameter 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT' that specifies the video playback timeout in seconds 
     actualresult, timeoutConfigValue = getDeviceConfigValue (sysUtilObj, 'FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT')
         
-    #If the value of FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT is retrieved correctly and its value is not empty, timeout value should be passed to the test application
-    #if the device config value is empty, default timeout(10sec) is passed
-    if expectedResult in actualresult.upper() and timeoutConfigValue != "":
-        timeoutInSeconds = timeoutConfigValue
-
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
     #Sample command = "mediapipelinetests test_generic_playback <FrameDrop_Test_STREAM_URL> checkavstatus=yes timeout=20"
     command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, timeout = timeoutInSeconds) 
+    command = command + " totalFrames=" + totalFrames
     print "Executing command in DUT: ", command
     
-    #Do frameDrop Test 4 times
-    for testcount in range(0,4):
-        print "\nIteration ",testcount
-        tdkTestObj.addParameter("command", command)
-        tdkTestObj.executeTestCase(expectedResult)
-        actualresult = tdkTestObj.getResult()
-        output = tdkTestObj.getResultDetails().replace(r'\n', '\n'); output = output[output.find('\n'):]
-        print "OUTPUT: ...\n", output
+    tdkTestObj.addParameter("command", command)
+    tdkTestObj.executeTestCase(expectedResult)
+    actualresult = tdkTestObj.getResult()
+    output = tdkTestObj.getResultDetails().replace(r'\n', '\n'); output = output[output.find('\n'):]
+    print "OUTPUT: ...\n", output
 
-        cmd = "cat video_info"
-        tdkTestObj.addParameter("command", cmd)
-        tdkTestObj.executeTestCase(expectedResult)
-        playback_details = tdkTestObj.getResultDetails();
-        print playback_details
-        #Check if the command executed successfully
-        if expectedResult in actualresult.upper() and output:
-            #Check the output string returned from 'mediapipelinetests' to verify if the test suite executed successfully 
-            executionStatus = checkMediaPipelineTestStatus (output)
+    #Check if the command executed successfully
+    if expectedResult in actualresult.upper() and output:
+        #Check the output string returned from 'mediapipelinetests' to verify if the test suite executed successfully 
+        executionStatus = checkMediaPipelineTestStatus (output)
         
-            if expectedResult in executionStatus:
-                tdkTestObj.setResultStatus("SUCCESS")
-                print "FrameDrop_Test Playback using 'playbin' and 'westeros-sink' was successfull"
-                print "Mediapipeline test executed successfully"
-            else:
-                tdkTestObj.setResultStatus("FAILURE")
-                print "FrameDrop_Test Playback using 'playbin' and 'westeros-sink' failed"
+        if expectedResult in executionStatus:
+            tdkTestObj.setResultStatus("SUCCESS")
+            print "FrameDrop_Test Playback using 'playbin' and 'westeros-sink' was successfull"
+            print "Mediapipeline test executed successfully"
         else:
             tdkTestObj.setResultStatus("FAILURE")
-            print "Mediapipeline test execution failed"
+            print "FrameDrop_Test Playback using 'playbin' and 'westeros-sink' failed"
+    else:
+        tdkTestObj.setResultStatus("FAILURE")
+        print "Mediapipeline test execution failed"
 
     #Unload the modules
     sysUtilObj.unloadModule("systemutil")

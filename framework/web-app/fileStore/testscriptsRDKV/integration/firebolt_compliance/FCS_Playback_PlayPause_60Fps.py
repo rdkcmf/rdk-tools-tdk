@@ -70,7 +70,7 @@
 3. FIREBOLT_COMPLIANCE_CHECK_AV_STATUS configuration should be set as yes/no in the device config file
 4. FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT configuration should be set to time to wait before checking for AV playback</pre_requisite>
     <api_or_interface_used>Execute the mediapipelinetests application in DUT</api_or_interface_used>
-    <input_parameters>testcasename - "test_play_pause_pipeline"
+    <input_parameters>testcasename - "test_playback_fps"
 test_url - hls url from MediaValidationVariables library (MediaValidationVariables.video_src_url_mp4_60fps)
 "checkavstatus=yes" - argument to do the video playback verification from SOC side . This argument can be yes/no based on a device configuration(FIREBOLT_COMPLIANCE_CHECK_AV_STATUS) from Device Config file
 timeout - a string to specify the time in seconds for which the videoplayback should be done . This argument is the value of device configuration(FIREBOLT_COMPLIANCE_MEDIAPLAYBACK_TIMEOUT) from Device Config file</input_parameters>
@@ -113,6 +113,7 @@ sysUtilObj.configureTestCase(ip,port,'FCS_Playback_PlayPause_60Fps')
 #Set device configurations to default values
 checkAVStatus = "no"
 timeoutInSeconds = "10"
+fps = 60
 
 #Load the systemutil library
 sysutilloadModuleStatus =sysUtilObj.getLoadModuleResult()
@@ -126,7 +127,7 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
     tdkTestObj = sysUtilObj.createTestStep('ExecuteCommand')
     
     #The test name specifies the test case to be executed from the mediapipeline test suite
-    test_name = "test_play_pause_pipeline"
+    test_name = "test_playback_fps"
 
     #Test url for the stream to be played is retrieved from MediaValidationVariables library
     test_url = MediaValidationVariables.video_src_url_mp4_60fps
@@ -146,8 +147,9 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
         timeoutInSeconds = timeoutConfigValue
 
     #To do the AV playback through 'playbin' element, we are using 'mediapipelinetests' test application that is available in TDK along with required parameters
-    #Sample command = "mediapipelinetests test_play_pause_pipeline <60 fps_STREAM_URL> checkavstatus=yes timeout=30"
+    #Sample command = "mediapipelinetests test_playback_fps <60 fps_STREAM_URL> checkavstatus=yes timeout=30"
     command = getMediaPipelineTestCommand (test_name, test_url, checkavstatus = checkAVStatus, timeout = timeoutInSeconds)
+    command = command + " fps=" + str(fps)
     print "Executing command in DUT: ", command
     
     tdkTestObj.addParameter("command", command)
@@ -165,7 +167,6 @@ if "SUCCESS" in sysutilloadModuleStatus.upper():
             tdkTestObj.setResultStatus("SUCCESS")
             print "60Fps video playback  using 'playbin' and 'westeros-sink' was successfull"
             print "Mediapipeline test executed successfully"
-            checkFPS(tdkTestObj,60);
         else:
             tdkTestObj.setResultStatus("FAILURE")
             print "60Fps video playback using 'playbin' and 'westeros-sink' failed"
