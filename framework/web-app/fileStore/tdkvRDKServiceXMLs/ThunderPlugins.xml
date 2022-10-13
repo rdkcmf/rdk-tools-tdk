@@ -1748,6 +1748,9 @@
                 <param tag="message" type="string" defaultValue="EDID"/>
             </params>
         </method>
+        <method name="Get_HDMISPD" api="getHDMISPD" type="method" version="2" desc="Returns the SPD infoFrame packet information for the specified HDMI Input device"/>
+        <method name="Get_Raw_HDMISPD" api="getRawHDMISPD" type="method" version="2" desc="Returns the SPD infoFrame packet information for the specified HDMI Input device as raw bits"/>
+        <method name="Get_Edid_Version" api="getEdidVersion" type="method" version="2" desc="Returns the EDID version"/>
     </plugin>
  
     <!-- PlayerInfo Plugin Information -->
@@ -2063,7 +2066,23 @@
           </params>
         </method>       
         <method name="Reset_Aspect_Ratio" api="resetAspectRatio" type="method" desc="Resets the TV aspect ratio to the factory default" />
-        <method name="Reset_Auto_Backlight" api="resetAutoBacklight" type="method" desc="Resets the TV automatic backlight to the factory default" /> 
+        <method name="Reset_Auto_Backlight" api="resetAutoBacklight" type="method" desc="Resets the TV automatic backlight to the factory default" />
+        <method name="Reset_Dolby_Vision_Mode" api="resetDolbyVisionMode" type="method" desc="Resets the TV Dolby vision mode to the factory default" />
+        <method name="Reset_Backlight_Dimming_Mode" api="resetBacklightDimmingMode" type="method" desc="Resets the TV backlight dimming mode to the factory default" />
+        <method name="Reset_Backlight" api="resetBacklight" type="method" desc="Resets the TV backlight to the factory default" />
+        <method name="Reset_Brightness" api="resetBrightness" type="method" desc="Resets the TV brightness to the factory default" />
+        <method name="Reset_Contrast" api="resetContrast" type="method" desc="Resets the TV contrast to the factory default" />
+        <method name="Reset_Saturation" api="resetSaturation" type="method" desc="Resets the TV saturation to the factory default" />
+        <method name="Reset_Sharpness" api="resetSharpness" type="method" desc="Resets the TV sharpness to the factory default" />
+        <method name="TV_Get_Video_Format" api="getVideoFormat" type="method" desc="Returns the currently set video format" />
+        <method name="TV_Get_Video_FrameRate" api="getVideoFrameRate" type="method" desc="Returns the currently set video frame rate" />
+        <method name="TV_Get_Video_Resolution" api="getVideoResolution" type="method" desc="Returns the currently set video resolution" />
+        <method name="Get_Global_Backlight_Factor" api="getGlobalBacklightFactor" type="method" desc="Returns the global backlight factor" />
+        <method name="Set_Global_Backlight_Factor" api="setGlobalBacklightFactor" type="method" desc="Sets the global backlight factor" >
+          <params>
+           <param tag="BacklightFactor" type="int"/>
+          </params>
+        </method> 
     </plugin> 
 
 </thunderPlugins>

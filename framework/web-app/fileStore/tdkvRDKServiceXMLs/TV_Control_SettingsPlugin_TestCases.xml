@@ -741,5 +741,292 @@
                 </resultGeneration>
             </testStep>
         </testCase> 
+        <testCase testCaseId="CS_29" testCaseName="TV_ControlSettings_Set_And_Reset_Dolby_Vision_Mode"  desc="Check whether able to reset the dolby vision mode">
+            <testCaseInfo testCaseType="direct" revert="true"  />
+            <testStep testStepId="1" name="Get_Supported_Dolby_Vision_Modes" method="Get_Supported_Dolby_Vision_Modes" saveResult="true" revertGet="yes">
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_supported_modes" arguments="SupportedDVModes" />
+            </testStep>
+            <testStep testStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="fixed_length_list" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="SupportedDVModes,DolbyVisionMode"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_Dolby_Vision_Mode" method="Set_Dolby_Vision_Mode" revertSet="yes">
+                  <params>
+                    <param tag="DolbyVisionMode" usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="DolbyVisionMode" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Dolby_Vision_Mode" method="Get_Dolby_Vision_Mode"  >
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="DolbyVisionMode,check_expected_mode" >
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="DolbyVisionMode" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Reset_Dolby_Vision_Mode" method="Reset_Dolby_Vision_Mode" >
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Default_Values" >
+                            <arguments value="TvSettings.DolbyVisionMode" useConfigFile="true" key="TV_CS_DEFAULT_VALUES_FILE_PATH"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Get_Dolby_Vision_Mode" method="Get_Dolby_Vision_Mode" revertFlag="yes" >
+                <resultGeneration useMethodTag="tvcontrolsettings_check_supported_modes" arguments="DolbyVisionMode,check_expected_mode">
+                     <expectedValues usePreviousResult="true" Id="6" useMethodTag="tvcontrolsettings_get_default_values" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_30" testCaseName="TV_ControlSettings_Set_And_Reset_Backlight_Dimming_Mode"  desc="Check whether able to reset the TV Backlight Dimming Mode">
+            <testCaseInfo testCaseType="direct" revert="true"  />
+            <testStep testStepId="1" name="Get_All_Backlight_Dimming_Modes" method="Get_All_Backlight_Dimming_Modes" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_supported_modes" arguments="SupportedDimmingModes"  />
+            </testStep>
+            <testStep testStepId="2" name="Get_Backlight_Dimming_Mode" method="Get_Backlight_Dimming_Mode" saveResult="true" revertGet="yes">
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="DimmingMode" >
+                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="SupportedDimmingModes,DimmingMode" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="fixed_length_list" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="SupportedDimmingModes,DimmingMode"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="4" name="Set_Backlight_Dimming_Mode" method="Set_Backlight_Dimming_Mode" revertSet="yes">
+                  <params>
+                    <param tag="DimmingMode" usePreviousResult="true" Id="3" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="DimmingMode" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="5" name="Get_Backlight_Dimming_Mode" method="Get_Backlight_Dimming_Mode"  >
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="DimmingMode,check_expected_mode" >
+                    <expectedValues usePreviousResult="true" Id="4" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="DimmingMode" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="6" name="Reset_Backlight_Dimming_Mode" method="Reset_Backlight_Dimming_Mode" >
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="7" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Default_Values" >
+                            <arguments value="TvSettings.0.DimmingMode" useConfigFile="true" key="TV_CS_DEFAULT_VALUES_FILE_PATH"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="8" name="Get_Backlight_Dimming_Mode" method="Get_Backlight_Dimming_Mode" revertFlag="yes" >
+                <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="DimmingMode,check_expected_mode">
+                     <expectedValues usePreviousResult="true" Id="7" useMethodTag="tvcontrolsettings_get_default_values" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_31" testCaseName="TV_ControlSettings_Set_And_Reset_Backlight_Setting"  desc="Check whether able to reset the TV Backlight settings">
+            <testCaseInfo testCaseType="direct" revert="true"  />
+            <testStep testStepId="1" name="Get_Backlight" method="Get_Backlight" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Backlight,backlight,check_range"  />
+            </testStep>
+            <testStep testStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="0,100"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_Backlight" method="Set_Backlight" revertSet="yes">
+                  <params>
+                    <param tag="backlight" usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="backlight" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Backlight" method="Get_Backlight"  >
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Backlight,backlight" >
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="backlight" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Reset_Backlight" method="Reset_Backlight" >
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Default_Values" >
+                            <arguments value="TvSettings.PicMode.0.Format.1.Backlight" useConfigFile="true" key="TV_CS_DEFAULT_VALUES_FILE_PATH"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Get_Backlight" method="Get_Backlight" revertFlag="yes" >
+                <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Backlight,backlight">
+                     <expectedValues usePreviousResult="true" Id="6" useMethodTag="tvcontrolsettings_get_default_values" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_32" testCaseName="TV_ControlSettings_Set_And_Reset_Brightness_Setting"  desc="Check whether able to reset the TV Brightness settings">
+            <testCaseInfo testCaseType="direct" revert="true"  />
+            <testStep testStepId="1" name="Get_Brightness" method="Get_Brightness" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Brightness,brightness,check_range"  />
+            </testStep>
+            <testStep testStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="0,100"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_Brightness" method="Set_Brightness" revertSet="yes">
+                  <params>
+                    <param tag="brightness" usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="brightness" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Brightness" method="Get_Brightness"  >
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Brightness,brightness" >
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="brightness" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Reset_Brightness" method="Reset_Brightness" >
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Default_Values" >
+                            <arguments value="TvSettings.PicMode.0.Format.1.Brightness" useConfigFile="true" key="TV_CS_DEFAULT_VALUES_FILE_PATH"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Get_Brightness" method="Get_Brightness" revertFlag="yes" >
+                <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Brightness,brightness">
+                     <expectedValues usePreviousResult="true" Id="6" useMethodTag="tvcontrolsettings_get_default_values" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_33" testCaseName="TV_ControlSettings_Set_And_Reset_Contrast_Setting"  desc="Check whether able to reset the TV Contrast settings">
+            <testCaseInfo testCaseType="direct" revert="true"  />
+            <testStep testStepId="1" name="Get_Contrast" method="Get_Contrast" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Contrast,contrast,check_range"  />
+            </testStep>
+            <testStep testStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="0,100"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_Contrast" method="Set_Contrast" revertSet="yes">
+                  <params>
+                    <param tag="contrast" usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="contrast" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Contrast" method="Get_Contrast"  >
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Contrast,contrast" >
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="contrast" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Reset_Contrast" method="Reset_Contrast" >
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Default_Values" >
+                            <arguments value="TvSettings.PicMode.0.Format.1.Contrast" useConfigFile="true" key="TV_CS_DEFAULT_VALUES_FILE_PATH"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Get_Contrast" method="Get_Contrast" revertFlag="yes" >
+                <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Contrast,contrast">
+                     <expectedValues usePreviousResult="true" Id="6" useMethodTag="tvcontrolsettings_get_default_values" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_34" testCaseName="TV_ControlSettings_Set_And_Reset_Saturation_Setting"  desc="Check whether able to reset the TV Saturation settings">
+            <testCaseInfo testCaseType="direct" revert="true"  />
+            <testStep testStepId="1" name="Get_Saturation" method="Get_Saturation" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Saturation,saturation,check_range"  />
+            </testStep>
+            <testStep testStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="0,100"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_Saturation" method="Set_Saturation" revertSet="yes">
+                  <params>
+                    <param tag="saturation" usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="saturation" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Saturation" method="Get_Saturation"  >
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Saturation,saturation" >
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="saturation" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Reset_Saturation" method="Reset_Saturation" >
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Default_Values" >
+                            <arguments value="TvSettings.PicMode.0.Format.1.Saturation" useConfigFile="true" key="TV_CS_DEFAULT_VALUES_FILE_PATH"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Get_Saturation" method="Get_Saturation" revertFlag="yes" >
+                <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Saturation,saturation">
+                     <expectedValues usePreviousResult="true" Id="6" useMethodTag="tvcontrolsettings_get_default_values" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_35" testCaseName="TV_ControlSettings_Set_And_Reset_Sharpness_Setting"  desc="Check whether able to reset the TV Sharpness settings">
+            <testCaseInfo testCaseType="direct" revert="true"  />
+            <testStep testStepId="1" name="Get_Sharpness" method="Get_Sharpness" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Sharpness,sharpness,check_range"  />
+            </testStep>
+            <testStep testStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="0,100"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_Sharpness" method="Set_Sharpness" revertSet="yes">
+                  <params>
+                    <param tag="sharpness" usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="sharpness" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Sharpness" method="Get_Sharpness"  >
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Sharpness,sharpness" >
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="sharpness" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Reset_Sharpness" method="Reset_Sharpness" >
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Default_Values" >
+                            <arguments value="TvSettings.PicMode.0.Format.1.Sharpness" useConfigFile="true" key="TV_CS_DEFAULT_VALUES_FILE_PATH"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Get_Sharpness" method="Get_Sharpness" revertFlag="yes" >
+                <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Sharpness,sharpness">
+                     <expectedValues usePreviousResult="true" Id="6" useMethodTag="tvcontrolsettings_get_default_values" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_36" testCaseName="Check_Current_And_Supported_Video_Formats"  desc="Checks the current and supported video formats">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Check_Video_Format" method="TV_Get_Video_Format" >
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_video_formats" arguments="supportedVideoFormat,currentVideoFormat" />
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_37" testCaseName="Check_Current_And_Supported_Video_FrameRate"  desc="Checks the current and supported video framerate">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Check_Video_FrameRate" method="TV_Get_Video_FrameRate" >
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_video_formats" arguments="supportedVideoFrameRate,currentVideoFrameRate" />
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_38" testCaseName="Check_Current_And_Supported_Video_Resolution"  desc="Checks the current and supported video resolution">
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Check_Video_Resolution" method="TV_Get_Video_Resolution"  >
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_video_formats" arguments="supportedVideoResolution,currentVideoResolution" />
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_39" testCaseName="TV_ControlSettings_Set_And_Get_Global_Backlight_Factor"  desc="Sets and gets the global backlight factor">
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Global_Backlight_Factor" method="Get_Global_Backlight_Factor" saveResult="true" revertGet="yes">
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version1,BacklightFactor,check_range" />
+            </testStep>
+            <testStep testStepId="2"  name="Set_And_Get_Global_Backlight_Factor_Setting" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Global_Backlight_Factor" method="Set_Global_Backlight_Factor" revertSet="yes">
+                  <params>
+                    <param tag="BacklightFactor" value="0,40,80,100" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Global_Backlight_Factor" method="Get_Global_Backlight_Factor" revertFlag="yes">
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version1,BacklightFactor" >
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>
 </testPlugin>
 

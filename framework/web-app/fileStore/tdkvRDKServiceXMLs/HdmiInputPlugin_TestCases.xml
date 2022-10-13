@@ -49,7 +49,7 @@
         </testCase>
         
         <testCase testCaseId="HI_02" testCaseName= "Start_And_Stop_HdmiInput "  desc="Activates and deactivates selected HdmiIn Port as primary video source">
-            <testCaseInfo testCaseType="loop" revert="true" />
+            <testCaseInfo testCaseType="loop"  />
             <testStep testStepId="1" name="Get_HdmiInput_Devices" method="Get_HdmiInput_Devices" saveResult="true">
                 <resultGeneration useMethodTag="get_hdmiinput_devices"/>
             </testStep>
@@ -67,7 +67,7 @@
         </testCase>
 
         <testCase testCaseId="HI_03" testCaseName= "Write_And_Read_EDID"  desc="Writes and reads EDID value">
-            <testCaseInfo testCaseType="loop" revert="true" />
+            <testCaseInfo testCaseType="loop"  />
             <testStep testStepId="1" name="Get_HdmiInput_Devices" method="Get_HdmiInput_Devices" saveResult="true">
                 <resultGeneration useMethodTag="get_hdmiinput_devices"/>
             </testStep>
@@ -84,6 +84,51 @@
                           <param tag="deviceId" usePreviousResult="true" Id="1" useMethodTag="hdmiinput_get_portids" arguments="deviceid" iteration="true"/>
                   </params>
                   <resultGeneration useMethodTag="hdmiinput_read_edid_value"/>
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="HI_04" testCaseName="Check_Raw_HDMI_SPD"  desc="Checks the HDMI SPD packet information for the HDMI Input device as raw bits">
+            <testCaseInfo testCaseType="loop"  />
+            <testStep testStepId="1" name="Get_HdmiInput_Devices" method="Get_HdmiInput_Devices" saveResult="true">
+                <resultGeneration useMethodTag="get_hdmiinput_devices"/>
+            </testStep>
+            <testStep testStepId="2"  name="Check_Raw_HDMI_SPD" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Get_Raw_HDMISPD" method="Get_Raw_HDMISPD" >
+                    <params>
+                          <param tag="portId" usePreviousResult="true" Id="1" useMethodTag="hdmiinput_get_portids" iteration="true"/>
+                  </params>
+                  <resultGeneration useMethodTag="hdmiinput_read_edid_value" arguments="HDMISPD" />
+              </subtestStep>
+            </testStep>
+        </testCase>
+
+        <testCase testCaseId="HI_05" testCaseName="Check_Get_Edid_Version"  desc="Checks the edid version">
+            <testCaseInfo testCaseType="loop"  />
+            <testStep testStepId="1" name="Get_HdmiInput_Devices" method="Get_HdmiInput_Devices" saveResult="true">
+                <resultGeneration useMethodTag="get_hdmiinput_devices"/>
+            </testStep>
+            <testStep testStepId="2"  name="Check_Edid_Version" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Get_Edid_Version" method="Get_Edid_Version" >
+                    <params>
+                          <param tag="portId" usePreviousResult="true" Id="1" useMethodTag="hdmiinput_get_portids" iteration="true"/>
+                  </params>
+                  <resultGeneration useMethodTag="hdmiinput_read_edid_value" arguments="edidVersion" />
+              </subtestStep>
+            </testStep>
+        </testCase>
+        
+        <testCase testCaseId="HI_06" testCaseName="Check_HDMI_SPD"  desc="Checks the HDMI SPD packet information for the HDMI Input device">
+            <testCaseInfo testCaseType="loop" />
+            <testStep testStepId="1" name="Get_HdmiInput_Devices" method="Get_HdmiInput_Devices" saveResult="true">
+                <resultGeneration useMethodTag="get_hdmiinput_devices"/>
+            </testStep>
+            <testStep testStepId="2"  name="Check_HDMI_SPD" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Get_HDMISPD" method="Get_HDMISPD" >
+                    <params>
+                          <param tag="portId" usePreviousResult="true" Id="1" useMethodTag="hdmiinput_get_portids" iteration="true"/>
+                  </params>
+                  <resultGeneration useMethodTag="hdmiinput_check_spd_packet_information" arguments="HDMISPD" />
               </subtestStep>
             </testStep>
         </testCase>

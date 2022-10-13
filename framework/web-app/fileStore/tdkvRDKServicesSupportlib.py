@@ -2345,6 +2345,20 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "hdmiinput_check_spd_packet_information":
+            packetInfo = str(result.get(arg[0])).split(',')
+            status = []
+            for key in packetInfo:
+                key,value = str(key).split(':')
+                info[key] = value
+                if str(value) == "":
+                    status.append("FALSE")
+                elif int(value) == 0:
+                    status.append("FALSE")
+            if "FALSE" not in status:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
         # PlayerInfo Plugin Response result parser steps
         elif tag == "playerinfo_check_audio_video_codecs":
             info["RESULT"] = result
@@ -2664,6 +2678,16 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "tvcontrolsettings_check_video_formats":
+            info[arg[0]] = supportedFormats = result.get(arg[0])
+            info[arg[1]] = result.get(arg[1])
+            status = checkNonEmptyResultData(result)
+            supportedFormats = [ value.lower() for value in supportedFormats ]
+            if status == "TRUE" and str(result.get(arg[1])).lower() in supportedFormats:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
 
         # Controller Plugin Response result parser steps
         elif tag == "controller_get_plugin_state":
