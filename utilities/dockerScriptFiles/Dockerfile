@@ -107,5 +107,29 @@ RUN service mysql start
 COPY run_tomcat_mysql.sh run_tomcat_mysql.sh
 RUN /bin/bash -c "chmod 777 run_tomcat_mysql.sh"
 
+#Google Chrome setup
+COPY google_chrome_setup.sh google_chrome_setup.sh
+RUN /bin/bash -c "chmod +x google_chrome_setup.sh"
+RUN /bin/bash -c "./google_chrome_setup.sh"
+RUN /bin/bash -c "rm -rf google_chrome_setup.sh"
+
+#SVS setup
+COPY svs_setup.sh svs_setup.sh
+RUN /bin/bash -c "chmod +x svs_setup.sh"
+RUN /bin/bash -c "./svs_setup.sh"
+RUN /bin/bash -c "rm -rf svs_setup.sh"
+
+#XConf Simulator setup
+#COPY xconf_simulator_setup.sh xconf_simulator_setup.sh
+#RUN /bin/bash -c "chmod +x xconf_simulator_setup.sh"
+#RUN /bin/bash -c "./xconf_simulator_setup.sh"
+#RUN /bin/bash -c "rm -rf xconf_simulator_setup.sh"
+
 #Passing the shell script to CMD
 CMD /bin/bash -c "./run_tomcat_mysql.sh"
+
+#Lightning Apps setup
+COPY lightning_apps_setup.sh lightning_apps_setup.sh
+RUN /bin/bash -c "chmod +x lightning_apps_setup.sh"
+RUN /bin/bash -c "./lightning_apps_setup.sh"
+RUN /bin/bash -c "rm -rf lightning_apps_setup.sh"
