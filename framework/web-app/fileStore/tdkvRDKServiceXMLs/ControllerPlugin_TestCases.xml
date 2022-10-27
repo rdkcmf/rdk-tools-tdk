@@ -108,13 +108,21 @@
         </params>
         <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,WebKitBrowser"  expectedValues="deactivated"/>
       </testStep>
-      <testStep testStepId="3" name="Set_Configuration_url" method="Configuration">
+      <testStep testStepId="3" name="Get_Configuration" method="Configuration" saveResult="true">
         <params>
           <param tag="value" value="WebKitBrowser" indexOnly="true" />
-          <param tag="url"  useConfigFile="true" key="WEBKIT_TEST_URL"  />
+        </params>
+        <resultGeneration useMethodTag="controller_get_configuration">
+          <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
+        </resultGeneration>
+      </testStep>
+      <testStep testStepId="4" name="Set_Configuration_url" method="Set_Configuration_url">
+        <params>
+          <param tag="value" value="WebKitBrowser" indexOnly="true" />
+          <param tag="configuration" usePreviousResult="true" Id="3" useMethodTag="controller_parse_configuration_values"/>
         </params>
       </testStep>
-      <testStep testStepId="4" name="Get_Configuration_url" method="Configuration">
+      <testStep testStepId="5" name="Get_Configuration_url" method="Configuration">
         <params>
           <param tag="value" value="WebKitBrowser" indexOnly="true" />
         </params>
@@ -122,18 +130,18 @@
           <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
         </resultGeneration>
       </testStep>
-      <testStep testStepId="5" name="Activate_Plugin" method="Activate_Plugin" >
+      <testStep testStepId="6" name="Activate_Plugin" method="Activate_Plugin" >
         <params>
           <param tag="callsign" value="WebKitBrowser" />
         </params>
       </testStep>
-      <testStep subtestStepId="6" name="Check_PluginActive_Status" method="Get_Plugin_Status" >
+      <testStep subtestStepId="7" name="Check_PluginActive_Status" method="Get_Plugin_Status" >
         <params>
           <param tag="plugin" value="WebKitBrowser" indexOnly="true" />
         </params>
         <resultGeneration useMethodTag="controller_get_plugin_state" arguments ="check_status,WebKitBrowser" expectedValues="activated,suspended,resumed" />
       </testStep>
-      <testStep testStepId="7" pluginName="WebKitBrowser" name="Get_Browser_Test_URL" method="Get_Browser_URL">
+      <testStep testStepId="8" pluginName="WebKitBrowser" name="Get_Browser_Test_URL" method="Get_Browser_URL">
         <resultGeneration useMethodTag="webkitbrowser_check_url" >
           <expectedValues useConfigFile="true" key="WEBKIT_TEST_URL" />
         </resultGeneration>  

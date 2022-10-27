@@ -63,6 +63,12 @@
             </params>
             <expectedValues>null</expectedValues>
         </method>
+        <method name="Set_Configuration_url"  api="configuration" type="method" desc="Sets the Configuration" >
+            <params paramType="userGenerate" useMethodTag="webkit_browser_configuration" >
+                <param tag="configuration" defaultValue="null" />
+            </params>
+            <expectedValues>null</expectedValues>
+        </method>
         <event name="Event_Controller_State_Changed" eventName="statechange" eventId="client.events.1" type="event" desc="Signals a plugin state change" />
         <event name="Event_Controller_All" eventName="all" eventId="client.events.1" type="event" desc="Signals each and every event in the system" />
     </plugin>

@@ -2708,6 +2708,16 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 else:
                     info["Test_Step_Status"] = "FAILURE"
 
+        #Fetch the complete configuration and save it
+        elif tag == "controller_get_configuration":
+            status = checkNonEmptyResultData(result)
+            info["configuration"] = result
+            info["url"] = expectedValues[0]
+            if status:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
         elif tag == "controller_check_discovery_result":
             info = checkAndGetAllResultInfo (result[0])
 
@@ -3091,6 +3101,13 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["enabled"] = False
             else:
                 info["enabled"] = True
+
+        #Parse the previous results and update only URL value
+        elif tag == "controller_parse_configuration_values":
+            testStepResults = testStepResults[0].values()[0]
+            updatedConfiguration = testStepResults[0].get("configuration")
+            updatedConfiguration['url'] = testStepResults[0].get("url")
+            info["configuration"] = updatedConfiguration
 
         elif tag == "network_get_stb_ip":
             testStepResults = testStepResults[0].values()[0]
@@ -3967,6 +3984,8 @@ def generateComplexTestInputParam(methodTag,testParams):
             userGeneratedParam = { "tunertype":testParams.get("tunertype"),"searchtype":testParams.get("searchtype"),"retune":testParams.get("retune"),"usetuningparams":testParams.get("usetuningparams"),"dvbctuningparams":newtestParams}
         elif tag == "system_set_thresholds_params":
             userGeneratedParam = {"thresholds":testParams}
+        elif tag == "webkit_browser_configuration":
+            userGeneratedParam = testParams.get("configuration")
 
         else:
             print "\nError Occurred: [%s] No Parser steps available for %s" %(inspect.stack()[0][3],methodTag)
