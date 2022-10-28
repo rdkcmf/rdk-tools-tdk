@@ -1314,7 +1314,8 @@ def rdkservice_getBrowserScore_Kraken():
 # OPEN A LOG FILE TO REDIRECT THE LOGS
 #--------------------------------------------------------
 def open_write_logfile(obj,filename,script_name,data=""):
-    output_file = '{}{}.txt'.format(obj.logpath,filename)
+    new_path = "fileStore/"
+    output_file = '{}{}.txt'.format(obj.realpath+new_path,filename)
     if os.path.isfile(output_file):
         with open(output_file, 'r') as the_file:
             buf = the_file.readlines()

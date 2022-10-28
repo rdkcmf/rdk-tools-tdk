@@ -118,6 +118,8 @@ pre_condition_status = check_device_state(obj)
 expectedResult = "SUCCESS"
 if expectedResult in (result.upper() and pre_condition_status):
     channel_change_url = StabilityTestVariables.channel_change_url
+    tm_url = obj.url.split("/")[2]
+    channel_change_url=channel_change_url.replace("TM-IP",tm_url)
     #Write the TestManager IP and stream path to the channels.js file
     #where the user can configure their own channels for the test.
     filename = obj.realpath+"fileStore/lightning-apps/channels.js"
