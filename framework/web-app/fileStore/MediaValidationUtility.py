@@ -1014,6 +1014,7 @@ def monitorVideoTestUsingRestAPI(obj,validation_dict,check_pattern,timeout):
                         test_result = lines[i]
 
 
+                sys.stdout.flush()
                 #last_line  = lines[-1]
                 last_index = len(lines)
                 if test_result != "":
@@ -1031,6 +1032,7 @@ def monitorVideoTestUsingRestAPI(obj,validation_dict,check_pattern,timeout):
         video_test_result = "FAILURE"
 
     if os.path.exists(app_log_file):
+        print "Removing the temporary log file..."
         os.remove(app_log_file)
 
     return video_test_result,proc_check_list
@@ -1141,6 +1143,7 @@ def monitorAnimationTestUsingRestAPI(obj,check_pattern,timeout):
                     if "TEST COMPLETED" in lines[i]:
                         test_result = "SUCCESS"
 
+                sys.stdout.flush()
                 #lastLine  = lines[-1]
                 lastIndex = len(lines)
                 if test_result != "":
@@ -1158,6 +1161,7 @@ def monitorAnimationTestUsingRestAPI(obj,check_pattern,timeout):
         animation_test_result = "FAILURE"
 
     if os.path.exists(app_log_file):
+        print "Removing the temporary log file..."
         os.remove(app_log_file)
 
     return animation_test_result,diagnosis_info
