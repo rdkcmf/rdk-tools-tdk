@@ -2074,6 +2074,9 @@
         <method name="Reset_Contrast" api="resetContrast" type="method" desc="Resets the TV contrast to the factory default" />
         <method name="Reset_Saturation" api="resetSaturation" type="method" desc="Resets the TV saturation to the factory default" />
         <method name="Reset_Sharpness" api="resetSharpness" type="method" desc="Resets the TV sharpness to the factory default" />
+        <method name="Reset_Hue" api="resetHue" type="method" desc="Resets the TV hue to the factory default" />       
+        <method name="Reset_HDR10_Mode" api="resetHDR10Mode" type="method" desc="Resets the HDR10 mode to the factory default" />
+        <method name="Reset_HLG_Mode" api="resetHLGMode" type="method" desc="Resets the HLG mode to the factory default" /> 
         <method name="TV_Get_Video_Format" api="getVideoFormat" type="method" desc="Returns the currently set video format" />
         <method name="TV_Get_Video_FrameRate" api="getVideoFrameRate" type="method" desc="Returns the currently set video frame rate" />
         <method name="TV_Get_Video_Resolution" api="getVideoResolution" type="method" desc="Returns the currently set video resolution" />
@@ -2084,7 +2087,37 @@
           </params>
         </method> 
     </plugin> 
+    
+    <!-- CompositeInput Plugin Information -->
+    <plugin pluginName="CompositeInput" serviceName="org.rdk.CompositeInput" serviceVersion="1">
+        <method name="Get_CompositeInput_Devices" api="getCompositeInputDevices" type="method" desc="Returns a list of composite input devices"/>
+        <method name="Start_CompositeInput" api="startCompositeInput" type="method" desc="Activates the specified composite input as the primary video source">
+            <params>
+                <param tag="portId" type="int" />
+            </params>
+        </method>
+        <method name="Stop_CompositeInput" api="stopCompositeInput" type="method" desc="Deactivates the current composite input source that is the primary video source"/>
+        <event name="Event_On_Input_Status_Changed" eventName="onInputStatusChanged" eventId="client.events.1" type="event" desc="Triggered when the status of the composite input changes" />
+    </plugin>
 
+    <!-- HdmiCecSink Plugin Information -->
+    <plugin pluginName="HdmiCecSink" serviceName="org.rdk.HdmiCecSink" serviceVersion="1">
+        <method name="Get_Enabled" api="getEnabled" type="method" desc="Returns if CEC is enabled">
+            <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Set_Enabled" api="setEnabled" type="method" desc="Enables or disables CEC">
+            <params>
+                <param tag="enabled" defaultValue="null" type="bool" />
+            </params>
+        </method>
+        <method name="Get_Vendor_ID" api="getVendorId" type="method" desc="Gets the current vendor ID used by host device"/>
+        <method name="Get_Active_Source" api="getActiveSource" type="method" desc="Gets details for the current active source"/>
+        <method name="Get_Audio_Device_Connected_Status" api="getAudioDeviceConnectedStatus" type="method" desc="Get status of audio device connection">
+                <expectedValues>True,False</expectedValues>
+        </method>
+        <method name="Get_OSD_Name" api="getOSDName" type="method" desc="Gets the OSD name used by host device"/>
+        <event name="Event_Report_Cec_Enabled" eventName="reportCecEnabledEvent" eventId="client.events.1" type="event" desc="Triggered when the HDMI-CEC is enabled" />
+    </plugin>
 </thunderPlugins>
 
 

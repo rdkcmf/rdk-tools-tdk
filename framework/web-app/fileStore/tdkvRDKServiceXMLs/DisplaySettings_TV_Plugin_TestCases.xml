@@ -186,8 +186,9 @@
                   <params>
                     <param tag="audioPort" value="HDMI0" />
                   </params>
-                  <resultGeneration useMethodTag="check_sound_mode" arguments="check_expected_sound_mode" >
-                    <expectedValues useIterableValue="true" />
+                  <resultGeneration useMethodTag="check_sound_mode" >
+                          <arguments value ="check_expected_sound_mode" usePreviousResult="true" Id="3" useMethodTag="get_supported_sound_modes"/>
+                          <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>
@@ -817,8 +818,9 @@
                   <params>
                     <param tag="audioPort" value="SPEAKER0" />
                   </params>
-                  <resultGeneration useMethodTag="check_sound_mode" arguments="check_expected_sound_mode">
-                    <expectedValues useIterableValue="true" />
+                  <resultGeneration useMethodTag="check_sound_mode" >
+                          <arguments value ="check_expected_sound_mode" usePreviousResult="true" Id="3" useMethodTag="get_supported_sound_modes"/>
+                          <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
             </testStep>

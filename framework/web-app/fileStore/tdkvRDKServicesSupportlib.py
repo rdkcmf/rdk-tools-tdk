@@ -1520,16 +1520,18 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
-        
+
         elif tag == "check_sound_mode":
             soundMode = result.get('soundMode')
-            if "AUTO" in soundMode:
-                message = "Best sound mode of the device %s" %(soundMode)
-                info["Test_Step_Message"] = message
-                soundMode = re.search(r"\((.*?)\)",soundMode).group(1)
-            info["soundMode"] = str(soundMode).lower()
+            info["soundMode"] = soundMode
             if len(arg) and arg[0] == "check_expected_sound_mode":
-                expectedMode = str(expectedValues[0]).lower()
+                if "AUTO" in expectedValues:
+                    for Mode in arg:
+                        if "AUTO" in Mode:
+                            expectedMode = Mode.lower()
+                            break
+                else:
+                    expectedMode = str(expectedValues[0]).lower()
                 if result.get('soundMode').lower() == expectedMode or expectedMode in result.get('soundMode').lower():
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
@@ -1538,8 +1540,8 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 if str(result.get("success")).lower() == "true" and result.get('soundMode') in expectedValues:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
-                    info["Test_Step_Status"] = "FAILURE" 
-
+                    info["Test_Step_Status"] = "FAILURE"
+ 
         elif tag == "check_zoom_settings":
             info["zoomSetting"] = result.get('zoomSetting');
             if str(result.get("success")).lower() == "true" and result.get('zoomSetting') in expectedValues :
@@ -3489,12 +3491,11 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             soundModes = []
             for mode in supported_sound_modes:
                 if "AUTO" in mode:
-                    value = re.search(r"\((.*?)\)",mode).group(1)
-                    soundModes.append(value)
+                    soundModes.append("AUTO")
                 else:
                     soundModes.append(mode)
             info["soundMode"] = ",".join(soundModes)
-            
+    
         elif tag =="get_settop_and_tv_resolutions":
             testStepResults1 = testStepResults[0].values()[0]
             testStepResults2 = testStepResults[1].values()[0]

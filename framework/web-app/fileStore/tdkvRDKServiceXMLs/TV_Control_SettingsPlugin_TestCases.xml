@@ -1028,5 +1028,100 @@
               </subtestStep>
             </testStep>
         </testCase>
+        <testCase testCaseId="CS_40" testCaseName="TV_ControlSettings_Set_And_Reset_Hue_Setting"  desc="Check whether able to reset the TV Hue settings">
+            <testCaseInfo testCaseType="direct" revert="true"  />
+            <testStep testStepId="1" name="Get_Hue" method="Get_Hue" saveResult="true" >
+                    <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Hue,hue,check_range"  />
+            </testStep>
+            <testStep testStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="0,100"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_Hue" method="Set_Hue" revertSet="yes">
+                  <params>
+                    <param tag="hue" usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="hue" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Hue" method="Get_Hue"  >
+                  <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Hue,hue" >
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="hue" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Reset_Hue" method="Reset_Hue" >
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Default_Values" >
+                            <arguments value="TvSettings.PicMode.0.Format.1.Hue" useConfigFile="true" key="TV_CS_DEFAULT_VALUES_FILE_PATH"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Get_Hue" method="Get_Hue" revertFlag="yes" >
+                <resultGeneration useMethodTag="tvcontrolsettings_validate_range" arguments="version2,Hue,hue">
+                     <expectedValues usePreviousResult="true" Id="6" useMethodTag="tvcontrolsettings_get_default_values" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_41" testCaseName="TV_ControlSettings_Set_And_Reset_HDR10_Mode"  desc="Check whether able to reset the HDR10 mode">
+            <testCaseInfo testCaseType="direct" revert="true"  />
+            <testStep testStepId="1" name="Get_Supported_HDR10_Modes" method="Get_Supported_HDR10_Modes" saveResult="true" revertGet="yes">
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_supported_modes" arguments="SupportedHDR10Modes" />
+            </testStep>
+            <testStep testStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="fixed_length_list" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="SupportedHDR10Modes,HDR10Mode"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_HDR10_Mode" method="Set_HDR10_Mode" revertSet="yes">
+                  <params>
+                    <param tag="HDR10Mode" usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="HDR10Mode" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_HDR10_Mode" method="Get_HDR10_Mode"  >
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="HDR10Mode,check_expected_mode" >
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="HDR10Mode" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Reset_HDR10_Mode" method="Reset_HDR10_Mode" >
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Get_HDR10_Mode" method="Get_HDR10_Mode" revertFlag="yes" >
+                <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="HDR10Mode,check_expected_mode">
+                     <expectedValues useConfigFile="true" key="TV_DEFAULT_HDR10_Mode"/>
+                </resultGeneration>
+            </testStep>
+        </testCase>
+        <testCase testCaseId="CS_42" testCaseName="TV_ControlSettings_Set_And_Reset_HLG_Mode"  desc="Check whether able to reset the HLG mode">
+            <testCaseInfo testCaseType="direct" revert="true"  />
+            <testStep testStepId="1" name="Get_Supported_HLG_Modes" method="Get_Supported_HLG_Modes" saveResult="true" revertGet="yes">
+                    <resultGeneration useMethodTag="tvcontrolsettings_check_supported_modes" arguments="SupportedHLGModes" />
+            </testStep>
+            <testStep testStepId="2" name="Execute_Command" action="externalFnCall" saveResult="true" >
+                    <resultGeneration useMethodTag="TV_ControlSettings_Get_Random_Number" >
+                            <arguments value="fixed_length_list" usePreviousResult="true" Id="1" useMethodTag="tvcontrolsettings_get_supported_modes" arguments="SupportedHLGModes,HLGMode"/>
+                    </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Set_HLG_Mode" method="Set_HLG_Mode" revertSet="yes">
+                  <params>
+                    <param tag="HLGMode" usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="HLGMode" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_HLG_Mode" method="Get_HLG_Mode"  >
+                  <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="HLGMode,check_expected_mode" >
+                    <expectedValues usePreviousResult="true" Id="2" useMethodTag="tvcontrolsettings_get_selected_mode" arguments="HLGMode" />
+                  </resultGeneration>
+            </testStep>
+            <testStep testStepId="5" name="Reset_HLG_Mode" method="Reset_HLG_Mode" >
+                  <resultGeneration useMethodTag="display_settings_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Get_HLG_Mode" method="Get_HLG_Mode" revertFlag="yes" >
+                <resultGeneration useMethodTag="tvcontrolsettings_check_modes" arguments="HLGMode,check_expected_mode">
+                     <expectedValues useConfigFile="true" key="TV_DEFAULT_HLG_Mode" />
+                </resultGeneration>
+            </testStep>
+        </testCase>
 </testPlugin>
 

@@ -797,6 +797,24 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        # CompositeInput Events response result parser steps
+        elif tag == "compositeinput_check_input_status_changed_event":
+            info["Test_Step_Status"] = "FAILURE"
+            for eventResult in result:
+                if str(eventResult.get("status")).lower() in expectedValues:
+                    info = eventResult
+                    info["Test_Step_Status"] = "SUCCESS"
+                    break;
+
+        # HdmiCecSink Events response result parser steps
+        elif tag == "hdmicecsink_check_report_cec_enabled_event":
+            result = result[0]
+            info = result
+            if str(result.get("cecEnable")).lower() == str(expectedValues[0]).lower():
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
         # FirmwareControl Events response result parser steps
         elif tag == "fwc_check_upgrade_progress_event":
             print "Events list :",result
