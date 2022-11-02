@@ -186,6 +186,10 @@ def checkMediaPipelineTestStatus (outputString):
     else:
         result = "FAILURE"
 
+    if "No such testcase is present in app" in outputString:
+        print "App present in DUT doesnot have such test. Please update the app\n"
+        result = "FAILURE"
+
     return result
 
 def ResolutionTestStart(dsObj, resolution):
