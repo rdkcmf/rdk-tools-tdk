@@ -49,6 +49,7 @@
   <!--  -->
   <box_types>
     <box_type>Hybrid-1</box_type>
+    <!--  -->
     <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
@@ -150,14 +151,14 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStat
                     print details;
                     logName = "/opt/TDK/logs/AgentConsole.log";
                     tdkTestObj = sysObj.createTestStep('ExecuteCommand');
-                    cmd = "grep -n \"dsSetBackgroundColor\" " + logName;
-                    print cmd;
+                    cmd = "grep dsSetBackgroundColor " + logName + " | grep '" + str(colorMap["Black"]) + "$\|" + str(colorId["Black"]) + "$'"
+                    print cmd
                     tdkTestObj.addParameter("command", cmd);
                     tdkTestObj.executeTestCase("SUCCESS");
                     actualresult = tdkTestObj.getResult();
                     color = tdkTestObj.getResultDetails();
                     print "OUTPUT:", color;
-                    if color in colorMap["Black"] or color in colorId["Black"]:
+                    if colorMap["Black"] in color or str(colorId["Black"]) in color:
                         tdkTestObj.setResultStatus("SUCCESS");
                         print "BGColor set to Black";
                     else:

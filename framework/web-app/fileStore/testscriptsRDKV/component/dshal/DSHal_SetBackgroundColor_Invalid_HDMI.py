@@ -145,28 +145,23 @@ if "SUCCESS" in dshalloadModuleStatus.upper() and "SUCCESS" in sysloadModuleStat
                 tdkTestObj.executeTestCase(expectedResult);
                 actualResult = tdkTestObj.getResult();
                 print "DSHal_SetBackgroundColor result: ", actualResult;
-                if expectedResult in actualResult:
-                    details = tdkTestObj.getResultDetails();
-                    print details;
-                    logName = "/opt/TDK/logs/AgentConsole.log";
-                    tdkTestObj = sysObj.createTestStep('ExecuteCommand');
-                    cmd = "grep -n \"dsSetBackgroundColor\" " + logName ;
-                    print cmd;
-                    tdkTestObj.addParameter("command", cmd);
-                    tdkTestObj.executeTestCase("SUCCESS");
-                    actualresult = tdkTestObj.getResult();
-                    color = tdkTestObj.getResultDetails();
-                    print "OUTPUT:", color;
-                    if color in colorMap["Invalid"] or color in colorId["Invalid"]:
-                        tdkTestObj.setResultStatus("SUCCESS");
-                        print "BGColor set to none for Invalid color id";
-                    else:
-                        tdkTestObj.setResultStatus("FAILURE");
-                        print "BGColor not set to none for Invalid color id";
+                details = tdkTestObj.getResultDetails();
+                print details;
+                logName = "/opt/TDK/logs/AgentConsole.log";
+                tdkTestObj = sysObj.createTestStep('ExecuteCommand');
+                cmd = "grep dsSetBackgroundColor " + logName + " | grep '" + str(colorMap["Invalid"]) + "$\|" + str(colorId["Invalid"]) + "$'"
+                print cmd;
+                tdkTestObj.addParameter("command", cmd);
+                tdkTestObj.executeTestCase("SUCCESS");
+                actualresult = tdkTestObj.getResult();
+                color = tdkTestObj.getResultDetails();
+                print "OUTPUT:", color;
+                if colorMap["Invalid"] in color or str(colorId["Invalid"]) in color:
+                    tdkTestObj.setResultStatus("SUCCESS");
+                    print "BGColor set to none for Invalid color id";
                 else:
                     tdkTestObj.setResultStatus("FAILURE");
-                    print "Failed to set BGColor";
-
+                    print "BGColor not set to none for Invalid color id";
             else:
                 tdkTestObj.setResultStatus("FAILURE");
                 print "Please test connecting a display device";
