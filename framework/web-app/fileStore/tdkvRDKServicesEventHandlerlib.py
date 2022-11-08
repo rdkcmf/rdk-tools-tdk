@@ -773,8 +773,14 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
         elif tag == "playerinfo_check_dolby_audiomode_changed_event":
             result = result[0]
             info = result
-            expectedMode = str(expectedValues[0]).lower()
-            if result.get('mode').lower() == expectedMode or expectedMode in result.get('mode').lower():
+            if "AUTO" in expectedValues:
+                for Mode in arg:
+                    if "AUTO" in Mode:
+                        expectedMode = Mode.lower()
+                        break
+            else:
+                expectedMode = str(expectedValues[0]).lower()
+            if result.get('mode').lower() == expectedMode or result.get('mode').lower() in expectedMode:
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"

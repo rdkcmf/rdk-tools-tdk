@@ -174,12 +174,14 @@
                   <params>
                     <param tag="audioPort" usePreviousResult="true" Id="1" useMethodTag="get_connected_audio_port" />
                   </params>
-                  <resultGeneration useMethodTag="check_sound_mode" arguments="check_expected_sound_mode" >
-                    <expectedValues useIterableValue="true" />
+                  <resultGeneration useMethodTag="check_sound_mode" >
+                          <arguments value ="check_expected_sound_mode" usePreviousResult="true" Id="2" useMethodTag="get_supported_sound_modes"/>
+                          <expectedValues useIterableValue="true" />
                   </resultGeneration>
               </subtestStep>
               <subtestStep subtestStepId="3" name="Check_Dolby_AudioMode_Changed_Event" event="Event_AudioMode_Changed" action="eventListener" delay="2" >
-                  <resultGeneration useMethodTag="playerinfo_check_dolby_audiomode_changed_event" >
+                      <resultGeneration useMethodTag="playerinfo_check_dolby_audiomode_changed_event" >
+                              <arguments value ="check_expected_sound_mode" usePreviousResult="true" Id="2" useMethodTag="get_supported_sound_modes"/>
                     <expectedValues useIterableValue="true"/>
                   </resultGeneration>
               </subtestStep>

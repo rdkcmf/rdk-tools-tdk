@@ -1290,7 +1290,88 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                             info["Test_Step_Status"] = "FAILURE"
                  else:
                     info["Test_Step_Status"] = "FAILURE"
+        #Parser code for HdmiCecSink plugin
+        elif tag == "hdmicecsink_check_active_source_details":
+           info["AVAILABLE"] = result.get("available")
+           success = str(result.get("success")).lower() == "true"
+           if str(result.get("available")).lower() == "true" and success:
+            if arg[0] == "get_logical_address":
+                logicalAddress = result.get("logicalAddress")
+                info["logicalAddress"] = logicalAddress
+                info["deviceType"] =  result.get("deviceType")
+                deviceType = result.get("deviceType")
+                if logicalAddress  not in [15,255] and logicalAddress == int(expectedValues[0]) and deviceType == expectedValues[1] and  success:
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif arg[0] == "get_physical_address":
+                 physical_address = result.get("physicalAddress")
+                 status = checkNonEmptyResultData(result.get("physicalAddress"))
+                 hex_codes = {"\x00":"0","\x01":"1","\x02":"2","\x03":"3","\x04":"4","\x05":"5","\x06":"6","\x07":"7","\x08":"8","\x09":"9","\x0a":"a","\x0b":"b","\x0c":"c","\x0d":"d","\x0e":"e","\x0f":"f"}
+                 for code in hex_codes.keys():
+                    physical_address = physical_address.replace(code,hex_codes.get(code))
+                 info["physicalAddress"] = physical_address
+                 if status == "TRUE":
+                    if expectedValues[0] == "true" and  physical_address != "ffff":
+                            info["Test_Step_Status"] = "SUCCESS"
 
+                    elif expectedValues[0] == "false" and  physical_address == "ffff":
+                            info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                            info["Test_Step_Status"] = "FAILURE"
+                 else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif arg[0] == "get_cec_version":
+                cecVersion = result.get("cecVersion")
+                info["cecVersion"] = cecVersion
+                status = checkNonEmptyResultData(cecVersion)
+                if status == "TRUE" and str(cecVersion).lower() != "unknown":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif arg[0] == "get_vendor_id":
+                vendorID = result.get("vendorID")
+                info["vendorID"] = vendorID
+                status = checkNonEmptyResultData(vendorID)
+                if status == "TRUE" and str(vendorID).lower() != "000":
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
+            elif arg[0] == "get_power_status":
+                info["powerStatus"] = result.get("powerStatus")
+                if str(result.get("powerStatus")).lower() == expectedValues[0].lower():
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+           else:
+               info["Test_Step_Status"] = "FAILURE"
+        elif tag == "hdmicecsink_get_vendor_id":
+            success = str(result.get("success")).lower() == "true"
+            vendorID = result.get("vendorid")
+            info["vendorID"] = vendorID
+            status = checkNonEmptyResultData(vendorID)
+            if status == "TRUE" and str(vendorID).lower() != "000":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "hdmicecsink_get_osd_name":
+            success = str(result.get("success")).lower() == "true"
+            info["OSDNAME"] = result.get("name")
+            status = checkNonEmptyResultData(result.get("name"))
+            if status == "TRUE":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "hdmicecsink_check_audio_connected_status":
+            success = str(result.get("success")).lower() == "true"
+            info["connected"] = result.get("connected")
+            if str(result.get("connected")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
         #Parser code for State Observer plugin
         elif tag == "StateObserver_validate_result":
             info = checkAndGetAllResultInfo(result,result.get("success"))
@@ -2360,6 +2441,37 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+        # CompositeInput Response result parser steps
+        elif tag == "get_compositeinput_devices":
+            success = str(result.get("success")).lower() == "true"
+            devices = result.get("devices")
+            status = []
+            device_details = []
+            if len(arg) and arg[0] == "get_data":
+                for device_info in devices:
+                    status.append(checkNonEmptyResultData(device_info))
+                    device_data = {}
+                    device_data["id"] = int(device_info.get("id"))
+                    device_data["locator"] = str(device_info.get("locator"))
+                    device_data["connected"] = str(device_info.get("connected"))
+                    device_details.append(device_data)
+                info["devices"] = device_details
+            else:
+                port_id_list = []
+                for device_info in devices:
+                    status.append(checkNonEmptyResultData(device_info))
+                    port_id_list.append(str(device_info.get("id")))
+                info["portIds"] = port_id_list
+            if "FALSE" not in status and success:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "compositeinput_check_set_operation":
+            if str(result.get("success")).lower() == "true":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
         # PlayerInfo Plugin Response result parser steps
         elif tag == "playerinfo_check_audio_video_codecs":
             info["RESULT"] = result
@@ -2951,6 +3063,14 @@ def CheckAndGenerateConditionalExecStatus(testStepResults,methodTag,arguments):
                 result = "FALSE"
             else:
                 result = "TRUE"
+
+        # HdmiCecSink Plugin Response result parser steps
+        elif tag == "hdmicecsink_check_cec_enabled_status":
+            testStepResults = testStepResults[0].values()[0]
+            if str(testStepResults[0].get("enabled")).lower() != "true":
+                result = "TRUE"
+            else:
+                result = "FALSE"
 
         # System Plugin Response result parser steps
         elif tag == "system_check_preferred_standby_mode":
@@ -3643,6 +3763,12 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["deviceId"] = ",".join(port_id_list)
             else:
                 info["portId"] = ",".join(port_id_list)
+
+        #CompositeInput plugin result parser steps
+        elif tag == "compositeinput_get_portids":
+            testStepResults = testStepResults[0].values()[0]
+            port_id_list = testStepResults[0].get("portIds")
+            info["portId"] = ",".join(port_id_list)
 
         #PlayerInfo Plugin Response result parser steps
         elif tag == "player_info_get_resolutions":
