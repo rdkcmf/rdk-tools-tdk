@@ -112,12 +112,12 @@ if expectedResult in result.upper():
             if "Cobalt version" in output:
                 print "\n Checking Cobalt version\n"
                 output = output.replace(command,"")
-                cobalt_version = int(output.split('Cobalt version ')[1].split('.')[0])
-                if cobalt_version == int(current_cobalt_version):
-                    print "\n Cobalt version is the current version :{}  \n".format(cobalt_version)
+                cobalt_version = (output.split('Cobalt version ')[1].split('\n')[0])
+                if (cobalt_version.__contains__(current_cobalt_version)):
+                    print "\n Cobalt version is same as the current version :{}  \n".format(cobalt_version)
                     tdkTestObj.setResultStatus("SUCCESS")
                 else:
-                    print "\n Cobalt version is not  current version: {}\n".format(cobalt_version)
+                    print "\n Cobalt version is not same current version: {}\n".format(cobalt_version)
                     tdkTestObj.setResultStatus("FAILURE")
             else:
                 print "\n Cobalt version is not available\n"

@@ -50,6 +50,9 @@ html_app_webinspect_port = "10001"
 #List of Graphical plugins available for test
 graphical_plugins_list = ["Cobalt","WebKitBrowser","LightningApp","ResidentApp","HtmlApp"]
 
+#Actual youtube URL should be passed in the below variable
+req_graphical_plugins = "Cobalt,deeplink,<Youtube URL video>,13;WebKitBrowser,url,<Google URL>;LightningApp,url,<Youtube URL>"
+
 #URL used to test HtmlApp plugin
 html_page_url = "https://vimeo.com/channels/premieres"
 
