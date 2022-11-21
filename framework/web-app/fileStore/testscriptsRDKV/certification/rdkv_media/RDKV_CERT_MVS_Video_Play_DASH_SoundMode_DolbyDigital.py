@@ -117,7 +117,7 @@ if expectedResult in result.upper():
     print "\nCheck Pre conditions..."
     tdkTestObj = obj.createTestStep('rdkv_media_pre_requisites');
     tdkTestObj.executeTestCase(expectedResult);
-    mode = "Dolby Digital"
+    mode = "Dolby Digital,DolbyDigital"
     # Setting the required sound mode
     # Setting the pre-requites for media test. Launching the wekit inspect via RDKShell and
     # moving it to the front, openning a socket connection to the webkit inspect page and

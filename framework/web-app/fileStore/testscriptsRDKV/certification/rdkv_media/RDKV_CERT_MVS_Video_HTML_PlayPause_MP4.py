@@ -139,6 +139,7 @@ if expectedResult in result.upper():
         # Setting VideoPlayer test app URL arguments
         setURLArgument("url",videoURL)
         setURLArgument("operations",operations)
+        setURLArgument("autotest","true")
         appArguments = getURLArguments()
         # Getting the complete test app URL
         video_test_url = getTestURL(appURL,appArguments)

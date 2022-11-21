@@ -551,14 +551,16 @@ def checkSupportedAudioModes(obj,mode):
         mode_list = ast.literal_eval(details)["supportedAudioModes"]
         print "Supported Audio modes: %s" %(mode_list)
         mode_match = False
-        for mode_value in mode_list:
-            if mode.lower() in mode_value.lower():
-                mode_match = True
-                if "AUTO" in mode_value:
-                    mode = mode_value.split("(")[1].split(")")[0]
-                else:
-                    mode = mode_value;
-                break;
+        mode_check = mode.split(",")
+        for mode in mode_check:
+            for mode_value in mode_list:
+                if mode.lower() in mode_value.lower():
+                    mode_match = True
+                    if "AUTO" in mode_value:
+                        mode = mode_value.split("(")[1].split(")")[0]
+                    else:
+                        mode = mode_value;
+                    break;
         if mode_match:
             check_status = "SUCCESS"
         else:
