@@ -47,12 +47,12 @@ repeatCount = 1000
 
 #Give "No" if the validation step is not mandatory
 #If "Yes", script will exit whenever a step fails
-ValidateUptime = "No"
-ValidateInterface = "No"
-ValidatePluginStatus = "No"
-ValidateControllerUI = "No"
-ValidateNoOfPlugins = "No"
-ValidateActivatedPlugins = "No"
+ValidateUptime = "Yes"
+ValidateInterface = "Yes"
+ValidatePluginStatus = "Yes"
+ValidateControllerUI = "Yes"
+ValidateNoOfPlugins = "Yes"
+ValidateActivatedPlugins = "Yes"
 #Give the value in seconds to wait for device to come online after reboot.
 rebootwaitTime = 150
 
