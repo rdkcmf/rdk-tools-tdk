@@ -272,6 +272,46 @@ export default class App extends Lightning.Component {
           this.setTextTrack(this.expectedTextIndex)
       }
   }
+  getVideoBitRates(){
+      var videoBitrates = []
+      var currentBitrate = 0
+      logMsg("Available Video bitrates: " + this.getVideoBitrates())
+      videoBitrates = this.getVideoBitrates()
+      if (videoBitrates.length != 0){
+          currentBitrate = this.getCurrentVideoBitrate()
+          logMsg("Current Video bitrate: " + currentBitrate)
+	  if (currentBitrate != "" && currentBitrate > 0){
+	      for (var i = 0;i < videoBitrates.length; i++){
+	         if (videoBitrates[i] != currentBitrate)
+	            this.videoBitratesSelected.push(videoBitrates[i])
+	      }
+	      if(this.videoBitratesSelected.length)
+	          logMsg("Video bitrates excluding current bit rate " + this.videoBitratesSelected)
+	      else{
+		  this.videoBitratesAvailability = 0
+		  logMsg("[ERROR]:Video bitrates list excluding current bitrate is empty")
+	      }   
+          }else{
+	      this.videoBitratesAvailability  = 0
+              logMsg("[ERROR]:Current Video bitrate is not valid")
+          }
+       }else{
+           this.videoBitratesAvailability = 0
+           logMsg("[ERROR]:Available Video bitrates list is empty")
+       }
+  }
+  changeVideoBitrate(){
+      this.getVideoBitRates()
+      if(this.videoBitratesAvailability){
+          this.stop()
+	  var index = parseInt(getRandomInt(this.videoBitratesSelected.length))
+	  this.expectedVideoBitrate = this.videoBitratesSelected[index]
+	  logMsg("Changing bit rate to: "+ this.expectedVideoBitrate)
+	  this.VideoBitrateChangeFlag = 1
+	  this.loadAAMPPlayer();
+	  this.setVideoBitrate(this.expectedVideoBitrate)
+      }
+  }
   getPlaybackRate() {
      return this.player.getPlaybackRate();
   }
@@ -324,7 +364,15 @@ export default class App extends Lightning.Component {
   setVolume(volume){
       this.player.setVolume(volume)
   }
-
+  getVideoBitrates() {
+     return this.player.getVideoBitrates();
+  }
+  getCurrentVideoBitrate() {
+      return this.player.getCurrentVideoBitrate();
+  }
+  setVideoBitrate(bitrate) {
+      this.player.setVideoBitrate(bitrate);
+  }
 
   // AAMP Event Listerner and Handlers
   addEventListener(eventName, eventHandler) {
@@ -332,9 +380,6 @@ export default class App extends Lightning.Component {
      //logMsg("event:"+eventName+" handler registered");
   }
   eventplaybackStarted(){
-      // Able to get position info only after a pause.
-      tag.player.pause();
-      tag.player.play();
       tag.handlePlayerEvents("Video PlayBack Started");
   }
   eventplaybackProgressUpdate(event){
@@ -448,6 +493,12 @@ export default class App extends Lightning.Component {
       // Enable video progress pos validation with pos diff 1
       tag.updatePosValidationInfo(1)
   }
+  eventbitrateChanged(event) {
+    tag.observedEvents.push("bitratechange")
+    tag.observedBitrate = event.bitRate;
+    var bitrate_info = "Video Player BitRate Change to " + tag.observedBitrate
+    tag.checkAndLogEvents("bitratechange",bitrate_info);
+  }
   handlePlayerStates(id){
     if (this.playerStateIDs.includes(id)){
        for (var state in this.playerStates){
@@ -530,6 +581,7 @@ export default class App extends Lightning.Component {
     this.addEventListener("playbackSpeedChanged",this.eventplaybackRateChanged)
     this.addEventListener("playbackFailed",this.eventplaybackFailed)
     this.addEventListener("seeked", this.eventplaybackSeeked)
+    this.addEventListener("bitrateChanged",this.eventbitrateChanged)
     logMsg("Event listeners added successfully...")
   }
 
@@ -664,6 +716,12 @@ export default class App extends Lightning.Component {
                     this.setNegPlaybackRate(-16)
                 },actionInterval);
                 }
+            }
+	    else if (action == "changevideobitrate"){
+                setTimeout(()=> {
+                    this.clearEvents()
+                    this.changeVideoBitrate();
+                },actionInterval);
             }
             else if (action == "close"){
                 setTimeout(()=> {
@@ -812,6 +870,22 @@ export default class App extends Lightning.Component {
               Status = "FAILURE"
               logMsg("Failure Reason: Audio/Text tracks list empty")
           }
+          else if (this.VideoBitrateChangeFlag == 1){
+              this.VideoBitrateChangeFlag = 0
+              var currVideoBitrate = this.getCurrentVideoBitrate()
+              if( currVideoBitrate == this.expectedVideoBitrate){
+                logMsg(" Video bitrate change operation success")
+              }else{
+                this.eventFlowFlag = 0
+                Status = "FAILURE"
+                logMsg("Video bitrate  change operation failure")
+                logMsg("Failure Reason: Current Video bitrate is not as expected")                
+              }
+          }
+	  else if (this.videoBitratesAvailability == 0){
+	      Status = "FAILURE"
+              logMsg("Failure Reason: Unable to select new video bitrate")
+          }
       }
       logMsg("Test step status: " + Status)
   }
@@ -953,6 +1027,11 @@ export default class App extends Lightning.Component {
     this.expectedFPS     = 0
     this.webkitInstance  = null
     this.enable_fps_flag = 0
+    this.videoBitrates = []
+    this.videoBitratesSelected= []
+    this.expectedVideoBitrate= 0
+    this.videoBitratesAvailability = 1
+    this.VideoBitrateChangeFlag = 0
     logMsg("URL Info: " + this.videoURL )
 
     tag = this;
