@@ -83,9 +83,14 @@
             </testStep>
       </prerequisite>
 
-      <prerequisite requisiteId="5" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
-            <event pluginName="HdmiCecSink" eventName="Event_Report_Cec_Enabled" />
+      <prerequisite requisiteId="5" requisiteName="Check_Connected_Device_Status">
+          <testStep testStepId="1" name="Get_Connected_Device_Status" method="Get_Device_List" >
+              <resultGeneration useMethodTag="hdmicecsink_check_device_list" />
+          </testStep>
+      </prerequisite>
 
+      <prerequisite requisiteId="6" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
+            <event pluginName="HdmiCecSink" eventName="Event_Report_Cec_Enabled" />
       </prerequisite>
 
     </pluginPreRequisite>
@@ -141,11 +146,11 @@
         </testCasePostRequisite>
     </testCase>
      
-    <testCase testCaseId="HdmiCecSink_02" testCaseName="Get_CEC_Logical_Address" desc="Check CEC Logical Address">
+    <testCase testCaseId="HdmiCecSink_02" testCaseName="Get_Active_Source_Logical_Address" desc="Checks active source Logical Address">
         <testCaseInfo testCaseType="direct"/>
         <testStep testStepId="1" name="Get_Logical_Address" method="Get_Active_Source">
-          <resultGeneration useMethodTag="hdmicecsink_check_active_source_details" arguments="get_logical_address" >
-            <expectedValues useConfigFile="true" key="HDMICEC_LOGICAL_ADDR_INFO"/>
+          <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_logical_address" >
+            <expectedValues useConfigFile="true" key="HDMICECSink_ACTIVE_SOURCE_LOGICAL_ADDR_INFO"/>
           </resultGeneration>
         </testStep>
     </testCase>
@@ -153,31 +158,31 @@
     <testCase testCaseId="HdmiCecSink_03" testCaseName="Get_CEC_Physical_Address" desc="Check CEC Physical Address">
         <testCaseInfo testCaseType="direct"/>
         <testStep testStepId="1" name="Get_Physical_Address" method="Get_Active_Source">
-          <resultGeneration useMethodTag="hdmicecsink_check_active_source_details" arguments="get_physical_address" >
+          <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_physical_address" >
           </resultGeneration>
         </testStep>
     </testCase>
 
-    <testCase testCaseId="HdmiCecSink_04" testCaseName="Get_Active_Source_CEC_Version" desc="Check CEC Version">
+    <testCase testCaseId="HdmiCecSink_04" testCaseName="Get_Active_Source_CEC_Version" desc="Checks Active source CEC Version">
         <testCaseInfo testCaseType="direct"/>
         <testStep testStepId="1" name="Get_Active_Source_Cec_Version" method="Get_Active_Source">
-          <resultGeneration useMethodTag="hdmicecsink_check_active_source_details" arguments="get_cec_version" >
+          <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_cec_version" >
           </resultGeneration>
         </testStep>
     </testCase>
 
-    <testCase testCaseId="HdmiCecSink_05" testCaseName="Get_Active_Source_Power_Status" desc="Checks the power status">
+    <testCase testCaseId="HdmiCecSink_05" testCaseName="Get_Active_Source_Power_Status" desc="Checks the Active source power status">
         <testCaseInfo testCaseType="direct"/>
-        <testStep testStepId="1" name="Get_Active_Source" method="Get_Active_Source">
-          <resultGeneration useMethodTag="hdmicecsink_check_active_source_details" arguments="get_power_status" expectedValues="ON" >
+        <testStep testStepId="1" name="Get_Active_Source_Power_Status" method="Get_Active_Source">
+          <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_power_status" expectedValues="ON" >
           </resultGeneration>
         </testStep>
     </testCase>
 
-    <testCase testCaseId="HdmiCecSink_06" testCaseName="Get_Active_Source_Vendor_ID" desc="Checks the Vendor ID of the device">
+    <testCase testCaseId="HdmiCecSink_06" testCaseName="Get_Active_Source_Vendor_ID" desc="Checks the Active source Vendor ID of the device">
         <testCaseInfo testCaseType="direct"/>
-        <testStep testStepId="1" name="Get_Vendor_ID" method="Get_Active_Source">
-          <resultGeneration useMethodTag="hdmicecsink_check_active_source_details" arguments="get_vendor_id">
+        <testStep testStepId="1" name="Get_Active_Source_Vendor_ID" method="Get_Active_Source">
+          <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_vendor_id">
           </resultGeneration>
         </testStep>
     </testCase>
@@ -205,5 +210,40 @@
           </resultGeneration>
         </testStep>
     </testCase>
+    
+    <testCase testCaseId="HdmiCecSink_10" testCaseName="Check_Active_Route_Logical_Address" desc="Checks the active route logical address">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="Get_Active_Route_Logical_Address" method="Get_Active_Route">
+	  <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_logical_address">
+	        <expectedValues useConfigFile="true" key="HDMICECSINK_ACTIVE_SOURCE_LOGICAL_ADDR_INFO"/>		                 
+          </resultGeneration>
+        </testStep>
+    </testCase>
+
+    <testCase testCaseId="HdmiCecSink_11" testCaseName="Check_Active_Route_Physical_Address" desc="Check the active route physical address">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="Get_Active_Route_Physical_Address" method="Get_Active_Route">
+          <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_physical_address,active_route" >
+          </resultGeneration>
+        </testStep>
+    </testCase>
+
+    <testCase testCaseId="HdmiCecSink_12" testCaseName="Check_Active_Route_OSD_Name" desc="Checks the active route OSD name">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="Get_OSD_Name" method="Get_Active_Route">
+	  <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_osd_name" >
+             <expectedValues useConfigFile="true" key="HDMICECSINK_ACTIVE_SOURCE_OSD_NAME"/>
+          </resultGeneration>
+        </testStep>
+    </testCase> 
+
+    <testCase testCaseId="HdmiCecSink_13" testCaseName="Check_Active_Route_Vendor_ID" desc="Checks the Active route Vendor ID of the device">
+        <testCaseInfo testCaseType="direct"/>
+        <testStep testStepId="1" name="Get_Active_Route_Vendor_ID" method="Get_Active_Route">
+          <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_vendor_id">
+          </resultGeneration>
+        </testStep>
+    </testCase> 
+
 </testPlugin>
 

@@ -656,12 +656,12 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "rdkshell_check_application_state_event":
-            result=result[0]
-            info = result
-            if str(result.get("client")) in expectedValues:
-                info["Test_Step_Status"] = "SUCCESS"
-            else:
-                info["Test_Step_Status"] = "FAILURE"
+            info["Test_Step_Status"] = "FAILURE"
+            for eventResult in result:
+                if str(eventResult.get("client")) in expectedValues:
+                    info["client"] = eventResult.get("client")
+                    info["Test_Step_Status"] = "SUCCESS"
+
         elif tag == "rdkshell_check_on_userinactivity_event":
             if len(arg) and arg[0] == "check_user_inactive":
                 result1=result[0]
@@ -723,7 +723,7 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "FAILURE"
                 
         # DisplayInfo Events response result parser steps
-        elif tag == "displayinfo_check_resolution_postchange_event":
+        elif tag == "displayinfo_check_pre_post_resolution_change_event":
             info["Test_Step_Status"] = "FAILURE"
             for eventResult in result:
                 if str(eventResult.get("event")).lower() in expectedValues:
@@ -775,9 +775,12 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
             info = result
             if "AUTO" in expectedValues:
                 for Mode in arg:
-                    if "AUTO" in Mode:
-                        expectedMode = Mode.lower()
-                        break
+                    if "auto" in Mode.lower():
+                        if "dolby" in Mode.lower():
+                            expectedMode = "surround"
+                            break
+                        else:
+                            expectedMode = Mode.lower()
             else:
                 expectedMode = str(expectedValues[0]).lower()
             if result.get('mode').lower() == expectedMode or result.get('mode').lower() in expectedMode:

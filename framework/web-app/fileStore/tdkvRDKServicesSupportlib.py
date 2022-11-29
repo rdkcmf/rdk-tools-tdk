@@ -144,7 +144,39 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             if arg[0] == "get_all_info":
                 info = checkAndGetAllResultInfo(result)
 
+        elif tag == "deviceinfo_get_api_info":
+            info = checkAndGetAllResultInfo(result)
 
+        elif tag == "deviceinfo_check_expected_result":
+            status = checkNonEmptyResultData(result)
+            success = str(result.get("success")).lower() == "true"
+            if status == "TRUE" and success:
+                info["MODEL_NUMBER"] = result.get("model")
+                if str(result.get("model")).lower() == str(expectedValues[0]).lower():
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "deviceinfo_check_firmware_version":
+            status = checkNonEmptyResultData(result)
+            if status == "TRUE":
+                info["imagename"] = result.get("imagename")
+                info["yocto"] = result.get("yocto")
+                if str(result.get("imagename")).lower() == str(expectedValues[1].strip()).lower() and str(result.get("yocto")).lower() == str(expectedValues[0].strip()).lower():
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "deviceinfo_check_supported_audio_and_video_ports":
+            info[arg[0]] = result.get(arg[0])
+            if collections.Counter(result.get(arg[0])) == collections.Counter(expectedValues):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
         # LocationSync Plugin Response result parser steps
         elif tag == "locationsync_get_location_info":
             if arg[0] == "get_all_info":
@@ -1291,7 +1323,7 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                  else:
                     info["Test_Step_Status"] = "FAILURE"
         #Parser code for HdmiCecSink plugin
-        elif tag == "hdmicecsink_check_active_source_details":
+        elif tag == "hdmicecsink_check_active_source_and_route_details":
            info["AVAILABLE"] = result.get("available")
            success = str(result.get("success")).lower() == "true"
            if str(result.get("available")).lower() == "true" and success:
@@ -1300,25 +1332,26 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["logicalAddress"] = logicalAddress
                 info["deviceType"] =  result.get("deviceType")
                 deviceType = result.get("deviceType")
-                if logicalAddress  not in [15,255] and logicalAddress == int(expectedValues[0]) and deviceType == expectedValues[1] and  success:
+                if logicalAddress  not in [15,255] and logicalAddress == int(expectedValues[0]) and deviceType.lower() == expectedValues[1].lower() and  success:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             elif arg[0] == "get_physical_address":
                  physical_address = result.get("physicalAddress")
-                 status = checkNonEmptyResultData(result.get("physicalAddress"))
-                 hex_codes = {"\x00":"0","\x01":"1","\x02":"2","\x03":"3","\x04":"4","\x05":"5","\x06":"6","\x07":"7","\x08":"8","\x09":"9","\x0a":"a","\x0b":"b","\x0c":"c","\x0d":"d","\x0e":"e","\x0f":"f"}
-                 for code in hex_codes.keys():
-                    physical_address = physical_address.replace(code,hex_codes.get(code))
+                 if len(arg) > 1 and arg[1] == "active_route":
+                     hdmiPort = str(result.get("ActiveRoute"))
+                 else:
+                     hdmiPort = str(result.get("port"))
+                 hdmiPort = int(hdmiPort[len(hdmiPort)-1])
+                 hdmiPort += 1
+                 status = checkNonEmptyResultData(result)
                  info["physicalAddress"] = physical_address
+                 expectedAddress = str(hdmiPort)+'.0.0.0'
                  if status == "TRUE":
-                    if expectedValues[0] == "true" and  physical_address != "ffff":
-                            info["Test_Step_Status"] = "SUCCESS"
-
-                    elif expectedValues[0] == "false" and  physical_address == "ffff":
-                            info["Test_Step_Status"] = "SUCCESS"
+                    if  physical_address == expectedAddress and physical_address != "15.15.15.15":
+                        info["Test_Step_Status"] = "SUCCESS"
                     else:
-                            info["Test_Step_Status"] = "FAILURE"
+                        info["Test_Step_Status"] = "FAILURE"
                  else:
                     info["Test_Step_Status"] = "FAILURE"
             elif arg[0] == "get_cec_version":
@@ -1337,10 +1370,15 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
-
             elif arg[0] == "get_power_status":
                 info["powerStatus"] = result.get("powerStatus")
                 if str(result.get("powerStatus")).lower() == expectedValues[0].lower():
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+            elif arg[0] == "get_osd_name":
+                info["osdname"] = result.get("osdName")
+                if str(result.get("osdName")).lower() == expectedValues[0].lower():
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
@@ -1355,7 +1393,6 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
         elif tag == "hdmicecsink_get_osd_name":
             success = str(result.get("success")).lower() == "true"
             info["OSDNAME"] = result.get("name")
@@ -1364,7 +1401,6 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
-
         elif tag == "hdmicecsink_check_audio_connected_status":
             success = str(result.get("success")).lower() == "true"
             info["connected"] = result.get("connected")
@@ -1621,8 +1657,8 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 if str(result.get("success")).lower() == "true" and result.get('soundMode') in expectedValues:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
-                    info["Test_Step_Status"] = "FAILURE"
- 
+                    info["Test_Step_Status"] = "FAILURE" 
+
         elif tag == "check_zoom_settings":
             info["zoomSetting"] = result.get('zoomSetting');
             if str(result.get("success")).lower() == "true" and result.get('zoomSetting') in expectedValues :
@@ -3173,7 +3209,12 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
         elif tag == "tracecontrol_get_category":
             testStepResults = testStepResults[0].values()[0]
             info["category"] = testStepResults[0].get("category")
-
+        
+        # DeviceInfo Plugin Response result parser steps
+        elif tag == "deviceinfo_get_firmware_version_details":
+            testStepResults = testStepResults[0].values()[0]
+            info["imagename"] = testStepResults[0].get("image")
+            info["yocto"] = testStepResults[0].get("yocto")
 
         # OCDM Plugin Response result parser steps
         elif tag == "ocdm_get_all_drms":
@@ -4526,6 +4567,10 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,execInfo)
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
+            elif len(arg) and arg[0] == "get_image_and_yocto_version":
+                command = "grep -i 'YOCTO_VERSION' /version.txt | cut -d '=' -f2"
+                details = executeCommand(execInfo, command)
+                info["yocto"] = str(details).split("\n")[1]
             else:
                 if expectedValues[0] in info["image"] :
                     info["Test_Step_Status"] = "SUCCESS"
