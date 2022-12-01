@@ -2128,6 +2128,7 @@
                 <expectedValues>True,False</expectedValues>
         </method>
         <method name="Get_OSD_Name" api="getOSDName" type="method" desc="Gets the OSD name used by host device"/>
+        <method name="Get_Device_List" api="getDeviceList" type="method" desc="Gets the number of connected source devices and system information for each device"/>
         <method name="Get_Active_Route" api="getActiveRoute" type="method" desc="Gets details for the current route from the source to sink devices"/>
         <event name="Event_Report_Cec_Enabled" eventName="reportCecEnabledEvent" eventId="client.events.1" type="event" desc="Triggered when the HDMI-CEC is enabled" />
     </plugin>

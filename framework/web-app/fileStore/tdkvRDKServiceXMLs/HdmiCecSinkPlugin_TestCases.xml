@@ -214,7 +214,7 @@
     <testCase testCaseId="HdmiCecSink_10" testCaseName="Check_Active_Route_Logical_Address" desc="Checks the active route logical address">
         <testCaseInfo testCaseType="direct"/>
         <testStep testStepId="1" name="Get_Active_Route_Logical_Address" method="Get_Active_Route">
-	  <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_logical_address">
+	  <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_logical_address,active_route">
 	        <expectedValues useConfigFile="true" key="HDMICECSINK_ACTIVE_SOURCE_LOGICAL_ADDR_INFO"/>		                 
           </resultGeneration>
         </testStep>
@@ -231,7 +231,7 @@
     <testCase testCaseId="HdmiCecSink_12" testCaseName="Check_Active_Route_OSD_Name" desc="Checks the active route OSD name">
         <testCaseInfo testCaseType="direct"/>
         <testStep testStepId="1" name="Get_OSD_Name" method="Get_Active_Route">
-	  <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_osd_name" >
+	  <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_osd_name,active_route" >
              <expectedValues useConfigFile="true" key="HDMICECSINK_ACTIVE_SOURCE_OSD_NAME"/>
           </resultGeneration>
         </testStep>
@@ -240,7 +240,7 @@
     <testCase testCaseId="HdmiCecSink_13" testCaseName="Check_Active_Route_Vendor_ID" desc="Checks the Active route Vendor ID of the device">
         <testCaseInfo testCaseType="direct"/>
         <testStep testStepId="1" name="Get_Active_Route_Vendor_ID" method="Get_Active_Route">
-          <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_vendor_id">
+          <resultGeneration useMethodTag="hdmicecsink_check_active_source_and_route_details" arguments="get_vendor_id,active_route">
           </resultGeneration>
         </testStep>
     </testCase> 

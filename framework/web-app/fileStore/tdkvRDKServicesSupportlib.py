@@ -1328,19 +1328,26 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
            success = str(result.get("success")).lower() == "true"
            if str(result.get("available")).lower() == "true" and success:
             if arg[0] == "get_logical_address":
-                logicalAddress = result.get("logicalAddress")
+                if len(arg) > 1 and arg[1] == "active_route":
+                    values = result.get("pathList")
+                    logicalAddress = values[0].get("logicalAddress")
+                    deviceType = values[0].get("deviceType")
+                else:
+                    logicalAddress = result.get("logicalAddress")
+                    deviceType = result.get("deviceType")
                 info["logicalAddress"] = logicalAddress
-                info["deviceType"] =  result.get("deviceType")
-                deviceType = result.get("deviceType")
+                info["deviceType"] =  deviceType
                 if logicalAddress  not in [15,255] and logicalAddress == int(expectedValues[0]) and deviceType.lower() == expectedValues[1].lower() and  success:
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             elif arg[0] == "get_physical_address":
-                 physical_address = result.get("physicalAddress")
                  if len(arg) > 1 and arg[1] == "active_route":
                      hdmiPort = str(result.get("ActiveRoute"))
+                     physical_address = result.get("pathList")
+                     physical_address = physical_address[0].get("physicalAddress")
                  else:
+                     physical_address = result.get("physicalAddress")
                      hdmiPort = str(result.get("port"))
                  hdmiPort = int(hdmiPort[len(hdmiPort)-1])
                  hdmiPort += 1
@@ -1363,7 +1370,11 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             elif arg[0] == "get_vendor_id":
-                vendorID = result.get("vendorID")
+                if len(arg) > 1 and arg[1] == "active_route":
+                    vendorID = result.get("pathList")
+                    vendorID  = vendorID[0].get("vendorID")
+                else:
+                    vendorID = result.get("vendorID")
                 info["vendorID"] = vendorID
                 status = checkNonEmptyResultData(vendorID)
                 if status == "TRUE" and str(vendorID).lower() != "000":
@@ -1377,8 +1388,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             elif arg[0] == "get_osd_name":
-                info["osdname"] = result.get("osdName")
-                if str(result.get("osdName")).lower() == expectedValues[0].lower():
+                if len(arg) > 1 and arg[1] == "active_route":
+                    osdName = result.get("pathList")
+                    osdName = osdName[0].get("osdName")
+                else:
+                    osdName = result.get("osdName")
+                info["osdname"] = osdName
+                if str(osdName).lower() == expectedValues[0].lower():
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
@@ -1405,6 +1421,14 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             success = str(result.get("success")).lower() == "true"
             info["connected"] = result.get("connected")
             if str(result.get("connected")) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "hdmicecsink_check_device_list":
+            info["devicelist"] = result.get("deviceList")
+            success = str(result.get("success")).lower() == "true"
+            status = checkNonEmptyResultData(result)
+            if success and status == "TRUE" and int(result.get("numberofdevices")) > 0 :
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
