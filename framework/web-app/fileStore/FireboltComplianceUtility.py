@@ -154,7 +154,7 @@ def getMediaPipelineTestCommand (testName, testUrl, **arguments):
     if (use_audioSink):
         command = command + " audioSink=" + use_audioSink;
     #Use autovideosink for fpsdisplaysink
-    if  "checkFPS=no" not in command.lower() and use_autoVideoSink_for_fpsdisplaysink == "yes":
+    if  "checkfps=no" not in command.lower() and use_autoVideoSink_for_fpsdisplaysink == "yes":
         command = "export FPSDISPLAYSINK_USE_AUTOVIDEO=1 ;" + command
     #Feature to modify hls url to aamp url based on configuration
     if (use_aamp == "yes"):
