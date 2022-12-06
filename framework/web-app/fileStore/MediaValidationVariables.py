@@ -131,7 +131,7 @@ video_src_url_mp4_720p = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_
 video_src_url_mp4_480p = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4_480p.mp4"
 video_src_url_mp4_360p = test_streams_base_path + "DASH_H264_AAC/atfms_291_dash_tdk_avc_aac_fmp4_360p.mp4"
 video_src_url_mp4_2160p_av1 = test_streams_base_path + "TDK_Asset_Waterfall_4K_AV1.mp4"
-video_src_url_mp4_1080p_av1 = test_streams_base_path + "TDK_Asset_Waterfall_1080p_Av1.mp4"
+video_src_url_mp4_1080p_av1 = test_streams_base_path + "Waterfall_DASH_AV1_AAC/1080p.mp4"
 video_src_url_resolution_up_h264 = test_streams_base_path + "TDK_Asset_Sunrise_H264_resolution_up.mp4"
 video_src_url_resolution_down_h264 = test_streams_base_path + "TDK_Asset_Sunrise_H264_resolution_down.mp4"
 video_src_url_resolution_up_av1 = test_streams_base_path + "TDK_Asset_Sunrise_AV1_resolution_up.mp4"
@@ -180,6 +180,7 @@ video_src_url_mpeg = test_streams_base_path + "TDK_Asset_Sunrise_MPEGAV.mpeg"
 
 #AV1 Codec Video URL
 video_src_url_av1 = test_streams_base_path + "DASH_AV1_AAC/master.mpd"
+#video_src_url_av1 = test_streams_base_path + "Waterfall_DASH_AV1_AAC/master.mpd"
 
 #AC3 Codec Video URL
 video_src_url_ac3 = test_streams_base_path + "DASH_H264_AC3/atfms_291_dash_tdk_avc_ac3_fmp4.mpd"
@@ -226,21 +227,21 @@ video_src_url_multi_text_tracks  = ""
 
 # Streams with multiple audio codecs
 #Video URL with AC3 and AAC codec audio
-video_src_url_ac3_aac   = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_AC3_AAC.mp4"
+video_src_url_ac3_aac   = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_AC3_AAC_v2.mp4"
 #Video URL with OPUS and AC3 codec audio
-video_src_url_opus_ac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_AC3_OPUS.mp4"
+video_src_url_opus_ac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_OPUS_AC3_v2.mp4"
 #Video URL with OPUS and EAC3 codec audio
-video_src_url_opus_eac3 = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_EAC3_OPUS.mp4"
+video_src_url_opus_eac3 = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_OPUS_EAC3_v2.mp4"
 #Video URL with EAC3 and AC3 codec audio
-video_src_url_ac3_eac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_EAC3_AC3.mp4"
-video_src_url_aac_eac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_EAC3_AAC.mp4"
+video_src_url_ac3_eac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_AC3_EAC3_v2.mp4"
+video_src_url_aac_eac3  = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_AAC_EAC3_v2.mp4"
 video_src_url_opus_aac = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_AAC_OPUS.mp4"
 video_src_url_opus_vorbis = test_streams_base_path + "MultiCodecStreams/TDK_Asset_Sunrise_Vorbis_Opus.webm"
 video_src_url_ddp51_heaac = ""
 
 #Streams with mutiple tracks
-video_src_url_multi_audio_aac = test_streams_base_path + "TDK_Asset_Waterfall_MultiTrack_AAC.mp4"
-video_src_url_multi_audio_eac3 = test_streams_base_path + "TDK_Asset_Waterfall_MultiTrack_EAC3.mp4"
+video_src_url_multi_audio_aac = test_streams_base_path + "TDK_Asset_Sunrise_MultiTrack_AAC.mp4"
+video_src_url_multi_audio_eac3 = test_streams_base_path + "TDK_Asset_Sunrise_MultiTrack_EAC3.mp4"
 
 # Basic WAV PCM Audio format stream
 audio_src_url_wav_pcm = test_streams_base_path + "TDK_Asset_Sunrise_WAV_Audio.wav"

@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2021 RDK Management
+# Copyright 2022 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
   <version>4</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
-  <name>MFRHal_Get_SerializedData_ChipsetInfo</name>
+  <name>MFRHal_Get_SerializedData_WPS_PIN</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
   <primitive_test_id></primitive_test_id>
   <!-- Do not change primitive_test_id if you are editing an existing script. -->
@@ -33,7 +33,7 @@
   <!--  -->
   <status>FREE</status>
   <!--  -->
-  <synopsis>To retrieve chipset info from DUT</synopsis>
+  <synopsis>To retrieve wps_pin info from DUT</synopsis>
   <!--  -->
   <groups_id />
   <!--  -->
@@ -48,7 +48,6 @@
   <skip>false</skip>
   <!--  -->
   <box_types>
-    <box_type>Video_Accelerator</box_type>
     <!--  -->
   </box_types>
   <rdk_versions>
@@ -57,12 +56,12 @@
   </rdk_versions>
   <test_cases>
     <test_case_id>CT_MFR_HAL_16</test_case_id>
-    <test_objective>To retrieve chipset info from DUT</test_objective>
+    <test_objective>To retrieve wps_pin info from DUT</test_objective>
     <test_type>Positive</test_type>
-    <test_setup>Video_Accelerator</test_setup>
+    <test_setup></test_setup>
     <pre_requisite>1. Initialize the MFR module using mfr_init()</pre_requisite>
     <api_or_interface_used>mfrError_t mfrGetSerializedData( mfrSerializedType_t type,  mfrSerializedData_t *data );</api_or_interface_used>
-    <input_parameters>mfrSerializedType_t type = 16 for mfrSERIALIZED_TYPE_CHIPSETINFO</input_parameters>
+    <input_parameters>mfrSerializedType_t type = 16 for mfrSERIALIZED_TYPE_WPSPIN</input_parameters>
     <automation_approch>1. TM loads the MfrHal agent via the test agent.
 2 . MfrHal agent will invoke the api mfrGetSerializedData() with type of serialized data to be retrieved as input.
 3. Verify that the data retrieved is not empty.
@@ -71,9 +70,9 @@
 Checkpoint 2. Verify that the serialized data retrieved is not empty</expected_output>
     <priority>High</priority>
     <test_stub_interface>libmfrhalstub.so.0.0.0</test_stub_interface>
-    <test_script>MFRHal_Get_SerializedData_ChipsetInfo</test_script>
+    <test_script>MFRHal_Get_SerializedData_WPS_PIN</test_script>
     <skipped>No</skipped>
-    <release_version>M87</release_version>
+    <release_version>M107</release_version>
     <remarks></remarks>
   </test_cases>
   <script_tags />
@@ -89,7 +88,7 @@ mfrhalObj = tdklib.TDKScriptingLibrary("mfrhal","1");
 #This will be replaced with corresponding DUT Ip and port while executing script
 ip = <ipaddress>
 port = <port>
-mfrhalObj.configureTestCase(ip,port,'MFRHal_Get_SerializedData_ChipsetInfo');
+mfrhalObj.configureTestCase(ip,port,'MFRHal_Get_SerializedData_WPS_PIN');
 
 #Get the result of connection with test component and DUT
 result =mfrhalObj.getLoadModuleResult();
@@ -101,8 +100,8 @@ if "SUCCESS" in result.upper():
 
     #Prmitive test case which associated to this Script
     tdkTestObj = mfrhalObj.createTestStep('MfrHal_GetSerializedData');
-    #Set the serialized data type to 18(mfrSERIALIZED_TYPE_CHIPSETINFO)
-    tdkTestObj.addParameter("data_type", 18)
+    #Set the serialized data type to 16(mfrSERIALIZED_TYPE_WPSPIN)
+    tdkTestObj.addParameter("data_type", 16)
 
     #Execute the test case in DUT
     tdkTestObj.executeTestCase(expectedresult);
@@ -113,12 +112,12 @@ if "SUCCESS" in result.upper():
     #Set the result status of execution
     if (actualresult == expectedresult):
         print "Successfully executed MfrHal_GetSerializedData"
-        chipsetInfo = str(tdkTestObj.getResultDetails())
-        if (chipsetInfo):
-            print "MfrHal_GetSerializedData: Chipset Info : ", chipsetInfo
+        wps_pinInfo = str(tdkTestObj.getResultDetails())
+        if (wps_pinInfo):
+            print "MfrHal_GetSerializedData: WPS_PIN Info : ", wps_pinInfo
             tdkTestObj.setResultStatus("SUCCESS");
         else:
-            print "Chipset Info retrieved is empty or incorrect"
+            print "WPS_PIN Info retrieved is empty or incorrect"
             tdkTestObj.setResultStatus("FAILURE");
     else:
         print "Failed to execute MfrHal_GetSerializedData"
