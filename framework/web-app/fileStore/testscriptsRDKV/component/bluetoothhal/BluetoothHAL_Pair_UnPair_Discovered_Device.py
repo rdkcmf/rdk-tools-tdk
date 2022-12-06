@@ -152,6 +152,7 @@ if "SUCCESS" in result.upper():
                 if "FAILURE" not in bluetoothctlResult:
                     tdkTestObj.setResultStatus("SUCCESS");
                     print "Client Device %s set as discoverable" %(bluetoothhallib.deviceName)
+                    Unpair_if_paired(bluetoothhalObj);
                     #Start device discovery in DUT
                     print "Starting the device discovery in DUT"
                     tdkTestObj = bluetoothhalObj.createTestStep('BluetoothHal_StartDiscovery');
@@ -253,7 +254,7 @@ if "SUCCESS" in result.upper():
                                                     pairedDevices = json.loads(pairResult)
                                                     #Traverse the paired devices list to check if the client device is present
                                                     for device in pairedDevices :
-                                                        if (device["deviceName"] == bluetoothhallib.deviceName):
+                                                        if (str(device["deviceID"]) == deviceID):
                                                             print "Client device is successfully paired with DUT"
                                                             print "Client device details: \n", device
                                                             devicePaired = True
@@ -292,7 +293,7 @@ if "SUCCESS" in result.upper():
                                                                     pairedDevices = json.loads(pairResult)
                                                                     #Traverse the paired devices list to check if the client device is present
                                                                     for device in pairedDevices :
-                                                                        if (device["deviceName"] == bluetoothhallib.deviceName):
+                                                                        if (str(device["deviceID"]) == deviceID):
                                                                             devicePaired = True
                                                                     if True == devicePaired:
                                                                         print "Client device is not unpaired from DUT"

@@ -21,7 +21,7 @@
 <xml>
   <id></id>
   <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
-  <version>1</version>
+  <version>2</version>
   <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>BluetoothHAL_Check_Paired_Device_Not_Discoverable_For_DeviceType_Unknown</name>
   <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
@@ -99,6 +99,7 @@ Checkpoint 2. Verify that the bluetooth client device  is not present in the dis
     <release_version>M86</release_version>
     <remarks></remarks>
   </test_cases>
+  <script_tags />
 </xml>
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script
@@ -116,34 +117,6 @@ bluetoothhalObj = tdklib.TDKScriptingLibrary("bluetoothhal","1");
 ip = <ipaddress>
 port = <port>
 bluetoothhalObj.configureTestCase(ip,port,'BluetoothHAL_Check_Paired_Device_Not_Discoverable_For_DeviceType_Unknown');
-
-#Method to retrieve the list of paired devices and traverse the list to find the client device
-def checkDeviceInPairedList():
-    devicePaired = False
-    tdkTestObj = bluetoothhalObj.createTestStep('BluetoothHal_GetListOfPairedDevices');
-    #Execute the test case in DUT
-    tdkTestObj.executeTestCase(expectedresult);
-
-    #Get the result of execution
-    actualresult = tdkTestObj.getResult();
-
-    if (actualresult == expectedresult):
-        print "BluetoothHal_GetListOfPairedDevices executed successfully"
-        tdkTestObj.setResultStatus("SUCCESS")
-        pairResult = tdkTestObj.getResultDetails()
-        if pairResult and "NO_DEVICES_PAIRED" != pairResult :
-            pairedDevices = json.loads(pairResult)
-            #Traverse the paired devices list to check if the client device is present
-            for device in pairedDevices :
-                if (device["deviceName"] == bluetoothhallib.deviceName):
-                    devicePaired = True
-        else:
-            print "Paired devices list is empty"
-    else:
-        print "BluetoothHal_GetListOfPairedDevices: failed"
-        tdkTestObj.setResultStatus("FAILURE")
-
-    return devicePaired
 
 def startDeviceDiscovery():
     print "Starting the device discovery in DUT"
@@ -227,6 +200,7 @@ if "SUCCESS" in result.upper():
                 if "FAILURE" not in bluetoothctlResult:
                     tdkTestObj.setResultStatus("SUCCESS");
                     print "Client Device %s set as discoverable" %(bluetoothhallib.deviceName)
+                    Unpair_if_paired(bluetoothhalObj);
                     #Start device discovery in DUT
                     startDeviceDiscovery()
 
@@ -277,7 +251,7 @@ if "SUCCESS" in result.upper():
                                     tdkTestObj.setResultStatus("SUCCESS")
 
                                     #Retrieve the list of paired devices
-                                    devicePaired = checkDeviceInPairedList()
+                                    devicePaired = checkDeviceInPairedList(bluetoothhalObj,deviceID)
                                     if True == devicePaired:
                                         print "Client device is successfully paired with DUT"
                                         tdkTestObj.setResultStatus("SUCCESS")
@@ -309,7 +283,7 @@ if "SUCCESS" in result.upper():
                                                 scannedDevices = json.loads(scanResult)
                                                 #Traverse the scanned devices list to check if the client device is present
                                                 for device in scannedDevices:
-                                                    if (device["deviceName"] == bluetoothhallib.deviceName):
+                                                    if (str(device["deviceID"]) == deviceID):
                                                         print "Client device of type Unknown is successfully discovered in DUT"
                                                         deviceDiscovered = True
                                                 if True == deviceDiscovered:
@@ -342,7 +316,7 @@ if "SUCCESS" in result.upper():
                                             tdkTestObj.setResultStatus("SUCCESS")
 
                                             #Retrieve the list of paired devices
-                                            devicePaired = checkDeviceInPairedList()
+                                            devicePaired = checkDeviceInPairedList(bluetoothhalObj,deviceID)
                                             if True == devicePaired:
                                                 print "Client device is not unpaired from DUT"
                                                 tdkTestObj.setResultStatus("FAILURE")

@@ -144,6 +144,7 @@ if "SUCCESS" in result.upper():
                 if "FAILURE" not in bluetoothctlResult:
                     tdkTestObj.setResultStatus("SUCCESS");
                     print "Client Device %s set as discoverable" %(bluetoothhallib.deviceName)
+                    Unpair_if_paired(bluetoothhalObj);
                     if "LE" in  DeviceType(bluetoothhalObj):
                         LowEnergy = True;
                     else:
