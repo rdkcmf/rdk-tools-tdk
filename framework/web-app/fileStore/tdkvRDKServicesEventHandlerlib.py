@@ -378,7 +378,7 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                     resultStatus = "TRUE"
                     for frequency in frequencies:
                         if frequency not in expectedValues:
-                            resultstatus = "FALSE"
+                            resultStatus = "FALSE"
                             break
                     if "FALSE" not in resultStatus:
                         info["Test_Step_Status"] = "SUCCESS"
