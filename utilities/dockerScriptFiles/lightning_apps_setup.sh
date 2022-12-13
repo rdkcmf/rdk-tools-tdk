@@ -18,45 +18,27 @@
 # limitations under the License.
 ##########################################################################
 
-##Update local packages list
-apt-get update
+#Update local packages list
+apt update
 
-##Setting up tools for building Lightning Apps   
-
-#Install npm  
-apt install npm -y
-
-#Install node using npm
-npm install -g n
-
-#Update if version not latest
-n latest 
-npm install -g npm@latest
-
-#Update 
-apt -y update && apt -y upgrade
-
-#Make it as stable version
-n stable
-NODE_VERSION=$(node --version | sed 's/v\([0-9]*\).*/\1/g')
-echo "Stable node version: $NODE_VERSION"
-#download nodejs stable version
-curl -sL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
-#Install nodejs
+# install node
+node_version=16.x
+curl -sL https://deb.nodesource.com/setup_{$node_version} | bash
 apt-get install -y nodejs
-
-#Install Lightning CLI tool
-npm install -g rdkcentral/Lightning-CLI
+npm set unsafe-perm true
 
 #verify the npm and node versions
 echo "npm version:"
 npm --version || echo "npm is not installed."
 echo "node version:"
 node --version || echo "node is not installed."
+
+#Install Lightning CLI tool
+npm install -g rdkcentral/Lightning-CLI
+
 echo "Commands for installing npm, node and Lightning-CLI are executed."
 
-##Restart Tomcat7
-
+#Restart Tomcat7
 echo "Restarting the Tomcat7..."
 echo "Stopping Tomcat..."
 /etc/init.d/tomcat7 stop
@@ -65,52 +47,45 @@ echo "Startng Tomcat..."
 echo "Please wait, continuing in a minute..."
 sleep 50
 
-#function for npm
-build_lightning_apps()
-{	echo "build_lightning_apps"
+#function for building Lightning App
+build_lightning_app()
+{
+	echo "Building $2 ..."
+	cd $1
 	npm i
-	lng build
+	build_response=$(lng build) && echo $build_response
 	rm -rf node_modules
+		if [[ ! -z "$build_response" && $build_response != *"Error"* ]]; then
+			echo "$2 is built successfully"
+		else
+			echo "Error: Problem in building $2" >>/dev/stderr
+			exit 1
+		fi
 	cd ..
 }
 
-##Building the Lightning Apps
-
+#Building the Lightning Apps
 DIR="/opt/apache-tomcat-7.0.96/webapps/rdk-test-tool"
 if [ -d "$DIR" ]; then
-	echo "The directory ${DIR} exists, proceeding to build Lightning apps..."
+	echo "The WAR File is extracted and proceeding to build Lightning apps..."
 	#Setting up and building Lightning Apps in their given path
 
 	#Permission to read and execute access for everyone
 	chmod -R 755 /opt/apache-tomcat-7.0.96/webapps/rdk-test-tool/fileStore/lightning-apps
+	cd /opt/apache-tomcat-7.0.96/webapps/rdk-test-tool/fileStore/lightning-apps/
 
-	echo "Building App tdkunifiedplayer..."
-	cd /opt/apache-tomcat-7.0.96/webapps/rdk-test-tool/fileStore/lightning-apps/tdkunifiedplayer
-        build_lightning_apps
+	build_lightning_app "tdkunifiedplayer" "TDK Unified Player"
 		
-	echo "Building App tdkanimations..."
-	cd tdkanimations/
-	build_lightning_apps
+	build_lightning_app "tdkanimations" "TDK Animations Player"
 
-	echo "Building App tdkmultianimations..."
-	cd tdkmultianimations/
-	build_lightning_apps
+	build_lightning_app "tdkmultianimations" "TDK Multi Animations"
 	
-	echo "Building App tdkobjectanimations..."
-	cd tdkobjectanimations/
-	build_lightning_apps
+	build_lightning_app "tdkobjectanimations" "TDK Object Animations"
 
-	echo "Building App tdkipchange..."
-	cd tdkipchange/
-	build_lightning_apps
+	build_lightning_app "tdkipchange" "TDK IP Change"
 	
-	echo "Lightning apps are built. Please verify by launching the apps with below urls..."
-echo -e "For tdkunifiedplayer: http://<TM_IP>:<port>/rdk-test-tool/fileStore/lightning-apps/tdkunifiedplayer/build/index.html?\nplayer=hlsjs&url=<video_src_url>&operations=pause(10),play(10)&autotest=true&type=hls"
-echo -e "For tdkanimations: http://<TM_IP>:<port>/rdk-test-tool/fileStore/lightning-apps/tdkanimations/build/index.html?\noperations=pause(10),play(10),stop(10),stopNow(10)&autotest=true&ip=xx.xx.xx.xxxx&port=9998"
-echo -e "For tdkmultianimations: http://<TM_IP>:<port>/rdk-test-tool/fileStore/lightning-apps/tdkmultianimations/build/index.html?\nip=xx.xx.xx.xx&threshold=10&fps=30&autotest=true&duration=60&testtype=generic&port=9998"
-echo -e "For tdkobjectanimations: http://<TM_IP>:<port>/rdk-test-tool/fileStore/lightning-apps/tdkobjectanimations/build/index.html?\nip=xx.xx.xx.xx&port=9998&object=Text&text=demo&duration=60count=500&showfps=true&autotest=true",
-echo -e "For tdkipchange: http://<TM_IP>:<port>/rdk-test-tool/fileStore/lightning-apps/tdkipchange/build/index.html?\ntmURL=<TM_URL>&deviceName=<Name_of_device_in_TM>&tmUserName=<user_name>&tmPassword=<password>&ipAddressType=<ipv4 or ipv6>"
+	echo "Lightning Apps are Built Successfully"
 else
-	echo "Error: ${DIR} not found. Can not continue."
+	echo "Error: ${DIR} not found. Can not continue." >>/dev/stderr
 	exit 1
 fi

@@ -72,8 +72,10 @@ fi
 
 ##Execute permissions for chromedriver path
 
-echo "Executing permission for chromedriver path"
-chmod 777 tdk/selenium_path/
-chmod 777 tdk/selenium_path/chromedriver
+echo "Execute permission for chromedriver path"
+cd /tdk
+chmod 777 selenium_path
+chmod 777 selenium_path/chromedriver
+cd ..
 
 echo "Google Chrome setup is done."

@@ -26,11 +26,12 @@ ENV MYSQL_ROOT_PASSWORD=root
 ENV MYSQL_ROOT_USER=root
 
 #TDK TM Pre-requisites installation
-RUN apt update --fix-missing
-RUN apt install -y apt-utils
-RUN apt install -y mysql-server
-RUN apt-get update
-RUN apt-get install -y openjdk-8-jdk \
+RUN apt-get clean && apt-get update && apt-get upgrade -y \
+ && apt-get install -y --fix-missing apt-utils \
+ curl \
+ git \
+ mysql-server \
+ openjdk-8-jdk \
  python \
  expect \
  python-xlwt \
@@ -41,15 +42,13 @@ RUN apt-get install -y openjdk-8-jdk \
  python-pycurl \
  python-mysqldb \
  python-pip \
- curl \
  vim \
  net-tools \
  inetutils-ping \
  unzip \
  zip \
  wget \
- sshpass \
- git
+ sshpass 
 RUN python -m pip install selenium
 RUN python -m pip install --pre --upgrade websocket-client==0.57.0
 RUN pip install requests \
