@@ -473,7 +473,9 @@
                 </prerequisite>
             </testCasePreRequisite>
             <testStep testStepId="1" name="Get_Colorimetry" method="Get_Colorimetry">
-                <resultGeneration useMethodTag="displayinfo_validate_expected_results" arguments="check_colorimetry" expectedValues="COLORIMETRYUNKNOWN,COLORIMETRYOTHER,COLORIMETRYSMPTE170M,COLORIMETRYBT709,COLORIMETRYXVYCC601,COLORIMETRYXVYCC709,COLORIMETRYSYCC601, COLORIMETRYOPYCC601,COLORIMETRYOPRGB,COLORIMETRYBT2020YCCBCBRC,COLORIMETRYBT2020RGB_YCBCR"/>
+                <resultGeneration useMethodTag="displayinfo_validate_expected_results" arguments="check_colorimetry" >
+                      <expectedValues useConfigFile="true" key="DISPLAYINFO_SUPPORTED_COLORIMETRY_LIST"/>
+                </resultGeneration>
             </testStep>
         </testCase>
        <!-- Test case 23 -->

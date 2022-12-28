@@ -242,11 +242,11 @@
                 <resultGeneration useMethodTag="system_get_state_info" />
             </testStep>
         </testCase-->
-
+        
         <!-- Test case 13 -->
-        <testCase testCaseId="SYS_13" testCaseName= "System_Clear_Last_DeepSleep_Reason" desc="Clear the last deep sleep reason.">
+        <testCase testCaseId="SYS_13" testCaseName= "System_Get_Last_DeepSleep_Reason" desc="Retrieve the last deep sleep reason.">
             <testCaseInfo testCaseType="direct" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="DeepSleep" />
-            <testStep testStepId="1" name="Clear_Last_DeepSleep_Reason" method="Clear_Last_DeepSleep_Reason" >
+            <testStep testStepId="1" name="Get_Last_DeepSleep_Reason" method="Get_Last_DeepSleep_Reason" >
               <resultGeneration useMethodTag="system_get_state_info"/>
             </testStep>
         </testCase>
@@ -260,9 +260,9 @@
         </testCase>
 
         <!-- Test case 15 -->
-        <testCase testCaseId="SYS_15" testCaseName= "System_Get_Last_DeepSleep_Reason" desc="Retrieve the last deep sleep reason.">
+        <testCase testCaseId="SYS_15" testCaseName= "System_Clear_Last_DeepSleep_Reason" desc="Clear the last deep sleep reason.">
             <testCaseInfo testCaseType="direct" configurableTest="true" testKey="SYSTEM_DEVICE_FEATURES" useMethodTag="system_check_feature_applicability" arguments="DeepSleep" />
-            <testStep testStepId="1" name="Get_Last_DeepSleep_Reason" method="Get_Last_DeepSleep_Reason" >
+            <testStep testStepId="1" name="Clear_Last_DeepSleep_Reason" method="Clear_Last_DeepSleep_Reason" >
               <resultGeneration useMethodTag="system_get_state_info"/>
             </testStep>
         </testCase>
@@ -515,7 +515,7 @@
               <resultGeneration useMethodTag="system_check_set_operation"  />
             </testStep>
             <testStep testStepId="2" name="Check_On_Reboot_Request_Event" event="Event_Reboot_Request" action="eventListener" delay="60">
-              <resultGeneration useMethodTag="system_check_reboot_reason_event" expectedValues= "API Validation" />
+              <resultGeneration useMethodTag="system_check_reboot_reason_event" expectedValues= "API Validation,SystemServices" />
             </testStep>
        </testCase>
        <testCase testCaseId="SYS_37" testCaseName="Enable_And_Disable_Telemetry_OptOut_Status"  desc="Checks whether able to enable and disable the telemetry opt-out status">
@@ -876,5 +876,57 @@
                 </resultGeneration>
             </testStep>
        </testCase>
-
+       
+       <testCase testCaseId="SYS_50" testCaseName="Check_Power_State_Before_Reboot_On_Standby_State" desc="Checks the powerstate before reboot" >
+            <testCaseInfo testCaseType="direct" />
+            <testStep testStepId="1" name="Get_Available_StandBy_Modes" method="Get_Available_StandBy_Modes" saveResult="true">
+                <resultGeneration useMethodTag="system_get_available_standby_modes" arguments="check_mode" expectedValues="LIGHT_SLEEP" />
+            </testStep>
+            <testStep testStepId="2" name="Get_Preferred_StandBy_Mode" method="Get_Preferred_StandBy_Mode" saveResult="true">
+                <resultGeneration useMethodTag="system_get_preferred_standby_mode" />
+            </testStep>
+            <testStep testStepId="3" name="Set_Preferred_StandBy_Mode" method="Set_Preferred_StandBy_Mode" >
+                <conditionalExecution enable="true" Id="2" useMethodTag="system_check_preferred_standby_mode" arguments="isNotEqual,LIGHT_SLEEP" />
+                <params>
+                  <param tag="standbyMode" value="LIGHT_SLEEP" />
+                </params>
+                <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="4" name="Get_Power_State" method="Get_Power_State"  >
+                <resultGeneration useMethodTag="system_get_power_state"/>
+            </testStep>
+            <testStep testStepId="5" name="Set_Power_State" method="Set_Power_State" >
+                <params>
+                  <param tag="standbyReason"  useDefault="true" />
+                  <param tag="powerState"  value="STANDBY"/>
+                </params>
+                <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+            <testStep testStepId="6" name="Get_Power_State" method="Get_Power_State" saveResult="true" >
+                <resultGeneration useMethodTag="system_get_power_state" expectedValues="LIGHT_SLEEP,STANDBY" />
+            </testStep>
+            <testStep testStepId="7" name="System_reboot" method="Reboot" rebootStep="yes" >
+              <resultGeneration useMethodTag="system_check_set_operation"  />
+            </testStep>
+            <testStep testStepId="8" name="Get_Power_State_Before_Reboot" method="Get_Power_State_Before_Reboot" >
+                <resultGeneration useMethodTag="system_validate_powerstate_before_reboot">
+                  <expectedValues usePreviousResult="true" Id="6" useMethodTag="system_get_powerstate_before_reboot"/>
+                </resultGeneration>
+            </testStep>
+       <testCasePostRequisite>
+         <postrequisite requisiteId="1" requisiteName="Reverting_PowerState_ON">
+            <testStep testStepId="1" name="Check_power_state" method="Get_Power_State" saveResult="true">
+                <resultGeneration useMethodTag="system_get_power_state" />
+            </testStep>
+            <testStep testStepId="2" name="Set_Power_State" method="Set_Power_State" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="system_check_power_state_status"/>
+                <params>
+                  <param tag="standbyReason"  useDefault="true" />
+                  <param tag="powerState"  value="ON"/>
+                </params>
+                <resultGeneration useMethodTag="system_check_set_operation" />
+            </testStep>
+         </postrequisite>
+       </testCasePostRequisite>
+       </testCase>
 </testPlugin>

@@ -85,6 +85,12 @@
         <method name="Get_Supported_Video_Displays" api="supportedvideodisplays" type="property" desc="Provides access to the video ports supported on the device"/>
         <method name="Get_Supported_Audio_Ports" api="supportedaudioports" type="property" desc="Provides access to the audio ports supported on the device"/>
         <method name="Get_Host_EDID" api="hostedid" type="property" desc="Provides access to the EDID of the host"/>
+        <method name="DeviceInfo_Get_Supported_Resolutions" api="supportedresolutions" type="method" desc="Supported resolutions on the selected video display port">
+          <params>
+                <param tag="videoDisplay" defaultValue="null" />
+          </params>
+        </method>
+        <method name="DeviceInfo_Get_Default_Resolution" api="defaultresolution" type="method" desc="Default resolution on the selected video display port"/>
     </plugin>
 
 
@@ -923,6 +929,12 @@
             </params>
         </method>
         <method name="Hide_Full_Screen_Image" api="hideFullScreenImage" type="method" desc="Hides the Full Screen Image" />
+        <method name="Get_Graphics_FrameRate" api="getGraphicsFrameRate" type="method" desc="Returns the current Graphics Frame Rate" />
+        <method name="Set_Graphics_FrameRate" api="setGraphicsFrameRate" type="method" desc="Set Graphics Frame Rate" >
+            <params>
+                <param tag="framerate" defaultValue="null" type="int"/>
+            </params>
+        </method>
         <event name="Event_On_Application_Launched" eventName="onApplicationLaunched" eventId="client.events.1" type="event" desc="Triggered when an application launches successfully"/>
         <event name="Event_On_Launched" eventName="onLaunched" eventId="client.events.1" type="event" desc="Fired on launching the client" />
         <event name="Event_On_Suspended" eventName="onSuspended" eventId="client.events.1" type="event" desc="Fired on Suspending the client" />
@@ -2130,6 +2142,8 @@
         <method name="Get_OSD_Name" api="getOSDName" type="method" desc="Gets the OSD name used by host device"/>
         <method name="Get_Device_List" api="getDeviceList" type="method" desc="Gets the number of connected source devices and system information for each device"/>
         <method name="Get_Active_Route" api="getActiveRoute" type="method" desc="Gets details for the current route from the source to sink devices"/>
+        <method name="Request_Active_Source" api="requestActiveSource" type="method" desc="Requests the active source in the network"/>
+        <event name="Event_On_Active_Source_Change" eventName="onActiveSourceChange" eventId="client.events.1" type="event" desc="Triggered with the active source device changes" />
         <event name="Event_Report_Cec_Enabled" eventName="reportCecEnabledEvent" eventId="client.events.1" type="event" desc="Triggered when the HDMI-CEC is enabled" />
     </plugin>
 </thunderPlugins>

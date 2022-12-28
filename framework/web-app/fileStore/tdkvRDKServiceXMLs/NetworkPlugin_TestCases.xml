@@ -273,7 +273,7 @@
             </testStep>
             <testStep testStepId="4" name="Check_Interface_Status_Change_Event" event="Event_Interface_Status_Changed" action="eventListener" delay="3"  >
                 <resultGeneration useMethodTag="network_check_interface_status_change_event" >
-                    <expectedValues usePreviousResult="true" Id="1" useMethodTag="network_toggle_interface_status" />
+                    <expectedValues value="Wifi" usePreviousResult="true" Id="1" useMethodTag="network_toggle_interface_status" />
                 </resultGeneration>
             </testStep>
         </testCase>

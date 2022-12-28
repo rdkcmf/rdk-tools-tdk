@@ -478,8 +478,9 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
 
         elif tag == "system_check_reboot_reason_event":
              result=result[0]
+             info = result
              info["Test_Step_Status"] = "FAILURE"
-             if str(result.get("rebootReason")) == str(expectedValues[0]):
+             if str(result.get("rebootReason")) == str(expectedValues[0]) and str(result.get("requestedApp")).lower() == str(expectedValues[1]).lower():
                 info["Test_Step_Status"] = "SUCCESS"
 
         elif tag == "system_check_network_standby_mode_changed_event":
@@ -543,10 +544,11 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
         elif tag == "network_check_interface_status_change_event":
             result = result[0]
             info = result
-            if str(result.get("enabled")) in  expectedValues:
+            if str(result.get("enabled")) in expectedValues and str(result.get("interface")).lower() == str(expectedValues[0]).lower():
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+
         elif tag == "network_connection_status_change_event":
             info["Test_Step_Status"] = "FAILURE"
             for eventResult in result:
@@ -768,6 +770,15 @@ def CheckAndGenerateEventResult(result,methodTag,arguments,expectedValues):
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+
+        # HdmiCecSink Events response result parser steps
+        elif tag == "hdmicecsink_check_on_active_source_change_event":
+            info["Test_Step_Status"] = "FAILURE"
+            for eventResult in result:
+                if int(eventResult.get("logicalAddress")) == int(expectedValues[0]) and str(eventResult.get("physicalAddress")).lower() == str(expectedValues[1]).lower():
+                    info = eventResult
+                    info["Test_Step_Status"] = "SUCCESS"
+                    break;
 
         # PlayerInfo Events response result parser steps
         elif tag == "playerinfo_check_dolby_audiomode_changed_event":

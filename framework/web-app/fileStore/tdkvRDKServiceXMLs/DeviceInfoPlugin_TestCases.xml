@@ -38,6 +38,27 @@
                 <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,DeviceInfo" expectedValues="activated"/>
             </testStep>
           </prerequisite>
+          <prerequisite requisiteId="2" requisiteName="Activate_DisplaySettings_Plugin">
+            <testStep testStepId="1" name="Check_PluginActive_Status" method="Get_Plugin_Status" saveResult="true" pluginName="Controller">
+                <params>
+                  <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" />
+            </testStep>
+            <testStep testStepId="2" name="Activate_Plugin" method="Activate_Plugin"  pluginName="Controller" >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+                <params>
+                  <param tag="callsign" value="org.rdk.DisplaySettings" />
+                </params>
+            </testStep>
+            <testStep testStepId="3" name="Check_PluginActive_Status" method="Get_Plugin_Status" pluginName="Controller"  >
+                <conditionalExecution enable="true" Id="1" useMethodTag="controller_get_plugin_state" arguments="isDeactivated,org.rdk.DisplaySettings" />
+                <params>
+                  <param tag="plugin" value="org.rdk.DisplaySettings" indexOnly="true" />
+                </params>
+                <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.DisplaySettings" expectedValues="activated"/>
+            </testStep>
+          </prerequisite>
         </pluginPreRequisite>
 
         <testCase testCaseId="DI_01" testCaseName= "DeviceInfo_Get_All_System_Info" desc="Gets all system information">
@@ -146,6 +167,24 @@
             <testCaseInfo testCaseType="direct"/>
             <testStep testStepId="1" name="Get_Host_EDID_Details" method="Get_Host_EDID">
                 <resultGeneration useMethodTag="deviceinfo_get_api_info"/>
+            </testStep>
+       </testCase>
+
+       <testCase testCaseId="DI_11" testCaseName="DeviceInfo_Check_Default_Resolution" desc="Check whether the default resolution is available in supported resolutions" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Check_Display_Connected_Status" method="Get_Connected_VideoDisplays" saveResult="true" pluginName="DisplaySettings">
+                <resultGeneration useMethodTag="display_connected_status"/>
+            </testStep>
+            <testStep testStepId="2" name="Get_Supported_Resolutions" method="DeviceInfo_Get_Supported_Resolutions" saveResult="true">
+                <params>
+                  <param tag="videoDisplay" usePreviousResult="true" Id="1" useMethodTag="set_video_display"/>
+                </params>
+                <resultGeneration useMethodTag="deviceinfo_check_supported_resolutions"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_Default_Resolution" method="DeviceInfo_Get_Default_Resolution" >
+                <resultGeneration useMethodTag="deviceinfo_check_default_resolution" >
+                  <expectedValues usePreviousResult="true" Id="2" useMethodTag="get_supported_resolutions" />
+                </resultGeneration>
             </testStep>
        </testCase>
 </testPlugin>

@@ -2623,20 +2623,14 @@
             <testStep testStepId="5" name="Check_On_Application_Suspended_Event" event="Event_On_Application_Suspended" action="eventListener"  delay="2">
                 <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="westerostest"/>
             </testStep>
-            <testStep testStepId="6" name="Is_Westeros_App_Suspended" method="Get_Application_State" >
-              <resultGeneration useMethodTag="rdkshell_get_state" arguments="westerostest" expectedValues="suspended" />
-            </testStep>
-            <testStep testStepId="7" name="Resume_Application" method="Resume_Application" >
+            <testStep testStepId="6" name="Resume_Application" method="Resume_Application" >
               <params>
                 <param tag="client" value="westerostest" />
               </params>
               <resultGeneration useMethodTag="rdkshell_check_for_results" />
             </testStep>
-            <testStep testStepId="8" name="Check_On_Application_Resumed_Event" event="Event_On_Application_Resumed" action="eventListener"  delay="3">
+            <testStep testStepId="7" name="Check_On_Application_Resumed_Event" event="Event_On_Application_Resumed" action="eventListener"  delay="3">
                 <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="westerostest"/>
-            </testStep>
-            <testStep testStepId="9" name="Is_Westeros_App_Resumed" method="Get_Application_State" >
-              <resultGeneration useMethodTag="rdkshell_get_state" arguments="westerostest" expectedValues="resumed" />
             </testStep>
         <testCasePostRequisite>
          <postrequisite requisiteId="1" requisiteName="Destroy_Westros_Application">
@@ -2704,5 +2698,85 @@
               <resultGeneration useMethodTag="rdkshell_get_result_status"/>
             </testStep>
         </testCase>
+        <!-- Test case 95 -->
+        <testCase testCaseId="RDKShell_95" testCaseName="RDKShell_Launch_WesterosTest_Application_Check_Sate" desc="Checks the state on launching,suspend,resume westeros app" >
+            <testCaseInfo testCaseType="direct"/>
+            <testStep testStepId="1" name="Launch_Westeros_Application" method="LaunchApplication">
+                <params>
+                      <param tag="callsign"  value="HtmlApp" />
+                      <param tag="type" value="WesterosTest" />
+                      <param tag="uri" value="file:///usr/bin/westeros_test" />
+                </params>
+                <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="2" name="Get_connected_clients" method="GetClients" delay="5">
+              <resultGeneration useMethodTag="rdkshell_check_application" arguments= "check_if_exists" expectedValues= "htmlapp" />
+            </testStep>
+            <testStep testStepId="3" name="Check_On_Launched_Event" event="Event_On_Launched" action="eventListener"  >
+                <resultGeneration useMethodTag="rdkshell_check_on_launched_event" expectedValues="HtmlApp,activate"/>
+            </testStep>
+            <testStep testStepId="4" name="Suspend_Application" method="SuspendApplication" >
+              <params>
+                <param tag="callsign"  value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="5" name="Check_On_Suspended_Event" event="Event_On_Suspended" action="eventListener"  delay="2">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="HtmlApp"/>
+            </testStep>
+            <testStep testStepId="6" name="Is_Westeros_App_Suspended" method="Get_Application_State" >
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="HtmlApp" expectedValues="suspended" />
+            </testStep>
+            <testStep testStepId="7" name="Launch_Westeros_Application" method="LaunchApplication">
+                <params>
+                      <param tag="callsign"  value="HtmlApp" />
+                      <param tag="type" value="WesterosTest" />
+                      <param tag="uri" value="file:///usr/bin/westeros_test" />
+                </params>
+                <resultGeneration useMethodTag="rdkshell_check_for_results" />
+            </testStep>
+            <testStep testStepId="8" name="Check_On_Launched_Event" event="Event_On_Launched" action="eventListener"  delay="3">
+                <resultGeneration useMethodTag="rdkshell_check_on_launched_event" expectedValues="HtmlApp,resume"/>
+            </testStep>
+            <testStep testStepId="9" name="Is_Westeros_App_Resumed" method="Get_Application_State" >
+              <resultGeneration useMethodTag="rdkshell_get_state" arguments="HtmlApp" expectedValues="resumed" />
+            </testStep>
+        <testCasePostRequisite>
+         <postrequisite requisiteId="1" requisiteName="Destroy_Westros_Application">
+            <testStep testStepId="1" name="Check_On_Destroyed_Event" method="DestroyApplication"  >
+              <params>
+                <param tag="callsign"  value="HtmlApp" />
+              </params>
+              <resultGeneration useMethodTag="rdkshell_get_result_status" />
+            </testStep>
+            <testStep testStepId="2" name="Check_On_Destroyed_Event" event="Event_On_Destroyed" action="eventListener"  delay="2">
+                <resultGeneration useMethodTag="rdkshell_check_application_state_event" expectedValues="HtmlApp"/>
+            </testStep>
+            <testStep testStepId="3" name="Get_connected_clients" method="GetClients" >
+              <resultGeneration useMethodTag="rdkshell_check_application"  arguments="check_not_exists" expectedValues="htmlapp" />
+            </testStep>
+         </postrequisite>
+        </testCasePostRequisite>
+        </testCase> 
         
+        <!-- Test case 96 -->
+        <testCase testCaseId="RDKShell_96" testCaseName="RDKShell_Set_And_Get_Graphics_FrameRate" desc="Check whether graphics frameRates are able to set and get" >
+            <testCaseInfo testCaseType="loop" revert="true" />
+            <testStep testStepId="1" name="Get_Graphics_FrameRate" method="Get_Graphics_FrameRate" saveResult="true" revertGet="yes" >
+              <resultGeneration useMethodTag="rdkshell_check_graphics_framerate" />
+            </testStep>
+            <testStep testStepId="2" name="Set_And_Get_Graphics_FrameRate" testStepType="loop" >
+              <subtestStep subtestStepId="1" name="Set_Graphics_FrameRate" method="Set_Graphics_FrameRate" revertSet="yes">
+                  <params>
+                    <param tag="framerate" value="30,40,50,60" iteration="true" revertParam="yes" />
+                  </params>
+                  <resultGeneration useMethodTag="rdkshell_get_result_status" />
+              </subtestStep>
+              <subtestStep subtestStepId="2" name="Get_Graphics_FrameRate" method="Get_Graphics_FrameRate" revertFlag="yes" >
+                  <resultGeneration useMethodTag="rdkshell_check_graphics_framerate" arguments="check_expected_framerate">
+                    <expectedValues useIterableValue="true" />
+                  </resultGeneration>
+              </subtestStep>
+            </testStep>
+        </testCase>       
 </testPlugin>

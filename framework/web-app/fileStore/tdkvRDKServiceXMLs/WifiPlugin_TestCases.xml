@@ -1018,4 +1018,48 @@
                  <resultGeneration useMethodTag="controller_get_plugin_state" arguments="check_status,org.rdk.Wifi" expectedValues="activated"/>
             </testStep>
        </testCase>
+     
+       <testCase testCaseId="WIFI_21" testCaseName="WIFI_Check_On_WIFI_State_Changed_Event" desc="Checks the on wifi state changed event on various wifi connection state">
+            <testStep testStepId="1" name="Start_Scan" method="Start_Scan" >
+                <params>
+                  <param tag="ssid" value=""/>
+                  <param tag="incremental" useDefault="true" />
+                  <param tag="frequency" value=""/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="2" name="Check_SSID_Availability" event="Event_On_Available_SSIDs" action="eventListener" delay="5">
+                <resultGeneration useMethodTag="wifi_check_available_ssids_event" arguments="check_scanned_ssid_name" >
+                    <expectedValues  useConfigFile="true" key="WIFI_SSID_NAME" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="3" name="Connect" method="Connect">
+                <params>
+                  <param tag="ssid" useConfigFile="true" key="WIFI_SSID_NAME"/>
+                  <param tag="passphrase" useConfigFile="true" key="WIFI_PASSPHRASE"/>
+                  <param tag="securityMode" useConfigFile="true" key="WIFI_SECURITY_MODE"/>
+                </params>
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="4" name="Check_On_WIFI_State_Changed_Connected_Event" event="Event_On_WIFI_State_Changed" action="eventListener" clear="false" delay="5">
+                <resultGeneration useMethodTag="wifi_check_state_change_event" expectedValues="4"/>
+            </testStep>
+            <testStep testStepId="5" name="Check_On_WIFI_State_Changed_Connected_Event" event="Event_On_WIFI_State_Changed" action="eventListener" >
+                <resultGeneration useMethodTag="wifi_check_state_change_event" expectedValues="5"/>
+            </testStep>
+            <testStep testStepId="6" name="Get_Connected_SSID" method="Get_Connect_SSID">
+                <resultGeneration useMethodTag="wifi_get_connected_ssid" arguments="check_ssid">
+                    <expectedValues useConfigFile="true" key="WIFI_SSID_NAME" />
+                </resultGeneration>
+            </testStep>
+            <testStep testStepId="7" name="Disconnect" method="Disconnect" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+            <testStep testStepId="8" name="Check_On_WIFI_State_Changed_Connected_Event" event="Event_On_WIFI_State_Changed" action="eventListener" delay="3">
+                <resultGeneration useMethodTag="wifi_check_state_change_event" expectedValues="2"/>
+            </testStep>
+            <testStep testStepId="9" name="Stop_Scan" method="Stop_Scan" >
+                <resultGeneration useMethodTag="wifi_check_set_operation" expectedValues="true"/>
+            </testStep>
+       </testCase>
 </testPlugin>

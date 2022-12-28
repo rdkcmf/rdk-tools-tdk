@@ -177,6 +177,21 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
+      
+        elif tag == "deviceinfo_check_supported_resolutions":
+            info["supportedResolutions"] = result.get('supportedResolutions')
+            if result.get('supportedResolutions'):
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
+        elif tag == "deviceinfo_check_default_resolution" :
+            info["defaultResolution"] = result.get('defaultResolution')
+            if str(result.get('defaultResolution')) in expectedValues:
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+
         # LocationSync Plugin Response result parser steps
         elif tag == "locationsync_get_location_info":
             if arg[0] == "get_all_info":
@@ -1152,6 +1167,20 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             else:
                 info["Test_Step_Status"] = "FAILURE"
 
+        elif tag == "rdkshell_check_graphics_framerate":
+            status = checkNonEmptyResultData(result)
+            success = str(result.get("success")).lower() == "true"
+            info["framerate"] = result.get("framerate")
+            if success and status == "TRUE":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+            if len(arg) and arg[0] == "check_expected_framerate":
+                if int(result.get("framerate")) == int(expectedValues[0]):
+                    info["Test_Step_Status"] = "SUCCESS"
+                else:
+                    info["Test_Step_Status"] = "FAILURE"
+
         # DisplayInfo Plugin Response result parser steps
         elif tag == "displayinfo_get_general_info":
             if arg[0] == "get_all_info":
@@ -1429,6 +1458,11 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
             success = str(result.get("success")).lower() == "true"
             status = checkNonEmptyResultData(result)
             if success and status == "TRUE" and int(result.get("numberofdevices")) > 0 :
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+        elif tag == "hdmicecsink_set_operation_status":
+            if str(result.get("success")).lower() == "true":
                 info["Test_Step_Status"] = "SUCCESS"
             else:
                 info["Test_Step_Status"] = "FAILURE"
@@ -2102,6 +2136,13 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 info["Test_Step_Status"] = "FAILURE"
 
         # Bluetooth Plugin Response result parser steps
+        elif tag == "bluetooth_validate_startscan":
+            info["status"] = result.get("status")
+            if str(result.get("success")).lower() == "true" and str(result.get("status")).lower() == "available":
+                info["Test_Step_Status"] = "SUCCESS"
+            else:
+                info["Test_Step_Status"] = "FAILURE"
+                
         elif tag == "bluetooth_set_operation":
             if str(result.get("success")).lower() == "true":
                 info["Test_Step_Status"] = "SUCCESS"
@@ -2183,9 +2224,15 @@ def CheckAndGenerateTestStepResult(result,methodTag,arguments,expectedValues,oth
                 for pairedDevice in pairedDevices:
                     if str(pairedDevice.get("name")) in expectedValues[0]:
                         status = True
+                        state = pairedDevice.get("connected")
                         info = pairedDevice
                 if success and status:
                     info["Test_Step_Status"] = "SUCCESS"
+                    if len(arg) >=2 and arg[1] == "check_connected_state":
+                        if str(state).lower() == str(arg[2]).lower():
+                            info["Test_Step_Status"] = "SUCCESS"
+                        else:
+                            info["Test_Step_Status"] = "FAILURE"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
             elif arg[0] == "check_paired_device_list_empty":
@@ -3150,6 +3197,23 @@ def CheckAndGenerateConditionalExecStatus(testStepResults,methodTag,arguments):
             else:
                 result = "FALSE"
 
+        elif tag == "system_check_power_state_status":
+            testStepResults = testStepResults[0].values()[0]
+            powerState = testStepResults[0].get("powerState")
+            if powerState in ("STANDBY","DEEP_SLEEP","LIGHT_SLEEP"):
+                result = "TRUE"
+            else:
+                result = "FALSE"
+
+        elif tag == "system_check_existing_rule":
+            testStepResults = testStepResults[0].values()[0]
+            rule = testStepResults[0].get(arg[0])
+            if len(rule) == 0:
+                result = "TRUE"
+            else:
+                result = "FALSE"
+
+        # Bluetooth Plugin Response result parser steps
         elif tag == "bluetooth_check_device_pair_status":
             testStepResults = testStepResults[0].values()[0]
             if testStepResults[0].get("name"):
@@ -3487,6 +3551,12 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
             else:
                 info["language"] = "en"
 
+        # HdmiCecSink plugin result parser steps
+        elif tag =="hdmicecsink_get_physical_logical_address":
+            testStepResults1 = testStepResults[0].values()[0]
+            testStepResults2 = testStepResults[1].values()[0]
+            info["logicalAddress"] = testStepResults1[0].get("logicalAddress")
+            info["physicalAddress"] = testStepResults2[0].get("physicalAddress")
 
         # RDK Shell plugin result parser steps
         elif tag == "rdkshell_get_connected_client":
