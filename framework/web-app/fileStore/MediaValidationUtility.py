@@ -58,6 +58,8 @@ mode_revert = False
 proc_check_mode = None
 # Global variable to store process to be excluded
 excluded_process_list = PerformanceTestVariables.excluded_process_list
+# Global variable to store events
+evt_lst = []
 
 # Function to set the operation and interval
 def setOperation(operation,intervalOrCount):
@@ -970,6 +972,8 @@ def monitorVideoTestUsingRestAPI(obj,validation_dict,check_pattern,timeout):
     video_test_result = ""
     last_line = None
     last_index = 0
+    loaded_evt = ""
+    play_started_evt = ""
     # Decoder value will not be increasing during paused state and we check
     # the proc details after getting seeeked event not during the seek operation
     # While doing FF, in between rate may change to 0 and set back to original rate
@@ -1012,6 +1016,10 @@ def monitorVideoTestUsingRestAPI(obj,validation_dict,check_pattern,timeout):
                         print "<------------Proc------------->"
                         info = checkProcEntry(obj,validation_dict)
                         proc_check_list.append(info)
+                    if "AAMP Player loaded with video url:" in lines[i]:
+                        loaded_evt = lines[i]
+                    if "Video PlayBack Started" in lines[i]:
+                        play_started_evt = lines[i]
                     if "TEST RESULT" in lines[i]:
                         test_result = lines[i]
 
@@ -1027,7 +1035,8 @@ def monitorVideoTestUsingRestAPI(obj,validation_dict,check_pattern,timeout):
             continue_count += 1
 
         time.sleep(1)
-
+    global evt_lst
+    evt_lst = [loaded_evt,play_started_evt]
     if "SUCCESS" in test_result and "SUCCESS" in play_status and hang_detected == 0:
         video_test_result = "SUCCESS"
     else:
@@ -1049,6 +1058,8 @@ def monitorVideoTestUsingWebInspect(obj,webkit_console_socket,validation_dict,ch
     proc_check_list = []
     play_status = "FAILURE"
     video_test_result = ""
+    loaded_evt = ""
+    play_started_evt = ""
     # Decoder value will not be increasing during paused state and we check
     # the proc details after getting seeeked event not during the seek operation
     # While doing FF, in between rate may change to 0 and set back to original rate
@@ -1076,10 +1087,15 @@ def monitorVideoTestUsingWebInspect(obj,webkit_console_socket,validation_dict,ch
             print "<------------Proc------------->"
             info = checkProcEntry(obj,validation_dict)
             proc_check_list.append(info)
+        if "AAMP Player loaded with video url:" in console_log:
+            loaded_evt = getConsoleMessage(console_log)
+        if "Video PlayBack Started" in console_log:
+            play_started_evt = getConsoleMessage(console_log)
         if "TEST RESULT:" in console_log or "Connection refused" in console_log:
             test_result = getConsoleMessage(console_log)
             break;
-
+    global evt_lst
+    evt_lst = [loaded_evt,play_started_evt]
     if "SUCCESS" in test_result and "SUCCESS" in play_status and hang_detected == 0:
         video_test_result = "SUCCESS"
     else:
@@ -1337,7 +1353,30 @@ def setMediaTestPostRequisites(obj,webkit_browser_instance,webkit_console_socket
 
     return post_requisite_status
 
-
+# Function to validate the Latency time
+def validateLatency(obj):
+    loaded_time = getTimeFromMsg(evt_lst[0])
+    print "\n Player Loaded at : {} (UTC)".format(loaded_time)
+    loaded_time_millisec = getTimeInMilliSeconds(loaded_time)
+    play_start_time = getTimeFromMsg(evt_lst[1])
+    print "\n Playback Started at : {} (UTC)".format(play_start_time)
+    play_start_time_millisec = getTimeInMilliSeconds(play_start_time)
+    load_time = play_start_time_millisec - loaded_time_millisec
+    print "\n Time taken to load and play video: ",load_time
+    config_file,result = getDeviceConfigFile(obj.realpath)
+    result,load_threshold_value = getDeviceConfigKeyValue(config_file,"PLAYBACK_START_THRESHOLD_VALUE")
+    print "\n Threshold value for load time: ", load_threshold_value
+    if load_threshold_value != "":
+        if 0 < int(load_time) < int(load_threshold_value):
+            print "\n Time taken for load operation is within the expected limit \n"
+            test_result = "SUCCESS"
+        else:
+            print "\n Time taken for load operation is not within the expected limit \n"
+            test_result = "FAILURE"
+    else:
+        print "\n Please Configure the PLAYBACK_START_THRESHOLD_VALUE in config file \n"
+        test_result = "FAILURE"
+    return test_result
 
 
 
