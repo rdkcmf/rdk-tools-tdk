@@ -177,11 +177,11 @@ if expectedResult in result.upper():
                             Summ_list.append('Browser score from test: {} '.format(browser_score))
                             print "\n Threshold value for browser score:",kraken_threshold_value
                             Summ_list.append('Threshold value for browser score: {}'.format(kraken_threshold_value))
-                            if float(browser_score) > float(kraken_threshold_value):
-                                print "\n The browser performance score is high as expected\n"
+                            if 0 < float(browser_score) < float(kraken_threshold_value):
+                                print "\n The browser performance score is low as expected\n"
                             else:
                                 tdkTestObj.setResultStatus("FAILURE")
-                                print "\n The browser performance score is lower than expected \n"
+                                print "\n The browser performance score is higher than expected \n"
                         else:
                             tdkTestObj.setResultStatus("FAILURE")
                             print "Failed to get the threshold value from config file"

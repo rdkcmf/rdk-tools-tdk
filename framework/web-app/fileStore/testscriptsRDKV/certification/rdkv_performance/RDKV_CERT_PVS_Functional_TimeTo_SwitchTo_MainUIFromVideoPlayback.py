@@ -184,31 +184,51 @@ if expectedResult in result.upper():
                                 if "ResidentApp moveToFront Success" in output:
                                     required_line = output.split('\n')[1]
                                     main_ui_launched_time = getTimeStampFromString(required_line)
-                                    print "\n Home button pressed at :{} (UTC)".format(start_time)
-                                    Summ_list.append('Home button pressed at  :{}'.format(start_time))
-                                    print "\n Main UI launched at :{} (UTC)  ".format(main_ui_launched_time)
-                                    Summ_list.append('Main UI launched at :{}'.format(main_ui_launched_time))
-                                    start_time_millisec = getTimeInMilliSec(start_time)
-                                    main_ui_launched_time_millisec = getTimeInMilliSec(main_ui_launched_time)
-                                    ui_launchtime = main_ui_launched_time_millisec - start_time_millisec
-                                    print "\n Time taken for launching Main UI from another window  : {} ms\n".format(ui_launchtime)
-                                    Summ_list.append('Time taken for launching Main UI from another window  :{}ms'.format(ui_launchtime))
-                                    conf_file,result = getConfigFileName(tdkTestObj.realpath)
-                                    result1, ui_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"MAIN_UI_SWITCH_TIME_THRESHOLD_VALUE")
-                                    Summ_list.append('MAIN_UI_SWITCH_TIME_THRESHOLD_VALUE :{}ms'.format(ui_launch_threshold_value))
-                                    result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
-                                    Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
-                                    if all(value != "" for value in (ui_launch_threshold_value,offset)):
-                                        print "\n Threshold value for time taken for launching Main UI from another window : {} ms".format(ui_launch_threshold_value)
-                                        if 0 < int(ui_launchtime) < (int(ui_launch_threshold_value) + int(offset)):
-                                            tdkTestObj.setResultStatus("SUCCESS");
-                                            print "\n The time taken for launching Main UI from another window is within the expected limit\n"
+                                    tdkTestObj.setResultStatus("SUCCESS")
+                                    tdkTestObj = obj.createTestStep('rdkservice_getValue')
+                                    tdkTestObj.addParameter("method","org.rdk.RDKShell.1.getZOrder")
+                                    tdkTestObj.executeTestCase(expectedResult)
+                                    zorder = tdkTestObj.getResultDetails()
+                                    zorder_status = tdkTestObj.getResult()
+                                    if expectedResult in zorder_status :
+                                        zorder = ast.literal_eval(zorder)["clients"]
+                                        print "zorder: ",zorder
+                                        resident_app = "ResidentApp"
+                                        zorder = exclude_from_zorder(zorder)
+                                        if zorder[0].lower() == resident_app.lower():
+                                            print "\n Home screen is reached"
+                                            tdkTestObj.setResultStatus("SUCCESS")
+                                            print "\n Home button pressed at :{} (UTC)".format(start_time)
+                                            Summ_list.append('Home button pressed at  :{}'.format(start_time))
+                                            print "\n Main UI launched at :{} (UTC)  ".format(main_ui_launched_time)
+                                            Summ_list.append('Main UI launched at :{}'.format(main_ui_launched_time))
+                                            start_time_millisec = getTimeInMilliSec(start_time)
+                                            main_ui_launched_time_millisec = getTimeInMilliSec(main_ui_launched_time)
+                                            ui_launchtime = main_ui_launched_time_millisec - start_time_millisec
+                                            print "\n Time taken for launching Main UI from another window  : {} ms\n".format(ui_launchtime)
+                                            Summ_list.append('Time taken for launching Main UI from another window  :{}ms'.format(ui_launchtime))
+                                            conf_file,result = getConfigFileName(tdkTestObj.realpath)
+                                            result1, ui_launch_threshold_value = getDeviceConfigKeyValue(conf_file,"MAIN_UI_SWITCH_TIME_THRESHOLD_VALUE")
+                                            Summ_list.append('MAIN_UI_SWITCH_TIME_THRESHOLD_VALUE :{}ms'.format(ui_launch_threshold_value))
+                                            result2, offset = getDeviceConfigKeyValue(conf_file,"THRESHOLD_OFFSET")
+                                            Summ_list.append('THRESHOLD_OFFSET :{}ms'.format(offset))
+                                            if all(value != "" for value in (ui_launch_threshold_value,offset)):
+                                                print "\n Threshold value for time taken for launching Main UI from another window : {} ms".format(ui_launch_threshold_value)
+                                                if 0 < int(ui_launchtime) < (int(ui_launch_threshold_value) + int(offset)):
+                                                    tdkTestObj.setResultStatus("SUCCESS");
+                                                    print "\n The time taken for launching Main UI from another window is within the expected limit\n"
+                                                else:
+                                                    tdkTestObj.setResultStatus("FAILURE");
+                                                    print "\n The time taken for launching Main UI from another window is not within the expected limit \n"
+                                            else:
+                                                tdkTestObj.setResultStatus("FAILURE");
+                                                print "\n Failed to get the threshold value from config file"
                                         else:
-                                            tdkTestObj.setResultStatus("FAILURE");
-                                            print "\n The time taken for launching Main UI from another window is not within the expected limit \n"
+                                            print "\n Home screen is not reached"
+                                            tdkTestObj.setResultStatus("FAILURE")
                                     else:
-                                            tdkTestObj.setResultStatus("FAILURE");
-                                            print "\n Failed to get the threshold value from config file"
+                                        print "\n Error while getting zorder value"
+                                        tdkTestObj.setResultStatus("FAILURE")
                                 else:
                                     print "\n Required logs are not present in wpeframework.log"
                                     tdkTestObj.setResultStatus("FAILURE")

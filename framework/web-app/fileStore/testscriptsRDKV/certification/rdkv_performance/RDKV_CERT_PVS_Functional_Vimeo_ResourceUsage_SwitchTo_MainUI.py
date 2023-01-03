@@ -204,16 +204,35 @@ if expectedResult in result.upper():
                                 if output != "EXCEPTION" and expectedResult in result:
                                     if "ResidentApp moveToFront Success" in output:                                   
                                         tdkTestObj.setResultStatus("SUCCESS")
-                                        print "\n Validate Resource Usage"
-                                        tdkTestObj = obj.createTestStep("rdkservice_validateResourceUsage")
+                                        tdkTestObj = obj.createTestStep('rdkservice_getValue')
+                                        tdkTestObj.addParameter("method","org.rdk.RDKShell.1.getZOrder")
                                         tdkTestObj.executeTestCase(expectedResult)
-                                        resource_usage = tdkTestObj.getResultDetails()
-                                        result = tdkTestObj.getResult()
-                                        if expectedResult in result and resource_usage != "ERROR":
-                                            print "\n Successfully validated Resource usage"
-                                            tdkTestObj.setResultStatus("SUCCESS")
+                                        zorder = tdkTestObj.getResultDetails()
+                                        zorder_status = tdkTestObj.getResult()
+                                        if expectedResult in zorder_status :
+                                            zorder = ast.literal_eval(zorder)["clients"]
+                                            print "zorder: ",zorder
+                                            resident_app = "ResidentApp"
+                                            zorder = exclude_from_zorder(zorder)
+                                            if zorder[0].lower() == resident_app.lower():
+                                                print "\n Home screen is reached"
+                                                tdkTestObj.setResultStatus("SUCCESS")
+                                                print "\n Validate Resource Usage"
+                                                tdkTestObj = obj.createTestStep("rdkservice_validateResourceUsage")
+                                                tdkTestObj.executeTestCase(expectedResult)
+                                                resource_usage = tdkTestObj.getResultDetails()
+                                                result = tdkTestObj.getResult()
+                                                if expectedResult in result and resource_usage != "ERROR":
+                                                    print "\n Successfully validated Resource usage"
+                                                    tdkTestObj.setResultStatus("SUCCESS")
+                                                else:
+                                                    print "\n Error while validating Resource usage"
+                                                    tdkTestObj.setResultStatus("FAILURE")
+                                            else:
+                                                print "\n Home screen is not reached"
+                                                tdkTestObj.setResultStatus("FAILURE")
                                         else:
-                                            print "\n Error while validating Resource usage"
+                                            print "\n Error while getting zorder value"
                                             tdkTestObj.setResultStatus("FAILURE")
                                     else:
                                         print "\n Required logs are not present in wpeframework.log"
