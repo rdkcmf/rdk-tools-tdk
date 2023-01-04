@@ -2,7 +2,7 @@
 # If not stated otherwise in this file or this component's Licenses.txt
 # file the following copyright and licenses apply:
 #
-# Copyright 2021 RDK Management
+# Copyright 2022 RDK Management
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,28 +17,47 @@
 # limitations under the License.
 ##########################################################################
 '''
-<?xml version="1.0" encoding="UTF-8"?><xml>
-  <id/>
-  <version>4</version>
+<?xml version='1.0' encoding='utf-8'?>
+<xml>
+  <id></id>
+  <!-- Do not edit id. This will be auto filled while exporting. If you are adding a new script keep the id empty -->
+  <version>5</version>
+  <!-- Do not edit version. This will be auto incremented while updating. If you are adding a new script you can keep the vresion as 1 -->
   <name>RDKV_CERT_RVS_LongDuration_HLS_VideoPlayback</name>
-  <primitive_test_id/>
+  <!-- If you are adding a new script you can specify the script name. Script Name should be unique same as this file name with out .py extension -->
+  <primitive_test_id></primitive_test_id>
+  <!-- Do not change primitive_test_id if you are editing an existing script. -->
   <primitive_test_name>rdkservice_validateResourceUsage</primitive_test_name>
+  <!--  -->
   <primitive_test_version>1</primitive_test_version>
+  <!--  -->
   <status>FREE</status>
+  <!--  -->
   <synopsis>The objective of this test is to validate the resource usage while playing a video in video player Lightning application for a minimum of 10 hours.</synopsis>
-  <groups_id/>
+  <!--  -->
+  <groups_id />
+  <!--  -->
   <execution_time>630</execution_time>
+  <!--  -->
   <long_duration>false</long_duration>
+  <!--  -->
   <advanced_script>false</advanced_script>
-  <remarks/>
+  <!-- execution_time is the time out time for test execution -->
+  <remarks></remarks>
+  <!-- Reason for skipping the tests if marked to skip -->
   <skip>false</skip>
+  <!--  -->
   <box_types>
     <box_type>RPI-HYB</box_type>
+    <!--  -->
     <box_type>RPI-Client</box_type>
+    <!--  -->
     <box_type>Video_Accelerator</box_type>
+    <!--  -->
   </box_types>
   <rdk_versions>
     <rdk_version>RDK2.0</rdk_version>
+    <!--  -->
   </rdk_versions>
   <test_cases>
     <test_case_id>RDKV_STABILITY_43</test_case_id>
@@ -58,11 +77,10 @@
     <test_script>RDKV_CERT_RVS_LongDuration_HLS_VideoPlayback</test_script>
     <skipped>No</skipped>
     <release_version>M92</release_version>
-    <remarks/>
+    <remarks></remarks>
   </test_cases>
-  <script_tags/>
+  <script_tags />
 </xml>
-
 '''
 # use tdklib library,which provides a wrapper for tdk testcase script 
 import tdklib; 
@@ -101,13 +119,21 @@ expectedResult = "SUCCESS"
 if expectedResult in (result.upper() and pre_condition_status):
     status = "SUCCESS"
     print "\n Check Pre conditions"
-    appURL    = StabilityTestVariables.lightning_video_test_app_url
+    conf_file, status = get_configfile_name(obj);
+    result, logging_method = getDeviceConfigKeyValue(conf_file,"LOGGING_METHOD")
+    setDeviceConfigFile(conf_file)
     videoURL  = StabilityTestVariables.video_src_url_hls
     videoURL_type = "hls"
-    if any(value == "" for value in (appURL,videoURL,videoURL_type)):
+    if any(value == "" for value in (videoURL,videoURL_type)):
         print "\n Please configure the variables in StabilityTestVariables file"
         status = "FAILURE"
     else:
+        setURLArgument("execID",str(obj.execID))
+        setURLArgument("execDevId",str(obj.execDevId))
+        setURLArgument("resultId",str(obj.resultId))
+        setLoggingMethod(obj)
+        setURLArgument("logging",logging_method)
+        setURLArgument("tmUrl",str(obj.url)+"/")
         # Setting VideoPlayer Operations
         test_duration_in_seconds = 36000
         setOperation("close",test_duration_in_seconds)
@@ -119,7 +145,11 @@ if expectedResult in (result.upper() and pre_condition_status):
         setURLArgument("type",videoURL_type)
         appArguments = getURLArguments()
         # Getting the complete test app URL
-        video_test_url = getTestURL(appURL,appArguments)
+        video_test_urls = []
+        players_list = str(MediaValidationVariables.codec_hls_h264).split(",")
+        print "SELECTED PLAYERS: ", players_list
+        # Getting the complete test app URL
+        video_test_urls = getTestURLs(players_list,appArguments)
     webkit_console_socket = None
     started = False
     #No need to revert any values if the pre conditions are already set.
@@ -153,13 +183,12 @@ if expectedResult in (result.upper() and pre_condition_status):
         result = tdkTestObj.getResult();
         if current_url != None and expectedResult in result:
             tdkTestObj.setResultStatus("SUCCESS");
-            webkit_console_socket = createEventListener(ip,webinspect_port,[],"/devtools/page/1",False)
             time.sleep(10)
             print "\nCurrent URL:",current_url
             print "\nSet Lightning Application URL"
             tdkTestObj = obj.createTestStep('rdkservice_setValue');
             tdkTestObj.addParameter("method",set_method);
-            tdkTestObj.addParameter("value",video_test_url);
+            tdkTestObj.addParameter("value",video_test_urls[0]);
             tdkTestObj.executeTestCase(expectedResult);
             result = tdkTestObj.getResult();
             if expectedResult in result:
@@ -170,73 +199,15 @@ if expectedResult in (result.upper() and pre_condition_status):
                 tdkTestObj.executeTestCase(expectedResult);
                 new_url = tdkTestObj.getResultDetails();
                 result = tdkTestObj.getResult();
-                if new_url in video_test_url and expectedResult in result:
+                if new_url in video_test_urls[0] and expectedResult in result:
                     tdkTestObj.setResultStatus("SUCCESS");
                     print "\n URL(",new_url,") is set successfully \n"
-                    continue_count = 0
-                    count = 0
-                    while True:
-                        result_dict = {}
-                        if continue_count > 180:
-                            print "\n Not able to play the video"
-                            print "\n Current webkit console logs: ",webkit_console_socket.getEventsBuffer()
-                            tdkTestObj.setResultStatus("FAILURE")
-                            break
-                        if (len(webkit_console_socket.getEventsBuffer())== 0):
-                            print "\n Waiting for video plaback"
-                            time.sleep(1)
-                            continue_count += 1
-                            continue
-                        else:
-                            if [True for element in webkit_console_socket.getEventsBuffer() if "VIDEO STARTED PLAYING" in str(element)]:
-                                started = True
-                                print "\n Video playback is started"
-                                webkit_console_socket.clearEventsBuffer()
-                                continue_count = 0
-                            elif [True for element in webkit_console_socket.getEventsBuffer() if "TEST RESULT:" in str(element)]:
-                                if [True for element in webkit_console_socket.getEventsBuffer() if "TEST RESULT: SUCCESS" in str(element)] :
-                                    print "\n Successfully completed video playback"
-                                    tdkTestObj.setResultStatus("SUCCESS")
-                                else:
-                                    print "\n Error occurred while playing Video"
-                                    tdkTestObj.setResultStatus("FAILURE")
-                                break
-                            elif [True for element in webkit_console_socket.getEventsBuffer() if "Connection refused" in str(element)]:
-                                print "\n Error occurred while playing video"
-                                tdkTestObj.setResultStatus("FAILURE")
-                                break
-                            if started:
-                                continue_count = 0
-                                if not [True for element in webkit_console_socket.getEventsBuffer() if "TEST RESULT:" in str(element)]:
-                                    webkit_console_socket.clearEventsBuffer()
-                                    #Validate resource usage
-                                    print "\n Validate Resource usage for iteration: {}".format(count+1)
-                                    tdkTestObj = obj.createTestStep("rdkservice_validateResourceUsage")
-                                    tdkTestObj.executeTestCase(expectedResult)
-                                    resource_usage = tdkTestObj.getResultDetails()
-                                    result = tdkTestObj.getResult()
-                                    if expectedResult in result and resource_usage != "ERROR":
-                                        tdkTestObj.setResultStatus("SUCCESS")
-                                        cpuload = resource_usage.split(',')[0]
-                                        memory_usage = resource_usage.split(',')[1]
-                                        result_dict["iteration"] = count+1
-                                        result_dict["cpu_load"] = float(cpuload)
-                                        result_dict["memory_usage"] = float(memory_usage)
-                                        result_dict_list.append(result_dict)
-                                        time.sleep(30)
-                                        count += 1
-                                    else:
-                                        print "\n Error while validating Resource usage"
-                                        tdkTestObj.setResultStatus("FAILURE")
-                                        break
-                                else:
-                                    print "\n Video player is stopped"
-                                    continue
-                            else:
-                                print "\n Video playback is not happening"
-                                time.sleep(20)
-                                continue_count += 5
-                    webkit_console_socket.disconnect()
+                    if logging_method == "REST_API":
+                        result_dict_list = testUsingRestAPI(obj,result_dict_list);
+                    elif logging_method == "WEB_INSPECT":
+                        webkit_console_socket = createEventListener(ip,webinspect_port,[],"/devtools/page/1",False)
+                        result_dict_list = testUsingWebInspect(obj,webkit_console_socket,result_dict_list);
+                        webkit_console_socket.disconnect()
                     time.sleep(5)
                     cpu_mem_info_dict["cpuMemoryDetails"] = result_dict_list
                     json.dump(cpu_mem_info_dict,json_file)

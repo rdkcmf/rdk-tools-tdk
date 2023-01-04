@@ -271,3 +271,149 @@ def check_device_state(obj):
         print "Unable to get the status of DeviceInfo plugin"
     time.sleep(5)
     return result;
+
+#To test lightningapp player using RestAPI
+def testUsingRestAPI(obj,result_dict_list):
+    app_log_file = obj.logpath+"/"+str(obj.execID)+"/"+str(obj.execID)+"_"+str(obj.execDevId)+"_"+str(obj.resultId)+"_mvs_applog.txt"
+    continue_count = 0
+    file_check_count = 0
+    logging_flag = 0
+    hang_detected = 0
+    test_result = ""
+    lastLine = None
+    lastIndex = 0
+    count = 0
+    error_flag = 0
+    while True:
+        result_dict = {}
+        if error_flag:
+            break;
+        if file_check_count > 60:
+            print "\nREST API Logging is not happening properly. Exiting..."
+            break;
+        if os.path.exists(app_log_file):
+            logging_flag = 1
+            break;
+        else:
+            file_check_count += 1
+            time.sleep(1);
+    while logging_flag:
+        if continue_count > 60:
+            hang_detected = 1
+            print "\nApp not proceeding for 60 secs. Exiting..."
+            tdkTestObj.setResultStatus("FAILURE")
+            break;
+        with open(app_log_file,'r') as f:
+            lines = f.readlines()
+        if lines:
+            if len(lines) != lastIndex:
+                continue_count = 0
+                #print(lastIndex,len(lines))
+                for i in range(lastIndex,len(lines)):
+                    print(lines[i])
+                    if "Video Player CanPlay Through" in lines[i]:
+                        #Validate resource usage
+                        print "\n Validate Resource usage for iteration: {}".format(count+1)
+                        tdkTestObj = obj.createTestStep("rdkservice_validateResourceUsage")
+                        tdkTestObj.executeTestCase(expectedResult)
+                        resource_usage = tdkTestObj.getResultDetails()
+                        result = tdkTestObj.getResult()
+                        if expectedResult in result and resource_usage != "ERROR":
+                            tdkTestObj.setResultStatus("SUCCESS")
+                            cpuload = resource_usage.split(',')[0]
+                            memory_usage = resource_usage.split(',')[1]
+                            result_dict["iteration"] = count+1
+                            result_dict["cpu_load"] = float(cpuload)
+                            result_dict["memory_usage"] = float(memory_usage)
+                            result_dict_list.append(result_dict)
+                            time.sleep(30)
+                            count += 1
+                        else:
+                            print "\n Error while validating Resource usage"
+                            tdkTestObj.setResultStatus("FAILURE")
+                            error_flag = 1
+                            logging_flag = 0
+                            break
+                    if "TEST RESULT: SUCCESS" in lines[i]:
+                        print "\n Successfully completed video playback"
+                        tdkTestObj.setResultStatus("SUCCESS")
+                        test_result = lines[i]
+                lastIndex = len(lines)
+                if test_result != "":
+                    break;
+            else:
+                continue_count += 1
+        else:
+            continue_count += 1
+        time.sleep(1)
+    return result_dict_list
+
+##To test lightningapp player using Web Inspect method
+def testUsingWebInspect(obj,webkit_console_socket,result_dict_list):
+    continue_count = 0
+    count = 0
+    started = False
+    while True:
+        result_dict = {}
+        if continue_count > 180:
+            print "\n Not able to play the video"
+            print "\n Current webkit console logs: ",webkit_console_socket.getEventsBuffer()
+            tdkTestObj.setResultStatus("FAILURE")
+            break
+        if (len(webkit_console_socket.getEventsBuffer())== 0):
+            print "\n Waiting for video plaback"
+            time.sleep(1)
+            continue_count += 1
+            continue
+        else:
+            if [True for element in webkit_console_socket.getEventsBuffer() if "VIDEO STARTED PLAYING" in str(element)]:
+                started = True
+                print "\n Video playback is started"
+                webkit_console_socket.clearEventsBuffer()
+                continue_count = 0
+            elif [True for element in webkit_console_socket.getEventsBuffer() if "TEST RESULT:" in str(element)]:
+                if [True for element in webkit_console_socket.getEventsBuffer() if "TEST RESULT: SUCCESS" in str(element)] :
+                    print "\n Successfully completed video playback"
+                    tdkTestObj.setResultStatus("SUCCESS")
+                else:
+                    print "\n Error occurred while playing Video"
+                    tdkTestObj.setResultStatus("FAILURE")
+                break
+            elif [True for element in webkit_console_socket.getEventsBuffer() if "Connection refused" in str(element)]:
+                print "\n Error occurred while playing video"
+                tdkTestObj.setResultStatus("FAILURE")
+                break
+            if started:
+                continue_count = 0
+                if not [True for element in webkit_console_socket.getEventsBuffer() if "TEST RESULT:" in str(element)]:
+                    webkit_console_socket.clearEventsBuffer()
+                #Validate resource usage
+                    print "\n Validate Resource usage for iteration: {}".format(count+1)
+                    tdkTestObj = obj.createTestStep("rdkservice_validateResourceUsage")
+                    tdkTestObj.executeTestCase(expectedResult)
+                    resource_usage = tdkTestObj.getResultDetails()
+                    result = tdkTestObj.getResult()
+                    if expectedResult in result and resource_usage != "ERROR":
+                        tdkTestObj.setResultStatus("SUCCESS")
+                        cpuload = resource_usage.split(',')[0]
+                        memory_usage = resource_usage.split(',')[1]
+                        result_dict["iteration"] = count+1
+                        result_dict["cpu_load"] = float(cpuload)
+                        result_dict["memory_usage"] = float(memory_usage)
+                        result_dict_list.append(result_dict)
+                        time.sleep(30)
+                        count += 1
+                    else:
+                        print "\n Error while validating Resource usage"
+                        tdkTestObj.setResultStatus("FAILURE")
+                        break
+                else:
+                    print "\n Video player is stopped"
+                    continue
+            else:
+                print "\n Video playback is not happening"
+                time.sleep(20)
+                continue_count += 5
+    return result_dict_list
+
+
