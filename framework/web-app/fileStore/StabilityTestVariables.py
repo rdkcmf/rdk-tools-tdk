@@ -56,6 +56,9 @@ ValidateActivatedPlugins = "Yes"
 #Give the value in seconds to wait for device to come online after reboot.
 rebootwaitTime = 150
 
+#Give the number of times the device should reboot.
+deviceReboot_times = 100
+
 ####Webkit stress test details
 # webkit_instance can be "WebKitBrowser" or "LightningApp" or "HtmlApp" plugin
 webkit_instance = "LightningApp"
