@@ -3478,6 +3478,25 @@ def parsePreviousTestStepResult(testStepResults,methodTag,arguments):
                 info["nwStandby"] = False
             else:
                 info["nwStandby"] = True
+        
+        elif tag == "system_get_firmware_rule_parameters":
+            testStepResults1 = testStepResults[0].values()[0]
+            info["model"] = testStepResults1[0].get("details")
+            testStepResults2 = testStepResults[len(testStepResults)-1].values()[0]
+            info["estb_mac"] = testStepResults2[0].get("estb_mac")
+            if len(testStepResults) == 4:
+                firmwareConfig = testStepResults[2].values()[0]
+                firmwareConfig = json.dumps(firmwareConfig[0])
+                firmwareConfig = json.loads(firmwareConfig)
+                firmwareConfig = firmwareConfig.get("new_firmware_configuration")
+                info["configId"] = firmwareConfig.get("id")
+            else:
+                firmwareConfig = testStepResults[1].values()[0]
+                firmwareConfig = json.dumps(firmwareConfig[0])
+                firmwareConfig = json.loads(firmwareConfig)
+                firmwareConfig = firmwareConfig.get("existing_firmware_configuration")
+                info["configId"] = firmwareConfig[0].get("id")
+
         # user Preferences result parser steps
         elif tag == "userpreferences_switch_ui_language":
             testStepResults = testStepResults[0].values()[0]
@@ -4366,37 +4385,190 @@ def ExecExternalFnAndGenerateResult(methodTag,arguments,expectedValues,execInfo)
                 else:
                     print "File doesn't created"
                     info["Test_Step_Status"] = "FAILURE"
-
+        
         elif tag == "Check_disk_partition":
-            command = 'ls /dev/mmcblk0*'
+            command = 'ls /dev/mmcblk0* | wc -l'
             output = executeCommand(execInfo, command)
-            output = output.splitlines()
-            partition_list = output[1].split()
-            partition_count = len(partition_list)-1
-            info["partition_count"] = partition_count
+            output = str(output).split("\n")
+            info["partition_count"] = int(output[1])
             if len(arg) and arg[0] == "after_reboot":
-                if str(partition_count) in expectedValues:
+                if int(info["partition_count"]) >= int(expectedValues[0]):
                     info["Test_Step_Status"] = "SUCCESS"
                 else:
                     info["Test_Step_Status"] = "FAILURE"
-
-        elif tag == "Set_xconfServerConfigurations":
+        
+        
+        elif tag == "system_check_and_create_configuration_rule":
             configParser = ConfigParser.ConfigParser()
             configParser.read(r'%s' % deviceConfigFile)
-            firmwareDownloadProtocol = configParser.get('device.config', 'FIRMWARE_DOWNLOAD_PROTOCOL')
-            firmwareLocation = configParser.get('device.config', 'FIRMWARE_LOCATION')
             xconfurl = configParser.get('device.config', 'XCONF_SERVER_URL')
-            if len(arg) and arg[0]=="upgrade_image":
+
+            # To get the xconf url
+            slashparts = xconfurl.split('/')
+            xconfurl = '/'.join(slashparts[:3]) + '/'
+
+            # Method to check and create model id 
+            if len(arg) and arg[0] == "system_check_model_id":
+                ruleId = 'TDK_'+str(arg[3]).upper()+'_TEST_MODEL'
+                if len(arg) and arg[1] == "existing_rule":
+                    command = 'curl -sX GET '+xconfurl+arg[2]+ruleId+' -H \'Content-Type: application/json\' -H \'Accept: application/json\''
+                    output = executeCommandInTM(command)
+                    info["existing_model_id"] = output
+                    if not output:
+                        info["Test_Step_Message"] = "NO EXISTING MODEL ID"
+                    else:
+                        output = json.loads(output)
+                        if str(output.get("id")).lower() == str(ruleId).lower():
+                            info["Test_Step_Status"] = "SUCCESS"
+                        else:
+                            info["Test_Step_Status"] = "FAILURE"
+                    
+                elif len(arg) and arg[1] == "new_rule":
+                    command = 'curl -sX POST '+xconfurl+arg[2]+' -H \'Content-Type: application/json\' -H \'Accept: application/json\' -d \'{"id":"'+ruleId+'","description":"TDK '+arg[3]+' test model"}\''
+                    output = executeCommandInTM(command)
+                    info["new_model_id"] = output
+                    output = json.loads(output)
+                    if str(output.get("id")).lower() == str(ruleId).lower():
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+
+            # Method to check and create firmware configuration 
+            elif len(arg) and arg[0] == "system_check_firmware_configuration":
+                #Getting firmware configurations from config file
                 firmwareFilename = configParser.get('device.config', 'FIRMWARE_FILENAME')
-            elif len(arg) and arg[0]=="revert_image":
-                firmwareFilename = configParser.get('device.config', 'EXISTING_FIRMWARE_FILENAME')
-            command = 'curl -X PUT -H \'Content-Type: application/json\' -d \'{"eStbMac": "'+arg[1]+'","xconfServerConfig": {"firmwareDownloadProtocol": "'+firmwareDownloadProtocol+'","firmwareFilename": "'+firmwareFilename+'","firmwareVersion": "'+firmwareFilename+'","firmwareLocation": "'+firmwareLocation+'","rebootImmediately": false}}\' '+xconfurl
-            output = executeCommandInTM(command)
-            info["RESULT"] = output
-            if "Successfully added configuration" in output:
-                info["Test_Step_Status"] = "SUCCESS"
-            else:
-                info["Test_Step_Status"] = "FAILURE"
+                firmwareVersion = configParser.get('device.config', 'FIRMWARE_VERSION')
+                firmwareDownloadProtocol = configParser.get('device.config', 'FIRMWARE_DOWNLOAD_PROTOCOL')
+                if len(expectedValues) and expectedValues[0] == "update_existing_rule":
+                    firmwareFilename = configParser.get('device.config', 'EXISTING_FIRMWARE_FILENAME')
+                    firmwareVersion = expectedValues[1]
+
+                ruleId = 'TDK_'+str(arg[3]).upper()+'_TEST_FIRMWARE_CONFIGURATION'
+                modelId = 'TDK_'+str(arg[3]).upper()+'_TEST_MODEL'
+                if len(arg) and arg[1] == "existing_rule":
+                    command = 'curl -sX GET '+xconfurl+arg[2]+modelId+' -H \'Content-Type: application/json\' -H \'Accept: application/json\''
+                    output = executeCommandInTM(command)
+                    content = json.loads(output)
+                    info["existing_firmware_configuration"] = content
+                    if len(content) == 0:
+                        info["Test_Step_Message"] = "NO EXISTING FIRMWARE CONFIGURATION"
+                    else:  
+                        firmwareConfigs = json.loads(output)
+                        info["Test_Step_Status"] = "FAILURE"
+                        for output in firmwareConfigs:
+                            if str(output.get("description")).lower() == str(ruleId).lower():
+                                info["Test_Step_Status"] = "SUCCESS"
+                                if str(output.get("firmwareFilename")).lower() != firmwareFilename.lower():
+                                     firmwareConfigId = output.get("id")
+                                     command = 'curl -sX PUT '+xconfurl+'updates/firmwares.json -H \'Content-Type: application/json\' -H \'Accept: application/json\' -d \'{"id":"'+firmwareConfigId+'" ,"updated": 144757585,"supportedModelIds": ["TDK_'+str(arg[3]).upper()+'_TEST_MODEL"],"firmwareDownloadProtocol": "'+firmwareDownloadProtocol+'","firmwareFilename": "'+firmwareFilename+'","firmwareVersion": "'+firmwareVersion+'","description":"'+ruleId+'","rebootImmediately": true}\''
+                                     output = executeCommandInTM(command)
+                                     info["new_firmware_configuration"] = output
+                                     output = json.loads(output)
+                                     if str(output.get("description")).lower() == str(ruleId).lower():
+                                         info["Test_Step_Status"] = "SUCCESS"
+                                     else:
+                                         info["Test_Step_Status"] = "FAILURE"
+                                     break;    
+                                         
+
+                elif len(arg) and arg[1] == "new_rule":
+                    command = 'curl -sX POST '+xconfurl+arg[2]+' -H \'Content-Type: application/json\' -H \'Accept: application/json\' -d \'{"description":"'+ruleId+'","supportedModelIds": [ "TDK_'+str(arg[3]).upper()+'_TEST_MODEL" ], "firmwareDownloadProtocol": "'+firmwareDownloadProtocol+'", "firmwareFilename": "'+firmwareFilename+'", "firmwareVersion": "'+firmwareVersion+'", "rebootImmediately": true}\''
+                    output = executeCommandInTM(command)
+                    output = json.loads(output)
+                    info["new_firmware_configuration"] = output
+                    if str(output.get("description")).lower() == str(ruleId).lower():
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+            
+            # Method to check and create firmware rule
+            elif len(arg) and arg[0] == "system_check_firmware_rule":
+                print "arg",arg
+                ruleId = 'TDK_'+str(arg[3]).upper()+'_TEST_FIRMWARE_RULE'
+                modelId = 'TDK_'+str(arg[3]).upper()+'_TEST_MODEL'
+                firmwareconfigId = arg[2]
+                deviceMAC = arg[4]
+                if len(arg) and arg[1] == "existing_rule":
+                    command = 'curl -sX --location --request GET \''+xconfurl+'firmwarerule/filtered?name='+ruleId+'&applicationType=stb&templateId=MAC_RULE\''
+                    output = executeCommandInTM(command)
+                    content = json.loads(output)
+                    info["existing_firmware_rule"] = content
+                    if len(content) == 0:
+                        info["Test_Step_Message"] = "NO EXISTING FIRMWARE RULE"
+                    else:
+                        firmwareRule = content
+                        info["Test_Step_Status"] = "FAILURE"
+                        for output in firmwareRule:
+                            firmwareruleconfigId = output['applicableAction']['configId']
+                            firmwarerulename = output['name']
+                            if str(firmwarerulename).lower() == str(ruleId).lower() and str(firmwareruleconfigId).lower() == str(firmwareconfigId).lower():
+                                info["Test_Step_Status"] = "SUCCESS"
+                                firmwarerulemacaddress = output["rule"]["condition"]["fixedArg"]["bean"]["value"]["java.lang.String"]
+                                if str(firmwarerulemacaddress).lower() != str(deviceMAC).lower():
+                                     firmwareruleId = output['id']
+                                     command = 'curl -sX POST '+xconfurl+'firmwarerule/importAll -H "Content-Type: application/json" -H "Accept: application/json" -d \'[{"id": "'+firmwareruleId+'","name":"'+firmwarerulename+'","rule":{"negated":false,"condition":{"freeArg":{"type":"STRING","name":"eStbMac"},"operation":"IS","fixedArg":{"bean":{"value":{"java.lang.String":"'+deviceMAC+'"}}}}},"applicableAction":{"type":".RuleAction","actionType":"RULE","configId":"'+firmwareconfigId+'","configEntries":[],"active":true,"useAccountPercentage":false,"firmwareCheckRequired":false,"rebootImmediately":true},"type":"MAC_RULE","active":true,"applicationType":"stb"}]\''
+                                     output = executeCommandInTM(command)
+                                     info["new_firmware_rule_status"] = output
+                                     output = json.loads(output)
+                                     if str(output.get("IMPORTED")[0]).lower() == str(ruleId).lower():
+                                         info["Test_Step_Status"] = "SUCCESS"
+                                     else:
+                                         info["Test_Step_Status"] = "FAILURE"
+                elif len(arg) and arg[1] == "new_rule":
+                    command = 'curl -sX POST '+xconfurl+'firmwarerule/importAll -H "Content-Type: application/json" -H "Accept: application/json" -d \'[{"name":"'+ruleId+'","rule":{"negated":false,"condition":{"freeArg":{"type":"STRING","name":"eStbMac"},"operation":"IS","fixedArg":{"bean":{"value":{"java.lang.String":"'+deviceMAC+'"}}}}},"applicableAction":{"type":".RuleAction","actionType":"RULE","configId":"'+firmwareconfigId+'","configEntries":[],"active":true,"useAccountPercentage":false,"firmwareCheckRequired":false,"rebootImmediately":true},"type":"MAC_RULE","active":true,"applicationType":"stb"}]\''
+                    output = executeCommandInTM(command)
+                    info["new_firmware_rule_status"] = output
+                    output = json.loads(output)
+                    if str(output.get("IMPORTED")[0]).lower() == str(ruleId).lower():
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+
+            # Method to check and create firmware local server rule
+            elif len(arg) and arg[0] == "system_check_firmware_local_server_rule":
+                print "arg",arg
+                firmwareLocation = configParser.get('device.config','FIRMWARE_LOCATION')
+                firmwareDownloadProtocol = configParser.get('device.config', 'FIRMWARE_DOWNLOAD_PROTOCOL')
+                ruleId = 'TDK_'+str(arg[3]).upper()+'_TEST_FIRMWARE_LOCAL_SERVER_RULE'
+                modelId = 'TDK_'+str(arg[3]).upper()+'_TEST_MODEL'
+                firmwareConfigId = arg[2]
+                deviceMAC = arg[4]
+                if len(arg) and arg[1] == "existing_rule":
+                    command = 'curl -sX --location --request GET \''+xconfurl+'firmwarerule/filtered?name='+ruleId+'&applicationType=stb&templateId=DOWNLOAD_LOCATION_FILTER\''
+                    output = executeCommandInTM(command)
+                    firmwareRule = json.loads(output)
+                    info["existing_firmware_local_server_rule"] = firmwareRule
+                    if len(firmwareRule) == 0:
+                        info["Test_Step_Message"] = "NO EXISTING FIRMWARE LOCAL SERVER RULE"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
+                        for output in firmwareRule:
+                            firmwareRuleName = output['name']
+                            if str(firmwareRuleName).lower() == str(ruleId).lower():
+                                info["Test_Step_Status"] = "SUCCESS"
+                                firmwareRuleMacAddress = output["rule"]["compoundParts"][0]["condition"]["fixedArg"]["bean"]["value"]["java.lang.String"]
+                                firmwareRuleLocation = output['applicableAction']['properties']["firmwareLocation"]
+                                firmwareRuleDownloadLocation = output['applicableAction']['properties']["firmwareDownloadProtocol"]
+                                if str(firmwareRuleMacAddress).lower() != str(deviceMAC).lower() or str(firmwareRuleLocation).lower() != str(firmwareLocation).lower() or str(firmwareRuleDownloadLocation).lower() != str(firmwareDownloadProtocol).lower():
+                                     firmwareRuleId = output['id']
+                                     command = 'curl -sX POST '+xconfurl+'firmwarerule/importAll -H "Content-Type: application/json" -H "Accept: application/json" -d \'[{"name":"'+firmwareRuleName+'","rule":{"negated":false,"compoundParts":[{"negated":false,"condition":{"freeArg":{"type":"STRING","name":"eStbMac"},"operation":"IS","fixedArg":{"bean":{"value":{"java.lang.String":"'+deviceMAC+'"}}}},"compoundParts":[]},{"negated":false,"relation":"OR","condition":{"freeArg":{"type":"STRING","name":"eStbMac"},"operation":"IS","fixedArg":{"bean":{"value":{"java.lang.String":"AA:BB:CC:DD:EE:FF"}}}},"compoundParts":[]}]},"applicableAction":{"type":".DefinePropertiesAction","actionType":"DEFINE_PROPERTIES","configId":"'+firmwareConfigId+'","properties":{"ipv6FirmwareLocation":"","firmwareLocation":"'+firmwareLocation+'","firmwareDownloadProtocol":"'+firmwareDownloadProtocol+'"},"byPassFilters":[],"activationFirmwareVersions":{}},"type":"DOWNLOAD_LOCATION_FILTER","active":true,"applicationType":"stb"}]\''
+                                     output = executeCommandInTM(command)
+                                     info["new_firmware_local_server_rule_status"] = output
+                                     output = json.loads(output)
+                                     if str(output.get("IMPORTED")[0]).lower() == str(ruleId).lower():
+                                         info["Test_Step_Status"] = "SUCCESS"
+                                     else:
+                                         info["Test_Step_Status"] = "FAILURE"
+
+                elif len(arg) and arg[1] == "new_rule":
+                    command = 'curl -sX POST '+xconfurl+'firmwarerule/importAll -H "Content-Type: application/json" -H "Accept: application/json" -d \'[{"name":"'+ruleId+'","rule":{"negated":false,"compoundParts":[{"negated":false,"condition":{"freeArg":{"type":"STRING","name":"eStbMac"},"operation":"IS","fixedArg":{"bean":{"value":{"java.lang.String":"'+deviceMAC+'"}}}},"compoundParts":[]},{"negated":false,"relation":"OR","condition":{"freeArg":{"type":"STRING","name":"eStbMac"},"operation":"IS","fixedArg":{"bean":{"value":{"java.lang.String":"AA:BB:CC:DD:EE:FF"}}}},"compoundParts":[]}]},"applicableAction":{"type":".DefinePropertiesAction","actionType":"DEFINE_PROPERTIES","configId":"'+firmwareConfigId+'","properties":{"ipv6FirmwareLocation":"","firmwareLocation":"'+firmwareLocation+'","firmwareDownloadProtocol":"'+firmwareDownloadProtocol+'"},"byPassFilters":[],"activationFirmwareVersions":{}},"type":"DOWNLOAD_LOCATION_FILTER","active":true,"applicationType":"stb"}]\''
+                    output = executeCommandInTM(command)
+                    info["new_firmware_rule_status"] = output
+                    output = json.loads(output)
+                    if str(output.get("IMPORTED")[0]).lower() == str(ruleId).lower():
+                        info["Test_Step_Status"] = "SUCCESS"
+                    else:
+                        info["Test_Step_Status"] = "FAILURE"
 
         elif tag == "Create_File":
             command = "mkdir "+arguments[0]+"/Controller;[ -d "+arguments[0]+"/Controller ] && echo 1 || echo 0"
