@@ -91,6 +91,7 @@
 
       <prerequisite requisiteId="6" requisiteName="Register_And_Listen_Events" type="eventRegister" trace="false" >
             <event pluginName="HdmiCecSink" eventName="Event_Report_Cec_Enabled" />
+            <event pluginName="HdmiCecSink" eventName="Event_On_Active_Source_Change" />
       </prerequisite>
 
     </pluginPreRequisite>
